@@ -28,6 +28,7 @@ jobs:
       - uses: s4u/maven-settings-action@v2.8.0
         with:
           path: ci/ci_maven_settings.xml
+          githubServer: false
           servers: '[
             {
               "id": "ghcr.io",
