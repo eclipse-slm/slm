@@ -15,7 +15,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      MAVEN_CLI_OPTS: "-T 8 -s ci/ci_maven_settings.xml --batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+      MAVEN_CLI_OPTS: "-T 8 -s ci/ci_maven_settings.xml --batch-mode --errors --fail-at-end --show-version --no-transfer-progress -DinstallAtEnd=true -DdeployAtEnd=true"
       MAVEN_PROFILES: ""
     steps:
       - uses: actions/checkout@v3
