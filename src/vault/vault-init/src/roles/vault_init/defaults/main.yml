@@ -2,15 +2,15 @@ vault_config_directory: "/vault/config"
 vault_token_file: "{{ vault_config_directory }}/root/root_token"
 
 vault_approles:
-  - name: "resource-registry"
-    config_store_directory: "{{ vault_config_directory }}/resource-registry"
+  - name: "resource-management"
+    config_store_directory: "{{ vault_config_directory }}/resource-management"
     policies:
-      - name: "resource-registry"
+      - name: "resource-management"
         policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"resources/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
-  - name: "service-registry"
-    config_store_directory: "{{ vault_config_directory }}/service-registry"
+  - name: "service-management"
+    config_store_directory: "{{ vault_config_directory }}/service-management"
     policies:
-      - name: "service-registry"
+      - name: "service-management"
         policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"services/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"service-repositories/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
   - name: awx
     config_store_directory: "{{ vault_config_directory }}/awx"

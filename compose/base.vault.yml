@@ -42,8 +42,8 @@ services:
       - vault_config_root:/vault/config/root
       - vault_config_awx:/vault/config/awx
       - vault_config_awx-jwt-authenticator:/vault/config/awx-jwt-authenticator
-      - vault_config_resource-registry:/vault/config/resource-registry
-      - vault_config_service-registry:/vault/config/service-registry
+      - vault_config_resource-management:/vault/config/resource-management
+      - vault_config_service-management:/vault/config/service-management
     extra_hosts:
       - "${SLM_HOSTNAME}:172.17.0.1"
 
@@ -52,5 +52,5 @@ volumes:
   vault_config_root:
   vault_config_awx:
   vault_config_awx-jwt-authenticator:
-  vault_config_resource-registry:
-  vault_config_service-registry:
+  vault_config_resource-management:
+  vault_config_service-management:

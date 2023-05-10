@@ -80,7 +80,7 @@ notification-service:
   host: "localhost"
   port: 9001
 
-resource-registry:
+resource-management:
   url: "http://localhost:9010"
 
 ### Keycloak
@@ -133,5 +133,5 @@ basyx:
   aas-server:
     url: http://{{ target_host }}:4001/aasServer
 
-service-registry:
+service-management:
   url: {{ service_management_scheme }}://{{ target_host }}:{{ service_management_port }}

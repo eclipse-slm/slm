@@ -90,19 +90,19 @@
       "enabled": true
     },
     {
-      "key": "resource-registry.url",
+      "key": "resource-management.url",
       "value": "http://{{ resource_management_host }}:{{ resource_management_port }}",
       "type": "default",
       "enabled": true
     },
     {
-      "key": "resource-registry.vault.role-id",
+      "key": "resource-management.vault.role-id",
       "value": "{{ vault_resource_management_app_role_id }}",
       "type": "default",
       "enabled": true
     },
     {
-      "key": "resource-registry.vault.secret-id",
+      "key": "resource-management.vault.secret-id",
       "value": "{{ vault_resource_management_app_secret_id }}",
       "type": "default",
       "enabled": true
@@ -120,19 +120,19 @@
       "enabled": true
     },
     {
-      "key": "service-registry.url",
+      "key": "service-management.url",
       "value": "http://{{ service_management_host }}:{{ service_management_port }}",
       "type": "default",
       "enabled": true
     },
     {
-      "key": "service-registry.vault.role-id",
+      "key": "service-management.vault.role-id",
       "value": "{{ vault_service_management_app_role_id }}",
       "type": "default",
       "enabled": true
     },
     {
-      "key": "service-registry.vault.secret-id",
+      "key": "service-management.vault.secret-id",
       "value": "{{ vault_service_management_app_secret_id }}",
       "type": "default",
       "enabled": true

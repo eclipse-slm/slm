@@ -41,9 +41,9 @@ services:
     volumes:
       - keycloak_config_awx-jwt-authenticator:/config/awx-jwt-authenticator
       - keycloak_config_notification-service:/config/notification-service
-      - keycloak_config_resource-registry:/config/resource-registry
-      - keycloak_config_service-registry:/config/service-registry
-      - keycloak_config_service-registry-init:/config/service-registry-init
+      - keycloak_config_resource-management:/config/resource-management
+      - keycloak_config_service-management:/config/service-management
+      - keycloak_config_service-management-init:/config/service-management-init
     extra_hosts:
       - "${SLM_HOSTNAME}:172.17.0.1"
 
@@ -75,6 +75,6 @@ volumes:
   keycloak-database_config:
   keycloak_config_awx-jwt-authenticator:
   keycloak_config_notification-service:
-  keycloak_config_resource-registry:
-  keycloak_config_service-registry:
-  keycloak_config_service-registry-init:
+  keycloak_config_resource-management:
+  keycloak_config_service-management:
+  keycloak_config_service-management-init:

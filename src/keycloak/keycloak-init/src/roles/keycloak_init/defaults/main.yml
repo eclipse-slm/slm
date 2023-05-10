@@ -6,14 +6,14 @@ keycloak_clients:
   - client_id: self-service-portal
     public_client: true
     service_accounts_enabled: false
-  - client_id: resource-registry
+  - client_id: resource-management
     public_client: false
     service_accounts_enabled: true
-    oidc_installation_json_output_path_local: "/config/resource-registry"
-  - client_id: service-registry
+    oidc_installation_json_output_path_local: "/config/resource-management"
+  - client_id: service-management
     public_client: false
     service_accounts_enabled: true
-    oidc_installation_json_output_path_local: "/config/service-registry"
+    oidc_installation_json_output_path_local: "/config/service-management"
   - client_id: notification-service
     public_client: false
     service_accounts_enabled: false
@@ -44,4 +44,4 @@ keycloak_default_user:
       temporary: false
   realmRoles: [ "ssp-user", "slm-admin" ]
 
-keycloak_client_configs_store_directory: "/config/service-registry-init"
+keycloak_client_configs_store_directory: "/config/service-management-init"

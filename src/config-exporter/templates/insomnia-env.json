@@ -22,14 +22,14 @@
   "notification-service": {
     "url": "http://{{ notification_service_host }}:{{ notification_service_port }}"
   },
-  "resource-registry": {
+  "resource-management": {
     "url": "http://{{ resource_management_host }}:{{ resource_management_port }}",
     "vault": {
       "role-id": "{{ vault_resource_management_app_role_id }}",
       "secret-id": "{{ vault_resource_management_app_secret_id }}"
     }
   },
-  "service-registry": {
+  "service-management": {
     "url": "http://{{ service_management_host }}:{{ service_management_port }}",
     "vault": {
       "role-id": "{{ vault_service_management_app_role_id }}",

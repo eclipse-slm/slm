@@ -88,7 +88,7 @@
     name: keycloak_client
     tasks_from: roles/assign_client_role_to_service_account.yml
   vars:
-    client_with_service_account_id: "resource-registry"
+    client_with_service_account_id: "resource-management"
     client_id: "realm-management"
     client_role_name: "realm-admin"
 
@@ -96,6 +96,6 @@
     name: keycloak_client
     tasks_from: roles/assign_client_role_to_service_account.yml
   vars:
-    client_with_service_account_id: "service-registry"
+    client_with_service_account_id: "service-management"
     client_id: "realm-management"
     client_role_name: "realm-admin"

@@ -10,10 +10,10 @@ awx:
     notification-service:
       username: "{{ awx_notification_service_username }}"
       password: "{{ awx_notification_service_password }}"
-    resource-registry:
+    resource-management:
       username: "{{ awx_resource_management_username }}"
       password: "{{ awx_resource_management_password }}"
-    service-registry:
+    service-management:
       username: "{{ awx_service_management_username }}"
       password: "{{ awx_service_management_password }}"
 
@@ -21,17 +21,17 @@ consul:
   url: "{{ consul_scheme }}://{{ consul_hostname }}:{{ consul_port }}"
   master_token: "{{ consul_master_token }}"
   tokens:
-    resource-registry: "{{ consul_resource_management_token }}"
-    service-registry: "{{ consul_service_management_token }}"
+    resource-management: "{{ consul_resource_management_token }}"
+    service-management: "{{ consul_service_management_token }}"
 
 vault:
   url: "{{ vault_scheme }}://{{ vault_hostname }}:{{ vault_port }}"
   root_token: "{{ vault_root_token }}"
   app-roles:
-    resource-registry:
+    resource-management:
       role-id: "{{ vault_resource_management_app_role_id }}"
       secret-id: "{{ vault_resource_management_app_secret_id }}"
-    service-registry:
+    service-management:
       role-id: "{{ vault_service_management_app_role_id }}"
       secret-id: "{{ vault_service_management_app_secret_id }}"
 
@@ -44,7 +44,7 @@ notification-service:
     username: {{ notification_service_database_user }}
     password: {{ notification_service_database_password }}
 
-resource-registry:
+resource-management:
   url: "http://{{ resource_management_host }}:{{ resource_management_port }}"
   database:
     host: {{ target_host }}
@@ -53,7 +53,7 @@ resource-registry:
     username: {{ resource_management_database_user }}
     password: {{ resource_management_database_password }}
 
-service-registry:
+service-management:
   url: "http://{{ service_management_host }}:{{ service_management_port }}"
   database:
     host: {{ target_host }}

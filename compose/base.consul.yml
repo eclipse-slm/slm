@@ -20,8 +20,8 @@ services:
       - consul_data:/consul/data
       - consul_config_root:/config/root
       - consul_config_awx:/config/awx
-      - consul_config_resource-registry:/config/resource_management
-      - consul_config_service-registry:/config/service_management
+      - consul_config_resource-management:/config/resource_management
+      - consul_config_service-management:/config/service_management
     extra_hosts:
       - "${SLM_HOSTNAME}:172.17.0.1"
     healthcheck:
@@ -60,5 +60,5 @@ volumes:
   consul_data:
   consul_config_root:
   consul_config_awx:
-  consul_config_resource-registry:
-  consul_config_service-registry:
+  consul_config_resource-management:
+  consul_config_service-management:

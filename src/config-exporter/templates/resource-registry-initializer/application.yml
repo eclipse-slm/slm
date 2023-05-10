@@ -1,4 +1,4 @@
-resource-registry:
+resource-management:
   url: http://{{ resource_management_host }}:{{ resource_management_port }}
   init-directories: init/
 

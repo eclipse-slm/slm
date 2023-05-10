@@ -58,8 +58,8 @@
       user_claim: sub
       bound_audiences:
         - "self-service-portal"
-        - "resource-registry"
-        - "service-registry"
+        - "resource-management"
+        - "service-management"
       claim_mappings:
         preferred_username: username
         email: email

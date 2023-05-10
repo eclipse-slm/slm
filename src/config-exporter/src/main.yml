@@ -14,36 +14,36 @@
         awx_port:  "{{ lookup('env', 'AWX_PORT_HTTP') }}"
         awx_notification_service_username: "{{ lookup('file', '/config/awx/notification-service/awx_username') }}"
         awx_notification_service_password: "{{ lookup('file', '/config/awx/notification-service/awx_password') }}"
-        awx_resource_management_username: "{{ lookup('file', '/config/awx/resource-registry/awx_username') }}"
-        awx_resource_management_password: "{{ lookup('file', '/config/awx/resource-registry/awx_password') }}"
-        awx_service_management_username: "{{ lookup('file', '/config/awx/service-registry/awx_username') }}"
-        awx_service_management_password: "{{ lookup('file', '/config/awx/service-registry/awx_password') }}"
+        awx_resource_management_username: "{{ lookup('file', '/config/awx/resource-management/awx_username') }}"
+        awx_resource_management_password: "{{ lookup('file', '/config/awx/resource-management/awx_password') }}"
+        awx_service_management_username: "{{ lookup('file', '/config/awx/service-management/awx_username') }}"
+        awx_service_management_password: "{{ lookup('file', '/config/awx/service-management/awx_password') }}"
         consul_scheme: "http"
         consul_hostname: "{{ target_host }}"
         consul_port: "{{ lookup('env', 'CONSUL_PORT') }}"
         consul_master_token: "{{ lookup('file', '/config/consul/root/consul_master_token') }}"
-        consul_resource_management_token: "{{ lookup('file', '/config/consul/resource-registry/consul_token') }}"
-        consul_service_management_token: "{{ lookup('file', '/config/consul/service-registry/consul_token') }}"
+        consul_resource_management_token: "{{ lookup('file', '/config/consul/resource-management/consul_token') }}"
+        consul_service_management_token: "{{ lookup('file', '/config/consul/service-management/consul_token') }}"
         vault_scheme: "http"
         vault_hostname: "{{ target_host }}"
         vault_port: "{{ lookup('env', 'VAULT_PORT') }}"
         vault_root_token: "{{ lookup('file', '/config/vault/root/root_token') }}"
-        vault_resource_management_app_role_id: "{{ lookup('file', '/config/vault/resource-registry/role_id') }}"
-        vault_resource_management_app_secret_id: "{{ lookup('file', '/config/vault/resource-registry/secret_id') }}"
-        vault_service_management_app_role_id: "{{ lookup('file', '/config/vault/service-registry/role_id') }}"
-        vault_service_management_app_secret_id: "{{ lookup('file', '/config/vault/service-registry/secret_id') }}"
+        vault_resource_management_app_role_id: "{{ lookup('file', '/config/vault/resource-management/role_id') }}"
+        vault_resource_management_app_secret_id: "{{ lookup('file', '/config/vault/resource-management/secret_id') }}"
+        vault_service_management_app_role_id: "{{ lookup('file', '/config/vault/service-management/role_id') }}"
+        vault_service_management_app_secret_id: "{{ lookup('file', '/config/vault/service-management/secret_id') }}"
         resource_management_scheme: "http"
         resource_management_host: "{{ target_host }}"
         resource_management_port: "{{ lookup('env', 'RESOURCE_MANAGEMENT_PORT') }}"
-        resource_management_database_user: "{{ lookup('file', '/config/resource-registry/database/user') }}"
-        resource_management_database_password: "{{ lookup('file', '/config/resource-registry/database/password') }}"
-        resource_management_database_schema: "{{ lookup('file', '/config/resource-registry/database/schema') }}"
+        resource_management_database_user: "{{ lookup('file', '/config/resource-management/database/user') }}"
+        resource_management_database_password: "{{ lookup('file', '/config/resource-management/database/password') }}"
+        resource_management_database_schema: "{{ lookup('file', '/config/resource-management/database/schema') }}"
         service_management_scheme: "http"
         service_management_host: "{{ target_host }}"
         service_management_port: "{{ lookup('env', 'SERVICE_MANAGEMENT_PORT') }}"
-        service_management_database_user: "{{ lookup('file', '/config/service-registry/database/user') }}"
-        service_management_database_password: "{{ lookup('file', '/config/service-registry/database/password') }}"
-        service_management_database_schema: "{{ lookup('file', '/config/service-registry/database/schema') }}"
+        service_management_database_user: "{{ lookup('file', '/config/service-management/database/user') }}"
+        service_management_database_password: "{{ lookup('file', '/config/service-management/database/password') }}"
+        service_management_database_schema: "{{ lookup('file', '/config/service-management/database/schema') }}"
         notification_service_scheme: "http"
         notification_service_host: "{{ target_host }}"
         notification_service_port: "{{ lookup('env', 'NOTIFICATION_SERVICE_PORT') }}"
@@ -91,13 +91,13 @@
       with_items:
         - src: /templates/notification-service/application.yml
           dest: /project/notification_service/notification_service.service/notification_service.service.rest/src/main/resources/application.yml
-        - src: /templates/resource-registry/application.yml
+        - src: /templates/resource-management/application.yml
           dest: /project/resource_management/resource_management.service/resource_management.service.rest/src/main/resources/application.yml
-        - src: /templates/resource-registry-initializer/application.yml
+        - src: /templates/resource-management-initializer/application.yml
           dest: /project/resource_management/resource_management.service/resource_management.service.initializer/src/main/resources/application.yml
-        - src: /templates/service-registry/application.yml
+        - src: /templates/service-management/application.yml
           dest: /project/service_management/service_management.service/service_management.service.rest/src/main/resources/application.yml
-        - src: /templates/service-registry-initializer/application.yml
+        - src: /templates/service-management-initializer/application.yml
           dest: /project/service_management/service_management.service/service_management.service.initializer/src/main/resources/application.yml
         - src: /templates/catalog/application.yml
           dest: /project/catalog/catalog.service/catalog.service.app/src/main/resources/application.yml
@@ -113,8 +113,8 @@
       with_items:
         - src: /config/keycloak/notification-service/
           dest: /project/notification_service/notification_service.service/notification_service.service.rest/src/main/resources/keycloak
-        - src: /config/keycloak/resource-registry/
+        - src: /config/keycloak/resource-management/
           dest: /project/resource_management/resource_management.service/resource_management.service.rest/src/main/resources/keycloak
-        - src: /config/keycloak/service-registry/
+        - src: /config/keycloak/service-management/
           dest: /project/service_management/service_management.service/service_management.service.rest/src/main/resources/keycloak
       when: configure_core_project|default(false)|bool == true

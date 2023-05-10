@@ -141,8 +141,8 @@ services:
       - awx-postgres
     volumes:
       - awx_config_notification-service:/config/notification-service
-      - awx_config_resource-registry:/config/resource-registry
-      - awx_config_service-registry:/config/service-registry
+      - awx_config_resource-management:/config/resource-management
+      - awx_config_service-management:/config/service-management
       - awx_config_jwt-authenticator:/config/awx-jwt-authenticator
       - consul_config_awx:/config/consul
       - vault_config_awx:/config/vault
@@ -154,6 +154,6 @@ volumes:
   awx_rsyslog_config:
   awx-redis:
   awx_config_notification-service:
-  awx_config_resource-registry:
-  awx_config_service-registry:
+  awx_config_resource-management:
+  awx_config_service-management:
   awx_config_jwt-authenticator:

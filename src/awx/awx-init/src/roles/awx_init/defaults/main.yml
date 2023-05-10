@@ -74,10 +74,10 @@ notification_service_config_directory: "/config/notification-service"
 notification_service_username_file: "{{ notification_service_config_directory }}/awx_username"
 notification_service_password_file: "{{ notification_service_config_directory }}/awx_password"
 
-resource_management_config_directory: "/config/resource-registry"
+resource_management_config_directory: "/config/resource-management"
 resource_management_username_file: "{{ resource_management_config_directory }}/awx_username"
 resource_management_password_file: "{{ resource_management_config_directory }}/awx_password"
 
-service_management_config_directory: "/config/service-registry"
+service_management_config_directory: "/config/service-management"
 service_management_username_file: "{{ service_management_config_directory }}/awx_username"
 service_management_password_file: "{{ service_management_config_directory }}/awx_password"
