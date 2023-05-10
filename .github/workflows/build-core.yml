@@ -13,9 +13,10 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    env:
+      MAVEN_CLI_OPTS: "-T 8 -s ci/ci_maven_settings.xml --batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+      MAVEN_PROFILES: ""
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 19
@@ -24,5 +25,14 @@ jobs:
           java-version: '19'
           distribution: 'temurin'
           cache: maven
+      - uses: s4u/maven-settings-action@v2.8.0
+        with:
+          servers: '[
+            {
+              "id": "ghcr.io",
+              "username": "${{github.actor}}",
+              "password": "${{secrets.GITHUB_TOKEN}}"
+            }
+          ]'
       - name: Build with Maven
-        run: mvn verify
+        run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS verify
