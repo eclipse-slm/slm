@@ -37,7 +37,19 @@ jobs:
             }
           ]'
       - name: Build with Maven
-        run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS verify
+        strategy:
+          matrix:
+            build: [
+              {
+                type: "frontend",
+                maven-projects: "ui"
+              },
+              {
+                type: "backend",
+                maven-projects: "!ui"
+              }
+            ]
+        run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' deploy
       - name: Log test output on failure
         if: failure() || cancelled()
         run: find . -type f -path "*test-reports/*-output.txt" -exec tail -n +1 {} +
