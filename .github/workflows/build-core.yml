@@ -27,6 +27,7 @@ jobs:
           cache: maven
       - uses: s4u/maven-settings-action@v2.8.0
         with:
+          path: ci/ci_maven_settings.xml
           servers: '[
             {
               "id": "ghcr.io",
