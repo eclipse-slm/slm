@@ -15,11 +15,11 @@ env:
   DOCKER_COMPOSE_COMMAND: docker-compose -f base.awx.yml -f base.consul.yml -f base.keycloak.yml -f base.vault.yml -f slm.yml -f catalog.yml -f config-exporter.yml -f build.yml
 
 jobs:
-  permissions:
-    contents: read
-    packages: write
   build-and-push-awx:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v3
       - name: Build base docker image
@@ -46,6 +46,9 @@ jobs:
 
   build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     strategy:
       matrix:
         service:
