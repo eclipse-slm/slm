@@ -37,3 +37,6 @@ jobs:
           ]'
       - name: Build with Maven
         run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS verify
+      - name: Log test output on failure
+        if: failure() || cancelled()
+        run: find . -type f -path "*test-reports/*-output.txt" -exec tail -n +1 {} +
