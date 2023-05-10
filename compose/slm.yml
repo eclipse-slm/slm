@@ -39,7 +39,7 @@ services:
       BASYX_AASSERVER_URL: "http://${SLM_HOSTNAME}:4001/aasServer"
       MONITORING_SERVICE_URL: "http://${SLM_HOSTNAME}:${MONITORING_SERVICE_PORT}"
     ports:
-      - "${RESOURCE_management_PORT}:9010"
+      - "${RESOURCE_MANAGEMENT_PORT}:9010"
     networks:
       default:
         aliases:
@@ -56,7 +56,7 @@ services:
       test: [ "CMD", "curl", "http://localhost:9010/swagger-ui/index.html" ]
 
   resource-management-database:
-    image: ghcr.io/eclipse-slm/mariadb:${RESOURCE_management_DATABASE_VERSION}
+    image: ghcr.io/eclipse-slm/mariadb:${RESOURCE_MANAGEMENT_DATABASE_VERSION}
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -64,7 +64,7 @@ services:
         max-file: ${LOGGING_MAX_FILE}
         max-size: ${LOGGING_MAX_SIZE}
     ports:
-      - "${RESOURCE_management_DATABASE_PORT}:3306"
+      - "${RESOURCE_MANAGEMENT_DATABASE_PORT}:3306"
     networks:
       default:
         aliases:
