@@ -17,6 +17,18 @@ jobs:
     env:
       MAVEN_CLI_OPTS: "-T 8 -s ci/ci_maven_settings.xml --batch-mode --errors --fail-at-end --show-version --no-transfer-progress -DinstallAtEnd=true -DdeployAtEnd=true"
       MAVEN_PROFILES: ""
+    strategy:
+      matrix:
+        build: [
+          {
+            type: "frontend",
+            maven-projects: "ui"
+          },
+          {
+            type: "backend",
+            maven-projects: "!ui"
+          }
+        ]
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 19
@@ -36,19 +48,7 @@ jobs:
               "password": "${{secrets.GITHUB_TOKEN}}"
             }
           ]'
-      - name: Build with Maven
-        strategy:
-          matrix:
-            build: [
-              {
-                type: "frontend",
-                maven-projects: "ui"
-              },
-              {
-                type: "backend",
-                maven-projects: "!ui"
-              }
-            ]
+      - name: Build '${{ matrix.build.type }}' with Maven
         run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' deploy
       - name: Log test output on failure
         if: failure() || cancelled()
