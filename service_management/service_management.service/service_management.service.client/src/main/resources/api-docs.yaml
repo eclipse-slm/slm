@@ -1,0 +1,3002 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Service Management",
+    "description": "REST API of Service Management",
+    "contact": {
+      "name": "Fraunhofer IPA",
+      "url": "https://www.ipa.fraunhofer.de",
+      "email": "matthias.schneider@ipa.fraunhofer.de"
+    },
+    "version": "1.3.0-SNAPSHOT"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:9020",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "bearer_auth": []
+    },
+    {
+      "spring_oauth": []
+    }
+  ],
+  "paths": {
+    "/services/vendors/{serviceVendorId}": {
+      "get": {
+        "tags": [
+          "service-vendors-rest-controller"
+        ],
+        "summary": "Get service vendor by id",
+        "operationId": "getServiceVendorById",
+        "parameters": [
+          {
+            "name": "serviceVendorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "withImage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceVendor"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "service-vendors-rest-controller"
+        ],
+        "operationId": "createOrUpdateServiceVendorWithId",
+        "parameters": [
+          {
+            "name": "serviceVendorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceVendorDTOApi"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "service-vendors-rest-controller"
+        ],
+        "operationId": "deleteServiceVendor",
+        "parameters": [
+          {
+            "name": "serviceVendorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/services/vendors/{serviceVendorId}/repositories/{serviceRepositoryId}": {
+      "put": {
+        "tags": [
+          "service-repositories-rest-controller"
+        ],
+        "summary": "Create or update a repository containing files for service offerings",
+        "operationId": "createOrUpdateRepository",
+        "parameters": [
+          {
+            "name": "serviceVendorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "serviceRepositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceRepository"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceRepositoryCreateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/vendors/{serviceVendorId}/developers/{userId}": {
+      "put": {
+        "tags": [
+          "service-vendors-rest-controller"
+        ],
+        "operationId": "addDeveloperToServiceVendor",
+        "parameters": [
+          {
+            "name": "serviceVendorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "service-vendors-rest-controller"
+        ],
+        "operationId": "removeDeveloperFromServiceVendor",
+        "parameters": [
+          {
+            "name": "serviceVendorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/services/offerings/{serviceOfferingId}": {
+      "get": {
+        "tags": [
+          "service-offering-rest-controller"
+        ],
+        "summary": "Get service offering by id",
+        "operationId": "getServiceOfferingById",
+        "parameters": [
+          {
+            "name": "serviceOfferingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "withImage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceOfferingDTOApi"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "service-offering-rest-controller"
+        ],
+        "summary": "Create new service offering with specified id or update existing one",
+        "operationId": "createOrUpdateServiceOfferingWithId",
+        "parameters": [
+          {
+            "name": "serviceOfferingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceOfferingCreateOrUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceOfferingCreateResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "service-offering-rest-controller"
+        ],
+        "summary": "Delete service offering",
+        "operationId": "deleteServiceOffering",
+        "parameters": [
+          {
+            "name": "serviceOfferingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}": {
+      "get": {
+        "tags": [
+          "service-offering-versions-rest-controller"
+        ],
+        "summary": "Get service offering version by id",
+        "operationId": "getServiceOfferingVersionById",
+        "parameters": [
+          {
+            "name": "serviceOfferingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "serviceOfferingVersionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceOfferingVersionDTOApi"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "service-offering-versions-rest-controller"
+        ],
+        "summary": "Create new service offering version with specified id or update existing one",
+        "operationId": "createOrUpdateServiceOfferingVersionWithId",
+        "parameters": [
+          {
+            "name": "serviceOfferingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "serviceOfferingVersionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceOfferingVersionDTOApi"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceOfferingVersionCreateResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "service-offering-versions-rest-controller"
+        ],
+        "summary": "Delete service offering version",
+        "operationId": "deleteServiceOfferingVersion",
+        "parameters": [
+          {
+            "name": "serviceOfferingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "serviceOfferingVersionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/services/offerings/categories": {
+      "get": {
+        "tags": [
+          "service-categories-rest-controller"
+        ],
+        "summary": "Get service categories",
+        "operationId": "getServiceCategories",
+        "parameters": [
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceCategory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "service-categories-rest-controller"
+        ],
+        "summary": "Create or update a service category",
+        "operationId": "createOrUpdateServiceCategory",
+        "parameters": [
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceCategory"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "service-categories-rest-controller"
+        ],
+        "summary": "Create a service category",
+        "operationId": "createServiceCategory",
+        "parameters": [
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceCategory"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceCategoryCreateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/vendors": {
+      "get": {
+        "tags": [
+          "service-vendors-rest-controller"
+        ],
+        "summary": "Get service vendors",
+        "operationId": "getServiceVendors",
+        "parameters": [
+          {
+            "name": "withImage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceVendor"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "service-vendors-rest-controller"
+        ],
+        "operationId": "createServiceVendor",
+        "parameters": [
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceVendorDTOApi"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceVendorCreateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/vendors/{serviceVendorId}/repositories": {
+      "get": {
+        "tags": [
+          "service-repositories-rest-controller"
+        ],
+        "summary": "Get repositories containing files for service offerings",
+        "operationId": "getRepositories",
+        "parameters": [
+          {
+            "name": "serviceVendorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceRepositoryDTOApiRead"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "service-repositories-rest-controller"
+        ],
+        "summary": "Create repository containing files for service offerings",
+        "operationId": "createRepository",
+        "parameters": [
+          {
+            "name": "serviceVendorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceRepository"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceRepositoryCreateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/offerings": {
+      "get": {
+        "tags": [
+          "service-offering-rest-controller"
+        ],
+        "summary": "Get service offerings",
+        "operationId": "getServiceOfferings",
+        "parameters": [
+          {
+            "name": "withImage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "filterByServiceVendorId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceOfferingDTOApi"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "service-offering-rest-controller"
+        ],
+        "summary": "Create new service offering",
+        "operationId": "createServiceOfferingWithAutoGeneratedId",
+        "parameters": [
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceOfferingCreateOrUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceOfferingCreateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/offerings/{serviceOfferingId}/versions": {
+      "get": {
+        "tags": [
+          "service-offering-versions-rest-controller"
+        ],
+        "summary": "Get service offering versions of service offering",
+        "operationId": "getServiceOfferingVersionsOfServiceOffering",
+        "parameters": [
+          {
+            "name": "serviceOfferingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceOfferingVersionDTOApi"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "service-offering-versions-rest-controller"
+        ],
+        "summary": "Create new service offering version",
+        "operationId": "createServiceOfferingVersionWithAutoGeneratedId",
+        "parameters": [
+          {
+            "name": "serviceOfferingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceOfferingVersionDTOApi"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceOfferingVersionCreateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/order": {
+      "post": {
+        "tags": [
+          "service-offering-versions-rest-controller"
+        ],
+        "summary": "Order service offering version",
+        "operationId": "orderServiceOfferingVersionById",
+        "parameters": [
+          {
+            "name": "serviceOfferingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "serviceOfferingVersionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "deploymentCapabilityServiceId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceOrder"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/services/offerings/git": {
+      "post": {
+        "tags": [
+          "service-offering-rest-controller"
+        ],
+        "summary": "Create new service offering from a git repository",
+        "operationId": "addServiceOfferingWithAutoGeneratedIdFromGitRepo",
+        "parameters": [
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceOfferingGitRepository"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/vendors/{serviceVendorId}/logo": {
+      "get": {
+        "tags": [
+          "service-vendors-rest-controller"
+        ],
+        "operationId": "getLogoOfServiceVendor",
+        "parameters": [
+          {
+            "name": "serviceVendorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/vendors/{serviceVendorId}/developers": {
+      "get": {
+        "tags": [
+          "service-vendors-rest-controller"
+        ],
+        "operationId": "getDevelopersOfServiceVendor",
+        "parameters": [
+          {
+            "name": "serviceVendorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceVendorDeveloper"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/users": {
+      "get": {
+        "tags": [
+          "users-rest-controller"
+        ],
+        "summary": "Get users",
+        "operationId": "getUsers",
+        "parameters": [
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/users/vendors": {
+      "get": {
+        "tags": [
+          "users-rest-controller"
+        ],
+        "summary": "Get service vendors of authenticated user",
+        "operationId": "getServiceVendorsOfUser",
+        "parameters": [
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/users/organisation/id": {
+      "get": {
+        "tags": [
+          "users-rest-controller"
+        ],
+        "summary": "Get organisation id of authenticated user",
+        "operationId": "getOrganisationIdOfAuthenticatedUser",
+        "parameters": [
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/users/id": {
+      "get": {
+        "tags": [
+          "users-rest-controller"
+        ],
+        "summary": "Get user id of authenticated user",
+        "operationId": "getUserIdOfAuthenticatedUser",
+        "parameters": [
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/offerings/{serviceOfferingId}/cover": {
+      "get": {
+        "tags": [
+          "service-offering-rest-controller"
+        ],
+        "operationId": "getServiceOfferingCover",
+        "parameters": [
+          {
+            "name": "serviceOfferingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/offerings/deploymenttypes": {
+      "get": {
+        "tags": [
+          "service-offering-rest-controller"
+        ],
+        "summary": "Get possible deployment types",
+        "operationId": "getDeploymentTypes",
+        "parameters": [
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "DOCKER_CONTAINER",
+                      "DOCKER_COMPOSE",
+                      "KUBERNETES"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/offerings/categories/{serviceCategoryId}": {
+      "get": {
+        "tags": [
+          "service-categories-rest-controller"
+        ],
+        "summary": "Get service categories",
+        "operationId": "getServiceCategoryById",
+        "parameters": [
+          {
+            "name": "serviceCategoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceCategory"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "service-categories-rest-controller"
+        ],
+        "summary": "Delete a service category",
+        "operationId": "deleteServiceCategories",
+        "parameters": [
+          {
+            "name": "serviceCategoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceCategoryCreateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/instances": {
+      "get": {
+        "tags": [
+          "service-instances-rest-controller"
+        ],
+        "summary": "Get all services of user",
+        "operationId": "getServicesOfUser",
+        "parameters": [
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceInstance"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/vendors/{serviceVendorId}/repositories/{repositoryId}": {
+      "delete": {
+        "tags": [
+          "service-repositories-rest-controller"
+        ],
+        "summary": "Delete repository containing files for service offerings",
+        "operationId": "deleteRepository",
+        "parameters": [
+          {
+            "name": "serviceVendorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "repositoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/instances/{serviceInstanceId}": {
+      "delete": {
+        "tags": [
+          "service-instances-rest-controller"
+        ],
+        "summary": "Delete a service instance",
+        "operationId": "deleteServiceInstance",
+        "parameters": [
+          {
+            "name": "serviceInstanceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Realm",
+            "in": "header",
+            "description": "Keycloak Realm",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fabos"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ServiceVendorDTOApi": {
+        "required": [
+          "description",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "logo": {
+            "type": "string",
+            "format": "byte"
+          }
+        }
+      },
+      "ServiceRepository": {
+        "required": [
+          "address",
+          "id",
+          "password",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serviceVendorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "address": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "DOCKER_REGISTRY"
+            ]
+          }
+        }
+      },
+      "ServiceRepositoryCreateResponse": {
+        "required": [
+          "serviceRepositoryId"
+        ],
+        "type": "object",
+        "properties": {
+          "serviceRepositoryId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "ServiceOfferingCreateOrUpdateRequest": {
+        "required": [
+          "description",
+          "name",
+          "serviceCategoryId",
+          "serviceVendorId",
+          "shortDescription"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "shortDescription": {
+            "type": "string"
+          },
+          "serviceCategoryId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "serviceVendorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "coverImage": {
+            "type": "string",
+            "format": "byte"
+          }
+        }
+      },
+      "ServiceOfferingCreateResponse": {
+        "type": "object",
+        "properties": {
+          "serviceOfferingId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "DeploymentDefinition": {
+        "required": [
+          "deploymentType"
+        ],
+        "type": "object",
+        "properties": {
+          "deploymentType": {
+            "type": "string",
+            "enum": [
+              "DOCKER_CONTAINER",
+              "DOCKER_COMPOSE",
+              "KUBERNETES"
+            ]
+          }
+        },
+        "discriminator": {
+          "propertyName": "deploymentType"
+        }
+      },
+      "DockerComposeDeploymentDefinition": {
+        "required": [
+          "composeFile",
+          "deploymentType",
+          "dotEnvFile",
+          "envFiles"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DeploymentDefinition"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "composeFile": {
+                "type": "string"
+              },
+              "dotEnvFile": {
+                "type": "string"
+              },
+              "envFiles": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "DockerContainerDeploymentDefinition": {
+        "required": [
+          "deploymentType",
+          "environmentVariables",
+          "imageRepository",
+          "imageTag",
+          "labels",
+          "portMappings",
+          "restartPolicy",
+          "volumes"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DeploymentDefinition"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "imageRepository": {
+                "type": "string"
+              },
+              "imageTag": {
+                "type": "string"
+              },
+              "restartPolicy": {
+                "type": "string",
+                "enum": [
+                  "NO",
+                  "ALWAYS",
+                  "ON_FAILURE",
+                  "UNLESS_STOPPED"
+                ]
+              },
+              "environmentVariables": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ServiceOfferingEnvironmentVariable"
+                }
+              },
+              "labels": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DockerContainerLabel"
+                }
+              },
+              "portMappings": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DockerContainerPortMapping"
+                }
+              },
+              "volumes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DockerContainerVolume"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "DockerContainerLabel": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object"
+          }
+        }
+      },
+      "DockerContainerPortMapping": {
+        "required": [
+          "containerPort",
+          "hostPort",
+          "protocol"
+        ],
+        "type": "object",
+        "properties": {
+          "hostPort": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "containerPort": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "protocol": {
+            "type": "string"
+          }
+        }
+      },
+      "DockerContainerVolume": {
+        "required": [
+          "containerPath",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "containerPath": {
+            "type": "string"
+          }
+        }
+      },
+      "KubernetesDeploymentDefinition": {
+        "required": [
+          "deploymentType",
+          "manifestFile"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DeploymentDefinition"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "manifestFile": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "ServiceOfferingEnvironmentVariable": {
+        "required": [
+          "key"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object"
+          }
+        }
+      },
+      "ServiceOfferingVersionDTOApi": {
+        "required": [
+          "serviceOptionCategories",
+          "serviceRepositories",
+          "serviceRequirements"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serviceOfferingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "serviceOptionCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceOptionCategory"
+            }
+          },
+          "serviceRequirements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRequirement"
+            }
+          },
+          "serviceRepositories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "deploymentDefinition": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DockerComposeDeploymentDefinition"
+              },
+              {
+                "$ref": "#/components/schemas/DockerContainerDeploymentDefinition"
+              },
+              {
+                "$ref": "#/components/schemas/KubernetesDeploymentDefinition"
+              }
+            ]
+          }
+        }
+      },
+      "ServiceOption": {
+        "required": [
+          "description",
+          "editable",
+          "key",
+          "name",
+          "optionType",
+          "relation",
+          "required",
+          "valueType"
+        ],
+        "type": "object",
+        "properties": {
+          "relation": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "optionType": {
+            "type": "string",
+            "enum": [
+              "ENVIRONMENT_VARIABLE",
+              "PORT_MAPPING",
+              "VOLUME",
+              "LABEL"
+            ]
+          },
+          "defaultValue": {
+            "type": "object"
+          },
+          "valueType": {
+            "type": "string",
+            "enum": [
+              "STRING",
+              "PASSWORD",
+              "BOOLEAN",
+              "NUMBER",
+              "INTEGER",
+              "DECIMAL",
+              "EMAIL",
+              "IP",
+              "ENUM",
+              "AUTO_GENERATED_UUID",
+              "PORT",
+              "VOLUME"
+            ]
+          },
+          "valueOptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "editable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ServiceOptionCategory": {
+        "required": [
+          "id",
+          "name",
+          "serviceOptions"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "serviceOptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceOption"
+            }
+          }
+        }
+      },
+      "ServiceRequirement": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "condition": {
+            "type": "string"
+          },
+          "value": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unit": {
+            "type": "string"
+          }
+        }
+      },
+      "ServiceOfferingVersionCreateResponse": {
+        "type": "object",
+        "properties": {
+          "serviceOfferingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serviceOfferingVersionId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "ServiceCategory": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ServiceVendorCreateResponse": {
+        "required": [
+          "serviceVendorId"
+        ],
+        "type": "object",
+        "properties": {
+          "serviceVendorId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "ServiceOrder": {
+        "required": [
+          "serviceOptionValues"
+        ],
+        "type": "object",
+        "properties": {
+          "serviceOptionValues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceOptionValue"
+            }
+          }
+        }
+      },
+      "ServiceOptionValue": {
+        "required": [
+          "serviceOptionId",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "serviceOptionId": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object"
+          }
+        }
+      },
+      "ServiceOffering": {
+        "required": [
+          "description",
+          "id",
+          "name",
+          "shortDescription",
+          "versions"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "shortDescription": {
+            "type": "string"
+          },
+          "coverImage": {
+            "type": "string",
+            "format": "byte"
+          },
+          "serviceCategory": {
+            "$ref": "#/components/schemas/ServiceCategory"
+          },
+          "serviceVendor": {
+            "$ref": "#/components/schemas/ServiceVendor"
+          },
+          "versions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceOfferingVersion"
+            }
+          },
+          "gitRepository": {
+            "$ref": "#/components/schemas/ServiceOfferingGitRepository"
+          }
+        }
+      },
+      "ServiceOfferingGitRepository": {
+        "required": [
+          "gitPassword",
+          "gitTagRegEx",
+          "gitUsername",
+          "id",
+          "repositoryUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "repositoryUrl": {
+            "type": "string"
+          },
+          "gitUsername": {
+            "type": "string"
+          },
+          "gitPassword": {
+            "type": "string"
+          },
+          "gitTagRegEx": {
+            "type": "string"
+          },
+          "serviceVendorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serviceOffering": {
+            "$ref": "#/components/schemas/ServiceOffering"
+          }
+        }
+      },
+      "ServiceOfferingVersion": {
+        "required": [
+          "created",
+          "id",
+          "serviceOptionCategories",
+          "serviceRepositories",
+          "serviceRequirements",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serviceOffering": {
+            "$ref": "#/components/schemas/ServiceOffering"
+          },
+          "version": {
+            "type": "string"
+          },
+          "deploymentDefinition": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DockerComposeDeploymentDefinition"
+              },
+              {
+                "$ref": "#/components/schemas/DockerContainerDeploymentDefinition"
+              },
+              {
+                "$ref": "#/components/schemas/KubernetesDeploymentDefinition"
+              }
+            ]
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "serviceOptionCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceOptionCategory"
+            }
+          },
+          "serviceRequirements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRequirement"
+            }
+          },
+          "serviceRepositories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "ServiceVendor": {
+        "required": [
+          "description",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "logo": {
+            "type": "string",
+            "format": "byte"
+          }
+        }
+      },
+      "ServiceCategoryCreateResponse": {
+        "required": [
+          "serviceCategoryId"
+        ],
+        "type": "object",
+        "properties": {
+          "serviceCategoryId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ServiceRepositoryDTOApiRead": {
+        "required": [
+          "address",
+          "id",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serviceVendorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "address": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "DOCKER_REGISTRY"
+            ]
+          }
+        }
+      },
+      "ServiceVendorDeveloper": {
+        "required": [
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "username": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "User": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "ServiceOfferingDTOApi": {
+        "required": [
+          "description",
+          "name",
+          "scmBased",
+          "serviceCategoryId",
+          "serviceVendorId",
+          "shortDescription",
+          "versions"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "shortDescription": {
+            "type": "string"
+          },
+          "serviceCategoryId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "serviceVendorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "coverImage": {
+            "type": "string",
+            "format": "byte"
+          },
+          "versions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceOfferingVersionDTOShort"
+            }
+          },
+          "scmBased": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ServiceOfferingVersionDTOShort": {
+        "required": [
+          "created"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AwxCapabilityAction": {
+        "required": [
+          "awxBranch",
+          "awxRepo",
+          "capabilityActionClass",
+          "configParameters",
+          "playbook",
+          "skipable"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CapabilityAction"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "awxRepo": {
+                "type": "string"
+              },
+              "awxBranch": {
+                "type": "string"
+              },
+              "playbook": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "BasicResource": {
+        "required": [
+          "clusterMember",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "ip": {
+            "type": "string"
+          },
+          "hostname": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "credentialsType": {
+            "type": "string"
+          },
+          "project": {
+            "type": "string"
+          },
+          "clusterMember": {
+            "type": "boolean"
+          },
+          "deploymentCapabilities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeploymentCapability"
+            }
+          }
+        }
+      },
+      "CapabilityAction": {
+        "required": [
+          "capabilityActionClass",
+          "configParameters",
+          "skipable"
+        ],
+        "type": "object",
+        "properties": {
+          "capabilityActionClass": {
+            "type": "string"
+          },
+          "capabilityActionType": {
+            "type": "string",
+            "enum": [
+              "DEPLOY",
+              "UNDEPLOY",
+              "INSTALL",
+              "UNINSTALL",
+              "SCALE_UP",
+              "SCALE_DOWN"
+            ]
+          },
+          "skipable": {
+            "type": "boolean"
+          },
+          "configParameters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CapabilityActionConfigParameter"
+            }
+          }
+        },
+        "discriminator": {
+          "propertyName": "capabilityActionClass"
+        }
+      },
+      "CapabilityActionConfigParameter": {
+        "required": [
+          "description",
+          "name",
+          "prettyName",
+          "requiredType",
+          "secret",
+          "valueType"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "prettyName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "valueType": {
+            "type": "string",
+            "enum": [
+              "STRING",
+              "FILE"
+            ]
+          },
+          "requiredType": {
+            "type": "string",
+            "enum": [
+              "ALWAYS",
+              "SKIP"
+            ]
+          },
+          "secret": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CapabilityHealthCheck": {
+        "required": [
+          "interval",
+          "path",
+          "port",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "HTTP"
+            ]
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "path": {
+            "type": "string"
+          },
+          "interval": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Cluster": {
+        "required": [
+          "clusterMemberTypes",
+          "clusterType",
+          "id",
+          "memberMapping",
+          "nodes"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "clusterType": {
+            "type": "string"
+          },
+          "clusterMemberTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClusterMemberType"
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Node"
+            }
+          },
+          "memberMapping": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ClusterMemberType": {
+        "required": [
+          "minNumber",
+          "name",
+          "prettyName",
+          "scalable"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "prettyName": {
+            "type": "string"
+          },
+          "minNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "scalable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DeploymentCapability": {
+        "required": [
+          "actions",
+          "capabilityClass",
+          "cluster",
+          "clusterMemberTypes",
+          "id",
+          "logo",
+          "name",
+          "supportedDeploymentTypes",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "capabilityClass": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "logo": {
+            "type": "string"
+          },
+          "type": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "SETUP",
+                "DEPLOY",
+                "SCALE"
+              ]
+            }
+          },
+          "actions": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AwxCapabilityAction"
+                }
+              ]
+            }
+          },
+          "healthCheck": {
+            "$ref": "#/components/schemas/CapabilityHealthCheck"
+          },
+          "clusterMemberTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClusterMemberType"
+            }
+          },
+          "supportedDeploymentTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "DOCKER_CONTAINER",
+                "DOCKER_COMPOSE",
+                "KUBERNETES"
+              ]
+            }
+          },
+          "cluster": {
+            "type": "boolean"
+          }
+        }
+      },
+      "MatchingResourcesDTOApi": {
+        "type": "object",
+        "properties": {
+          "clusters": {
+            "type": "array",
+            "writeOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/Cluster"
+            }
+          },
+          "singleHosts": {
+            "type": "array",
+            "writeOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/BasicResource"
+            }
+          },
+          "clusterResources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cluster"
+            }
+          },
+          "singleHostResources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BasicResource"
+            }
+          }
+        }
+      },
+      "Node": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string"
+          },
+          "Node": {
+            "type": "string"
+          },
+          "Address": {
+            "type": "string"
+          },
+          "Datacenter": {
+            "type": "string"
+          },
+          "TaggedAddresses": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "Meta": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "CreateIndex": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ModifyIndex": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ServiceInstance": {
+        "required": [
+          "id",
+          "metaData",
+          "resourceId",
+          "serviceOfferingId",
+          "tags"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "metaData": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "resourceId": {
+            "type": "string"
+          },
+          "serviceOfferingId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "spring_oauth": {
+        "type": "oauth2",
+        "description": "Oauth2 flow",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "http://ipa-wn1152:7080/auth/realms/fabos/protocol/openid-connect/auth",
+            "tokenUrl": "http://ipa-wn1152:7080/auth/realms/fabos/protocol/openid-connect/token",
+            "refreshUrl": "http://ipa-wn1152:7080/auth/realms/fabos/protocol/openid-connect/token",
+            "scopes": {}
+          }
+        }
+      },
+      "bearer_auth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

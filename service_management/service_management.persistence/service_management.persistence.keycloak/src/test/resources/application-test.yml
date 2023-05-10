@@ -1,0 +1,14 @@
+### Spring
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      database-platform: org.hibernate.dialect.MariaDB105Dialect
+    properties:
+      hibernate:
+        id.new_generator_mappings: false
+  datasource:
+    driver-class-name: 'org.testcontainers.jdbc.ContainerDatabaseDriver'
+    url: jdbc:tc:mariadb:10.5:///mariadb://${database.schema}?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: ${database.username}
+    password: ${database.password}

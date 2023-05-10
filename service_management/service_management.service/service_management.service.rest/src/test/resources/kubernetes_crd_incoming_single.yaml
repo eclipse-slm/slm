@@ -1,0 +1,39 @@
+apiVersion: blubbeldibub/v1alpha1
+kind: Application
+metadata:
+  name: app1
+  namespace: namespace_test
+  labels:
+    application-group: applicationgroup-demo-ipa
+spec:
+  workloads:
+    - basename: w1
+      template:
+        metadata:
+          labels:
+            app: pause
+        spec:
+          containers:
+            - name: pause
+              image: k8s.gcr.io/pause:3.2
+      interfaces:
+        - otherWorkload:
+            basename: w2
+            applicationName: app1
+          bandwidth: "5M"
+          maxDelay: "1"
+    - basename: w2
+      template:
+        metadata:
+          labels:
+            app: pause
+        spec:
+          containers:
+            - name: pause
+              image: k8s.gcr.io/pause:3.2
+      interfaces:
+        - otherWorkload:
+            basename: w1
+            applicationName: app1
+          bandwidth: "2M"
+          maxDelay: "1"

@@ -1,0 +1,38 @@
+### Get Token from Keycloak
+POST http://{{host}}:7080/auth/realms/fabos/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&username=fabos&password=password&client_id=self-service-portal
+
+> {%
+  client.test("Request executed successfully", function() {
+    client.assert(response.status === 200, "Response status is not 200");
+  });
+
+  client.global.set("auth_token", response.body.access_token);
+%}
+
+### Get Locations
+GET http://{{host}}:9010/resources/locations
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+### Get Location by ID
+GET http://{{host}}:9010/resources/locations?id=d0b1897e-12b2-4975-9d50-68098b1c95f9
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+### Create Location without ID
+POST http://{{host}}:9010/resources/locations?name=test-location
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+### Create Location with ID
+POST http://{{host}}:9010/resources/locations?name=test-location-with-id&id=d0b1897e-12b2-4975-9d50-68098b1c95f9
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+### Delete Location with ID
+DELETE http://{{host}}:9010/resources/locations?id=d0b1897e-12b2-4975-9d50-68098b1c95f9
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}

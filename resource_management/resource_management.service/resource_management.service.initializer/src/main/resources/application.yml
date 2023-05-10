@@ -1,0 +1,9 @@
+resource-management:
+  url: http://localhost:9010
+  init-directories: init/
+
+keycloak:
+  auth-server-url: http://localhost:7080/auth
+  realm: fabos
+  username: fabos
+  password: password

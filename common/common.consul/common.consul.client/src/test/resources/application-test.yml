@@ -1,0 +1,14 @@
+consul:
+  scheme: http
+  host: localhost
+  port: 8500
+  acl-token: myroot
+  datacenter: fabos
+  skipAcl: true
+
+awx:
+  scheme: http
+  host: localhost
+  port: 80
+  username: admin
+  password: password

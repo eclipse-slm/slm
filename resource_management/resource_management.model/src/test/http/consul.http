@@ -1,0 +1,66 @@
+### Get Catalog Nodes
+GET http://{{host}}:{{port}}/v1/catalog/nodes
+
+### Get Catalog Services
+GET http://{{host}}:{{port}}/v1/catalog/services
+
+### Get Catalog Datacenters
+GET http://{{host}}:{{port}}/v1/catalog/datacenters
+
+### Put Catalog Node
+PUT http://{{host}}:{{port}}/v1/catalog/register
+
+{
+    "ID": "{{node_uuid}}",
+    "Node": "{{node_name}}",
+    "Address": "10.3.11.3",
+    "Datacenter": "fabos",
+    "TaggedAddresses": {
+        "lan": "10.3.11.3"
+    },
+    "NodeMeta": {
+        "uuid": "2f6f5354-1585-4370-a523-56df6f442854"
+    }
+}
+
+### Put Catalog Service
+PUT http://{{host}}:{{port}}/v1/catalog/register
+
+{
+    "id": "{{node_uuid}}",
+    "Node": "{{node_name}}",
+    "SkipNodeUpdate": true,
+    "Service": {
+        "ID": "{{service_uuid}}",
+        "Service": "{{service_name}}",
+        "Tags": [
+            "swarm_manager",
+            "docker",
+            "docker-swarm-test-1"
+        ],
+        "Meta": {
+            "cluster_type": "DockerSwarm"
+        }
+    }
+}
+
+### Delete Catalog Service
+PUT http://{{host}}:{{port}}/v1/catalog/deregister
+
+{
+    "Node": "{{node_name}}",
+    "ServiceID": "{{service_uuid}}"
+
+}
+
+### Get Node Services (by UUID)
+GET http://{{host}}:{{port}}/v1/catalog/node-services/{{node_uuid}}
+
+### Get Node Services (by Node)
+GET http://{{host}}:{{port}}/v1/catalog/node-services/{{node_name}}
+
+### Get Service (by Name)
+GET http://{{host}}:{{port}}/v1/catalog/service/{{service_name}}
+
+### Get Service (by Name)2
+GET http://{{host}}:{{port}}/v1/catalog/service/

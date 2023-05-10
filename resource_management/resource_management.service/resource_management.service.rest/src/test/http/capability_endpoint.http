@@ -1,0 +1,892 @@
+### Get Token from Keycloak
+POST http://{{host}}:7080/auth/realms/fabos/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&username=fabos&password=password&client_id=self-service-portal
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+
+    client.global.set("auth_token", response.body.access_token);
+%}
+
+### Create Docker Capability with UUID and Connection Types
+POST http://{{host}}:9010/resources/capabilities
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "uuid": "08c5b8de-5d4a-4116-a73f-1d1f616c7c70",
+  "capabilityClass": "DeploymentCapability",
+  "name": "Docker",
+  "logo": "mdi-docker",
+  "type": [
+    "SETUP",
+    "DEPLOY"
+  ],
+  "actions": {
+    "DEPLOY": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "DEPLOY",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
+      "awxBranch": "develop",
+      "playbook": "deploy.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    },
+    "UNINSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "UNINSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
+      "awxBranch": "develop",
+      "playbook": "uninstall.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    },
+    "INSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "INSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
+      "awxBranch": "develop",
+      "playbook": "install.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    },
+    "UNDEPLOY": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "UNDEPLOY",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
+      "awxBranch": "develop",
+      "playbook": "undeploy.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    }
+  },
+  "supportedDeploymentTypes": [
+    "DOCKER_CONTAINER",
+    "DOCKER_COMPOSE"
+  ],
+  "clusterMemberTypes": []
+}
+
+### Create Dummy Deployment Capability with UUID and Connection Types ["ssh", "WinRM"]
+POST http://{{host}}:9010/resources/capabilities
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "uuid": "08c5b8de-5d4a-4116-a73f-1d1f616c7c70",
+  "capabilityClass": "DeploymentCapability",
+  "name": "Dummy",
+  "logo": "mdi-docker",
+  "type": [
+    "SETUP",
+    "DEPLOY"
+  ],
+  "actions": {
+    "DEPLOY": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "DEPLOY",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+      "awxBranch": "main",
+      "playbook": "deploy.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    },
+    "UNINSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "UNINSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+      "awxBranch": "main",
+      "playbook": "uninstall.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    },
+    "INSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "INSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+      "awxBranch": "main",
+      "playbook": "install.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    },
+    "UNDEPLOY": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "UNDEPLOY",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+      "awxBranch": "main",
+      "playbook": "undeploy.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    }
+  },
+  "supportedDeploymentTypes": [
+    "DOCKER_CONTAINER",
+    "DOCKER_COMPOSE"
+  ],
+  "clusterMemberTypes": []
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+ %}
+
+### Create Dummy Deployment Capability with UUID, connection=tcp and Action Connection Types ["ssh", "WinRM", "tcp"]
+POST http://{{host}}:9010/resources/capabilities
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "uuid": "08c5b8de-5d4a-4116-a73f-1d1f616c7c70",
+  "capabilityClass": "DeploymentCapability",
+  "name": "Dummy_tcp",
+  "logo": "mdi-docker",
+  "type": [
+    "SETUP",
+    "DEPLOY"
+  ],
+  "connection": "tcp",
+  "actions": {
+    "DEPLOY": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "DEPLOY",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+      "awxBranch": "main",
+      "playbook": "deploy.yml",
+      "connectionTypes": ["ssh", "WinRM", "tcp"]
+    },
+    "UNINSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "UNINSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+      "awxBranch": "main",
+      "playbook": "uninstall.yml",
+      "connectionTypes": ["ssh", "WinRM", "tcp"]
+    },
+    "INSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "INSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+      "awxBranch": "main",
+      "playbook": "install.yml",
+      "connectionTypes": ["ssh", "WinRM", "tcp"]
+    },
+    "UNDEPLOY": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "UNDEPLOY",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+      "awxBranch": "main",
+      "playbook": "undeploy.yml",
+      "connectionTypes": ["ssh", "WinRM", "tcp"]
+    }
+  },
+  "supportedDeploymentTypes": [
+    "DOCKER_CONTAINER",
+    "DOCKER_COMPOSE"
+  ],
+  "clusterMemberTypes": []
+}
+
+> {%
+  client.test("Request executed successfully", function() {
+    client.assert(response.status === 201, "Response status is not 201");
+  });
+%}
+
+### Create Docker-tcp Deployment Capability with UUID
+POST http://{{host}}:9010/resources/capabilities
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "uuid": "08c5b8de-5d4a-4116-a73f-1d1f616c7c70",
+  "capabilityClass": "DeploymentCapability",
+  "name": "Docker (tcp)",
+  "logo": "mdi-docker",
+  "type": [
+    "SETUP",
+    "DEPLOY"
+  ],
+  "connection": "tcp",
+  "actions": {
+    "DEPLOY": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "DEPLOY",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-tcp.git",
+      "awxBranch": "main",
+      "playbook": "deploy.yml",
+      "connectionTypes": ["tcp"]
+    },
+    "UNINSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "UNINSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-tcp.git",
+      "awxBranch": "main",
+      "playbook": "uninstall.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    },
+    "INSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "INSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-tcp.git",
+      "awxBranch": "main",
+      "playbook": "install.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    },
+    "UNDEPLOY": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "UNDEPLOY",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-tcp.git",
+      "awxBranch": "main",
+      "playbook": "undeploy.yml",
+      "connectionTypes": ["tcp"]
+    }
+  },
+  "supportedDeploymentTypes": [
+    "DOCKER_CONTAINER",
+    "DOCKER_COMPOSE"
+  ],
+  "clusterMemberTypes": []
+}
+
+> {%
+  client.test("Request executed successfully", function() {
+    client.assert(response.status === 201, "Response status is not 201");
+  });
+%}
+
+### Create Docker Deployment Capability with UUID, connection=tcp and Action Connection Types ["ssh", "WinRM", "tcp"] but Dummy Un/Install
+POST http://{{host}}:9010/resources/capabilities
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "uuid": "08c5b8de-5d4a-4116-a73f-1d1f616c7c70",
+  "capabilityClass": "DeploymentCapability",
+  "name": "Docker_tcp_no_inst",
+  "logo": "mdi-docker",
+  "type": [
+    "SETUP",
+    "DEPLOY"
+  ],
+  "connection": "tcp",
+  "actions": {
+    "DEPLOY": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "DEPLOY",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
+      "awxBranch": "feat-expose-tcp",
+      "playbook": "deploy.yml",
+      "connectionTypes": ["tcp"]
+    },
+    "UNINSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "UNINSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "uninstall.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    },
+    "INSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "INSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "install.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    },
+    "UNDEPLOY": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "UNDEPLOY",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
+      "awxBranch": "feat-expose-tcp",
+      "playbook": "undeploy.yml",
+      "connectionTypes": ["tcp"]
+    }
+  },
+  "supportedDeploymentTypes": [
+    "DOCKER_CONTAINER",
+    "DOCKER_COMPOSE"
+  ],
+  "clusterMemberTypes": []
+}
+
+> {%
+  client.test("Request executed successfully", function() {
+    client.assert(response.status === 201, "Response status is not 201");
+  });
+%}
+
+### Delete Cabapility with UUID
+DELETE http://{{host}}:9010/resources/capabilities/eaa89339-b858-4e64-a900-6eff95311cb1
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+ %}
+
+### Create KVM/QEMU Dummy Virtualization Capability with UUID
+POST http://{{host}}:9010/resources/capabilities
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "uuid": "d5030707-dd26-4bae-b89d-26e845689927",
+  "capabilityClass": "VirtualizationCapability",
+  "name": "KVM/QEMU",
+  "logo": "mdi-alpha-k-box-outline",
+  "type": [
+    "SETUP",
+    "VM"
+  ],
+  "actions": {
+    "INSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "INSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "install.yml"
+    },
+    "UNINSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "UNINSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "uninstall.yml"
+    },
+    "CREATE_VM": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "CREATE_VM",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "create_vm.yml",
+      "parameter": [
+        {
+          "type": "multiplechoice",
+          "question_name": "VM Template",
+          "question_description": "Select the VM template you want to clone.",
+          "variable": "vm_template",
+          "choices": [
+            "ubuntu18",
+            "ubuntu20",
+            "ubuntu22"
+          ],
+          "required": true
+        },
+        {
+          "type": "multiplechoice",
+          "question_name": "VM Size",
+          "question_description": "Select the Size the VM should have",
+          "variable": "vm_size",
+          "choices": [
+            "s",
+            "m",
+            "l",
+            "xl"
+          ],
+          "required": true
+        }
+      ]
+    },
+    "DELETE_VM": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "DELETE_VM",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "delete_vm.yml"
+    }
+  },
+  "clusterMemberTypes": []
+}
+
+> {%
+  client.test("Request executed successfully", function() {
+    client.assert(response.status === 201, "Response status is not 201");
+  });
+%}
+
+### Create KVM/QEMU Dummy Virtualization Capability (all param types) with UUID
+POST http://{{host}}:9010/resources/capabilities
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "uuid": "d5030707-dd26-4bae-b89d-26e845689927",
+  "capabilityClass": "VirtualizationCapability",
+  "name": "KVM/QEMU",
+  "logo": "mdi-alpha-k-box-outline",
+  "type": [
+    "SETUP",
+    "VM"
+  ],
+  "actions": {
+    "INSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "INSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "install.yml"
+    },
+    "UNINSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "UNINSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "uninstall.yml"
+    },
+    "CREATE_VM": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "CREATE_VM",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "create_vm.yml",
+      "parameter": [
+        {
+          "type": "multiplechoice",
+          "question_name": "VM Template",
+          "question_description": "Select the VM template you want to clone.",
+          "variable": "vm_template",
+          "choices": [
+            "ubuntu18",
+            "ubuntu20",
+            "ubuntu22"
+          ],
+          "required": true
+        },
+        {
+          "type": "multiplechoice",
+          "question_name": "VM Size",
+          "question_description": "Select the Size the VM should have",
+          "variable": "vm_size",
+          "choices": [
+            "s",
+            "m",
+            "l",
+            "xl"
+          ],
+          "required": true
+        },
+        {
+          "type": "text",
+          "question_name": "Question 1",
+          "question_description": "Question 1 Description",
+          "variable": "question_1",
+          "required": false,
+          "default": "default-text"
+        },
+        {
+          "type": "multiplechoice",
+          "question_name": "Question 2",
+          "question_description": "Question 2 Description",
+          "variable": "question_2",
+          "choices": ["Choice1", "Choice2", "Choice3"],
+          "required": true,
+          "default": ""
+        },
+        {
+          "type": "integer",
+          "question_name": "Question 3",
+          "question_description": "Question 3 Description",
+          "variable": "question_3",
+          "min": 3,
+          "max": 45,
+          "required": true,
+          "default": ""
+        },
+        {
+          "type": "password",
+          "question_name": "Question 4",
+          "question_description": "Question 4 Description",
+          "variable": "question_4",
+          "required": true,
+          "default": ""
+        },
+        {
+          "type": "multiselect",
+          "question_name": "Question 5",
+          "question_description": "Question 5 Description",
+          "variable": "question_5",
+          "choices": ["Choice4", "Choice5", "Choice6"],
+          "required": false,
+          "default": ""
+        }
+      ]
+    },
+    "DELETE_VM": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "DELETE_VM",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "delete_vm.yml"
+    }
+  },
+  "clusterMemberTypes": []
+}
+
+> {%
+  client.test("Request executed successfully", function() {
+    client.assert(response.status === 201, "Response status is not 201");
+  });
+%}
+
+### Delete KVM/QEMU Dummy Virtualization Capability with UUID
+DELETE http://{{host}}:9010/resources/capabilities/fa2eafe1-10a8-4a85-9fe1-825207868f9e
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Request executed successfully", function() {
+    client.assert(response.status === 200, "Response status is not 200");
+  });
+%}
+
+### Delete Docker Cabapility with not existing UUID
+DELETE http://{{host}}:9010/resources/capabilities/12345678-1234-1234-1234-123456789012
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+ %}
+
+### Delete Capability with UUID
+DELETE http://{{host}}:9010/resources/capabilities/cfb0d3ad-065e-49d8-a98c-52fdf2477c71
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+ %}
+
+### Create Docker Capability with UUID and Repo User/Password
+POST http://{{host}}:9010/resources/capabilities
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "uuid": "37d74d79-03e2-40e6-b75d-7c9176f30def",
+  "capabilityClass": "DeploymentCapability",
+  "name": "DockerPW",
+  "logo": "mdi-docker",
+  "type": [
+    "setup",
+    "deploy"
+  ],
+  "actions": {
+    "deploy": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "deploy",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
+      "awxBranch": "1.0.0",
+      "username": "user",
+      "password": "pass",
+      "playbook": "deploy.yml"
+    },
+    "uninstall": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "uninstall",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
+      "awxBranch": "1.0.0",
+      "username": "user",
+      "password": "pass",
+      "playbook": "uninstall.yml"
+    },
+    "install": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "install",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
+      "awxBranch": "1.0.0",
+      "username": "user",
+      "password": "pass",
+      "playbook": "install.yml"
+    },
+    "undeploy": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "undeploy",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
+      "awxBranch": "1.0.0",
+      "username": "user",
+      "password": "pass",
+      "playbook": "undeploy.yml"
+    }
+  },
+  "supportedDeploymentTypes": [
+    "DOCKER_CONTAINER",
+    "DOCKER_COMPOSE"
+  ],
+  "clusterMemberTypes": []
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+ %}
+
+### Create Docker Swarm Capability with UUID
+POST http://{{host}}:9010/resources/capabilities
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "uuid": "5dcb8fc8-556b-4735-9c80-fce546e7bd7a",
+  "capabilityClass": "DeploymentCapability",
+  "name": "Docker-Swarm",
+  "logo": "mdi-docker-swarm",
+  "type": [
+    "setup",
+    "deploy",
+    "scale"
+  ],
+  "actions": {
+    "deploy": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "deploy",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm.git",
+      "awxBranch": "1.0.0",
+      "playbook": "deploy.yml"
+    },
+    "uninstall": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "uninstall",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm.git",
+      "awxBranch": "1.0.0",
+      "playbook": "uninstall.yml"
+    },
+    "install": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "install",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm.git",
+      "awxBranch": "1.0.0",
+      "playbook": "install.yml"
+    },
+    "undeploy": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "undeploy",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm.git",
+      "awxBranch": "1.0.0",
+      "playbook": "undeploy.yml"
+    },
+    "scaleup": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "scaleup",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm.git",
+      "awxBranch": "1.0.0",
+      "playbook": "scaleup.yml"
+    },
+    "scaledown": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "scaledown",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm.git",
+      "awxBranch": "1.0.0",
+      "playbook": "scaledown.yml"
+    }
+  },
+  "supportedDeploymentTypes": [
+    "DOCKER_CONTAINER",
+    "DOCKER_COMPOSE"
+  ],
+  "clusterMemberTypes": [
+    {
+      "prettyName": "Manager",
+      "name": "docker_manager",
+      "minNumber": 3
+    }, {
+      "prettyName": "Worker",
+      "name": "docker_worker",
+      "minNumber": 1
+    }
+  ]
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+ %}
+
+### Create Dummy Docker Swarm Capability with UUID, connection=tcp and Connection Types ["ssh", "WinRM", "tcp"]
+POST http://{{host}}:9010/resources/capabilities
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "uuid": "5dcb8fc8-556b-4735-9c80-fce546e7bd7a",
+  "capabilityClass": "DeploymentCapability",
+  "name": "Docker Swarm Dummy",
+  "logo": "mdi-docker-swarm",
+  "connection": "tcp",
+  "type": [
+    "SETUP",
+    "DEPLOY",
+    "SCALE"
+  ],
+  "actions": {
+    "DEPLOY": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "DEPLOY",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "deploy.yml",
+      "connectionTypes": ["ssh", "WinRM", "tcp"]
+    },
+    "UNINSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "UNINSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "uninstall.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    },
+    "INSTALL": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "INSTALL",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "install.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    },
+    "UNDEPLOY": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "UNDEPLOY",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "undeploy.yml",
+      "connectionTypes": ["ssh", "WinRM", "tcp"]
+    },
+    "SCALE_UP": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "SCALE_UP",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "scaleup.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    },
+    "SCALE_DOWN": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "SCALE_DOWN",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "scaledown.yml",
+      "connectionTypes": ["ssh", "WinRM"]
+    }
+  },
+  "supportedDeploymentTypes": [
+    "DOCKER_CONTAINER",
+    "DOCKER_COMPOSE"
+  ],
+  "clusterMemberTypes": [
+    {
+      "prettyName": "Manager",
+      "name": "docker_manager",
+      "minNumber": 3
+    }, {
+      "prettyName": "Worker",
+      "name": "docker_worker",
+      "minNumber": 1
+    }
+  ]
+}
+
+> {%
+  client.test("Request executed successfully", function() {
+    client.assert(response.status === 201, "Response status is not 201");
+  });
+%}
+
+### Create Docker Capability without UUID
+POST http://{{host}}:9010/resources/capabilities
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "capabilityClass": "DeploymentCapability",
+  "name": "Docker",
+  "logo": "mdi-docker",
+  "type": [
+    "setup",
+    "deploy"
+  ],
+  "actions": {
+    "deploy": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "deploy",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
+      "awxBranch": "1.0.0",
+      "playbook": "deploy.yml"
+    },
+    "uninstall": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "uninstall",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
+      "awxBranch": "1.0.0",
+      "playbook": "uninstall.yml"
+    },
+    "install": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "install",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
+      "awxBranch": "1.0.0",
+      "playbook": "install.yml"
+    },
+    "undeploy": {
+      "capabilityActionClass": "AwxCapabilityAction",
+      "capabilityActionType": "undeploy",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
+      "awxBranch": "1.0.0",
+      "playbook": "undeploy.yml"
+    }
+  },
+  "supportedDeploymentTypes": [
+    "DOCKER_CONTAINER",
+    "DOCKER_COMPOSE"
+  ],
+  "clusterMemberTypes": []
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+ %}
+
+### Get all Capabilities
+GET http://{{host}}:9010/resources/capabilities
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+ %}
+
+### Get all Single Host Capabilities
+GET http://{{host}}:9010/resources/capabilities?filter=singleHost
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+ %}
+
+### Get all Multi Host Capabilities
+GET http://{{host}}:9010/resources/capabilities?filter=multiHost
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+ %}
+
+### Install Single Host Capability on Resource
+PUT http://{{host}}:9010/resources/7a9878e1-f6b7-480d-bd2e-dff4a0aef8e9/capabilities?capabilityId=eaa89339-b858-4e64-a900-6eff95311cb1
+Authorization: Bearer {{auth_token}}
+
+### Install Single Host Capability on Resource
+GET http://{{host}}:9010/resources/02985c4a-b170-4a7f-a62a-9e2bcfae18f3/capability-services
+Authorization: Bearer {{auth_token}}

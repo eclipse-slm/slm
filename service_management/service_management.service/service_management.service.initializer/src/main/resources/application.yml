@@ -1,0 +1,12 @@
+service-management:
+  url: http://localhost:9020
+  init-directory: init-public/,init-private/
+  git-repos:
+    urls: "https://github.com/FabOS-AI/fabos-slm-service-management-content.git"
+    clone-directory: tmp/
+
+keycloak:
+  auth-server-url: http://localhost:7080/auth
+  realm: fabos
+  username: fabos
+  password: password

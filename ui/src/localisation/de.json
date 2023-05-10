@@ -1,0 +1,91 @@
+{
+  "SelectedDevice": {
+    "DeviceInfos": "Geräteinfos",
+    "connection": {
+      "ConnectionInformation": "Cloud-Verbindungsinformationen",
+      "lastContact": "Letzter Kontakt",
+      "connectionState": "Verbindungsstatus",
+      "connectionType": "Verbindungstyp",
+      "connectionFormat": "Verbindungsformat"
+    }
+  },
+  "headline": {
+    "Dashboard": "Anwendungen",
+    "Devices": "Geräte",
+    "App": "Gerätemanager",
+    "Device": "Gerät",
+    "Services": "Dienste"
+  },
+  "vuetify": {
+    "dataIterator": {
+      "itemsPerPageText": "Ressourcen pro Seite",
+      "itemsPerPageAllText": "Alle Ressourcen",
+      "pageText": "{0}-{1} von {2}"
+    }
+  },
+  "labels": {
+    "Value": "Wert",
+    "SearchLabel": "Suche",
+    "CategoryFilterLabel": "Kategorie (Mehrfachauswahl)",
+    "DeploymentTypeFilterLabel": "Bereitstellungstyp (Mehrfachauswahl)",
+    "UUID": "UUID",
+    "Name": "Name",
+    "Description": "Beschreibung",
+    "LastContact": "Letzte Verbindung",
+    "Status": "Status",
+    "Actions": "Aktionen",
+    "Flag": "de",
+    "Action": "Aktion",
+    "Connection": "Verbindung",
+    "URL": "URL"
+  },
+  "buttons": {
+    "Generate": "UUID generieren",
+    "Cancel": "Abbrechen",
+    "Back": "Zurück",
+    "Save": "Speichern",
+    "Edit": "Bearbeiten",
+    "RandomDevice": "Zufälliges Gerät",
+    "Hide_info": "Info ausblenden",
+    "Order": "Bestellen",
+    "Checkout": "Kasse",
+    "Next": "Nächster",
+    "Finish": "Ende",
+    "Update": "Aktualisieren",
+    "Create": "Erstellen",
+    "AddLogic": "Logik hinzufügen",
+    "AddProperty": "Eigenschaft hinzufügen",
+    "AddRequirement": "Anforderung hinzufügen"
+  },
+  "infoText": {
+    "NoDevice": "Keine Geräte erkannt, bitte laden Sie die Seite neu",
+    "NoService": "Keine Services erkannt, bitte laden Sie die Seite neu",
+    "AddDevice": "Fügen Sie einige neue Geräte hinzu",
+    "EditDialog": "Gerät aktualisieren",
+    "AddDialog": "Fügen Sie ein neues Gerät hinzu",
+    "footer": "Erstellt 2019 von Dominik Ratzel",
+    "SelectedDevice": "Ausgewähltes Gerät",
+    "ReloadPage": "Seite neuladen"
+  },
+
+  "RequirementLabels": {
+    "PropertySemanticId": "Semantische Id der Eigenschaft",
+    "PropertyValue": "Wert der Eigenschaft",
+    "ParentSubmodelsSemanticIds": "Semantische Ids der übergeordneten Teilmodelle"
+  },
+
+  "ServiceLabels": {
+    "Images": "Bilder",
+    "Documents": "Dokumente",
+    "Service_Requirements": "Serviceanforderungen",
+    "Overview": "Überblick",
+    "ChooseDeploymentType": "Wählen Sie einen Bereitstellungstype"
+  },
+
+  "ServiceStepper": {
+    "Common": "Allgemein",
+    "Deployment_Type": "Bereitstellungstyp",
+    "Service_Options": "Serviceoptionen",
+    "Requirements": "Anforderungen"
+  }
+}

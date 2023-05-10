@@ -1,0 +1,83 @@
+### Application
+application:
+  name: "^project.artifactId^"
+  version: "^project.version^"
+  timestamp: "^timestamp^"
+
+### Server / API
+server:
+  port: 9010
+  error:
+    include-message: always
+
+### Database
+database:
+  host: localhost
+  port: 3320
+  schema: services
+  username: service-management
+  password: password
+logging.level.org.hibernate.SQL: TRACE
+
+### Spring
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      database-platform: org.hibernate.dialect.MariaDB105Dialect
+    properties:
+      hibernate:
+        id.new_generator_mappings: false
+  datasource:
+    driver-class-name: 'org.testcontainers.jdbc.ContainerDatabaseDriver'
+    url: jdbc:tc:mariadb:10.5:///mariadb://${database.schema}?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: ${database.username}
+    password: ${database.password}
+
+### Components - Internal
+notification-service:
+  scheme: "http"
+  host: "localhost"
+  port: 45678
+
+resource-management:
+  url: "http://localhost:9010"
+
+### Keycloak
+keycloak:
+  config:
+    auth-white-list:
+    tenants:
+      config-path: keycloak/
+      client-registration-enable: false
+      client-update-enable: false
+      resolve-by-path: true
+      resolve-by-header: true
+      resolver-base-path: /
+      resolver-header: Realm
+      redirect-uris:
+      web-origins:
+
+### AWX
+awx:
+  scheme: http
+  host: localhost
+  port: 80
+  username: admin
+  password: password
+
+### Consul
+consul:
+  scheme: http
+  host: localhost
+  port: 8500
+  datacenter: fabos
+  acl-token: myroot
+
+### Vault
+vault:
+  scheme: http
+  host: localhost
+  port: 8200
+  authentication: TOKEN
+  token: myroot

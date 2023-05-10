@@ -1,0 +1,62 @@
+### Application
+application:
+  name: "^project.artifactId^"
+  version: "^project.version^"
+  timestamp: "^timestamp^"
+
+### Server / API
+server:
+  port: 10000
+  error:
+    include-message: always
+
+open-api:
+  title: Service Lifecycle Management Catalog
+  description: REST API of Service Lifecycle Management Catalog
+  version: "^project.version^"
+  contact:
+    name: Fraunhofer IPA
+    url: https://www.ipa.fraunhofer.de
+    email: matthias.schneider@ipa.fraunhofer.de
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+### Database
+database:
+  host: localhost
+  port: 3300
+  schema: catalog
+  password: password
+  username: catalog
+
+### Spring
+spring:
+  application:
+    name: slm_catalog
+  main:
+    allow-bean-definition-overriding: true
+  jpa:
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driver-class-name=org: 'mariadb.jdbc.Driver'
+    url: jdbc:mariadb://${database.host}:${database.port}/${database.schema}?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: ${database.username}
+    password: ${database.password}
+  sql:
+    init:
+      mode: always
+      platform: mysql
+
+management:
+  endpoints:
+    web.exposure.include: health,info
+  info:
+    git.enabled: false

@@ -1,0 +1,11 @@
+enum ResourcesCreateDialogPage {
+    START,
+    ADD_EXISTING_RESOURCE,
+    ADD_EXISTING_RESOURCE_HOST,
+    ADD_EXISTING_RESOURCE_CLUSTER,
+    CREATE_RESOURCE,
+    CREATE_RESOURCE_HOST,
+    CREATE_RESOURCE_CLUSTER
+}
+
+export default ResourcesCreateDialogPage

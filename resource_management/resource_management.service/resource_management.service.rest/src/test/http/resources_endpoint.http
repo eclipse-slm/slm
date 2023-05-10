@@ -1,0 +1,46 @@
+### Get Token from Keycloak
+POST http://{{host}}:7080/auth/realms/fabos/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&username=fabos&password=password&client_id=self-service-portal
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+
+    client.global.set("auth_token", response.body.access_token);
+%}
+
+### Get Resources
+GET http://{{host}}:9010/resources
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+ %}
+
+### Create Multiple Resources
+PUT http://{{host}}:9010/resources?resourceUsername=username&resourcePassword=password&resourceHostname=test-host-{{counter}}&resourceIp=192.168.0.{{counter}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+> {%
+
+ else {
+  var counter = parseInt(client.global.get("counter"))
+  client.global.set("counter", (counter+1).toString())
+}
+ %}
+
+### Delete Resource
+DELETE http://{{host}}:9010/resources/1d21a098-edd8-4c37-a835-1545006120b9
+Authorization: Bearer {{auth_token}}
+
+### Get Resource Connection Types
+GET http://{{host}}:9010/resources/connection-types
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}

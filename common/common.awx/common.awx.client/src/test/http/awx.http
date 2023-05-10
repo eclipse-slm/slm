@@ -1,0 +1,192 @@
+### Create Project
+POST http://{{host}}:{{port}}/{{base_path}}/projects/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+{
+  "name": "Test Name",
+  "description": "Test Description",
+  "scm_type": "git",
+  "scm_url": "https://github.com/FabOS-AI/fabos-slm-dc-docker",
+  "scm_branch": "1.0.0"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+%}
+
+### Get Jobs
+GET http://{{host}}:{{port}}/{{base_path}}/jobs/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Get Job Updates of Project updateJobID
+GET http://{{host}}:{{port}}/{{base_path}}/project_updates/2/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Get Job Updates of Project with specific projectID and updateJobID
+GET http://{{host}}:{{port}}/{{base_path}}/projects/7/project_updates/?id=2
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Create Organization
+POST http://{{host}}:{{port}}/{{base_path}}/organizations/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+{
+  "name": "test"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+%}
+
+### Get Organizations by Name
+GET http://{{host}}:{{port}}/{{base_path}}/organizations/?name=Self%20Service%20Portal
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Get Organizations
+GET http://{{host}}:{{port}}/{{base_path}}/organizations/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Get Organizations by Name
+GET http://{{host}}:{{port}}/{{base_path}}/organizations/?name=Self%20Service%20Portal
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Get Teams
+GET http://{{host}}:{{port}}/{{base_path}}/teams
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Create Inventory
+POST http://{{host}}:{{port}}/{{base_path}}/inventories/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+{
+  "kind": "",
+  "name": "empty",
+  "organization": 2
+}
+
+### Get Inventories
+GET http://{{host}}:{{port}}/{{base_path}}/inventories/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Get Inventory by name
+GET http://{{host}}:{{port}}/{{base_path}}/inventories/?name=empty
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Get Job Template
+GET http://{{host}}:{{port}}/{{base_path}}/job_templates/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Create Job Template
+POST http://{{host}}:{{port}}/{{base_path}}/job_templates/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+{
+  "name": "fabos-slm-dc-docker - install.yml",
+  "playbook": "install.yml",
+  "project": 7,
+  "inventory": 1
+}
+
+### Add credential to Job Template
+POST http://{{host}}:{{port}}/{{base_path}}/job_templates/9/credentials/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+{
+  "id": 3
+}
+
+### Get Roles
+GET http://{{host}}:{{port}}/{{base_path}}/roles
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Get Object Roles of Project
+GET http://{{host}}:{{port}}/{{base_path}}/projects/7/object_roles/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Get Object Roles of Project Filtered By Name
+GET http://{{host}}:{{port}}/{{base_path}}/projects/7/object_roles/?search=Read
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Get Object Roles of Job Templates
+GET http://{{host}}:{{port}}/{{base_path}}/job_templates/7/object_roles/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Add Role to Team
+POST http://{{host}}:{{port}}/{{base_path}}/teams/2/roles/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+{
+  "id": 52
+}
+
+### Get Credentials
+GET http://{{host}}:{{port}}/{{base_path}}/credentials/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Get Credential by name
+GET http://{{host}}:{{port}}/{{base_path}}/credentials/?name=https%3A%2F%2Fwww.github.de%2F%20-%20username
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Get Credential Types
+GET http://{{host}}:{{port}}/{{base_path}}/credential_types/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+### Create Credential Type
+POST http://{{host}}:{{port}}/{{base_path}}/credential_types/
+Content-Type: application/json
+Authorization: Basic {{user}} {{password}}
+
+{
+  "name": "test-credential-type1",
+  "description": "test-credential-type description1",
+  "kind": "cloud",
+  "inputs": {
+    "fields": [
+      {
+        "id": "text_field_id",
+        "label": "Text Field",
+        "secret": false,
+        "type": "string"
+      },
+      {
+        "id": "secret_field_id",
+        "label": "Secret Field",
+        "secret": true,
+        "type": "string"
+      }
+    ]
+  },
+  "injectors": {
+    "env": {
+      "TEXT_FIELD": "{{text_field_id}}",
+      "SECRET_FIELD": "{{secret_field_id}}"
+    }
+  }
+}

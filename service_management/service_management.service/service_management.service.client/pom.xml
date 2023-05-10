@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.eclipse.slm</groupId>
+    <artifactId>service_management.service.client</artifactId>
+    <version>${revision}</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.eclipse.slm</groupId>
+        <artifactId>service_management.service</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <dependencies>
+        <!-- Swagger !-->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <!-- Jersey HTTP Client !-->
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+        </dependency>
+        <!-- Jackson !-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
+        </dependency>
+        <!-- Joda !-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-joda</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda-time.version}</version>
+        </dependency>
+        <!-- Base64 encoding !-->
+        <dependency>
+            <groupId>com.brsanthu</groupId>
+            <artifactId>migbase64</artifactId>
+            <version>${migbase.version}</version>
+        </dependency>
+        <!-- Others !-->
+        <dependency>
+            <groupId>com.github.scribejava</groupId>
+            <artifactId>scribejava-core</artifactId>
+            <version>8.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <!-- Testing !-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <!-- Shared Modules !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>service_management.model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>resource_management.model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${maven.plugin.openapi-generator.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/api-docs.yaml</inputSpec>
+                            <generatorName>java</generatorName>
+                            <configOptions>
+                                <sourceFolder>src/gen/java/main</sourceFolder>
+                                <dateLibrary>joda</dateLibrary>
+                                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                <openApiNullable>false</openApiNullable>
+                            </configOptions>
+                            <library>jersey2</library>
+
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>${project.artifactId}.gen</artifactId>
+                            <artifactVersion>${project.version}</artifactVersion>
+
+                            <apiPackage>${project.groupId}.${project.artifactId}.handler</apiPackage>
+                            <modelPackage>${project.groupId}.service_management.model</modelPackage>
+                            <invokerPackage>${project.groupId}.${project.artifactId}.handler</invokerPackage>
+
+                            <generateModels>false</generateModels>
+                            <typeMappings>
+                                <typeMapping>ServiceVendorDeveloper=${project.groupId}.service_management.model.vendors.ServiceVendorDeveloper</typeMapping>
+                            </typeMappings>
+                            <importMappings>
+                                <importMapping>BasicResource=${project.groupId}.resource_management.model.resource.BasicResource</importMapping>
+
+                                <importMapping>User=${project.groupId}.service_management.model.users.User</importMapping>
+
+                                <importMapping>ServiceCategory=${project.groupId}.service_management.model.offerings.ServiceCategory</importMapping>
+                                <importMapping>ServiceCategoryCreateResponse=${project.groupId}.service_management.model.offerings.responses.ServiceCategoryCreateResponse</importMapping>
+
+                                <importMapping>ServiceOfferingDTOApi=${project.groupId}.service_management.model.offerings.ServiceOfferingDTOApi</importMapping>
+                                <importMapping>ServiceOfferingCreateOrUpdateRequest=${project.groupId}.service_management.model.offerings.ServiceOfferingCreateOrUpdateRequest</importMapping>
+                                <importMapping>ServiceOfferingVersionDTOApi=${project.groupId}.service_management.model.offerings.ServiceOfferingVersionDTOApi</importMapping>
+                                <importMapping>DeploymentDefinition=${project.groupId}.service_management.model.offerings.DeploymentDefinition</importMapping>
+                                <importMapping>ServiceOrder=${project.groupId}.service_management.model.offerings.ServiceOrder</importMapping>
+                                <importMapping>ServiceOfferingCreateResponse=${project.groupId}.service_management.model.offerings.responses.ServiceOfferingCreateResponse</importMapping>
+                                <importMapping>ServiceOfferingVersionCreateResponse=${project.groupId}.service_management.model.offerings.responses.ServiceOfferingVersionCreateResponse</importMapping>
+                                <importMapping>ServiceOfferingGitRepository=${project.groupId}.service_management.model.offerings.ServiceOfferingGitRepository</importMapping>
+
+                                <importMapping>ServiceVendor=${project.groupId}.service_management.model.vendors.ServiceVendor</importMapping>
+                                <importMapping>ServiceVendorDTOApi=${project.groupId}.service_management.model.vendors.ServiceVendorDTOApi</importMapping>
+                                <importMapping>ServiceVendorDeveloper=${project.groupId}.service_management.model.vendors.ServiceVendorDeveloper</importMapping>
+                                <importMapping>ServiceVendorCreateResponse=${project.groupId}.service_management.model.vendors.responses.ServiceVendorCreateResponse</importMapping>
+
+                                <importMapping>ServiceRepository=${project.groupId}.service_management.model.service_repositories.ServiceRepository</importMapping>
+                                <importMapping>ServiceRepositoryDTOApiRead=${project.groupId}.service_management.model.service_repositories.ServiceRepositoryDTOApiRead</importMapping>
+                                <importMapping>ServiceRepositoryCreateResponse=${project.groupId}.service_management.model.service_repositories.ServiceRepositoryCreateResponse</importMapping>
+
+                                <importMapping>ServiceInstance=org.eclipse.slm.service_management.model.services.ServiceInstance</importMapping>
+
+                                <importMapping>MatchingResourceDTO=org.eclipse.slm.resource_management.model.resource.MatchingResourceDTO</importMapping>
+                            </importMappings>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

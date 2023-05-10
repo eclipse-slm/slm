@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.eclipse.slm</groupId>
+    <artifactId>resource_management.service.client</artifactId>
+    <version>${revision}</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.eclipse.slm</groupId>
+        <artifactId>resource_management.service</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <dependencies>
+        <!-- Swagger !-->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <!-- Apache HTTP Client !-->
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.2.1</version>
+        </dependency>
+        <!-- Jersey HTTP Client !-->
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+        </dependency>
+        <!-- Jackson !-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-kotlin</artifactId>
+        </dependency>
+        <!-- Joda !-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-joda</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda-time.version}</version>
+        </dependency>
+        <!-- Base64 encoding !-->
+        <dependency>
+            <groupId>com.brsanthu</groupId>
+            <artifactId>migbase64</artifactId>
+            <version>${migbase.version}</version>
+        </dependency>
+        <!-- Others !-->
+        <dependency>
+            <groupId>com.github.scribejava</groupId>
+            <artifactId>scribejava-core</artifactId>
+            <version>8.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <!-- Testing !-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+        </dependency>
+        <!-- Shared Modules !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>resource_management.model</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.utils.keycloak</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${maven.plugin.openapi-generator.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/api-docs.yaml</inputSpec>
+                            <generatorName>java</generatorName>
+                            <configOptions>
+                                <sourceFolder>src/gen/java/main</sourceFolder>
+                                <dateLibrary>joda</dateLibrary>
+                                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                <openApiNullable>false</openApiNullable>
+                            </configOptions>
+                            <library>apache-httpclient</library>
+
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>${project.artifactId}.gen</artifactId>
+                            <artifactVersion>${project.version}</artifactVersion>
+
+                            <apiPackage>${project.groupId}.${project.artifactId}.handler</apiPackage>
+                            <modelPackage>${project.groupId}.${project.artifactId}.model</modelPackage>
+                            <invokerPackage>${project.groupId}.${project.artifactId}.handler</invokerPackage>
+
+                            <generateModels>false</generateModels>
+
+                            <importMappings>
+                                <importMapping>BasicResource=${project.groupId}.resource_management.model.resource.BasicResource</importMapping>
+                                <importMapping>Location=${project.groupId}.resource_management.model.resource.Location</importMapping>
+                                <importMapping>ClusterCreateRequest=${project.groupId}.resource_management.model.cluster.ClusterCreateRequest</importMapping>
+                                <importMapping>Capability=${project.groupId}.resource_management.model.capabilities.Capability</importMapping>
+                                <importMapping>CapabilityService=${project.groupId}.resource_management.model.consul.capability.CapabilityService</importMapping>
+                                <importMapping>CapabilityDTOApi=${project.groupId}.resource_management.model.capabilities.CapabilityDTOApi</importMapping>
+                                <importMapping>CapabilityFilter=${project.groupId}.resource_management.model.capabilities.CapabilityFilter</importMapping>
+                                <importMapping>CapabilityType=${project.groupId}.resource_management.model.capabilities.CapabilityType</importMapping>
+                                <importMapping>CatalogService=${project.groupId}.common.consul.model.catalog.CatalogService</importMapping>
+                                <importMapping>Cluster=${project.groupId}.resource_management.model.cluster.Cluster</importMapping>
+                                <importMapping>DeploymentCapability=${project.groupId}.resource_management.model.capabilities.DeploymentCapability</importMapping>
+                                <importMapping>DeploymentCapabilityDTOApi=${project.groupId}.resource_management.model.capabilities.DeploymentCapabilityDTOApi</importMapping>
+                                <importMapping>VirtualizationCapability=${project.groupId}.resource_management.model.capabilities.VirtualizationCapability</importMapping>
+                                <importMapping>VirtualizationCapabilityDTOApi=${project.groupId}.resource_management.model.capabilities.VirtualizationCapabilityDTOApi</importMapping>
+                                <importMapping>VirtualResourceProvider=${project.groupId}.resource_management.model.capabilities.provider.VirtualResourceProvider</importMapping>
+                                <importMapping>ClusterCreateRequest=${project.groupId}.resource_management.model.cluster.ClusterCreateRequest</importMapping>
+                                <importMapping>ServiceHoster=${project.groupId}.resource_management.model.capabilities.provider.ServiceHoster</importMapping>
+                                <importMapping>ServiceHosterFilter=${project.groupId}.resource_management.model.capabilities.provider.ServiceHosterFilter</importMapping>
+                                <importMapping>ConnectionType=${project.groupId}.resource_management.model.resource.ConnectionType</importMapping>
+                                <importMapping>ConnectionTypeDTO=${project.groupId}.resource_management.model.resource.ConnectionTypeDTO</importMapping>
+                            </importMappings>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

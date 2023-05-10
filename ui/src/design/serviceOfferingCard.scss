@@ -1,0 +1,38 @@
+input {
+  border-style: solid;
+  padding-left: 10px;
+}
+
+.v-card__text {
+  font-weight: bold;
+}
+
+.v-list-item {
+  background: lightgrey;
+}
+
+
+.v-card {
+}
+
+//.v-card .layout .flex{
+//  border-style: solid;
+//}
+
+#imageCard {
+  background-color: white;
+}
+
+.v-image {
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+.v-input {
+  max-width: 300px;
+}
+
+// Displays the selected Element in 100% Width
+.full-width {
+  min-width: 100%;
+}

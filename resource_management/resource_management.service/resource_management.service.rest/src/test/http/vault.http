@@ -1,0 +1,20 @@
+### Get Access Token by Approle ID and Secret ID
+POST http://{{host}}:{{vault-port}}/v1/auth/approle/login
+
+{
+"role_id": "resource-management",
+"secret_id": "48a319fa-f100-9b27-afa7-676809ba29fd"
+}
+
+### Create Secrets Engine KV2 'resources' with Dev Token
+POST http://{{host}}:{{vault-port}}/v1/sys/mounts/resources
+Content-Type: application/json
+Authorization: Bearer {{vault-token}}
+
+{
+  "type": "kv",
+  "description": "",
+  "options": {
+    "version": 2
+  }
+}

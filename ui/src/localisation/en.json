@@ -1,0 +1,175 @@
+{
+  "drawer": {
+    "section": {
+      "dashboard": {
+        "title": "Dashboard"
+      },
+      "jobs": {
+        "title": "Jobs"
+      },
+      "resources": {
+        "title": "Resources"
+      },
+      "clusters": {
+        "title": "Clusters"
+      },
+      "provider": {
+        "title": "Provider"
+      },
+      "serviceOfferings": {
+        "title": "Service Offerings"
+      },
+      "serviceVendor": {
+        "title": "Service Vendor"
+      },
+      "services": {
+        "title": "Services"
+      },
+      "admin": {
+        "title": "Admin"
+      }
+    }
+  },
+
+  "avatar": "Edge Deployment",
+  "buttons": "Buttons",
+  "calendar": "Calendar",
+  "charts": "Charts",
+  "components": "Components",
+  "ct": "CT",
+  "dashboard": "Dashboard",
+  "dtables": "Data Tables",
+  "eforms": "Extended Forms",
+  "error": "Error Page",
+  "etables": "Extended Tables",
+  "example": "Example",
+  "forms": "Forms",
+  "fullscreen": "Full Screen Map",
+  "google": "Google Maps",
+  "grid": "Grid System",
+  "icons": "Icons",
+  "lock": "Lock Screen Page",
+  "login": "Login Page",
+  "maps": "Maps",
+  "multi": "Multi Level Collapse",
+  "notifications": "Notifications",
+  "pages": "Pages",
+  "plan": "Choose Plan",
+  "pricing": "Pricing",
+  "my-profile": "My Profile",
+  "edit-profile": "Edit Profile",
+  "register": "Register Page",
+  "rforms": "Regular Forms",
+  "rtables": "Regular Tables",
+  "rtl": "RTL Support",
+  "search": "Search",
+  "settings": "Settings",
+  "tables": "Tables",
+  "tabs": "Tabs",
+  "tim": "Creative Tim",
+  "timeline": "Timeline",
+  "typography": "Typography",
+  "upgrade": "Upgrade To PRO",
+  "user": "User Profile",
+  "vforms": "Validation Forms",
+  "widgets": "Widgets",
+  "wizard": "Wizard",
+
+  "title.dashboard": "Dashboard",
+  "title.resources": "Resources",
+  "title.services": "Services",
+
+  "SelectedDevice": {
+    "DeviceInfos": "Device Infos",
+    "connection": {
+      "ConnectionInformation": "Cloud Connection Information",
+      "lastContact": "Last Contact",
+      "connectionState": "Connection State",
+      "connectionType": "Connection Type",
+      "connectionFormat": "Connection Format"
+    }
+  },
+  "headline": {
+    "Dashboard": "Applications",
+    "Devices": "Devices",
+    "App": "Device Manager",
+    "Device": "Device",
+    "Token": "Access Token",
+    "Services": "Services"
+  },
+
+  "vuetify": {
+    "dataIterator": {
+      "itemsPerPageText": "Resources per page",
+      "itemsPerPageAllText": "All Resources",
+      "pageText": "{0}-{1} of {2}"
+    }
+  },
+  "labels": {
+    "Value": "Value",
+    "SearchLabel": "Search",
+    "CategoryFilterLabel": "Category",
+    "DeploymentTypeFilterLabel": "Deployment Type",
+    "UUID": "UUID",
+    "Name": "Name",
+    "Description": "Description",
+    "LastContact": "Last Connection",
+    "Status": "Status",
+    "Actions": "Actions",
+    "Flag": "us",
+    "Action": "Action",
+    "Connection": "Connection",
+    "URL": "URL"
+  },
+
+  "buttons": {
+    "Generate": "Generate UUID",
+    "Cancel": "Cancel",
+    "Back": "Back",
+    "Save": "Save",
+    "Edit": "Edit",
+    "RandomDevice": "Random Device",
+    "Hide_info": "Cancel",
+    "Order": "Order",
+    "Checkout": "Checkout",
+    "Next": "Next",
+    "Finish": "Finish",
+    "Update": "Update",
+    "Create": "Create",
+    "AddLogic": "Add Logic",
+    "AddProperty": "Add Property",
+    "AddRequirement": "Add Requirement"
+  },
+
+  "infoText": {
+    "NoDevice": "No Devices detected, please reload the page",
+    "NoService": "No Service detected, please reload the page",
+    "AddDevice": "Add some new Devices",
+    "EditDialog": "Update Device",
+    "AddDialog": "Add a new Device",
+    "footer": "Created 2019 by Dominik Ratzel",
+    "SelectedDevice": "Selected Device",
+    "ReloadPage": "Reload Page"
+  },
+
+  "RequirementLabels": {
+    "PropertySemanticId": "Property Semantic Id",
+    "PropertyValue": "Property Value",
+    "ParentSubmodelsSemanticIds": "Parent Submodel Semantic Ids"
+  },
+
+  "ServiceLabels": {
+    "Images": "Images",
+    "Documents": "Documents",
+    "Service_Requirements": "Service Requirements",
+    "Overview": "Overview",
+    "ChooseDeploymentType": "Choose a Deployment Type"
+  },
+
+  "ServiceStepper": {
+    "Common": "Common",
+    "Deployment_Type": "DeploymentType",
+    "Service_Options": "Service Options",
+    "Requirements": "Requirements"
+  }
+}

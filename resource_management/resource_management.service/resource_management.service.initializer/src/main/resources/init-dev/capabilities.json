@@ -1,0 +1,243 @@
+[
+  {
+    "id": "2c8cafe5-1155-471c-9639-0db48ec249eb",
+    "capabilityClass": "DeploymentCapability",
+    "name": "Dummy",
+    "logo": "mdi-test-tube",
+    "type": [
+      "SETUP",
+      "DEPLOY"
+    ],
+    "actions": {
+      "INSTALL": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "INSTALL",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "install.yml"
+      },
+      "UNINSTALL": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "UNINSTALL",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "uninstall.yml"
+      },
+      "DEPLOY": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "DEPLOY",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "deploy.yml"
+      },
+      "UNDEPLOY": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "UNDEPLOY",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "undeploy.yml"
+      },
+      "UPDATE": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "UNDEPLOY",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "deploy.yml"
+      }
+    },
+    "supportedDeploymentTypes": [
+      "DOCKER_CONTAINER",
+      "DOCKER_COMPOSE"
+    ],
+    "clusterMemberTypes": []
+  },
+  {
+    "id": "b5cc76b3-c3cf-4df2-94ec-622245de34d1",
+    "capabilityClass": "DeploymentCapability",
+    "name": "Podman",
+    "logo": "mdi-alpha-p-circle-outline",
+    "type": [
+      "SETUP",
+      "DEPLOY"
+    ],
+    "actions": {
+      "INSTALL": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "INSTALL",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "install.yml"
+      },
+      "UNINSTALL": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "UNINSTALL",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "uninstall.yml"
+      },
+      "DEPLOY": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "DEPLOY",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "deploy.yml"
+      },
+      "UNDEPLOY": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "UNDEPLOY",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "undeploy.yml"
+      }
+    },
+    "supportedDeploymentTypes": [
+      "DOCKER_CONTAINER",
+      "DOCKER_COMPOSE"
+    ],
+    "clusterMemberTypes": []
+  },
+  {
+    "id": "5dcb8fc8-556b-4735-9c80-fce546e7bd7a",
+    "capabilityClass": "DeploymentCapability",
+    "name": "Docker-Swarm",
+    "logo": "mdi-docker-swarm",
+    "type": [
+      "SETUP",
+      "DEPLOY",
+      "SCALE"
+    ],
+    "actions": {
+      "DEPLOY": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "DEPLOY",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "deploy.yml"
+      },
+      "UNINSTALL": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "UNINSTALL",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "uninstall.yml"
+      },
+      "INSTALL": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "INSTALL",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "install.yml"
+      },
+      "UNDEPLOY": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "UNDEPLOY",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "undeploy.yml"
+      },
+      "SCALE_UP": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "SCALE_UP",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "scaleup.yml"
+      },
+      "SCALE_DOWN": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "SCALE_DOWN",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "scaledown.yml"
+      }
+    },
+    "supportedDeploymentTypes": [
+      "DOCKER_CONTAINER",
+      "DOCKER_COMPOSE"
+    ],
+    "clusterMemberTypes": [
+      {
+        "prettyName": "Manager",
+        "name": "docker_manager",
+        "minNumber": 3,
+        "scalable": false
+      }, {
+        "prettyName": "Worker",
+        "name": "docker_worker",
+        "minNumber": 1,
+        "scalable": true
+      }
+    ]
+  },
+  {
+    "id": "21afb100-01f9-4915-9c8c-bf9afc032c01",
+    "capabilityClass": "DeploymentCapability",
+    "name": "K3s",
+    "logo": "mdi-alpha-k-box-outline",
+    "type": [
+      "SETUP",
+      "DEPLOY",
+      "SCALE"
+    ],
+    "actions": {
+      "INSTALL": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "INSTALL",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "install.yml"
+      },
+      "UNINSTALL": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "UNINSTALL",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "uninstall.yml"
+      },
+      "DEPLOY": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "DEPLOY",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "deploy.yml"
+      },
+      "UNDEPLOY": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "UNDEPLOY",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "undeploy.yml"
+      },
+      "SCALE_UP": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "SCALE_UP",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "scaleup.yml"
+      },
+      "SCALE_DOWN": {
+        "capabilityActionClass": "AwxCapabilityAction",
+        "capabilityActionType": "SCALE_DOWN",
+        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
+        "awxBranch": "main",
+        "playbook": "scaledown.yml"
+      }
+    },
+    "supportedDeploymentTypes": [
+      "DOCKER_CONTAINER",
+      "DOCKER_COMPOSE"
+    ],
+    "clusterMemberTypes": [
+      {
+        "prettyName": "Server",
+        "name": "k3s_server",
+        "minNumber": 3,
+        "scalable": false
+      }, {
+        "prettyName": "Agent",
+        "name": "k3s_agent",
+        "minNumber": 1,
+        "scalable": true
+      }
+    ]
+  }
+]

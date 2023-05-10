@@ -1,0 +1,77 @@
+version: '3'
+
+services:
+  awx-web-no-jwt:
+    image: fabos4ai/slm-awx-web-no-jwt:15.0.1
+    depends_on:
+      - awx-redis
+      - awx-redis-init
+      - awx-postgres
+    networks:
+      default:
+        aliases:
+          - awxweb
+    user: root
+    volumes:
+      - awx_test_supervisor_socket:/var/run/supervisor
+      - awx_test_rsyslog_socket:/var/run/awx-rsyslog/
+      - awx_test_rsyslog_config:/var/lib/awx/rsyslog/
+      - awx_test-redis:/var/run/redis
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:8052" ]
+
+  awx-task:
+    image: fabos4ai/slm-awx-task:15.0.1
+    depends_on:
+      - awx-redis
+      - awx-redis-init
+      - awx-web-no-jwt
+      - awx-postgres
+    networks:
+      default:
+        aliases:
+          - awx
+    user: root
+    volumes:
+      - awx_test_supervisor_socket:/var/run/supervisor
+      - awx_test_rsyslog_socket:/var/run/awx-rsyslog/
+      - awx_test_rsyslog_config:/var/lib/awx/rsyslog/
+      - awx_test-redis:/var/run/redis
+
+  awx-redis:
+    image: fabos4ai/awx-redis:6
+    restart: unless-stopped
+    depends_on:
+      - awx-redis-init
+    environment:
+      http_proxy:
+      https_proxy:
+      no_proxy:
+    command: [ "/usr/local/etc/redis/redis.conf" ]
+    volumes:
+      - awx_test-redis:/var/run/redis/
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-s", "/var/run/redis/redis.sock", "ping" ]
+
+  awx-redis-init:
+    image: busybox
+    restart: "no"
+    command: sh -c "cd /var/run/redis/ && chmod -R 777 ."
+    volumes:
+      - awx_test-redis:/var/run/redis/
+
+  awx-postgres:
+    image: fabos4ai/slm-awx-postgres:10
+    environment:
+      PGUSER: awx
+    volumes:
+      - "awx_test_database_data:/var/lib/postgresql/data:Z"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+
+volumes:
+  awx_test_database_data:
+  awx_test_supervisor_socket:
+  awx_test_rsyslog_socket:
+  awx_test_rsyslog_config:
+  awx_test-redis:

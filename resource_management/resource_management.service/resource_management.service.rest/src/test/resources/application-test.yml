@@ -1,0 +1,91 @@
+### Application
+application:
+  name: "^project.artifactId^"
+  version: "^project.version^"
+  timestamp: "^timestamp^"
+
+open-api:
+  title: Resource Management
+  description: REST API of Resource Management
+  version: "^project.version^"
+  contact:
+    name: Fraunhofer IPA
+    url: https://www.ipa.fraunhofer.de
+    email: matthias.schneider@ipa.fraunhofer.de
+
+database:
+  schema: resource_management
+  username: user
+  password: password
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      database-platform: org.hibernate.dialect.MariaDB105Dialect
+  datasource:
+    driver-class-name: 'org.testcontainers.jdbc.ContainerDatabaseDriver'
+    url: jdbc:tc:mariadb:10.5:///mariadb://${database.schema}?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: ${database.username}
+    password: ${database.password}
+
+eureka:
+  client:
+    enabled: false
+
+logging:
+  level:
+    httpclient:
+      wire: INFO
+    org:
+      apache:
+        http: INFO
+
+keycloak:
+  config:
+    tenants:
+      config-path: ../../src/test/resources/keycloak/
+      client-registration-enable: false
+      client-update-enable: false
+      resolve-by-path: true
+      resolve-by-header: true
+      resolver-base-path: /
+      resolver-header: Realm
+      redirect-uris:
+      web-origins:
+
+awx:
+  username: admin
+  password: password
+  scheme: http
+  host: localhost
+  port: 80
+
+### Consul
+consul:
+  scheme: http
+  host: localhost
+  port: 8500
+  datacenter: fabos
+  skipAcl: true
+  acl-token: myroot
+
+### Vault
+vault:
+  scheme: http
+  host: localhost
+  port: 7777
+  authentication: TOKEN
+  token: myroot
+  app-role:
+    role-id: resource-management
+    secret-id: 48a319fa-f100-9b27-afa7-676809ba29fd
+    app-role-path: approle
+
+notification-service:
+  scheme: http
+  host: localhost
+  port: 4567
+
+resource-management:
+  url: "http://localhost:4567"

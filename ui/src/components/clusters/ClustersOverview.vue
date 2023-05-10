@@ -1,0 +1,82 @@
+<template>
+  <div>
+    <base-material-card
+      class="px-5 py-3"
+    >
+      <template #heading>
+        <overview-heading text="Clusters" />
+      </template>
+
+      <no-item-available-note
+        v-if="!clusters.length"
+        item="Cluster"
+      />
+
+      <v-card-text v-else>
+        <resources-table-clusters
+          class="mt-0 flex"
+        />
+      </v-card-text>
+    </base-material-card>
+
+
+    <v-fab-transition>
+      <v-btn
+        id="resources-button-add-resource"
+        class="mb-10 elevation-15"
+        color="primary"
+        absolute
+        bottom
+        right
+        fab
+        @click="showCreateDialog = true"
+      >
+        <v-icon large>
+          mdi-plus
+        </v-icon>
+      </v-btn>
+    </v-fab-transition>
+
+    <clusters-create-dialog
+      :show="showCreateDialog"
+      @canceled="showCreateDialog = false"
+    />
+  </div>
+</template>
+
+<script>
+import { mapGetters, mapActions } from 'vuex'
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import ClustersCreateDialog from "@/components/clusters/dialogs/ClustersCreateDialog.vue";
+import ResourcesTableClusters from "@/components/resources/ResourcesTableClusters.vue";
+
+export default {
+  name: 'ClustersOverview',
+  components: {
+    ResourcesTableClusters,
+    OverviewHeading,
+    NoItemAvailableNote,
+    ClustersCreateDialog
+  },
+  data () {
+    return {
+      showCreateDialog: false,
+      showDeleteDialog: false,
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'clusters',
+    ])
+  },
+  mounted () {
+    this.$store.dispatch('getDeploymentCapabilities')
+  },
+  methods: {
+    ...mapActions([
+      'getResourcesFromBackend',
+    ])
+  },
+}
+</script>

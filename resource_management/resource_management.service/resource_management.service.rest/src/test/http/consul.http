@@ -1,0 +1,57 @@
+### Create Node
+PUT http://{{host}}:{{consul-port}}/v1/catalog/register
+Content-Type: application/json
+
+{
+  "address": "1.2.3.4",
+  "id": "b819c8c0-146a-4392-a2e0-71f4498cfdc2",
+  "node": "test-node",
+  "nodeMeta": {
+    "key1": "value1"
+  },
+  "taggedAddresses": {
+    "lan": "1.2.3.4"
+  }
+}
+
+### Get Node By ID
+GET http://{{host}}:{{consul-port}}/v1/catalog/nodes?filter=ID=="6d64bacc-090e-4a3b-95c1-2c265f0ec2ab"
+Authorization: Bearer {{consul-token}}
+
+### Get Policies
+GET http://{{host}}:{{consul-port}}/v1/acl/policies
+Authorization: Bearer {{consul-token}}
+
+### Get Policy by Name
+GET http://{{host}}:{{consul-port}}/v1/acl/policy/name/resource_1d79e156-db45-4018-af44-0a9abf8cca01
+Authorization: Bearer {{consul-token}}
+
+### Get Services
+GET http://{{host}}:{{consul-port}}/v1/catalog/services
+Authorization: Bearer {{consul-token}}
+
+### Get Nodes of a Service
+GET http://{{host}}:{{consul-port}}/v1/catalog/service/docker-swarm_f73075e0-3bdb-4bf1-9903-b3eecf15a19e
+Authorization: Bearer {{consul-token}}
+
+### Delete Service
+PUT http://{{host}}:{{consul-port}}/v1/catalog/deregister
+Authorization: Bearer {{consul-token}}
+Content-Type: application/json
+
+{
+  "node": "test-host-1",
+  "serviceId": "e98fbba4-88aa-44ae-8bd0-0d0773a63f59"
+}
+
+### Get KV
+GET http://{{host}}:{{consul-port}}/v1/kv/edb94fe0-9cba-4d3d-a362-7626d4323e48"
+Authorization: Bearer {{consul-token}}
+
+### Get KV recursive
+GET http://{{host}}:{{consul-port}}/v1/kv/edb94fe0-9cba-4d3d-a362-7626d4323e48?recurse=true"
+Authorization: Bearer {{consul-token}}
+
+### Get KV recursive
+DELETE http://{{host}}:{{consul-port}}/v1/kv/edb94fe0-9cba-4d3d-a362-7626d4323e48?recurse=true"
+Authorization: Bearer {{consul-token}}

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-second-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: my-app
+          image: nginx:1.14.0
+          ports:
+            - containerPort: 80
+          env:
+            - name: MY_SECOND_APP_ENV_VAR
+              value: "my value"
+          volumeMounts:
+            - name: my-app-storage
+              mountPath: /data/my-app
+      volumes:
+        - name: my-app-storage
+          persistentVolumeClaim:
+            claimName: my-app-pvc

@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  consul:
+      image: "consul:1.14"
+#      ports:
+#        - "9500:8500"
+      environment:
+        CONSUL_LOCAL_CONFIG: '{"datacenter": "fabos", "domain": ".fabos", "bind_addr": "0.0.0.0", "retry_join": ["0.0.0.0"], "acl":{"enabled": true, "default_policy": "allow", "tokens":{"master": "myroot"}}}'
+  vault:
+      image: "vault:1.11.3"
+#      ports:
+#        - "9200:8200"
+      environment:
+        VAULT_DEV_ROOT_TOKEN_ID: "myroot"

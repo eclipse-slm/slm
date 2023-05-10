@@ -1,0 +1,6 @@
+awx:
+  scheme: http
+  host: localhost
+  port: 80
+  username: admin
+  password: password

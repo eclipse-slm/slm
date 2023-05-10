@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+
+  slm-catalog:
+    image: fabos4ai/slm-catalog:${SLM_CATALOG_VERSION}
+    restart: unless-stopped
+    depends_on:
+      - slm-catalog-database
+    logging:
+      driver: "json-file"
+      options:
+        max-file: ${LOGGING_MAX_FILE}
+        max-size: ${LOGGING_MAX_SIZE}
+    ports:
+      - "${SLM_CATALOG_SERVICE_PORT}:10000"
+    networks:
+      default:
+        aliases:
+          - slm-catalog
+    extra_hosts:
+      - "${SLM_HOSTNAME}:172.17.0.1"
+    volumes:
+      - slm-catalog-database_config:/app/database/config
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:9000/swagger-ui/index.html" ]
+
+  slm-catalog-database:
+    image: fabos4ai/mariadb:${SLM_CATALOG_SERVICE_DATABASE_VERSION}
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: ${LOGGING_MAX_FILE}
+        max-size: ${LOGGING_MAX_SIZE}
+    ports:
+      - "${SLM_CATALOG_SERVICE_DATABASE_PORT}:3306"
+    networks:
+      default:
+        aliases:
+          - slm-catalog-database
+    environment:
+      MYSQL_USER: slm-catalog
+      MYSQL_DATABASE: catalog
+    volumes:
+      - slm-catalog-database_data:/var/lib/mysql
+      - slm-catalog-database_config:/config
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+
+networks:
+  default:
+
+volumes:
+  slm-catalog-database_data:
+  slm-catalog-database_config:
