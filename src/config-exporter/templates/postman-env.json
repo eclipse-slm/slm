@@ -1,0 +1,150 @@
+{
+  "id": "4e13a48e-e6cf-4e30-939e-1bf98ac84f94",
+  "name": "SLM - {{ target_host }}",
+  "values": [
+    {
+      "key": "resource.id",
+      "value": "c09c1edf-dce9-47b0-85b0-3a855ceff440",
+      "enabled": true
+    },
+    {
+      "key": "awx.url",
+      "value": "{{ awx_scheme }}://{{ awx_hostname }}:{{ awx_port }}",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "awx.jwt-authenticator.url",
+      "value": "{{ awx_scheme }}://{{ awx_hostname }}:{{ awx_port }}",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "keycloak.url",
+      "value": "{{ keycloak_auth_server_url }}",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "consul.url",
+      "value": "{{ consul_scheme }}://{{ consul_hostname }}:{{ consul_port }}/v1",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "consul.master-token",
+      "value": "{{ consul_master_token }}",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "keycloak.realm",
+      "value": "fabos",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "keycloak.user.username",
+      "value": "fabos",
+      "enabled": true
+    },
+    {
+      "key": "keycloak.user.password",
+      "value": "password",
+      "enabled": true
+    },
+    {
+      "key": "keycloak.admin.username",
+      "value": "admin",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "keycloak.admin.password",
+      "value": "password",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "keylcoak.user.token",
+      "value": "Generated via test script",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "vault.url",
+      "value": "{{ vault_scheme }}://{{ vault_hostname }}:{{ vault_port }}",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "vault.root-token",
+      "value": "{{ vault_root_token }}",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "notification-service.url",
+      "value": "http://{{ notification_service_host }}:{{ notification_service_port }}",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "resource-registry.url",
+      "value": "http://{{ resource_management_host }}:{{ resource_management_port }}",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "resource-registry.vault.role-id",
+      "value": "{{ vault_resource_management_app_role_id }}",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "resource-registry.vault.secret-id",
+      "value": "{{ vault_resource_management_app_secret_id }}",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "deployment-capability.docker",
+      "value": "  {\n    \"id\": \"08c5b8de-5d4a-4116-a73f-1d1f616c7c70\",\n    \"capabilityClass\": \"DeploymentCapability\",\n    \"name\": \"Docker\",\n    \"logo\": \"mdi-docker\",\n    \"type\": [\n      \"setup\",\n      \"deploy\"\n    ],\n    \"actions\": {\n      \"deploy\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"deploy\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-docker\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"deploy.yml\"\n      },\n      \"uninstall\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"uninstall\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-docker\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"uninstall.yml\"\n      },\n      \"install\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"install\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-docker\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"install.yml\"\n      },\n      \"undeploy\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"undeploy\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-docker\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"undeploy.yml\"\n      }\n    },\n    \"supportedDeploymentTypes\": [\n      \"DOCKER_CONTAINER\",\n      \"DOCKER_COMPOSE\"\n    ],\n    \"clusterMemberTypes\": []\n  },\n  {\n    \"uuid\": \"5dcb8fc8-556b-4735-9c80-fce546e7bd7a\",\n    \"capabilityClass\": \"DeploymentCapability\",\n    \"name\": \"Docker-Swarm\",\n    \"logo\": \"mdi-docker-swarm\",\n    \"type\": [\n      \"setup\",\n      \"deploy\",\n      \"scale\"\n    ],\n    \"actions\": {\n      \"deploy\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"deploy\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"deploy.yml\"\n      },\n      \"uninstall\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"uninstall\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"uninstall.yml\"\n      },\n      \"install\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"install\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"install.yml\"\n      },\n      \"undeploy\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"undeploy\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"undeploy.yml\"\n      },\n      \"scaleup\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"scaleup\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"scaleup.yml\"\n      },\n      \"scaledown\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"scaledown\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"scaledown.yml\"\n      }\n    },\n    \"supportedDeploymentTypes\": [\n      \"DOCKER_CONTAINER\",\n      \"DOCKER_COMPOSE\"\n    ],\n    \"clusterMemberTypes\": [\n      {\n        \"prettyName\": \"Manager\",\n        \"name\": \"docker_manager\",\n        \"minNumber\": 3,\n        \"scalable\": false\n      }, {\n        \"prettyName\": \"Worker\",\n        \"name\": \"docker_worker\",\n        \"minNumber\": 1,\n        \"scalable\": true\n      }\n    ]\n  },\n  {\n    \"uuid\": \"21afb100-01f9-4915-9c8c-bf9afc032c01\",\n    \"capabilityClass\": \"DeploymentCapability\",\n    \"name\": \"K3s\",\n    \"logo\": \"mdi-alpha-k-box-outline\",\n    \"type\": [\n      \"setup\",\n      \"deploy\",\n      \"scale\"\n    ],\n    \"actions\": {\n      \"install\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"install\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-k3s\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"install.yml\"\n      },\n      \"uninstall\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"uninstall\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-k3s\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"uninstall.yml\"\n      },\n      \"deploy\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"deploy\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-k3s\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"deploy.yml\"\n      },\n      \"undeploy\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"undeploy\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-k3s\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"undeploy.yml\"\n      },\n      \"scaleup\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"scaleup\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-k3s\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"scaleup.yml\"\n      },\n      \"scaledown\": {\n        \"capabilityActionClass\": \"AwxCapabilityAction\",\n        \"capabilityActionType\": \"scaledown\",\n        \"awxRepo\": \"https://github.com/FabOS-AI/fabos-slm-dc-k3s\",\n        \"awxBranch\": \"main\",\n        \"playbook\": \"scaledown.yml\"\n      }\n    },\n    \"supportedDeploymentTypes\": [\n      \"DOCKER_CONTAINER\",\n      \"DOCKER_COMPOSE\"\n    ],\n    \"clusterMemberTypes\": [\n      {\n        \"prettyName\": \"Server\",\n        \"name\": \"k3s_server\",\n        \"minNumber\": 3,\n        \"scalable\": false\n      }, {\n        \"prettyName\": \"Agent\",\n        \"name\": \"k3s_agent\",\n        \"minNumber\": 1,\n        \"scalable\": true\n      }\n    ]\n  }",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "deployment-capability.docker.id",
+      "value": "08c5b8de-5d4a-4116-a73f-1d1f616c7c70",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "service-registry.url",
+      "value": "http://{{ service_management_host }}:{{ service_management_port }}",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "service-registry.vault.role-id",
+      "value": "{{ vault_service_management_app_role_id }}",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "service-registry.vault.secret-id",
+      "value": "{{ vault_service_management_app_secret_id }}",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "R_Keycloak_Login_User",
+      "value": "Request - Generated via test script",
+      "type": "any",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2022-09-14T13:30:34.181Z",
+  "_postman_exported_using": "Postman/9.31.6"
+}

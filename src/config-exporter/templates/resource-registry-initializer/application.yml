@@ -1,0 +1,9 @@
+resource-registry:
+  url: http://{{ resource_management_host }}:{{ resource_management_port }}
+  init-directories: init/
+
+keycloak:
+  auth-server-url: {{ keycloak_auth_server_url }}
+  realm: fabos
+  username: fabos
+  password: password

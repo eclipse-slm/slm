@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  config-exporter:
+    image: ghcr.io/eclipse-slm/slm/config-exporter:${SLM_VERSION}
+    restart: "no"
+    environment:
+      - CONFIGURE_CORE_PROJECT=false
+    env_file:
+      - .env
+    volumes:
+      - ./config:/project
+      - keycloak_config_awx-jwt-authenticator:/config/keycloak/awx-jwt-authenticator
+      - keycloak_config_notification-service:/config/keycloak/notification-service
+      - keycloak_config_resource-registry:/config/keycloak/resource-registry
+      - keycloak_config_service-registry:/config/keycloak/service-registry
+
+      - consul_config_root:/config/consul/root
+      - consul_config_awx:/config/consul/awx
+      - consul_config_resource-registry:/config/consul/resource-registry
+      - consul_config_service-registry:/config/consul/service-registry
+
+      - vault_config_root:/config/vault/root
+      - vault_config_awx:/config/vault/awx
+      - vault_config_awx-jwt-authenticator:/config/vault/awx-jwt-authenticator
+      - vault_config_service-registry:/config/vault/service-registry
+      - vault_config_resource-registry:/config/vault/resource-registry
+
+      - awx_config_notification-service:/config/awx/notification-service
+      - awx_config_resource-registry:/config/awx/resource-registry
+      - awx_config_service-registry:/config/awx/service-registry
+      - awx_config_jwt-authenticator:/config/awx/awx-jwt-authenticator
+
+      - notification-service-database_config:/config/notification-service/database
+      - resource-registry-database_config:/config/resource-registry/database
+      - service-registry-database_config:/config/service-registry/database
+      - catalog-database_config:/config/catalog/database

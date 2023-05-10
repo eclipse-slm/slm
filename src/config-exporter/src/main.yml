@@ -1,0 +1,120 @@
+- name: "Export configuration"
+  hosts: localhost
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - set_fact:
+        configure_core_project: "{{ lookup('env', 'CONFIGURE_CORE_PROJECT') }}"
+        target_host: "{{ lookup('env', 'SLM_HOSTNAME') }}"
+    - set_fact:
+        keycloak_auth_server_url: "http://{{ lookup('env', 'SLM_HOSTNAME') }}:7080/auth"
+        awx_scheme: "http"
+        awx_hostname: "{{ lookup('env', 'SLM_HOSTNAME') }}"
+        awx_port:  "{{ lookup('env', 'AWX_PORT_HTTP') }}"
+        awx_notification_service_username: "{{ lookup('file', '/config/awx/notification-service/awx_username') }}"
+        awx_notification_service_password: "{{ lookup('file', '/config/awx/notification-service/awx_password') }}"
+        awx_resource_management_username: "{{ lookup('file', '/config/awx/resource-registry/awx_username') }}"
+        awx_resource_management_password: "{{ lookup('file', '/config/awx/resource-registry/awx_password') }}"
+        awx_service_management_username: "{{ lookup('file', '/config/awx/service-registry/awx_username') }}"
+        awx_service_management_password: "{{ lookup('file', '/config/awx/service-registry/awx_password') }}"
+        consul_scheme: "http"
+        consul_hostname: "{{ target_host }}"
+        consul_port: "{{ lookup('env', 'CONSUL_PORT') }}"
+        consul_master_token: "{{ lookup('file', '/config/consul/root/consul_master_token') }}"
+        consul_resource_management_token: "{{ lookup('file', '/config/consul/resource-registry/consul_token') }}"
+        consul_service_management_token: "{{ lookup('file', '/config/consul/service-registry/consul_token') }}"
+        vault_scheme: "http"
+        vault_hostname: "{{ target_host }}"
+        vault_port: "{{ lookup('env', 'VAULT_PORT') }}"
+        vault_root_token: "{{ lookup('file', '/config/vault/root/root_token') }}"
+        vault_resource_management_app_role_id: "{{ lookup('file', '/config/vault/resource-registry/role_id') }}"
+        vault_resource_management_app_secret_id: "{{ lookup('file', '/config/vault/resource-registry/secret_id') }}"
+        vault_service_management_app_role_id: "{{ lookup('file', '/config/vault/service-registry/role_id') }}"
+        vault_service_management_app_secret_id: "{{ lookup('file', '/config/vault/service-registry/secret_id') }}"
+        resource_management_scheme: "http"
+        resource_management_host: "{{ target_host }}"
+        resource_management_port: "{{ lookup('env', 'RESOURCE_MANAGEMENT_PORT') }}"
+        resource_management_database_user: "{{ lookup('file', '/config/resource-registry/database/user') }}"
+        resource_management_database_password: "{{ lookup('file', '/config/resource-registry/database/password') }}"
+        resource_management_database_schema: "{{ lookup('file', '/config/resource-registry/database/schema') }}"
+        service_management_scheme: "http"
+        service_management_host: "{{ target_host }}"
+        service_management_port: "{{ lookup('env', 'SERVICE_MANAGEMENT_PORT') }}"
+        service_management_database_user: "{{ lookup('file', '/config/service-registry/database/user') }}"
+        service_management_database_password: "{{ lookup('file', '/config/service-registry/database/password') }}"
+        service_management_database_schema: "{{ lookup('file', '/config/service-registry/database/schema') }}"
+        notification_service_scheme: "http"
+        notification_service_host: "{{ target_host }}"
+        notification_service_port: "{{ lookup('env', 'NOTIFICATION_SERVICE_PORT') }}"
+        notification_service_database_user: "{{ lookup('file', '/config/notification-service/database/user') }}"
+        notification_service_database_password: "{{ lookup('file', '/config/notification-service/database/password') }}"
+        notification_service_database_schema: "{{ lookup('file', '/config/notification-service/database/schema') }}"
+        catalog_service_scheme: "http"
+        catalog_service_host: "{{ target_host }}"
+        catalog_service_port: "{{ lookup('env', 'SLM_CATALOG_SERVICE_PORT') }}"
+        catalog_service_database_user: "{{ lookup('file', '/config/catalog/database/user') }}"
+        catalog_service_database_password: "{{ lookup('file', '/config/catalog/database/password') }}"
+        catalog_service_database_schema: "{{ lookup('file', '/config/catalog/database/schema') }}"
+        monitoring_service_scheme: "http"
+        monitoring_service_host: "{{ lookup('env', 'SLM_HOSTNAME') }}"
+        monitoring_service_port: "{{ lookup('env', 'MONITORING_SERVICE_PORT') }}"
+    - set_fact:
+        awx_url: "{{awx_scheme}}://{{awx_hostname}}:{{awx_port}}"
+        resource_management_url: "{{resource_management_scheme}}://{{resource_management_host}}:{{resource_management_port}}"
+        service_management_url: "{{service_management_scheme}}://{{service_management_host}}:{{service_management_port}}"
+        notification_service_url: "{{notification_service_scheme}}://{{notification_service_host}}:{{notification_service_port}}"
+        catalog_service_url: "{{catalog_service_scheme}}://{{catalog_service_host}}:{{catalog_service_port}}"
+        monitoring_service_url: "{{monitoring_service_scheme}}://{{monitoring_service_host}}:{{monitoring_service_port}}"
+
+    - name: "Ensures /project/_config_generated dir exists"
+      file:
+        path: "/project/_config_generated"
+        state: directory
+
+    - name: "Copy application properties"
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items:
+       - src: /templates/slm-config.yml
+         dest: /project/_config_generated/slm-config.yml
+       - src: /templates/insomnia-env.json
+         dest: /project/_config_generated/insomnia-env.json
+       - src: /templates/postman-env.json
+         dest: /project/_config_generated/postman-env.json
+
+    - name: "Copy application properties"
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items:
+        - src: /templates/notification-service/application.yml
+          dest: /project/notification_service/notification_service.service/notification_service.service.rest/src/main/resources/application.yml
+        - src: /templates/resource-registry/application.yml
+          dest: /project/resource_management/resource_management.service/resource_management.service.rest/src/main/resources/application.yml
+        - src: /templates/resource-registry-initializer/application.yml
+          dest: /project/resource_management/resource_management.service/resource_management.service.initializer/src/main/resources/application.yml
+        - src: /templates/service-registry/application.yml
+          dest: /project/service_management/service_management.service/service_management.service.rest/src/main/resources/application.yml
+        - src: /templates/service-registry-initializer/application.yml
+          dest: /project/service_management/service_management.service/service_management.service.initializer/src/main/resources/application.yml
+        - src: /templates/catalog/application.yml
+          dest: /project/catalog/catalog.service/catalog.service.app/src/main/resources/application.yml
+        - src: /templates/ui/.env
+          dest: /project/ui/.env
+      when: configure_core_project|default(false)|bool == true
+      ignore_errors: true
+
+    - name: "Copy Keycloak configs"
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items:
+        - src: /config/keycloak/notification-service/
+          dest: /project/notification_service/notification_service.service/notification_service.service.rest/src/main/resources/keycloak
+        - src: /config/keycloak/resource-registry/
+          dest: /project/resource_management/resource_management.service/resource_management.service.rest/src/main/resources/keycloak
+        - src: /config/keycloak/service-registry/
+          dest: /project/service_management/service_management.service/service_management.service.rest/src/main/resources/keycloak
+      when: configure_core_project|default(false)|bool == true
