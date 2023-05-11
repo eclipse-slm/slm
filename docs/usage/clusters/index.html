@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Clusters | EclipseSLM</title>
+    <meta name="generator" content="VuePress 1.9.9">
+    
+    <meta name="description" content="Eclipse Service Lifecycle Management">
+    
+    <link rel="preload" href="/assets/css/0.styles.5ad24126.css" as="style"><link rel="preload" href="/assets/js/app.12c7b921.js" as="script"><link rel="preload" href="/assets/js/3.75245a12.js" as="script"><link rel="preload" href="/assets/js/4.303d47de.js" as="script"><link rel="preload" href="/assets/js/25.1487643f.js" as="script"><link rel="prefetch" href="/assets/js/1.4fa3d05e.js"><link rel="prefetch" href="/assets/js/10.a288b142.js"><link rel="prefetch" href="/assets/js/11.f02265bf.js"><link rel="prefetch" href="/assets/js/12.a184ac06.js"><link rel="prefetch" href="/assets/js/13.d8d15ad4.js"><link rel="prefetch" href="/assets/js/14.f7deaad9.js"><link rel="prefetch" href="/assets/js/15.e9e57b90.js"><link rel="prefetch" href="/assets/js/16.57b20029.js"><link rel="prefetch" href="/assets/js/17.24347182.js"><link rel="prefetch" href="/assets/js/18.7dcc8c33.js"><link rel="prefetch" href="/assets/js/19.b0007514.js"><link rel="prefetch" href="/assets/js/20.8316ef52.js"><link rel="prefetch" href="/assets/js/21.543f9294.js"><link rel="prefetch" href="/assets/js/22.53ab31c5.js"><link rel="prefetch" href="/assets/js/23.ba0ebc75.js"><link rel="prefetch" href="/assets/js/24.f2cbb09d.js"><link rel="prefetch" href="/assets/js/26.53c6cb58.js"><link rel="prefetch" href="/assets/js/27.f48c7d31.js"><link rel="prefetch" href="/assets/js/28.af09f4bc.js"><link rel="prefetch" href="/assets/js/29.4a7419b8.js"><link rel="prefetch" href="/assets/js/5.9dded4d9.js"><link rel="prefetch" href="/assets/js/6.f0b9cbeb.js"><link rel="prefetch" href="/assets/js/7.823f07ee.js"><link rel="prefetch" href="/assets/js/8.4661b4b9.js"><link rel="prefetch" href="/assets/js/9.7c6b1e44.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.5ad24126.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><img src="/img/logo.svg" alt="EclipseSLM" class="logo"></a> <!----> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <a href="https://github.com/FabOS-AI/fabos-slm" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <a href="https://github.com/FabOS-AI/fabos-slm" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></nav>  <ul class="sidebar-links"><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>Getting Started</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading open"><span>Usage</span> <span class="arrow down"></span></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/docs/usage/" aria-current="page" class="sidebar-link">Overview</a></li><li><a href="/docs/usage/capabilities/" class="sidebar-link">Capabilities</a></li><li><a href="/docs/usage/clusters/" aria-current="page" class="active sidebar-link">Clusters</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/docs/usage/clusters/#install-new-clusters" class="sidebar-link">Install new clusters</a></li><li class="sidebar-sub-header"><a href="/docs/usage/clusters/#add-managed-clusters" class="sidebar-link">Add managed clusters</a></li></ul></li><li><a href="/docs/usage/service-offerings/" class="sidebar-link">Service Offerings</a></li><li><a href="/docs/usage/api/" class="sidebar-link">API</a></li><li><a href="/docs/usage/reporting-issues/" class="sidebar-link">Reporting Issues</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>Development</span> <span class="arrow right"></span></p> <!----></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="clusters"><a href="#clusters" class="header-anchor">#</a> Clusters</h1> <p>The Service Lifecycle Management enables the <a href="#install-new-clusters">installation of new clusters</a> and the integration of <a href="#add-managed-clusters">existing clusters (managed clusters)</a>. To deploy a service offering into a cluster, the corresponding deployment capability must have the deployment type of the service offering defined in the property <code>supportedDeploymentTypes</code>(see section <a href="/docs/usage/capabilities/#deployment-capabilities">Deployment Capabilites</a> for details).</p> <h2 id="install-new-clusters"><a href="#install-new-clusters" class="header-anchor">#</a> Install new clusters</h2> <p>A corresponding cluster deployment capability must be available to allow the installation of a new cluster. That deployment capability must have an <code>INSTALL</code> action and a definition for <code>clusterMemberTypes</code>.
+<br><br>
+Example from the <a href="https://github.com/FabOS-AI/fabos-slm-dc-k8s" target="_blank" rel="noopener noreferrer">official K8S deployment capability<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a>:</p> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token punctuation">{</span>
+    <span class="token punctuation">...</span>
+    <span class="token key atrule">&quot;actions&quot;</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">...</span>
+        <span class="token key atrule">&quot;INSTALL&quot;</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        <span class="token key atrule">&quot;capabilityActionClass&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;AwxCapabilityAction&quot;</span><span class="token punctuation">,</span>
+        <span class="token key atrule">&quot;capabilityActionType&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;INSTALL&quot;</span><span class="token punctuation">,</span>
+        <span class="token key atrule">&quot;awxRepo&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;https://github.com/FabOS-AI/fabos-slm-dc-k8s&quot;</span><span class="token punctuation">,</span>
+        <span class="token key atrule">&quot;awxBranch&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;main&quot;</span><span class="token punctuation">,</span>
+        <span class="token key atrule">&quot;playbook&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;install.yml&quot;</span><span class="token punctuation">,</span>
+        <span class="token punctuation">...</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">...</span>
+    <span class="token key atrule">&quot;clusterMemberTypes&quot;</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span>
+            <span class="token key atrule">&quot;name&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;k8s_master&quot;</span><span class="token punctuation">,</span>
+            <span class="token key atrule">&quot;prettyName&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;Control-Plane Master&quot;</span><span class="token punctuation">,</span>
+            <span class="token key atrule">&quot;minNumber&quot;</span><span class="token punctuation">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
+            <span class="token key atrule">&quot;scalable&quot;</span><span class="token punctuation">:</span> <span class="token boolean important">false</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span>
+            <span class="token key atrule">&quot;name&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;k8s_node&quot;</span><span class="token punctuation">,</span>
+            <span class="token key atrule">&quot;prettyName&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;Worker&quot;</span><span class="token punctuation">,</span>
+            <span class="token key atrule">&quot;minNumber&quot;</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+            <span class="token key atrule">&quot;scalable&quot;</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span>
+            <span class="token key atrule">&quot;name&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;haproxy&quot;</span><span class="token punctuation">,</span>
+            <span class="token key atrule">&quot;prettyName&quot;</span><span class="token punctuation">:</span> <span class="token string">&quot;External Proxy&quot;</span><span class="token punctuation">,</span>
+            <span class="token key atrule">&quot;minNumber&quot;</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+            <span class="token key atrule">&quot;scalable&quot;</span><span class="token punctuation">:</span> <span class="token boolean important">false</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">...</span>
+<span class="token punctuation">}</span>
+</code></pre></div><h3 id="install-new-kubernetes-clusters"><a href="#install-new-kubernetes-clusters" class="header-anchor">#</a> Install new Kubernetes clusters</h3> <p>The Service Lifecycle Management provides an <a href="https://github.com/FabOS-AI/fabos-slm-dc-k8s" target="_blank" rel="noopener noreferrer">official K8S deployment capability<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a>, which supports the installation of new clusters. At least 5 hosts are required to set up a new Kubernetes cluster.</p> <p>Example:</p> <ul><li><p>Go to the <code>Resource</code> tab and press the <code>+</code> button in the bottom right corner.
+<img src="/img/figures/use/cluster-create-new-1.png" alt="Add resource button"></p></li> <li><p>Select <code>ADD EXISTING</code>.
+<img src="/img/figures/use/cluster-create-new-2.png" alt="Create new resource"></p></li> <li><p>Select <code>Cluster</code>.
+<img src="/img/figures/use/cluster-create-new-3.png" alt="Add new cluster"></p></li> <li><p>Configure cluster</p> <ul><li>Select <code>Create Methode</code> <code>Use existing resources</code>.</li> <li>Select <code>Cluster Type</code> <code>Kubernetes</code>.</li> <li>Assign the hosts to the member types.</li> <li>Press <code>CREATE</code>, and the automation to set up your Kubernetes cluster will be triggered. It will take a few minutes.</li></ul> <p><img src="/img/figures/use/cluster-create-new-4.png" alt="Cluster create dialog"></p></li> <li><p>After the automation has finished, your new Kubernetes cluster will be shown in the <code>Resources</code> overview.
+<img src="/img/figures/use/cluster-create-new-5.png" alt="Result"></p></li></ul> <h2 id="add-managed-clusters"><a href="#add-managed-clusters" class="header-anchor">#</a> Add managed clusters</h2> <p>Already existing clusters be added as managed clusters. To allow the addition of a managed cluster, a corresponding cluster deployment capability must be available. That deployment capability must have an <code>INSTALL</code> action with the property <code>skipable: true</code>. Configuration parameters in the action, can be used to query information required for accessing the cluster.
+<br><br>
+Example from the <a href="https://github.com/FabOS-AI/fabos-slm-dc-k8s" target="_blank" rel="noopener noreferrer">official K8S deployment capability<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a>:</p> <div class="language-yaml:line-numbers extra-class"><pre class="language-text"><code>{
+    ...
+    &quot;actions&quot;: {
+        ...
+        &quot;INSTALL&quot;: {
+            &quot;capabilityActionClass&quot;: &quot;AwxCapabilityAction&quot;,
+            &quot;capabilityActionType&quot;: &quot;INSTALL&quot;,
+            &quot;awxRepo&quot;: &quot;https://github.com/FabOS-AI/fabos-slm-dc-k8s&quot;,
+            &quot;awxBranch&quot;: &quot;main&quot;,
+            &quot;playbook&quot;: &quot;install.yml&quot;,
+            &quot;skipable&quot;: true,
+            &quot;configParameters&quot;: [
+                {
+                &quot;name&quot;: &quot;kubeconfig&quot;,
+                &quot;prettyName&quot;: &quot;Kube Config&quot;,
+                &quot;description&quot;: &quot;...&quot;,
+                &quot;secret&quot;: true,
+                &quot;valueType&quot;: &quot;FILE&quot;,
+                &quot;requiredType&quot;: &quot;SKIP&quot;
+                },
+                {
+                &quot;name&quot;: &quot;namespace&quot;,
+                &quot;prettyName&quot;: &quot;Namespace&quot;,
+                &quot;description&quot;: &quot;...&quot;,
+                &quot;secret&quot;: true,
+                &quot;valueType&quot;: &quot;STRING&quot;,
+                &quot;requiredType&quot;: &quot;SKIP&quot;
+                }
+            ]
+        },
+        ...
+    },
+    ...
+}
+</code></pre></div><h3 id="kubernetes-clusters"><a href="#kubernetes-clusters" class="header-anchor">#</a> Kubernetes Clusters</h3> <p>The Service Lifecycle Management provides an <a href="https://github.com/FabOS-AI/fabos-slm-dc-k8s" target="_blank" rel="noopener noreferrer">official K8S deployment capability<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a>, which supports managed clusters. It requires a <a href="https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/" target="_blank" rel="noopener noreferrer">kubeconfig file<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a> and a namespace in the cluster. The Service Lifecycle Management will deploy all services into this namespace.</p> <p>Example:</p> <ul><li><p>Go to the <code>Resource</code> tab and press the <code>+</code> button in the bottom right corner.
+<img src="/img/figures/use/cluster-add-existing-1.png" alt="Add resource button"></p></li> <li><p>Select <code>ADD EXISTING</code>.
+<img src="/img/figures/use/cluster-add-existing-2.png" alt="Add existing resource"></p></li> <li><p>Select <code>Cluster</code>.
+<img src="/img/figures/use/cluster-add-existing-3.png" alt="Add cluster"></p></li> <li><p>Add details of cluster</p> <ul><li>Select <code>Cluster Type</code> <code>Kubernetes</code>.</li> <li>Upload or paste the kubeconfig file of the Kubernetes cluster you want to add.</li> <li>Enter the name of the namespace where the Service Lifecycle Management should deploy your services.</li> <li>Press <code>ADD</code>, and your Kubernetes cluster will be added.</li></ul> <p><img src="/img/figures/use/cluster-add-existing-4.png" alt="Dialog to add cluster"></p></li> <li><p>Your Kubernetes cluster will be shown in the <code>Resources</code> overview.
+<img src="/img/figures/use/cluster-add-existing-5.png" alt="Result"></p></li></ul></div> <footer class="page-edit"><!----> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+      ←
+      <a href="/docs/usage/capabilities/" class="prev">
+        Capabilities
+      </a></span> <span class="next"><a href="/docs/usage/service-offerings/">
+        Service Offerings
+      </a>
+      →
+    </span></p></div> </main></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.12c7b921.js" defer></script><script src="/assets/js/3.75245a12.js" defer></script><script src="/assets/js/4.303d47de.js" defer></script><script src="/assets/js/25.1487643f.js" defer></script>
+  </body>
+</html>
