@@ -1,6 +1,6 @@
 service-management:
   url: http://{{ service_management_host }}:{{ service_management_port }}
-  init-directories: init-public/,init-private/
+  init-directories:
   git-repos:
     urls: "https://github.com/FabOS-AI/fabos-slm-service-management-content.git"
     clone-directory: tmp/

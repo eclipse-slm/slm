@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./config:/project
+      - ../..:/project
       - keycloak_config_awx-jwt-authenticator:/config/keycloak/awx-jwt-authenticator
       - keycloak_config_notification-service:/config/keycloak/notification-service
       - keycloak_config_resource-management:/config/keycloak/resource-management

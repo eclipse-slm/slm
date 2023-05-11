@@ -1,6 +1,6 @@
 service-management:
   url: http://localhost:9020
-  init-directory:
+  init-directories:
   git-repos:
     urls: "https://github.com/FabOS-AI/fabos-slm-service-management-content.git"
     clone-directory: tmp/
