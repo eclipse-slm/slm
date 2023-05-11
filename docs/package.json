@@ -1,0 +1,27 @@
+{
+  "name": "EclipseSLM",
+  "version": "1.3.0-SNAPSHOT",
+  "description": "Eclipse Service Lifecycle Management",
+  "main": "index.js",
+  "authors": {
+    "name": "Matthias Schneider",
+    "email": "matthias.schneider@ipa.fraunhofer.de"
+  },
+  "repository": "https://github.com/ma-sch/vuepress-test",
+  "scripts": {
+    "dev": "vuepress dev --temp .temp",
+    "build": "vuepress build",
+    "start": "nodemon --ext md,vue --watch .vuepress --watch . --exec vuepress dev"
+  },
+  "license": "Apache License 2.0",
+  "devDependencies": {
+    "@dovyp/vuepress-plugin-clipboard-copy": "^1.0.0-alpha.7",
+    "@vuepress/plugin-medium-zoom": "^1.9.7",
+    "axios": "^0.21.0",
+    "vuepress": "^1.9.7",
+    "vuepress-plugin-global-variables": "^0.2.0"
+  },
+  "dependencies": {
+    "vuetify": "^2.6.9"
+  }
+}
