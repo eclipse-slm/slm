@@ -2,7 +2,7 @@ service-management:
   url: http://{{ service_management_host }}:{{ service_management_port }}
   init-directories:
   git-repos:
-    urls: "https://github.com/FabOS-AI/fabos-slm-service-management-content.git"
+    urls: "https://github.com/FabOS-AI/fabos-slm-service-registry-content.git"
     clone-directory: tmp/
 
 keycloak:

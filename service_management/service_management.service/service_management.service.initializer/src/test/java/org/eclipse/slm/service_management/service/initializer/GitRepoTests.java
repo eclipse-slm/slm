@@ -15,10 +15,10 @@ public class GitRepoTests {
         @Test
         @DisplayName("... without credentials, without branch or tag")
         public void parseRepoUrlWithoutCredentialsAndWithoutBranchOrTag() {
-            var repoUrl = "https://github.com/FabOS-AI/fabos-slm-service-management-content.git";
+            var repoUrl = "https://github.com/FabOS-AI/fabos-slm-service-registry-content.git";
             var expectedGitRepo = new GitRepo();
-            expectedGitRepo.setUrl("https://github.com/FabOS-AI/fabos-slm-service-management-content.git");
-            expectedGitRepo.setName("fabos-slm-service-management-content");
+            expectedGitRepo.setUrl("https://github.com/FabOS-AI/fabos-slm-service-registry-content.git");
+            expectedGitRepo.setName("fabos-slm-service-registry-content");
 
             var gitRepo = new GitRepo(repoUrl);
 
@@ -28,10 +28,10 @@ public class GitRepoTests {
         @Test
         @DisplayName("... with credentials, without branch or tag")
         public void parseRepoUrlWithCredentialsAndWithoutBranchOrTag() {
-            var repoUrl = "myuser:mypass@https://github.com/FabOS-AI/fabos-slm-service-management-content.git";
+            var repoUrl = "myuser:mypass@https://github.com/FabOS-AI/fabos-slm-service-registry-content.git";
             var expectedGitRepo = new GitRepo();
-            expectedGitRepo.setUrl("https://github.com/FabOS-AI/fabos-slm-service-management-content.git");
-            expectedGitRepo.setName("fabos-slm-service-management-content");
+            expectedGitRepo.setUrl("https://github.com/FabOS-AI/fabos-slm-service-registry-content.git");
+            expectedGitRepo.setName("fabos-slm-service-registry-content");
             expectedGitRepo.setGitUsername("myuser");
             expectedGitRepo.setGitPassword("mypass");
 
@@ -43,10 +43,10 @@ public class GitRepoTests {
         @Test
         @DisplayName("... without credentials, with branch or tag")
         public void parseRepoUrlWithoutCredentialsAndWithBranchOrTag() {
-            var repoUrl = "https://github.com/FabOS-AI/fabos-slm-service-management-content.git:1.0.0";
+            var repoUrl = "https://github.com/FabOS-AI/fabos-slm-service-registry-content.git:1.0.0";
             var expectedGitRepo = new GitRepo();
-            expectedGitRepo.setUrl("https://github.com/FabOS-AI/fabos-slm-service-management-content.git");
-            expectedGitRepo.setName("fabos-slm-service-management-content");
+            expectedGitRepo.setUrl("https://github.com/FabOS-AI/fabos-slm-service-registry-content.git");
+            expectedGitRepo.setName("fabos-slm-service-registry-content");
             expectedGitRepo.setBranchOrTag("1.0.0");
 
             var gitRepo = new GitRepo(repoUrl);
@@ -57,10 +57,10 @@ public class GitRepoTests {
         @Test
         @DisplayName("... with credentials, with branch or tag")
         public void parseRepoUrlWithCredentialsAndWithBranchOrTag() {
-            var repoUrl = "myuser:mypass@https://github.com/FabOS-AI/fabos-slm-service-management-content.git:1.0.0";
+            var repoUrl = "myuser:mypass@https://github.com/FabOS-AI/fabos-slm-service-registry-content.git:1.0.0";
             var expectedGitRepo = new GitRepo();
-            expectedGitRepo.setUrl("https://github.com/FabOS-AI/fabos-slm-service-management-content.git");
-            expectedGitRepo.setName("fabos-slm-service-management-content");
+            expectedGitRepo.setUrl("https://github.com/FabOS-AI/fabos-slm-service-registry-content.git");
+            expectedGitRepo.setName("fabos-slm-service-registry-content");
             expectedGitRepo.setGitUsername("myuser");
             expectedGitRepo.setGitPassword("mypass");
             expectedGitRepo.setBranchOrTag("1.0.0");
