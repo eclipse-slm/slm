@@ -4,7 +4,7 @@ MAINTAINER Matthias Schneider (matthias.schneider@ipa.fraunhofer.de)
 ENV KEYCLOAK_CONFIG_TENANTS_CONFIGPATH="/app/keycloak" \
     DATABASE_HOST="service-management-database" \
     DATABASE_PORT=3306 \
-    RESOURCEREGISTRY_URL="http://resource-management:9010" \
+    RESOURCEMANAGEMENT_URL="http://resource-management:9010" \
     NOTIFICATIONSERVICE_SCHEME="http" \
     NOTIFICATIONSERVICE_HOST="notification-service"  \
     NOTIFICATIONSERVICE_PORT=9001 \

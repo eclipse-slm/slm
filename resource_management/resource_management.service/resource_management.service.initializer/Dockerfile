@@ -1,7 +1,7 @@
 FROM openjdk:18.0.2.1-jdk-slim-buster
 
-ENV RESOURCEREGISTRY_URL="http://resource-management:9010" \
-    RESOURCEREGISTRY_INITDIRECTORIES="/init/" \
+ENV RESOURCEMANAGEMENT_URL="http://resource-management:9010" \
+    RESOURCEMANAGEMENT_INITDIRECTORIES="/init/" \
     KEYCLOAK_AUTHSERVERURL="http://localhost:7080/auth" \
     KEYCLOAK_REALM="fabos" \
     KEYCLOAK_USERNAME="fabos" \
