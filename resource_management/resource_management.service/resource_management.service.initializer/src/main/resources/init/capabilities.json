@@ -12,8 +12,8 @@
       "INSTALL": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "INSTALL",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
+        "awxBranch": "main",
         "playbook": "install.yml",
         "skipable": true,
         "connectionTypes": ["ssh", "WinSsh"]
@@ -21,32 +21,32 @@
       "UNINSTALL": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "UNINSTALL",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
+        "awxBranch": "main",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh", "WinSsh"]
       },
       "DEPLOY": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "DEPLOY",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
+        "awxBranch": "main",
         "playbook": "deploy.yml",
         "connectionTypes": ["ssh", "WinSsh"]
       },
       "UNDEPLOY": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "UNDEPLOY",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
+        "awxBranch": "main",
         "playbook": "undeploy.yml",
         "connectionTypes": ["ssh", "WinSsh"]
       },
       "UPDATE": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "UPDATE",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
+        "awxBranch": "main",
         "playbook": "deploy.yml",
         "connectionTypes": ["ssh", "WinSsh"]
       }
@@ -71,32 +71,32 @@
       "DEPLOY": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "DEPLOY",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-portainer",
-        "awxBranch": "1.0.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-portainer",
+        "awxBranch": "main",
         "playbook": "deploy.yml",
         "connectionTypes": ["http"]
       },
       "UPDATE": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "UPDATE",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-portainer",
-        "awxBranch": "1.0.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-portainer",
+        "awxBranch": "main",
         "playbook": "update.yml",
         "connectionTypes": ["http"]
       },
       "UNINSTALL": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "UNINSTALL",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-portainer",
-        "awxBranch": "1.0.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-portainer",
+        "awxBranch": "main",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh", "WinSsh"]
       },
       "INSTALL": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "INSTALL",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-portainer",
-        "awxBranch": "1.0.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-portainer",
+        "awxBranch": "main",
         "playbook": "install.yml",
         "connectionTypes": ["ssh", "WinSsh"],
         "skipable": true,
@@ -123,8 +123,8 @@
       "UNDEPLOY": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "UNDEPLOY",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-portainer",
-        "awxBranch": "1.0.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-portainer",
+        "awxBranch": "main",
         "playbook": "undeploy.yml",
         "connectionTypes": ["http"]
       }
@@ -180,48 +180,48 @@
       "INSTALL": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "INSTALL",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-swarm",
+        "awxBranch": "main",
         "playbook": "install.yml",
         "connectionTypes": ["ssh"]
       },
       "UNINSTALL": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "UNINSTALL",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-swarm",
+        "awxBranch": "main",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh"]
       },
       "SCALE_UP": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "SCALE_UP",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-swarm",
+        "awxBranch": "main",
         "playbook": "scaleup.yml",
         "connectionTypes": ["ssh"]
       },
       "SCALE_DOWN": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "SCALE_DOWN",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-swarm",
+        "awxBranch": "main",
         "playbook": "scaledown.yml",
         "connectionTypes": ["ssh"]
       },
       "DEPLOY": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "DEPLOY",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-swarm",
+        "awxBranch": "main",
         "playbook": "deploy.yml",
         "connectionTypes": ["ssh"]
       },
       "UNDEPLOY": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "UNDEPLOY",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-swarm",
+        "awxBranch": "main",
         "playbook": "undeploy.yml",
         "connectionTypes": ["ssh"]
       }
@@ -258,48 +258,48 @@
       "INSTALL": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "INSTALL",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-k3s",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s",
+        "awxBranch": "main",
         "playbook": "install.yml",
         "connectionTypes": ["ssh"]
       },
       "UNINSTALL": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "UNINSTALL",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-k3s",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s",
+        "awxBranch": "main",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh"]
       },
       "SCALE_UP": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "SCALE_UP",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-k3s",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s",
+        "awxBranch": "main",
         "playbook": "scaleup.yml",
         "connectionTypes": ["ssh"]
       },
       "SCALE_DOWN": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "SCALE_DOWN",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-k3s",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s",
+        "awxBranch": "main",
         "playbook": "scaledown.yml",
         "connectionTypes": ["ssh"]
       },
       "DEPLOY": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "DEPLOY",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-k3s",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s",
+        "awxBranch": "main",
         "playbook": "deploy.yml",
         "connectionTypes": ["ssh"]
       },
       "UNDEPLOY": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "UNDEPLOY",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-k3s",
-        "awxBranch": "1.1.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s",
+        "awxBranch": "main",
         "playbook": "undeploy.yml",
         "connectionTypes": ["ssh"]
       }
@@ -336,8 +336,8 @@
       "INSTALL": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "INSTALL",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-k8s",
-        "awxBranch": "1.1.1",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k8s",
+        "awxBranch": "main",
         "playbook": "install.yml",
         "connectionTypes": ["ssh"],
         "skipable": true,
@@ -363,40 +363,40 @@
       "UNINSTALL": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "UNINSTALL",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-k8s",
-        "awxBranch": "1.1.1",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k8s",
+        "awxBranch": "main",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh"]
       },
       "SCALE_UP": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "SCALE_UP",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-k8s",
-        "awxBranch": "1.1.1",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k8s",
+        "awxBranch": "main",
         "playbook": "scaleup.yml",
         "connectionTypes": ["ssh"]
       },
       "SCALE_DOWN": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "SCALE_DOWN",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-k8s",
-        "awxBranch": "1.1.1",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k8s",
+        "awxBranch": "main",
         "playbook": "scaledown.yml",
         "connectionTypes": ["ssh"]
       },
       "DEPLOY": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "DEPLOY",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-k8s",
-        "awxBranch": "1.1.1",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k8s",
+        "awxBranch": "main",
         "playbook": "deploy.yml",
         "connectionTypes": ["http"]
       },
       "UNDEPLOY": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "UNDEPLOY",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-k8s",
-        "awxBranch": "1.1.1",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k8s",
+        "awxBranch": "main",
         "playbook": "undeploy.yml",
         "connectionTypes": ["http"]
       }
