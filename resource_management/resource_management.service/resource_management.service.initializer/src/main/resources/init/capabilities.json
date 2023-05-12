@@ -138,7 +138,7 @@
   {
     "id": "657d64b6-7f8a-41b7-8202-d3fb7c0ddaac",
     "capabilityClass": "BaseConfigurationCapability",
-    "name": "FabOS-Base-Config",
+    "name": "Base-Config",
     "logo": "mdi-factory",
     "type": [
       "SETUP"
@@ -147,8 +147,8 @@
       "UNINSTALL": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "UNINSTALL",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-bc-fabos-device",
-        "awxBranch": "1.0.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-cc-base",
+        "awxBranch": "main",
         "playbook": "uninstall.yml",
         "connectionTypes": [
           "ssh"
@@ -157,8 +157,8 @@
       "INSTALL": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "INSTALL",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-bc-fabos-device",
-        "awxBranch": "1.0.0",
+        "awxRepo": "https://github.com/eclipse-slm/slm-cc-base",
+        "awxBranch": "main",
         "playbook": "install.yml",
         "connectionTypes": [
           "ssh"
