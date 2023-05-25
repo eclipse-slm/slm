@@ -20,7 +20,7 @@ jobs:
       - name: SSH Remote Commands
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: $STAGING_DEVELOP_VM
+          host: ${{env.STAGING_DEVELOP_VM}}
           key_path: /home/vfk/.ssh/id_ed25519
           script: |
             cd /staging/tmp/stack/compose
