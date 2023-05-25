@@ -1,0 +1,39 @@
+name: Deploy Staging Environment
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - release-*
+
+env:
+  STAGING_DEVELOP_VM: 10.3.7.166
+  STAGING_DEVELOP_HOSTNAME: develop.stage.slm.vfk
+  STAGING_RELEASE_VM: 10.3.7.145
+  STAGING_RELEASE_HOSTNAME: main.stage.slm.vfk
+
+jobs:
+  deploy-staging-environment:
+    run-on: self-hosted
+    steps:
+      - name: "Use staging VM"
+        run: | 
+          ssh $STAGING_VM_DEVELOP
+          cd /staging
+      - uses: actions/checkout@v3
+      - name: Login to Docker Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+      - name: Build base docker image
+        working-directory: ./stack/compose
+        run: |
+          cd stack/compose
+          sed -ir "s/^[#]*\s*SLM_HOSTNAME=.*/SLM_HOSTNAME=$STAGING_DEVELOP_HOSTNAME/" .env
+          docker-compose down --volumes
+          docker system prune -f
+          docker-compose pull
+          docker-compose up -d --force-recreate
