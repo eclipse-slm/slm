@@ -15,7 +15,7 @@ env:
 
 jobs:
   deploy-staging-environment:
-    run-on: self-hosted
+    runs-on: self-hosted
     steps:
       - name: "Use staging VM"
         run: | 
