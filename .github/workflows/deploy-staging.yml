@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: "Use staging VM"
         run: | 
-          ssh $STAGING_VM_DEVELOP
+          ssh $STAGING_DEVELOP_VM
           cd /staging
       - uses: actions/checkout@v3
       - name: Login to Docker Registry
