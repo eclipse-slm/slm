@@ -1,1 +1,1 @@
-# slm
+# Eclipse Service Lifecycle Management
