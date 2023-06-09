@@ -120,6 +120,12 @@ public class ConsulAgentClientTest {
             ).when(consulAgentApiClient).getConsulAgentClient(Mockito.any(), Mockito.any());
         }
 
+        private void assertServiceCount(int expectedServiceCount) {
+            Map<String, List<String>> services = consulServicesApiClient.getServices(new ConsulCredential());
+
+            assertEquals(services.size(), expectedServiceCount);
+        };
+
         @Test
         @Order(10)
         public void testRegisterServiceViaAgent() throws Exception {
@@ -138,9 +144,7 @@ public class ConsulAgentClientTest {
                     new HashMap<>()
             );
 
-            Map<String, List<String>> services = consulServicesApiClient.getServices(new ConsulCredential());
-
-            assertEquals(services.size(), expectedServiceCount);
+            assertServiceCount(expectedServiceCount);
         }
 
         @Test
@@ -154,8 +158,7 @@ public class ConsulAgentClientTest {
             Thread.sleep(sleepTimeInSeconds*1000);
 
             // Make sure Node keeps service over time:
-            Map<String, List<String>> services = consulServicesApiClient.getServices(new ConsulCredential());
-            assertEquals(services.size(), expectedServiceCount);
+            assertServiceCount(expectedServiceCount);
         }
 
         @Test
@@ -172,9 +175,7 @@ public class ConsulAgentClientTest {
                     service.getService()
             );
 
-            Map<String, List<String>> services = consulServicesApiClient.getServices(new ConsulCredential());
-
-            assertEquals(services.size(), expectedServiceCount);
+            assertServiceCount(expectedServiceCount);
         }
     }
 }
