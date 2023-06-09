@@ -1,0 +1,8 @@
+### Get Catalog Nodes
+GET http://{{host}}:{{consul-port}}/v1/catalog/nodes
+
+### Get Checks of Node by NodeName
+GET http://{{host}}:{{consul-port}}/v1/health/node/test-node
+
+### Get Checks of Agent
+GET http://{{host}}:9500/v1/agent/checks
