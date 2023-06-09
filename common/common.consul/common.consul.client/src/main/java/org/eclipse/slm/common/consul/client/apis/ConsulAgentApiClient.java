@@ -1,10 +1,13 @@
 package org.eclipse.slm.common.consul.client.apis;
 
 import com.google.common.net.HostAndPort;
+import com.orbitz.consul.AgentClient;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.model.agent.ImmutableRegistration;
 import com.orbitz.consul.model.catalog.ImmutableCatalogRegistration;
 import com.orbitz.consul.model.health.ImmutableService;
+import com.orbitz.consul.model.health.Service;
+import com.orbitz.consul.option.ImmutableQueryOptions;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.model.catalog.Node;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
@@ -56,7 +59,19 @@ public class ConsulAgentApiClient extends AbstractConsulApiClient {
         }
     }
 
-    private Consul getConsulAgentClient(
+    public void removeServiceByName(ConsulCredential consulCredential, UUID nodeId, String service) throws ConsulLoginFailedException {
+        AgentClient agentClient = getConsulAgentClient(consulCredential, nodeId).agentClient();
+        Map<String, Service> services = agentClient.getServices(
+                ImmutableQueryOptions.builder().filter("Service==\"" + service + "\"").build()
+        );
+
+        if(services.size() != 1)
+            return;
+
+       agentClient.deregister(services.keySet().stream().findFirst().get());
+    }
+
+    public Consul getConsulAgentClient(
             ConsulCredential consulCredential,
             UUID nodeId
     ) throws ConsulLoginFailedException {
@@ -68,10 +83,12 @@ public class ConsulAgentApiClient extends AbstractConsulApiClient {
         if(optionalNode.isEmpty())
             return null;
 
-        Node node = optionalNode.get();
-
         return Consul.builder()
-                .withHostAndPort(HostAndPort.fromParts(node.getAddress(),9500))
+                .withHostAndPort(HostAndPort.fromParts(
+                        optionalNode.get().getAddress(),
+                        9500))
                 .build();
     }
+
+
 }
