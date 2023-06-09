@@ -1,6 +1,8 @@
 package org.eclipse.slm.common.consul.client.tests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.net.HostAndPort;
+import com.orbitz.consul.Consul;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.client.apis.ConsulAclApiClient;
 import org.eclipse.slm.common.consul.client.apis.ConsulAgentApiClient;
@@ -11,10 +13,15 @@ import org.eclipse.slm.common.consul.model.catalog.Node;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
@@ -53,7 +60,7 @@ public class ConsulAgentClientTest {
     ConsulNodesApiClient consulNodesApiClient;
     @Autowired
     ConsulServicesApiClient consulServicesApiClient;
-    @Autowired
+    @SpyBean
     ConsulAgentApiClient consulAgentApiClient;
     //endregion
 
@@ -105,9 +112,19 @@ public class ConsulAgentClientTest {
         }
         //endregion
 
+        private void mockGetConsulAgentClient() throws ConsulLoginFailedException {
+            Mockito.doReturn(
+                    Consul.builder()
+                            .withHostAndPort(HostAndPort.fromParts("localhost", 9500))
+                            .build()
+            ).when(consulAgentApiClient).getConsulAgentClient(Mockito.any(), Mockito.any());
+        }
+
         @Test
         @Order(10)
-        public void testRegisterServiceViaAgent() throws ConsulLoginFailedException {
+        public void testRegisterServiceViaAgent() throws Exception {
+            mockGetConsulAgentClient();
+
             // Size == 2 because "consul" by default is also registered as a service
             int expectedServiceCount = 2;
 
@@ -129,7 +146,7 @@ public class ConsulAgentClientTest {
         @Test
         @Order(20)
         public void testConsulKeepsServiceOverTime() throws ConsulLoginFailedException, InterruptedException {
-            int sleepTimeInSeconds = 120;
+            int sleepTimeInSeconds = 10;
             // Size == 2 because "consul" by default is also registered as a service
             int expectedServiceCount = 2;
 
@@ -138,6 +155,25 @@ public class ConsulAgentClientTest {
 
             // Make sure Node keeps service over time:
             Map<String, List<String>> services = consulServicesApiClient.getServices(new ConsulCredential());
+            assertEquals(services.size(), expectedServiceCount);
+        }
+
+        @Test
+        @Order(30)
+        public void testDeregisterServiceViaAgent() throws ConsulLoginFailedException {
+            mockGetConsulAgentClient();
+
+            // Size == 1 because "consul" by default is also registered as a service
+            int expectedServiceCount = 1;
+
+            consulAgentApiClient.removeServiceByName(
+                    new ConsulCredential(),
+                    nodeId,
+                    service.getService()
+            );
+
+            Map<String, List<String>> services = consulServicesApiClient.getServices(new ConsulCredential());
+
             assertEquals(services.size(), expectedServiceCount);
         }
     }
