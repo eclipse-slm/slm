@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.HostAndPort;
 import com.orbitz.consul.Consul;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.client.apis.ConsulAclApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulAgentApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulNodesApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulServicesApiClient;
+import org.eclipse.slm.common.consul.client.apis.*;
 import org.eclipse.slm.common.consul.model.agent.Service;
+import org.eclipse.slm.common.consul.model.catalog.CatalogNode;
 import org.eclipse.slm.common.consul.model.catalog.Node;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.junit.jupiter.api.*;
@@ -39,6 +37,7 @@ import static org.junit.Assert.assertEquals;
         ConsulServicesApiClient.class,
         ConsulAgentApiClient.class,
         ConsulAclApiClient.class,
+        ConsulHealthApiClient.class,
         RestTemplate.class,
         ObjectMapper.class
 })
@@ -62,6 +61,8 @@ public class ConsulAgentClientTest {
     ConsulServicesApiClient consulServicesApiClient;
     @Autowired
     ConsulAgentApiClient consulAgentApiClient;
+    @Autowired
+    ConsulHealthApiClient consulHealthApiClient;
     //endregion
 
     static {
@@ -130,6 +131,12 @@ public class ConsulAgentClientTest {
 
         @Test
         @Order(10)
+        public void testIsAgentAvailable() throws ConsulLoginFailedException {
+            assertEquals(true, consulHealthApiClient.hasNodeAgent(new ConsulCredential(), nodeId));
+        }
+
+        @Test
+        @Order(20)
         public void testRegisterServiceViaAgent() throws Exception {
             mockGetConsulNodeById();
 
@@ -150,8 +157,8 @@ public class ConsulAgentClientTest {
         }
 
         @Test
-        @Order(20)
-        public void testConsulKeepsServiceOverTime() throws ConsulLoginFailedException, InterruptedException {
+        @Order(30)
+        public void testConsulKeepsServiceOverTime() throws InterruptedException {
             int sleepTimeInSeconds = 10;
             // Size == 2 because "consul" by default is also registered as a service
             int expectedServiceCount = 2;
@@ -164,7 +171,7 @@ public class ConsulAgentClientTest {
         }
 
         @Test
-        @Order(30)
+        @Order(40)
         public void testDeregisterServiceViaAgent() throws ConsulLoginFailedException {
             mockGetConsulNodeById();
 
