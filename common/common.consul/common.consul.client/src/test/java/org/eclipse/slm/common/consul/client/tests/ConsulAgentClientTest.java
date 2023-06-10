@@ -56,11 +56,11 @@ public class ConsulAgentClientTest {
     //endregion
 
     //region Autowiring
-    @Autowired
+    @SpyBean
     ConsulNodesApiClient consulNodesApiClient;
     @Autowired
     ConsulServicesApiClient consulServicesApiClient;
-    @SpyBean
+    @Autowired
     ConsulAgentApiClient consulAgentApiClient;
     //endregion
 
@@ -86,7 +86,7 @@ public class ConsulAgentClientTest {
                 tries++;
                 LOG.info(tries + "# try");
 
-                if(tries > 60)
+                if(tries > maxTries)
                     break;
             }
 
@@ -100,7 +100,6 @@ public class ConsulAgentClientTest {
     public class TestConsulAgentClient {
         //region Test config vars
         //See docker-compose file for nodeName and nodeId
-        public static String nodeName = "test-node";
         public static UUID nodeId = UUID.fromString("79e4fb43-8233-4d07-868a-928d521063f3");
         public static UUID serviceId = UUID.randomUUID();
         public static Service service = new Service();
@@ -112,12 +111,15 @@ public class ConsulAgentClientTest {
         }
         //endregion
 
-        private void mockGetConsulAgentClient() throws ConsulLoginFailedException {
-            Mockito.doReturn(
-                    Consul.builder()
-                            .withHostAndPort(HostAndPort.fromParts("localhost", 9500))
-                            .build()
-            ).when(consulAgentApiClient).getConsulAgentClient(Mockito.any(), Mockito.any());
+        private void mockGetConsulNodeById() throws ConsulLoginFailedException {
+            Node node = new Node();
+            node.setNode("test-node");
+            node.setId(nodeId);
+            node.setAddress("127.0.0.1");
+
+            Mockito
+                    .doReturn(Optional.of(node))
+                    .when(consulNodesApiClient).getNodeById(Mockito.any(), Mockito.any());
         }
 
         private void assertServiceCount(int expectedServiceCount) {
@@ -129,7 +131,7 @@ public class ConsulAgentClientTest {
         @Test
         @Order(10)
         public void testRegisterServiceViaAgent() throws Exception {
-            mockGetConsulAgentClient();
+            mockGetConsulNodeById();
 
             // Size == 2 because "consul" by default is also registered as a service
             int expectedServiceCount = 2;
@@ -164,7 +166,7 @@ public class ConsulAgentClientTest {
         @Test
         @Order(30)
         public void testDeregisterServiceViaAgent() throws ConsulLoginFailedException {
-            mockGetConsulAgentClient();
+            mockGetConsulNodeById();
 
             // Size == 1 because "consul" by default is also registered as a service
             int expectedServiceCount = 1;
