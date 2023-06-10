@@ -71,7 +71,7 @@ public class ConsulAgentApiClient extends AbstractConsulApiClient {
        agentClient.deregister(services.keySet().stream().findFirst().get());
     }
 
-    public Consul getConsulAgentClient(
+    private Consul getConsulAgentClient(
             ConsulCredential consulCredential,
             UUID nodeId
     ) throws ConsulLoginFailedException {
