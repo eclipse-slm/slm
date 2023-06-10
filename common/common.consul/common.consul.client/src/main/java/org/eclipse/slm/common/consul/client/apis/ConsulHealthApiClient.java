@@ -15,13 +15,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
 public class ConsulHealthApiClient extends AbstractConsulApiClient {
 
     public final static Logger LOG = LoggerFactory.getLogger(ConsulHealthApiClient.class);
-
+    public final static String CHECK_ID_SERF = "serfHealth";
+    public final static String CHECK_STATUS_PASSING = "passing";
     private final ConsulNodesApiClient consulNodesApiClient;
     private final ConsulServicesApiClient consulServicesApiClient;
 
@@ -31,10 +33,10 @@ public class ConsulHealthApiClient extends AbstractConsulApiClient {
             @Value("${consul.port}") int consulPort,
             @Value("${consul.acl-token}") String consulToken,
             @Value("${consul.datacenter}") String consulDatacenter,
-            ConsulNodesApiClient consulNodesApiClient, ConsulServicesApiClient consulServicesApiClient) {
+            ConsulNodesApiClient consulNodesApiClient,
+            ConsulServicesApiClient consulServicesApiClient) {
         super(consulScheme, consulHost, consulPort, consulToken, consulDatacenter);
         this.consulNodesApiClient = consulNodesApiClient;
-
         this.consulServicesApiClient = consulServicesApiClient;
 
     }
@@ -81,6 +83,22 @@ public class ConsulHealthApiClient extends AbstractConsulApiClient {
             throws ConsulLoginFailedException {
         var nodeChecks = this.getConsulClient(consulCredential).healthClient().getNodeChecks(node).getResponse();
         return ConsulObjectMapper.mapAll(nodeChecks, CatalogNode.Check.class);
+    }
+
+    public Optional<CatalogNode.Check> getSerfHealthCheckOfNode(ConsulCredential consulCredential, UUID nodeId) throws ConsulLoginFailedException {
+        List<CatalogNode.Check> checks = getChecksOfNode(consulCredential, nodeId);
+
+        return checks.stream().filter(check -> check.getCheckId().equals(CHECK_ID_SERF)).findFirst();
+    }
+
+    public Boolean hasNodeAgent(ConsulCredential consulCredential, UUID nodeId) throws ConsulLoginFailedException {
+        Optional<CatalogNode.Check> optionalSerfCheck =
+                getSerfHealthCheckOfNode(consulCredential, nodeId);
+
+        if(optionalSerfCheck.isEmpty() || !optionalSerfCheck.get().getStatus().equals(CHECK_STATUS_PASSING))
+            return false;
+        else
+            return true;
     }
 
     public void removeCheckFromNode(ConsulCredential consulCredential, String nodeName, String checkId) throws ConsulLoginFailedException {
