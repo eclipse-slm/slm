@@ -32,7 +32,8 @@ public class ConsulNodesApiClient extends AbstractConsulApiClient {
                                 @Value("${consul.port}")         int consulPort,
                                 @Value("${consul.acl-token}")    String consulToken,
                                 @Value("${consul.datacenter}")   String consulDatacenter,
-                                ConsulAclApiClient               consulAclApiClient) {
+                                ConsulAclApiClient               consulAclApiClient
+    ) {
         super(consulScheme, consulHost, consulPort, consulToken, consulDatacenter);
         this.consulAclApiClient = consulAclApiClient;
     }
@@ -78,5 +79,4 @@ public class ConsulNodesApiClient extends AbstractConsulApiClient {
                 .build();
         this.getConsulClient(consulCredential).catalogClient().deregister(deregistration);
     }
-
 }
