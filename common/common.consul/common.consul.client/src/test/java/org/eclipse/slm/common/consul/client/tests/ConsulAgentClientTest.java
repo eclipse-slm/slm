@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
@@ -76,6 +78,14 @@ public class ConsulAgentClientTest {
         consulServerClientCompose.start();
     }
 
+    @DynamicPropertySource
+    static void consulProperties(DynamicPropertyRegistry registry){
+        registry.add(
+                "consul.port",
+                () -> consulServerClientCompose.getServicePort(CONSUL_SERVER_SERVICE_NAME, CONSUL_SERVER_PORT)
+        );
+    }
+
     private void mockGetConsulNodeById() throws ConsulLoginFailedException {
         Node node = new Node();
         node.setNode("test-node");
@@ -89,8 +99,10 @@ public class ConsulAgentClientTest {
 
     @Nested
     @Order(10)
-    public class PreTests {
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    public class Prepare {
         @Test
+        @Order(10)
         public void testConsulNodeCountEqualsTwo() throws ConsulLoginFailedException, InterruptedException {
             List<Node> nodes = new ArrayList<>();
             int tries = 0;
@@ -106,6 +118,28 @@ public class ConsulAgentClientTest {
             }
 
             assertEquals(nodes.size(), 2);
+        }
+
+        @Test
+        @Order(20)
+        public void registerConsulClientAsConsulService() throws ConsulLoginFailedException {
+            mockGetConsulNodeById();
+
+            Integer exposedConsulClientPort = consulServerClientCompose.getServicePort(
+                    CONSUL_CLIENT_SERVICE_NAME,
+                    CONSUL_CLIENT_PORT
+            );
+
+            consulAgentApiClient.registerService(
+                    new ConsulCredential(),
+                    exposedConsulClientPort,
+                    nodeIdAgent,
+                    ConsulAgentApiClient.CONSUL_CLIENT_SERVICE_NAME,
+                    UUID.randomUUID(),
+                    Optional.of(exposedConsulClientPort),
+                    new ArrayList<>(),
+                    new HashMap<>()
+            );
         }
     }
 
@@ -143,8 +177,8 @@ public class ConsulAgentClientTest {
         public void testRegisterServiceViaAgent() throws Exception {
             mockGetConsulNodeById();
 
-            // Size == 2 because "consul" by default is also registered as a service
-            int expectedServiceCount = 2;
+            // Size == 3 because "consul" and "consul-client" are registered, too
+            int expectedServiceCount = 3;
 
             consulAgentApiClient.registerService(
                     new ConsulCredential(),
@@ -163,8 +197,8 @@ public class ConsulAgentClientTest {
         @Order(30)
         public void testConsulKeepsServiceOverTime() throws InterruptedException {
             int sleepTimeInSeconds = 10;
-            // Size == 2 because "consul" by default is also registered as a service
-            int expectedServiceCount = 2;
+            // Size == 3 because "consul" and "consul-client" are registered, too
+            int expectedServiceCount = 3;
 
             LOG.info("Sleep for "+sleepTimeInSeconds+" seconds...");
             Thread.sleep(sleepTimeInSeconds*1000);
@@ -178,8 +212,8 @@ public class ConsulAgentClientTest {
         public void testDeregisterServiceViaAgent() throws ConsulLoginFailedException {
             mockGetConsulNodeById();
 
-            // Size == 1 because "consul" by default is also registered as a service
-            int expectedServiceCount = 1;
+            // Size == 2 because "consul" and "consul-client" are registered, too
+            int expectedServiceCount = 2;
 
             consulAgentApiClient.removeServiceByName(
                     new ConsulCredential(),
@@ -228,6 +262,9 @@ public class ConsulAgentClientTest {
         @Test
         @Order(40)
         public void registerServiceInAgentNonAgentEnvironment() throws ConsulLoginFailedException {
+            int expectedNonAgentServiceCount = 1;
+            int expectedAgentServiceCount = 2; // 2 because consul-client also registered
+
             consulGenericServicesClient.registerService(
                     new ConsulCredential(),
                     nodeIdNonAgent,
@@ -241,7 +278,10 @@ public class ConsulAgentClientTest {
             List<NodeService> servicesOfNonAgent =
                     consulServicesApiClient.getNodeServicesByNodeId(new ConsulCredential(), nodeIdNonAgent);
 
-            assertEquals(1, servicesOfNonAgent.size());
+            assertEquals(
+                    expectedNonAgentServiceCount,
+                    servicesOfNonAgent.size()
+            );
 
             mockGetConsulNodeById();
 
@@ -258,7 +298,10 @@ public class ConsulAgentClientTest {
             List<NodeService> servicesOfAgent =
                     consulServicesApiClient.getNodeServicesByNodeId(new ConsulCredential(), nodeIdAgent);
 
-            assertEquals(1, servicesOfAgent.size());
+            assertEquals(
+                    expectedAgentServiceCount,
+                    servicesOfAgent.size()
+            );
 
             Optional<List<CatalogService>> optionalServices = consulServicesApiClient.getServiceByName(new ConsulCredential(), serviceName);
 
@@ -269,6 +312,9 @@ public class ConsulAgentClientTest {
         @Test
         @Order(50)
         public void deregisterServiceInAgentNonAgentEnvironment() throws ConsulLoginFailedException {
+            int expectedNonAgentServiceCount = 0;
+            int expectedAgentServiceCount = 1; // 2 because consul-client also registered
+
             consulGenericServicesClient.deregisterService(
                     new ConsulCredential(),
                     nodeIdNonAgent,
@@ -278,7 +324,10 @@ public class ConsulAgentClientTest {
             List<NodeService> servicesOfNonAgent =
                     consulServicesApiClient.getNodeServicesByNodeId(new ConsulCredential(), nodeIdNonAgent);
 
-            assertEquals(0, servicesOfNonAgent.size());
+            assertEquals(
+                    expectedNonAgentServiceCount,
+                    servicesOfNonAgent.size()
+            );
 
             mockGetConsulNodeById();
 
@@ -291,7 +340,10 @@ public class ConsulAgentClientTest {
             List<NodeService> servicesOfAgent =
                     consulServicesApiClient.getNodeServicesByNodeId(new ConsulCredential(), nodeIdAgent);
 
-            assertEquals(0, servicesOfAgent.size());
+            assertEquals(
+                    expectedAgentServiceCount,
+                    servicesOfAgent.size()
+            );
 
             Optional<List<CatalogService>> optionalServices =
                     consulServicesApiClient.getServiceByName(new ConsulCredential(), serviceName);
