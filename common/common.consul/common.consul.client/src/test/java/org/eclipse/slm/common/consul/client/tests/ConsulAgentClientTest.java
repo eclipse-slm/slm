@@ -229,7 +229,7 @@ public class ConsulAgentClientTest {
     @Order(30)
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    public class TestMixedAgentNonAgentScenario {
+    public class TestConsulGenericServicesClient {
         CatalogNode nonAgentNode = new CatalogNode();
         private static final UUID nodeIdNonAgent = UUID.fromString("ea79b972-f805-4fb1-a2b7-28d825f5ef38");
         private static final UUID serviceIdNonAgent = UUID.fromString("30eb3356-f9d9-4568-8641-ed569a992f2f");
