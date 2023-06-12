@@ -43,28 +43,28 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: consul-config-resource-registry-pv
+  name: consul-config-resource-management-pv
 spec:
   accessModes:
     - ReadWriteOnce
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/consul-config-resource-registry
+    path: /data/consul-config-resource-management
 
 ---
 
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: consul-config-service-registry-pv
+  name: consul-config-service-management-pv
 spec:
   accessModes:
     - ReadWriteOnce
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/consul-config-service-registry
+    path: /data/consul-config-service-management
 
 ---
 
@@ -119,14 +119,14 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: consul-config-resource-registry-pvc
+  name: consul-config-resource-management-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 6Gi
-  volumeName: consul-config-resource-registry-pv
+  volumeName: consul-config-resource-management-pv
 
   storageClassName: ""
 
@@ -135,14 +135,14 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: consul-config-service-registry-pvc
+  name: consul-config-service-management-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 6Gi
-  volumeName: consul-config-service-registry-pv
+  volumeName: consul-config-service-management-pv
 
   storageClassName: ""
 
