@@ -7,7 +7,7 @@ metadata:
 spec:
   containers:
     - name: awx-postgres
-      image: fabos4ai/slm-awx-postgres:10
+      image: ghcr.io/eclipse-slm/awx/awx-postgres:10
       imagePullPolicy: IfNotPresent
       env:
         - name: PGUSER

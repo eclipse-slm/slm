@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: vault
-          image: fabos4ai/slm-vault:{{ .Values.slm.vault.version }}
+          image: ghcr.io/eclipse-slm/vault:{{ .Values.slm.vault.version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8200
