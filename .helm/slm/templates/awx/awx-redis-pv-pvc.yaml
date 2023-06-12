@@ -8,7 +8,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/slm/awx-redis
+    path: /data/awx-redis
 
 
 ---

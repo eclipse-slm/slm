@@ -12,7 +12,7 @@ spec:
         busybox
       env:
         - name: KEYCLOAK_AUTHSERVERURL
-          value: "http://keycloak:{{ .Values.keycloak.port}}/auth"
+          value: "http://keycloak:{{ .Values.slm.keycloak.port}}/auth"
       command: [ "/bin/sh" ]
       args: [ "-c","cd /var/run/redis/ && chmod -R 777 ." ]
       volumeMounts:

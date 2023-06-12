@@ -13,7 +13,7 @@ spec:
       ports:
         - containerPort: 27017
       volumeMounts:
-        - mountPath: /data/slm/db
+        - mountPath: /data/db
           name: aas-database-pvc
 
 

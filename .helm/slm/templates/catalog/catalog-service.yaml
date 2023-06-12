@@ -10,5 +10,5 @@ spec:
     app: catalog
   ports:
     - protocol: TCP
-      port: {{.Values.catalog.service.port}}
+      port: {{.Values.slm.catalog.ui_port}}
       targetPort: 10000

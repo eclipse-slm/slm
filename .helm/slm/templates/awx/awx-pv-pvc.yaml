@@ -8,7 +8,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/slm/awx
+    path: /data/awx
 
 ---
 
@@ -22,35 +22,35 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/slm/awx-config-notification-service
+    path: /data/awx-config-notification-service
 
 ---
 
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: awx-config-resource-management-pv
+  name: awx-config-resource-registry-pv
 spec:
   accessModes:
     - ReadWriteOnce
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/slm/awx-config-resource-management
+    path: /data/awx-config-resource-registry
 
 ---
 
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: awx-config-service-management-pv
+  name: awx-config-service-registry-pv
 spec:
   accessModes:
     - ReadWriteOnce
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/slm/awx-config-service-management
+    path: /data/awx-config-service-registry
 
 ---
 
@@ -64,7 +64,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/slm/awx-config-jwt-authenticator
+    path: /data/awx-config-jwt-authenticator
 
 ---
 
@@ -78,7 +78,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/slm/awx-supervisor-socket
+    path: /data/awx-supervisor-socket
 
 ---
 
@@ -92,7 +92,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/slm/awx-rsyslog-socket
+    path: /data/awx-rsyslog-socket
 
 ---
 
@@ -106,7 +106,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/slm/awx-rsyslog-config
+    path: /data/awx-rsyslog-config
 
 ---
 
@@ -129,14 +129,14 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: awx-config-resource-management-pvc
+  name: awx-config-resource-registry-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 6Gi
-  volumeName: awx-config-resource-management-pv
+  volumeName: awx-config-resource-registry-pv
 
   storageClassName: ""
 
@@ -145,14 +145,14 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: awx-config-service-management-pvc
+  name: awx-config-service-registry-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 6Gi
-  volumeName: awx-config-service-management-pv
+  volumeName: awx-config-service-registry-pv
 
   storageClassName: ""
 

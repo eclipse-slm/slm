@@ -5,10 +5,10 @@ metadata:
   labels:
     app: consul
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: consul
   ports:
     - protocol: TCP
-      port: {{ .Values.consul.port}}
+      port: 8500
       targetPort: 8500

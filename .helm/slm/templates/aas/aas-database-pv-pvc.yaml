@@ -8,7 +8,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/slm/aas-database
+    path: /data/aas-database
 
 
 ---

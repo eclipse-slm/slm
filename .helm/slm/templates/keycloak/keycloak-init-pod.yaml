@@ -8,8 +8,8 @@ metadata:
 spec:
   containers:
     - name: keycloak-init
-      image: ghcr.io/eclipse-slm/keycloak-init:{{ .Values.version}}
-      imagePullPolicy: Always
+      image: fabos4ai/slm-keycloak-init:{{ .Values.slm.version}}
+      imagePullPolicy: IfNotPresent
       env:
         - name: KEYCLOAK_ADMIN
           value: admin
@@ -18,18 +18,18 @@ spec:
         - name: KEYCLOAK_DEFAULT_USER_PASSWORD
           value: password
         - name: KEYCLOAK_AUTHSERVERURL
-          value: http://keycloak:{{.Values.keycloak.port}}/auth
+          value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
       volumeMounts:
         - mountPath: /config/awx-jwt-authenticator
           name: keycloak-config-awx-jwt-authenticator-pv
         - mountPath: /config/notification-service
           name: keycloak-config-notification-service-pv
-        - mountPath: /config/resource-management
-          name: keycloak-config-resource-management-pv
-        - mountPath: /config/service-management
-          name: keycloak-config-service-management-pv
-        - mountPath: /config/service-management-init
-          name: keycloak-config-service-management-init-pv
+        - mountPath: /config/resource-registry
+          name: keycloak-config-resource-registry-pv
+        - mountPath: /config/service-registry
+          name: keycloak-config-service-registry-pv
+        - mountPath: /config/service-registry-init
+          name: keycloak-config-service-registry-init-pv
 
 
   volumes:
@@ -45,15 +45,15 @@ spec:
     - name: keycloak-config-notification-service-pv
       persistentVolumeClaim:
         claimName: keycloak-config-notification-service-pvc
-    - name: keycloak-config-resource-management-pv
+    - name: keycloak-config-resource-registry-pv
       persistentVolumeClaim:
-        claimName: keycloak-config-resource-management-pvc
-    - name: keycloak-config-service-management-pv
+        claimName: keycloak-config-resource-registry-pvc
+    - name: keycloak-config-service-registry-pv
       persistentVolumeClaim:
-        claimName: keycloak-config-service-management-pvc
-    - name: keycloak-config-service-management-init-pv
+        claimName: keycloak-config-service-registry-pvc
+    - name: keycloak-config-service-registry-init-pv
       persistentVolumeClaim:
-        claimName: keycloak-config-service-management-init-pvc
+        claimName: keycloak-config-service-registry-init-pvc
 
 
   restartPolicy: OnFailure

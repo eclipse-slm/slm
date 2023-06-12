@@ -9,7 +9,7 @@ spec:
     containers:
       - name: catalog-database
         image:
-          ghcr.io/eclipse-slm/mariadb:{{ .Values.catalog.service.database_version }}
+          fabos4ai/mariadb:{{ .Values.slm.catalog.service.database_version }}
         imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 3306
@@ -23,16 +23,6 @@ spec:
             name: catalog-database-data-pv
           - mountPath: /config
             name: catalog-database-config-pv
-
-{{/*        livenessProbe:*/}}
-{{/*          exec:*/}}
-{{/*            command:*/}}
-{{/*              - mysqladmin*/}}
-{{/*              - ping*/}}
-{{/*              - --silent*/}}
-{{/*          initialDelaySeconds: 40*/}}
-{{/*          periodSeconds: 90*/}}
-{{/*          timeoutSeconds: 10*/}}
 
     volumes:
       - name: catalog-database-data-pv

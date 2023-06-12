@@ -8,7 +8,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/slm/catalog-database-data
+    path: /data/catalog-database-data
 
 
 ---
@@ -22,7 +22,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/slm/catalog-database-data
+    path: /data/catalog-database-data
 
 
 ---

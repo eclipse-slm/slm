@@ -7,25 +7,20 @@ metadata:
 spec:
   containers:
     - name: awx-init
-      image: ghcr.io/eclipse-slm/awx/awx-init:{{ .Values.version }}
-      imagePullPolicy: Always
+      image:
+        fabos4ai/slm-awx-init:{{ .Values.slm.version }}
       env:
         - name: KEYCLOAK_AUTHSERVERURL
-          value: "http://keycloak:{{ .Values.keycloak.port}}/auth"
+          value: "http://keycloak:{{ .Values.slm.keycloak.port}}/auth"
         - name: AWX_URL
-          value: "http://awx-web:8052"
-
-      command:
-        - ansible-playbook
-        - main.yml
-        - -vvvv
+          value: "http://slm-awx-service"
       volumeMounts:
         - name: awx-config-notification-service-pv
           mountPath: /config/notification-service
-        - name: awx-config-resource-management-pv
-          mountPath: /config/resource-management
-        - name: awx-config-service-management-pv
-          mountPath: /config/service-management
+        - name: awx-config-resource-registry-pv
+          mountPath: /config/resource-registry
+        - name: awx-config-service-registry-pv
+          mountPath: /config/service-registry
         - name: awx-config-jwt-authenticator-pv
           mountPath: /config/awx-jwt-authenticator
         - name: vault-config-awx-pv
@@ -37,12 +32,12 @@ spec:
     - name: awx-config-notification-service-pv
       persistentVolumeClaim:
         claimName: awx-config-notification-service-pvc
-    - name: awx-config-resource-management-pv
+    - name: awx-config-resource-registry-pv
       persistentVolumeClaim:
-        claimName: awx-config-resource-management-pvc
-    - name: awx-config-service-management-pv
+        claimName: awx-config-resource-registry-pvc
+    - name: awx-config-service-registry-pv
       persistentVolumeClaim:
-        claimName: awx-config-service-management-pvc
+        claimName: awx-config-service-registry-pvc
     - name: awx-config-jwt-authenticator-pv
       persistentVolumeClaim:
         claimName: awx-config-jwt-authenticator-pvc

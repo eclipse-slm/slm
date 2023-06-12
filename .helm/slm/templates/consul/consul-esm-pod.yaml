@@ -8,11 +8,11 @@ spec:
 
   containers:
     - name: consul-esm
-      image: hashicorp/consul-esm:{{ .Values.consul.esm_version}}
-      imagePullPolicy: Always
+      image: hashicorp/consul-esm:{{ .Values.slm.consul.esm_version}}
+      imagePullPolicy: IfNotPresent
       env:
         - name: CONSUL_HTTP_ADDR
-          value: consul:{{ .Values.consul.port}}
+          value: consul:8500
       command: ["/bin/sh"]
       args: ["-c","export CONSUL_HTTP_TOKEN=$$(cat /consul/consul_master_token) && consul-esm"]
       volumeMounts:

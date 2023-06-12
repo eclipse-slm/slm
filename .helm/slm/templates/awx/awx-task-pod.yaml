@@ -8,8 +8,8 @@ metadata:
 spec:
   containers:
     - name: awx-task
-      image: ghcr.io/eclipse-slm/awx/awx-task:{{.Values.awx.version}}
-      imagePullPolicy: Always
+      image: fabos4ai/slm-awx-task:15.0.1
+      imagePullPolicy: IfNotPresent
 
       volumeMounts:
         - name: awx-supervisor-socket-pv

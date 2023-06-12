@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: monitoring-prometheus-aas
-          image: fabos4ai/fabos-monitoring-prometheus-aas:{{ .Values.monitoring.version }}
+          image: fabos4ai/fabos-monitoring-prometheus-aas:{{ .Values.slm.monitoring.version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -32,7 +32,7 @@ spec:
               name: prometheus-targets-pv
               
         - name: prometheus
-          image: prom/prometheus:{{.Values.prometheus.version}}
+          image: prom/prometheus:{{.Values.slm.prometheus.version}}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9090

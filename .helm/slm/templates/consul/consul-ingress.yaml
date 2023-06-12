@@ -13,5 +13,5 @@ spec:
               service:
                 name: consul
                 port:
-                  number: {{.Values.consul.port}}
+                  number: {{.Values.slm.consul.port}}
   ingressClassName: nginx

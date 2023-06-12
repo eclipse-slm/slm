@@ -8,8 +8,7 @@ metadata:
 spec:
   containers:
     - name: vault-init
-      image: ghcr.io/eclipse-slm/vault-init:{{ .Values.version}}
-      imagePullPolicy: Always
+      image: fabos4ai/slm-vault-init:{{ .Values.slm.version}}
       env:
         - name: KEYCLOAK_AUTHSERVERURL
           value: "http://keycloak:7080/auth"
@@ -22,10 +21,10 @@ spec:
           name: vault-config-awx-pv
         - mountPath: /vault/config/awx-jwt-authenticator
           name: vault-config-awx-jwt-authenticator-pv
-        - mountPath: /vault/config/resource-management
-          name: vault-config-resource-management-pv
-        - mountPath: /vault/config/service-management
-          name: vault-config-service-management-pv
+        - mountPath: /vault/config/resource-registry
+          name: vault-config-resource-registry-pv
+        - mountPath: /vault/config/service-registry
+          name: vault-config-service-registry-pv
 
   volumes:
     - name: vault-config-root-pv
@@ -37,10 +36,10 @@ spec:
     - name: vault-config-awx-jwt-authenticator-pv
       persistentVolumeClaim:
         claimName: vault-config-awx-jwt-authenticator-pvc
-    - name: vault-config-resource-management-pv
+    - name: vault-config-resource-registry-pv
       persistentVolumeClaim:
-        claimName: vault-config-resource-management-pvc
-    - name: vault-config-service-management-pv
+        claimName: vault-config-resource-registry-pvc
+    - name: vault-config-service-registry-pv
       persistentVolumeClaim:
-        claimName: vault-config-service-management-pvc
+        claimName: vault-config-service-registry-pvc
   restartPolicy: OnFailure

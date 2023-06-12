@@ -11,7 +11,7 @@ spec:
   ports:
     - name: internal
       protocol: TCP
-      port: {{.Values.catalog.service.database_port}}
+      port: 3306
       targetPort: 3306
     - name: external
       protocol: TCP

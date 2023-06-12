@@ -9,11 +9,10 @@ spec:
   containers:
     - name: consul-init
       image:
-        ghcr.io/eclipse-slm/consul-init:{{ .Values.version }}
-      imagePullPolicy: Always
+        fabos4ai/slm-consul-init:{{ .Values.slm.version }}
       env:
         - name: KEYCLOAK_AUTHSERVERURL
-          value: "http://keycloak:{{ .Values.keycloak.port}}/auth"
+          value: "http://keycloak:{{ .Values.slm.keycloak.port}}/auth"
       volumeMounts:
         - name: consul-config-root-pv
           mountPath: /config/consul/root
