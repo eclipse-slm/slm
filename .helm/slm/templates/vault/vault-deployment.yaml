@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: vault
-          image: ghcr.io/eclipse-slm/vault:{{ .Values.slm.vault.version }}
+          image: fabos4ai/slm-vault:{{ .Values.slm.vault.version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8200
@@ -33,15 +33,6 @@ spec:
               name: vault-config-root-pv
             - mountPath: /vault/file
               name: vault-data-pv
-
-          livenessProbe:
-            exec:
-              command:
-                - vault
-                - status
-            initialDelaySeconds: 40
-            periodSeconds: 90
-            timeoutSeconds: 10
 
       volumes:
         - name: vault-data-pv

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image: ghcr.io/eclipse-slm/slm/notification-service:{{ .Values.slm.version }}
+          image: fabos4ai/slm-notification-service:{{ .Values.slm.version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9001
@@ -31,7 +31,7 @@ spec:
             - name: NOTIFICATION_SERVICE_PORT
               value: "9001"
             - name: AWX_HOST
-              value: "awx-web"
+              value: "slm-awx-service"
             - name: AWX_PORT
               value: "80"
           volumeMounts:
@@ -41,14 +41,6 @@ spec:
               name: keycloak-config-notification-service-pv
             - mountPath: /app/database/config
               name: notification-service-database-config-pv
-
-          livenessProbe:
-            httpGet:
-              port: 9001
-              path: /swagger-ui/index.html
-            initialDelaySeconds: 40
-            periodSeconds: 90
-            timeoutSeconds: 10
 
       volumes:
         - name: notification-service-database-config-pv

@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: catalog-database
+  name: resource-registry-database
   labels:
-    app: catalog-database
+    app: resource-registry-database
 spec:
   type: ClusterIP
   selector:
-    app: catalog-database
+    app: resource-registry-database
   ports:
     - name: internal
       protocol: TCP

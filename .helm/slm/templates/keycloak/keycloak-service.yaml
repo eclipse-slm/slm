@@ -11,5 +11,5 @@ spec:
   ports:
     - name: external
       protocol: TCP
-      port: {{ .Values.slm.keycloak.port}}
+      port: 7080
       targetPort: 8080
