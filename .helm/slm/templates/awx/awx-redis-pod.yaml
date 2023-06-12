@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: awx-redis
+  labels:
+    app: awx-redis
+spec:
+  containers:
+    - name: awx-redis
+      image: fabos4ai/awx-redis:6
+      imagePullPolicy: IfNotPresent
+      command: [ "redis-server" ]
+      args: ["/usr/local/etc/redis/redis.conf"]
+      volumeMounts:
+        - mountPath: /var/run/redis/
+          name: awx-redis-pv
+  volumes:
+    - name: awx-redis-pv
+      persistentVolumeClaim:
+        claimName: awx-redis-pvc
+
+  restartPolicy: Always
+

@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: awx-postgres
+  labels:
+    app: awx-postgres
+spec:
+  containers:
+    - name: awx-postgres
+      image: fabos4ai/slm-awx-postgres:10
+      imagePullPolicy: IfNotPresent
+      env:
+        - name: PGUSER
+          value: awx
+      volumeMounts:
+        - mountPath: "/var/lib/postgresql/data"
+          name: awx-postgres-pv
+
+  volumes:
+    - name: awx-postgres-pv
+      persistentVolumeClaim:
+        claimName: awx-postgres-pvc
+
+  restartPolicy: Always
+

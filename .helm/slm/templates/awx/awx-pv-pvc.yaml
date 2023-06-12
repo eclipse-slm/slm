@@ -1,0 +1,223 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: awx-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/awx
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: awx-config-notification-service-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/awx-config-notification-service
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: awx-config-resource-registry-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/awx-config-resource-registry
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: awx-config-service-registry-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/awx-config-service-registry
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: awx-config-jwt-authenticator-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/awx-config-jwt-authenticator
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: awx-supervisor-socket-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/awx-supervisor-socket
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: awx-rsyslog-socket-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/awx-rsyslog-socket
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: awx-rsyslog-config-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/awx-rsyslog-config
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: awx-config-notification-service-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: awx-config-notification-service-pv
+
+  storageClassName: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: awx-config-resource-registry-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: awx-config-resource-registry-pv
+
+  storageClassName: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: awx-config-service-registry-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: awx-config-service-registry-pv
+
+  storageClassName: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: awx-config-jwt-authenticator-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: awx-config-jwt-authenticator-pv
+
+  storageClassName: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: awx-supervisor-socket-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: awx-supervisor-socket-pv
+
+  storageClassName: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: awx-rsyslog-socket-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: awx-rsyslog-socket-pv
+
+  storageClassName: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: awx-rsyslog-config-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: awx-rsyslog-config-pv
+
+  storageClassName: ""
+
+---

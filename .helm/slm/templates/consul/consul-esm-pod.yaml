@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: consul-esm
+  labels:
+    app: consul-esm
+spec:
+
+  containers:
+    - name: consul-esm
+      image: hashicorp/consul-esm:{{ .Values.slm.consul.esm_version}}
+      imagePullPolicy: IfNotPresent
+      env:
+        - name: CONSUL_HTTP_ADDR
+          value: consul:8500
+      command: ["/bin/sh"]
+      args: ["-c","export CONSUL_HTTP_TOKEN=$$(cat /consul/consul_master_token) && consul-esm"]
+      volumeMounts:
+        - name: consul-config-root-pv
+          mountPath: /consul/
+
+  volumes:
+    - name: consul-config-root-pv
+      persistentVolumeClaim:
+        claimName: consul-config-root-pvc
+
+  restartPolicy: OnFailure

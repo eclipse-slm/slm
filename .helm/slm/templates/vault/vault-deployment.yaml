@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vault
+  labels:
+    app: vault
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vault
+  template:
+    metadata:
+      name: vault
+      labels:
+        app: vault
+    spec:
+      containers:
+        - name: vault
+          image: fabos4ai/slm-vault:{{ .Values.slm.vault.version }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8200
+          env:
+            - name: KEYCLOAK_ADMIN
+              value: admin
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: password
+            - name: KEYCLOAK_DEFAULT_USER_PASSWORD
+              value: password
+          volumeMounts:
+            - mountPath: /vault/config/root
+              name: vault-config-root-pv
+            - mountPath: /vault/file
+              name: vault-data-pv
+
+      volumes:
+        - name: vault-data-pv
+          persistentVolumeClaim:
+            claimName: vault-data-pvc
+        - name: vault-config-root-pv
+          persistentVolumeClaim:
+            claimName: vault-config-root-pvc
+      restartPolicy: Always

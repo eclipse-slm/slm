@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: awx-jwt-authenticator
+  labels:
+    app: awx-jwt-authenticator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: awx-jwt-authenticator
+  template:
+    metadata:
+      name: awx-jwt-authenticator
+      labels:
+        app: awx-jwt-authenticator
+    spec:
+      containers:
+        - name: awx-jwt-authenticator
+          image: fabos4ai/slm-awx-jwt-authenticator:{{ .Values.slm.version}}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8051
+          env:
+            - name: KEYCLOAK_AUTHSERVERURL
+              value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
+            - name: VAULT_HOST
+              value: vault
+            - name: VAULT_PORT
+              value: "8200"
+            - name: VAULT_AUTHENTICATION
+              value: TOKEN
+            - name: VAULT_TOKEN
+              value: "hvs.rsDBkZtxSHdIJ8fQzWMWufbb"
+            - name: AWX_HOST
+              value: "slm-awx-service"
+            - name: AWX_PORT
+              value: "80"
+          volumeMounts:
+            - name: vault-config-awx-pv
+              mountPath: /opt/vault/awx-jwt-authenticator
+            - name: awx-config-jwt-authenticator-pv
+              mountPath: /app/awx
+            - name: keycloak-config-awx-jwt-authenticator-pv
+              mountPath: /app/keycloak
+
+
+      volumes:
+        - name: keycloak-config-awx-jwt-authenticator-pv
+          persistentVolumeClaim:
+            claimName: keycloak-config-awx-jwt-authenticator-pvc
+        - name: vault-config-awx-pv
+          persistentVolumeClaim:
+            claimName: vault-config-awx-pvc
+        - name: awx-config-jwt-authenticator-pv
+          persistentVolumeClaim:
+            claimName: awx-config-jwt-authenticator-pvc
+
+      restartPolicy: Always
