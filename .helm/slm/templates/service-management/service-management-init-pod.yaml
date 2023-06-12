@@ -11,10 +11,10 @@ spec:
       image: ghcr.io/eclipse-slm/slm/service-management-init:{{ .Values.slm.version}}
       imagePullPolicy: IfNotPresent
       env:
-        - name: SERVICEREGISTRY_INITDIRECTORIES
-          value: "{{.Values.slm.service_registry.initialization_local_directories}}"
-        - name: SERVICEREGISTRY_GITREPOS_URLS
-          value: "{{.Values.slm.service_registry.git_check_interval_minutes}}"
+        - name: SERVICEMANAGEMENT_INITDIRECTORIES
+          value: "{{.Values.slm.service_management.initialization_local_directories}}"
+        - name: SERVICEMANAGEMENT_GITREPOS_URLS
+          value: "{{.Values.slm.service_management.git_check_interval_minutes}}"
         - name: KEYCLOAK_AUTHSERVERURL
           value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
 
