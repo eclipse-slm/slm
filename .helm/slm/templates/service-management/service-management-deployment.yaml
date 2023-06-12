@@ -20,7 +20,7 @@ spec:
           image: ghcr.io/eclipse-slm/slm/service-management:{{ .Values.slm.version }}
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 9020
+            - containerPort: 9010
           env:
             - name: KEYCLOAK_AUTHSERVERURL
               value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
@@ -31,15 +31,15 @@ spec:
             - name: MONITORING_SERVICE_URL
               value: http://monitoring:9080
             - name: CONSUL_PORT
-              value: "{{.Values.slm.consul.port}}"
+              value: "8500"
             - name: VAULT_PORT
-              value: "{{.Values.slm.vault.port}}"
+              value: "8200"
             - name: NOTIFICATION_SERVICE_PORT
-              value: "{{.Values.slm.notification_service.port}}"
+              value: "9001"
             - name: AWX_HOST
-              value: "awx-web"
+              value: "slm-awx-service"
             - name: AWX_PORT
-              value: "{{.Values.slm.awx.port_http}}"
+              value: "80"
           volumeMounts:
             - mountPath: /app/awx
               name: awx-config-service-management-pv
@@ -52,13 +52,6 @@ spec:
             - mountPath: /app/database/config
               name: service-management-database-config-pv
 
-          livenessProbe:
-            httpGet:
-              port: 9020
-              path: /swagger-ui/index.html
-            initialDelaySeconds: 40
-            periodSeconds: 90
-            timeoutSeconds: 10
       volumes:
         - name: awx-config-service-management-pv
           persistentVolumeClaim:

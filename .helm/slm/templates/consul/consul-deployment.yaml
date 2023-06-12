@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: consul
-          image: fabos4ai/slm-consul:{{ .Values.slm.consul.version}}
+          image: ghcr.io/eclipse-slm/consul:{{ .Values.slm.consul.version}}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8500

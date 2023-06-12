@@ -9,7 +9,7 @@ spec:
     containers:
       - name: catalog-database
         image:
-          fabos4ai/mariadb:{{ .Values.slm.catalog.service.database_version }}
+          ghcr.io/eclipse-slm/mariadb:{{ .Values.slm.catalog.service.database_version }}
         imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 3306

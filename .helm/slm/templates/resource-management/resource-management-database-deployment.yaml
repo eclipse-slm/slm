@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: resource-management-database
-          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.slm.resource_management.database_version }}
+          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.slm.resource_registry.database_version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3306
@@ -33,16 +33,6 @@ spec:
               name: resource-management-database-data-pv
             - mountPath: /config
               name: resource-management-database-config-pv
-
-          livenessProbe:
-            exec:
-              command:
-                - mysqladmin
-                - ping
-                - --silent
-            initialDelaySeconds: 40
-            periodSeconds: 90
-            timeoutSeconds: 10
 
       volumes:
         - name: resource-management-database-config-pv

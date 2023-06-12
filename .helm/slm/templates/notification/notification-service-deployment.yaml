@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image: fabos4ai/slm-notification-service:{{ .Values.slm.version }}
+          image: ghcr.io/eclipse-slm/slm/notification-service:{{ .Values.slm.version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9001
