@@ -1,0 +1,183 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vault-data-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/vault-data
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vault-config-root-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/vault-config-root
+
+---
+
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vault-config-awx-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/vault-config-awx
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vault-config-awx-jwt-authenticator-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/vault-config-awx-jwt-authenticator
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vault-config-resource-registry-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/vault-config-resource-registry
+
+---
+
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vault-config-service-registry-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/vault-config-service-registry
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vault-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: vault-data-pv
+
+  storageClassName: ""
+
+---
+
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vault-config-root-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: vault-config-root-pv
+
+  storageClassName: ""
+
+---
+
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vault-config-awx-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: vault-config-awx-pv
+
+  storageClassName: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vault-config-awx-jwt-authenticator-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: vault-config-awx-jwt-authenticator-pv
+
+  storageClassName: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vault-config-resource-registry-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: vault-config-resource-registry-pv
+
+  storageClassName: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vault-config-service-registry-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: vault-config-service-registry-pv
+
+  storageClassName: ""
+
+---

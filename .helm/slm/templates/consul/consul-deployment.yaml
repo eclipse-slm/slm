@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consul
+  labels:
+    app: consul
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consul
+  template:
+    metadata:
+      name: consul
+      labels:
+        app: consul
+    spec:
+      containers:
+        - name: consul
+          image: fabos4ai/slm-consul:{{ .Values.slm.consul.version}}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8500
+          volumeMounts:
+            - name: consul-data-pv
+              mountPath: /consul/data
+            - name: consul-config-root-pv
+              mountPath: /config/root
+            - name: consul-config-awx-pv
+              mountPath: /config/awx
+            - name: consul-config-resource-registry-pv
+              mountPath: /config/resource_registry
+            - name: consul-config-service-registry-pv
+              mountPath: /config/service_registry
+
+
+      volumes:
+        - name: consul-data-pv
+          persistentVolumeClaim:
+            claimName: consul-data-pvc
+        - name: consul-config-root-pv
+          persistentVolumeClaim:
+            claimName: consul-config-root-pvc
+        - name: consul-config-awx-pv
+          persistentVolumeClaim:
+            claimName: consul-config-awx-pvc
+        - name: consul-config-resource-registry-pv
+          persistentVolumeClaim:
+            claimName: consul-config-resource-registry-pvc
+        - name: consul-config-service-registry-pv
+          persistentVolumeClaim:
+            claimName: consul-config-service-registry-pvc
+
+      restartPolicy: Always

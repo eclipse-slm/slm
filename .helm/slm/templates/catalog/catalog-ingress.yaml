@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-catalog
+spec:
+  rules:
+    - host: catalog.{{.Values.slm.hostname}}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: catalog
+                port:
+                  number: {{.Values.slm.catalog.ui_port}}
+  ingressClassName: nginx

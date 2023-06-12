@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog
+  labels:
+    app: catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalog
+  template:
+    metadata:
+      name: catalog
+      labels:
+        app: catalog
+    spec:
+      containers:
+        - name: catalog
+          image: fabos4ai/slm-catalog:{{ .Values.slm.catalog.version }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 10000
+          volumeMounts:
+            - mountPath: /app/database/config
+              name: catalog-database-config-pv
+
+      volumes:
+        - name: catalog-database-config-pv
+          persistentVolumeClaim:
+            claimName: catalog-database-config-pvc
+
+      restartPolicy: Always

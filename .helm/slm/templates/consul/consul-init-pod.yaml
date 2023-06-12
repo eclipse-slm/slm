@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: consul-init
+  labels:
+    app: consul-init
+spec:
+
+  containers:
+    - name: consul-init
+      image:
+        fabos4ai/slm-consul-init:{{ .Values.slm.version }}
+      env:
+        - name: KEYCLOAK_AUTHSERVERURL
+          value: "http://keycloak:{{ .Values.slm.keycloak.port}}/auth"
+      volumeMounts:
+        - name: consul-config-root-pv
+          mountPath: /config/consul/root
+
+  volumes:
+    - name: consul-config-root-pv
+      persistentVolumeClaim:
+        claimName: consul-config-root-pvc
+
+  restartPolicy: OnFailure

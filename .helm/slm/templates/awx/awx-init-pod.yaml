@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: awx-init
+  labels:
+    app: awx-init
+spec:
+  containers:
+    - name: awx-init
+      image:
+        fabos4ai/slm-awx-init:{{ .Values.slm.version }}
+      env:
+        - name: KEYCLOAK_AUTHSERVERURL
+          value: "http://keycloak:{{ .Values.slm.keycloak.port}}/auth"
+        - name: AWX_URL
+          value: "http://slm-awx-service"
+      volumeMounts:
+        - name: awx-config-notification-service-pv
+          mountPath: /config/notification-service
+        - name: awx-config-resource-registry-pv
+          mountPath: /config/resource-registry
+        - name: awx-config-service-registry-pv
+          mountPath: /config/service-registry
+        - name: awx-config-jwt-authenticator-pv
+          mountPath: /config/awx-jwt-authenticator
+        - name: vault-config-awx-pv
+          mountPath: /config/vault
+        - name: consul-config-awx-pv
+          mountPath: /config/consul
+
+  volumes:
+    - name: awx-config-notification-service-pv
+      persistentVolumeClaim:
+        claimName: awx-config-notification-service-pvc
+    - name: awx-config-resource-registry-pv
+      persistentVolumeClaim:
+        claimName: awx-config-resource-registry-pvc
+    - name: awx-config-service-registry-pv
+      persistentVolumeClaim:
+        claimName: awx-config-service-registry-pvc
+    - name: awx-config-jwt-authenticator-pv
+      persistentVolumeClaim:
+        claimName: awx-config-jwt-authenticator-pvc
+    - name: consul-config-awx-pv
+      persistentVolumeClaim:
+        claimName: consul-config-awx-pvc
+    - name: vault-config-awx-pv
+      persistentVolumeClaim:
+        claimName: vault-config-awx-pvc
+    
+
+  restartPolicy: OnFailure

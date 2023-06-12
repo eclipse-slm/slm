@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: slm-awx-service
+  labels:
+    app: slm-awx-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: awx-web
+  ports:
+    - name: "http"
+      protocol: TCP
+      port: 80
+      targetPort: 8052
+    - name: "container"
+      protocol: TCP
+      port: 8052
+      targetPort: 8052
+    - name: "https"
+      protocol: TCP
+      port: 443
+      targetPort: 8053

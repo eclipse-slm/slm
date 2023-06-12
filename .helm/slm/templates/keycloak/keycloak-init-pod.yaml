@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: keycloak-init
+  labels:
+    app: keycloak-init
+
+spec:
+  containers:
+    - name: keycloak-init
+      image: fabos4ai/slm-keycloak-init:{{ .Values.slm.version}}
+      imagePullPolicy: IfNotPresent
+      env:
+        - name: KEYCLOAK_ADMIN
+          value: admin
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          value: password
+        - name: KEYCLOAK_DEFAULT_USER_PASSWORD
+          value: password
+        - name: KEYCLOAK_AUTHSERVERURL
+          value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
+      volumeMounts:
+        - mountPath: /config/awx-jwt-authenticator
+          name: keycloak-config-awx-jwt-authenticator-pv
+        - mountPath: /config/notification-service
+          name: keycloak-config-notification-service-pv
+        - mountPath: /config/resource-registry
+          name: keycloak-config-resource-registry-pv
+        - mountPath: /config/service-registry
+          name: keycloak-config-service-registry-pv
+        - mountPath: /config/service-registry-init
+          name: keycloak-config-service-registry-init-pv
+
+
+  volumes:
+    - name: keycloak-database-data-pv
+      persistentVolumeClaim:
+        claimName: keycloak-database-data-pvc
+    - name: keycloak-database-config-pv
+      persistentVolumeClaim:
+        claimName: keycloak-database-config-pvc
+    - name: keycloak-config-awx-jwt-authenticator-pv
+      persistentVolumeClaim:
+        claimName: keycloak-config-awx-jwt-authenticator-pvc
+    - name: keycloak-config-notification-service-pv
+      persistentVolumeClaim:
+        claimName: keycloak-config-notification-service-pvc
+    - name: keycloak-config-resource-registry-pv
+      persistentVolumeClaim:
+        claimName: keycloak-config-resource-registry-pvc
+    - name: keycloak-config-service-registry-pv
+      persistentVolumeClaim:
+        claimName: keycloak-config-service-registry-pvc
+    - name: keycloak-config-service-registry-init-pv
+      persistentVolumeClaim:
+        claimName: keycloak-config-service-registry-init-pvc
+
+
+  restartPolicy: OnFailure
+      

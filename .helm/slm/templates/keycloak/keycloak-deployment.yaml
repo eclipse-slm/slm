@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  labels:
+    app: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      name: keycloak
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: fabos4ai/slm-keycloak:{{ .Values.slm.keycloak.version}}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KEYCLOAK_ADMIN
+              value: admin
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: password
+            - name: KEYCLOAK_DEFAULT_USER_PASSWORD
+              value: password
+          volumeMounts:
+            - name: keycloak-database-config-pv
+              mountPath: /keycloak/database/config
+
+
+
+      volumes:
+        - name: keycloak-database-config-pv
+          persistentVolumeClaim:
+            claimName: keycloak-database-config-pvc
+
+
+      restartPolicy: Always
+      

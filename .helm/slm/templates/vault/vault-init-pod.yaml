@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vault-init
+  labels:
+    app: vault-init
+
+spec:
+  containers:
+    - name: vault-init
+      image: fabos4ai/slm-vault-init:{{ .Values.slm.version}}
+      env:
+        - name: KEYCLOAK_AUTHSERVERURL
+          value: "http://keycloak:7080/auth"
+        - name: VAULT_TOKEN
+          value: s.GN32jmokCi9S7O1qM3P5pMLv
+      volumeMounts:
+        - mountPath: /vault/config/root
+          name: vault-config-root-pv
+        - mountPath: /vault/config/awx
+          name: vault-config-awx-pv
+        - mountPath: /vault/config/awx-jwt-authenticator
+          name: vault-config-awx-jwt-authenticator-pv
+        - mountPath: /vault/config/resource-registry
+          name: vault-config-resource-registry-pv
+        - mountPath: /vault/config/service-registry
+          name: vault-config-service-registry-pv
+
+  volumes:
+    - name: vault-config-root-pv
+      persistentVolumeClaim:
+        claimName: vault-config-root-pvc
+    - name: vault-config-awx-pv
+      persistentVolumeClaim:
+        claimName: vault-config-awx-pvc
+    - name: vault-config-awx-jwt-authenticator-pv
+      persistentVolumeClaim:
+        claimName: vault-config-awx-jwt-authenticator-pvc
+    - name: vault-config-resource-registry-pv
+      persistentVolumeClaim:
+        claimName: vault-config-resource-registry-pvc
+    - name: vault-config-service-registry-pv
+      persistentVolumeClaim:
+        claimName: vault-config-service-registry-pvc
+  restartPolicy: OnFailure
