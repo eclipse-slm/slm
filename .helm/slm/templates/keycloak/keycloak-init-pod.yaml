@@ -24,12 +24,12 @@ spec:
           name: keycloak-config-awx-jwt-authenticator-pv
         - mountPath: /config/notification-service
           name: keycloak-config-notification-service-pv
-        - mountPath: /config/resource-registry
-          name: keycloak-config-resource-registry-pv
-        - mountPath: /config/service-registry
-          name: keycloak-config-service-registry-pv
-        - mountPath: /config/service-registry-init
-          name: keycloak-config-service-registry-init-pv
+        - mountPath: /config/resource-management
+          name: keycloak-config-resource-management-pv
+        - mountPath: /config/service-management
+          name: keycloak-config-service-management-pv
+        - mountPath: /config/service-management-init
+          name: keycloak-config-service-management-init-pv
 
 
   volumes:
@@ -45,15 +45,15 @@ spec:
     - name: keycloak-config-notification-service-pv
       persistentVolumeClaim:
         claimName: keycloak-config-notification-service-pvc
-    - name: keycloak-config-resource-registry-pv
+    - name: keycloak-config-resource-management-pv
       persistentVolumeClaim:
-        claimName: keycloak-config-resource-registry-pvc
-    - name: keycloak-config-service-registry-pv
+        claimName: keycloak-config-resource-management-pvc
+    - name: keycloak-config-service-management-pv
       persistentVolumeClaim:
-        claimName: keycloak-config-service-registry-pvc
-    - name: keycloak-config-service-registry-init-pv
+        claimName: keycloak-config-service-management-pvc
+    - name: keycloak-config-service-management-init-pv
       persistentVolumeClaim:
-        claimName: keycloak-config-service-registry-init-pvc
+        claimName: keycloak-config-service-management-init-pvc
 
 
   restartPolicy: OnFailure

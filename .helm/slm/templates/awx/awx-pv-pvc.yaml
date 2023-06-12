@@ -29,28 +29,28 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: awx-config-resource-registry-pv
+  name: awx-config-resource-management-pv
 spec:
   accessModes:
     - ReadWriteOnce
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/awx-config-resource-registry
+    path: /data/awx-config-resource-management
 
 ---
 
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: awx-config-service-registry-pv
+  name: awx-config-service-management-pv
 spec:
   accessModes:
     - ReadWriteOnce
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/awx-config-service-registry
+    path: /data/awx-config-service-management
 
 ---
 
@@ -129,14 +129,14 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: awx-config-resource-registry-pvc
+  name: awx-config-resource-management-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 6Gi
-  volumeName: awx-config-resource-registry-pv
+  volumeName: awx-config-resource-management-pv
 
   storageClassName: ""
 
@@ -145,14 +145,14 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: awx-config-service-registry-pvc
+  name: awx-config-service-management-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 6Gi
-  volumeName: awx-config-service-registry-pv
+  volumeName: awx-config-service-management-pv
 
   storageClassName: ""
 
