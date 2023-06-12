@@ -17,21 +17,13 @@ spec:
     spec:
       containers:
         - name: catalog
-          image: ghcr.io/eclipse-slm/slm/catalog:{{ .Values.slm.catalog.version }}
+          image: fabos4ai/slm-catalog:{{ .Values.slm.catalog.version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 10000
           volumeMounts:
             - mountPath: /app/database/config
               name: catalog-database-config-pv
-
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              port: 10000*/}}
-{{/*              path: /swagger-ui/index.html*/}}
-{{/*            initialDelaySeconds: 40*/}}
-{{/*            periodSeconds: 90*/}}
-{{/*            timeoutSeconds: 10*/}}
 
       volumes:
         - name: catalog-database-config-pv

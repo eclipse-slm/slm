@@ -7,15 +7,13 @@ metadata:
 spec:
       containers:
         - name: awx-web
-          image: ghcr.io/eclipse-slm/awx/awx-web:{{.Values.slm.awx.version}}
+          image: fabos4ai/slm-awx-web:15.0.1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8052
             - containerPort: 8053
 
           volumeMounts:
-            - name: nginx-config
-              mountPath: /etc/nginx/nginx.conf
             - name: awx-supervisor-socket-pv
               mountPath: /var/run/supervisor
             - name: awx-rsyslog-socket-pv
@@ -24,19 +22,7 @@ spec:
               mountPath: /var/lib/awx/rsyslog/
             - name: awx-redis-pv
               mountPath: /var/run/redis
-
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              port: 8052*/}}
-{{/*              path: /*/}}
-{{/*            initialDelaySeconds: 40*/}}
-{{/*            periodSeconds: 90*/}}
-{{/*            timeoutSeconds: 10*/}}
-
       volumes:
-        - name: nginx-config
-          hostPath:
-            path: /data/minikube/nginx.conf
         - name: awx-supervisor-socket-pv
           persistentVolumeClaim:
             claimName: awx-supervisor-socket-pvc

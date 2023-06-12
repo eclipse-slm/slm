@@ -57,40 +57,40 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: keycloak-config-resource-management-pv
+  name: keycloak-config-resource-registry-pv
 spec:
   accessModes:
     - ReadWriteOnce
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/keycloak-config-resource-management
+    path: /data/keycloak-config-resource-registry
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: keycloak-config-service-management-pv
+  name: keycloak-config-service-registry-pv
 spec:
   accessModes:
     - ReadWriteOnce
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/keycloak-config-service-management
+    path: /data/keycloak-config-service-registry
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: keycloak-config-service-management-init-pv
+  name: keycloak-config-service-registry-init-pv
 spec:
   accessModes:
     - ReadWriteOnce
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/keycloak-config-service-management-init
+    path: /data/keycloak-config-service-registry-init
 
 ---
 
@@ -161,14 +161,14 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: keycloak-config-resource-management-pvc
+  name: keycloak-config-resource-registry-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 6Gi
-  volumeName: keycloak-config-resource-management-pv
+  volumeName: keycloak-config-resource-registry-pv
 
   storageClassName: ""
 
@@ -177,14 +177,14 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: keycloak-config-service-management-pvc
+  name: keycloak-config-service-registry-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 6Gi
-  volumeName: keycloak-config-service-management-pv
+  volumeName: keycloak-config-service-registry-pv
 
   storageClassName: ""
 
@@ -193,14 +193,14 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: keycloak-config-service-management-init-pvc
+  name: keycloak-config-service-registry-init-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 6Gi
-  volumeName: keycloak-config-service-management-init-pv
+  volumeName: keycloak-config-service-registry-init-pv
 
   storageClassName: ""
 

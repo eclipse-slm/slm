@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: vault
+  name: ui
   labels:
-    app: vault
+    app: ui
 spec:
   type: LoadBalancer
   selector:
-    app: vault
+    app: ui
   ports:
     - protocol: TCP
-      port: 8200
-      targetPort: 8200
+      port: {{.Values.slm.ui_port}}
+      targetPort: 80

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: keycloak
-          image: ghcr.io/eclipse-slm/keycloak:{{ .Values.slm.keycloak.version}}
+          image: fabos4ai/slm-keycloak:{{ .Values.slm.keycloak.version}}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -32,13 +32,6 @@ spec:
             - name: keycloak-database-config-pv
               mountPath: /keycloak/database/config
 
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              port: 8080*/}}
-{{/*              path: /auth*/}}
-{{/*            initialDelaySeconds: 40*/}}
-{{/*            periodSeconds: 90*/}}
-{{/*            timeoutSeconds: 10*/}}
 
 
       volumes:

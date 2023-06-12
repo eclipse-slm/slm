@@ -8,7 +8,7 @@ spec:
     hostname: keycloak-database
     containers:
       - name: keycloak-database
-        image: ghcr.io/eclipse-slm/mariadb:{{ .Values.slm.keycloak.database_version}}
+        image: fabos4ai/mariadb:{{ .Values.slm.keycloak.database_version}}
         ports:
           - containerPort: 3306
         volumeMounts:
@@ -21,15 +21,6 @@ spec:
             value: keycloak
           - name: MYSQL_USER
             value: keycloak
-{{/*        livenessProbe:*/}}
-{{/*          exec:*/}}
-{{/*            command:*/}}
-{{/*              - mysqladmin*/}}
-{{/*              - ping*/}}
-{{/*              - --silent*/}}
-{{/*          initialDelaySeconds: 40*/}}
-{{/*          periodSeconds: 90*/}}
-{{/*          timeoutSeconds: 10*/}}
 
     volumes:
       - name: keycloak-database-data-pv
