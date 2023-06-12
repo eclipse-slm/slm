@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-management-database
+  labels:
+    app: service-management-database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-management-database
+  template:
+    metadata:
+      name: service-management-database
+      labels:
+        app: service-management-database
+    spec:
+      containers:
+
+        - name: service-management-database
+          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.slm.service_registry.database_version }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3306
+          env:
+            - name: KEYCLOAK_AUTHSERVERURL
+              value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
+            - name: MYSQL_USER
+              value: service-management
+            - name: MYSQL_DATABASE
+              value: services
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: service-management-database-data-pv
+            - mountPath: /config
+              name: service-management-database-config-pv
+
+      volumes:
+        - name: service-management-database-data-pv
+          persistentVolumeClaim:
+            claimName: service-management-database-data-pvc
+        - name: service-management-database-config-pv
+          persistentVolumeClaim:
+            claimName: service-management-database-config-pvc
+
+      restartPolicy: Always
