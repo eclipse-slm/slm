@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: service-registry
+  name: resource-management
   labels:
-    app: service-registry
+    app: resource-management
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: service-registry
+      app: resource-management
   template:
     metadata:
-      name: service-registry
+      name: resource-management
       labels:
-        app: service-registry
+        app: resource-management
     spec:
       containers:
-        - name: service-registry
-          image: fabos4ai/slm-service-registry:{{ .Values.slm.version }}
+        - name: resource-management
+          image: ghcr.io/eclipse-slm/slm/resource-management:1.3.0-SNAPSHOT
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9010
@@ -34,39 +34,44 @@ spec:
               value: "8500"
             - name: VAULT_PORT
               value: "8200"
-            - name: NOTIFICATION_SERVICE_PORT
-              value: "9001"
             - name: AWX_HOST
               value: "slm-awx-service"
             - name: AWX_PORT
               value: "80"
+            - name: AWX_TOKEN_HOST
+              value: "awx-jwt-authenticator"
+            - name: AWX_TOKEN_PORT
+              value: "8051"
+            - name: AWX_POLLING_INTERVAL_IN_S
+              value: "80"
+
           volumeMounts:
             - mountPath: /app/awx
-              name: awx-config-service-registry-pv
+              name: awx-config-resource-management-pv
             - mountPath: /app/consul
-              name: consul-config-service-registry-pv
+              name: consul-config-resource-management-pv
             - mountPath: /app/keycloak
-              name: keycloak-config-service-registry-pv
+              name: keycloak-config-resource-management-pv
             - mountPath: /app/vault
-              name: vault-config-service-registry-pv
+              name: vault-config-resource-management-pv
             - mountPath: /app/database/config
-              name: service-registry-database-config-pv
+              name: resource-management-database-config-pv
 
       volumes:
-        - name: awx-config-service-registry-pv
+        - name: awx-config-resource-management-pv
           persistentVolumeClaim:
-            claimName: awx-config-service-registry-pvc
-        - name: consul-config-service-registry-pv
+            claimName: awx-config-resource-management-pvc
+        - name: consul-config-resource-management-pv
           persistentVolumeClaim:
-            claimName: consul-config-service-registry-pvc
-        - name: keycloak-config-service-registry-pv
+            claimName: consul-config-resource-management-pvc
+        - name: keycloak-config-resource-management-pv
           persistentVolumeClaim:
-            claimName: keycloak-config-service-registry-pvc
-        - name: vault-config-service-registry-pv
+            claimName: keycloak-config-resource-management-pvc
+        - name: vault-config-resource-management-pv
           persistentVolumeClaim:
-            claimName: vault-config-service-registry-pvc
-        - name: service-registry-database-config-pv
+            claimName: vault-config-resource-management-pvc
+        - name: resource-management-database-config-pv
           persistentVolumeClaim:
-            claimName: service-registry-database-config-pvc
+            claimName: resource-management-database-config-pvc
 
       restartPolicy: Always

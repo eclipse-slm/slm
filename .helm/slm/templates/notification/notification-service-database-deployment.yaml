@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: notification-service-database
-          image: fabos4ai/mariadb:{{ .Values.slm.notification_service.database_version }}
+          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.slm.notification_service.database_version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3306

@@ -8,7 +8,7 @@ metadata:
 spec:
   containers:
     - name: vault-init
-      image: fabos4ai/slm-vault-init:{{ .Values.slm.version}}
+      image: ghcr.io/eclipse-slm/vault-init:{{ .Values.slm.version}}
       env:
         - name: KEYCLOAK_AUTHSERVERURL
           value: "http://keycloak:7080/auth"
