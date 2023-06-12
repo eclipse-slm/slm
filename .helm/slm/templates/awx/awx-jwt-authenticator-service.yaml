@@ -11,5 +11,5 @@ spec:
   ports:
     - name: "http"
       protocol: TCP
-      port: {{.Values.slm.awx.jwt_authenticator_port}}
-      targetPort: {{.Values.slm.awx.jwt_authenticator_port}}
+      port: 8051
+      targetPort: 8051

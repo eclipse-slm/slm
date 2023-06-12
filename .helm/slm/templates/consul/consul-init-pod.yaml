@@ -9,7 +9,7 @@ spec:
   containers:
     - name: consul-init
       image:
-        ghcr.io/eclipse-slm/consul-init:{{ .Values.slm.version }}
+        fabos4ai/slm-consul-init:{{ .Values.slm.version }}
       env:
         - name: KEYCLOAK_AUTHSERVERURL
           value: "http://keycloak:{{ .Values.slm.keycloak.port}}/auth"

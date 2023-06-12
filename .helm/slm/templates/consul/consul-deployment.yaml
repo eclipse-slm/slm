@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: consul
-          image: ghcr.io/eclipse-slm/consul:{{ .Values.slm.consul.version}}
+          image: fabos4ai/slm-consul:{{ .Values.slm.consul.version}}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8500
@@ -28,18 +28,11 @@ spec:
               mountPath: /config/root
             - name: consul-config-awx-pv
               mountPath: /config/awx
-            - name: consul-config-resource-management-pv
-              mountPath: /config/resource_management
-            - name: consul-config-service-management-pv
-              mountPath: /config/service_management
+            - name: consul-config-resource-registry-pv
+              mountPath: /config/resource_registry
+            - name: consul-config-service-registry-pv
+              mountPath: /config/service_registry
 
-          livenessProbe:
-            httpGet:
-              port: 8500
-              path: /
-            initialDelaySeconds: 40
-            periodSeconds: 90
-            timeoutSeconds: 10
 
       volumes:
         - name: consul-data-pv
@@ -51,11 +44,11 @@ spec:
         - name: consul-config-awx-pv
           persistentVolumeClaim:
             claimName: consul-config-awx-pvc
-        - name: consul-config-resource-management-pv
+        - name: consul-config-resource-registry-pv
           persistentVolumeClaim:
-            claimName: consul-config-resource-management-pvc
-        - name: consul-config-service-management-pv
+            claimName: consul-config-resource-registry-pvc
+        - name: consul-config-service-registry-pv
           persistentVolumeClaim:
-            claimName: consul-config-service-management-pvc
+            claimName: consul-config-service-registry-pvc
 
       restartPolicy: Always

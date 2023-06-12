@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: ui
-          image: ghcr.io/eclipse-slm/slm/ui:{{ .Values.slm.version }}
+          image: fabos4ai/slm-ui:{{ .Values.slm.version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
@@ -25,17 +25,9 @@ spec:
             - name: KEYCLOAK_URL
               value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
             - name: AWX_URL
-              value: http://awx-web:{{.Values.slm.awx.port_http}}/
+              value: http://slm-awx-service:{{.Values.slm.awx.port_http}}/
             - name: BASYX_AAS_GUI_URL
               value: http://{{.Values.slm.hostname}}:3000
-
-          livenessProbe:
-            httpGet:
-              port: 80
-              path: /
-            initialDelaySeconds: 40
-            periodSeconds: 90
-            timeoutSeconds: 10
 
 
       restartPolicy: Always

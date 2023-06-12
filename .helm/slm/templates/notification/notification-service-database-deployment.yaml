@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: notification-service-database
-          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.slm.notification_service.database_version }}
+          image: fabos4ai/mariadb:{{ .Values.slm.notification_service.database_version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3306
@@ -33,16 +33,6 @@ spec:
               name: notification-service-database-data-pv
             - mountPath: /config
               name: notification-service-database-config-pv
-
-          livenessProbe:
-            exec:
-              command:
-                - mysqladmin
-                - ping
-                - --silent
-            initialDelaySeconds: 40
-            periodSeconds: 90
-            timeoutSeconds: 10
 
       volumes:
         - name: notification-service-database-data-pv

@@ -8,7 +8,7 @@ metadata:
 spec:
   containers:
     - name: awx-task
-      image: ghcr.io/eclipse-slm/awx/awx-task:{{.Values.slm.awx.version}}
+      image: fabos4ai/slm-awx-task:15.0.1
       imagePullPolicy: IfNotPresent
 
       volumeMounts:
