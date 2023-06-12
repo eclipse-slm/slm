@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: service-registry-init
+  name: service-management-init
   labels:
-    app: service-registry-init
+    app: service-management-init
 
 spec:
   containers:
-    - name: service-registry-init
-      image: fabos4ai/slm-service-registry-init:{{ .Values.slm.version}}
+    - name: service-management-init
+      image: ghcr.io/eclipse-slm/slm/service-management-init:{{ .Values.slm.version}}
       imagePullPolicy: IfNotPresent
       env:
         - name: SERVICEREGISTRY_INITDIRECTORIES
@@ -20,12 +20,12 @@ spec:
 
       volumeMounts:
         - mountPath: /app/keycloak
-          name: keycloak-config-service-registry-init-pv
+          name: keycloak-config-service-management-init-pv
 
   volumes:
-    - name: keycloak-config-service-registry-init-pv
+    - name: keycloak-config-service-management-init-pv
       persistentVolumeClaim:
-        claimName: keycloak-config-service-registry-init-pvc
+        claimName: keycloak-config-service-management-init-pvc
 
   restartPolicy: OnFailure
       

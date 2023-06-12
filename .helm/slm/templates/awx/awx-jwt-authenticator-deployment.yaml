@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: awx-jwt-authenticator
-          image: fabos4ai/slm-awx-jwt-authenticator:{{ .Values.slm.version}}
+          image: ghcr.io/eclipse-slm/awx-jwt-authenticator:1.0.0-snapshot
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8051
