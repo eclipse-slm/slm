@@ -28,10 +28,10 @@ spec:
               mountPath: /config/root
             - name: consul-config-awx-pv
               mountPath: /config/awx
-            - name: consul-config-resource-registry-pv
-              mountPath: /config/resource_registry
-            - name: consul-config-service-registry-pv
-              mountPath: /config/service_registry
+            - name: consul-config-resource-management-pv
+              mountPath: /config/resource_management
+            - name: consul-config-service-management-pv
+              mountPath: /config/service_management
 
 
       volumes:
@@ -44,11 +44,11 @@ spec:
         - name: consul-config-awx-pv
           persistentVolumeClaim:
             claimName: consul-config-awx-pvc
-        - name: consul-config-resource-registry-pv
+        - name: consul-config-resource-management-pv
           persistentVolumeClaim:
-            claimName: consul-config-resource-registry-pvc
-        - name: consul-config-service-registry-pv
+            claimName: consul-config-resource-management-pvc
+        - name: consul-config-service-management-pv
           persistentVolumeClaim:
-            claimName: consul-config-service-registry-pvc
+            claimName: consul-config-service-management-pvc
 
       restartPolicy: Always

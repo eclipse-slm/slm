@@ -18,7 +18,7 @@ spec:
       containers:
 
         - name: service-management-database
-          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.slm.service_registry.database_version }}
+          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.slm.service_management.database_version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3306

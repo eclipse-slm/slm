@@ -21,10 +21,10 @@ spec:
           name: vault-config-awx-pv
         - mountPath: /vault/config/awx-jwt-authenticator
           name: vault-config-awx-jwt-authenticator-pv
-        - mountPath: /vault/config/resource-registry
-          name: vault-config-resource-registry-pv
-        - mountPath: /vault/config/service-registry
-          name: vault-config-service-registry-pv
+        - mountPath: /vault/config/resource-management
+          name: vault-config-resource-management-pv
+        - mountPath: /vault/config/service-management
+          name: vault-config-service-management-pv
 
   volumes:
     - name: vault-config-root-pv
@@ -36,10 +36,10 @@ spec:
     - name: vault-config-awx-jwt-authenticator-pv
       persistentVolumeClaim:
         claimName: vault-config-awx-jwt-authenticator-pvc
-    - name: vault-config-resource-registry-pv
+    - name: vault-config-resource-management-pv
       persistentVolumeClaim:
-        claimName: vault-config-resource-registry-pvc
-    - name: vault-config-service-registry-pv
+        claimName: vault-config-resource-management-pvc
+    - name: vault-config-service-management-pv
       persistentVolumeClaim:
-        claimName: vault-config-service-registry-pvc
+        claimName: vault-config-service-management-pvc
   restartPolicy: OnFailure

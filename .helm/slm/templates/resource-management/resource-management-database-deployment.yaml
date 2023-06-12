@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: resource-management-database
-          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.slm.resource_registry.database_version }}
+          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.slm.resource_management.database_version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3306
