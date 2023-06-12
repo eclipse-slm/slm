@@ -58,14 +58,14 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: vault-config-resource-management-pv
+  name: vault-config-resource-registry-pv
 spec:
   accessModes:
     - ReadWriteOnce
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/vault-config-resource-management
+    path: /data/vault-config-resource-registry
 
 ---
 
@@ -73,14 +73,14 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: vault-config-service-management-pv
+  name: vault-config-service-registry-pv
 spec:
   accessModes:
     - ReadWriteOnce
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/vault-config-service-management
+    path: /data/vault-config-service-registry
 
 ---
 
@@ -153,14 +153,14 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: vault-config-resource-management-pvc
+  name: vault-config-resource-registry-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 6Gi
-  volumeName: vault-config-resource-management-pv
+  volumeName: vault-config-resource-registry-pv
 
   storageClassName: ""
 
@@ -169,14 +169,14 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: vault-config-service-management-pvc
+  name: vault-config-service-registry-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 6Gi
-  volumeName: vault-config-service-management-pv
+  volumeName: vault-config-service-registry-pv
 
   storageClassName: ""
 
