@@ -31,17 +31,17 @@ spec:
             - name: MONITORING_SERVICE_URL
               value: http://monitoring:9080
             - name: CONSUL_PORT
-              value: "{{.Values.slm.consul.port}}"
+              value: "8500"
             - name: VAULT_PORT
-              value: "{{.Values.slm.vault.port}}"
+              value: "8200"
             - name: AWX_HOST
-              value: "awx-web"
+              value: "slm-awx-service"
             - name: AWX_PORT
-              value: "{{.Values.slm.awx.port_http}}"
+              value: "80"
             - name: AWX_TOKEN_HOST
               value: "awx-jwt-authenticator"
             - name: AWX_TOKEN_PORT
-              value: "{{.Values.slm.awx.jwt_authenticator_port}}"
+              value: "8051"
             - name: AWX_POLLING_INTERVAL_IN_S
               value: "80"
 
@@ -56,14 +56,6 @@ spec:
               name: vault-config-resource-management-pv
             - mountPath: /app/database/config
               name: resource-management-database-config-pv
-
-          livenessProbe:
-            httpGet:
-              port: 9010
-              path: /swagger-ui/index.html
-            initialDelaySeconds: 40
-            periodSeconds: 90
-            timeoutSeconds: 10
 
       volumes:
         - name: awx-config-resource-management-pv
