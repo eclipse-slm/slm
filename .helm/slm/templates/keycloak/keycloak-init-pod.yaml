@@ -8,7 +8,7 @@ metadata:
 spec:
   containers:
     - name: keycloak-init
-      image: fabos4ai/slm-keycloak-init:{{ .Values.slm.version}}
+      image: ghcr.io/eclipse-slm/keycloak-init:{{ .Values.slm.version}}
       imagePullPolicy: IfNotPresent
       env:
         - name: KEYCLOAK_ADMIN
