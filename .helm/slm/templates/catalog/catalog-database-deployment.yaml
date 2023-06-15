@@ -24,6 +24,16 @@ spec:
           - mountPath: /config
             name: catalog-database-config-pv
 
+        livenessProbe:
+          exec:
+            command:
+              - mysqladmin
+              - ping
+              - --silent
+          initialDelaySeconds: 40
+          periodSeconds: 90
+          timeoutSeconds: 10
+
     volumes:
       - name: catalog-database-data-pv
         persistentVolumeClaim:
