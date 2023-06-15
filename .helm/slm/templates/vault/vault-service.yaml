@@ -10,5 +10,5 @@ spec:
     app: vault
   ports:
     - protocol: TCP
-      port: 8200
+      port: {{.Values.slm.vault.port}}
       targetPort: 8200
