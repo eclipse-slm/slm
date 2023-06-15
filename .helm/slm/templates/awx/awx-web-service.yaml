@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: slm-awx-service
+  name: awx-web
   labels:
-    app: slm-awx-service
+    app: awx-web
 spec:
   type: LoadBalancer
   selector:

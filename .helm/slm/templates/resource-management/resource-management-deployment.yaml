@@ -35,7 +35,7 @@ spec:
             - name: VAULT_PORT
               value: "8200"
             - name: AWX_HOST
-              value: "slm-awx-service"
+              value: "awx-web"
             - name: AWX_PORT
               value: "80"
             - name: AWX_TOKEN_HOST
