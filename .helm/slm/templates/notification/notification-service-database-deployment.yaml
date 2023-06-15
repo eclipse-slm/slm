@@ -34,6 +34,16 @@ spec:
             - mountPath: /config
               name: notification-service-database-config-pv
 
+          livenessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - --silent
+            initialDelaySeconds: 40
+            periodSeconds: 90
+            timeoutSeconds: 10
+
       volumes:
         - name: notification-service-database-data-pv
           persistentVolumeClaim:

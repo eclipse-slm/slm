@@ -4,17 +4,20 @@
 
 replicaCount: 1
 
-slm_hostname: my-fabos.local
 
 slm:
-  hostname: my-fabos.local
+  hostname: my-slm.local
   version: 1.3.0-SNAPSHOT
 
   ui_port: 8080
 
   awx:
+    version: 15.0.1
     port_http: 80
     port_https: 443
+    redis_version: 6
+    postgres_version: 10
+    jwt_authenticator_port: 8051
 
   catalog:
     version: 1.3.0-SNAPSHOT
@@ -22,7 +25,7 @@ slm:
     service:
       port: 10000
       database_version: 10.5
-      database_port: 3300
+      database_port: 3306
 
   notification_service:
     port: 9001
@@ -47,8 +50,6 @@ slm:
     initialization_git_repos: https://github.com/FabOS-AI/fabos-slm-service-registry-content.git
     git_check_interval_minutes: 15
 
-
-
   consul:
     version: 1.14.5
     port: 8500
@@ -67,12 +68,9 @@ slm:
     version: v2.43.0
     port: 9090
 
-
-awx_settings:
-  spec:
-    admin_password_secret: password
-
-
+logging:
+  max_file: 5
+  max_size: 10m
 
 image:
   repository: nginx
