@@ -10,5 +10,5 @@ spec:
     app: consul
   ports:
     - protocol: TCP
-      port: 8500
+      port: {{ .Values.slm.consul.port}}
       targetPort: 8500

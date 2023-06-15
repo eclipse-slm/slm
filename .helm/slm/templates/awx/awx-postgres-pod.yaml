@@ -7,14 +7,23 @@ metadata:
 spec:
   containers:
     - name: awx-postgres
-      image: ghcr.io/eclipse-slm/awx/awx-postgres:10
+      image: ghcr.io/eclipse-slm/awx/awx-postgres:{{.Values.slm.awx.postgres_version}}
       imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 5432
       env:
         - name: PGUSER
           value: awx
       volumeMounts:
         - mountPath: "/var/lib/postgresql/data"
           name: awx-postgres-pv
+      livenessProbe:
+        exec:
+          command:
+            - pg_isready
+        initialDelaySeconds: 40
+        periodSeconds: 90
+        timeoutSeconds: 10
 
   volumes:
     - name: awx-postgres-pv
