@@ -28,16 +28,12 @@ spec:
               value: vault
             - name: VAULT_PORT
               value: "8200"
-            - name: VAULT_AUTHENTICATION
-              value: TOKEN
-            - name: VAULT_TOKEN
-              value: "hvs.rsDBkZtxSHdIJ8fQzWMWufbb"
             - name: AWX_HOST
-              value: "slm-awx-service"
+              value: "awx-web"
             - name: AWX_PORT
               value: "80"
           volumeMounts:
-            - name: vault-config-awx-pv
+            - name: vault-config-awx-jwt-authenticator-pv
               mountPath: /opt/vault/awx-jwt-authenticator
             - name: awx-config-jwt-authenticator-pv
               mountPath: /app/awx
@@ -49,9 +45,9 @@ spec:
         - name: keycloak-config-awx-jwt-authenticator-pv
           persistentVolumeClaim:
             claimName: keycloak-config-awx-jwt-authenticator-pvc
-        - name: vault-config-awx-pv
+        - name: vault-config-awx-jwt-authenticator-pv
           persistentVolumeClaim:
-            claimName: vault-config-awx-pvc
+            claimName: vault-config-awx-jwt-authenticator-pvc
         - name: awx-config-jwt-authenticator-pv
           persistentVolumeClaim:
             claimName: awx-config-jwt-authenticator-pvc

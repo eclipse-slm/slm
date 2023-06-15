@@ -14,6 +14,8 @@ spec:
             - containerPort: 8053
 
           volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
             - name: awx-supervisor-socket-pv
               mountPath: /var/run/supervisor
             - name: awx-rsyslog-socket-pv
@@ -23,6 +25,9 @@ spec:
             - name: awx-redis-pv
               mountPath: /var/run/redis
       volumes:
+        - name: nginx-config
+          hostPath:
+            path: /data/minikube/nginx.conf
         - name: awx-supervisor-socket-pv
           persistentVolumeClaim:
             claimName: awx-supervisor-socket-pvc
