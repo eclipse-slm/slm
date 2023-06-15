@@ -25,7 +25,7 @@ spec:
             - name: KEYCLOAK_URL
               value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
             - name: AWX_URL
-              value: http://slm-awx-service:{{.Values.slm.awx.port_http}}/
+              value: http://awx-web:{{.Values.slm.awx.port_http}}/
             - name: BASYX_AAS_GUI_URL
               value: http://{{.Values.slm.hostname}}:3000
 

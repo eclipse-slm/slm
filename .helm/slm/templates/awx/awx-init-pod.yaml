@@ -12,7 +12,7 @@ spec:
         - name: KEYCLOAK_AUTHSERVERURL
           value: "http://keycloak:{{ .Values.slm.keycloak.port}}/auth"
         - name: AWX_URL
-          value: "http://slm-awx-service"
+          value: "http://awx-web:8052"
       volumeMounts:
         - name: awx-config-notification-service-pv
           mountPath: /config/notification-service
