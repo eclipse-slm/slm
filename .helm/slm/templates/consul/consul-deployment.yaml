@@ -33,6 +33,13 @@ spec:
             - name: consul-config-service-management-pv
               mountPath: /config/service_management
 
+          livenessProbe:
+            httpGet:
+              port: 8500
+              path: /
+            initialDelaySeconds: 40
+            periodSeconds: 90
+            timeoutSeconds: 10
 
       volumes:
         - name: consul-data-pv

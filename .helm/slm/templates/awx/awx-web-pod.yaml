@@ -7,7 +7,7 @@ metadata:
 spec:
       containers:
         - name: awx-web
-          image: ghcr.io/eclipse-slm/awx/awx-web:15.0.1
+          image: ghcr.io/eclipse-slm/awx/awx-web:{{.Values.slm.awx.version}}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8052
@@ -24,6 +24,15 @@ spec:
               mountPath: /var/lib/awx/rsyslog/
             - name: awx-redis-pv
               mountPath: /var/run/redis
+
+          livenessProbe:
+            httpGet:
+              port: 8052
+              path: /
+            initialDelaySeconds: 40
+            periodSeconds: 90
+            timeoutSeconds: 10
+
       volumes:
         - name: nginx-config
           hostPath:

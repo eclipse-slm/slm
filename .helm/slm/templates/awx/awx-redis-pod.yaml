@@ -7,13 +7,24 @@ metadata:
 spec:
   containers:
     - name: awx-redis
-      image: fabos4ai/awx-redis:6
+      image: fabos4ai/awx-redis:{{.Values.slm.awx.redis_version}}
       imagePullPolicy: IfNotPresent
       command: [ "redis-server" ]
       args: ["/usr/local/etc/redis/redis.conf"]
       volumeMounts:
         - mountPath: /var/run/redis/
           name: awx-redis-pv
+
+      livenessProbe:
+        exec:
+          command:
+            - redis-cli
+            - "-s"
+            - /var/run/redis/redis.sock
+            - ping
+        initialDelaySeconds: 40
+        periodSeconds: 90
+        timeoutSeconds: 10
   volumes:
     - name: awx-redis-pv
       persistentVolumeClaim:
