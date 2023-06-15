@@ -31,7 +31,7 @@ spec:
             - name: NOTIFICATION_SERVICE_PORT
               value: "9001"
             - name: AWX_HOST
-              value: "slm-awx-service"
+              value: "awx-web"
             - name: AWX_PORT
               value: "80"
           volumeMounts:
