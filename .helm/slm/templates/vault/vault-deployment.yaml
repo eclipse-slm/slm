@@ -34,6 +34,15 @@ spec:
             - mountPath: /vault/file
               name: vault-data-pv
 
+          livenessProbe:
+            exec:
+              command:
+                - vault
+                - status
+            initialDelaySeconds: 40
+            periodSeconds: 90
+            timeoutSeconds: 10
+
       volumes:
         - name: vault-data-pv
           persistentVolumeClaim:
