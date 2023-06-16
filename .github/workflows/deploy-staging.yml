@@ -17,6 +17,7 @@ jobs:
   deploy-staging-environment:
     runs-on: self-hosted
     steps:
+      - uses: actions/checkout@v3
       - name: Test secret
         run: |
           echo ${{ secrets.RUNNER_PRIVATE_KEY }} >> tmp.key
