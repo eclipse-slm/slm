@@ -17,6 +17,9 @@ jobs:
   deploy-staging-environment:
     runs-on: self-hosted
     steps:
+      - name: Test secret
+        run: |
+          echo ${{ secrets.RUNNER_PRIVATE_KEY }} >> /tmp/key
       - name: SSH Remote Commands
         uses: appleboy/ssh-action@v0.1.10
         with:
