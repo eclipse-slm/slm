@@ -6,19 +6,11 @@ services:
 #    ports:
 #      - "8500:8500"
     environment:
-      CONSUL_LOCAL_CONFIG: '{"datacenter": "fabos", "domain": ".fabos", "bind_addr": "0.0.0.0", "retry_join": ["0.0.0.0"], "acl":{"enabled": true, "default_policy": "allow", "tokens":{"master": "myroot"}}}'
+      CONSUL_LOCAL_CONFIG: '{"datacenter": "fabos", "domain": ".fabos", "bind_addr": "0.0.0.0", "retry_join": ["0.0.0.0"], "acl":{"enabled": true, "default_policy": "deny", "down_policy": "extend-cache", "enable_token_persistence": true, "enable_token_replication": true, "tokens":{"initial_management": "myroot"}}}'
 
   consul-client:
     image: "consul:1.14"
 #    ports:
 #      - "9500:8500"
     environment:
-      CONSUL_LOCAL_CONFIG: '{"datacenter": "fabos", "domain": ".fabos", "server": false, "bind_addr": "0.0.0.0", "enable_script_checks": true, "node_id": "79e4fb43-8233-4d07-868a-928d521063f3", "node_name": "test-node", "leave_on_terminate": false, "retry_join": ["consul-server"], "acl":{"enabled": true, "default_policy": "allow", "tokens":{"master": "myroot"}}}'
-#      CONSUL_LOCAL_CONFIG: '{"datacenter": "fabos", "domain": ".fabos", "server": false, "bind_addr": "127.0.0.1", "addresses": { "dns": "127.0.0.1", "http": "127.0.0.1", "grpc": "127.0.0.1" }, "advertise_addr": "127.0.0.1", "ports": { "dns": 9600, "grpc": 9502, "http": 9500, "serf_lan": 9301 }, "enable_script_checks": true, "node_id": "79e4fb43-8233-4d07-868a-928d521063f3", "node_name": "test-node", "leave_on_terminate": false, "retry_join": ["127.0.0.1:8301"], "acl":{"enabled": true, "default_policy": "allow", "tokens":{"master": "myroot"}}}'
-
-#advertise_addr
-#bind_addr
-#addresses.http
-#serf_lan
-#"addresses": { "dns": "127.0.0.1", "http": "127.0.0.1", "grpc": "127.0.0.1" },
-# {{ GetInterfaceIP \"eth0\" }}
+      CONSUL_LOCAL_CONFIG: '{"datacenter": "fabos", "domain": ".fabos", "server": false, "bind_addr": "0.0.0.0", "enable_script_checks": true, "node_id": "79e4fb43-8233-4d07-868a-928d521063f3", "node_name": "test-node", "leave_on_terminate": false, "retry_join": ["consul-server"], "acl":{"enabled": true, "default_policy": "deny", "down_policy": "extend-cache", "enable_token_persistence": true, "enable_token_replication": true, "tokens":{"initial_management": "myrootclient"}}}'
