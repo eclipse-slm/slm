@@ -21,6 +21,7 @@ jobs:
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{env.STAGING_DEVELOP_VM}}
+          username: vfk
           key: ${{ secrets.RUNNER_PRIVATE_KEY }}-
           script: |
             cd /staging/tmp/stack/compose
