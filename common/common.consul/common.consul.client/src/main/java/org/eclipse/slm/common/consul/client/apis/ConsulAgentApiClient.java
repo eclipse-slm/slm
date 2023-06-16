@@ -1,15 +1,11 @@
 package org.eclipse.slm.common.consul.client.apis;
 
-import com.google.common.net.HostAndPort;
 import com.orbitz.consul.AgentClient;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.model.agent.ImmutableRegistration;
-import com.orbitz.consul.model.catalog.ImmutableCatalogRegistration;
-import com.orbitz.consul.model.health.ImmutableService;
 import com.orbitz.consul.model.health.Service;
 import com.orbitz.consul.option.ImmutableQueryOptions;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.model.catalog.ConsulService;
 import org.eclipse.slm.common.consul.model.catalog.Node;
 import org.eclipse.slm.common.consul.model.catalog.NodeService;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
@@ -20,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @Component
 public class ConsulAgentApiClient extends AbstractConsulApiClient {
@@ -144,12 +139,10 @@ public class ConsulAgentApiClient extends AbstractConsulApiClient {
         if(optionalNode.isEmpty())
             return null;
 
-        return Consul.builder()
-                .withHostAndPort(HostAndPort.fromParts(
-                        optionalNode.get().getAddress(),
-                        consulClientPort))
-                .build();
+        return getConsulClient(
+                consulCredential,
+                optionalNode.get().getAddress(),
+                consulClientPort
+        );
     }
-
-
 }
