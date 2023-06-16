@@ -97,6 +97,12 @@ public class ConsulAgentClientTest {
                 .when(consulNodesApiClient).getNodeById(Mockito.any(), Mockito.any());
     }
 
+    private void assertServiceCount(int expectedServiceCount) {
+        Map<String, List<String>> services = consulServicesApiClient.getServices(new ConsulCredential());
+
+        assertEquals(services.size(), expectedServiceCount);
+    };
+
     @Nested
     @Order(10)
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -140,6 +146,9 @@ public class ConsulAgentClientTest {
                     new ArrayList<>(),
                     new HashMap<>()
             );
+
+            // Size == 2 because "consul" and "consul-client" should be registered
+            assertServiceCount(2);
         }
     }
 
@@ -157,14 +166,6 @@ public class ConsulAgentClientTest {
             service.setPort(8080);
         }
         //endregion
-
-
-
-        private void assertServiceCount(int expectedServiceCount) {
-            Map<String, List<String>> services = consulServicesApiClient.getServices(new ConsulCredential());
-
-            assertEquals(services.size(), expectedServiceCount);
-        };
 
         @Test
         @Order(10)
