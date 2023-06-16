@@ -1,8 +1,28 @@
-### Get Catalog Nodes
+### SERVER - Get Catalog Nodes
 GET http://{{host}}:{{consul-port}}/v1/catalog/nodes
 
-### Get Checks of Node by NodeName
+### SERVER - Get Checks of Node by NodeName
 GET http://{{host}}:{{consul-port}}/v1/health/node/test-node
 
-### Get Checks of Agent
-GET http://{{host}}:9500/v1/agent/checks
+### AGENT - Get Checks of Agent
+GET http://{{host}}:{{consul-agent-port}}/v1/agent/checks
+
+### AGENT - Get Services of Agent
+GET http://{{host}}:{{consul-agent-port}}/v1/agent/services
+
+### AGENT - PUT Service on Agent
+PUT http://{{host}}:{{consul-agent-port}}/v1/agent/service/register
+Authorization: Bearer myroot
+
+{
+
+        "ID": "test-service-id",
+        "Name": "test-service",
+        "Tags": [
+            "test-service-tag"
+        ],
+        "Meta": {
+            "test-service-meta-key": "test-service-meta-value"
+        }
+
+}
