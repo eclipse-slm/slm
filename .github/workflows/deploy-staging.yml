@@ -27,7 +27,8 @@ jobs:
             cd /staging/tmp/stack/compose
             docker-compose down --volumes
             docker system prune -f
-            cd /staging && rm -r tmp & mkdir tmp && cd tmp
+            cd /staging && rm -r tmp && mkdir tmp && cd tmp
+            echo "$GITHUB_REF_NAME https://github.com/$GITHUB_REPOSITORY.git"
             git clone -b $GITHUB_REF_NAME https://github.com/$GITHUB_REPOSITORY.git
             cd slm
             CORE_VERSION=$(cat pom.xml | grep -oPm1 "(?<=<revision>)[^<]+")
