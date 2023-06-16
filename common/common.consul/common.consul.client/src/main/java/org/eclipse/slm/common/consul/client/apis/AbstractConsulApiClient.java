@@ -26,17 +26,18 @@ class AbstractConsulApiClient {
     protected RestTemplate restTemplate;
 
     protected String consulHost;
-
     protected int consulPort;
-
     protected String consulToken;
-
     protected String consulScheme;
-
     protected String consulDatacenter;
 
-    public AbstractConsulApiClient(String consulScheme, String consulHost, int consulPort,
-                                   String consulToken, String consulDatacenter) {
+    public AbstractConsulApiClient(
+            String consulScheme,
+            String consulHost,
+            int consulPort,
+            String consulToken,
+            String consulDatacenter
+    ) {
         this.consulScheme = consulScheme;
         this.consulHost = consulHost;
         this.consulPort = consulPort;
@@ -48,7 +49,7 @@ class AbstractConsulApiClient {
 
     private Map<String, Consul> keycloakTokenClients = new HashMap<>();
 
-    public Consul getConsulClient(ConsulCredential consulCredential) throws ConsulLoginFailedException {
+    public Consul getConsulClient(ConsulCredential consulCredential, String consulHost, int consulPort) throws ConsulLoginFailedException {
         switch (consulCredential.getConsulCredentialType()) {
             case APPLICATION_PROPERTIES -> {
                 if (consulClients.containsKey("APPLICATION_PROPERTIES")) {
@@ -113,6 +114,10 @@ class AbstractConsulApiClient {
         }
 
         throw new ConsulLoginFailedException("Unable to login to consul with consul credentials: " + consulCredential);
+    }
+
+    public Consul getConsulClient(ConsulCredential consulCredential) throws ConsulLoginFailedException {
+        return getConsulClient(consulCredential, this.consulHost, this.consulPort);
     }
 
     protected org.springframework.http.HttpHeaders getAuthHeaders(String consulToken)
