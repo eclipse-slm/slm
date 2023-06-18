@@ -3,10 +3,7 @@ package org.eclipse.slm.resource_management.service.rest.resources;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.client.apis.ConsulAclApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulKeyValueApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulNodesApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulServicesApiClient;
+import org.eclipse.slm.common.consul.client.apis.*;
 import org.eclipse.slm.common.consul.model.acl.BindingRule;
 import org.eclipse.slm.common.consul.model.catalog.CatalogNode;
 import org.eclipse.slm.common.consul.model.catalog.Node;
@@ -36,19 +33,23 @@ public class ResourcesConsulClient {
     private final ConsulNodesApiClient consulNodesApiClient;
     private final ConsulAclApiClient consulAclApiClient;
     private final ConsulServicesApiClient consulServicesApiClient;
+    private final ConsulGenericServicesClient consulGenericServicesClient;
     private final ConsulKeyValueApiClient consulKeyValueApiClient;
     private final LocationJpaRepository locationJpaRepository;
+
 
     public ResourcesConsulClient(
             ConsulNodesApiClient consulNodesApiClient,
             ConsulAclApiClient consulAclApiClient,
             ConsulServicesApiClient consulServicesApiClient,
+            ConsulGenericServicesClient consulGenericServicesClient,
             ConsulKeyValueApiClient consulKeyValueApiClient,
             LocationJpaRepository locationJpaRepository
     ) {
         this.consulNodesApiClient = consulNodesApiClient;
         this.consulAclApiClient = consulAclApiClient;
         this.consulServicesApiClient = consulServicesApiClient;
+        this.consulGenericServicesClient = consulGenericServicesClient;
         this.consulKeyValueApiClient = consulKeyValueApiClient;
         this.locationJpaRepository = locationJpaRepository;
     }
@@ -115,10 +116,14 @@ public class ResourcesConsulClient {
         );
 
         //Register Service:
-        consulServicesApiClient.registerServiceWithoutAccess(
+        consulGenericServicesClient.registerService(
                 new ConsulCredential(),
                 basicResource.getId(),
-                remoteAccessService
+                remoteAccessService.getService(),
+                remoteAccessService.getId(),
+                Optional.ofNullable(remoteAccessService.getPort()),
+                remoteAccessService.getTags(),
+                remoteAccessService.getServiceMeta()
         );
 
         //region Register KV:
