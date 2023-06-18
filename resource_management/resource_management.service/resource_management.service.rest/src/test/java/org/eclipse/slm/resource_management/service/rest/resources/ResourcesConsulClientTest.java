@@ -2,10 +2,7 @@ package org.eclipse.slm.resource_management.service.rest.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.client.apis.ConsulAclApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulKeyValueApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulNodesApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulServicesApiClient;
+import org.eclipse.slm.common.consul.client.apis.*;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.model.resource.BasicResource;
 import org.eclipse.slm.resource_management.persistence.api.LocationJpaRepository;
@@ -38,7 +35,10 @@ import static org.junit.jupiter.api.Assertions.*;
         ConsulAclApiClient.class,
         ConsulNodesApiClient.class,
         ConsulServicesApiClient.class,
+        ConsulGenericServicesClient.class,
         ConsulKeyValueApiClient.class,
+        ConsulHealthApiClient.class,
+        ConsulAgentApiClient.class,
         RestTemplate.class,
         ObjectMapper.class
 })
@@ -86,7 +86,6 @@ public class ResourcesConsulClientTest {
                 .withEnv("CONSUL_LOCAL_CONFIG", "{\"datacenter\": \"fabos\", \"domain\": \".fabos\", \"bind_addr\": \"0.0.0.0\", \"retry_join\": [\"0.0.0.0\"], \"acl\":{\"enabled\": true, \"default_policy\": \"allow\", \"tokens\":{\"master\": \"myroot\"}}}");
         consulDockerContainer.start();
     }
-
 
     @BeforeAll
     public static void beforeAll() throws InterruptedException {
