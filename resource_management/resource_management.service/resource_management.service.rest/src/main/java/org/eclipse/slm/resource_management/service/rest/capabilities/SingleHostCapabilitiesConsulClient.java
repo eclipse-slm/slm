@@ -27,6 +27,7 @@ public class SingleHostCapabilitiesConsulClient {
     private final ResourcesConsulClient resourcesConsulClient;
     private final ConsulNodesApiClient consulNodesApiClient;
     private final ConsulServicesApiClient consulServicesApiClient;
+    private final ConsulGenericServicesClient consulGenericServicesClient;
     private final ConsulAclApiClient consulAclApiClient;
     private final ConsulHealthApiClient consulHealthApiClient;
     private final ConsulKeyValueApiClient consulKeyValueApiClient;
@@ -38,6 +39,7 @@ public class SingleHostCapabilitiesConsulClient {
             ResourcesConsulClient resourcesConsulClient,
             ConsulNodesApiClient consulNodesApiClient,
             ConsulServicesApiClient consulServicesApiClient,
+            ConsulGenericServicesClient consulGenericServicesClient,
             ConsulAclApiClient consulAclApiClient,
             ConsulHealthApiClient consulHealthApiClient,
             ConsulKeyValueApiClient consulKeyValueApiClient,
@@ -47,6 +49,7 @@ public class SingleHostCapabilitiesConsulClient {
         this.resourcesConsulClient = resourcesConsulClient;
         this.consulNodesApiClient = consulNodesApiClient;
         this.consulServicesApiClient = consulServicesApiClient;
+        this.consulGenericServicesClient = consulGenericServicesClient;
         this.consulAclApiClient = consulAclApiClient;
         this.consulHealthApiClient = consulHealthApiClient;
         this.consulKeyValueApiClient = consulKeyValueApiClient;
@@ -64,14 +67,18 @@ public class SingleHostCapabilitiesConsulClient {
         if (capability.getHealthCheck() != null) {
             var existingResources = this.resourcesConsulClient.getResources(consulCredential);
             for (var existingResource : existingResources) {
-                this.addSingleHostCapabilityToNode(
+                List<NodeService> nodeServices = consulServicesApiClient.getNodeServicesByNodeId(new ConsulCredential(), existingResource.getId());
+                Optional<NodeService> consulService = nodeServices.stream().filter(srv -> srv.getService().equals("consul")).findFirst();
+
+                if(consulService.isEmpty())
+                    this.addSingleHostCapabilityToNode(
                         consulCredential,
                         capability,
                         existingResource.getId(),
                         CapabilityServiceStatus.INSTALL,
                         isManaged,
                         configParameter
-                );
+                    );
             }
         }
         else {
@@ -110,7 +117,7 @@ public class SingleHostCapabilitiesConsulClient {
                 isManaged,
                 capabilityUtil.getNonSecretConfigParameter(capability,configParameter)
         );
-        this.consulServicesApiClient.registerServiceWithoutAccess(
+        this.consulGenericServicesClient.registerService(
                 consulCredential,
                 singleHostCapabilityService.getConsulNodeId(),
                 singleHostCapabilityService.getService(),
@@ -169,7 +176,7 @@ public class SingleHostCapabilitiesConsulClient {
             UUID nodeId,
             CapabilityService capabilityService
     ) throws ConsulLoginFailedException {
-        consulServicesApiClient.registerService(
+        this.consulGenericServicesClient.registerService(
                 consulCredential,
                 nodeId,
                 capabilityService.getService(),
@@ -215,7 +222,7 @@ public class SingleHostCapabilitiesConsulClient {
         }
 
 //        var existingCapabilityService = new SingleHostCapabilityService(capability, nodeId);
-        consulServicesApiClient.removeServiceByName(
+        this.consulGenericServicesClient.deregisterService(
                 new ConsulCredential(),
                 nodeId,
                 capabilityService.get().getService()
