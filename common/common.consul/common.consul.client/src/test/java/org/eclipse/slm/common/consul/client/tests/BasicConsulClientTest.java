@@ -549,10 +549,14 @@ public class BasicConsulClientTest {
                         new ConsulCredential()
                 );
 
-                consulServicesApiClient.registerServiceWithoutAccess(
+                consulServicesApiClient.registerService(
                         new ConsulCredential(),
                         catalogNode.getId(),
-                        service
+                        service.getService(),
+                        service.getId(),
+                        Optional.ofNullable(service.getPort()),
+                        service.getTags(),
+                        service.getServiceMeta()
                 );
 
                 Map<String, List<String>> servicesAfter = consulServicesApiClient.getServices(
