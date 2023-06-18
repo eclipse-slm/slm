@@ -44,6 +44,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
         ConsulServicesApiClient.class,
+        ConsulGenericServicesClient.class,
+        ConsulAgentApiClient.class,
         ConsulNodesApiClient.class,
         ConsulAclApiClient.class,
         ConsulHealthApiClient.class,
@@ -526,11 +528,10 @@ public class CapabilitiesConsulClientTest {
                 );
 
                 /**
-                 * +1 => Consul Node / Container
                  * +1 => static basicResource instance
                  */
                 assertEquals(
-                        resourceCount+1+1,
+                        resourceCount+1,
                         deploymentCapabilityServices.size()
                 );
             }
