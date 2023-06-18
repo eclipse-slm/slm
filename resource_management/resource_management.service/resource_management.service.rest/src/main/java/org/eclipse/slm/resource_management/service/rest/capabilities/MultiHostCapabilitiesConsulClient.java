@@ -2,6 +2,7 @@ package org.eclipse.slm.resource_management.service.rest.capabilities;
 
 import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.client.apis.ConsulAclApiClient;
+import org.eclipse.slm.common.consul.client.apis.ConsulGenericServicesClient;
 import org.eclipse.slm.common.consul.client.apis.ConsulNodesApiClient;
 import org.eclipse.slm.common.consul.client.apis.ConsulServicesApiClient;
 import org.eclipse.slm.common.consul.model.acl.BindingRule;
@@ -26,20 +27,24 @@ public class MultiHostCapabilitiesConsulClient {
     private final static Logger LOG = LoggerFactory.getLogger(MultiHostCapabilitiesConsulClient.class);
     private final CapabilityUtil capabilityUtil;
     private final ConsulServicesApiClient consulServicesApiClient;
+    private final ConsulGenericServicesClient consulGenericServicesClient;
     private final CapabilityJpaRepository capabilityJpaRepository;
     private final ConsulNodesApiClient consulNodesApiClient;
     private final ConsulAclApiClient consulAclApiClient;
+
 
     public MultiHostCapabilitiesConsulClient(
             CapabilityJpaRepository capabilityJpaRepository,
             ConsulNodesApiClient consulNodesApiClient,
             ConsulServicesApiClient consulServicesApiClient,
+            ConsulGenericServicesClient consulGenericServicesClient,
             ConsulAclApiClient consulAclApiClient,
             CapabilityUtil capabilityUtil
     ) {
         this.capabilityJpaRepository = capabilityJpaRepository;
         this.consulNodesApiClient = consulNodesApiClient;
         this.consulServicesApiClient = consulServicesApiClient;
+        this.consulGenericServicesClient = consulGenericServicesClient;
         this.consulAclApiClient = consulAclApiClient;
         this.capabilityUtil = capabilityUtil;
     }
@@ -268,7 +273,7 @@ public class MultiHostCapabilitiesConsulClient {
                 .stream()
                 .forEach(nodeId -> {
                     try {
-                        this.consulServicesApiClient.registerServiceWithoutAccess(
+                        this.consulGenericServicesClient.registerService(
                                 consulCredential,
                                 nodeId,
                                 multiHostCapabilityService.getService(),
@@ -371,7 +376,7 @@ public class MultiHostCapabilitiesConsulClient {
                 .forEach(k -> {
                     try {
                         // Remove Capability Service:
-                        this.consulServicesApiClient.removeServiceByName(
+                        this.consulGenericServicesClient.deregisterService(
                                 new ConsulCredential(),
                                 k,
                                 multiHostCapabilityService.getService()
@@ -441,7 +446,7 @@ public class MultiHostCapabilitiesConsulClient {
 
         MultiHostCapabilityService multiHostCapabilityService = optionalMultiHostCapabilityService.get();
 
-        this.consulServicesApiClient.removeServiceByName(
+        this.consulGenericServicesClient.deregisterService(
                 new ConsulCredential(),
                 scaleDownOperation.getResourceId(),
                 multiHostCapabilityService.getService()
@@ -476,7 +481,7 @@ public class MultiHostCapabilitiesConsulClient {
 
         multiHostCapabilityService.applyScaleUp(scaleUpOperation);
 
-        this.consulServicesApiClient.registerServiceForNodeWithReadAccessViaKeycloakRole(
+        this.consulGenericServicesClient.registerServiceForNodeWithReadAccessViaKeycloakRole(
                 consulCredential,
                 nodeId,
                 multiHostCapabilityService.getService(),
