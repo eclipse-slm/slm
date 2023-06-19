@@ -26,6 +26,12 @@ CONSUL_CONFIG_FILE=/consul/config/basic_config.json
 CONSUL_CONFIG=$(cat $CONSUL_CONFIG_FILE | jq -r ". | .acl.tokens.master = \"$CONSUL_MASTER_TOKEN\"")
 echo "$CONSUL_CONFIG" > $CONSUL_CONFIG_FILE
 
-consul agent -server -bootstrap-expect 1 -ui -bind=0.0.0.0 -client=0.0.0.0 -data-dir=/consul/data -config-dir=/consul/config &
+if [[ -z "${CONSUL_ADVERTISE}" ]]; then
+  CONSUL_ADVERTISE_CMD=""
+else
+  CONSUL_ADVERTISE_CMD="-advertise ${CONSUL_ADVERTISE}"
+fi
+
+consul agent -server -bootstrap-expect 1 -ui -bind=0.0.0.0 -client=0.0.0.0 $CONSUL_ADVERTISE_CMD -data-dir=/consul/data -config-dir=/consul/config &
 
 fg %1
