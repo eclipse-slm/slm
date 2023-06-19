@@ -33,6 +33,7 @@ resource "vsphere_virtual_machine" "slm-vm" {
         eclipse_slm_git_url   = var.git_slm_url
         eclipse_slm_branch    = var.git_slm_branch
         slm_hostname          = var.slm_hostname
+        slm_ip                = self.default_ip_address
       }
     )
     destination = "/tmp/run_slm.sh"
