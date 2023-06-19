@@ -24,11 +24,10 @@ jobs:
           username: vfk
           key: ${{ secrets.RUNNER_PRIVATE_KEY }}
           script: |
-            cd /staging/tmp/stack/compose
-            docker-compose down --volumes
+            cd /staging/tmp/stack/compose || true
+            docker-compose down --volumes || true
             docker system prune -f
             cd /staging && rm -r tmp && mkdir tmp && cd tmp
-            echo "${{github.ref_name}} https://github.com/${{github.repository}}.git"
             git clone -b ${{github.ref_name}} https://github.com/${{github.repository}}.git
             cd slm
             CORE_VERSION=$(cat pom.xml | grep -oPm1 "(?<=<revision>)[^<]+")
