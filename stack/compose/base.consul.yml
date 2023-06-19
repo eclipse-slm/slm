@@ -10,12 +10,15 @@ services:
       options:
         max-file: ${LOGGING_MAX_FILE}
         max-size: ${LOGGING_MAX_SIZE}
+    environment:
+      CONSUL_ADVERTISE: ${CONSUL_ADVERTISE}
     networks:
       default:
         aliases:
           - consul
     ports:
       - "${CONSUL_PORT}:8500"
+      - "${CONSUL_PORT_RPC}:8300"
     volumes:
       - consul_data:/consul/data
       - consul_config_root:/config/root
