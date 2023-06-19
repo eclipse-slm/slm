@@ -22,7 +22,8 @@ jobs:
         with:
           host: ${{env.STAGING_DEVELOP_VM}}
           username: vfk
-          key: ${{ secrets.RUNNER_PRIVATE_KEY }}
+          key: ${{secrets.RUNNER_PRIVATE_KEY}}
+          envs: STAGING_DEVELOP_HOSTNAME
           script: |
             cd /staging/tmp/stack/compose || true
             docker-compose down --volumes || true
