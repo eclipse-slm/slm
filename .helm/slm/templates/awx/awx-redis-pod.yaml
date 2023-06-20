@@ -15,16 +15,16 @@ spec:
         - mountPath: /var/run/redis/
           name: awx-redis-pv
 
-      livenessProbe:
-        exec:
-          command:
-            - redis-cli
-            - "-s"
-            - /var/run/redis/redis.sock
-            - ping
-        initialDelaySeconds: 40
-        periodSeconds: 90
-        timeoutSeconds: 10
+{{/*      livenessProbe:*/}}
+{{/*        exec:*/}}
+{{/*          command:*/}}
+{{/*            - redis-cli*/}}
+{{/*            - "-s"*/}}
+{{/*            - /var/run/redis/redis.sock*/}}
+{{/*            - ping*/}}
+{{/*        initialDelaySeconds: 40*/}}
+{{/*        periodSeconds: 90*/}}
+{{/*        timeoutSeconds: 10*/}}
   volumes:
     - name: awx-redis-pv
       persistentVolumeClaim:

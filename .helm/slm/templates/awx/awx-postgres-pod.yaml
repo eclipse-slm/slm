@@ -17,13 +17,13 @@ spec:
       volumeMounts:
         - mountPath: "/var/lib/postgresql/data"
           name: awx-postgres-pv
-      livenessProbe:
-        exec:
-          command:
-            - pg_isready
-        initialDelaySeconds: 40
-        periodSeconds: 90
-        timeoutSeconds: 10
+{{/*      livenessProbe:*/}}
+{{/*        exec:*/}}
+{{/*          command:*/}}
+{{/*            - pg_isready*/}}
+{{/*        initialDelaySeconds: 40*/}}
+{{/*        periodSeconds: 90*/}}
+{{/*        timeoutSeconds: 10*/}}
 
   volumes:
     - name: awx-postgres-pv

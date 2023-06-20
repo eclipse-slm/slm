@@ -8,15 +8,11 @@ metadata:
 spec:
   containers:
     - name: resource-management-init
-      image: ghcr.io/eclipse-slm/slm/resource-management-init:{{ .Values.version}}
-      imagePullPolicy: Always
+      image: ghcr.io/eclipse-slm/slm/resource-management-init:{{ .Values.slm.version}}
+      imagePullPolicy: IfNotPresent
       env:
         - name: KEYCLOAK_AUTHSERVERURL
-          value: http://keycloak:{{.Values.keycloak.port}}/auth
-        - name: AWX_HOST
-          value: "awx-web"
-        - name: AWX_PORT
-          value: "{{.Values.awx.port_http}}"
+          value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
 
   restartPolicy: OnFailure
       

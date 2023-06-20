@@ -17,17 +17,13 @@ spec:
     spec:
       containers:
         - name: service-management
-          image: ghcr.io/eclipse-slm/slm/service-management:{{ .Values.version }}
-          imagePullPolicy: Always
+          image: ghcr.io/eclipse-slm/slm/service-management:{{ .Values.slm.version }}
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9020
           env:
             - name: KEYCLOAK_AUTHSERVERURL
-              value: http://keycloak:{{.Values.keycloak.port}}/auth
-            - name: BASYX_AASREGISTRY_PATH
-              value: http://aas-registry:4000
-            - name: BASYX_AASSERVER_PATH
-              value: http://aas-server:4001
+              value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
             - name: BASYX_AASREGISTRY_URL
               value: http://aas-registry:4000/registry
             - name: BASYX_AASSERVER_URL
@@ -37,19 +33,19 @@ spec:
             - name: CONSUL_HOST
               value: "consul"
             - name: CONSUL_PORT
-              value: "{{.Values.consul.port}}"
+              value: "{{.Values.slm.consul.port}}"
             - name: VAULT_HOST
               value: "vault"
             - name: VAULT_PORT
-              value: "{{.Values.vault.port}}"
+              value: "{{.Values.slm.vault.port}}"
             - name: NOTIFICATIONSERVICE_HOST
               value: "notification-service"
             - name: NOTIFICATION_SERVICE_PORT
-              value: "{{.Values.notification_service.port}}"
+              value: "{{.Values.slm.notification_service.port}}"
             - name: AWX_HOST
               value: "awx-web"
             - name: AWX_PORT
-              value: "{{.Values.awx.port_http}}"
+              value: "{{.Values.slm.awx.port_http}}"
           volumeMounts:
             - mountPath: /app/awx
               name: awx-config-service-management-pv

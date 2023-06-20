@@ -17,39 +17,37 @@ spec:
     spec:
       containers:
         - name: resource-management-database
-          image: mariadb:{{ .Values.resource_management.database_version }}
+          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.slm.resource_management.database_version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3306
           env:
             - name: KEYCLOAK_AUTHSERVERURL
-              value: http://keycloak:{{.Values.keycloak.port}}/auth
+              value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
             - name: MYSQL_USER
-              valueFrom:
-                configMapKeyRef:
-                  name: resource-management-database-mariadb-config
-                  key: database-user
-            - name: MARIADB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: resource-management-database-mariadb-secret
-                  key: mysql-password
-            - name: MARIADB_DATABASE
-              valueFrom:
-                configMapKeyRef:
-                  name: resource-management-database-mariadb-config
-                  key: database-schema
-            - name: MARIADB_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: resource-management-database-mariadb-secret
-                  key: mysql-root-password
+              value: resource-management
+            - name: MYSQL_DATABASE
+              value: resources
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: resource-management-database-data-pv
+            - mountPath: /config
+              name: resource-management-database-config-pv
+
+{{/*          livenessProbe:*/}}
+{{/*            exec:*/}}
+{{/*              command:*/}}
+{{/*                - mysqladmin*/}}
+{{/*                - ping*/}}
+{{/*                - --silent*/}}
+{{/*            initialDelaySeconds: 40*/}}
+{{/*            periodSeconds: 90*/}}
+{{/*            timeoutSeconds: 10*/}}
 
       volumes:
-
+        - name: resource-management-database-config-pv
+          persistentVolumeClaim:
+            claimName: resource-management-database-config-pvc
         - name: resource-management-database-data-pv
           persistentVolumeClaim:
             claimName: resource-management-database-data-pvc

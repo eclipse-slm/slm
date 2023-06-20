@@ -40,13 +40,13 @@ spec:
             - name: keycloak-config-awx-jwt-authenticator-pv
               mountPath: /app/keycloak
 
-          livenessProbe:
-            httpGet:
-              port: {{.Values.slm.awx.jwt_authenticator_port}}
-              path: /swagger-ui.html
-            initialDelaySeconds: 40
-            periodSeconds: 90
-            timeoutSeconds: 10
+{{/*          livenessProbe:*/}}
+{{/*            httpGet:*/}}
+{{/*              port: {{.Values.slm.awx.jwt_authenticator_port}}*/}}
+{{/*              path: /swagger-ui.html*/}}
+{{/*            initialDelaySeconds: 40*/}}
+{{/*            periodSeconds: 90*/}}
+{{/*            timeoutSeconds: 10*/}}
 
       volumes:
         - name: keycloak-config-awx-jwt-authenticator-pv
