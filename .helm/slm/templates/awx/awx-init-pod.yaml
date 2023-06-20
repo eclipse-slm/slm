@@ -13,6 +13,11 @@ spec:
           value: "http://keycloak:{{ .Values.slm.keycloak.port}}/auth"
         - name: AWX_URL
           value: "http://awx-web:8052"
+
+      command:
+        - ansible-playbook
+        - main.yml
+        - -vvvv
       volumeMounts:
         - name: awx-config-notification-service-pv
           mountPath: /config/notification-service

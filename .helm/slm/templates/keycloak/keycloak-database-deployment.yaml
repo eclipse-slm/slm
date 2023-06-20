@@ -21,15 +21,15 @@ spec:
             value: keycloak
           - name: MYSQL_USER
             value: keycloak
-        livenessProbe:
-          exec:
-            command:
-              - mysqladmin
-              - ping
-              - --silent
-          initialDelaySeconds: 40
-          periodSeconds: 90
-          timeoutSeconds: 10
+{{/*        livenessProbe:*/}}
+{{/*          exec:*/}}
+{{/*            command:*/}}
+{{/*              - mysqladmin*/}}
+{{/*              - ping*/}}
+{{/*              - --silent*/}}
+{{/*          initialDelaySeconds: 40*/}}
+{{/*          periodSeconds: 90*/}}
+{{/*          timeoutSeconds: 10*/}}
 
     volumes:
       - name: keycloak-database-data-pv
