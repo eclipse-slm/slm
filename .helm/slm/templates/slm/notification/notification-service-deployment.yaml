@@ -23,7 +23,7 @@ spec:
             - containerPort: 9001
           env:
             - name: KEYCLOAK_AUTHSERVERURL
-              value: http://keycloak:{{.Values.slm.keycloak.port}}
+              value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
             - name: CONSUL_PORT
               value: "8500"
             - name: VAULT_PORT
@@ -42,13 +42,14 @@ spec:
             - mountPath: /app/database/config
               name: notification-service-database-config-pv
 
-          livenessProbe:
-            httpGet:
-              port: 9001
-              path: /swagger-ui/index.html
-            initialDelaySeconds: 40
-            periodSeconds: 90
-            timeoutSeconds: 10
+{{/*          livenessProbe:*/}}
+{{/*            httpGet:*/}}
+{{/*              host: notification-service*/}}
+{{/*              port: 9001*/}}
+{{/*              path: /swagger-ui/index.html*/}}
+{{/*            initialDelaySeconds: 40*/}}
+{{/*            periodSeconds: 90*/}}
+{{/*            timeoutSeconds: 10*/}}
 
       volumes:
         - name: notification-service-database-config-pv

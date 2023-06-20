@@ -30,10 +30,16 @@ spec:
               value: http://aas-server:4001/aasServer
             - name: MONITORING_SERVICE_URL
               value: http://monitoring:9080
+            - name: CONSUL_HOST
+              value: "consul"
             - name: CONSUL_PORT
               value: "{{.Values.slm.consul.port}}"
+            - name: VAULT_HOST
+              value: "vault"
             - name: VAULT_PORT
               value: "{{.Values.slm.vault.port}}"
+            - name: NOTIFICATIONSERVICE_HOST
+              value: "notification-service"
             - name: NOTIFICATION_SERVICE_PORT
               value: "{{.Values.slm.notification_service.port}}"
             - name: AWX_HOST
@@ -52,13 +58,14 @@ spec:
             - mountPath: /app/database/config
               name: service-management-database-config-pv
 
-          livenessProbe:
-            httpGet:
-              port: 9020
-              path: /swagger-ui/index.html
-            initialDelaySeconds: 40
-            periodSeconds: 90
-            timeoutSeconds: 10
+{{/*          livenessProbe:*/}}
+{{/*            httpGet:*/}}
+{{/*              host: service-management*/}}
+{{/*              port: 9020*/}}
+{{/*              path: /swagger-ui/index.html*/}}
+{{/*            initialDelaySeconds: 40*/}}
+{{/*            periodSeconds: 90*/}}
+{{/*            timeoutSeconds: 10*/}}
       volumes:
         - name: awx-config-service-management-pv
           persistentVolumeClaim:

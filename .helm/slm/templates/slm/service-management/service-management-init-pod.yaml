@@ -14,7 +14,7 @@ spec:
         - name: SERVICEMANAGEMENT_INITDIRECTORIES
           value: "{{.Values.slm.service_management.initialization_local_directories}}"
         - name: SERVICEMANAGEMENT_GITREPOS_URLS
-          value: "{{.Values.slm.service_management.git_check_interval_minutes}}"
+          value: "{{.Values.slm.service_management.initialization_git_repos}}"
         - name: KEYCLOAK_AUTHSERVERURL
           value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
 
