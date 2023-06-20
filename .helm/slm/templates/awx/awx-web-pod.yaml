@@ -25,13 +25,13 @@ spec:
             - name: awx-redis-pv
               mountPath: /var/run/redis
 
-          livenessProbe:
-            httpGet:
-              port: 8052
-              path: /
-            initialDelaySeconds: 40
-            periodSeconds: 90
-            timeoutSeconds: 10
+{{/*          livenessProbe:*/}}
+{{/*            httpGet:*/}}
+{{/*              port: 8052*/}}
+{{/*              path: /*/}}
+{{/*            initialDelaySeconds: 40*/}}
+{{/*            periodSeconds: 90*/}}
+{{/*            timeoutSeconds: 10*/}}
 
       volumes:
         - name: nginx-config

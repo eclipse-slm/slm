@@ -29,13 +29,14 @@ spec:
             - name: BASYX_AAS_GUI_URL
               value: http://{{.Values.slm.hostname}}:3000
 
-          livenessProbe:
-            httpGet:
-              port: 80
-              path: /
-            initialDelaySeconds: 40
-            periodSeconds: 90
-            timeoutSeconds: 10
+{{/*          livenessProbe:*/}}
+{{/*            httpGet:*/}}
+{{/*              host: ui*/}}
+{{/*              port: 80*/}}
+{{/*              path: /*/}}
+{{/*            initialDelaySeconds: 40*/}}
+{{/*            periodSeconds: 90*/}}
+{{/*            timeoutSeconds: 10*/}}
 
 
       restartPolicy: Always

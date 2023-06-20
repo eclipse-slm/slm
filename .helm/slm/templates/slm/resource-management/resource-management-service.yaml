@@ -5,7 +5,7 @@ metadata:
   labels:
     app: resource-management
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: resource-management
   ports:
