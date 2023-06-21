@@ -88,7 +88,6 @@ jobs:
             echo ${{secrets.GITHUB_TOKEN}} | docker login -u${{github.actor}} --password-stdin ghcr.io
             docker-compose pull
             docker-compose up -d --force-recreate
-            - name: Deploy stack von staging VM
       - name: Test stack running on staging VM
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -98,3 +97,40 @@ jobs:
           script: |
             cd /staging/tmp/slm/tests/backend
             mvn test -Dtest=DockerStackTests
+
+  tests:
+    needs: build
+#    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        tests: [
+          {
+            component: "AWX",
+            test-class: "AWXTests"
+          },
+          {
+            component: "Consul",
+            test-class: "ConsulTests"
+          },
+          {
+            component: "Keycloak",
+            test-class: "KeycloakTests"
+          },
+          {
+            component: "Vault",
+            test-class: "VaultTests"
+          }
+        ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 19
+        uses: actions/setup-java@v3
+        with:
+          java-version: '19'
+          distribution: 'temurin'
+          cache: maven
+      - name: Run tests for '${{ matrix.tests.component }}' with Maven
+        run: |
+          cd tests/backend
+          mvn test -Dtest=${{ matrix.tests.test-class }}
