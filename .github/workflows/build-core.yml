@@ -60,7 +60,7 @@ jobs:
         run: find . -type f -path "*test-reports/*-output.txt" -exec tail -n +1 {} +
 
   deploy-staging-environment:
-    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith('release/'))
+    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
     runs-on: self-hosted
     env:
       STAGING_VM_IP: ${{ github.ref_name == 'develop' && '10.3.7.166' || '10.3.7.145' }}
