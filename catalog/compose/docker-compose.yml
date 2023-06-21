@@ -3,7 +3,7 @@ version: '3'
 services:
 
   slm-catalog:
-    image: fabos4ai/slm-catalog:${SLM_CATALOG_VERSION}
+    image: ghcr.io/eclipse-slm/slm/catalog:${SLM_CATALOG_VERSION}
     restart: unless-stopped
     depends_on:
       - slm-catalog-database
@@ -26,7 +26,7 @@ services:
       test: [ "CMD", "curl", "http://localhost:9000/swagger-ui/index.html" ]
 
   slm-catalog-database:
-    image: fabos4ai/mariadb:${SLM_CATALOG_SERVICE_DATABASE_VERSION}
+    image: ghcr.io/eclipse-slm/mariadb:${SLM_CATALOG_SERVICE_DATABASE_VERSION}
     restart: unless-stopped
     logging:
       driver: "json-file"
