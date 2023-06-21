@@ -36,7 +36,7 @@ jobs:
             cd /staging/tmp/slm/stack/compose || true
             docker-compose down --volumes || true
             docker system prune -f
-            cd /staging && rm -r tmp && mkdir tmp && cd tmp
+            cd /staging && sudo rm -r tmp && mkdir tmp && cd tmp
             git clone -b ${{github.ref_name}} https://github.com/${{github.repository}}.git
             cd slm
             CORE_VERSION=$(cat pom.xml | grep -oPm1 "(?<=<revision>)[^<]+")
