@@ -2,7 +2,7 @@ version: '3'
 
 services:
   awx-web-no-jwt:
-    image: ghcr.io/eclipse-slm/awx/awx-web-no-jwt:15.0.1
+    image: fabos4ai/slm-awx-web-no-jwt:15.0.1
     depends_on:
       - awx-redis
       - awx-redis-init
