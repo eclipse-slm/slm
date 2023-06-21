@@ -1,4 +1,4 @@
-FROM fabos4ai/ansible-core:2.11.9
+FROM ghcr.io/eclipse-slm/ansible:2.11.9
 
 ENV VAULT_URL=http://vault:8200 \
     VAULT_CONFIG_VIA=SHARED_VOLUME \

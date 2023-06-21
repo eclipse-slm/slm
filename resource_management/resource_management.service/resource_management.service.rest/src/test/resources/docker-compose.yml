@@ -2,7 +2,7 @@ version: '3'
 
 services:
   awx-web-no-jwt:
-    image: fabos4ai/slm-awx-web-no-jwt:15.0.1
+    image: ghcr.io/eclipse-slm/awx/awx-web-no-jwt:15.0.1
     depends_on:
       - awx-redis
       - awx-redis-init
@@ -21,7 +21,7 @@ services:
       test: [ "CMD", "curl", "http://localhost:8052" ]
 
   awx-task:
-    image: fabos4ai/slm-awx-task:15.0.1
+    image: ghcr.io/eclipse-slm/awx/awx-task:15.0.1
     depends_on:
       - awx-redis
       - awx-redis-init
@@ -39,7 +39,7 @@ services:
       - awx_test-redis:/var/run/redis
 
   awx-redis:
-    image: fabos4ai/awx-redis:6
+    image: ghcr.io/eclipse-slm/awx/redis:6
     restart: unless-stopped
     depends_on:
       - awx-redis-init
@@ -61,7 +61,7 @@ services:
       - awx_test-redis:/var/run/redis/
 
   awx-postgres:
-    image: fabos4ai/slm-awx-postgres:10
+    image: ghcr.io/eclipse-slm/awx/awx-postgres:10
     environment:
       PGUSER: awx
     volumes:
