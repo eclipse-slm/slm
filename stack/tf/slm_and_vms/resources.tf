@@ -12,7 +12,7 @@ resource "vsphere_virtual_machine" "slm-vm" {
   }
   disk {
     label = "disk0"
-    size  = var.disk_size
+    size  = 60
     thin_provisioned = false
   }
   clone {
@@ -30,10 +30,13 @@ resource "vsphere_virtual_machine" "slm-vm" {
     content   = templatefile(
       "scripts/run_slm.tftpl",
       {
-        eclipse_slm_git_url   = var.git_slm_url
-        eclipse_slm_branch    = var.git_slm_branch
-        slm_hostname          = var.slm_hostname
-        slm_ip                = self.default_ip_address
+        eclipse_slm_git_url       = var.git_slm_url
+        eclipse_slm_branch        = var.git_slm_branch
+        slm_hostname              = var.slm_hostname
+        slm_ip                    = self.default_ip_address
+        slm_build_docker_images   = var.slm_build_docker_images
+        run_portainer             = var.run_portainer
+        portainer_admin_password  = var.portainer_admin_password
       }
     )
     destination = "/tmp/run_slm.sh"
