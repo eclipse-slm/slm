@@ -67,7 +67,7 @@ jobs:
       STAGING_VM_IP: ${{ github.ref_name == 'develop' && '10.3.7.166' || '10.3.7.145' }}
       STAGING_VM_HOSTNAME: ${{ github.ref_name == 'develop' && 'develop.stage.slm.vfk' || 'main.stage.slm.vfk' }}
     steps:
-      - name: SSH Remote Commands
+      - name: Deploy stack von staging VM
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{env.STAGING_VM_IP}}
@@ -88,3 +88,13 @@ jobs:
             echo ${{secrets.GITHUB_TOKEN}} | docker login -u${{github.actor}} --password-stdin ghcr.io
             docker-compose pull
             docker-compose up -d --force-recreate
+            - name: Deploy stack von staging VM
+      - name: Test stack running on staging VM
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{env.STAGING_VM_IP}}
+          username: vfk
+          key: ${{secrets.RUNNER_PRIVATE_KEY}}
+          script: |
+            cd /staging/tmp/slm/tests/backend
+            mvn test -Dtest=DockerStackTests

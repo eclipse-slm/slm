@@ -1,0 +1,7 @@
+{
+  "name": "Test Service Offering",
+  "description": "Description of test service offering",
+  "shortDescription": "Short description",
+  "serviceCategoryId": 1,
+  "serviceVendorId": "<service-vendor-id>"
+}
