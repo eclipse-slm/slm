@@ -105,3 +105,18 @@ variable "slm_kc_port" {
   type = number
   default = 7080
 }
+
+variable "slm_build_docker_images" {
+  type = bool
+  default = false
+}
+
+variable "run_portainer" {
+  type = bool
+  default = true
+}
+
+variable "portainer_admin_password" {
+  type = string
+  default = "passwordpassword"
+}
