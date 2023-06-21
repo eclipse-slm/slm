@@ -2,17 +2,22 @@ name: Deploy Staging Environment
 
 
 on:
-  workflow_run:
-    workflows: Build Core
+  push:
     branches:
       - main
-      - release/*
       - develop
-    types: completed
+      - release-*
+#  workflow_run:
+#    workflows: Build Core
+#    branches:
+#      - main
+#      - release/*
+#      - develop
+#    types: completed
 
 env:
-  STAGING_VM_IP: ${{ github.ref == 'refs/heads/develop' && '10.3.7.166' || '10.3.7.145' }}
-  STAGING_VM_HOSTNAME: ${{ github.ref == 'refs/heads/develop' && 'develop.stage.slm.vfk' || 'main.stage.slm.vfk' }}
+  STAGING_VM_IP: ${{ github.ref_name == 'develop' && '10.3.7.166' || '10.3.7.145' }}
+  STAGING_VM_HOSTNAME: ${{ github.ref_name == 'develop' && 'develop.stage.slm.vfk' || 'main.stage.slm.vfk' }}
 
 jobs:
   deploy-staging-environment:
@@ -27,6 +32,7 @@ jobs:
           key: ${{secrets.RUNNER_PRIVATE_KEY}}
           envs: STAGING_VM_HOSTNAME
           script: |
+            echo ${{github.ref_name}}
             cd /staging/tmp/stack/compose || true
             docker-compose down --volumes || true
             docker system prune -f
