@@ -11,8 +11,8 @@ on:
     types: completed
 
 env:
-  STAGING_VM_IP: ${{ github.ref_name == 'develop' && '10.3.7.166' || '10.3.7.145' }}
-  STAGING_VM_HOSTNAME: ${{ github.ref_name == 'develop' && 'develop.stage.slm.vfk' || 'main.stage.slm.vfk' }}
+  STAGING_VM_IP: ${{ github.event.workflow_run.head_branch == 'refs/heads/develop' && '10.3.7.166' || '10.3.7.145' }}
+  STAGING_VM_HOSTNAME: ${{ github.event.workflow_run.head_branch == 'refs/heads/develop' && 'develop.stage.slm.vfk' || 'main.stage.slm.vfk' }}
 
 jobs:
   deploy-staging-environment:
