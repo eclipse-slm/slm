@@ -1,4 +1,4 @@
-FROM ghcr.io/eclipse-slm/awx/base:15.0.1
+FROM fabos4ai/awx:15.0.1
 
 USER root
 

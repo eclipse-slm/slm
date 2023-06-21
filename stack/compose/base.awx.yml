@@ -78,7 +78,7 @@ services:
       - "${SLM_HOSTNAME}:172.17.0.1"
 
   awx-redis:
-    image: ghcr.io/eclipse-slm/awx/redis:${AWX_REDIS_VERSION}
+    image: fabos4ai/awx-redis:${AWX_REDIS_VERSION}
     restart: unless-stopped
     logging:
       driver: "json-file"

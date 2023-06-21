@@ -1,4 +1,4 @@
-FROM ghcr.io/eclipse-slm/ansible:2.11.9
+FROM fabos4ai/ansible-core:2.11.9
 
 ENV KEYCLOAK_AUTHSERVERURL=http://keycloak:8080/auth \
     KEYCLOAK_ADMIN_USER=admin \
