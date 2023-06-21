@@ -21,7 +21,7 @@ env:
 
 jobs:
   deploy-staging-environment:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+#    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: self-hosted
     steps:
       - name: SSH Remote Commands
