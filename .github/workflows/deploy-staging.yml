@@ -8,10 +8,7 @@ on:
       - release-*
 
 env:
-  STAGING_DEVELOP_VM: 10.3.7.166
-  STAGING_DEVELOP_HOSTNAME: develop.stage.slm.vfk
-  STAGING_RELEASE_VM: 10.3.7.145
-  STAGING_RELEASE_HOSTNAME: main.stage.slm.vfk
+  STAGING_VM: ${{ github.ref == 'refs/heads/develop' && 'develop.stage.slm.vfk' || 'main.stage.slm.vfk' }}
 
 jobs:
   deploy-staging-environment:
@@ -20,10 +17,10 @@ jobs:
       - name: SSH Remote Commands
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{env.STAGING_DEVELOP_VM}}
+          host: ${{env.STAGING_VM}}
           username: vfk
           key: ${{secrets.RUNNER_PRIVATE_KEY}}
-          envs: STAGING_DEVELOP_HOSTNAME
+          envs: STAGING_VM
           script: |
             cd /staging/tmp/stack/compose || true
             docker-compose down --volumes || true
@@ -33,7 +30,7 @@ jobs:
             cd slm
             CORE_VERSION=$(cat pom.xml | grep -oPm1 "(?<=<revision>)[^<]+")
             cd stack/compose
-            sed -ir "s/^[#]*\s*SLM_HOSTNAME=.*/SLM_HOSTNAME=$STAGING_DEVELOP_HOSTNAME/" .env
+            sed -ir "s/^[#]*\s*SLM_HOSTNAME=.*/SLM_HOSTNAME=$STAGING_VM/" .env
             sed -ir "s/^[#]*\s*SLM_VERSION=.*/SLM_VERSION=$CORE_VERSION/" .env
             echo ${{secrets.GITHUB_TOKEN}} | docker login -u${{github.actor}} --password-stdin ghcr.io
             docker-compose pull
