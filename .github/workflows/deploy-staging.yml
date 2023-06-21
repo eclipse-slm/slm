@@ -33,7 +33,7 @@ jobs:
           envs: STAGING_VM_HOSTNAME
           script: |
             echo ${{github.ref_name}}
-            cd /staging/tmp/stack/compose || true
+            cd /staging/tmp/slm/stack/compose || true
             docker-compose down --volumes || true
             docker system prune -f
             cd /staging && rm -r tmp && mkdir tmp && cd tmp
