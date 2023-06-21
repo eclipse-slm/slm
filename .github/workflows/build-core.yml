@@ -131,7 +131,7 @@ jobs:
 #          distribution: 'temurin'
 #          cache: maven
       - name: Setup Maven Action
-        uses: s4u/setup-maven-action@1.8.0
+        uses: s4u/setup-maven-action@v1.8.0
         with:
           java-version: 19
           java-distribution: 'temurin'
