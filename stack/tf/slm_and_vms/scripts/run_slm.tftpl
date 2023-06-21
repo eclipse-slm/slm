@@ -2,7 +2,7 @@
 
 #### INSTALL DOCKER
 sudo apt update
-sudo apt install ansible git ca-certificates curl gnupg -y
+sudo apt install ansible maven git openjdk-18-jdk ca-certificates curl gnupg -y
 sudo install -m 0755 -d /etc/apt/keyrings
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -12,10 +12,30 @@ echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docke
 sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-#### INSTALL SLM
+%{ if run_portainer == true }
+#### INSTALL PORTAINER
+  mkdir -p /tmp/portainer_data
+  echo "${portainer_admin_password}" > /tmp/portainer_data/password
+  sudo docker volume create portainer_data
+  sudo docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/portainer_data:/data portainer/portainer-ce:latest --admin-password-file /data/password -H unix:///var/run/docker.sock
+%{ endif }
+
+
+#### GET SLM
+cd /tmp
 git clone -b ${eclipse_slm_branch} ${eclipse_slm_git_url}
 sed -i '/^SLM_HOSTNAME=/s/=.*/=${slm_hostname}/' /tmp/eclipse-slm/stack/compose/.env
 sed -i '/^CONSUL_ADVERTISE=/s/=.*/=${slm_ip}/' /tmp/eclipse-slm/stack/compose/.env
 
+
+%{ if slm_build_docker_images == true }
+#### BUILD SLM IMAGES
+  cd /tmp/eclipse-slm/
+  sudo mvn clean install -DskipTests=true -T 8 -f pom.xml
+%{ endif }
+
+
+##### RUN SLM
 cd /tmp/eclipse-slm/stack/compose
+sudo docker compose -f build.yml -f base.consul.yml build consul
 sudo docker compose up -d
