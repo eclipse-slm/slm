@@ -19,6 +19,7 @@ services:
     ports:
       - "${CONSUL_PORT}:8500"
       - "${CONSUL_PORT_RPC}:8300"
+      - "${CONSUL_PORT_LAN_SERF}:8301"
     volumes:
       - consul_data:/consul/data
       - consul_config_root:/config/root
