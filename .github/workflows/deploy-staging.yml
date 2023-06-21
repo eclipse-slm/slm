@@ -36,11 +36,11 @@ jobs:
             cd /staging/tmp/slm/stack/compose || true
             docker-compose down --volumes || true
             docker system prune -f
-            cd /staging && sudo rm -r tmp && mkdir tmp && cd tmp
+            sudo rm -r /staging/tmp && mkdir /staging/tmp && cd /staging/tmp
             git clone -b ${{github.ref_name}} https://github.com/${{github.repository}}.git
-            cd slm
+            cd /staging/tmp/slm
             CORE_VERSION=$(cat pom.xml | grep -oPm1 "(?<=<revision>)[^<]+")
-            cd stack/compose
+            cd /staging/tmp/slm/stack/compose
             sed -ir "s/^[#]*\s*SLM_HOSTNAME=.*/SLM_HOSTNAME=$STAGING_VM_HOSTNAME/" .env
             sed -ir "s/^[#]*\s*SLM_VERSION=.*/SLM_VERSION=$CORE_VERSION/" .env
             echo ${{secrets.GITHUB_TOKEN}} | docker login -u${{github.actor}} --password-stdin ghcr.io
