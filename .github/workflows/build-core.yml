@@ -98,10 +98,12 @@ jobs:
             cd /staging/tmp/slm/tests/backend
             mvn test -Dtest=DockerStackTests
 
-  tests:
+  test-external-components:
 #    needs: build
 #    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
     runs-on: self-hosted
+    container:
+      image: maven:3.9-eclipse-temurin-19-focal
     strategy:
       matrix:
         tests: [
@@ -126,13 +128,6 @@ jobs:
       TARGET_HOST: ${{ github.ref_name == 'develop' && '10.3.7.166' || '10.3.7.145' }}
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Maven Action
-        uses: s4u/setup-maven-action@v1.8.0
-        with:
-          java-version: 19
-          java-distribution: 'temurin'
-          maven-version: 3.6.3
-          cache: maven
       - name: Run tests for '${{ matrix.tests.component }}' with Maven
         run: |
           cd tests/backend
