@@ -1,8 +1,6 @@
 package org.eclipse.slm.tests;
 
-import de.fhg.ipa.ced.tests.stack.*;
-import io.restassured.RestAssured;
-import org.junit.jupiter.api.BeforeAll;
+import org.eclipse.slm.tests.stack.*;
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
 import org.junit.platform.suite.api.SuiteDisplayName;
@@ -16,8 +14,8 @@ import org.junit.platform.suite.api.SuiteDisplayName;
         ConsulTests.class,
         VaultTests.class,
         NotificationServiceTests.class,
-        ResourceRegistryTests.class,
-        ServiceRegistryTests.class,
+        ResourceManagementTests.class,
+        ServiceManagementTests.class,
         DcDockerTest.class
 })
 public class StackTestSuite {

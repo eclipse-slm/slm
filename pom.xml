@@ -19,6 +19,15 @@
         <module>catalog</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>e2e-tests</id>
+            <modules>
+                <module>tests</module>
+            </modules>
+        </profile>
+    </profiles>
+
     <properties>
         <revision>1.3.0-SNAPSHOT</revision>
 

@@ -4,15 +4,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>tests</name>
-    <groupId>de.fhg.ipa.ced</groupId>
-    <artifactId>tests</artifactId>
+    <groupId>org.eclipse.slm</groupId>
+    <artifactId>tests.backend</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
 
-    <properties>
-        <revision>1.0.0-SNAPSHOT</revision>
+    <parent>
+        <groupId>org.eclipse.slm</groupId>
+        <artifactId>tests</artifactId>
+        <version>${revision}</version>
+    </parent>
 
+    <properties>
         <java.version>18</java.version>
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
         <junit.jupiter.platform.version>1.8.1</junit.jupiter.platform.version>
