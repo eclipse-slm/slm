@@ -40,10 +40,12 @@ public class DockerStackTests {
         put("ui", "unhealthy");
         put("notification-service", "healthy");
         put("notification-service-database", "healthy");
-        put("resource-registry", "healthy");
-        put("service-registry", "healthy");
-        put("service-registry-database", "healthy");
-        put("service-registry-init", "exited");
+        put("resource-management", "healthy");
+        put("resource-management-database", "healthy");
+        put("resource-management-init", "exited");
+        put("service-management", "healthy");
+        put("service-management-database", "healthy");
+        put("service-management-init", "exited");
     }};
 
     private ObjectMapper objectMapper = new ObjectMapper();
