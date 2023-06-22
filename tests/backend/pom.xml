@@ -19,7 +19,6 @@
         <slf4j.version>1.7.36</slf4j.version>
         <logback.version>1.2.11</logback.version>
         <docker.java.version>3.2.13</docker.java.version>
-        <testSuite>**/StackTestSuite.class</testSuite>
     </properties>
 
     <dependencies>
@@ -88,26 +87,12 @@
     </dependencies>
 
     <build>
-        <finalName>running-unit-tests</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven.plugin.surefire.version}</version>
                 <configuration>
-                    <includes>
-                        <include>${testSuite}</include>
-                    </includes>
+                    <useModulePath>false</useModulePath>
                 </configuration>
             </plugin>
         </plugins>
