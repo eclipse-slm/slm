@@ -1,9 +1,9 @@
-package de.fhg.ipa.ced.tests.utils;
+package org.eclipse.slm.tests.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.fhg.ipa.ced.tests.stack.TestConfig;
+import org.eclipse.slm.tests.stack.TestConfig;
 
 import java.util.Base64;
 

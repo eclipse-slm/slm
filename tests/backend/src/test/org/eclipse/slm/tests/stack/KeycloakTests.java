@@ -1,6 +1,6 @@
-package de.fhg.ipa.ced.tests.stack;
+package org.eclipse.slm.tests.stack;
 
-import de.fhg.ipa.ced.tests.utils.KeycloakUtil;
+import org.eclipse.slm.tests.utils.KeycloakUtil;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.*;
 

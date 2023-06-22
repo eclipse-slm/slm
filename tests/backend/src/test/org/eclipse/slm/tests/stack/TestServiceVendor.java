@@ -1,4 +1,4 @@
-package de.fhg.ipa.ced.tests.stack;
+package org.eclipse.slm.tests.stack;
 
 public class TestServiceVendor {
     String id;

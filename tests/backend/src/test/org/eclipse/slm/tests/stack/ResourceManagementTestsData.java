@@ -1,6 +1,6 @@
-package de.fhg.ipa.ced.tests.stack;
+package org.eclipse.slm.tests.stack;
 
-public class ResourceRegistryTestsData {
+public class ResourceManagementTestsData {
 
     public final static String DUMMY_DEPLOYMENT_CAPABILITY_JSON = """
             {

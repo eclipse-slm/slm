@@ -1,4 +1,4 @@
-package de.fhg.ipa.ced.tests;
+package org.eclipse.slm.tests;
 
 import de.fhg.ipa.ced.tests.stack.*;
 import io.restassured.RestAssured;

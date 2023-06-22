@@ -1,4 +1,4 @@
-package de.fhg.ipa.ced.tests.stack;
+package org.eclipse.slm.tests.stack;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

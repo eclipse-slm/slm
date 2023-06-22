@@ -1,9 +1,9 @@
-package de.fhg.ipa.ced.tests.stack;
+package org.eclipse.slm.tests.stack;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import de.fhg.ipa.ced.tests.utils.KeycloakUtil;
+import org.eclipse.slm.tests.utils.KeycloakUtil;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.*;
@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.*;
 
 @DisplayName("Service Registry")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ServiceRegistryTests {
+public class ServiceManagementTests {
 
     @BeforeAll
     public static void init()

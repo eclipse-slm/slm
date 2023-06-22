@@ -1,4 +1,4 @@
-package de.fhg.ipa.ced.tests.stack;
+package org.eclipse.slm.tests.stack;
 
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeAll;
