@@ -134,32 +134,32 @@ jobs:
           mvn test -Dtest=${{ matrix.tests.test-class }}
 
   test-internal-components:
-  #    needs: build
-  #    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
-  runs-on: self-hosted
-  container:
-    image: maven:3.9-eclipse-temurin-19-focal
-  strategy:
-    matrix:
-      tests: [
-        {
-          component: "Notification Service",
-          test-class: "NotificationServiceTests"
-        },
-        {
-          component: "Resource Management",
-          test-class: "ResourceManagementTests"
-        },
-        {
-          component: "Service Management",
-          test-class: "ServiceManagementTests"
-        }
-      ]
-  env:
-    TARGET_HOST: ${{ github.ref_name == 'develop' && '10.3.7.166' || '10.3.7.145' }}
-  steps:
-    - uses: actions/checkout@v3
-    - name: Run tests for '${{ matrix.tests.component }}' with Maven
-      run: |
-        cd tests/backend
-        mvn test -Dtest=${{ matrix.tests.test-class }}
+    #    needs: build
+    #    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
+    runs-on: self-hosted
+    container:
+      image: maven:3.9-eclipse-temurin-19-focal
+    strategy:
+      matrix:
+        tests: [
+          {
+            component: "Notification Service",
+            test-class: "NotificationServiceTests"
+          },
+          {
+            component: "Resource Management",
+            test-class: "ResourceManagementTests"
+          },
+          {
+            component: "Service Management",
+            test-class: "ServiceManagementTests"
+          }
+        ]
+    env:
+      TARGET_HOST: ${{ github.ref_name == 'develop' && '10.3.7.166' || '10.3.7.145' }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run tests for '${{ matrix.tests.component }}' with Maven
+        run: |
+          cd tests/backend
+          mvn test -Dtest=${{ matrix.tests.test-class }}
