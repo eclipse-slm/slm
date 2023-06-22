@@ -16,16 +16,9 @@
     </parent>
 
     <properties>
-        <java.version>18</java.version>
-        <junit.jupiter.version>5.8.2</junit.jupiter.version>
-        <junit.jupiter.platform.version>1.8.1</junit.jupiter.platform.version>
         <slf4j.version>1.7.36</slf4j.version>
         <logback.version>1.2.11</logback.version>
-        <jackson.version>2.13.2.2</jackson.version>
         <docker.java.version>3.2.13</docker.java.version>
-        <rest-assured.version>5.0.0</rest-assured.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <testSuite>**/StackTestSuite.class</testSuite>
     </properties>
 

@@ -67,11 +67,12 @@
         <basyx.version>1.3.1</basyx.version>
 
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
+        <junit.jupiter.platform.version>1.8.1</junit.jupiter.platform.version>
         <testcontainers.version>1.17.3</testcontainers.version>
         <rest-assured.version>5.1.1</rest-assured.version>
         <assertj.version>3.23.1</assertj.version>
         <project.reporting.outputDirectory>${project.build}</project.reporting.outputDirectory>
-
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <docker.image.registry>ghcr.io/eclipse-slm</docker.image.registry>
