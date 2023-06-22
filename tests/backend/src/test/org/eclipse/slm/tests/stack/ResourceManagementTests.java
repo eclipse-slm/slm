@@ -103,7 +103,7 @@ public class ResourceManagementTests {
             .auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
             .log().all()
             .contentType(ContentType.JSON)
-            .body(ResourceRegistryTestsData.DUMMY_DEPLOYMENT_CAPABILITY_JSON)
+            .body(ResourceManagementTestsData.DUMMY_DEPLOYMENT_CAPABILITY_JSON)
             .post("/resources/capabilities")
             .then().assertThat() .statusCode(201);
     }
