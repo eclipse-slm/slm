@@ -30,7 +30,7 @@ export default {
   },
   created: async function() {
     try {
-      let response = await Axios.get('https://api.github.com/repos/FabOS-AI/fabos-slm/git/trees/github-pages');
+      let response = await Axios.get('https://api.github.com/repos/eclipse-slm/slm/git/trees/github-pages');
       const versionNode = response.data.tree.find(e => {
         return e.path.toLowerCase() === 'version';
       });
