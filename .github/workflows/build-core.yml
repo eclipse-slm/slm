@@ -99,8 +99,8 @@ jobs:
             mvn test -Dtest=DockerStackTests
 
   test-external-components:
-#    needs: build
-#    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
+    needs: deploy-staging-environment
+    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
     runs-on: self-hosted
     container:
       image: maven:3.9-eclipse-temurin-19-focal
@@ -136,8 +136,8 @@ jobs:
           mvn test -Dtest=${{ matrix.tests.test-class }}
 
   test-internal-components:
-    #    needs: build
-    #    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
+    needs: test-external-components
+    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
     runs-on: self-hosted
     container:
       image: maven:3.9-eclipse-temurin-19-focal
