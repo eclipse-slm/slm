@@ -1,8 +1,13 @@
 #!/bin/bash
 
 #### INSTALL DOCKER
+wget https://dlcdn.apache.org/maven/maven-3/3.9.2/binaries/apache-maven-3.9.2-bin.tar.gz
+tar xzvf apache-maven-3.9.2-bin.tar.gz
+cd apache-maven-3.9.2/bin
+sudo ln -s /home/ansible/apache-maven-3.9.2/bin/mvn /usr/local/bin/
+
 sudo apt update
-sudo apt install ansible maven git openjdk-18-jdk ca-certificates curl gnupg -y
+sudo apt install ansible git openjdk-18-jdk ca-certificates curl gnupg -y
 sudo install -m 0755 -d /etc/apt/keyrings
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -31,11 +36,19 @@ sed -i '/^CONSUL_ADVERTISE=/s/=.*/=${slm_ip}/' /tmp/eclipse-slm/stack/compose/.e
 %{ if slm_build_docker_images == true }
 #### BUILD SLM IMAGES
   cd /tmp/eclipse-slm/
-  sudo mvn clean install -DskipTests=true -T 8 -f pom.xml
+  sudo mvn -DskipTests=true -T 8 -f pom.xml clean package
+  cd /tmp/eclipse-slm/stack/compose
+  DOCKER_COMPOSE_COMMAND="docker compose -f base.awx.yml -f base.consul.yml -f base.keycloak.yml -f base.vault.yml -f slm.yml -f catalog.yml -f config-exporter.yml -f build.yml"
+  sudo $DOCKER_COMPOSE_COMMAND build --no-cache awx-fixed-files
+  sudo $DOCKER_COMPOSE_COMMAND build --no-cache awx-web awx-web-no-jwt awx-task awx-postgres awx-init
+  sudo $DOCKER_COMPOSE_COMMAND build --no-cache common-database-mariadb
+  sudo $DOCKER_COMPOSE_COMMAND build --no-cache consul consul-init
+  sudo $DOCKER_COMPOSE_COMMAND build --no-cache keycloak keycloak-init
+  sudo $DOCKER_COMPOSE_COMMAND build --no-cache vault vault-init
+  sudo $DOCKER_COMPOSE_COMMAND build --no-cache config-exporter
 %{ endif }
 
 
 ##### RUN SLM
 cd /tmp/eclipse-slm/stack/compose
-sudo docker compose -f build.yml -f base.consul.yml build consul
 sudo docker compose up -d
