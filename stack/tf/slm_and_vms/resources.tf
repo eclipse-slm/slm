@@ -51,6 +51,10 @@ resource "vsphere_virtual_machine" "slm-vm" {
 
   provisioner "remote-exec" {
     inline = [
+      "sudo growpart /dev/sda 3",
+      "sudo resize2fs /dev/sda3",
+      "sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv",
+      "sudo resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv",
       "sudo chmod +x /tmp/run_slm.sh",
       "/tmp/run_slm.sh"
     ]
