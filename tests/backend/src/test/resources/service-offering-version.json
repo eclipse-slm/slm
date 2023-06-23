@@ -1,0 +1,128 @@
+{
+  "id": "789c5e35-12e0-4516-852f-f3d80849c333",
+  "name": "MariaDB",
+  "description": "MariaDB Server is one of the most popular database servers in the world. It’s made by the original developers of MySQL and guaranteed to stay open source. Notable users include Wikipedia, DBS Bank, and ServiceNow.\n\nThe intent is also to maintain high compatibility with MySQL, ensuring a library binary equivalency and exact matching with MySQL APIs and commands. MariaDB developers continue to develop new features and improve performance to better serve its users.\n",
+  "shortDescription": "MariaDB Server is one of the most popular database servers in the world. It’s made by the original developers of MySQL and guaranteed to stay open source.\n",
+  "serviceVendorId": "<service-vendor-id>",
+  "serviceCategoryId": 0,
+  "version": {
+    "version": "10.6.4",
+    "serviceOptionCategories": [
+      {
+        "id": 0,
+        "name": "Environment",
+        "serviceOptions": [
+          {
+            "relation": "",
+            "key": "MARIADB_ROOT_PASSWORD",
+            "name": "Root Password",
+            "description": "This specifies the password that will be set for the MariaDB root superuser account.",
+            "optionType": "ENVIRONMENT_VARIABLE",
+            "defaultValue": "",
+            "valueType": "PASSWORD",
+            "valueOptions": [
+            ],
+            "required": false,
+            "editable": true
+          },
+          {
+            "relation": "",
+            "key": "MARIADB_DATABASE",
+            "name": "Database Name",
+            "description": "This variable allows you to specify the name of a database to be created on image startup.",
+            "optionType": "ENVIRONMENT_VARIABLE",
+            "defaultValue": "MyNewDatabase",
+            "valueType": "STRING",
+            "valueOptions": [
+            ],
+            "required": false,
+            "editable": true
+          },
+          {
+            "relation": "",
+            "key": "MARIADB_USER",
+            "name": "Username",
+            "description": "Username is used in conjunction with 'Password' service option to create a new user and to set\nthat user's password. Both user and password variables are required for a user to be created.\nThis user will be granted all access (corresponding to GRANT ALL) to the MARIADB_DATABASE database.\n",
+            "optionType": "ENVIRONMENT_VARIABLE",
+            "defaultValue": "user",
+            "valueType": "STRING",
+            "valueOptions": [
+            ],
+            "required": false,
+            "editable": true
+          },
+          {
+            "relation": "",
+            "key": "MARIADB_PASSWORD",
+            "name": "Password",
+            "description": "Password is used in conjunction with 'Username' service option to create a new user and to set\nthat user's password. Both user and password variables are required for a user to be created.\nThis user will be granted all access (corresponding to GRANT ALL) to the MARIADB_DATABASE database.\n",
+            "optionType": "ENVIRONMENT_VARIABLE",
+            "defaultValue": "user",
+            "valueType": "PASSWORD",
+            "valueOptions": [
+            ],
+            "required": false,
+            "editable": true
+          }
+        ]
+      },
+      {
+        "id": 1,
+        "name": "Ports",
+        "serviceOptions": [
+          {
+            "relation": "",
+            "key": "3306",
+            "name": "Database Port",
+            "description": "Port for access to MariaDB database.",
+            "optionType": "PORT_MAPPING",
+            "defaultValue": "3306",
+            "valueType": "INTEGER",
+            "valueOptions": [
+            ],
+            "required": false,
+            "editable": true
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "name": "Volumes",
+        "serviceOptions": [
+          {
+            "relation": "",
+            "key": "/var/lib/mysql",
+            "name": "Data Volume",
+            "description": "Volume of container used to persist database.",
+            "optionType": "VOLUME",
+            "defaultValue": "mariadb_data",
+            "valueType": "STRING",
+            "valueOptions": [
+            ],
+            "required": false,
+            "editable": true
+          }
+        ]
+      }
+    ],
+    "serviceRequirements": [
+    ],
+    "serviceRepositories": [
+    ],
+    "deploymentDefinition": {
+      "deploymentType": "DOCKER_CONTAINER",
+      "imageRepository": "mariadb",
+      "imageTag": "10.6.4",
+      "restartPolicy": "Always",
+      "environmentVariables": [
+        {
+          "key": "MARIADB_ALLOW_EMPTY_ROOT_PASSWORD",
+          "value": "no"
+        }
+      ],
+      "labels": [],
+      "portMappings": [],
+      "volumes": []
+    }
+  }
+}
