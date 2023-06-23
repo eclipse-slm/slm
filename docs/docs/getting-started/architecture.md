@@ -6,7 +6,7 @@ permalink: /docs/getting-started/architecture/
 
 The architecture of the Service Lifecycle Management consists of serveral components:
 
-![Service Lifecycle Management Architecture](/img/figures/architecture.png)
+<img :src="$withBase('/img/figures/architecture.png')">
 
 ## Discovery Server
 As Discovery Server [Consul](https://www.consul.io) from HashiCorp is used. It provides the following functionalities:
