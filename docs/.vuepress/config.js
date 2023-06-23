@@ -1,7 +1,7 @@
 module.exports = {
     title: 'EclipseSLM',
     description: 'Eclipse Service Lifecycle Management',
-    base: `/slm/${process.env.VERSION_PATH || '/slm'}`,
+    base: `/slm/${process.env.VERSION_PATH || ''}`,
     themeConfig: {
           repo: 'FabOS-AI/fabos-slm',
           logo: '/img/logo.svg',
