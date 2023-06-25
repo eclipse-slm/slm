@@ -61,3 +61,15 @@ service-management:
     schema: {{ service_management_database_schema }}
     username: {{ service_management_database_user }}
     password: {{ service_management_database_password }}
+
+catalog:
+  url: "http://{{catalog_service_host}}:{{catalog_service_port}}"
+  database:
+    host: {{ target_host }}
+    port: 3300
+    schema: {{ catalog_service_database_schema }}
+    username: {{ catalog_service_database_user }}
+    password: {{ catalog_service_database_password }}
+
+monitoring:
+    url: "http://{{monitoring_service_host}}:{{monitoring_service_port}}"
