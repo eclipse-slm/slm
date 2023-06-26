@@ -26,6 +26,7 @@ services:
       - consul_config_awx:/config/awx
       - consul_config_resource-management:/config/resource_management
       - consul_config_service-management:/config/service_management
+      - consul_config_ui:/config/ui
     extra_hosts:
       - "${SLM_HOSTNAME}:172.17.0.1"
     healthcheck:
@@ -66,3 +67,4 @@ volumes:
   consul_config_awx:
   consul_config_resource-management:
   consul_config_service-management:
+  consul_config_ui:
