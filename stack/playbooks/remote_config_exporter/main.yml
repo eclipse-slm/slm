@@ -4,9 +4,16 @@
   become: no
   gather_facts: no
   tasks:
-    - name: Get Project folder
+    - name: Get Project folder and local_host
       ansible.builtin.set_fact:
         project_folder: "{{ lookup('env', 'PROJECT_FOLDER') }}"
+        local_host: "{{ lookup('env', 'LOCAL_HOST') }}"
+
+    - name: Delegate local_host to localhost
+      ansible.builtin.set_fact:
+        local_host: "{{ lookup('env', 'LOCAL_HOST') }}"
+      delegate_facts: yes
+      delegate_to: localhost
 
     - debug:
         msg: "Lookup slm config at {{ project_folder }}"
@@ -67,10 +74,10 @@
       delegate_facts: yes
       delegate_to: localhost
 
-- name: debug
+- name: Replace local config with config from remote
   hosts: localhost
   become: no
-  gather_facts: no
+  gather_facts: yes
   tasks:
     - name: Set target_host / remote_host
       ansible.builtin.set_fact:
@@ -126,9 +133,9 @@
         notification_service_host:    "{{ remote_host }}"
         notification_service_port:    "{{ remote_slm_config['notification-service'].url | urlsplit('port') }}"
         notification_service_database_host:       "{{ remote_host }}"
-        notification_service_database_user:       "{{ remote_slm_config['service-management'].database.username }}"
-        notification_service_database_password:   "{{ remote_slm_config['service-management'].database.password }}"
-        notification_service_database_schema:     "{{ remote_slm_config['service-management'].database.schema }}"
+        notification_service_database_user:       "{{ remote_slm_config['notification-service'].database.username }}"
+        notification_service_database_password:   "{{ remote_slm_config['notification-service'].database.password }}"
+        notification_service_database_schema:     "{{ remote_slm_config['notification-service'].database.schema }}"
 
         catalog_service_scheme:   "{{ remote_slm_config.catalog.url | urlsplit('scheme') }}"
         catalog_service_host:     "{{ remote_host }}"
@@ -189,12 +196,3 @@
           dest: /project/service_management/service_management.service/service_management.service.rest/src/main/resources/keycloak
       vars:
         filename: "fabos-keycloak.json"
-
-
-
-
-
-
-
-
-
