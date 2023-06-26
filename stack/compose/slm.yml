@@ -18,6 +18,8 @@ services:
           - ui
     extra_hosts:
       - "${SLM_HOSTNAME}:172.17.0.1"
+    volumes:
+      - consul_config_resource-management:/app/consul:ro
     environment:
       KEYCLOAK_URL: "http://${SLM_HOSTNAME}:${KEYCLOAK_PORT}/auth"
       AWX_URL: "http://${SLM_HOSTNAME}:${AWX_PORT_HTTP}"
