@@ -43,10 +43,14 @@ spring:
   main:
     allow-bean-definition-overriding: true
   cloud:
-    bootstrap:
-      enable: false
     consul:
-      enabled: false
+      host: ${consul.host}
+      port: ${consul.port}
+      discovery:
+        ip-address: 127.0.0.1
+        acl-token: ${consul.acl-token}
+        prefer-ip-address: true
+        register-health-check: false
   security:
     user:
       name: "user"
