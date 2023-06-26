@@ -44,6 +44,15 @@ spring:
     user:
       name: admin
       password: password
+  cloud:
+    consul:
+      host: ${consul.host}
+      port: ${consul.port}
+      discovery:
+        ip-address: 127.0.0.1
+        acl-token: ${consul.acl-token}
+        prefer-ip-address: true
+        register-health-check: false
   jpa:
     hibernate:
       ddl-auto: update
@@ -90,3 +99,11 @@ awx:
   username: admin
   password: password
   polling-interval-in-s: 4
+
+### Consul
+consul:
+  scheme: http
+  host: localhost
+  port: 8500
+  datacenter: fabos
+  acl-token: myroot
