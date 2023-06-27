@@ -76,20 +76,20 @@
         :success="valid"
       />
 
-      <!-- Template Variables !-->
+      <!-- System Variables !-->
       <v-select
-        v-if="serviceOption.valueType === 'TEMPLATE_VARIABLE' && definitionMode"
+        v-if="serviceOption.valueType === 'SYSTEM_VARIABLE' && definitionMode"
         v-model="serviceOption.defaultValue"
-        placeholder="Select template variable"
+        placeholder="Select system variable"
         item-value="key"
         item-text="name"
-        :items="serviceManagementTemplateVariables"
+        :items="serviceManagementSystemVariables"
         :error-messages="errors"
         :success="valid"
       />
 
       <v-tooltip
-        v-if="serviceOption.valueType === 'TEMPLATE_VARIABLE' && !definitionMode"
+        v-if="serviceOption.valueType === 'SYSTEM_VARIABLE' && !definitionMode"
         bottom
       >
         <template #activator="{ on, attrs }">
@@ -105,6 +105,37 @@
           </div>
         </template>
         <span>Template variables cannot be edited</span>
+      </v-tooltip>
+
+      <!-- Deployment Variables !-->
+      <v-select
+          v-if="serviceOption.valueType === 'DEPLOYMENT_VARIABLE' && definitionMode"
+          v-model="serviceOption.defaultValue"
+          placeholder="Select deployment variable"
+          item-value="key"
+          item-text="prettyName"
+          :items="serviceManagementDeploymentVariables"
+          :error-messages="errors"
+          :success="valid"
+      />
+
+      <v-tooltip
+          v-if="serviceOption.valueType === 'DEPLOYMENT_VARIABLE' && !definitionMode"
+          bottom
+      >
+        <template #activator="{ on, attrs }">
+          <div
+              v-bind="attrs"
+              v-on="on"
+          >
+            <v-text-field
+                :value="serviceOption.defaultValue"
+                :readonly="true"
+                :disabled="true"
+            />
+          </div>
+        </template>
+        <span>Deployment variables cannot be edited</span>
       </v-tooltip>
     </validation-provider>
   </div>
@@ -131,7 +162,8 @@
     computed: {
       ...mapGetters([
         'valueOfTemplateVariable',
-        'serviceManagementTemplateVariables',
+        'serviceManagementSystemVariables',
+        'serviceManagementDeploymentVariables',
         'aasSubmodelTemplates'
       ]),
     },
