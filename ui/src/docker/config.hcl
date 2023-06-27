@@ -5,7 +5,7 @@ consul {
 
 template {
   source =        "/consul-template/default.ctmpl"
-  destination =   "/etc/nginx/conf.d/default.config"
+  destination =   "/etc/nginx/conf.d/default.conf"
   exec {
     command = ["nginx", "-s", "reload"]
   }
