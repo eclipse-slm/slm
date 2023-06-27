@@ -162,7 +162,6 @@ public class ServiceOfferingVersionsRestController {
 
     @RequestMapping(value = "/{serviceOfferingVersionId}/matching-resources", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get possible resources matching service requirements")
-    // ToDo: K3S - Change return value to more generic response for Cluster and Basic Resources
     public @ResponseBody ResponseEntity<List<MatchingResourceDTO>> getResourcesMatchingServiceRequirements(
             @PathVariable("serviceOfferingId") UUID serviceOfferingId,
             @PathVariable("serviceOfferingVersionId") UUID serviceOfferingVersionId)

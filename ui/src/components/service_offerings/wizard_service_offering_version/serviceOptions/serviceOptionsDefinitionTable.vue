@@ -87,7 +87,7 @@
                   v-bind="attrs"
                   color="primary"
                   :ripple="false"
-                  :disabled="serviceOption.valueType === 'TEMPLATE_VARIABLE' || serviceOption.valueType === 'AAS_SM_TEMPLATE'"
+                  :disabled="serviceOption.valueType === 'SYSTEM_VARIABLE' || serviceOption.valueType === 'DEPLOYMENT_VARIABLE' || serviceOption.valueType === 'AAS_SM_TEMPLATE'"
                   v-on="on"
                   @click="onServiceOptionRequiredChanged(serviceOption)"
                 />
@@ -100,7 +100,7 @@
               v-model="serviceOption.editable"
               color="primary"
               :ripple="false"
-              :disabled="serviceOption.valueType === 'TEMPLATE_VARIABLE' || serviceOption.valueType === 'AAS_SM_TEMPLATE'"
+              :disabled="serviceOption.valueType === 'SYSTEM_VARIABLE' || serviceOption.valueType === 'DEPLOYMENT_VARIABLE' || serviceOption.valueType === 'AAS_SM_TEMPLATE'"
               @click="onServiceOptionEditableChanged(serviceOption)"
             />
           </td>
@@ -137,7 +137,8 @@ export default {
         'PORT',
         'VOLUME',
         'AAS_SM_TEMPLATE',
-        'TEMPLATE_VARIABLE'
+        'SYSTEM_VARIABLE',
+        'DEPLOYMENT_VARIABLE',
       ],
       tableHeaders: [
         { text: '', value: '', sortable: false },
