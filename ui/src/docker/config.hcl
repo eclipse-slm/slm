@@ -1,6 +1,5 @@
 consul {
   address = "consul:8500"
-  #token = "pWNvsOmmEQ2UJx7Cg06WlJC6"
 }
 
 template {
@@ -11,6 +10,6 @@ template {
   }
 }
 
-exec {
-  command = ["nginx", "-g", "daemon off;"]
-}
+#exec {
+#  command = ["nginx", "-g", "daemon off;"]
+#}
