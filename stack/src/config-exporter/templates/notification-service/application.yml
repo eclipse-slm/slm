@@ -52,7 +52,7 @@ spring:
         ip-address: {{ local_host | default(ansible_default_ipv4.address) }}
         acl-token: ${consul.acl-token}
         prefer-ip-address: true
-        register-health-check: false
+        register-health-check: true
   jpa:
     hibernate:
       ddl-auto: update
@@ -73,7 +73,7 @@ management:
 ### Components - Internal
 notification-service:
   scheme: "http"
-  host: "localhost"
+  host: {{ target_host }}
   port: ${server.port}
 
 ### Keycloak

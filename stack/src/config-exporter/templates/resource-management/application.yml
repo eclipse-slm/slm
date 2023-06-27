@@ -50,7 +50,7 @@ spring:
         ip-address: {{ local_host | default(ansible_default_ipv4.address) }}
         acl-token: ${consul.acl-token}
         prefer-ip-address: true
-        register-health-check: false
+        register-health-check: true
   security:
     user:
       name: "user"
@@ -75,7 +75,7 @@ management:
 ### Components - Internal
 notification-service:
   scheme: "http"
-  host: "localhost"
+  host: {{ target_host }}
   port: 9001
 
 ### Keycloak
