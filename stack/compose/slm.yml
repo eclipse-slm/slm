@@ -192,6 +192,7 @@ services:
       test: [ "CMD", "curl", "http://localhost:9001/swagger-ui/index.html" ]
     volumes:
       - awx_config_notification-service:/app/awx:ro
+      - consul_config_notification-service:/app/consul:ro
       - keycloak_config_notification-service:/app/keycloak:ro
       - notification-service-database_config:/app/database/config
 
