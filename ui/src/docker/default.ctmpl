@@ -11,7 +11,7 @@ server {
             {{ end }}
             {{ end }}
         {{ else }}
-            proxy_pass http://resource-management:9010/;
+            return 404;
         {{ end }}
         proxy_set_header Origin "";
     }
@@ -25,7 +25,7 @@ server {
             {{ end }}
             {{ end }}
         {{ else }}
-            proxy_pass http://service-management:9010/;
+            return 404;
         {{ end }}
         proxy_set_header Origin "";
     }
@@ -39,7 +39,7 @@ server {
             {{ end }}
             {{ end }}
         {{ else }}
-            proxy_pass http://notification-service:9010/;
+            return 404;
         {{ end }}
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;

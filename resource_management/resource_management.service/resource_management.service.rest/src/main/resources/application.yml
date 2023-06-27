@@ -50,7 +50,7 @@ spring:
         ip-address: 172.17.0.1
         acl-token: ${consul.acl-token}
         prefer-ip-address: true
-        register-health-check: false
+        register-health-check: true
   security:
     user:
       name: "user"
