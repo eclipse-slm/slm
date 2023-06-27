@@ -34,4 +34,4 @@ RUN rm /etc/nginx/conf.d/*
 RUN chmod +x /app/entrypoint.sh
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-CMD consul-template -config /consul-template/config.hcl
+CMD consul-template -config /consul-template/config.hcl & nginx -g "daemon off;"
