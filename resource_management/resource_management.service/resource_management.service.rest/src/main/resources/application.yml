@@ -47,7 +47,7 @@ spring:
       host: ${consul.host}
       port: ${consul.port}
       discovery:
-        ip-address: 127.0.0.1
+        ip-address: 172.17.0.1
         acl-token: ${consul.acl-token}
         prefer-ip-address: true
         register-health-check: false
