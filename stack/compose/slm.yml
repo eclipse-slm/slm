@@ -95,8 +95,11 @@ services:
         max-size: ${LOGGING_MAX_SIZE}
     environment:
       KEYCLOAK_AUTHSERVERURL: "http://${SLM_HOSTNAME}:${KEYCLOAK_PORT}/auth"
+      SPRING_CLOUD_CONSUL_DISCOVERY_IPADDRESS: "${SLM_IP}"
     extra_hosts:
       - "${SLM_HOSTNAME}:172.17.0.1"
+    volumes:
+      - consul_config_resource-management-init:/app/consul:ro
 
   service-management:
     image: ghcr.io/eclipse-slm/slm/service-management:${SLM_VERSION}
