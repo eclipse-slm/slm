@@ -8,6 +8,9 @@ import org.eclipse.slm.resource_management.service.client.handler.CapabilitiesRe
 import org.eclipse.slm.resource_management.service.client.handler.ResourcesRestControllerApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -16,15 +19,16 @@ import java.util.List;
 
 @Component
 public class CapabilitiesInitializer extends AbstractInitializer {
-
     private static final Logger LOG = LoggerFactory.getLogger(CapabilitiesInitializer.class);
-
     private CapabilitiesRestControllerApi capabilitiesRestControllerApi;
 
-    public CapabilitiesInitializer(FileUtil fileUtil,
-                                   ResourceManagementApiClientInitializer resourceManagementApiClientInitializer) {
+    public CapabilitiesInitializer(
+            FileUtil fileUtil,
+            ResourceManagementApiClientInitializer resourceManagementApiClientInitializer
+    ) {
         super(fileUtil, resourceManagementApiClientInitializer);
     }
+
 
     @PostConstruct
     public void init() throws FileNotFoundException {

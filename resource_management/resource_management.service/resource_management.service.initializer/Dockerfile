@@ -2,6 +2,11 @@ FROM openjdk:18.0.2.1-jdk-slim-buster
 
 ENV RESOURCEMANAGEMENT_URL="http://resource-management:9010" \
     RESOURCEMANAGEMENT_INITDIRECTORIES="/init/" \
+    CONSUL_SCHEME="http" \
+    CONSUL_HOST="consul" \
+    CONSUL_PORT=8500 \
+    CONSUL_DATACENTER="fabos" \
+    CONSUL_ACLTOKEN="password" \
     KEYCLOAK_AUTHSERVERURL="http://localhost:7080/auth" \
     KEYCLOAK_REALM="fabos" \
     KEYCLOAK_USERNAME="fabos" \
