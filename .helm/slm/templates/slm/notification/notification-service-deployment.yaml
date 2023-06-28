@@ -18,7 +18,7 @@ spec:
       containers:
         - name: notification-service
           image: ghcr.io/eclipse-slm/slm/notification-service:{{ .Values.slm.version }}
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 9001
           env:
@@ -33,7 +33,7 @@ spec:
             - name: AWX_HOST
               value: "awx-web"
             - name: AWX_PORT
-              value: "80"
+              value: "{{.Values.slm.awx.port_http}}"
           volumeMounts:
             - mountPath: /app/awx
               name: awx-config-notification-service-pv

@@ -13,7 +13,7 @@ slm:
 
   awx:
     version: 15.0.1
-    port_http: 80
+    port_http: 8052
     port_https: 443
     redis_version: 6
     postgres_version: 10

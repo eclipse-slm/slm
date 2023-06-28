@@ -9,7 +9,7 @@ spec:
   containers:
     - name: keycloak-init
       image: ghcr.io/eclipse-slm/keycloak-init:{{ .Values.slm.version}}
-      imagePullPolicy: IfNotPresent
+      imagePullPolicy: Always
       env:
         - name: KEYCLOAK_ADMIN
           value: admin

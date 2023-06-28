@@ -18,7 +18,7 @@ spec:
       containers:
         - name: vault
           image: ghcr.io/eclipse-slm/vault:{{ .Values.slm.vault.version }}
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8200
           env:

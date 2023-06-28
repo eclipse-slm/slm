@@ -9,7 +9,7 @@ spec:
   containers:
     - name: consul-esm
       image: hashicorp/consul-esm:{{ .Values.slm.consul.esm_version}}
-      imagePullPolicy: IfNotPresent
+      imagePullPolicy: Always
       env:
         - name: CONSUL_HTTP_ADDR
           value: consul:{{ .Values.slm.consul.port}}

@@ -10,6 +10,7 @@ spec:
     - name: consul-init
       image:
         ghcr.io/eclipse-slm/consul-init:{{ .Values.slm.version }}
+      imagePullPolicy: Always
       env:
         - name: KEYCLOAK_AUTHSERVERURL
           value: "http://keycloak:{{ .Values.slm.keycloak.port}}/auth"

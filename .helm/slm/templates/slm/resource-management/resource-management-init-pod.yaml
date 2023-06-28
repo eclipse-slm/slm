@@ -9,10 +9,14 @@ spec:
   containers:
     - name: resource-management-init
       image: ghcr.io/eclipse-slm/slm/resource-management-init:{{ .Values.slm.version}}
-      imagePullPolicy: IfNotPresent
+      imagePullPolicy: Always
       env:
         - name: KEYCLOAK_AUTHSERVERURL
           value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
+        - name: AWX_HOST
+          value: "awx-web"
+        - name: AWX_PORT
+          value: "{{.Values.slm.awx.port_http}}"
 
   restartPolicy: OnFailure
       

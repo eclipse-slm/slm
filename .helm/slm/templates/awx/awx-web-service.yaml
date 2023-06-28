@@ -9,15 +9,16 @@ spec:
   selector:
     app: awx-web
   ports:
-    - name: "http"
-      protocol: TCP
-      port: {{.Values.slm.awx.port_http}}
-      targetPort: 8052
+{{/*    - name: "http"*/}}
+{{/*      protocol: TCP*/}}
+{{/*      port: {{.Values.slm.awx.port_http}}*/}}
+{{/*      targetPort: 8052*/}}
     - name: "container"
       protocol: TCP
       port: 8052
       targetPort: 8052
-    - name: "https"
-      protocol: TCP
-      port: {{.Values.slm.awx.port_https}}
-      targetPort: 8053
+
+{{/*    - name: "https"*/}}
+{{/*      protocol: TCP*/}}
+{{/*      port: {{.Values.slm.awx.port_https}}*/}}
+{{/*      targetPort: 8053*/}}
