@@ -35,6 +35,12 @@ resource "null_resource" "local-slm" {
   }
 }
 
+resource "vsphere_folder" "user_folder" {
+  path          = "slm/${var.vsphere_user}"
+  type          = "vm"
+  datacenter_id = data.vsphere_datacenter.datacenter.id
+}
+
 resource "vsphere_virtual_machine" "vms" {
   depends_on = [null_resource.local-slm]
 
@@ -72,12 +78,6 @@ resource "vsphere_virtual_machine" "vms" {
   }
 }
 
-resource "vsphere_folder" "user_folder" {
-  path          = "slm/${var.vsphere_user}"
-  type          = "vm"
-  datacenter_id = data.vsphere_datacenter.datacenter.id
-}
-
 resource "null_resource" "config-exporter" {
   depends_on = [vsphere_virtual_machine.vms]
 
@@ -85,5 +85,4 @@ resource "null_resource" "config-exporter" {
     working_dir = "../../compose"
     command     = "docker compose up --force-recreate config-exporter"
   }
-
 }
