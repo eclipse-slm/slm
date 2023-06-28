@@ -18,7 +18,7 @@ spec:
       containers:
         - name: consul
           image: ghcr.io/eclipse-slm/consul:{{ .Values.slm.consul.version}}
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8500
           volumeMounts:

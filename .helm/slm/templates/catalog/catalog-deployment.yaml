@@ -18,7 +18,7 @@ spec:
       containers:
         - name: catalog
           image: ghcr.io/eclipse-slm/slm/catalog:{{ .Values.slm.catalog.version }}
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 10000
           volumeMounts:

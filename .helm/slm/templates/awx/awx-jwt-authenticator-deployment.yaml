@@ -18,7 +18,7 @@ spec:
       containers:
         - name: awx-jwt-authenticator
           image: ghcr.io/eclipse-slm/awx-jwt-authenticator:1.0.0-snapshot
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: {{.Values.slm.awx.jwt_authenticator_port}}
           env:

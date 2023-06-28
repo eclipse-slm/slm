@@ -8,14 +8,15 @@ spec:
       containers:
         - name: awx-web
           image: ghcr.io/eclipse-slm/awx/awx-web:{{.Values.slm.awx.version}}
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8052
             - containerPort: 8053
 
           volumeMounts:
-            - name: nginx-config
+            - name: awx-web-pv
               mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
             - name: awx-supervisor-socket-pv
               mountPath: /var/run/supervisor
             - name: awx-rsyslog-socket-pv
@@ -34,9 +35,9 @@ spec:
 {{/*            timeoutSeconds: 10*/}}
 
       volumes:
-        - name: nginx-config
+        - name: awx-web-pv
           hostPath:
-            path: /data/minikube/nginx.conf
+            path: /home/vfk/slm/.helm/
         - name: awx-supervisor-socket-pv
           persistentVolumeClaim:
             claimName: awx-supervisor-socket-pvc

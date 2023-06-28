@@ -9,7 +9,7 @@ spec:
   containers:
     - name: service-management-init
       image: ghcr.io/eclipse-slm/slm/service-management-init:{{ .Values.slm.version}}
-      imagePullPolicy: IfNotPresent
+      imagePullPolicy: Always
       env:
         - name: SERVICEMANAGEMENT_INITDIRECTORIES
           value: "{{.Values.slm.service_management.initialization_local_directories}}"
