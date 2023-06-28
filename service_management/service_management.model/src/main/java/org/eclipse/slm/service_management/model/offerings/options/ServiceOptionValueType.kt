@@ -14,5 +14,6 @@ enum class ServiceOptionValueType {
     PORT,
     VOLUME,
     AAS_SM_TEMPLATE,
-    TEMPLATE_VARIABLE
+    SYSTEM_VARIABLE,
+    DEPLOYMENT_VARIABLE
 }

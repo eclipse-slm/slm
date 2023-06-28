@@ -1,5 +1,5 @@
 package org.eclipse.slm.common.model
 
-enum class TemplateVariableValueSource {
+enum class SystemVariableValueSource {
     APPLICATION_PROPERTIES
 }

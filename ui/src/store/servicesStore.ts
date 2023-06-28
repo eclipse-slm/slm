@@ -5,7 +5,7 @@ import ApiState from '@/api/apiState.js'
 import Vue from 'vue'
 import ServiceOffering from "@/model/serviceOffering";
 import {UUID} from "vue-uuid";
-import ServiceManagementTemplatesRestApi from "@/api/service-management/serviceManagementTemplatesRestApi";
+import ServiceManagementTemplatesRestApi from "@/api/service-management/serviceManagementVariablesRestApi";
 import ServiceInstancesGroupsRestApi from "@/api/service-management/serviceInstancesGroupsRestApi";
 
 export default {
@@ -30,7 +30,8 @@ export default {
 
         serviceInstanceGroups: [],
 
-        serviceManagementTemplateVariables: [],
+        serviceManagementSystemVariables: [],
+        serviceManagementDeploymentVariables: [],
     },
 
     getters: {
@@ -91,12 +92,16 @@ export default {
             return state.services
         },
 
-        serviceManagementTemplateVariables: (state) => {
-            return state.serviceManagementTemplateVariables
+        serviceManagementSystemVariables: (state) => {
+            return state.serviceManagementSystemVariables
         },
 
         valueOfTemplateVariable: (state) => (templateVariableKey) => {
-            return state.serviceManagementTemplateVariables.filter(tv => tv.key === templateVariableKey)[0].value
+            return state.serviceManagementSystemVariables.filter(tv => tv.key === templateVariableKey)[0].value
+        },
+
+        serviceManagementDeploymentVariables: (state) => {
+            return state.serviceManagementDeploymentVariables
         },
 
         serviceInstanceGroups: (state) => {
@@ -181,8 +186,12 @@ export default {
             })
         },
 
-        SET_SERVICE_REGISTRY_TEMPLATE_VARIABLES (state, templateVariables) {
-            state.serviceManagementTemplateVariables = templateVariables
+        SET_SERVICE_MANAGEMENT_SYSTEM_VARIABLES (state, systemVariables) {
+            state.serviceManagementSystemVariables = systemVariables
+        },
+
+        SET_SERVICE_MANAGEMENT_DEPLOYMENT_VARIABLES (state, deploymentVariables) {
+            state.serviceManagementDeploymentVariables = deploymentVariables
         },
 
         SET_SERVICE_INSTANCE_GROUPS (state, groups) {
@@ -192,10 +201,16 @@ export default {
 
     actions: {
         async initServiceStore (context) {
-            await ServiceManagementTemplatesRestApi.getTemplateVariables()
+            await ServiceManagementTemplatesRestApi.getSystemVariables()
                 .then(
                     templateVariables => {
-                        context.commit('SET_SERVICE_REGISTRY_TEMPLATE_VARIABLES', templateVariables)
+                        context.commit('SET_SERVICE_MANAGEMENT_SYSTEM_VARIABLES', templateVariables)
+                    })
+
+            await ServiceManagementTemplatesRestApi.getDeploymentVariables()
+                .then(
+                    templateVariables => {
+                        context.commit('SET_SERVICE_MANAGEMENT_DEPLOYMENT_VARIABLES', templateVariables)
                     })
         },
 

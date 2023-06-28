@@ -1,16 +1,16 @@
 package org.eclipse.slm.common.model
 
-class TemplateVariable(
+class SystemVariable(
 
     val key: String,
 
     val name: String,
 
-    val valueSource: TemplateVariableValueSource,
+    val valueSource: SystemVariableValueSource,
 
     val valuePath: String,
 
-)
+    )
 {
 
     var value: Any? = null
