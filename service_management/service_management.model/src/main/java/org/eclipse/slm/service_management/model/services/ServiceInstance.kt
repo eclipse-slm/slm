@@ -82,6 +82,8 @@ class ServiceInstance(
             META_DATA_KEY_GROUPS)
 
         fun ofMetaDataAndTags(metaData: MutableMap<String, String>, tags: MutableList<String>): ServiceInstance {
+            var mutableTags = tags.toMutableList();
+
             val JSON = jacksonObjectMapper()
             var resourceId = UUID.fromString(metaData[META_DATA_KEY_RESOURCE_ID])
             metaData.remove(META_DATA_KEY_RESOURCE_ID)
@@ -98,9 +100,9 @@ class ServiceInstance(
             var groupsIds = JSON.readValue(metaData[META_DATA_KEY_GROUPS], object: TypeReference<List<UUID>>() {})
             metaData.remove(META_DATA_KEY_GROUPS)
 
-            tags.remove("service")
+            mutableTags.remove("service")
 
-            return ServiceInstance(id, tags, metaData, resourceId, capabilityServiceId, serviceOfferingId,
+            return ServiceInstance(id, mutableTags, metaData, resourceId, capabilityServiceId, serviceOfferingId,
             serviceOfferingVersionId, ports, groupsIds)
         }
     }
