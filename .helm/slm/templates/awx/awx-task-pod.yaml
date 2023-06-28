@@ -9,7 +9,7 @@ spec:
   containers:
     - name: awx-task
       image: ghcr.io/eclipse-slm/awx/awx-task:{{.Values.slm.awx.version}}
-      imagePullPolicy: IfNotPresent
+      imagePullPolicy: Always
 
       volumeMounts:
         - name: awx-supervisor-socket-pv

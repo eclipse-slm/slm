@@ -18,12 +18,16 @@ spec:
       containers:
         - name: service-management
           image: ghcr.io/eclipse-slm/slm/service-management:{{ .Values.slm.version }}
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 9020
           env:
             - name: KEYCLOAK_AUTHSERVERURL
               value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
+            - name: BASYX_AASREGISTRY_PATH
+              value: http://aas-registry:4000
+            - name: BASYX_AASSERVER_PATH
+              value: http://aas-server:4001
             - name: BASYX_AASREGISTRY_URL
               value: http://aas-registry:4000/registry
             - name: BASYX_AASSERVER_URL

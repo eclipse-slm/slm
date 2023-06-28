@@ -9,7 +9,9 @@ sudo install minikube-linux-amd64 /usr/local/bin/minikube
 
 create folder under /data/minikube/ and copy the custom nginx.config to it for the awx-web container
 
-minikube start --driver=docker --addons=ingress --cpus=6  --install-addons=true --kubernetes-version=stable --memory=8g
+minikube start --driver=docker --addons=ingress --cpus=6  --install-addons=true --kubernetes-version=stable --memory=8g --apiserver-ips=10.3.7.176
+minikube start --driver=kvm2 --addons=ingress --cpus=6  --install-addons=true --kubernetes-version=stable --memory=8g
+minikube start --driver=none --addons=ingress  --install-addons=true --kubernetes-version=stable 
 
 
 ### Dashboard

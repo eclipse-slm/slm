@@ -18,7 +18,7 @@ spec:
       containers:
         - name: keycloak
           image: ghcr.io/eclipse-slm/keycloak:{{ .Values.slm.keycloak.version}}
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:

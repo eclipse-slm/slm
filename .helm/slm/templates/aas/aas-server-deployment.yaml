@@ -29,7 +29,7 @@ spec:
             - name: basyxaas_aas_aasxupload
               value: Enabled
             - name: basyxaas_registry_host
-              value: http://${SLM_HOSTNAME}:4001/aasServer
+              value: http://aas-server:4001/aasServer
             - name: basyxmongodb_dbconnectionstring
               value: mongodb://aas-database:27017/
             - name: basyxcontext_accesscontrolalloworigin
