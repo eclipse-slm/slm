@@ -55,7 +55,9 @@ resource "vsphere_virtual_machine" "slm-vm" {
       "sudo resize2fs /dev/sda3",
       "sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv",
       "sudo resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv",
+      "sudo apt update && sudo apt install -y dos2unix",
       "sudo chmod +x /tmp/run_slm.sh",
+      "dos2unix /tmp/run_slm.sh",
       "/tmp/run_slm.sh"
     ]
 
@@ -124,7 +126,9 @@ resource "vsphere_virtual_machine" "vms" {
 
   provisioner "remote-exec" {
     inline = [
+      "sudo apt update && sudo apt install -y dos2unix",
       "sudo chmod +x /tmp/add_vm_to_slm.sh",
+      "dos2unix /tmp/add_vm_to_slm.sh",
       "/tmp/add_vm_to_slm.sh"
     ]
 
