@@ -1,4 +1,3 @@
-
 variable "vsphere_user" {
   type = string
   nullable = false
