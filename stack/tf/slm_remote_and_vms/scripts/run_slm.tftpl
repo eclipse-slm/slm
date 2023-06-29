@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #### INSTALL MAVEN, JAVA, DOCKER
-wget https://dlcdn.apache.org/maven/maven-3/3.9.2/binaries/apache-maven-3.9.2-bin.tar.gz
-tar xzvf apache-maven-3.9.2-bin.tar.gz
-cd apache-maven-3.9.2/bin
-sudo ln -s /home/ansible/apache-maven-3.9.2/bin/mvn /usr/local/bin/
+wget https://dlcdn.apache.org/maven/maven-3/3.9.3/binaries/apache-maven-3.9.3-bin.tar.gz
+tar xzvf apache-maven-3.9.3-bin.tar.gz
+cd apache-maven-3.9.3/bin
+sudo ln -s /home/ansible/apache-maven-3.9.3/bin/mvn /usr/local/bin/
 
 sudo apt update
 sudo apt install ansible git openjdk-18-jdk ca-certificates curl gnupg -y
@@ -38,6 +38,7 @@ sed -i '/^CONSUL_ADVERTISE=/s/=.*/=${slm_ip}/' /tmp/eclipse-slm/stack/compose/.e
 #### BUILD SLM IMAGES
   cd /tmp/eclipse-slm/
   sudo mvn -DskipTests=true -T 8 -f pom.xml clean package
+
   cd /tmp/eclipse-slm/stack/compose
   DOCKER_COMPOSE_COMMAND="docker compose -f base.awx.yml -f base.consul.yml -f base.keycloak.yml -f base.vault.yml -f slm.yml -f catalog.yml -f config-exporter.yml -f build.yml"
   sudo $DOCKER_COMPOSE_COMMAND build --no-cache awx-fixed-files
