@@ -127,6 +127,7 @@ resource "vsphere_virtual_machine" "vms" {
   provisioner "remote-exec" {
     inline = [
       "sudo apt update && sudo apt install -y dos2unix",
+      "sudo apt remove -y unattended-upgrades",
       "sudo chmod +x /tmp/add_vm_to_slm.sh",
       "dos2unix /tmp/add_vm_to_slm.sh",
       "/tmp/add_vm_to_slm.sh"

@@ -27,6 +27,19 @@ resource "vsphere_virtual_machine" "vms" {
       network_interface {}
     }
   }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt remove -y unattended-upgrades",
+    ]
+
+    connection {
+      host     = self.default_ip_address
+      type     = "ssh"
+      user     = var.vm_username
+      password = var.vm_password
+    }
+  }
 #  requires jq -> https://stedolan.github.io/jq/download/
 #  provisioner "local-exec" {
 #    command = "powershell -ExecutionPolicy Bypass .\\add_resource.ps1 ${var.slm_hostname} ${var.slm_username} ${var.slm_password} ${var.vm_username} ${var.vm_password} ${self.default_ip_address}"
