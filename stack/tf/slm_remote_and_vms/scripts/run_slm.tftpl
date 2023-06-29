@@ -30,6 +30,7 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin d
 cd /tmp
 git clone -b ${eclipse_slm_branch} ${eclipse_slm_git_url}
 sed -i '/^SLM_HOSTNAME=/s/=.*/=${slm_hostname}/' /tmp/eclipse-slm/stack/compose/.env
+sed -i '/^SLM_IP=/s/=.*/=${slm_ip}/' /tmp/eclipse-slm/stack/compose/.env
 sed -i '/^CONSUL_ADVERTISE=/s/=.*/=${slm_ip}/' /tmp/eclipse-slm/stack/compose/.env
 
 
