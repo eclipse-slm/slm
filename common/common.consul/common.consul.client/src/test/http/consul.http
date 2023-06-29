@@ -1,8 +1,14 @@
 ### SERVER - Get Catalog Nodes
 GET http://{{host}}:{{consul-port}}/v1/catalog/nodes
+Authorization: Bearer {{consul-token}}
 
 ### SERVER - Get Checks of Node by NodeName
-GET http://{{host}}:{{consul-port}}/v1/health/node/test-node
+GET http://{{host}}:{{consul-port}}/v1/health/node/test-node-one
+Authorization: Bearer {{consul-token}}
+
+### SERVER - Get Node Services
+GET http://{{host}}:{{consul-port}}/v1/catalog/node-services/test-node-one
+Authorization: Bearer {{consul-token}}
 
 ### AGENT - Get Checks of Agent
 GET http://{{host}}:{{consul-agent-port}}/v1/agent/checks
