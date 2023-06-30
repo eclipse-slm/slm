@@ -38,6 +38,7 @@ public class ConsulGenericNodeRemoveClient extends AbstractConsulApiClient {
 
         if(consulHealthApiClient.hasNodeAgent(consulCredential, node.getId())) {
             consulAgentApiClient.leaveGracefully(consulCredential, node.getId());
+            consulAgentApiClient.leaveForce(consulCredential, nodeName);
         } else {
             consulNodesApiClient.deleteNode(consulCredential, nodeName);
         }
