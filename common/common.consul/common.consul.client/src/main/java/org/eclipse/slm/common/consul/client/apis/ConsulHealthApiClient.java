@@ -1,9 +1,11 @@
 package org.eclipse.slm.common.consul.client.apis;
 
+import com.orbitz.consul.model.ConsulResponse;
 import com.orbitz.consul.model.agent.ImmutableCheckDefinition;
 import com.orbitz.consul.model.agent.ImmutableCheckV2;
 import com.orbitz.consul.model.catalog.ImmutableCatalogDeregistration;
 import com.orbitz.consul.model.catalog.ImmutableCatalogRegistration;
+import com.orbitz.consul.model.health.HealthCheck;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.client.utils.ConsulObjectMapper;
 import org.eclipse.slm.common.consul.model.catalog.CatalogNode;
@@ -81,8 +83,15 @@ public class ConsulHealthApiClient extends AbstractConsulApiClient {
 
     public List<CatalogNode.Check> getChecksOfNode(ConsulCredential consulCredential, String node)
             throws ConsulLoginFailedException {
-        var nodeChecks = this.getConsulClient(consulCredential).healthClient().getNodeChecks(node).getResponse();
-        return ConsulObjectMapper.mapAll(nodeChecks, CatalogNode.Check.class);
+        try {
+            ConsulResponse<List<HealthCheck>> getNodeChecks = this.getConsulClient(consulCredential).healthClient().getNodeChecks(node);
+
+            var nodeChecks = getNodeChecks.getResponse();
+            return ConsulObjectMapper.mapAll(nodeChecks, CatalogNode.Check.class);
+        } catch (IllegalArgumentException e) {
+            LOG.info("Unable to get checks of node '" + node + "' because of: " + e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     public Optional<CatalogNode.Check> getSerfHealthCheckOfNode(ConsulCredential consulCredential, UUID nodeId) throws ConsulLoginFailedException {
