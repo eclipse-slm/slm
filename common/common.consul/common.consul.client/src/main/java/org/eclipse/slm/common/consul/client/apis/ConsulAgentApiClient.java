@@ -10,8 +10,13 @@ import org.eclipse.slm.common.consul.model.catalog.Node;
 import org.eclipse.slm.common.consul.model.catalog.NodeService;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -100,7 +105,7 @@ public class ConsulAgentApiClient extends AbstractConsulApiClient {
         );
     }
 
-    public void removeServiceByName(
+    private void removeServiceByName(
             ConsulCredential consulCredential,
             int consulClientPort,
             UUID nodeId,
@@ -124,6 +129,25 @@ public class ConsulAgentApiClient extends AbstractConsulApiClient {
                 nodeId,
                 service
         );
+    }
+
+    public void leaveGracefully(ConsulCredential consulCredential, UUID nodeId) throws ConsulLoginFailedException {
+        Optional<Node> node = consulNodesApiClient.getNodeById(consulCredential, nodeId);
+        int port = getConsulClientPort(consulCredential, nodeId);
+        URI uri = null;
+
+        if(node.isEmpty())
+            return;
+
+        try {
+            uri = new URI("http", null, node.get().getAddress(), port, "/v1/agent/leave", null, null);
+        } catch(URISyntaxException e) {
+            LOG.error("Failed to set agent leave gracefully, because: " + e.getMessage());
+        }
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setBearerAuth(getConsulToken(consulCredential));
+
+        restTemplate.exchange(uri, HttpMethod.PUT, new HttpEntity<>(null, httpHeaders), String.class);
     }
 
     private Consul getConsulAgentClient(
