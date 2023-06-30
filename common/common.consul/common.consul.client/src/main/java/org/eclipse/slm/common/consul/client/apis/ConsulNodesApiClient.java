@@ -2,6 +2,7 @@ package org.eclipse.slm.common.consul.client.apis;
 
 import com.orbitz.consul.model.catalog.CatalogRegistration;
 import com.orbitz.consul.model.catalog.ImmutableCatalogDeregistration;
+import com.orbitz.consul.model.catalog.TaggedAddresses;
 import com.orbitz.consul.option.ImmutableQueryOptions;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.client.utils.ConsulObjectMapper;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -21,9 +23,8 @@ public class ConsulNodesApiClient extends AbstractConsulApiClient {
 
     public final static Logger LOG = LoggerFactory.getLogger(ConsulNodesApiClient.class);
     private final ConsulAclApiClient consulAclApiClient;
-
-    @Value("${consul.skipAcl:false}")
-    private Boolean skipAcl;
+    @Autowired
+    RestTemplate restTemplate;
 
     @Autowired
     public ConsulNodesApiClient(
@@ -60,16 +61,34 @@ public class ConsulNodesApiClient extends AbstractConsulApiClient {
         }
     }
 
+    public Node getNodeByName(ConsulCredential consulCredential, String nodeName) throws ConsulLoginFailedException {
+        com.orbitz.consul.model.health.Node getNode = this.getConsulClient(consulCredential).catalogClient().getNode(nodeName).getResponse().getNode();
+        Optional<TaggedAddresses> optionalTaggedAddresses = getNode.getTaggedAddresses();
+        org.eclipse.slm.common.consul.model.catalog.TaggedAddresses taggedAddresses = new org.eclipse.slm.common.consul.model.catalog.TaggedAddresses();
+
+        if(optionalTaggedAddresses.isPresent()) {
+            if(optionalTaggedAddresses.get().getLan().isPresent())
+                taggedAddresses.setLan(optionalTaggedAddresses.get().getLan().get());
+            if(optionalTaggedAddresses.get().getWan().isPresent())
+                taggedAddresses.setWan(optionalTaggedAddresses.get().getWan().get());
+        }
+
+        Node node = new Node();
+        node.setId(getNode.getId().get());
+        node.setNode(getNode.getNode());
+        node.setDatacenter(String.valueOf(getNode.getDatacenter()));
+        node.setAddress(getNode.getAddress());
+        node.setTaggedAddresses(taggedAddresses);
+        node.setMeta(getNode.getNodeMeta().get());
+
+        return node;
+    }
+
     public void registerNode(ConsulCredential consulCredential, CatalogNode node)
             throws ConsulLoginFailedException {
         var catalogRegistration = ConsulObjectMapper.map(node, CatalogRegistration.class);
         this.getConsulClient(consulCredential).catalogClient().register(catalogRegistration);
         this.consulAclApiClient.addReadAccessViaKeycloakRole(node.getId(), node.getNode(), "node");
-    }
-
-    public void deleteNode(ConsulCredential consulCredential, CatalogNode catalogNode)
-            throws ConsulLoginFailedException {
-        this.deleteNode(consulCredential, catalogNode.getNode());
     }
 
     public void deleteNode(ConsulCredential consulCredential, String consulNodeName)
