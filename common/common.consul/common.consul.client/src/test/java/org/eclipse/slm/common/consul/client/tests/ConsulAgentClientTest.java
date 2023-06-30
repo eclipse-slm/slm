@@ -11,6 +11,9 @@ import org.eclipse.slm.common.consul.model.catalog.NodeService;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +30,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -39,6 +43,7 @@ import static org.junit.Assert.assertNotEquals;
         ConsulAclApiClient.class,
         ConsulHealthApiClient.class,
         ConsulGenericServicesClient.class,
+        ConsulGenericNodeRemoveClient.class,
         RestTemplate.class,
         ObjectMapper.class
 })
@@ -60,6 +65,7 @@ public class ConsulAgentClientTest {
     public static String nodeNameAgent1 = "test-node-one";
     public static UUID nodeIdAgent2 = UUID.fromString("fff35bca-06f0-473f-acba-5e8e6b63350d");
     public static String nodeNameAgent2 = "test-node-two";
+    public static CatalogNode nonAgentNode = new CatalogNode();
     //endregion
 
     //region Autowiring
@@ -73,6 +79,8 @@ public class ConsulAgentClientTest {
     ConsulHealthApiClient consulHealthApiClient;
     @Autowired
     ConsulGenericServicesClient consulGenericServicesClient;
+    @Autowired
+    ConsulGenericNodeRemoveClient consulGenericNodeRemoveClient;
     //endregion
 
     static {
@@ -107,6 +115,23 @@ public class ConsulAgentClientTest {
         Mockito
                 .doReturn(Optional.of(node))
                 .when(consulNodesApiClient).getNodeById(Mockito.any(), Mockito.any());
+    }
+
+    private void mockGetConsulNodeByName(String nodeName) throws ConsulLoginFailedException {
+        Node node = new Node();
+        if(nodeName.equals(nodeNameAgent1)) {
+            node.setNode(nodeNameAgent1);
+            node.setId(nodeIdAgent1);
+            node.setAddress("127.0.0.1");
+        } else if(nodeName.equals(nodeNameAgent1)) {
+            node.setNode(nodeNameAgent2);
+            node.setId(nodeIdAgent2);
+            node.setAddress("127.0.0.2");
+        }
+
+        Mockito
+                .doReturn(node)
+                .when(consulNodesApiClient).getNodeByName(Mockito.any(), Mockito.any());
     }
 
     private void assertServiceCount(int expectedServiceCount) {
@@ -279,7 +304,6 @@ public class ConsulAgentClientTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     public class TestConsulGenericServicesClient {
         //region Testvars
-        CatalogNode nonAgentNode = new CatalogNode();
         private static final UUID nodeIdNonAgent = UUID.fromString("ea79b972-f805-4fb1-a2b7-28d825f5ef38");
         private static final UUID serviceIdNonAgent = UUID.fromString("30eb3356-f9d9-4568-8641-ed569a992f2f");
         private static final UUID serviceIdAgent = UUID.fromString("d29d28bc-68ba-478e-96cb-9b88d9330a47");
@@ -396,6 +420,40 @@ public class ConsulAgentClientTest {
                     consulServicesApiClient.getServiceByName(new ConsulCredential(), serviceName);
 
             assertEquals(true, optionalServices.isEmpty());
+        }
+    }
+
+    @Nested
+    @Order(40)
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    public class TestGenericNodeRemoveClient {
+
+        private static Stream<Arguments> getTestNodes() {
+            return Stream.of(
+                    Arguments.of(nodeNameAgent1, nodeIdAgent1),
+                    Arguments.of(nonAgentNode.getNode(), nonAgentNode.getId())
+            );
+        }
+        @Order(10)
+        @ParameterizedTest
+        @MethodSource("getTestNodes")
+        public void testRemoveOfNodeWithAgent(String nodeName, UUID nodeId) throws ConsulLoginFailedException, InterruptedException {
+            int sleepTimeInSeconds = 30;
+            int nodesBeforeCount = consulNodesApiClient.getNodes(new ConsulCredential()).size();
+
+            mockGetConsulNodeByName(nodeName);
+            mockGetConsulNodeById(nodeId);
+            consulGenericNodeRemoveClient.removeNode(new ConsulCredential(), nodeName);
+
+            LOG.info("Wait " + sleepTimeInSeconds + " seconds for Node maybe showing up again.");
+            Thread.sleep(sleepTimeInSeconds*1000);
+
+            int nodesAfterCount = consulNodesApiClient.getNodes(new ConsulCredential()).size();
+
+            assertEquals(
+                    nodesBeforeCount-1,
+                    nodesAfterCount
+            );
         }
     }
 }
