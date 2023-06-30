@@ -5,6 +5,7 @@ import com.orbitz.consul.Consul;
 import com.orbitz.consul.model.agent.ImmutableRegistration;
 import com.orbitz.consul.model.health.Service;
 import com.orbitz.consul.option.ImmutableQueryOptions;
+import com.orbitz.consul.option.ImmutableQueryParameterOptions;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.model.catalog.Node;
 import org.eclipse.slm.common.consul.model.catalog.NodeService;
@@ -148,6 +149,12 @@ public class ConsulAgentApiClient extends AbstractConsulApiClient {
         httpHeaders.setBearerAuth(getConsulToken(consulCredential));
 
         restTemplate.exchange(uri, HttpMethod.PUT, new HttpEntity<>(null, httpHeaders), String.class);
+    }
+
+    public void leaveForce(ConsulCredential consulCredential, String nodeName) throws ConsulLoginFailedException {
+        getConsulClient(consulCredential)
+                .agentClient()
+                .forceLeave(nodeName, ImmutableQueryParameterOptions.builder().prune(true).build());
     }
 
     private Consul getConsulAgentClient(
