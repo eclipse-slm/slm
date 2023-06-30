@@ -32,3 +32,11 @@ Authorization: Bearer myroot
         }
 
 }
+
+### AGENT - PUT Gracefully leave and shutdown
+PUT http://{{host}}:{{consul-agent-port}}/v1/agent/leave
+Authorization: Bearer {{consul-token}}
+
+### AGENT - PUT Force leave and shutdown
+PUT http://{{host}}:{{consul-agent-port}}/v1/agent/force-leave/test-node-two?prune
+Authorization: Bearer {{consul-token}}
