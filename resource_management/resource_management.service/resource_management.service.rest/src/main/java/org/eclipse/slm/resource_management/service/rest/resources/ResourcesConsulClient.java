@@ -36,6 +36,7 @@ public class ResourcesConsulClient {
     private final ConsulGenericServicesClient consulGenericServicesClient;
     private final ConsulKeyValueApiClient consulKeyValueApiClient;
     private final LocationJpaRepository locationJpaRepository;
+    private final ConsulGenericNodeRemoveClient consulGenericNodeRemoveClient;
 
 
     public ResourcesConsulClient(
@@ -44,6 +45,7 @@ public class ResourcesConsulClient {
             ConsulServicesApiClient consulServicesApiClient,
             ConsulGenericServicesClient consulGenericServicesClient,
             ConsulKeyValueApiClient consulKeyValueApiClient,
+            ConsulGenericNodeRemoveClient consulGenericNodeRemoveClient,
             LocationJpaRepository locationJpaRepository
     ) {
         this.consulNodesApiClient = consulNodesApiClient;
@@ -51,6 +53,7 @@ public class ResourcesConsulClient {
         this.consulServicesApiClient = consulServicesApiClient;
         this.consulGenericServicesClient = consulGenericServicesClient;
         this.consulKeyValueApiClient = consulKeyValueApiClient;
+        this.consulGenericNodeRemoveClient = consulGenericNodeRemoveClient;
         this.locationJpaRepository = locationJpaRepository;
     }
 
@@ -280,7 +283,7 @@ public class ResourcesConsulClient {
             bindungRuleNames.add(serviceID);
         }
 
-        this.consulNodesApiClient.deleteNode(consulCredential, consulNode.getNode());
+        this.consulGenericNodeRemoveClient.removeNode(consulCredential, consulNode.getNode());
 
         policyNames.add("resource_"+resource.getId());
         roleNames.add("resource_"+resource.getId());

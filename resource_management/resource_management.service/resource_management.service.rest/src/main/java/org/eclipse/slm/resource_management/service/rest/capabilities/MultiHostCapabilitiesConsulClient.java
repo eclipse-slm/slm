@@ -1,10 +1,7 @@
 package org.eclipse.slm.resource_management.service.rest.capabilities;
 
 import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.client.apis.ConsulAclApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulGenericServicesClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulNodesApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulServicesApiClient;
+import org.eclipse.slm.common.consul.client.apis.*;
 import org.eclipse.slm.common.consul.model.acl.BindingRule;
 import org.eclipse.slm.common.consul.model.catalog.CatalogService;
 import org.eclipse.slm.common.consul.model.catalog.Node;
@@ -31,6 +28,7 @@ public class MultiHostCapabilitiesConsulClient {
     private final CapabilityJpaRepository capabilityJpaRepository;
     private final ConsulNodesApiClient consulNodesApiClient;
     private final ConsulAclApiClient consulAclApiClient;
+    private final ConsulGenericNodeRemoveClient consulGenericNodeRemoveClient;
 
 
     public MultiHostCapabilitiesConsulClient(
@@ -39,6 +37,7 @@ public class MultiHostCapabilitiesConsulClient {
             ConsulServicesApiClient consulServicesApiClient,
             ConsulGenericServicesClient consulGenericServicesClient,
             ConsulAclApiClient consulAclApiClient,
+            ConsulGenericNodeRemoveClient consulGenericNodeRemoveClient,
             CapabilityUtil capabilityUtil
     ) {
         this.capabilityJpaRepository = capabilityJpaRepository;
@@ -46,6 +45,7 @@ public class MultiHostCapabilitiesConsulClient {
         this.consulServicesApiClient = consulServicesApiClient;
         this.consulGenericServicesClient = consulGenericServicesClient;
         this.consulAclApiClient = consulAclApiClient;
+        this.consulGenericNodeRemoveClient = consulGenericNodeRemoveClient;
         this.capabilityUtil = capabilityUtil;
     }
 
@@ -323,7 +323,8 @@ public class MultiHostCapabilitiesConsulClient {
 
                 // delete dummy node first
                 var consulNode = consulNodeOptional.get();
-                this.consulNodesApiClient.deleteNode(consulCredential, consulNode.getNode());
+//                this.consulNodesApiClient.deleteNode(consulCredential, consulNode.getNode());
+                this.consulGenericNodeRemoveClient.removeNode(consulCredential, consulNode.getNode());
 
                 // remove read rule from policy
                 this.consulAclApiClient.removeReadRuleFromPolicy(
