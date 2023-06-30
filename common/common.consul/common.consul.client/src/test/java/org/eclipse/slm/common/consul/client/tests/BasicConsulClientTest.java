@@ -397,7 +397,7 @@ public class BasicConsulClientTest {
 
             consulNodesApiClient.deleteNode(
                     new ConsulCredential(),
-                    catalogNode
+                    catalogNode.getNode()
             );
 
             assertEquals(
