@@ -28,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
+import javax.xml.catalog.Catalog;
 import java.io.File;
 import java.util.*;
 import java.util.stream.Stream;
@@ -445,13 +446,38 @@ public class ConsulAgentClientTest {
             mockGetConsulNodeById(nodeId);
             consulGenericNodeRemoveClient.removeNode(new ConsulCredential(), nodeName);
 
-            LOG.info("Wait " + sleepTimeInSeconds + " seconds for Node maybe showing up again.");
+            LOG.info("Wait " + sleepTimeInSeconds + " seconds if Node is showing up again.");
             Thread.sleep(sleepTimeInSeconds*1000);
 
             int nodesAfterCount = consulNodesApiClient.getNodes(new ConsulCredential()).size();
 
             assertEquals(
                     nodesBeforeCount-1,
+                    nodesAfterCount
+            );
+        }
+
+        @Order(20)
+        @ParameterizedTest
+        @MethodSource("getTestNodes")
+        public void testReAddNode(String nodeName, UUID nodeId) throws ConsulLoginFailedException, InterruptedException {
+            int sleepTimeInSeconds = 60;
+            int nodesBeforeCount = consulNodesApiClient.getNodes(new ConsulCredential()).size();
+
+            CatalogNode node = new CatalogNode();
+            node.setNode(nodeName);
+            node.setId(UUID.randomUUID());
+            node.setAddress("127.0.0.1");
+
+            consulNodesApiClient.registerNode(new ConsulCredential(), node);
+
+            LOG.info("Wait " + sleepTimeInSeconds + " seconds if Node is showing up again.");
+            Thread.sleep(sleepTimeInSeconds*1000);
+
+            int nodesAfterCount = consulNodesApiClient.getNodes(new ConsulCredential()).size();
+
+            assertEquals(
+                    nodesBeforeCount+1,
                     nodesAfterCount
             );
         }
