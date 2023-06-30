@@ -6,9 +6,11 @@ import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+@Component
 public class ConsulGenericNodeRemoveClient extends AbstractConsulApiClient {
     private final static Logger LOG = LoggerFactory.getLogger(ConsulGenericNodeRemoveClient.class);
     private final ConsulHealthApiClient consulHealthApiClient;
