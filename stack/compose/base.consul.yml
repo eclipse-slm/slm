@@ -11,7 +11,7 @@ services:
         max-file: ${LOGGING_MAX_FILE}
         max-size: ${LOGGING_MAX_SIZE}
     environment:
-      CONSUL_ADVERTISE: ${CONSUL_ADVERTISE}
+      CONSUL_ADVERTISE: ${SLM_IP}
     networks:
       default:
         aliases:
