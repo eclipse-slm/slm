@@ -1,5 +1,6 @@
 package org.eclipse.slm.notification_service.service.client;
 
+import org.apache.http.conn.HttpHostConnectException;
 import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
 import org.eclipse.slm.notification_service.model.Category;
 import org.eclipse.slm.notification_service.model.JobGoal;
@@ -117,23 +118,26 @@ public class NotificationServiceClient {
     }
 
     private URL getNotificationServiceUrl() throws MalformedURLException {
-        List<ServiceInstance> instances = discoveryClient.getInstances(CONSUL_SERVICE_ID);
+        URL notificationServiceUrl =  new URL(
+                this.notificationServiceScheme,
+                this.notificationServiceHost,
+                this.notificationServicePort,
+                ""
+        );
 
-        URL notificationServiceUrl;
-        if(instances.size() > 0) {
-            notificationServiceUrl = new URL(
-                    this.notificationServiceScheme,
-                    instances.get(0).getHost(),
-                    instances.get(0).getPort(),
-                    ""
-            );
-        } else {
-            notificationServiceUrl = new URL(
-                    this.notificationServiceScheme,
-                    this.notificationServiceHost,
-                    this.notificationServicePort,
-                    ""
-            );
+        try {
+            List<ServiceInstance> instances = discoveryClient.getInstances(CONSUL_SERVICE_ID);
+
+            if (instances.size() > 0) {
+                notificationServiceUrl = new URL(
+                        this.notificationServiceScheme,
+                        instances.get(0).getHost(),
+                        instances.get(0).getPort(),
+                        ""
+                );
+            }
+        } catch(Exception e) {
+            LOG.warn("Failed to connect to consul server. Fallback to connection details of notification service from application.yml");
         }
 
         return notificationServiceUrl;
