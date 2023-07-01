@@ -84,7 +84,7 @@ jobs:
             CORE_VERSION=$(cat pom.xml | grep -oPm1 "(?<=<revision>)[^<]+")
             cd /staging/tmp/slm/stack/compose
             sed -ir "s/^[#]*\s*SLM_HOSTNAME=.*/SLM_HOSTNAME=$STAGING_VM_HOSTNAME/" .env
-            sed -ir "s/^[#]*\s*SLM_IP=.*/SLM_IP=STAGING_VM_IP/" .env
+            sed -ir "s/^[#]*\s*SLM_IP=.*/SLM_IP=$STAGING_VM_IP/" .env
             sed -ir "s/^[#]*\s*SLM_VERSION=.*/SLM_VERSION=$CORE_VERSION/" .env
             echo ${{secrets.GITHUB_TOKEN}} | docker login -u${{github.actor}} --password-stdin ghcr.io
             docker-compose pull
