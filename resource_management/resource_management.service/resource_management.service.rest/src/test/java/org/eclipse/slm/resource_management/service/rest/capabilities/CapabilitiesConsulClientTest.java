@@ -45,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(classes = {
         ConsulServicesApiClient.class,
         ConsulGenericServicesClient.class,
+        ConsulGenericNodeRemoveClient.class,
         ConsulAgentApiClient.class,
         ConsulNodesApiClient.class,
         ConsulAclApiClient.class,
@@ -102,7 +103,6 @@ public class CapabilitiesConsulClientTest {
                 .withEnv("CONSUL_LOCAL_CONFIG", "{\"datacenter\": \"fabos\", \"domain\": \".fabos\", \"bind_addr\": \"0.0.0.0\", \"retry_join\": [\"0.0.0.0\"], \"acl\":{\"enabled\": true, \"default_policy\": \"allow\", \"tokens\":{\"master\": \"myroot\"}}}");
         consulDockerContainer.start();
     }
-
 
     @AfterAll
     public static void afterAll(){
