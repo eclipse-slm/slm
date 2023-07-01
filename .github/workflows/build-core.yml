@@ -53,8 +53,6 @@ jobs:
               "password": "${{secrets.GITHUB_TOKEN}}"
             }
           ]'
-#      - name: Install '${{ matrix.build.type }}' with Maven
-#        run: mvn -T 8 -Ddocker.image.skip=true -DskipTests=true --projects '${{ matrix.build.maven-projects }}' clean install
       - name: Build '${{ matrix.build.type }}' with Maven
         run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' deploy
       - name: Log test output on failure
