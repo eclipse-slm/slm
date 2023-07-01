@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
         ConsulNodesApiClient.class,
         ConsulServicesApiClient.class,
         ConsulGenericServicesClient.class,
+        ConsulGenericNodeRemoveClient.class,
         ConsulKeyValueApiClient.class,
         ConsulHealthApiClient.class,
         ConsulAgentApiClient.class,
