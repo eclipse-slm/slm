@@ -25,11 +25,9 @@ import java.util.stream.Collectors;
 public class ResourcesConsulClient {
 
     public final static Logger LOG = LoggerFactory.getLogger(ResourcesConsulClient.class);
-
     private static final String META_KEY_LOCATION = "locationId";
     private static final String META_KEY_RESOURCE_ID = "resourceId";
     private static final String META_KEY_CONNECTION_TYPE = "resourceConnectionType";
-
     private final ConsulNodesApiClient consulNodesApiClient;
     private final ConsulAclApiClient consulAclApiClient;
     private final ConsulServicesApiClient consulServicesApiClient;
