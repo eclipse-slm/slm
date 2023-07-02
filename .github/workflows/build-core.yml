@@ -73,7 +73,7 @@ jobs:
           host: ${{env.STAGING_VM_IP}}
           username: vfk
           key: ${{secrets.RUNNER_PRIVATE_KEY}}
-          envs: STAGING_VM_HOSTNAME
+          envs: STAGING_VM_HOSTNAME,STAGING_VM_IP
           script: |
             cd /staging/tmp/slm/stack/compose || true
             docker-compose down --volumes || true
