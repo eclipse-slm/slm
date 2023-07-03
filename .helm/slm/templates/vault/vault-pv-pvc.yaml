@@ -8,7 +8,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/vault-data
+    path: /data/slm/vault-data
 
 ---
 
@@ -22,7 +22,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/vault-config-root
+    path: /data/slm/vault-config-root
 
 ---
 
@@ -37,7 +37,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/vault-config-awx
+    path: /data/slm/vault-config-awx
 
 ---
 
@@ -51,7 +51,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/vault-config-awx-jwt-authenticator
+    path: /data/slm/vault-config-awx-jwt-authenticator
 
 ---
 
@@ -65,7 +65,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/vault-config-resource-management
+    path: /data/slm/vault-config-resource-management
 
 ---
 
@@ -80,7 +80,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/vault-config-service-management
+    path: /data/slm/vault-config-service-management
 
 ---
 

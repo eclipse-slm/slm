@@ -8,7 +8,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/awx
+    path: /data/slm/awx
 
 ---
 
@@ -22,7 +22,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/awx-config-notification-service
+    path: /data/slm/awx-config-notification-service
 
 ---
 
@@ -36,7 +36,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/awx-config-resource-management
+    path: /data/slm/awx-config-resource-management
 
 ---
 
@@ -50,7 +50,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/awx-config-service-management
+    path: /data/slm/awx-config-service-management
 
 ---
 
@@ -64,7 +64,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/awx-config-jwt-authenticator
+    path: /data/slm/awx-config-jwt-authenticator
 
 ---
 
@@ -78,7 +78,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/awx-supervisor-socket
+    path: /data/slm/awx-supervisor-socket
 
 ---
 
@@ -92,7 +92,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/awx-rsyslog-socket
+    path: /data/slm/awx-rsyslog-socket
 
 ---
 
@@ -106,7 +106,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/awx-rsyslog-config
+    path: /data/slm/awx-rsyslog-config
 
 ---
 
