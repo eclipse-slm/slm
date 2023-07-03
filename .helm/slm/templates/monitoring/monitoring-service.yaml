@@ -11,13 +11,13 @@ spec:
   ports:
     - name: monitoring-prometheus-aas
       protocol: TCP
-      port: {{.Values.slm.monitoring.service_port}}
+      port: {{.Values.monitoring.service_port}}
       targetPort: 8080
     - name: monitoring-prometheus-configurator
       protocol: TCP
-      port: {{.Values.slm.monitoring.configurator_port}}
+      port: {{.Values.monitoring.configurator_port}}
       targetPort: 5000
     - name: prometheus
       protocol: TCP
-      port: {{.Values.slm.prometheus.port}}
+      port: {{.Values.prometheus.port}}
       targetPort: 9090

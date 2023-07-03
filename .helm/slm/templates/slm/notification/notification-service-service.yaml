@@ -10,5 +10,5 @@ spec:
     app: notification-service
   ports:
     - protocol: TCP
-      port: {{.Values.slm.notification_service.port}}
+      port: {{.Values.notification_service.port}}
       targetPort: 9001

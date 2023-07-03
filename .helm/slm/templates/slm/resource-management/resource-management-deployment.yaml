@@ -23,7 +23,7 @@ spec:
             - containerPort: 9010
           env:
             - name: KEYCLOAK_AUTHSERVERURL
-              value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
+              value: http://keycloak:{{.Values.keycloak.port}}/auth
             - name: BASYX_AASREGISTRY_URL
               value: http://aas-registry:4000/registry
             - name: BASYX_AASSERVER_URL
@@ -33,19 +33,19 @@ spec:
             - name: CONSUL_HOST
               value: "consul"
             - name: CONSUL_PORT
-              value: "{{.Values.slm.consul.port}}"
+              value: "{{.Values.consul.port}}"
             - name: VAULT_HOST
               value: "vault"
             - name: VAULT_PORT
-              value: "{{.Values.slm.vault.port}}"
+              value: "{{.Values.vault.port}}"
             - name: NOTIFICATIONSERVICE_HOST
               value: "notification-service"
             - name: NOTIFICATION_SERVICE_PORT
-              value: "{{.Values.slm.notification_service.port}}"
+              value: "{{.Values.notification_service.port}}"
             - name: AWX_HOST
               value: "awx-web"
             - name: AWX_PORT
-              value: "{{.Values.slm.awx.port_http}}"
+              value: "{{.Values.awx.port_http}}"
             - name: AWX_POLLING_INTERVAL_IN_S
               value: "80"
 

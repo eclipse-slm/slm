@@ -7,7 +7,7 @@ metadata:
 spec:
   containers:
     - name: awx-redis
-      image: fabos4ai/awx-redis:{{.Values.slm.awx.redis_version}}
+      image: fabos4ai/awx-redis:{{.Values.awx.redis_version}}
       imagePullPolicy: IfNotPresent
       command: [ "redis-server" ]
       args: ["/usr/local/etc/redis/redis.conf"]
