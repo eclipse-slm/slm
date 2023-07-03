@@ -7,7 +7,7 @@ metadata:
 spec:
       containers:
         - name: awx-web
-          image: ghcr.io/eclipse-slm/awx/awx-web:{{.Values.slm.awx.version}}
+          image: ghcr.io/eclipse-slm/awx/awx-web:{{.Values.awx.version}}
           imagePullPolicy: Always
           ports:
             - containerPort: 8052
@@ -37,7 +37,7 @@ spec:
       volumes:
         - name: awx-web-pv
           hostPath:
-            path: {{.Values.slm.awx.nginx_path}}
+            path: {{.Values.awx.nginx_path}}
         - name: awx-supervisor-socket-pv
           persistentVolumeClaim:
             claimName: awx-supervisor-socket-pvc

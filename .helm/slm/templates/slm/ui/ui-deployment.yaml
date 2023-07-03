@@ -17,17 +17,17 @@ spec:
     spec:
       containers:
         - name: ui
-          image: ghcr.io/eclipse-slm/slm/ui:{{ .Values.slm.version }}
+          image: ghcr.io/eclipse-slm/slm/ui:{{ .Values.version }}
           imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
             - name: KEYCLOAK_URL
-              value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
+              value: http://keycloak:{{.Values.keycloak.port}}/auth
             - name: AWX_URL
-              value: http://awx-web:{{.Values.slm.awx.port_http}}/
+              value: http://awx-web:{{.Values.awx.port_http}}/
             - name: BASYX_AAS_GUI_URL
-              value: http://{{.Values.slm.hostname}}:3000
+              value: http://{{.Values.hostname}}:3000
 
 {{/*          livenessProbe:*/}}
 {{/*            httpGet:*/}}

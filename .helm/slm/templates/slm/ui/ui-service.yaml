@@ -10,5 +10,5 @@ spec:
     app: ui
   ports:
     - protocol: TCP
-      port: {{.Values.slm.ui_port}}
+      port: {{.Values.ui_port}}
       targetPort: 80

@@ -17,13 +17,13 @@ spec:
     spec:
       containers:
         - name: notification-service-database
-          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.slm.notification_service.database_version }}
+          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.notification_service.database_version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3306
           env:
             - name: KEYCLOAK_AUTHSERVERURL
-              value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
+              value: http://keycloak:{{.Values.keycloak.port}}/auth
             - name: MYSQL_USER
               value: notification-service
             - name: MYSQL_DATABASE

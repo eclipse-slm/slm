@@ -8,7 +8,7 @@ metadata:
 spec:
   containers:
     - name: vault-init
-      image: ghcr.io/eclipse-slm/vault-init:{{ .Values.slm.version}}
+      image: ghcr.io/eclipse-slm/vault-init:{{ .Values.version}}
       imagePullPolicy: Always
       env:
         - name: KEYCLOAK_AUTHSERVERURL
