@@ -20,18 +20,18 @@ spec:
           image: ghcr.io/eclipse-slm/awx-jwt-authenticator:1.0.0-snapshot
           imagePullPolicy: Always
           ports:
-            - containerPort: {{.Values.slm.awx.jwt_authenticator_port}}
+            - containerPort: {{.Values.awx.jwt_authenticator_port}}
           env:
             - name: KEYCLOAK_AUTHSERVERURL
-              value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
+              value: http://keycloak:{{.Values.keycloak.port}}/auth
             - name: VAULT_HOST
               value: vault
             - name: VAULT_PORT
-              value: "{{.Values.slm.vault.port}}"
+              value: "{{.Values.vault.port}}"
             - name: AWX_HOST
               value: "awx-web"
             - name: AWX_PORT
-              value: "{{.Values.slm.awx.port_http}}"
+              value: "{{.Values.awx.port_http}}"
           volumeMounts:
             - name: vault-config-awx-jwt-authenticator-pv
               mountPath: /opt/vault/awx-jwt-authenticator
@@ -42,7 +42,7 @@ spec:
 
 {{/*          livenessProbe:*/}}
 {{/*            httpGet:*/}}
-{{/*              port: {{.Values.slm.awx.jwt_authenticator_port}}*/}}
+{{/*              port: {{.Values.awx.jwt_authenticator_port}}*/}}
 {{/*              path: /swagger-ui.html*/}}
 {{/*            initialDelaySeconds: 40*/}}
 {{/*            periodSeconds: 90*/}}

@@ -4,70 +4,68 @@
 
 replicaCount: 1
 
+hostname: my-slm.local
+version: 1.3.0-SNAPSHOT
 
-slm:
-  hostname: my-slm.local
+ui_port: 8080
+
+awx:
+  version: 15.0.1
+  port_http: 8052
+  port_https: 443
+  redis_version: 6
+  postgres_version: 10
+  jwt_authenticator_port: 8051
+  nginx_path: PATH
+
+catalog:
   version: 1.3.0-SNAPSHOT
-
-  ui_port: 8080
-
-  awx:
-    version: 15.0.1
-    port_http: 8052
-    port_https: 443
-    redis_version: 6
-    postgres_version: 10
-    jwt_authenticator_port: 8051
-    nginx_path: PATH
-
-  catalog:
-    version: 1.3.0-SNAPSHOT
-    ui_port: 10001
-    service:
-      port: 10000
-      database_version: 10.5
-      database_port: 3306
-
-  notification_service:
-    port: 9001
+  ui_port: 10001
+  service:
+    port: 10000
     database_version: 10.5
-    database_port: 3301
+    database_port: 3306
 
-  monitoring:
-    version: 0.0.1-SNAPSHOT
-    service_port: 9080
-    configurator_port: 5000
+notification_service:
+  port: 9001
+  database_version: 10.5
+  database_port: 3301
 
-  resource_management:
-    port: 9010
-    database_version: 10.5
-    database_port: 3310
+monitoring:
+  version: 0.0.1-SNAPSHOT
+  service_port: 9080
+  configurator_port: 5000
 
-  service_management:
-    port: 9020
-    database_version: 10.5
-    database_port: 3320
-    initialization_local_directories: ""
-    initialization_git_repos: https://github.com/FabOS-AI/fabos-slm-service-registry-content.git
-    git_check_interval_minutes: 15
+resource_management:
+  port: 9010
+  database_version: 10.5
+  database_port: 3310
 
-  consul:
-    version: 1.14.5
-    port: 8500
-    esm_version: 0.6.1
+service_management:
+  port: 9020
+  database_version: 10.5
+  database_port: 3320
+  initialization_local_directories: ""
+  initialization_git_repos: https://github.com/FabOS-AI/fabos-slm-service-registry-content.git
+  git_check_interval_minutes: 15
 
-  keycloak:
-    version: 19.0.2
-    database_version: 10.5
-    port: 7080
+consul:
+  version: 1.14.5
+  port: 8500
+  esm_version: 0.6.1
 
-  vault:
-    version: 1.11.3
-    port: 8200
+keycloak:
+  version: 19.0.2
+  database_version: 10.5
+  port: 7080
 
-  prometheus:
-    version: v2.43.0
-    port: 9090
+vault:
+  version: 1.11.3
+  port: 8200
+
+prometheus:
+  version: v2.43.0
+  port: 9090
 
 logging:
   max_file: 5

@@ -4,7 +4,7 @@ metadata:
   name: ingress-catalog
 spec:
   rules:
-    - host: catalog.{{.Values.slm.hostname}}
+    - host: catalog.{{.Values.hostname}}
       http:
         paths:
           - path: /
@@ -13,5 +13,5 @@ spec:
               service:
                 name: catalog
                 port:
-                  number: {{.Values.slm.catalog.ui_port}}
+                  number: {{.Values.catalog.ui_port}}
   ingressClassName: nginx

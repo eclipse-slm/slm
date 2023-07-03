@@ -17,13 +17,13 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image: ghcr.io/eclipse-slm/slm/notification-service:{{ .Values.slm.version }}
+          image: ghcr.io/eclipse-slm/slm/notification-service:{{ .Values.version }}
           imagePullPolicy: Always
           ports:
             - containerPort: 9001
           env:
             - name: KEYCLOAK_AUTHSERVERURL
-              value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
+              value: http://keycloak:{{.Values.keycloak.port}}/auth
             - name: CONSUL_PORT
               value: "8500"
             - name: VAULT_PORT
@@ -33,7 +33,7 @@ spec:
             - name: AWX_HOST
               value: "awx-web"
             - name: AWX_PORT
-              value: "{{.Values.slm.awx.port_http}}"
+              value: "{{.Values.awx.port_http}}"
           volumeMounts:
             - mountPath: /app/awx
               name: awx-config-notification-service-pv

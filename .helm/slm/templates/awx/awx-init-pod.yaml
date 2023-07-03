@@ -7,11 +7,11 @@ metadata:
 spec:
   containers:
     - name: awx-init
-      image: ghcr.io/eclipse-slm/awx/awx-init:{{ .Values.slm.version }}
+      image: ghcr.io/eclipse-slm/awx/awx-init:{{ .Values.version }}
       imagePullPolicy: Always
       env:
         - name: KEYCLOAK_AUTHSERVERURL
-          value: "http://keycloak:{{ .Values.slm.keycloak.port}}/auth"
+          value: "http://keycloak:{{ .Values.keycloak.port}}/auth"
         - name: AWX_URL
           value: "http://awx-web:8052"
 

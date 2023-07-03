@@ -18,13 +18,13 @@ spec:
       containers:
 
         - name: service-management-database
-          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.slm.service_management.database_version }}
+          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.service_management.database_version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3306
           env:
             - name: KEYCLOAK_AUTHSERVERURL
-              value: http://keycloak:{{.Values.slm.keycloak.port}}/auth
+              value: http://keycloak:{{.Values.keycloak.port}}/auth
             - name: MYSQL_USER
               value: service-management
             - name: MYSQL_DATABASE

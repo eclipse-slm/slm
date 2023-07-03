@@ -11,7 +11,7 @@ spec:
   ports:
 {{/*    - name: "http"*/}}
 {{/*      protocol: TCP*/}}
-{{/*      port: {{.Values.slm.awx.port_http}}*/}}
+{{/*      port: {{.Values.awx.port_http}}*/}}
 {{/*      targetPort: 8052*/}}
     - name: "container"
       protocol: TCP
@@ -20,5 +20,5 @@ spec:
 
 {{/*    - name: "https"*/}}
 {{/*      protocol: TCP*/}}
-{{/*      port: {{.Values.slm.awx.port_https}}*/}}
+{{/*      port: {{.Values.awx.port_https}}*/}}
 {{/*      targetPort: 8053*/}}

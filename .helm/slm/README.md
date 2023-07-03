@@ -35,9 +35,8 @@ Create a new file with the name value.yaml
 Add the following content:  
 
 ```
-slm:
-    awx:
-        nginx_path: PATH_TO_YOUR_HOME_DIC
+awx:
+    nginx_path: PATH_TO_YOUR_HOME_DIC
 ```
 
 Now we replace PATH_TO_YOUR_HOME_DIC with the location of the slm folder.
@@ -45,6 +44,10 @@ Now we replace PATH_TO_YOUR_HOME_DIC with the location of the slm folder.
 ### Local installation from repository
 
 `helm install slm slm/.helm/slm/ -f value.yaml `
+
+or you can install it by override the variable like this 
+
+`helm isntall slm slm/.helm/slm/ --set=awx.nginx_path=PATH_TO_YOUR_HOME_DIC`
 
 #### Upgrade  
 If you did some changes you can upgrade the SLM with the command
