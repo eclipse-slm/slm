@@ -8,7 +8,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/resource-management-database-data
+    path: /data/slm/resource-management-database-data
 
 ---
 
@@ -22,7 +22,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/resource-management-database-config
+    path: /data/slm/resource-management-database-config
 
 ---
 
