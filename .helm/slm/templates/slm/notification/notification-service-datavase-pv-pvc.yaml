@@ -8,7 +8,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/notification-service-database-data
+    path: /data/slm/notification-service-database-data
 
 ---
 
@@ -22,7 +22,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/notification-service-database-config
+    path: /data/slm/notification-service-database-config
 
 ---
 

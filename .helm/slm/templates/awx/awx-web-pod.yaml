@@ -37,7 +37,7 @@ spec:
       volumes:
         - name: awx-web-pv
           hostPath:
-            path: /home/vfk/slm/.helm/
+            path: {{.Values.slm.awx.nginx_path}}
         - name: awx-supervisor-socket-pv
           persistentVolumeClaim:
             claimName: awx-supervisor-socket-pvc

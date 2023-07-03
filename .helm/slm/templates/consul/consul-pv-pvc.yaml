@@ -8,7 +8,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/consul-data
+    path: /data/slm/consul-data
 
 ---
 
@@ -22,7 +22,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/consul-config-root
+    path: /data/slm/consul-config-root
 
 ---
 
@@ -36,7 +36,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/consul-config-awx
+    path: /data/slm/consul-config-awx
 
 ---
 
@@ -50,7 +50,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/consul-config-resource-management
+    path: /data/slm/consul-config-resource-management
 
 ---
 
@@ -64,7 +64,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/consul-config-service-management
+    path: /data/slm/consul-config-service-management
 
 ---
 

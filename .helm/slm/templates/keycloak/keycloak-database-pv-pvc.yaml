@@ -8,7 +8,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/keycloak-database-data
+    path: /data/slm/keycloak-database-data
 
 ---
 
@@ -22,7 +22,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/keycloak-database-config
+    path: /data/slm/keycloak-database-config
 
 ---
 
@@ -36,7 +36,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/keycloak-config-awx-jwt-authenticator
+    path: /data/slm/keycloak-config-awx-jwt-authenticator
 
 ---
 
@@ -50,7 +50,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/keycloak-config-notification-service
+    path: /data/slm/keycloak-config-notification-service
 
 ---
 
@@ -64,7 +64,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/keycloak-config-resource-management
+    path: /data/slm/keycloak-config-resource-management
 
 ---
 apiVersion: v1
@@ -77,7 +77,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/keycloak-config-service-management
+    path: /data/slm/keycloak-config-service-management
 
 ---
 apiVersion: v1
@@ -90,7 +90,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/keycloak-config-service-management-init
+    path: /data/slm/keycloak-config-service-management-init
 
 ---
 

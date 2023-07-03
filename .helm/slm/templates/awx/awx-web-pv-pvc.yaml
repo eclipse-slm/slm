@@ -8,7 +8,7 @@ spec:
   capacity:
     storage: 6Gi
   hostPath:
-    path: /data/awx-web
+    path: /data/slm/awx-web
 
 
 ---
