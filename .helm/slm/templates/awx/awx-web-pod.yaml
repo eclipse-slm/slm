@@ -26,7 +26,7 @@ spec:
             - name: awx-redis-pv
               mountPath: /var/run/redis
 
-{{/*          livenessProbe:*/}}
+{{/*          livenessProbe:  slm/templates/awx/awx-web-pod.yaml */}}
 {{/*            httpGet:*/}}
 {{/*              port: 8052*/}}
 {{/*              path: /*/}}
@@ -37,7 +37,7 @@ spec:
       volumes:
         - name: awx-web-pv
           hostPath:
-            path: {{.Values.awx.nginx_path}}
+            path: {{ printf "%s/%s" .Values.awx.nginx_path "/.helm/slm/config/" | clean}}
         - name: awx-supervisor-socket-pv
           persistentVolumeClaim:
             claimName: awx-supervisor-socket-pvc
