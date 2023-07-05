@@ -58,19 +58,25 @@ spec:
               name: keycloak-config-resource-management-pv
             - mountPath: /app/vault
               name: vault-config-resource-management-pv
-            - mountPath: /app/database/config
-              name: resource-management-database-config-pv
-
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              host: resource-management*/}}
-{{/*              port: 9010*/}}
-{{/*              path: /swagger-ui/index.html*/}}
-{{/*            initialDelaySeconds: 40*/}}
-{{/*            periodSeconds: 90*/}}
-{{/*            timeoutSeconds: 10*/}}
+            - name: resource-management-database-mariadb
+              mountPath: /app/database/config
 
       volumes:
+        - name: resource-management-database-mariadb
+          projected:
+            sources:
+              - secret:
+                  name: resource-management-database-mariadb-secret
+                  items:
+                    - key: mysql-password
+                      path: password
+              - configMap:
+                  name: resource-management-database-mariadb-config
+                  items:
+                    - key: database-user
+                      path: user
+                    - key: database-schema
+                      path: schema
         - name: awx-config-resource-management-pv
           persistentVolumeClaim:
             claimName: awx-config-resource-management-pvc
@@ -83,8 +89,5 @@ spec:
         - name: vault-config-resource-management-pv
           persistentVolumeClaim:
             claimName: vault-config-resource-management-pvc
-        - name: resource-management-database-config-pv
-          persistentVolumeClaim:
-            claimName: resource-management-database-config-pvc
 
       restartPolicy: Always

@@ -12,19 +12,6 @@ spec:
 
 ---
 
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: resource-management-database-config-pv
-spec:
-  accessModes:
-    - ReadWriteOnce
-  capacity:
-    storage: 6Gi
-  hostPath:
-    path: /data/slm/resource-management-database-config
-
----
 
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -37,21 +24,5 @@ spec:
     requests:
       storage: 6Gi
   volumeName: resource-management-database-data-pv
-
-  storageClassName: ""
-
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: resource-management-database-config-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 6Gi
-  volumeName: resource-management-database-config-pv
 
   storageClassName: ""
