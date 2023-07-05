@@ -7,6 +7,8 @@
     - set_fact:
         configure_core_project: "{{ lookup('env', 'CONFIGURE_CORE_PROJECT') }}"
         target_host: "{{ lookup('env', 'SLM_HOSTNAME') }}"
+        local_host: "{{ lookup('env', 'LOCAL_HOST') }}"
+
     - set_fact:
         keycloak_auth_server_url: "http://{{ lookup('env', 'SLM_HOSTNAME') }}:7080/auth"
         awx_scheme: "http"
