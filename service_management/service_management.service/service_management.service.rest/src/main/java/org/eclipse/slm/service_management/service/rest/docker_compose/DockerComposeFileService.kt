@@ -56,4 +56,7 @@ data class DockerComposeFileService(
 
     @JsonProperty("network_mode")
     var networkMode: String?,
+
+    @JsonProperty("extra_hosts")
+    var extraHosts: List<String>?,
 )
