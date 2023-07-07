@@ -60,7 +60,7 @@ spec:
             - mountPath: /app/vault
               name: vault-config-service-management-pv
             - mountPath: /app/database/config
-              name: service-management-database-config-pv
+              name: service-management-database-mariadb
 
 {{/*          livenessProbe:*/}}
 {{/*            httpGet:*/}}
@@ -71,6 +71,21 @@ spec:
 {{/*            periodSeconds: 90*/}}
 {{/*            timeoutSeconds: 10*/}}
       volumes:
+        - name: service-management-database-mariadb
+          projected:
+            sources:
+              - secret:
+                  name: service-management-database-mariadb-secret
+                  items:
+                    - key: mysql-password
+                      path: password
+              - configMap:
+                  name: service-management-database-mariadb-config
+                  items:
+                    - key: database-user
+                      path: user
+                    - key: database-schema
+                      path: schema
         - name: awx-config-service-management-pv
           persistentVolumeClaim:
             claimName: awx-config-service-management-pvc
@@ -83,8 +98,5 @@ spec:
         - name: vault-config-service-management-pv
           persistentVolumeClaim:
             claimName: vault-config-service-management-pvc
-        - name: service-management-database-config-pv
-          persistentVolumeClaim:
-            claimName: service-management-database-config-pvc
 
       restartPolicy: Always
