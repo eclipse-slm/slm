@@ -39,10 +39,10 @@ spec:
               name: awx-config-notification-service-pv
             - mountPath: /app/keycloak
               name: keycloak-config-notification-service-pv
-            - mountPath: /app/database/config
-              name: notification-service-database-config-pv
             - mountPath: /app/consul
               name: consul-config-service-management-pv
+            - name: notification-service-database-mariadb
+              mountPath: /app/database/config
 
 {{/*          livenessProbe:*/}}
 {{/*            httpGet:*/}}
@@ -54,9 +54,21 @@ spec:
 {{/*            timeoutSeconds: 10*/}}
 
       volumes:
-        - name: notification-service-database-config-pv
-          persistentVolumeClaim:
-            claimName: notification-service-database-config-pvc
+        - name: notification-service-database-mariadb
+          projected:
+            sources:
+              - secret:
+                  name: notification-service-database-mariadb-secret
+                  items:
+                    - key: mysql-password
+                      path: password
+              - configMap:
+                  name: notification-service-database-mariadb-config
+                  items:
+                    - key: database-user
+                      path: user
+                    - key: database-schema
+                      path: schema
         - name: awx-config-notification-service-pv
           persistentVolumeClaim:
             claimName: awx-config-notification-service-pvc

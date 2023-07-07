@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: notification-service-database
-          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.notification_service.database_version }}
+          image: mariadb:{{ .Values.notification_service.database_version }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3306
@@ -25,14 +25,28 @@ spec:
             - name: KEYCLOAK_AUTHSERVERURL
               value: http://keycloak:{{.Values.keycloak.port}}/auth
             - name: MYSQL_USER
-              value: notification-service
-            - name: MYSQL_DATABASE
-              value: notifications
+              valueFrom:
+                configMapKeyRef:
+                  name: notification-service-database-mariadb-config
+                  key: database-user
+            - name: MARIADB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: notification-service-database-mariadb-secret
+                  key: mysql-password
+            - name: MARIADB_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: notification-service-database-mariadb-config
+                  key: database-schema
+            - name: MARIADB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: notification-service-database-mariadb-secret
+                  key: mysql-root-password
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: notification-service-database-data-pv
-            - mountPath: /config
-              name: notification-service-database-config-pv
 
 {{/*          livenessProbe:*/}}
 {{/*            exec:*/}}
@@ -48,8 +62,6 @@ spec:
         - name: notification-service-database-data-pv
           persistentVolumeClaim:
             claimName: notification-service-database-data-pvc
-        - name: notification-service-database-config-pv
-          persistentVolumeClaim:
-            claimName: notification-service-database-config-pvc
+
 
       restartPolicy: Always
