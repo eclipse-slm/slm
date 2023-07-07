@@ -41,6 +41,8 @@ spec:
               name: keycloak-config-notification-service-pv
             - mountPath: /app/database/config
               name: notification-service-database-config-pv
+            - mountPath: /app/consul
+              name: consul-config-service-management-pv
 
 {{/*          livenessProbe:*/}}
 {{/*            httpGet:*/}}
@@ -61,5 +63,8 @@ spec:
         - name: keycloak-config-notification-service-pv
           persistentVolumeClaim:
             claimName: keycloak-config-notification-service-pvc
+        - name: consul-config-service-management-pv
+          persistentVolumeClaim:
+            claimName: consul-config-service-management-pvc
 
       restartPolicy: Always
