@@ -29,6 +29,7 @@ spec:
             - name: BASYX_AAS_GUI_URL
               value: http://{{.Values.hostname}}:3000
 
+
 {{/*          livenessProbe:*/}}
 {{/*            httpGet:*/}}
 {{/*              host: ui*/}}
@@ -38,5 +39,12 @@ spec:
 {{/*            periodSeconds: 90*/}}
 {{/*            timeoutSeconds: 10*/}}
 
+          volumeMounts:
+            - mountPath: /app/consul
+              name: consul-config-service-management-pv
+      volumes:
+        - name: consul-config-service-management-pv
+          persistentVolumeClaim:
+            claimName: consul-config-service-management-pvc
 
       restartPolicy: Always
