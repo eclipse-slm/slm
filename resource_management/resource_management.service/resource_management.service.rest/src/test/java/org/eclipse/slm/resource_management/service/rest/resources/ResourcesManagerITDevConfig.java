@@ -6,9 +6,9 @@ import org.eclipse.slm.common.vault.client.VaultCredential;
 import org.eclipse.slm.common.vault.client.VaultCredentialType;
 import org.eclipse.slm.resource_management.model.capabilities.CapabilityType;
 import org.eclipse.slm.resource_management.model.capabilities.DeploymentCapability;
-import org.eclipse.slm.resource_management.model.capabilities.actions.AwxCapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.AwxAction;
+import org.eclipse.slm.resource_management.model.actions.Action;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.resource.ConnectionType;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
@@ -20,7 +20,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.UUID;
 
 public class ResourcesManagerITDevConfig {
     public final static int CONSUL_PORT = 8500;
@@ -69,10 +68,10 @@ public class ResourcesManagerITDevConfig {
         ));
 
         // Set AWX Capability Actions
-        HashMap<CapabilityActionType, CapabilityAction> capabilityActions = new HashMap();
+        HashMap<ActionType, Action> capabilityActions = new HashMap();
         capabilityActions.put(
-                CapabilityActionType.INSTALL,
-                new AwxCapabilityAction(
+                ActionType.INSTALL,
+                new AwxAction(
                         "awxRepo",
                         "awxBranch",
                         "playbook",
@@ -80,8 +79,8 @@ public class ResourcesManagerITDevConfig {
                 )
         );
         capabilityActions.put(
-                CapabilityActionType.UNINSTALL,
-                new AwxCapabilityAction(
+                ActionType.UNINSTALL,
+                new AwxAction(
                         "awxRepo",
                         "awxBranch",
                         "playbook",
@@ -89,8 +88,8 @@ public class ResourcesManagerITDevConfig {
                 )
         );
         capabilityActions.put(
-                CapabilityActionType.DEPLOY,
-                new AwxCapabilityAction(
+                ActionType.DEPLOY,
+                new AwxAction(
                         "awxRepo",
                         "awxBranch",
                         "playbook",
@@ -98,8 +97,8 @@ public class ResourcesManagerITDevConfig {
                 )
         );
         capabilityActions.put(
-                CapabilityActionType.UNDEPLOY,
-                new AwxCapabilityAction(
+                ActionType.UNDEPLOY,
+                new AwxAction(
                         "awxRepo",
                         "awxBranch",
                         "playbook",

@@ -3,9 +3,9 @@ package org.eclipse.slm.resource_management.service.rest.handler;
 import org.eclipse.slm.common.model.DeploymentType;
 import org.eclipse.slm.resource_management.model.capabilities.CapabilityType;
 import org.eclipse.slm.resource_management.model.capabilities.DeploymentCapability;
-import org.eclipse.slm.resource_management.model.capabilities.actions.AwxCapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.AwxAction;
+import org.eclipse.slm.resource_management.model.actions.Action;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.cluster.ClusterCreateRequest;
 import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType;
 import org.eclipse.slm.resource_management.model.consul.capability.MultiHostCapabilityService;
@@ -23,18 +23,18 @@ public class ClusterHandlerITConfigDockerSwarmCapability {
             CapabilityType.DEPLOY,
             CapabilityType.SCALE
     );
-    private static AwxCapabilityAction awxCapabilityAction = new AwxCapabilityAction(
+    private static AwxAction awxCapabilityAction = new AwxAction(
             "repo",
             "branch",
             "playbook"
     );
-    private static Map<CapabilityActionType, CapabilityAction> actions = Map.of(
-            CapabilityActionType.INSTALL, awxCapabilityAction,
-            CapabilityActionType.UNINSTALL, awxCapabilityAction,
-            CapabilityActionType.DEPLOY, awxCapabilityAction,
-            CapabilityActionType.UNDEPLOY, awxCapabilityAction,
-            CapabilityActionType.SCALE_UP, awxCapabilityAction,
-            CapabilityActionType.SCALE_DOWN, awxCapabilityAction
+    private static Map<ActionType, Action> actions = Map.of(
+            ActionType.INSTALL, awxCapabilityAction,
+            ActionType.UNINSTALL, awxCapabilityAction,
+            ActionType.DEPLOY, awxCapabilityAction,
+            ActionType.UNDEPLOY, awxCapabilityAction,
+            ActionType.SCALE_UP, awxCapabilityAction,
+            ActionType.SCALE_DOWN, awxCapabilityAction
     );
     private static List<DeploymentType> deploymentTypes = Arrays.asList(
             DeploymentType.DOCKER_CONTAINER,

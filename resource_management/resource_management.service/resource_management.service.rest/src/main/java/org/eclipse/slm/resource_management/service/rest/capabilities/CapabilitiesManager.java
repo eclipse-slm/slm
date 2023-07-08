@@ -20,8 +20,8 @@ import org.eclipse.slm.common.vault.client.VaultCredential;
 import org.eclipse.slm.notification_service.model.*;
 import org.eclipse.slm.notification_service.service.client.NotificationServiceClient;
 import org.eclipse.slm.resource_management.model.capabilities.*;
-import org.eclipse.slm.resource_management.model.capabilities.actions.AwxCapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.AwxAction;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.consul.capability.CapabilityService;
 import org.eclipse.slm.resource_management.model.consul.capability.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.model.consul.capability.CapabilityServiceStatus;
@@ -45,9 +45,7 @@ import static org.eclipse.slm.notification_service.model.JobGoal.DELETE;
 
 @Component
 public class CapabilitiesManager implements IAwxJobObserverListener {
-
     private final static Logger LOG = LoggerFactory.getLogger(CapabilitiesManager.class);
-
     private final CapabilitiesConsulClient capabilitiesConsulClient;
     private final SingleHostCapabilitiesConsulClient singleHostCapabilitiesConsulClient;
     private final AwxJobExecutor awxJobExecutor;
@@ -134,8 +132,8 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
     public void addCapability(Capability capability)
             throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException {
         capability.getActions().forEach((capabilityActionType, capabilityAction) -> {
-                    if(capabilityAction.getCapabilityActionClass().equals(AwxCapabilityAction.class.getSimpleName())) {
-                        AwxCapabilityAction awxCapabilityAction = (AwxCapabilityAction) capabilityAction;
+                    if(capabilityAction.getActionClass().equals(AwxAction.class.getSimpleName())) {
+                        AwxAction awxCapabilityAction = (AwxAction) capabilityAction;
                         try {
                             var jobTemplateCredentialNames = List.of("Consul", "HashiCorp Vault");
                             JobTemplate jobTemplate;
@@ -207,8 +205,8 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
         this.capabilityJpaRepository.delete(capability);
 
         capability.getActions().forEach((capabilityActionType, capabilityAction) -> {
-            if (capabilityAction.getCapabilityActionClass().equals(AwxCapabilityAction.class.getSimpleName())) {
-                AwxCapabilityAction awxCapabilityAction = (AwxCapabilityAction) capabilityAction;
+            if (capabilityAction.getActionClass().equals(AwxAction.class.getSimpleName())) {
+                AwxAction awxCapabilityAction = (AwxAction) capabilityAction;
                 awxClient.deleteJobTemplate(
                         awxCapabilityAction.getAwxRepo(),
                         awxCapabilityAction.getAwxBranch(),
@@ -326,10 +324,10 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
             Map<String,String> configParameters
     ) throws SSLException, CapabilityNotFoundException, ConsulLoginFailedException, ResourceNotFoundException, JsonProcessingException {
         UUID capabilityId = newCapabilityService.getCapability().getId();
-        if (newCapabilityService.getCapability().getActions().containsKey(CapabilityActionType.INSTALL)) {
-            var capabilityInstallAction = newCapabilityService.getCapability().getActions().get(CapabilityActionType.INSTALL);
-            if (capabilityInstallAction instanceof AwxCapabilityAction) {
-                var awxInstallCapabilityAction = (AwxCapabilityAction) capabilityInstallAction;
+        if (newCapabilityService.getCapability().getActions().containsKey(ActionType.INSTALL)) {
+            var capabilityInstallAction = newCapabilityService.getCapability().getActions().get(ActionType.INSTALL);
+            if (capabilityInstallAction instanceof AwxAction) {
+                var awxInstallCapabilityAction = (AwxAction) capabilityInstallAction;
                 Map<String, String> secretConfigParams = capabilityUtil.getSecretConfigParameter(
                         newCapabilityService.getCapability(),
                         configParameters
@@ -508,7 +506,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
     ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException {
         Capability capability = capabilityService.getCapability();
 
-        var uninstallAction = (AwxCapabilityAction) capability.getActions().get(CapabilityActionType.UNINSTALL);
+        var uninstallAction = (AwxAction) capability.getActions().get(ActionType.UNINSTALL);
         Map<String, Object> extraVars = new HashMap<>();
         extraVars.put("keycloak_token", keycloakToken);
         extraVars.put("resource_id", resourceId.toString());

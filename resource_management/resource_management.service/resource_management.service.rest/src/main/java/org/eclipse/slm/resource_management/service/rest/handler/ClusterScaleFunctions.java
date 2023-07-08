@@ -23,11 +23,10 @@ import org.eclipse.slm.resource_management.model.consul.capability.ScaleOperatio
 import org.eclipse.slm.resource_management.model.consul.capability.ScaleUpOperation;
 import org.eclipse.slm.resource_management.service.rest.capabilities.CapabilitiesConsulClient;
 import org.eclipse.slm.resource_management.service.rest.capabilities.MultiHostCapabilitiesConsulClient;
-import org.eclipse.slm.resource_management.model.capabilities.actions.AwxCapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.AwxAction;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType;
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotFoundException;
-import org.eclipse.slm.resource_management.service.rest.handler.ClusterJob;
 import org.eclipse.slm.resource_management.service.rest.resources.ResourcesConsulClient;
 import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
@@ -89,7 +88,7 @@ class ClusterScaleFunctions extends AbstractClusterFunctions implements IAwxJobO
         }
 
         MultiHostCapabilityService service = serviceOptional.get();
-        AwxCapabilityAction scaleUpAction = (AwxCapabilityAction) service.getCapability().getActions().get(CapabilityActionType.SCALE_UP);
+        AwxAction scaleUpAction = (AwxAction) service.getCapability().getActions().get(ActionType.SCALE_UP);
         Optional<ClusterMemberType> clusterMemberTypeOptional = service.getCapability().getClusterMemberTypes()
                 .stream()
                 .filter(type -> type.getScalable())
@@ -154,7 +153,7 @@ class ClusterScaleFunctions extends AbstractClusterFunctions implements IAwxJobO
             return -1;
 
         MultiHostCapabilityService service = serviceOptional.get();
-        AwxCapabilityAction scaleDownAction = (AwxCapabilityAction) service.getCapability().getActions().get(CapabilityActionType.SCALE_DOWN);
+        AwxAction scaleDownAction = (AwxAction) service.getCapability().getActions().get(ActionType.SCALE_DOWN);
 
         Optional<NodeService> resourceToAddAsSerivce = this.resourcesConsulClient.getRemoteAccessServiceOfResourceAsNodeService(new ConsulCredential(), resourceId);
 
