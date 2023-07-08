@@ -13,7 +13,7 @@ import org.eclipse.slm.common.keycloak.config.KeycloakUtil;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.notification_service.model.*;
 import org.eclipse.slm.notification_service.service.client.NotificationServiceClient;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
 import org.eclipse.slm.resource_management.service.client.handler.ApiException;
 import org.eclipse.slm.service_management.model.offerings.exceptions.ServiceOfferingNotFoundException;
@@ -81,7 +81,7 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
 
         var serviceHoster = this.getServiceHoster(keycloakPrincipal, serviceInstance.getCapabilityServiceId());
 
-        var awxCapabilityAction = this.getAwxDeployCapabilityAction(CapabilityActionType.UNDEPLOY, serviceHoster.getCapabilityService().getCapability());
+        var awxCapabilityAction = this.getAwxDeployCapabilityAction(ActionType.UNDEPLOY, serviceHoster.getCapabilityService().getCapability());
         var awxGitRepoOfProject = awxCapabilityAction.getAwxRepo();
         var awxGitBranchOfProject = awxCapabilityAction.getAwxBranch();
         var awxPlaybook = awxCapabilityAction.getPlaybook();
