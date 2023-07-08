@@ -1,8 +1,10 @@
 package org.eclipse.slm.resource_management.model.capabilities
 
 import com.fasterxml.jackson.annotation.JsonTypeName
-import org.eclipse.slm.common.model.DeploymentType
-import org.eclipse.slm.resource_management.model.capabilities.actions.*
+import org.eclipse.slm.resource_management.model.actions.Action
+import org.eclipse.slm.resource_management.model.actions.ActionType
+import org.eclipse.slm.resource_management.model.actions.AwxAction
+import org.eclipse.slm.resource_management.model.actions.*
 import java.util.*
 import java.util.function.Consumer
 
@@ -12,13 +14,13 @@ open class BaseConfigurationCapabilityDTOApi(id: UUID? = null) : CapabilityDTOAp
     fun setActions(
         repo: String,
         branch: String,
-        capabilityActionTypes: List<CapabilityActionType>
+        actionTypes: List<ActionType>
     ) {
-        val actions = HashMap<CapabilityActionType, CapabilityAction>()
+        val actions = HashMap<ActionType, Action>()
 
-        capabilityActionTypes.forEach(
-            Consumer { t: CapabilityActionType ->
-                actions[t] = AwxCapabilityAction(
+        actionTypes.forEach(
+            Consumer { t: ActionType ->
+                actions[t] = AwxAction(
                     repo,
                     branch,
                     t.name + ".yml"

@@ -1,6 +1,6 @@
-package org.eclipse.slm.resource_management.model.capabilities.actions
+package org.eclipse.slm.resource_management.model.actions
 
-enum class CapabilityActionType {
+enum class ActionType {
     INSTALL,
     UNINSTALL,
     SCALE_UP,

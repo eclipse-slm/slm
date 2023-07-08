@@ -1,8 +1,8 @@
-package org.eclipse.slm.resource_management.model.capabilities.actions
+package org.eclipse.slm.resource_management.model.actions
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-class CapabilityActionConfigParameter(
+class ActionConfigParameter(
 
     @JsonProperty("name")
     val name: String,
@@ -14,13 +14,13 @@ class CapabilityActionConfigParameter(
     val description: String,
 
     @JsonProperty("valueType")
-    val valueType: CapabilityActionConfigParameterValueType,
+    val valueType: ActionConfigParameterValueType,
 
     @JsonProperty("defaultValue")
     val defaultValue: String?,
 
     @JsonProperty("requiredType")
-    val requiredType: CapabilityActionConfigParameterRequiredType,
+    val requiredType: ActionConfigParameterRequiredType,
 
     @JsonProperty("secret")
     val secret: Boolean = false,

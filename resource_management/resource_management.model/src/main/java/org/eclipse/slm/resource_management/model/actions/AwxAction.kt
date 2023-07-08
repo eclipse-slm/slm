@@ -1,4 +1,4 @@
-package org.eclipse.slm.resource_management.model.capabilities.actions
+package org.eclipse.slm.resource_management.model.actions
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
@@ -10,7 +10,7 @@ import org.eclipse.slm.resource_management.model.resource.ConnectionType
 @JsonTypeName("AwxCapabilityAction")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-class AwxCapabilityAction(): CapabilityAction(AwxCapabilityAction::class.java.simpleName) {
+class AwxAction(): Action(AwxAction::class.java.simpleName) {
 
     var awxRepo: String = ""
 
@@ -31,7 +31,7 @@ class AwxCapabilityAction(): CapabilityAction(AwxCapabilityAction::class.java.si
          awxBranch: String,
          playbook: String
     ) : this() {
-        this.capabilityActionType = capabilityActionType
+        this.actionType = actionType
         this.awxRepo = awxRepo
         this.awxBranch = awxBranch
         this.playbook = playbook
@@ -48,7 +48,7 @@ class AwxCapabilityAction(): CapabilityAction(AwxCapabilityAction::class.java.si
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is AwxCapabilityAction) return false
+        if (other !is AwxAction) return false
 
         if (awxRepo != other.awxRepo) return false
         if (awxBranch != other.awxBranch) return false

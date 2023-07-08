@@ -1,35 +1,35 @@
 package org.eclipse.slm.resource_management.model.capabilities
 
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType
+import org.eclipse.slm.resource_management.model.actions.ActionType
 
 
-enum class CapabilityType(val actions: MutableList<CapabilityActionType>) {
+enum class CapabilityType(val actions: MutableList<ActionType>) {
 
     SETUP(
         mutableListOf(
-            CapabilityActionType.INSTALL,
-            CapabilityActionType.UNINSTALL
+            ActionType.INSTALL,
+            ActionType.UNINSTALL
         )
     ),
 
     DEPLOY(
         mutableListOf(
-            CapabilityActionType.DEPLOY,
-            CapabilityActionType.UNDEPLOY
+            ActionType.DEPLOY,
+            ActionType.UNDEPLOY
         )
     ),
 
     SCALE(
         mutableListOf(
-            CapabilityActionType.SCALE_UP,
-            CapabilityActionType.SCALE_DOWN
+            ActionType.SCALE_UP,
+            ActionType.SCALE_DOWN
         )
     ),
 
     VM(
         mutableListOf(
-            CapabilityActionType.CREATE_VM,
-            CapabilityActionType.DELETE_VM
+            ActionType.CREATE_VM,
+            ActionType.DELETE_VM
         )
     )
 }
