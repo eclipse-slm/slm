@@ -7,6 +7,7 @@ import org.keycloak.KeycloakPrincipal;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +37,9 @@ public class ProfilerRestController {
         );
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get all Profiler")
+    @ResponseBody
     public List<Profiler> getProfiler() {
         return profilerManager.getProfiler();
     }
