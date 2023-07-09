@@ -42,6 +42,7 @@ logging:
         http: INFO
 
 keycloak:
+  enabled: false
   config:
     tenants:
       config-path: ../../src/test/resources/keycloak/
