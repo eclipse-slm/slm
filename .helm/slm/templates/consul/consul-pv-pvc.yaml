@@ -55,20 +55,6 @@ spec:
 ---
 
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: consul-config-service-management-pv
-spec:
-  accessModes:
-    - ReadWriteOnce
-  capacity:
-    storage: 6Gi
-  hostPath:
-    path: /data/slm/consul-config-service-management
-
----
-
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: consul-data-pvc
@@ -127,22 +113,6 @@ spec:
     requests:
       storage: 6Gi
   volumeName: consul-config-resource-management-pv
-
-  storageClassName: ""
-
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: consul-config-service-management-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 6Gi
-  volumeName: consul-config-service-management-pv
 
   storageClassName: ""
 

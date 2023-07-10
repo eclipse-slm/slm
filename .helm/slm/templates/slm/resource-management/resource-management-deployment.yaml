@@ -53,7 +53,7 @@ spec:
             - mountPath: /app/awx
               name: awx-config-resource-management-pv
             - mountPath: /app/consul
-              name: consul-config-resource-management-pv
+              name: consul-token
             - mountPath: /app/keycloak
               name: keycloak-config-resource-management-pv
             - mountPath: /app/vault
@@ -80,9 +80,12 @@ spec:
         - name: awx-config-resource-management-pv
           persistentVolumeClaim:
             claimName: awx-config-resource-management-pvc
-        - name: consul-config-resource-management-pv
-          persistentVolumeClaim:
-            claimName: consul-config-resource-management-pvc
+        - name: consul-token
+          secret:
+            secretName: consul-secret
+            items:
+              - key: consul-master-token
+                path: consul_token
         - name: keycloak-config-resource-management-pv
           persistentVolumeClaim:
             claimName: keycloak-config-resource-management-pvc

@@ -24,14 +24,9 @@ spec:
           volumeMounts:
             - name: consul-data-pv
               mountPath: /consul/data
-            - name: consul-config-root-pv
-              mountPath: /config/root
-            - name: consul-config-awx-pv
-              mountPath: /config/awx
-            - name: consul-config-resource-management-pv
-              mountPath: /config/resource_management
-            - name: consul-config-service-management-pv
-              mountPath: /config/service_management
+
+            - name: consul-master-token
+              mountPath: /consul/init/
 
 {{/*          livenessProbe:*/}}
 {{/*            httpGet:*/}}
@@ -45,17 +40,12 @@ spec:
         - name: consul-data-pv
           persistentVolumeClaim:
             claimName: consul-data-pvc
-        - name: consul-config-root-pv
-          persistentVolumeClaim:
-            claimName: consul-config-root-pvc
-        - name: consul-config-awx-pv
-          persistentVolumeClaim:
-            claimName: consul-config-awx-pvc
-        - name: consul-config-resource-management-pv
-          persistentVolumeClaim:
-            claimName: consul-config-resource-management-pvc
-        - name: consul-config-service-management-pv
-          persistentVolumeClaim:
-            claimName: consul-config-service-management-pvc
+
+        - name: consul-master-token
+          secret:
+            secretName: consul-secret
+            items:
+              - key: consul-master-token
+                path: consul_master_token
 
       restartPolicy: Always

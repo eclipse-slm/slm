@@ -40,7 +40,7 @@ spec:
             - mountPath: /app/keycloak
               name: keycloak-config-notification-service-pv
             - mountPath: /app/consul
-              name: consul-config-service-management-pv
+              name: consul-token
             - name: notification-service-database-mariadb
               mountPath: /app/database/config
 
@@ -75,8 +75,11 @@ spec:
         - name: keycloak-config-notification-service-pv
           persistentVolumeClaim:
             claimName: keycloak-config-notification-service-pvc
-        - name: consul-config-service-management-pv
-          persistentVolumeClaim:
-            claimName: consul-config-service-management-pvc
+        - name: consul-token
+          secret:
+            secretName: consul-secret
+            items:
+              - key: consul-master-token
+                path: consul_token
 
       restartPolicy: Always
