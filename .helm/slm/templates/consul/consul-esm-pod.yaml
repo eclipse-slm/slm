@@ -16,12 +16,18 @@ spec:
       command: ["/bin/sh"]
       args: ["-c","export CONSUL_HTTP_TOKEN=$$(cat /consul/consul_master_token) && consul-esm"]
       volumeMounts:
-        - name: consul-config-root-pv
+        - name: consul-master-token
           mountPath: /consul/
 
   volumes:
     - name: consul-config-root-pv
       persistentVolumeClaim:
         claimName: consul-config-root-pvc
+    - name: consul-master-token
+      secret:
+        secretName: consul-secret
+        items:
+          - key: consul-master-token
+            path: consul_master_token
 
   restartPolicy: OnFailure

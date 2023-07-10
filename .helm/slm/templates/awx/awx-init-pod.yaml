@@ -30,7 +30,7 @@ spec:
           mountPath: /config/awx-jwt-authenticator
         - name: vault-config-awx-pv
           mountPath: /config/vault
-        - name: consul-config-awx-pv
+        - name: consul-token
           mountPath: /config/consul
 
   volumes:
@@ -46,9 +46,12 @@ spec:
     - name: awx-config-jwt-authenticator-pv
       persistentVolumeClaim:
         claimName: awx-config-jwt-authenticator-pvc
-    - name: consul-config-awx-pv
-      persistentVolumeClaim:
-        claimName: consul-config-awx-pvc
+    - name: consul-token
+      secret:
+        secretName: consul-secret
+        items:
+          - key: consul-master-token
+            path: consul_token
     - name: vault-config-awx-pv
       persistentVolumeClaim:
         claimName: vault-config-awx-pvc
