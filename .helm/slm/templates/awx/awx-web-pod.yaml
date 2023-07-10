@@ -14,7 +14,7 @@ spec:
             - containerPort: 8053
 
           volumeMounts:
-            - name: awx-web-pv
+            - name: nginx-conf
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
             - name: awx-supervisor-socket-pv
@@ -25,6 +25,8 @@ spec:
               mountPath: /var/lib/awx/rsyslog/
             - name: awx-redis-pv
               mountPath: /var/run/redis
+{{/*            - mountPath: /var/log/nginx*/}}
+{{/*              name: log*/}}
 
 {{/*          livenessProbe:  slm/templates/awx/awx-web-pod.yaml */}}
 {{/*            httpGet:*/}}
@@ -35,9 +37,12 @@ spec:
 {{/*            timeoutSeconds: 10*/}}
 
       volumes:
-        - name: awx-web-pv
-          hostPath:
-            path: {{ printf "%s/%s" .Values.awx.nginx_path "/.helm/slm/config/" | clean}}
+        - name: nginx-conf
+          configMap:
+            name: awx-web-nginx-config # place ConfigMap `awx-web-nginx-config` on /etc/nginx
+            items:
+              - key: nginx.conf
+                path: nginx.conf
         - name: awx-supervisor-socket-pv
           persistentVolumeClaim:
             claimName: awx-supervisor-socket-pvc
@@ -50,5 +55,7 @@ spec:
         - name: awx-redis-pv
           persistentVolumeClaim:
             claimName: awx-redis-pvc
+{{/*        - name: log*/}}
+{{/*          emptyDir: { }*/}}
 
       restartPolicy: Always
