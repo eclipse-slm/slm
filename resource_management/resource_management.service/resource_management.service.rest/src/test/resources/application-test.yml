@@ -19,6 +19,9 @@ database:
   password: password
 
 spring:
+  cloud:
+    consul:
+      enabled: false
   jpa:
     hibernate:
       ddl-auto: create-drop
