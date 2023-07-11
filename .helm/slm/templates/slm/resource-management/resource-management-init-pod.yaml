@@ -18,5 +18,17 @@ spec:
         - name: AWX_PORT
           value: "{{.Values.awx.port_http}}"
 
+      volumeMounts:
+        - mountPath: /app/consul
+          name: consul-token
+  volumes:
+    - name: consul-token
+      secret:
+        secretName: consul-secret
+        items:
+          - key: consul-master-token
+            path: consul_token
+
+
   restartPolicy: OnFailure
       

@@ -5,7 +5,7 @@ metadata:
   labels:
     app: notification-service
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: notification-service
   ports:
