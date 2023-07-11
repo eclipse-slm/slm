@@ -9,5 +9,6 @@ enum class ActionType {
     DELETE_VM,
     DEPLOY,
     UNDEPLOY,
-    UPDATE
+    UPDATE,
+    RUN
 }
