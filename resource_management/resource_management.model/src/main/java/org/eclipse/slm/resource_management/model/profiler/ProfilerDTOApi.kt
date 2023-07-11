@@ -7,9 +7,10 @@ import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-data class ProfilerDTOApi(
-    val name: String,
-    val action: Action,
+class ProfilerDTOApi(
+    id: UUID? = null,
 ) {
-    val id: UUID? = null
+    var id: UUID = id ?: UUID.randomUUID()
+    var name: String = ""
+    var action: Action? = null
 }
