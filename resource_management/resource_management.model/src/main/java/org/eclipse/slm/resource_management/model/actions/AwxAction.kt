@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName
 import org.eclipse.slm.common.awx.model.SurveyItem
 import org.eclipse.slm.resource_management.model.resource.ConnectionType
 
-@JsonTypeName("AwxCapabilityAction")
+@JsonTypeName("AwxAction")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 class AwxAction(): Action(AwxAction::class.java.simpleName) {
