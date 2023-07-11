@@ -8,20 +8,14 @@ import javax.persistence.Entity
 import javax.persistence.Id
 
 @Entity
-class Profiler {
+class Profiler(id: UUID? = null) {
 
-    constructor() {
-        this.id = UUID.randomUUID()
-    }
-
-    constructor(id: UUID) : this() {
-        this.id = id
-    }
+    constructor() : this(UUID.randomUUID()) {}
 
     @Id
     @Type(type="uuid-char")
     @Column(name = "uuid", length = 36, unique = true, nullable = false)
-    var id: UUID
+    var id: UUID = id ?: UUID.randomUUID()
 
     @Column(name = "name")
     var name: String = ""
