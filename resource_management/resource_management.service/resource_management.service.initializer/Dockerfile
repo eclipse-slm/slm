@@ -17,6 +17,7 @@ RUN apt update && \
 
 COPY target/*-exec.jar /app/app.jar
 COPY src/main/resources/init/capabilities.json /init/capabilities.json
+COPY src/main/resources/init/profiler.json /init/profiler.json
 COPY src/main/docker/startup.sh /app/startup.sh
 RUN chmod +x /app/startup.sh
 
