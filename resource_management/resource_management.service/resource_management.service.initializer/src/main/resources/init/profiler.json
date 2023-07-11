@@ -1,0 +1,13 @@
+[
+  {
+    "id": "24729ce0-a405-4b54-ab42-0b71011ad900",
+    "name": "ansible-facts",
+    "action": {
+      "actionClass": "AwxAction",
+      "actionType": "RUN",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxBranch": "main",
+      "playbook": "install.yml"
+    }
+  }
+]
