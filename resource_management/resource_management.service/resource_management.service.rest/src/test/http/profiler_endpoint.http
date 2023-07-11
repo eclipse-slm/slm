@@ -15,3 +15,31 @@ grant_type=password&username=fabos&password=password&client_id=self-service-port
 ### Get all profiler
 GET http://{{host}}:9010/resources/profiler
 Authorization: Bearer {{auth_token}}
+
+### Create profiler
+POST http://{{host}}:9010/resources/profiler
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "ansible-facts",
+  "action": {
+    "actionClass": "AwxAction",
+    "actionType": "RUN",
+    "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+    "awxBranch": "main",
+    "playbook": "install.yml"
+  }
+}
+
+### Get one profiler
+GET http://{{host}}:9010/resources/profiler/{{profiler-id}}
+Authorization: Bearer {{auth_token}}
+
+### Run one profiler
+POST http://{{host}}:9010/resources/profiler/{{profiler-id}}/execute
+Authorization: Bearer {{auth_token}}
+
+### Delete one profiler
+DELETE http://{{host}}:9010/resources/profiler/{{profiler-id}}
+Authorization: Bearer {{auth_token}}
