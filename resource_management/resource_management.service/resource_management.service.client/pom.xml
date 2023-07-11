@@ -178,6 +178,8 @@
                                 <importMapping>ServiceHosterFilter=${project.groupId}.resource_management.model.capabilities.provider.ServiceHosterFilter</importMapping>
                                 <importMapping>ConnectionType=${project.groupId}.resource_management.model.resource.ConnectionType</importMapping>
                                 <importMapping>ConnectionTypeDTO=${project.groupId}.resource_management.model.resource.ConnectionTypeDTO</importMapping>
+                                <importMapping>Profiler=${project.groupId}.resource_management.model.profiler.Profiler</importMapping>
+                                <importMapping>ProfilerDTOApi=${project.groupId}.resource_management.model.profiler.ProfilerDTOApi</importMapping>
                             </importMappings>
                         </configuration>
                     </execution>
