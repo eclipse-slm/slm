@@ -44,7 +44,7 @@ public class ProfilerManager implements IAwxJobObserverListener {
         this.awxJobExecutor = awxJobExecutor;
     }
 
-    public void createProfiler(Profiler profiler) {
+    public Profiler createProfiler(Profiler profiler) {
         if(isProfilerActionAwxAction(profiler)) {
             AwxAction awxProfilerAction = (AwxAction) profiler.getAction();
             try {
@@ -85,7 +85,8 @@ public class ProfilerManager implements IAwxJobObserverListener {
             }
         }
 
-        profilerJpaRepository.save(profiler);
+        Profiler newProfiler = profilerJpaRepository.save(profiler);
+        return newProfiler;
     }
 
     public List<Profiler> getProfiler() {
@@ -96,6 +97,9 @@ public class ProfilerManager implements IAwxJobObserverListener {
         return profilerJpaRepository.findById(profilerId);
     }
 
+    public void runAllProfilerAction(KeycloakPrincipal keycloakPrincipal) {
+        //TODO implement
+    }
     public void runProfilerAction(UUID profilerId, KeycloakPrincipal keycloakPrincipal) {
         Optional<Profiler> optionalProfiler = getProfiler(profilerId);
 
