@@ -25,14 +25,14 @@ public class ProfilerRestController {
     public ProfilerRestController(ProfilerManager profilerManager) {
         this.profilerManager = profilerManager;
 
-        modelMapper.typeMap(ProfilerDTOApi.class, Profiler.class)
-                .setProvider(provisionRequest -> modelMapper.map(provisionRequest.getSource(), Profiler.class));
+        //modelMapper.typeMap(ProfilerDTOApi.class, Profiler.class)
+        //        .setProvider(provisionRequest -> modelMapper.map(provisionRequest.getSource(), Profiler.class));
     }
 
     @RequestMapping(method = RequestMethod.POST)
     @Operation(summary = "Create Profiler")
-    public void createProfiler(@RequestBody ProfilerDTOApi profilerDTOApi) {
-        profilerManager.createProfiler(
+    public Profiler createProfiler(@RequestBody ProfilerDTOApi profilerDTOApi) {
+        return profilerManager.createProfiler(
                 modelMapper.map(profilerDTOApi, Profiler.class)
         );
     }
@@ -44,13 +44,23 @@ public class ProfilerRestController {
         return profilerManager.getProfiler();
     }
 
+    @RequestMapping(value = "/execute", method = RequestMethod.POST)
+    @Operation(summary = "Run all Profiler")
+    public void runProfiler() {
+        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        profilerManager.runAllProfilerAction(
+                keycloakPrincipal
+        );
+    }
+
     @RequestMapping(value = "/{profilerId}", method = RequestMethod.GET)
     @Operation(summary = "Get Profiler")
     public Optional<Profiler> getProfiler(@PathVariable UUID profilerId) {
         return profilerManager.getProfiler(profilerId);
     }
 
-    @RequestMapping(value = "/{profilerId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/{profilerId}/execute", method = RequestMethod.POST)
     @Operation(summary = "Run one Profiler")
     public void runProfiler(@PathVariable UUID profilerId) {
         KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
