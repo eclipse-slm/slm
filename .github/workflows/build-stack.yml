@@ -12,7 +12,7 @@ on:
       - develop
 
 env:
-  DOCKER_COMPOSE_COMMAND: docker-compose -f base.awx.yml -f base.consul.yml -f base.keycloak.yml -f base.vault.yml -f slm.yml -f catalog.yml -f config-exporter.yml -f build.yml
+  DOCKER_COMPOSE_COMMAND: docker-compose -f base.awx.yml -f base.consul.yml -f base.keycloak.yml -f base.vault.yml -f slm.yml -f catalog.yml -f config-exporter.yml -f monitoring.yml -f build.yml
 
 jobs:
   build-and-push-awx:
@@ -61,6 +61,7 @@ jobs:
           - keycloak-init
           - vault
           - vault-init
+          - prometheus
           - config-exporter
     steps:
       - uses: actions/checkout@v3
