@@ -98,7 +98,11 @@ public class ProfilerManager implements IAwxJobObserverListener {
     }
 
     public void runAllProfilerAction(KeycloakPrincipal keycloakPrincipal) {
-        //TODO implement
+        List<Profiler> profiler = getProfiler();
+
+        profiler.stream().forEach(pr -> {
+            runProfilerAction(pr.getId(), keycloakPrincipal);
+        });
     }
     public void runProfilerAction(UUID profilerId, KeycloakPrincipal keycloakPrincipal) {
         Optional<Profiler> optionalProfiler = getProfiler(profilerId);
