@@ -45,6 +45,9 @@ services:
       - consul_config_root:/config/consul/root
     extra_hosts:
       - "${SLM_HOSTNAME}:172.17.0.1"
+    depends_on:
+      - consul
+      - consul-esm
 
   consul-esm:
     image: hashicorp/consul-esm:${CONSUL_ESM_VERSION}
