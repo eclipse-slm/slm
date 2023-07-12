@@ -29,7 +29,6 @@ import java.util.Locale;
 public class MultiTenantKeycloakConfigResolver implements KeycloakConfigResolver {
 
     private static final Logger LOG = LoggerFactory.getLogger(MultiTenantKeycloakConfigResolver.class);
-
     private KeycloakSpringBootProperties keycloakSpringBootProperties;
     private MultiTenantKeycloakApplicationProperties multiTenantKeycloakApplicationProperties;
     private MultiTenantKeycloakRegistration multiTenantKeycloakRegistration;
