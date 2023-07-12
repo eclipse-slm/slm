@@ -5,9 +5,9 @@
     "action": {
       "actionClass": "AwxAction",
       "actionType": "RUN",
-      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-pr-ansible-facts",
       "awxBranch": "main",
-      "playbook": "install.yml"
+      "playbook": "run.yml"
     }
   }
 ]
