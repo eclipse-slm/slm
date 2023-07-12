@@ -6,6 +6,8 @@ services:
     restart: always
     depends_on:
       - aas-database
+      - aas-server
+      - aas-gui
     networks:
       default:
         aliases:
