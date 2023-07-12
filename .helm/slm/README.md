@@ -1,11 +1,15 @@
 # Helm definitions for install on kubernetes
 
-This Chart installs the SLM resources 
+In this README we will give you a short introduction to install a k3s single cluster. Also, we want to give a short introduction 
+how we can install [eclipse-slm/slm](https://github.com/eclipse-slm/slm) on our created k3s cluster. For this we use 
+the [Helm Chars](https://helm.sh/) tool.  
+For this we fist install k3s on our node. Then we install Helm Charts to deploy eclipse-slm easily.
+After this we install eclipse-slm.
 
-## k3s
+## Managing k3s
 
 ### Install
-For a more detailed description visit the official [Quick-Starter Guide](https://docs.k3s.io/quick-start)
+For a more detailed description how to install k3s, visit the official [Quick-Starter Guide](https://docs.k3s.io/quick-start)
 Also have a look for the [Requirements](https://docs.k3s.io/installation/requirements) to configure your system
 
 `curl -sfL https://get.k3s.io | sh -`
@@ -26,46 +30,53 @@ K3s will create a remove script under the path /usr/local/bin/k3s-uninstall.sh
 ### Install Helm
 Follow the instructions on [Installing Helm](https://helm.sh/docs/intro/install/)
 
+#### From Apt (Debian/Ubuntu) 
+
+```
+curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+sudo apt-get install apt-transport-https --yes
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+sudo apt-get update
+sudo apt-get install helm
+```
+
 ### Install SLM
 
-Clone the repository from [eclipse-slm/slm](https://github.com/eclipse-slm/slm) to your home directory  
+Clone the repository from [eclipse-slm/slm](https://github.com/eclipse-slm/slm)
 `git clone https://github.com/eclipse-slm/slm.git`
-
-Create a new file with the name value.yaml  
-Add the following content:  
-
-```
-awx:
-    nginx_path: PATH_TO_YOUR_HOME_DIC
-```
-
-Now we replace PATH_TO_YOUR_HOME_DIC with the location of the slm folder.
 
 ### Local installation from repository
 
-`helm install slm slm/.helm/slm/ -f value.yaml `
+`helm install slm slm/.helm/slm/ `
 
-or you can install it by override the variable like this 
+We can also install it in an extra namespace. For this we use the following command
 
-`helm isntall slm slm/.helm/slm/ --set=awx.nginx_path=PATH_TO_YOUR_HOME_DIC`
+`helm install slm slm/.helm/slm/ -n <your-namespace>  --create-namespace `
 
 #### Upgrade  
 If you did some changes you can upgrade the SLM with the command
 
 `helm upgrade slm slm/.helm/slm/`
 
+If you use a namespace, then you also need to add `-n <your-namespace>`
+
 #### Uninstall   
-`helm delete slm`
-To remove the folder under data slm
+
+If you want to remove the installation, then you can use the following command.  
+`helm delete slm`  
+If you use a namespace, then you also need to add `-n <your-namespace>`
+
+To remove the created data by the system we delete the following folder with the 
+command  
 `sudo rm -Rf /data/slm`
 
 
 
 
 
-[//]: # (### From Repository)
+### From Repository
 
-[//]: # (TODO:  Create helm repo for updates of the definitions)
+TODO:  Create helm repo 
 
 [//]: # (`helm repo add slm https://github.com/eclipse-slm/slm`  )
 
