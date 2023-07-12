@@ -46,6 +46,8 @@ services:
       - keycloak_config_service-management-init:/config/service-management-init
     extra_hosts:
       - "${SLM_HOSTNAME}:172.17.0.1"
+    depends_on:
+      - keycloak
 
   keycloak-database:
     image: ghcr.io/eclipse-slm/mariadb:${KEYCLOAK_DATABASE_VERSION}
