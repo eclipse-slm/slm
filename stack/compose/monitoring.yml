@@ -24,7 +24,7 @@ services:
       - prometheus-targets:/code/targets
 
   prometheus:
-    image: prom/prometheus:${PROMETHEUS_VERSION}
+    image: ghcr.io/eclipse-slm/monitoring-prometheus:${SLM_VERSION}
     restart: unless-stopped
     networks:
       default:
@@ -32,8 +32,10 @@ services:
           - prometheus
     ports:
       - "${PROMETHEUS_PORT}:9090"
+    depends_on:
+      - monitoring-prometheus-aas
+      - monitoring-prometheus-configurator
     volumes:
-      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-targets:/etc/prometheus/targets/
 
 volumes:
