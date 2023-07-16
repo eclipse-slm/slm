@@ -24,6 +24,7 @@ echo "$CONSUL_MASTER_TOKEN" > /config/resource_management/consul_token
 echo "$CONSUL_MASTER_TOKEN" > /config/resource_management_init/consul_token
 echo "$CONSUL_MASTER_TOKEN" > /config/service_management/consul_token
 echo "$CONSUL_MASTER_TOKEN" > /config/notification_service/consul_token
+echo "$CONSUL_MASTER_TOKEN" > /config/catalog/consul_token
 CONSUL_CONFIG_FILE=/consul/config/basic_config.json
 CONSUL_CONFIG=$(cat $CONSUL_CONFIG_FILE | jq -r ". | .acl.tokens.master = \"$CONSUL_MASTER_TOKEN\"")
 echo "$CONSUL_CONFIG" > $CONSUL_CONFIG_FILE
