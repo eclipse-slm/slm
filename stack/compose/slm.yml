@@ -139,6 +139,8 @@ services:
   service-management-init:
     image: ghcr.io/eclipse-slm/slm/service-management-init:${SLM_VERSION}
     restart: "no"
+    depends_on:
+      - service-management
     logging:
       driver: "json-file"
       options:
