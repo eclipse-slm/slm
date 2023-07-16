@@ -28,6 +28,7 @@ services:
       - consul_config_resource-management-init:/config/resource_management_init
       - consul_config_service-management:/config/service_management
       - consul_config_notification-service:/config/notification_service
+      - consul_config_catalog:/config/catalog
       - consul_config_ui:/config/ui
     extra_hosts:
       - "${SLM_HOSTNAME}:172.17.0.1"
@@ -74,4 +75,5 @@ volumes:
   consul_config_resource-management-init:
   consul_config_service-management:
   consul_config_notification-service:
+  consul_config_catalog:
   consul_config_ui:
