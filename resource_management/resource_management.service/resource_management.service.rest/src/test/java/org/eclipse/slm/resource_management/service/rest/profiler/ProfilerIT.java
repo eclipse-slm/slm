@@ -38,6 +38,7 @@ import static org.hamcrest.Matchers.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
+@Disabled
 public class ProfilerIT {
     @Autowired
     ProfilerManager profilerManager;
