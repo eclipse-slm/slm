@@ -9,5 +9,16 @@
       "awxBranch": "main",
       "playbook": "run.yml"
     }
+  },
+  {
+    "id": "91508cd8-dc96-43a9-894c-e7384a381a0e",
+    "name": "webcams",
+    "action": {
+      "actionClass": "AwxAction",
+      "actionType": "RUN",
+      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-pr-webcams",
+      "awxBranch": "main",
+      "playbook": "run.yml"
+    }
   }
 ]
