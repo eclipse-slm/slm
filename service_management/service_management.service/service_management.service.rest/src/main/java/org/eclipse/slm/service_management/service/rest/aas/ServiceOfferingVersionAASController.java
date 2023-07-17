@@ -50,12 +50,23 @@ public class ServiceOfferingVersionAASController implements ApplicationListener<
 
     private void createAASandSubmodels(ServiceOfferingVersion serviceOfferingVersion) {
         Identifier aasIdentifier = ServiceAASConverter.getAASIdentifierFromServiceOfferingVersionUUID(serviceOfferingVersion.getId());
+        Boolean createAAS = false;
         try {
             aasManager.retrieveAAS(aasIdentifier);
         } catch (ResourceNotFoundException e) {
-            AssetAdministrationShell aas = ServiceAASConverter.getAASFromServiceOfferingVersion(serviceOfferingVersion);
-            aasManager.createAAS(aas, aasServerUrl);
+            createAAS = true;
         }
+
+        if(createAAS) {
+            AssetAdministrationShell aas = ServiceAASConverter.getAASFromServiceOfferingVersion(serviceOfferingVersion);
+            try {
+                aasManager.createAAS(aas, aasServerUrl);
+            } catch (ResourceNotFoundException e) {
+                LOG.error("Failed to create AAS for resource. Message: " + e.getMessage());
+                return;
+            }
+        }
+
         Submodel softwareNameplateSM = ServiceAASConverter.getSoftwareNameplateSMForServiceOfferingVersion(serviceOfferingVersion);
         Submodel requirementsSM = RequirementsConverter.createRequirementsSubmodel(serviceOfferingVersion);
 
