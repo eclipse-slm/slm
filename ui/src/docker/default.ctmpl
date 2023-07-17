@@ -50,7 +50,17 @@ server {
     }
 
     location /slm-catalog/ {
-        proxy_pass http://catalog:10000/;
+        {{ $services := service "slm-catalog" }}
+        {{ if $services }}
+            {{ range $index, $instance := $services }}
+            {{ if eq $index 0 }}
+            proxy_pass http://{{ .Address }}:{{ .Port }}/;
+            {{ end }}
+            {{ end }}
+        {{ else }}
+            return 404;
+        {{ end }}
+        #proxy_pass http://catalog:10000/;
         proxy_set_header Origin "";
     }
 
