@@ -47,7 +47,7 @@ spring:
       host: ${consul.host}
       port: ${consul.port}
       discovery:
-        ip-address: {{ local_host | default(ansible_default_ipv4.address) }}
+        ip-address: {{ local_host | default("172.17.0.1") }}
         acl-token: ${consul.acl-token}
         prefer-ip-address: true
         register-health-check: true
