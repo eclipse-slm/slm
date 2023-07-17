@@ -160,8 +160,8 @@ public class ModelMappingTest {
     public void useJacksonMapperForJsonToAwxCapabilityAction() throws JsonProcessingException {
         String jsonString = """
                 {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "UNINSTALL",
+                      "actionClass": "AwxAction",
+                      "actionType": "UNINSTALL",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "uninstall.yml"
@@ -177,32 +177,32 @@ public class ModelMappingTest {
         String jsonString = """
                 {
                     "DEPLOY": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "DEPLOY",
+                      "actionClass": "AwxAction",
+                      "actionType": "DEPLOY",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "deploy.yml",
                       "parameter": []
                     },
                     "UNINSTALL": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "UNINSTALL",
+                      "actionClass": "AwxAction",
+                      "actionType": "UNINSTALL",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "uninstall.yml",
                       "parameter": []
                     },
                     "INSTALL": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "INSTALL",
+                      "actionClass": "AwxAction",
+                      "actionType": "INSTALL",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "install.yml",
                       "parameter": []
                     },
                     "UNDEPLOY": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "UNDEPLOY",
+                      "actionClass": "AwxAction",
+                      "actionType": "UNDEPLOY",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "undeploy.yml",
@@ -260,29 +260,29 @@ public class ModelMappingTest {
                   ],
                   "actions": {
                     "DEPLOY": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "DEPLOY",
+                      "actionClass": "AwxAction",
+                      "actionType": "DEPLOY",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "deploy.yml"
                     },
                     "UNINSTALL": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "UNINSTALL",
+                      "actionClass": "AwxAction",
+                      "actionType": "UNINSTALL",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "uninstall.yml"
                     },
                     "INSTALL": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "INSTALL",
+                      "actionClass": "AwxAction",
+                      "actionType": "INSTALL",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "install.yml"
                     },
                     "UNDEPLOY": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "UNDEPLOY",
+                      "actionClass": "AwxAction",
+                      "actionType": "UNDEPLOY",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "undeploy.yml"
