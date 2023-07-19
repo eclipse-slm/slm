@@ -56,6 +56,17 @@ public class CapabilitiesInitializer extends AbstractInitializer {
             capabilities.forEach(capability -> {
                 CapabilitiesInitializerThread thread = new CapabilitiesInitializerThread(capability, keycloakRealm, capabilitiesRestControllerApi);
                 thread.start();
+                LOG.info("Wait till creation of '"+capability.getName()+"' is finished.");
+
+                while(thread.isAlive()) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                LOG.info("Creation of '"+capability.getName()+"' is finished.");
             });
         }
     }
