@@ -1,11 +1,15 @@
 package org.eclipse.slm.service_management.service.rest.service_deployment;
 
 import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
+import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
+import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
+import org.eclipse.basyx.aas.registration.restapi.AASRegistryModelProvider;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
+import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.connected.ConnectedSubmodel;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
@@ -56,6 +60,8 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
 
     private final ConnectedAssetAdministrationShellManager aasManager;
 
+    private final AASRegistryModelProvider aasRegistryModelProvider;
+
     private Map<AwxJobObserver, UndeploymentJobRun> observedAwxJobsToUndeploymentJobDetails = new HashMap<>();
 
     public ServiceUndeploymentHandler(
@@ -76,6 +82,7 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
         this.serviceOfferingVersionHandler = serviceOfferingVersionHandler;
         IAASRegistry registry = new AASRegistryProxy(aasRegistryUrl);
         this.aasManager = new ConnectedAssetAdministrationShellManager(registry);
+        this.aasRegistryModelProvider = new AASRegistryModelProvider(registry);
     }
 
     public void deleteService(KeycloakPrincipal keycloakPrincipal, List<CatalogService> consulService)
@@ -127,6 +134,9 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
     private void runSubmodelGarbageCollection(UUID resourceId) {
         IIdentifier iIdentifier = new CustomId(resourceId.toString());
         Map<String, ISubmodel> submodelMap;
+        ConnectedAssetAdministrationShell aas = aasManager.retrieveAAS(iIdentifier);
+        Collection<IReference> submodelReferences = aas.getSubmodelReferences();
+
         try {
             submodelMap = aasManager.retrieveSubmodels(iIdentifier);
         } catch (org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException e) {
@@ -140,6 +150,20 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
                 Submodel submodel = ((ConnectedSubmodel) entry.getValue()).getLocalCopy();
             } catch(ResourceNotFoundException e) {
                 LOG.info("Delete submodel with ID = " + entry.getKey() + " from AAS with ID = " + resourceId);
+
+                submodelReferences
+                        .stream()
+                        .forEach(ref -> {
+                            SubmodelDescriptor submodelDescriptor = (SubmodelDescriptor) ref;
+                            LOG.info("Submodel Descriptor id = " + submodelDescriptor.getIdentifier().getId());
+                            String path = "/"+resourceId+"/submodels/"+submodelDescriptor.getIdentifier().getId();
+                            if(submodelDescriptor.getIdShort().equals(entry.getKey())) {
+                                LOG.info("Delete submodel descriptor with path: " + path);
+                                aasRegistryModelProvider.deleteValue(path);
+                            }
+                        });
+
+
 //                aasManager.deleteSubmodel(iIdentifier, new CustomId());
             }
         }
