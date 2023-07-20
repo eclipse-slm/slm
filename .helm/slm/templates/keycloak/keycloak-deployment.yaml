@@ -41,13 +41,13 @@ spec:
             - name: keycloak-database-config-pv
               mountPath: /keycloak/database/config
 
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              port: 8080*/}}
-{{/*              path: /auth*/}}
-{{/*            initialDelaySeconds: 40*/}}
-{{/*            periodSeconds: 90*/}}
-{{/*            timeoutSeconds: 10*/}}
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /auth
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
 
 
       volumes:
