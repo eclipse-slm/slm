@@ -1,5 +1,6 @@
 package org.eclipse.slm.service_management.service.rest.service_offerings;
 
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.slm.service_management.model.offerings.RequirementLogicType;
 import org.eclipse.slm.service_management.model.offerings.RequirementProperty;
 import org.eclipse.slm.service_management.model.offerings.ServiceRequirement;
@@ -16,6 +17,8 @@ import org.eclipse.basyx.submodel.metamodel.connected.ConnectedSubmodel;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +29,7 @@ import java.util.UUID;
 
 @Component
 public class ServiceOfferingVersionRequirementsHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceOfferingVersionRequirementsHandler.class);
     private final ConnectedAssetAdministrationShellManager aasManager;
 
     ServiceOfferingVersionRequirementsHandler(
@@ -44,8 +48,12 @@ public class ServiceOfferingVersionRequirementsHandler {
         }
         List<Submodel> submodels = new ArrayList<>();
         for (Map.Entry<String, ISubmodel> entry: submodelMap.entrySet()) {
-            Submodel submodel = ((ConnectedSubmodel) entry.getValue()).getLocalCopy();
-            submodels.add(submodel);
+            try {
+                Submodel submodel = ((ConnectedSubmodel) entry.getValue()).getLocalCopy();
+                submodels.add(submodel);
+            } catch(ResourceNotFoundException e) {
+                LOG.warn("Submodel not available anymore. Error Msg: " + e.getMessage());
+            }
         }
         return isRequirementFulfilledBySubmodels(requirementDTO, submodels);
     }
