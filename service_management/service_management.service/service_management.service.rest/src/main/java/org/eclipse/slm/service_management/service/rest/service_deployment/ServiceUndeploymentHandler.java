@@ -136,9 +136,10 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
 
         for (Map.Entry<String, ISubmodel> entry: submodelMap.entrySet()) {
             try {
+                LOG.info("Get information from submodel with ID = " + entry.getKey());
                 Submodel submodel = ((ConnectedSubmodel) entry.getValue()).getLocalCopy();
             } catch(ResourceNotFoundException e) {
-                aasManager.deleteSubmodel(iIdentifier, entry.getValue().getIdentification());
+                aasManager.deleteSubmodel(iIdentifier, new CustomId(entry.getKey()));
             }
         }
     }
