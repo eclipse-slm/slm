@@ -30,14 +30,13 @@ spec:
               value: http://{{.Values.hostname}}:3000
 
 
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              host: ui*/}}
-{{/*              port: 80*/}}
-{{/*              path: /*/}}
-{{/*            initialDelaySeconds: 40*/}}
-{{/*            periodSeconds: 90*/}}
-{{/*            timeoutSeconds: 10*/}}
+          livenessProbe:
+            httpGet:
+              port: 80
+              path: /
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
 
           volumeMounts:
             - mountPath: /app/consul

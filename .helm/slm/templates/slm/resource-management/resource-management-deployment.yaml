@@ -61,14 +61,13 @@ spec:
             - mountPath: /app/database/config
               name: resource-management-database-config-pv
 
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              host: resource-management*/}}
-{{/*              port: 9010*/}}
-{{/*              path: /swagger-ui/index.html*/}}
-{{/*            initialDelaySeconds: 40*/}}
-{{/*            periodSeconds: 90*/}}
-{{/*            timeoutSeconds: 10*/}}
+          livenessProbe:
+            httpGet:
+              port: 9010
+              path: /swagger-ui/index.html
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
 
       volumes:
         - name: awx-config-resource-management-pv

@@ -44,14 +44,13 @@ spec:
             - name: notification-service-database-mariadb
               mountPath: /app/database/config
 
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              host: notification-service*/}}
-{{/*              port: 9001*/}}
-{{/*              path: /swagger-ui/index.html*/}}
-{{/*            initialDelaySeconds: 40*/}}
-{{/*            periodSeconds: 90*/}}
-{{/*            timeoutSeconds: 10*/}}
+          livenessProbe:
+            httpGet:
+              port: 9001
+              path: /swagger-ui/index.html
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
 
       volumes:
         - name: notification-service-database-mariadb

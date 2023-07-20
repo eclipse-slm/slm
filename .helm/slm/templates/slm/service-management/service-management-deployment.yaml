@@ -62,14 +62,13 @@ spec:
             - mountPath: /app/database/config
               name: service-management-database-mariadb
 
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              host: service-management*/}}
-{{/*              port: 9020*/}}
-{{/*              path: /swagger-ui/index.html*/}}
-{{/*            initialDelaySeconds: 40*/}}
-{{/*            periodSeconds: 90*/}}
-{{/*            timeoutSeconds: 10*/}}
+          livenessProbe:
+            httpGet:
+              port: 9020
+              path: /swagger-ui/index.html
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
       volumes:
         - name: service-management-database-mariadb
           projected:
