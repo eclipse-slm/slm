@@ -139,7 +139,8 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
                 LOG.info("Get information from submodel with ID = " + entry.getKey());
                 Submodel submodel = ((ConnectedSubmodel) entry.getValue()).getLocalCopy();
             } catch(ResourceNotFoundException e) {
-                aasManager.deleteSubmodel(iIdentifier, new CustomId(entry.getKey()));
+                LOG.info("Delete submodel with ID = " + entry.getKey() + " from AAS with ID = " + resourceId);
+//                aasManager.deleteSubmodel(iIdentifier, new CustomId());
             }
         }
     }
