@@ -60,7 +60,7 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
 
     private final ConnectedAssetAdministrationShellManager aasManager;
 
-    private final AASRegistryModelProvider aasRegistryModelProvider;
+    private final AASRegistryProxy aasRegistryProxy;
 
     private Map<AwxJobObserver, UndeploymentJobRun> observedAwxJobsToUndeploymentJobDetails = new HashMap<>();
 
@@ -80,9 +80,8 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
         this.consulServicesApiClient = consulServicesApiClient;
         this.keycloakUtil = keycloakUtil;
         this.serviceOfferingVersionHandler = serviceOfferingVersionHandler;
-        IAASRegistry registry = new AASRegistryProxy(aasRegistryUrl);
-        this.aasManager = new ConnectedAssetAdministrationShellManager(registry);
-        this.aasRegistryModelProvider = new AASRegistryModelProvider(registry);
+        this.aasRegistryProxy = new AASRegistryProxy(aasRegistryUrl);
+        this.aasManager = new ConnectedAssetAdministrationShellManager(this.aasRegistryProxy);
     }
 
     public void deleteService(KeycloakPrincipal keycloakPrincipal, List<CatalogService> consulService)
@@ -135,7 +134,6 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
         IIdentifier iIdentifier = new CustomId(resourceId.toString());
         Map<String, ISubmodel> submodelMap;
         ConnectedAssetAdministrationShell aas = aasManager.retrieveAAS(iIdentifier);
-        Collection<IReference> submodelReferences = aas.getSubmodelReferences();
 
         try {
             submodelMap = aasManager.retrieveSubmodels(iIdentifier);
@@ -149,22 +147,16 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
                 LOG.info("Get information from submodel with ID = " + entry.getKey());
                 Submodel submodel = ((ConnectedSubmodel) entry.getValue()).getLocalCopy();
             } catch(ResourceNotFoundException e) {
-                LOG.info("Delete submodel with ID = " + entry.getKey() + " from AAS with ID = " + resourceId);
-
-                submodelReferences
+                LOG.info("Delete submodel with idShort = " + entry.getKey() + " from AAS with ID = " + resourceId);
+                Optional<SubmodelDescriptor> optionalSubmodelDescriptor = this.aasRegistryProxy.lookupSubmodels(iIdentifier)
                         .stream()
-                        .forEach(ref -> {
-                            SubmodelDescriptor submodelDescriptor = (SubmodelDescriptor) ref;
-                            LOG.info("Submodel Descriptor id = " + submodelDescriptor.getIdentifier().getId());
-                            String path = "/"+resourceId+"/submodels/"+submodelDescriptor.getIdentifier().getId();
-                            if(submodelDescriptor.getIdShort().equals(entry.getKey())) {
-                                LOG.info("Delete submodel descriptor with path: " + path);
-                                aasRegistryModelProvider.deleteValue(path);
-                            }
-                        });
-
-
-//                aasManager.deleteSubmodel(iIdentifier, new CustomId());
+                        .filter(sd -> sd.getIdShort().equals(entry.getKey()))
+                        .findFirst();
+                if(optionalSubmodelDescriptor.isPresent())
+                    aasRegistryProxy.delete(
+                            iIdentifier,
+                            optionalSubmodelDescriptor.get().getIdentifier()
+                    );
             }
         }
     }
