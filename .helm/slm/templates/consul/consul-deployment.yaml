@@ -28,13 +28,13 @@ spec:
             - name: consul-master-token
               mountPath: /consul/init/
 
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              port: 8500*/}}
-{{/*              path: /*/}}
-{{/*            initialDelaySeconds: 40*/}}
-{{/*            periodSeconds: 90*/}}
-{{/*            timeoutSeconds: 10*/}}
+          livenessProbe:
+            httpGet:
+              port: 8500
+              path: /
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
 
       volumes:
         - name: consul-data-pv
