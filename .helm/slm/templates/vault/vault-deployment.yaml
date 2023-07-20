@@ -23,11 +23,20 @@ spec:
             - containerPort: 8200
           env:
             - name: KEYCLOAK_ADMIN
-              value: admin
+              valueFrom:
+                configMapKeyRef:
+                  name: keycloak-config
+                  key: keycloak-admin
             - name: KEYCLOAK_ADMIN_PASSWORD
-              value: password
+              valueFrom:
+                secretKeyRef:
+                  key: keycloak-admin-password
+                  name: keycloak-secret
             - name: KEYCLOAK_DEFAULT_USER_PASSWORD
-              value: password
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-secret
+                  key: keycloak-default-user-password
           volumeMounts:
             - mountPath: /vault/config/root
               name: vault-config-root-pv

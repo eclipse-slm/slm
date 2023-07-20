@@ -12,11 +12,20 @@ spec:
       imagePullPolicy: Always
       env:
         - name: KEYCLOAK_ADMIN
-          value: admin
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-config
+              key: keycloak-admin
         - name: KEYCLOAK_ADMIN_PASSWORD
-          value: password
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-secret
+              key: keycloak-admin-password
         - name: KEYCLOAK_DEFAULT_USER_PASSWORD
-          value: password
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-secret
+              key: keycloak-default-user-password
         - name: KEYCLOAK_AUTHSERVERURL
           value: http://keycloak:{{.Values.keycloak.port}}/auth
       volumeMounts:
