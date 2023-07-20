@@ -20,9 +20,6 @@ spec:
           mountPath: /consul/
 
   volumes:
-    - name: consul-config-root-pv
-      persistentVolumeClaim:
-        claimName: consul-config-root-pvc
     - name: consul-master-token
       secret:
         secretName: consul-secret

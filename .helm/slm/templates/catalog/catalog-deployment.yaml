@@ -25,13 +25,13 @@ spec:
             - mountPath: /app/database/config
               name: catalog-database-config-pv
 
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              port: 10000*/}}
-{{/*              path: /swagger-ui/index.html*/}}
-{{/*            initialDelaySeconds: 40*/}}
-{{/*            periodSeconds: 90*/}}
-{{/*            timeoutSeconds: 10*/}}
+          livenessProbe:
+            httpGet:
+              port: 10000
+              path: /swagger-ui/index.html
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
 
       volumes:
         - name: catalog-database-config-pv
