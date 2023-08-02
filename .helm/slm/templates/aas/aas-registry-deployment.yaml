@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aas-registry
+  labels:
+    app: aas-registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aas-registry
+  template:
+    metadata:
+      name: aas-registry
+      labels:
+        app: aas-registry
+    spec:
+      containers:
+        - name: aas-registry
+          image: eclipsebasyx/aas-registry:1.3.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 4000
+          env:
+            - name: basyxregistry_registry_backend
+              value: MongoDB
+            - name: basyxmongodb_dbconnectionstring
+              value: mongodb://aas-database:27017/
+            - name: basyxcontext_accesscontrolalloworigin
+              value: "*"
+
+      restartPolicy: Always

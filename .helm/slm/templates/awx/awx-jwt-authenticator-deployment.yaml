@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: awx-jwt-authenticator
+  labels:
+    app: awx-jwt-authenticator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: awx-jwt-authenticator
+  template:
+    metadata:
+      name: awx-jwt-authenticator
+      labels:
+        app: awx-jwt-authenticator
+    spec:
+      containers:
+        - name: awx-jwt-authenticator
+          image: ghcr.io/eclipse-slm/awx-jwt-authenticator:1.0.0-snapshot
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{.Values.awx.jwt_authenticator_port}}
+          env:
+            - name: KEYCLOAK_AUTHSERVERURL
+              value: http://keycloak:{{.Values.keycloak.port}}/auth
+            - name: VAULT_HOST
+              value: vault
+            - name: VAULT_PORT
+              value: "{{.Values.vault.port}}"
+            - name: AWX_HOST
+              value: "awx-web"
+            - name: AWX_PORT
+              value: "{{.Values.awx.port_http}}"
+            - name: AWX_ADMIN_USERNAME
+              value: {{ .Values.awx.admin_username  }}
+            - name: AWX_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: awx-secret
+                  key: admin-password
+          volumeMounts:
+            - name: vault-config-awx-jwt-authenticator-pv
+              mountPath: /opt/vault/awx-jwt-authenticator
+            - name: awx-config-jwt-authenticator-pv
+              mountPath: /app/awx
+            - name: keycloak-config-awx-jwt-authenticator-pv
+              mountPath: /app/keycloak
+
+          livenessProbe:
+            httpGet:
+              port: {{.Values.awx.jwt_authenticator_port}}
+              path: /swagger-ui.html
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
+
+      volumes:
+        - name: keycloak-config-awx-jwt-authenticator-pv
+          persistentVolumeClaim:
+            claimName: keycloak-config-awx-jwt-authenticator-pvc
+        - name: vault-config-awx-jwt-authenticator-pv
+          persistentVolumeClaim:
+            claimName: vault-config-awx-jwt-authenticator-pvc
+        - name: awx-config-jwt-authenticator-pv
+          persistentVolumeClaim:
+            claimName: awx-config-jwt-authenticator-pvc
+
+      restartPolicy: Always

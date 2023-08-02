@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: service-management-database-mariadb-config
+data:
+  database-user: "service-management"
+  database-schema: "services"
