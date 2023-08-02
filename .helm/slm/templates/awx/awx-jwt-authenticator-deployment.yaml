@@ -32,6 +32,13 @@ spec:
               value: "awx-web"
             - name: AWX_PORT
               value: "{{.Values.awx.port_http}}"
+            - name: AWX_ADMIN_USERNAME
+              value: {{ .Values.awx.admin_username  }}
+            - name: AWX_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: awx-secret
+                  key: admin-password
           volumeMounts:
             - name: vault-config-awx-jwt-authenticator-pv
               mountPath: /opt/vault/awx-jwt-authenticator
@@ -40,13 +47,13 @@ spec:
             - name: keycloak-config-awx-jwt-authenticator-pv
               mountPath: /app/keycloak
 
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              port: {{.Values.awx.jwt_authenticator_port}}*/}}
-{{/*              path: /swagger-ui.html*/}}
-{{/*            initialDelaySeconds: 40*/}}
-{{/*            periodSeconds: 90*/}}
-{{/*            timeoutSeconds: 10*/}}
+          livenessProbe:
+            httpGet:
+              port: {{.Values.awx.jwt_authenticator_port}}
+              path: /swagger-ui.html
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
 
       volumes:
         - name: keycloak-config-awx-jwt-authenticator-pv

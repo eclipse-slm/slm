@@ -11,6 +11,15 @@ spec:
       image: ghcr.io/eclipse-slm/awx/awx-task:{{.Values.awx.version}}
       imagePullPolicy: Always
 
+      env:
+        - name: AWX_ADMIN_USERNAME
+          value: {{ .Values.awx.admin_username  }}
+        - name: AWX_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: awx-secret
+              key: admin-password
+
       volumeMounts:
         - name: awx-supervisor-socket-pv
           mountPath: /var/run/supervisor

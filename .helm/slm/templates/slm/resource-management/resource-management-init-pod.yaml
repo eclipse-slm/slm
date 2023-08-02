@@ -17,6 +17,13 @@ spec:
           value: "awx-web"
         - name: AWX_PORT
           value: "{{.Values.awx.port_http}}"
+        - name: AWX_ADMIN_USERNAME
+          value: {{ .Values.awx.admin_username  }}
+        - name: AWX_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: awx-secret
+              key: admin-password
 
       volumeMounts:
         - mountPath: /app/consul

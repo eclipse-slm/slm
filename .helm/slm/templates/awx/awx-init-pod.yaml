@@ -14,6 +14,13 @@ spec:
           value: "http://keycloak:{{ .Values.keycloak.port}}/auth"
         - name: AWX_URL
           value: "http://awx-web:8052"
+        - name: AWX_ADMIN_USERNAME
+          value: {{ .Values.awx.admin_username }}
+        - name: AWX_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: awx-secret
+              key: admin-password
 
       command:
         - ansible-playbook

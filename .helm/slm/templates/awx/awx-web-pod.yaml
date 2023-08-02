@@ -12,6 +12,14 @@ spec:
           ports:
             - containerPort: 8052
             - containerPort: 8053
+          env:
+            - name: AWX_ADMIN_USERNAME
+              value: {{ .Values.awx.admin_username  }}
+            - name: AWX_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: awx-secret
+                  key: admin-password
 
           volumeMounts:
             - name: nginx-conf
@@ -25,16 +33,14 @@ spec:
               mountPath: /var/lib/awx/rsyslog/
             - name: awx-redis-pv
               mountPath: /var/run/redis
-{{/*            - mountPath: /var/log/nginx*/}}
-{{/*              name: log*/}}
 
-{{/*          livenessProbe:  slm/templates/awx/awx-web-pod.yaml */}}
-{{/*            httpGet:*/}}
-{{/*              port: 8052*/}}
-{{/*              path: /*/}}
-{{/*            initialDelaySeconds: 40*/}}
-{{/*            periodSeconds: 90*/}}
-{{/*            timeoutSeconds: 10*/}}
+          livenessProbe:
+            httpGet:
+              port: 8052
+              path: /
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
 
       volumes:
         - name: nginx-conf
