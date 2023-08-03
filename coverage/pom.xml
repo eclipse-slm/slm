@@ -21,54 +21,54 @@
 
     <dependencies>
         <dependency>
-            <groupId>de.fhg.ipa.ced</groupId>
+            <groupId>org.eclipse.slm</groupId>
             <artifactId>common.awx.client</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>de.fhg.ipa.ced</groupId>
+            <groupId>org.eclipse.slm</groupId>
             <artifactId>common.awx.model</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>de.fhg.ipa.ced</groupId>
+            <groupId>org.eclipse.slm</groupId>
             <artifactId>common.consul.client</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>de.fhg.ipa.ced</groupId>
+            <groupId>org.eclipse.slm</groupId>
             <artifactId>notification_service.service.client</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>de.fhg.ipa.ced</groupId>
-            <artifactId>resource_registry.model</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>resource_management.model</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>de.fhg.ipa.ced</groupId>
-            <artifactId>resource_registry.service.rest</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>resource_management.service.rest</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>de.fhg.ipa.ced</groupId>
-            <artifactId>service_registry.persistence.keycloak</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>service_management.persistence.keycloak</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>de.fhg.ipa.ced</groupId>
-            <artifactId>service_registry.persistence.mariadb</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>service_management.persistence.mariadb</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>de.fhg.ipa.ced</groupId>
-            <artifactId>service_registry.service.initializer</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>service_management.service.initializer</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>de.fhg.ipa.ced</groupId>
-            <artifactId>service_registry.service.rest</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>service_management.service.rest</artifactId>
+            <version>${revision}</version>
         </dependency>
     </dependencies>
 
