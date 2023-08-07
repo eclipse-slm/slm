@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monitoring
+  labels:
+    app: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: monitoring
+  template:
+    metadata:
+      name: monitoring
+      labels:
+        app: monitoring
+    spec:
+      containers:
+        - name: monitoring-prometheus-aas
+          image: fabos4ai/fabos-monitoring-prometheus-aas:{{ .Values.monitoring.version }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+
+        - name: monitoring-prometheus-configurator
+          image: fabos4ai/fabos-monitoring-prometheus-configurator:0.0.1-SNAPSHOT
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          volumeMounts:
+            - mountPath: /code/targets
+              name: prometheus-targets-pv
+              
+        - name: prometheus
+          image: prom/prometheus:{{.Values.prometheus.version}}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - mountPath: /etc/prometheus/targets/
+              name: prometheus-targets-pv
+      volumes:
+        - name: prometheus-targets-pv
+          persistentVolumeClaim:
+            claimName: prometheus-targets-pvc
+
+      restartPolicy: Always

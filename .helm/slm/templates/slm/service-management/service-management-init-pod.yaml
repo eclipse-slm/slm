@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: service-management-init
+  labels:
+    app: service-management-init
+
+spec:
+  containers:
+    - name: service-management-init
+      image: ghcr.io/eclipse-slm/slm/service-management-init:{{ .Values.version}}
+      imagePullPolicy: Always
+      env:
+        - name: SERVICEMANAGEMENT_INITDIRECTORIES
+          value: "{{.Values.service_management.initialization_local_directories}}"
+        - name: SERVICEMANAGEMENT_GITREPOS_URLS
+          value: "{{.Values.service_management.initialization_git_repos}}"
+        - name: KEYCLOAK_AUTHSERVERURL
+          value: http://keycloak:{{.Values.keycloak.port}}/auth
+
+      volumeMounts:
+        - mountPath: /app/keycloak
+          name: keycloak-config-service-management-init-pv
+
+  volumes:
+    - name: keycloak-config-service-management-init-pv
+      persistentVolumeClaim:
+        claimName: keycloak-config-service-management-init-pvc
+
+  restartPolicy: OnFailure
+      

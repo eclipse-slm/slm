@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resource-management-init
+  labels:
+    app: resource-management-init
+
+spec:
+  containers:
+    - name: resource-management-init
+      image: ghcr.io/eclipse-slm/slm/resource-management-init:{{ .Values.version}}
+      imagePullPolicy: Always
+      env:
+        - name: KEYCLOAK_AUTHSERVERURL
+          value: http://keycloak:{{.Values.keycloak.port}}/auth
+        - name: AWX_HOST
+          value: "awx-web"
+        - name: AWX_PORT
+          value: "{{.Values.awx.port_http}}"
+        - name: AWX_ADMIN_USERNAME
+          value: {{ .Values.awx.admin_username  }}
+        - name: AWX_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: awx-secret
+              key: admin-password
+
+      volumeMounts:
+        - mountPath: /app/consul
+          name: consul-token
+  volumes:
+    - name: consul-token
+      secret:
+        secretName: consul-secret
+        items:
+          - key: consul-master-token
+            path: consul_token
+
+
+  restartPolicy: OnFailure
+      

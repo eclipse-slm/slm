@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  labels:
+    app: notification-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      name: notification-service
+      labels:
+        app: notification-service
+    spec:
+      containers:
+        - name: notification-service
+          image: ghcr.io/eclipse-slm/slm/notification-service:{{ .Values.version }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9001
+          env:
+            - name: KEYCLOAK_AUTHSERVERURL
+              value: http://keycloak:{{.Values.keycloak.port}}/auth
+            - name: CONSUL_PORT
+              value: "8500"
+            - name: VAULT_PORT
+              value: "8200"
+            - name: NOTIFICATION_SERVICE_PORT
+              value: "9001"
+            - name: AWX_HOST
+              value: "awx-web"
+            - name: AWX_PORT
+              value: "{{.Values.awx.port_http}}"
+          volumeMounts:
+            - mountPath: /app/awx
+              name: awx-config-notification-service-pv
+            - mountPath: /app/keycloak
+              name: keycloak-config-notification-service-pv
+            - mountPath: /app/consul
+              name: consul-token
+            - name: notification-service-database-mariadb
+              mountPath: /app/database/config
+
+          livenessProbe:
+            httpGet:
+              port: 9001
+              path: /swagger-ui/index.html
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
+
+      volumes:
+        - name: notification-service-database-mariadb
+          projected:
+            sources:
+              - secret:
+                  name: notification-service-database-mariadb-secret
+                  items:
+                    - key: mysql-password
+                      path: password
+              - configMap:
+                  name: notification-service-database-mariadb-config
+                  items:
+                    - key: database-user
+                      path: user
+                    - key: database-schema
+                      path: schema
+        - name: awx-config-notification-service-pv
+          persistentVolumeClaim:
+            claimName: awx-config-notification-service-pvc
+        - name: keycloak-config-notification-service-pv
+          persistentVolumeClaim:
+            claimName: keycloak-config-notification-service-pvc
+        - name: consul-token
+          secret:
+            secretName: consul-secret
+            items:
+              - key: consul-master-token
+                path: consul_token
+
+      restartPolicy: Always
