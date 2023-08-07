@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consul
+  labels:
+    app: consul
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consul
+  template:
+    metadata:
+      name: consul
+      labels:
+        app: consul
+    spec:
+      containers:
+        - name: consul
+          image: ghcr.io/eclipse-slm/consul:{{ .Values.consul.version}}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8500
+          volumeMounts:
+            - name: consul-data-pv
+              mountPath: /consul/data
+
+            - name: consul-master-token
+              mountPath: /consul/init/
+
+          livenessProbe:
+            httpGet:
+              port: 8500
+              path: /
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
+
+      volumes:
+        - name: consul-data-pv
+          persistentVolumeClaim:
+            claimName: consul-data-pvc
+
+        - name: consul-master-token
+          secret:
+            secretName: consul-secret
+            items:
+              - key: consul-master-token
+                path: consul_master_token
+
+      restartPolicy: Always

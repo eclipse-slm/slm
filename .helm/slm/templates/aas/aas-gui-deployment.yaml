@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aas-gui
+  labels:
+    app: aas-gui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aas-gui
+  template:
+    metadata:
+      name: aas-gui
+      labels:
+        app: aas-gui
+    spec:
+      containers:
+        - name: aas-gui
+          image: fabos4ai/aas-ui:1.2.0-SNAPSHOT
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: VITE_REGISTRY_PATH
+              value: "http://aas-registry:4000/registry"
+            - name: VITE_AAS_SERVER_PATH
+              value: "http://aas-server:4001/aasServer"
+            - name: VITE_PRIMARY_COLOR
+              value: "00A0E3"
+
+
+
+
+      restartPolicy: Always

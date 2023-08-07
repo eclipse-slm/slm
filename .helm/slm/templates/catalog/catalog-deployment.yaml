@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog
+  labels:
+    app: catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalog
+  template:
+    metadata:
+      name: catalog
+      labels:
+        app: catalog
+    spec:
+      containers:
+        - name: catalog
+          image: ghcr.io/eclipse-slm/slm/catalog:{{ .Values.catalog.version }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 10000
+          volumeMounts:
+            - mountPath: /app/database/config
+              name: catalog-database-config-pv
+
+          livenessProbe:
+            httpGet:
+              port: 10000
+              path: /swagger-ui/index.html
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
+
+      volumes:
+        - name: catalog-database-config-pv
+          persistentVolumeClaim:
+            claimName: catalog-database-config-pvc
+
+      restartPolicy: Always
