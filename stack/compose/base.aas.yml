@@ -61,5 +61,12 @@ services:
     volumes:
       - "./config/aas-gui/logo:/app/src/assets/Logo"
 
+  aas-broker:
+    image: eclipsebasyx/aas-broker:1.6
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+
+
 volumes:
   aas_database:
