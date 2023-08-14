@@ -15,6 +15,8 @@ services:
     ports:
       - "4000:4000"
     environment:
+      basyxregistry_registry_events: MQTTV2_SIMPLE_ENCODING
+      basyxmqtt_server: tcp://aas-broker:1883
       basyxregistry_registry_backend: MongoDB
       basyxmongodb_dbconnectionstring: mongodb://aas-database:27017/
       basyxcontext_accesscontrolalloworigin: "*"
@@ -32,10 +34,12 @@ services:
       - "4001:4001"
     environment:
       basyxaas_registry_path: http://aas-registry:4000/registry/api/v1/registry
+      basyxaas_aas_events: MQTTV2_SIMPLE_ENCODING
       basyxaas_aas_backend: MongoDB
       basyxaas_aas_aasxupload: Enabled
       basyxaas_registry_host: http://${SLM_HOSTNAME}:4001/aasServer
       basyxmongodb_dbconnectionstring: mongodb://aas-database:27017/
+      basyxmqtt_server: tcp://aas-broker:1883
       basyxcontext_accesscontrolalloworigin: "*"
       waiting_for: '[{"host":"aas-registry","port":"4000"}]'
 
@@ -62,10 +66,12 @@ services:
       - "./config/aas-gui/logo:/app/src/assets/Logo"
 
   aas-broker:
-    image: eclipsebasyx/aas-broker:1.6
+    image: eclipse-mosquitto:1.6
+    volumes:
+      - ../src/aas-broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
     ports:
       - "1883:1883"
-      - "9001:9001"
+      - "1801:9001"
 
 
 volumes:
