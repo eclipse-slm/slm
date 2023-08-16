@@ -8,6 +8,7 @@ services:
       - aas-database
       - aas-server
       - aas-gui
+      - aas-broker
     networks:
       default:
         aliases:
@@ -26,6 +27,7 @@ services:
     restart: always
     depends_on:
       - aas-database
+      - aas-broker
     networks:
       default:
         aliases:
@@ -66,13 +68,35 @@ services:
       - "./config/aas-gui/logo:/app/src/assets/Logo"
 
   aas-broker:
-    image: eclipse-mosquitto:1.6
-    volumes:
-      - ../src/aas-broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    image: fabos4ai/aas-broker:1.0.0-SNAPSHOT
+    restart: unless-stopped
     ports:
       - "1883:1883"
       - "1801:9001"
 
+  aas-transformer:
+    image: fabos4ai/aas-transformer:1.0.0-SNAPSHOT
+    restart: unless-stopped
+    depends_on:
+      - aas-transformer-database
+    ports:
+      - "4010:4010"
+
+  aas-transformer-database:
+    image: mariadb:10.5
+    restart: unless-stopped
+    environment:
+      MYSQL_USER: aas-transformer
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: transformer
+      MARIADB_ROOT_PASSWORD: password
+    volumes:
+      - "aas_transformer_database:/var/lib/mysql"
+
+  aas-transformer-initializer:
+    image: fabos4ai/aas-transformer-initializer:1.0.0-SNAPSHOT
+    restart: "no"
 
 volumes:
   aas_database:
+  aas_transformer_database:
