@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: catalog-database
+  labels:
+    app: catalog-database
+spec:
+    hostname: catalog-database
+    containers:
+      - name: catalog-database
+        image:
+          ghcr.io/eclipse-slm/mariadb:{{ .Values.catalog.service.database_version }}
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 3306
+        env:
+          - name: MYSQL_USER
+            value: catalog
+          - name: MYSQL_DATABASE
+            value: catalog
+        volumeMounts:
+          - mountPath: /var/lib/mysql
+            name: catalog-database-data-pv
+          - mountPath: /config
+            name: catalog-database-config-pv
+
+{{/*        livenessProbe:*/}}
+{{/*          exec:*/}}
+{{/*            command:*/}}
+{{/*              - mysqladmin*/}}
+{{/*              - ping*/}}
+{{/*              - --silent*/}}
+{{/*          initialDelaySeconds: 40*/}}
+{{/*          periodSeconds: 90*/}}
+{{/*          timeoutSeconds: 10*/}}
+
+    volumes:
+      - name: catalog-database-data-pv
+        persistentVolumeClaim:
+          claimName: catalog-database-data-pvc
+      - name: catalog-database-config-pv
+        persistentVolumeClaim:
+          claimName: catalog-database-config-pvc
+
+    restartPolicy: Always

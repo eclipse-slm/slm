@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: aas-gui
+  labels:
+    app: aas-gui
+spec:
+  type: ClusterIP
+  selector:
+    app: aas-gui
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000

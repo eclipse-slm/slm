@@ -6,6 +6,9 @@ services:
     image: ghcr.io/eclipse-slm/mariadb:10.5
     build: ../src/common/database/mariadb
 
+  aas-broker:
+    build: ../src/aas-broker
+
   awx-fixed-files:
     image: ghcr.io/eclipse-slm/awx/awx-fixed-files:${AWX_VERSION}
     build: ../src/awx/awx-fixed-files

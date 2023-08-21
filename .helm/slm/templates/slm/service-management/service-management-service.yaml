@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-management
+  labels:
+    app: service-management
+spec:
+  type: LoadBalancer
+  selector:
+    app: service-management
+  ports:
+    - protocol: TCP
+      port: {{.Values.service_management.port}}
+      targetPort: 9020
