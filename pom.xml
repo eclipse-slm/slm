@@ -475,6 +475,22 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- to push to coveralls -->
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>4.3.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.3.1</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <jacocoReports>coverage/target/site/jacoco-aggregate-ut/jacoco.xml</jacocoReports>
+                </configuration>
+            </plugin>
             <!-- Compilation: Kotlin !-->
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
