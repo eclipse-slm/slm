@@ -61,7 +61,7 @@ jobs:
         if: github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')
         run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' -q org.jacoco:jacoco-maven-plugin:report -Pcoverage verify
       - name: Build Coveralls Report
-        if: github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')
+        if: (github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')) && matrix.build.type == 'backend'
         run: mvn test jacoco:report coveralls:report  -DrepoToken=$COVERALLS_TOKEN
         env:
           GITHUB_TOKEN: ${{ github.token }}
