@@ -82,6 +82,7 @@
         <docker.image.skip>false</docker.image.skip>
 
         <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
+        <jacoco.version>0.8.8</jacoco.version>
         <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
     </properties>
 
@@ -155,6 +156,13 @@
                 <artifactId>junit-bom</artifactId>
                 <version>${junit.jupiter.version}</version>
                 <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.jacoco</groupId>
+                <artifactId>org.jacoco.agent</artifactId>
+                <version>${jacoco.version}</version>
+                <classifier>runtime</classifier>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -587,6 +595,25 @@
                         <goals>
                             <goal>clean</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- IT Code Coverage -->
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-jacoco</id>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <includeArtifactIds>org.jacoco.agent</includeArtifactIds>
+                            <includeClassifiers>runtime</includeClassifiers>
+                            <outputDirectory>${project.build.directory}/jacoco-agent</outputDirectory>
+                            <stripVersion>true</stripVersion>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
