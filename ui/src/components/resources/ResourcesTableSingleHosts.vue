@@ -159,6 +159,7 @@
           <v-menu>
             <template #activator="{ on, attrs }">
               <v-btn
+                id="mushroom-button"
                 color="info"
                 v-bind="attrs"
                 :disabled="item.clusterMember || availableSingleHostCapabilitiesNoDefault.length == 0"
@@ -186,6 +187,7 @@
                   <!-- Capability Install Button -->
                   <v-btn
                     v-if="showCapabilityInstallButton(item, capability)"
+                    id="install-button"
                     :disabled="!resourceHasRemoteAccessService(item)"
                     color="info"
                     style="height:36px"
