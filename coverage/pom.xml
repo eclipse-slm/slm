@@ -80,7 +80,7 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco-maven-plugin.version}</version>
                 <executions>
-                    <!--aggregated unit test coverage report -->
+                    <!-- aggregated unit test coverage report -->
                     <execution>
                         <id>aggregate-reports-ut</id>
                         <phase>test</phase>
@@ -88,38 +88,11 @@
                             <goal>report-aggregate</goal>
                         </goals>
                         <configuration>
-                            <title>Maven Multimodule Coverage Demo: Coverage of Unit Tests</title>
+                            <title>Maven Multimodule Coverage: Coverage of Unit Tests</title>
                             <outputDirectory>${project.reporting.outputDirectory}/jacoco-aggregate-ut</outputDirectory>
                             <dataFileExcludes>
                                 <dataFileExclude>**/target/jacoco-it.exec</dataFileExclude>
                             </dataFileExcludes>
-                        </configuration>
-                    </execution>
-                    <!-- aggregated integration test coverage report -->
-                    <execution>
-                        <id>aggregate-reports-it</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report-aggregate</goal>
-                        </goals>
-                        <configuration>
-                            <title>Maven Multimodule Coverage Demo: Coverage of Integration Tests</title>
-                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-aggregate-it</outputDirectory>
-                            <dataFileExcludes>
-                                <dataFileExclude>**/target/jacoco.exec</dataFileExclude>
-                            </dataFileExcludes>
-                        </configuration>
-                    </execution>
-                    <!-- aggregated overallall test coverage report -->
-                    <execution>
-                        <id>aggregate-reports-all</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>report-aggregate</goal>
-                        </goals>
-                        <configuration>
-                            <title>Maven Multimodule Coverage Demo: Overall Coverage </title>
-                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-aggregate-all</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
