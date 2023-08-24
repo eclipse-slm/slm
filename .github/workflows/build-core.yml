@@ -65,7 +65,7 @@ jobs:
         if: secrets.COVERALLS_TOKEN
         run: echo test
       - name: Build Coveralls Report
-        if: ${{ secrets.COVERALLS_TOKEN != ''}} && ((github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')) && matrix.build.type == 'backend')
+        if: ${{ env.COVERALLS_TOKEN != ''}} && ((github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')) && matrix.build.type == 'backend')
         run: mvn test jacoco:report coveralls:report  -DrepoToken=$COVERALLS_TOKEN
         env:
           GITHUB_TOKEN: ${{ github.token }}
