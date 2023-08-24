@@ -48,7 +48,7 @@ public class AwxClientCapabilityTest {
     static {
         awxContainer = new DockerComposeContainer(new File("src/test/resources/docker-compose.yml"))
                 .withExposedService(AWX_WEB_SERVICE, AWX_PORT, Wait.forListeningPort())
-                .withLocalCompose(false);
+                .withLocalCompose(true);
 
         awxContainer.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> stopContainer()));

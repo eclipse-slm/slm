@@ -47,7 +47,7 @@ public class ResourcesManagerITDevConfig {
                         VAULT_SERVICE_NAME,
                         VAULT_PORT,
                         Wait.forListeningPort())
-                .withLocalCompose(false);
+                .withLocalCompose(true);
         dockerCompose.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(()-> dockerCompose.stop()));
