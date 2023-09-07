@@ -2,36 +2,29 @@ version: '3'
 
 services:
 
-  awx-web:
-    image: ghcr.io/eclipse-slm/awx/awx-web:${AWX_VERSION}
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-file: ${LOGGING_MAX_FILE}
-        max-size: ${LOGGING_MAX_SIZE}
-    depends_on:
-      - awx-redis
-      - awx-redis-init
-      - awx-postgres
-    ports:
-      - "${AWX_PORT_HTTP}:8052"
-      - "${AWX_PORT_HTTPS}:8053"
-    networks:
-      default:
-        aliases:
-          - awxweb
-    user: root
-    volumes:
-      - awx_supervisor_socket:/var/run/supervisor
-      - awx_rsyslog_socket:/var/run/awx-rsyslog/
-      - awx_rsyslog_config:/var/lib/awx/rsyslog/
-      - awx-redis:/var/run/redis
-    healthcheck:
-      test: [ "CMD", "curl", "http://localhost:8052" ]
-
   awx-task:
-    image: ghcr.io/eclipse-slm/awx/awx-task:${AWX_VERSION}
+    user: "0"
+    image: ghcr.io/eclipse-slm/awx/awx-task${AWX_VERSION}
+    container_name: awx
+    hostname: awxweb
+    command: launch_awx.sh
+    environment:
+      OS: " Operating System: Docker Desktop"
+      SDB_HOST: 0.0.0.0
+      SDB_PORT: 7899
+      AWX_GROUP_QUEUES: tower
+      MAIN_NODE_TYPE: "${MAIN_NODE_TYPE:-hybrid}"
+      RECEPTORCTL_SOCKET: /var/run/awx-receptor/receptor.sock
+      CONTROL_PLANE_NODE_COUNT: 1
+      EXECUTION_NODE_COUNT: 0
+      AWX_LOGGING_MODE: stdout
+#      DJANGO_SUPERUSER_PASSWORD: PrXajTWYbthSGyRhqHDO
+      DJANGO_SUPERUSER_PASSWORD: password
+      UWSGI_MOUNT_PATH: /
+      RUN_MIGRATIONS: 1
+    links:
+      - awx-postgres
+      - awx-redis
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -41,18 +34,28 @@ services:
     depends_on:
       - awx-redis
       - awx-redis-init
-      - awx-web
       - awx-postgres
     networks:
       default:
         aliases:
           - awx
-    user: root
     volumes:
       - awx_supervisor_socket:/var/run/supervisor
       - awx_rsyslog_socket:/var/run/awx-rsyslog/
       - awx_rsyslog_config:/var/lib/awx/rsyslog/
       - awx-redis:/var/run/redis
+#      - "redis_socket:/var/run/redis/:rw"
+    privileged: true
+    tty: true
+    ports:
+      - "7899-7999:7899-7999"  # sdb-listen
+      - "6899:6899"
+#      - "8080:8080"  # unused but mapped for debugging
+      - "8888:8888"  # jupyter notebook
+      - "8052:8013"  # http
+      - "8053:8043"  # https
+      - "2222:2222"  # receptor foo node
+      - "3001:3001"  # used by the UI dev env
 
   awx-jwt-authenticator:
     image: ghcr.io/eclipse-slm/awx-jwt-authenticator:1.0.0-snapshot
@@ -78,7 +81,9 @@ services:
       - "${SLM_HOSTNAME}:172.17.0.1"
 
   awx-redis:
-    image: fabos4ai/awx-redis:${AWX_REDIS_VERSION}
+    image: ghcr.io/eclipse-slm/awx/redis:6
+    container_name: awx-redis
+    entrypoint: [ "redis-server" ]
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -94,6 +99,7 @@ services:
     command: [ "/usr/local/etc/redis/redis.conf" ]
     volumes:
       - awx-redis:/var/run/redis/
+#      - "redis_socket:/var/run/redis/:rw"
     healthcheck:
       test: [ "CMD", "redis-cli", "-s", "/var/run/redis/redis.sock", "ping" ]
 
@@ -110,7 +116,10 @@ services:
       - awx-redis:/var/run/redis/
 
   awx-postgres:
-    image: ghcr.io/eclipse-slm/awx/awx-postgres:${AWX_POSTGRES_VERSION}
+    image: postgres:12
+    hostname: postgres
+    container_name: awx-postgres
+    command: postgres -c log_destination=stderr -c log_min_messages=info -c log_min_duration_statement=1000 -c max_connections=1024
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -118,7 +127,10 @@ services:
         max-file: ${LOGGING_MAX_FILE}
         max-size: ${LOGGING_MAX_SIZE}
     environment:
-      PGUSER: awx
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: awx
+      POSTGRES_DB: awx
+      POSTGRES_PASSWORD: awxpass
     volumes:
       - "awx_database_data:/var/lib/postgresql/data:Z"
     healthcheck:
@@ -132,9 +144,11 @@ services:
       options:
         max-file: ${LOGGING_MAX_FILE}
         max-size: ${LOGGING_MAX_SIZE}
-    depends_on:
-      - awx-web
+    links:
       - awx-task
+    environment:
+      AWX_URL: http://awxweb:8013/
+    depends_on:
       - awx-jwt-authenticator
       - awx-redis
       - awx-redis-init

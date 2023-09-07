@@ -9,19 +9,12 @@ services:
   aas-broker:
     build: ../src/aas-broker
 
-  awx-fixed-files:
-    image: ghcr.io/eclipse-slm/awx/awx-fixed-files:${AWX_VERSION}
-    build: ../src/awx/awx-fixed-files
-
-  awx-web:
-    build: ../src/awx/awx-web
+  awx-task:
+    build: ../src/awx/awx-task
 
   awx-web-no-jwt:
     image: ghcr.io/eclipse-slm/awx/awx-web-no-jwt:${AWX_VERSION}
     build: ../src/awx/awx-web-no-jwt
-
-  awx-task:
-    build: ../src/awx/awx-task
 
   awx-postgres:
     build: ../src/awx/awx-postgres
