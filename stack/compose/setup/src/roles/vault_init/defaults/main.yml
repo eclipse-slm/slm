@@ -1,0 +1,26 @@
+vault_config_directory: "/vault/config"
+vault_token_file: "{{ vault_config_directory }}/root/root_token"
+
+vault_approles:
+  - name: "resource_management"
+    policies:
+      - name: "resource_management"
+        policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"resources/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
+  - name: "service_management"
+    policies:
+      - name: "service_management"
+        policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"services/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"service-repositories/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
+  - name: awx
+    policies:
+      - name: "awx"
+        policy: "path \"resources/*\" { capabilities = [\"read\", \"list\", \"create\", \"update\"] } \npath \"service-repositories/*\" { capabilities = [\"read\", \"list\"] }"
+  - name: awx_jwt_authenticator
+    policies:
+      - name: "awx_jwt_authenticator"
+        policy: "path \"awx_jwt_authenticator/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
+
+vault_kv_secret_engines:
+  - "awx_jwt_authenticator"
+  - "resources"
+  - "services"
+  - "service-repositories"

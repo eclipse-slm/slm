@@ -1,0 +1,89 @@
+- assert:
+    that:
+      - (vault_url is defined) and (vault_url|length > 0)
+      - (vault_token is defined) and (vault_token|length > 0)
+      - (approle_name is defined) and (approle_name|length > 0)
+    fail_msg: "Variable must be defined and not empty"
+
+- name: "Create app role '{{ approle_name }}'"
+  uri:
+    url: "{{ vault_url }}/v1/auth/approle/role/{{ approle_name }}"
+    validate_certs: no
+    method: POST
+    headers:
+      Authorization: "Bearer {{ vault_token }}"
+    status_code: 200, 204
+  no_log: false
+
+- name: "Set app role id to app role name '{{ approle_name }}'"
+  uri:
+    url: "{{ vault_url }}/v1/auth/approle/role/{{ approle_name }}/role-id"
+    validate_certs: no
+    method: POST
+    headers:
+      Authorization: "Bearer {{ vault_token }}"
+    body_format: json
+    body:
+      role_id: "{{ approle_name }}"
+    status_code: 200, 204
+  no_log: false
+
+- name: "Create secret id for app role with id '{{ approle_name }}'"
+  uri:
+    url: "{{ vault_url }}/v1/auth/approle/role/{{ approle_name }}/secret-id"
+    validate_certs: no
+    method: POST
+    headers:
+      Authorization: "Bearer {{ vault_token }}"
+    status_code: 200, 204
+  register: request_secret_id
+  no_log: false
+
+- set_fact:
+    role_id: "{{ approle_name }}"
+    secret_id: "{{ request_secret_id.json.data.secret_id }}"
+
+- name: "Store config in Consul"
+  block:
+  - name: "Check if config exists in Consul"
+    community.general.consul_kv:
+      scheme: "{{ consul_scheme }}"
+      host: "{{ consul_host }}"
+      port: "{{ consul_port }}"
+      token: "{{ consul_token }}"
+      key: "config/{{ approle_name }}/data"
+    register: app_config_consul_response
+  - set_fact:
+      app_config_consul: "{{ app_config_consul_response.data.Value }}"
+    when: app_config_consul_response.data.Value is defined
+  - set_fact:
+      app_config_consul: "{{ app_config_consul | from_yaml | combine(
+    { 'vault': {
+        'approle': {
+          'roleid': role_id,
+          'secretid': secret_id
+        }
+      }
+    }
+    , recursive=true) }}"
+    when: app_config_consul_response.data.Value is defined
+  - set_fact:
+      app_config_consul: "{ 'vault': {
+        'approle': {
+          'roleid': '{{ role_id }}',
+          'secretid': '{{ secret_id }}'
+        }
+      }
+    }"
+    when: app_config_consul_response.data.Value is not defined
+  - name: "Store app role config in Consul"
+    community.general.consul_kv:
+      scheme: "{{ consul_scheme }}"
+      host: "{{ consul_host }}"
+      port: "{{ consul_port }}"
+      token: "{{ consul_token }}"
+      key: "{{ item.key }}"
+      value: "{{ item.value }}"
+    with_items:
+      - { key: "config/{{ approle_name }}/data", value: "{{ app_config_consul | to_yaml }}" }
+

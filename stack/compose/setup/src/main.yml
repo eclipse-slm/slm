@@ -1,0 +1,77 @@
+- name: "Init Vault"
+  hosts: localhost
+  gather_facts: yes
+  become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  vars_files:
+    - config.yml
+  pre_tasks:
+    - name: include env vars
+      include_vars: "/env/env.yml"
+  tasks:
+    - name: "Import configuration from environment variables"
+      block:
+        - set_fact:
+            consul_scheme: "http"
+            consul_host: "ipa-wn1152"
+            consul_port: "8500"
+
+            vault_scheme: "http"
+            vault_host: "ipa-wn1152"
+            vault_port: "8200"
+
+            keycloak_auth_url: "http://{{ SLM_HOSTNAME }}:{{ KEYCLOAK_PORT }}/auth"
+            keycloak_admin_username: "admin"
+            keycloak_admin_password: "password"
+            keycloak_default_user_password: "password"
+
+            awx_scheme: "http"
+            awx_host: "ipa-wn1152"
+            awx_port: 80
+
+        - set_fact:
+            vault_url: "{{ vault_scheme }}://{{ vault_host }}:{{ vault_port }}"
+
+    - name: "Start Consul"
+      ansible.builtin.include_tasks:
+        file: main_consul.yml
+
+    - name: "Start Keycloak"
+      ansible.builtin.include_tasks:
+        file: main_keycloak.yml
+
+    - name: "Init Consul"
+      include_role:
+        name: consul_init
+        tasks_from: main.yml
+
+    - name: "Start Vault"
+      ansible.builtin.include_tasks:
+        file: main_vault.yml
+
+    - name: "Start AWX"
+      ansible.builtin.include_tasks:
+        file: main_awx.yml
+
+    - name: "Start AAS services"
+      block:
+        - set_fact:
+            aas_compose: "{{ lookup('template', './templates/base.aas.yml') }}"
+        - name: "Start containers"
+          community.docker.docker_compose:
+            project_name: eclipse-slm
+            definition: "{{ aas_compose | from_yaml}}"
+
+    - name: "Start monitoring"
+      block:
+        - set_fact:
+            monitoring_compose: "{{ lookup('template', './templates/monitoring.yml') }}"
+        - name: "Start containers"
+          community.docker.docker_compose:
+            project_name: eclipse-slm
+            definition: "{{ monitoring_compose | from_yaml}}"
+
+    - name: "Start internal SLM components"
+      ansible.builtin.include_tasks:
+        file: main_slm.yml

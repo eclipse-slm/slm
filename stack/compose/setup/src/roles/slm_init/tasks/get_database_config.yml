@@ -1,0 +1,47 @@
+- name: "Check if config exists in Consul"
+  community.general.consul_kv:
+    scheme: "{{ consul_scheme }}"
+    host: "{{ consul_host }}"
+    port: "{{ consul_port }}"
+    token: "{{ consul_token }}"
+    key: "config/{{ app_name }}/data"
+  register: app_config_consul
+
+- set_fact:
+    app_config_consul: {
+      data: {
+        Value:
+      }
+    }
+    when: app_config_consul.data.Value is not defined
+
+- name: "Create passwords"
+  set_fact:
+    database_root_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
+    database_user_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
+  when: app_config_consul.data.Value.database is not defined
+
+- set_fact:
+    database_user_passwords: "{{ database_user_passwords | default({}) | combine(
+        { app_name: {
+            'username': app_name,
+            'password': database_user_password,
+            'root_password': database_root_password
+          }
+        }, recursive=true) }}"
+
+- set_fact:
+    app_config_consul: "{{ app_config_consul.data.Value | from_yaml | combine(
+        { 'database': {
+            'username': app_name,
+            'password': database_user_password
+          }
+        }, recursive=true) }}"
+
+- name: "Store config in Consul"
+  community.general.consul_kv:
+    host: "{{ consul_host }}"
+    port: "{{ consul_port }}"
+    token: "{{ consul_token }}"
+    key: "config/{{ app_name }}/data"
+    value: "{{ app_config_consul | to_yaml }}"

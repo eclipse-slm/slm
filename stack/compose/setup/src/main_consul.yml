@@ -1,0 +1,64 @@
+- name: "Consul | Assert variables"
+  assert:
+    that:
+      - (consul_scheme is defined) and (consul_scheme|length > 0)
+      - (consul_host is defined) and (consul_host|length > 0)
+      - (consul_port is defined) and (consul_port|length > 0)
+
+- name: "Consul | Config"
+  block:
+    - set_fact:
+        consul_url: "{{ consul_scheme }}://{{ consul_host }}:{{ consul_port }}"
+    - name: "Consul | Check if instance is already running"
+      docker_container_info:
+        name: eclipse-slm_consul_1
+      register: consul_container
+    - name: "Consul | Get master token of existing instance"
+      set_fact:
+        CONSUL_MASTER_TOKEN: "{{ consul_container.container.Config.Env | regex_search('\\\"master\\\": \\\"(.*)\\\"', '\\1') | first }}"
+      when: consul_container.exists
+    - name: "Consul | Create master token"
+      set_fact:
+        CONSUL_MASTER_TOKEN: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
+      when: (CONSUL_MASTER_TOKEN is not defined) or (CONSUL_MASTER_TOKEN | default([]) | length == 0) and not consul_container.exists
+    - name: "Consul | Update consul_config dictionary and override default values"
+      set_fact:
+        consul_config: "{{ consul_config | combine(
+      { 'acl': {
+          'tokens': {
+            'master': CONSUL_MASTER_TOKEN
+          }
+        }
+      }
+      , recursive=true) }}"
+    - set_fact:
+        consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+
+- name: "Consul | Start"
+  block:
+    - name: "Consul | Create compose definition from template"
+      set_fact:
+        consul_compose: "{{ lookup('template', './templates/base.consul.yml') }}"
+    - name: "Consul | Start containers"
+      community.docker.docker_compose:
+        project_name: eclipse-slm
+        definition: "{{ consul_compose | from_yaml}}"
+    - name: "Consul | Wait for Consul being up"
+      uri:
+        url: "{{ consul_url }}"
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 120
+      delay: 3
+
+- name: "Consul | Store Consul config in Consul"
+  community.general.consul_kv:
+    scheme: "{{ consul_scheme }}"
+    host: "{{ consul_host }}"
+    port: "{{ consul_port }}"
+    token: "{{ consul_token }}"
+    key: "{{ item.key }}"
+    value: "{{ item.value }}"
+  with_items:
+    - { key: "config/consul/data", value: "{{ consul_config | to_yaml }}" }

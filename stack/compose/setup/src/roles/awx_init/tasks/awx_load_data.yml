@@ -1,0 +1,123 @@
+- assert:
+    that:
+      - (awx_url is defined) and (awx_url|length > 0)
+      - (awx_config.admin.username is defined) and (awx_config.admin.username|length > 0)
+      - (awx_config.admin.password is defined) and (awx_config.admin.password|length > 0)
+      - (awx_config.jwt_authenticator.username is defined) and (awx_config.jwt_authenticator.username|length > 0)
+      - (awx_config.jwt_authenticator.password is defined) and (awx_config.jwt_authenticator.password|length > 0)
+      - (consul_token is defined) and (consul_token|length > 0)
+      - (awx_config.vault.approle.roleid is defined) and (awx_config.vault.approle.roleid|length > 0)
+      - (awx_config.vault.approle.secretid is defined) and (awx_config.vault.approle.secretid|length > 0)
+
+- name: "Remove organization"
+  awx.awx.organization:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_config.admin.username }}"
+    controller_password: "{{ awx_config.admin.password }}"
+    name: "Self Service Portal"
+    description: ""
+    state: absent
+
+- name: "Add organization"
+  awx.awx.organization:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_config.admin.username }}"
+    controller_password: "{{ awx_config.admin.password }}"
+    name: "{{ awx_slm_organization_name }}"
+    description: ""
+    state: present
+
+###region AWX JWT Authenticator
+- name: "Add user '{{ awx_config.jwt_authenticator.username }}'"
+  awx.awx.user:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_config.admin.username }}"
+    controller_password: "{{ awx_config.admin.password }}"
+    username: "{{ awx_config.jwt_authenticator.username }}"
+    password: "{{ awx_config.jwt_authenticator.password }}"
+    email: "{{ awx_config.jwt_authenticator.username }}@fab-os.org"
+    first_name: AWX
+    last_name: JWT Authenticator
+    superuser: yes
+    state: present
+
+- include_tasks: helper/create_application.yml
+  vars:
+    awx_username: "{{ awx_config.admin.username }}"
+    awx_password: "{{ awx_config.admin.password }}"
+    awx_application_name: "awx_jwt_authenticator"
+    awx_application_description: "AWX JWT Authenticator"
+    awx_organization_name: "{{ awx_slm_organization_name }}"
+
+- name: "Create team in which AWX JWT Authenticator can add new users"
+  awx.awx.team:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_config.admin.username }}"
+    controller_password: "{{ awx_config.admin.password }}"
+    name: "user"
+    description: "Team for users added by AWX JWT Authenticator"
+    organization: "{{ awx_slm_organization_name }}"
+    state: present
+###endregion AWX JWT Authenticator
+- name: "Create default inventory"
+  awx.awx.inventory:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_config.admin.username }}"
+    controller_password: "{{ awx_config.admin.password }}"
+    name: "Default"
+    description: "Default Inventory"
+    organization: "{{ awx_slm_organization_name }}"
+    state: present
+
+- name: "Remove Demo Inventory"
+  awx.awx.inventory:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_config.admin.username }}"
+    controller_password: "{{ awx_config.admin.password }}"
+    name: "Demo Inventory"
+    description: "Demo Inventory"
+    organization: "{{ awx_slm_organization_name }}"
+    state: absent
+
+- name: "Remove Demo Project"
+  awx.awx.project:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_config.admin.username }}"
+    controller_password: "{{ awx_config.admin.password }}"
+    name: "Demo Project"
+    state: absent
+
+- name: "Remove Demo Template Project"
+  awx.awx.project:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_config.admin.username }}"
+    controller_password: "{{ awx_config.admin.password }}"
+    name: "Demo Job Template"
+    state: absent
+
+- debug:
+    var: awx_config
+
+- name: "Add credential types"
+  awx.awx.credential_type:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_config.admin.username }}"
+    controller_password: "{{ awx_config.admin.password }}"
+    name: "{{ item.name }}"
+    kind: cloud
+    inputs: "{{ item.inputs }}"
+    injectors: "{{ item.injectors }}"
+    state: present
+    validate_certs: false
+  with_items: "{{ awx_credential_types }}"
+
+- name: "Add credentials"
+  awx.awx.credential:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_config.admin.username }}"
+    controller_password: "{{ awx_config.admin.password }}"
+    name: "{{ item.name }}"
+    credential_type: "{{ item.credential_type }}"
+    organization: "{{ awx_slm_organization_name }}"
+    inputs: "{{ item.inputs }}"
+  with_items: "{{ awx_credentials }}"

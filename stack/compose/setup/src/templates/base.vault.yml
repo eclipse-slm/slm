@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+
+  vault:
+    image: "ghcr.io/eclipse-slm/vault:{{ VAULT_VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    ports:
+      - "{{ VAULT_PORT }}:8200"
+    networks:
+      default:
+        aliases:
+          - vault
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+    volumes:
+      - vault_config_root:/vault/config/root
+      - vault_data:/vault/file
+    cap_add:
+      - IPC_LOCK
+    healthcheck:
+      test: export VAULT_ADDR=http://127.0.0.1:8200 && vault status
+
+volumes:
+  vault_data:
+  vault_config_root:

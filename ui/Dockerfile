@@ -18,7 +18,7 @@ ENV NOTIFICATION_SERVICE_URL="http://notification-service:9001/" \
     SERVICE_REGISTRY_URL="http://service-management:9020/" \
     KEYCLOAK_URL="http://keycloak:8080/auth" \
     KEYCLOAK_REALM="fabos" \
-    KEYCLOAK_CLIENT_ID="self-service-portal" \
+    KEYCLOAK_CLIENT_ID="ui" \
     AWX_URL="http://awxweb:80" \
     CATALOG_SERVICE_URL="http://catalog:10000/"
 

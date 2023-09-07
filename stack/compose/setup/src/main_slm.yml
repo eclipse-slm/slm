@@ -1,0 +1,60 @@
+- name: "SLM | Create database configs"
+  include_role:
+    name: "slm_init"
+    tasks_from: get_database_config.yml
+  vars:
+    app_name: "{{ item.app_name }}"
+    database_user_username: "{{ item.database_user_username }}"
+  with_items:
+    - app_name: service_management
+    - app_name: resource_management
+    - app_name: notification_service
+
+- debug:
+    var: database_user_passwords
+
+- name: "Start internal SLM components"
+  block:
+    - set_fact:
+        slm_compose: "{{ lookup('template', './templates/slm.yml') }}"
+    - name: "Start containers"
+      community.docker.docker_compose:
+        project_name: eclipse-slm
+        definition: "{{ slm_compose | from_yaml}}"
+
+#    - app_name: catalog
+
+#      - name: "Start container"
+#        community.docker.docker_compose:
+#          project_name: eclipse-slm
+#          definition:
+#            version: '3'
+#            services:
+#              service-management-database:
+#                image: mariadb:10.7
+#                restart: unless-stopped
+##                logging:
+##                  driver: "json-file"
+##                  options:
+##                    max-file: ${LOGGING_MAX_FILE}
+##                    max-size: ${LOGGING_MAX_SIZE}
+#                ports:
+#                  - "3320:3306"
+#                networks:
+#                  default:
+#                    aliases:
+#                      - service-management-database
+#                environment:
+#                  MARIADB_ROOT_PASSWORD: "{{ database_root_password }}"
+#                  MARIADB_USER: service-management
+#                  MARIADB_PASSWORD: "{{ database_user_password }}"
+#                  MARIADB_DATABASE: services
+#                  KEYCLOAK_AUTHSERVERURL: "http://${SLM_HOSTNAME}:${KEYCLOAK_PORT}/auth"
+#                volumes:
+#                  - service-management-database_data:/var/lib/mysql
+#                healthcheck:
+#                  test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+#
+#            volumes:
+#              service-management-database_data:
+

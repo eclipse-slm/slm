@@ -242,7 +242,7 @@ public class ClusterHandlerITDev {
             WebClient webclient = WebClient.builder().build();
             MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
             formData.put("grant_type", Collections.singletonList("password"));
-            formData.put("client_id", Collections.singletonList("self-service-portal"));
+            formData.put("client_id", Collections.singletonList("ui"));
             formData.put("username", Collections.singletonList("fabos"));
             formData.put("password", Collections.singletonList("password"));
 

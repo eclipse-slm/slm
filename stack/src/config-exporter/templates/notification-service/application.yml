@@ -25,7 +25,7 @@ springdoc:
     tags-sorter: alpha
     operations-sorter: alpha
     oauth:
-      clientId: self-service-portal
+      clientId: ui
       clientSecret: unused-and-not-required
 
 ### Database

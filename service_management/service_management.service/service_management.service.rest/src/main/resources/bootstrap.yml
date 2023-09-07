@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: service_management
+  cloud:
+    consul:
+      host: ipa-wn1152
+      port: 8500
+      discovery:
+        acl-token: 7L7gcy1f8.s5Ecev-.oU
+        ip-address: "172.17.0.1"
+        prefer-ip-address: true
+        register-health-check: true
+      config:
+        acl-token: 7L7gcy1f8.s5Ecev-.oU
+        enabled: true
+        fail-fast: true
+        profileSeparator: '::'
+        format: YAML

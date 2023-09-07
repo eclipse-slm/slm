@@ -14,7 +14,7 @@ All APIs are secured using token-based authentication via Keycloak. To get a acc
 curl --request POST \
   --url http://<<your-slm-host>>:7080/auth/realms/fabos/protocol/openid-connect/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
-  --data client_id=self-service-portal \
+  --data client_id=ui \
   --data grant_type=password \
   --data username=<<your-username>> \
   --data password=<<your-password>>

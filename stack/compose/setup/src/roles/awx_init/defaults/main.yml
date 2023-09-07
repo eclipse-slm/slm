@@ -1,0 +1,62 @@
+awx_slm_organization_name: "Service Lifecycle Management"
+
+awx_credential_types:
+  - name: Consul
+    inputs:
+      fields:
+        - id: consul_url
+          type: string
+          label: Consul URL
+          multiline: false
+        - id: consul_token
+          type: string
+          label: Consul Token
+          secret: true
+          multiline: false
+      required:
+        - consul_url
+        - consul_token
+    injectors:
+      env:
+        CONSUL_TOKEN: "{{ awx_config.consul.token }}"
+        CONSUL_URL: "{{ consul_url }}"
+  - name: HashiCorp Vault
+    inputs:
+      fields:
+        - id: vault_url
+          type: string
+          label: Vault URL
+          secret: false
+          multiline: false
+        - id: vault_approle_role_id
+          type: string
+          label: Vault App Role - Role ID
+          secret: false
+          multiline: false
+        - id: vault_approle_secret_id
+          type: string
+          label: Vault App Role - Secret ID
+          secret: true
+          multiline: false
+      required:
+        - vault_url
+        - vault_approle_role_id
+        - vault_approle_secret_id
+    injectors:
+      env:
+        VAULT_URL: "{{ vault_url }}"
+        VAULT_APPROLE_ROLE_ID: "{{ awx_config.vault.approle.roleid }}"
+        VAULT_APPROLE_SECRET_ID: "{{ awx_config.vault.approle.secretid }}"
+
+awx_credentials:
+  - name: Consul
+    credential_type: Consul
+    inputs:
+      consul_url: "http://consul:8500"
+      consul_token: "{{ awx_config.consul.token }}"
+  - name: HashiCorp Vault
+    credential_type: HashiCorp Vault
+    inputs:
+      vault_url: "http://vault:8200"
+      vault_approle_role_id: "{{ awx_config.vault.approle.roleid }}"
+      vault_approle_secret_id: "{{ awx_config.vault.approle.secretid }}"
