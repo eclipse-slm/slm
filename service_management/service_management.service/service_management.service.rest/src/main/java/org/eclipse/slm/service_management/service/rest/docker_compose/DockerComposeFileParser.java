@@ -10,12 +10,9 @@ import org.eclipse.slm.service_management.model.offerings.docker.compose.DockerC
 import org.eclipse.slm.service_management.model.offerings.exceptions.InvalidServiceOfferingDefinitionException;
 import org.eclipse.slm.service_management.model.offerings.options.ServiceOptionType;
 import org.eclipse.slm.service_management.model.offerings.options.ServiceOptionValue;
-import org.eclipse.slm.service_management.service.rest.docker_compose.DockerComposeFile;
-import org.eclipse.slm.service_management.service.rest.docker_compose.DockerComposeFileEnvironment;
-import org.eclipse.slm.service_management.service.rest.docker_compose.DockerComposeFileLabels;
-import org.eclipse.slm.service_management.service.rest.docker_compose.DockerComposeFileVolume;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.Yaml;
 
 import java.util.*;
 
@@ -30,10 +27,26 @@ public final class DockerComposeFileParser {
         module.addDeserializer(DockerComposeFileVolume.class, new DockerComposeFileVolumeDeserializer());
         module.addDeserializer(DockerComposeFileEnvironment.class, new ArrayMapNodeDeserializer(DockerComposeFileEnvironment.class));
         module.addDeserializer(DockerComposeFileLabels.class, new ArrayMapNodeDeserializer(DockerComposeFileLabels.class));
+        module.addDeserializer(DockerComposeFileDependsOn.class, new DockerComposeFileDependsOnDeserializer());
         objectMapper.registerModule(module);
         var dockerComposeFile = objectMapper.readValue(composeFileContentYaml, DockerComposeFile.class);
 
         return dockerComposeFile;
+    }
+
+    public static Map<String, Object> composeFileToYAML (DockerComposeFile dockerComposeFile) throws JsonProcessingException {
+        var objectMapper = new ObjectMapper(new YAMLFactory());
+        objectMapper.findAndRegisterModules();
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(DockerComposeFileDependsOn.class, new DockerComposeFileDependsOnSerializer());
+        objectMapper.registerModule(module);
+
+        var dockerComposeFileAsString = objectMapper.writeValueAsString(dockerComposeFile);
+
+        Yaml yaml = new Yaml();
+        Map<String, Object> dockerComposeYaml = yaml.load(dockerComposeFileAsString);
+
+        return dockerComposeYaml;
     }
 
     public static DockerComposeFile generateDeployableComposeFileForServiceOffering(
