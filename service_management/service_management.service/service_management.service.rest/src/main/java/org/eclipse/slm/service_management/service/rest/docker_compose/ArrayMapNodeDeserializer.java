@@ -35,9 +35,18 @@ public class ArrayMapNodeDeserializer<T extends Map<String, Object>> extends Std
             var arrayNode = (ArrayNode) jsonNode;
             for (var element : arrayNode) {
                 if (element.textValue().contains("=")) {
-                    var envVarKey = element.textValue().split("=")[0];
-                    var envVarValue = element.textValue().split("=")[1];
-                    map.put(envVarKey, envVarValue);
+                    try {
+                        var envVarKey = element.textValue().split("=", 2)[0];
+                        String envVarValue = "";
+                        if (element.textValue().split("=").length > 1) {
+                            envVarValue = element.textValue().split("=", 2)[1];
+                        }
+                        map.put(envVarKey, envVarValue);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                        int i = 0;
+                    }
+
                 }
                 else {
                     map.put(element.textValue(), null);
