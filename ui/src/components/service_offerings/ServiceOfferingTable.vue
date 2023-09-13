@@ -47,6 +47,7 @@
                 <template #activator="{ on }">
                   <div v-on="on">
                     <v-btn
+                      id="editServiceOfferingButton"
                       class="ma-1"
                       small
                       color="info"
