@@ -84,12 +84,12 @@ which are added during the initial startup. In rare cases this adding process fa
 capabilities are available in the UI:
 
 <figure>
-    <img src="/img/figures/installation/known-issues-missing-dcs-dc-button-disabled.png">
+    <img :src="$withBase('/img/figures/installation/known-issues-missing-dcs-dc-button-disabled.png')">
     <figcaption>Deployment Capability Button disabled because of missing single host deployment capabilities</figcaption>
 </figure>
 
 <figure>
-    <img src="/img/figures/installation/known-issues-missing-dcs-cluster-button-disabled.png">
+    <img :src="$withBase('/img/figures/installation/known-issues-missing-dcs-cluster-button-disabled.png')">
     <figcaption>Cluster Button disabled because of missing multi host deployment capabilities</figcaption>
 </figure>
 
@@ -103,16 +103,16 @@ After the container has started and has added the deployment capabilities and it
 host and cluster) should be available after reloading the ui:
 
 <figure>
-    <img src="/img/figures/installation/known-issues-missing-dcs-dc-button-enabled.png">
+    <img :src="$withBase('/img/figures/installation/known-issues-missing-dcs-dc-button-enabled.png')">
     <figcaption>Deployment Capability Button enabled</figcaption>
 </figure>
 
 <figure>
-    <img src="/img/figures/installation/known-issues-missing-dcs-cluster-button-enabled.png">
+    <img :src="$withBase('/img/figures/installation/known-issues-missing-dcs-cluster-button-enabled.png')">
     <figcaption>Cluster Create Button enabled</figcaption>
 </figure>
 
 <figure>
-    <img src="/img/figures/installation/known-issues-missing-dcs-cluster-types-available.png">
+    <img :src="$withBase('/img/figures/installation/known-issues-missing-dcs-cluster-types-available.png')">
     <figcaption>Default Cluster Types available in selection form</figcaption>
 </figure>

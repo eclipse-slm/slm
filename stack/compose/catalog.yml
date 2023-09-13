@@ -12,6 +12,8 @@ services:
       options:
         max-file: ${LOGGING_MAX_FILE}
         max-size: ${LOGGING_MAX_SIZE}
+    environment:
+      SPRING_CLOUD_CONSUL_DISCOVERY_IPADDRESS: "${SLM_IP}"
     ports:
       - "${SLM_CATALOG_SERVICE_PORT}:10000"
     networks:
@@ -22,6 +24,7 @@ services:
       - "${SLM_HOSTNAME}:172.17.0.1"
     volumes:
       - catalog-database_config:/app/database/config
+      - consul_config_catalog:/app/consul:ro
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:10000/swagger-ui/index.html" ]
 

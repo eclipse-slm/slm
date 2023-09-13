@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.slm.common.model.DeploymentType;
 import org.eclipse.slm.resource_management.model.capabilities.*;
-import org.eclipse.slm.resource_management.model.capabilities.actions.AwxCapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.AwxAction;
+import org.eclipse.slm.resource_management.model.actions.Action;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -81,10 +81,10 @@ public class ModelMappingTest {
                 "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                 "1.0.0",
                 Arrays.asList(
-                        CapabilityActionType.INSTALL,
-                        CapabilityActionType.UNINSTALL,
-                        CapabilityActionType.DEPLOY,
-                        CapabilityActionType.UNDEPLOY
+                        ActionType.INSTALL,
+                        ActionType.UNINSTALL,
+                        ActionType.DEPLOY,
+                        ActionType.UNDEPLOY
                 )
         );
 
@@ -122,13 +122,13 @@ public class ModelMappingTest {
         var deploymentCapabilityRepo = "https://github.com/FabOS-AI/fabos-slm-dc-docker.git";
         var deploymentCapabilityBranch = "1.0.0";
         dc.getActions()
-                .put(CapabilityActionType.INSTALL, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "install.yml"));
+                .put(ActionType.INSTALL, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "install.yml"));
         dc.getActions()
-                .put(CapabilityActionType.UNINSTALL, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "uninstall.yml"));
+                .put(ActionType.UNINSTALL, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "uninstall.yml"));
         dc.getActions()
-                .put(CapabilityActionType.DEPLOY, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "deploy.yml"));
+                .put(ActionType.DEPLOY, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "deploy.yml"));
         dc.getActions()
-                .put(CapabilityActionType.UNDEPLOY, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "undeploy.yml"));
+                .put(ActionType.UNDEPLOY, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "undeploy.yml"));
 
         //Create DTO via modelMapper
         DeploymentCapabilityDTOApi dcDTOApi = modelMapper.map(dc, DeploymentCapabilityDTOApi.class);
@@ -160,16 +160,16 @@ public class ModelMappingTest {
     public void useJacksonMapperForJsonToAwxCapabilityAction() throws JsonProcessingException {
         String jsonString = """
                 {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "UNINSTALL",
+                      "actionClass": "AwxAction",
+                      "actionType": "UNINSTALL",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "uninstall.yml"
                 }
                 """;
 
-        CapabilityAction capabilityAction =
-                objectMapper.readValue(jsonString, CapabilityAction.class);
+        Action action =
+                objectMapper.readValue(jsonString, Action.class);
     }
 
     @Test
@@ -177,32 +177,32 @@ public class ModelMappingTest {
         String jsonString = """
                 {
                     "DEPLOY": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "DEPLOY",
+                      "actionClass": "AwxAction",
+                      "actionType": "DEPLOY",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "deploy.yml",
                       "parameter": []
                     },
                     "UNINSTALL": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "UNINSTALL",
+                      "actionClass": "AwxAction",
+                      "actionType": "UNINSTALL",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "uninstall.yml",
                       "parameter": []
                     },
                     "INSTALL": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "INSTALL",
+                      "actionClass": "AwxAction",
+                      "actionType": "INSTALL",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "install.yml",
                       "parameter": []
                     },
                     "UNDEPLOY": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "UNDEPLOY",
+                      "actionClass": "AwxAction",
+                      "actionType": "UNDEPLOY",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "undeploy.yml",
@@ -211,34 +211,34 @@ public class ModelMappingTest {
                 }
                 """;
 
-        TypeReference<HashMap<CapabilityActionType, CapabilityAction>> typeRef =
-                new TypeReference<HashMap<CapabilityActionType, CapabilityAction>>(){};
+        TypeReference<HashMap<ActionType, Action>> typeRef =
+                new TypeReference<HashMap<ActionType, Action>>(){};
 
-        HashMap<CapabilityActionType, CapabilityAction> awxCapabilityAction =
+        HashMap<ActionType, Action> awxCapabilityAction =
                 objectMapper.readValue(jsonString, typeRef);
 
         JsonNode awxCapabilityActionJsonNode = objectMapper.readTree(jsonString);
 
-        for(Map.Entry<CapabilityActionType, CapabilityAction> entry : awxCapabilityAction.entrySet()) {
-            CapabilityActionType capabilityActionType = entry.getKey();
-            AwxCapabilityAction capabilityAction = (AwxCapabilityAction) entry.getValue();
+        for(Map.Entry<ActionType, Action> entry : awxCapabilityAction.entrySet()) {
+            ActionType actionType = entry.getKey();
+            AwxAction capabilityAction = (AwxAction) entry.getValue();
 
             assertNotNull(
-                    awxCapabilityActionJsonNode.get(capabilityActionType.name())
+                    awxCapabilityActionJsonNode.get(actionType.name())
             );
 
             assertEquals(
-                    awxCapabilityActionJsonNode.get(capabilityActionType.name()).get("awxRepo").asText(),
+                    awxCapabilityActionJsonNode.get(actionType.name()).get("awxRepo").asText(),
                     capabilityAction.getAwxRepo()
             );
 
             assertEquals(
-                    awxCapabilityActionJsonNode.get(capabilityActionType.name()).get("awxBranch").asText(),
+                    awxCapabilityActionJsonNode.get(actionType.name()).get("awxBranch").asText(),
                     capabilityAction.getAwxBranch()
             );
 
             assertEquals(
-                    awxCapabilityActionJsonNode.get(capabilityActionType.name()).get("playbook").asText(),
+                    awxCapabilityActionJsonNode.get(actionType.name()).get("playbook").asText(),
                     capabilityAction.getPlaybook()
             );
         }
@@ -260,29 +260,29 @@ public class ModelMappingTest {
                   ],
                   "actions": {
                     "DEPLOY": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "DEPLOY",
+                      "actionClass": "AwxAction",
+                      "actionType": "DEPLOY",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "deploy.yml"
                     },
                     "UNINSTALL": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "UNINSTALL",
+                      "actionClass": "AwxAction",
+                      "actionType": "UNINSTALL",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "uninstall.yml"
                     },
                     "INSTALL": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "INSTALL",
+                      "actionClass": "AwxAction",
+                      "actionType": "INSTALL",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "install.yml"
                     },
                     "UNDEPLOY": {
-                      "capabilityActionClass": "AwxCapabilityAction",
-                      "capabilityActionType": "UNDEPLOY",
+                      "actionClass": "AwxAction",
+                      "actionType": "UNDEPLOY",
                       "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker.git",
                       "awxBranch": "1.0.0",
                       "playbook": "undeploy.yml"

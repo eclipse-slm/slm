@@ -26,6 +26,7 @@
       this.$store.dispatch('getDeploymentCapabilities')
       this.$store.dispatch('getResourcesFromBackend')
       this.$store.dispatch('getLocations')
+      this.$store.dispatch('getProfiler')
       this.$store.dispatch('getCluster')
       this.$store.dispatch('getNotifications')
       this.$store.dispatch('getClusterTypes')

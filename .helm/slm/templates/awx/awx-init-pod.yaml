@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: awx-init
+  labels:
+    app: awx-init
+spec:
+  containers:
+    - name: awx-init
+      image: ghcr.io/eclipse-slm/awx/awx-init:{{ .Values.version }}
+      imagePullPolicy: Always
+      env:
+        - name: KEYCLOAK_AUTHSERVERURL
+          value: "http://keycloak:{{ .Values.keycloak.port}}/auth"
+        - name: AWX_URL
+          value: "http://awx-web:8052"
+        - name: AWX_ADMIN_USERNAME
+          value: {{ .Values.awx.admin_username }}
+        - name: AWX_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: awx-secret
+              key: admin-password
+
+      command:
+        - ansible-playbook
+        - main.yml
+        - -vvvv
+      volumeMounts:
+        - name: awx-config-notification-service-pv
+          mountPath: /config/notification-service
+        - name: awx-config-resource-management-pv
+          mountPath: /config/resource-management
+        - name: awx-config-service-management-pv
+          mountPath: /config/service-management
+        - name: awx-config-jwt-authenticator-pv
+          mountPath: /config/awx-jwt-authenticator
+        - name: vault-config-awx-pv
+          mountPath: /config/vault
+        - name: consul-token
+          mountPath: /config/consul
+
+  volumes:
+    - name: awx-config-notification-service-pv
+      persistentVolumeClaim:
+        claimName: awx-config-notification-service-pvc
+    - name: awx-config-resource-management-pv
+      persistentVolumeClaim:
+        claimName: awx-config-resource-management-pvc
+    - name: awx-config-service-management-pv
+      persistentVolumeClaim:
+        claimName: awx-config-service-management-pvc
+    - name: awx-config-jwt-authenticator-pv
+      persistentVolumeClaim:
+        claimName: awx-config-jwt-authenticator-pvc
+    - name: consul-token
+      secret:
+        secretName: consul-secret
+        items:
+          - key: consul-master-token
+            path: consul_token
+    - name: vault-config-awx-pv
+      persistentVolumeClaim:
+        claimName: vault-config-awx-pvc
+    
+
+  restartPolicy: OnFailure

@@ -89,7 +89,8 @@
                   color="primary"
                   :ripple="false"
                   :disabled="
-                    serviceOption.valueType === 'TEMPLATE_VARIABLE' ||
+                    serviceOption.valueType === 'SYSTEM_VARIABLE' ||
+                    serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
                     serviceOption.valueType === 'AAS_SM_TEMPLATE'
                   "
                   v-on="on"
@@ -109,7 +110,8 @@
               color="primary"
               :ripple="false"
               :disabled="
-                serviceOption.valueType === 'TEMPLATE_VARIABLE' ||
+                serviceOption.valueType === 'SYSTEM_VARIABLE' ||
+                serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
                 serviceOption.valueType === 'AAS_SM_TEMPLATE'
               "
               @click="onServiceOptionEditableChanged(serviceOption)"
@@ -148,7 +150,8 @@ export default {
         "PORT",
         "VOLUME",
         "AAS_SM_TEMPLATE",
-        "TEMPLATE_VARIABLE",
+        "SYSTEM_VARIABLE",
+        "DEPLOYMENT_VARIABLE",
       ],
       tableHeaders: [
         { text: "", value: "", sortable: false },

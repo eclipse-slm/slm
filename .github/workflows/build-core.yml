@@ -5,7 +5,9 @@ on:
     branches:
       - main
       - develop
-      - release-*
+      - release/*
+      - feature/*
+      - fix/*
   pull_request:
     branches:
       - main
@@ -20,6 +22,7 @@ jobs:
     env:
       MAVEN_CLI_OPTS: "-T 8 -s ci/ci_maven_settings.xml --batch-mode --errors --fail-at-end --show-version --no-transfer-progress -DinstallAtEnd=true -DdeployAtEnd=true"
       MAVEN_PROFILES: ""
+      COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
     strategy:
       matrix:
         build: [
@@ -51,8 +54,126 @@ jobs:
               "password": "${{secrets.GITHUB_TOKEN}}"
             }
           ]'
-      - name: Build '${{ matrix.build.type }}' with Maven
+      - name: Build '${{ matrix.build.type }}' with Maven and push Docker Images
+        if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
         run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' deploy
+      - name: Build '${{ matrix.build.type }}' with Maven
+        if: github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')
+        run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' clean org.jacoco:jacoco-maven-plugin:prepare-agent install -q org.jacoco:jacoco-maven-plugin:report -Pcoverage verify
+      - name: Build Coveralls Report
+        if: ${{ env.COVERALLS_TOKEN != '' && matrix.build.type == 'backend' && (github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')) }}
+        run: mvn jacoco:report coveralls:report  -DrepoToken=$COVERALLS_TOKEN
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       - name: Log test output on failure
         if: failure() || cancelled()
         run: find . -type f -path "*test-reports/*-output.txt" -exec tail -n +1 {} +
+
+  deploy-staging-environment:
+    needs: build
+    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
+    runs-on: self-hosted
+    env:
+      STAGING_VM_IP: ${{ github.ref_name == 'develop' && '10.3.7.166' || '10.3.7.145' }}
+      STAGING_VM_HOSTNAME: ${{ github.ref_name == 'develop' && 'develop.stage.slm.vfk' || 'main.stage.slm.vfk' }}
+    steps:
+      - name: Deploy stack von staging VM
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{env.STAGING_VM_IP}}
+          username: vfk
+          key: ${{secrets.RUNNER_PRIVATE_KEY}}
+          envs: STAGING_VM_HOSTNAME,STAGING_VM_IP
+          script: |
+            cd /staging/tmp/slm/stack/compose || true
+            docker-compose down --volumes || true
+            docker system prune -f
+            sudo rm -r /staging/tmp && mkdir /staging/tmp && cd /staging/tmp
+            git clone -b ${{github.ref_name}} https://github.com/${{github.repository}}.git
+            cd /staging/tmp/slm
+            CORE_VERSION=$(cat pom.xml | grep -oPm1 "(?<=<revision>)[^<]+")
+            cd /staging/tmp/slm/stack/compose
+            sed -ir "s/^[#]*\s*SLM_HOSTNAME=.*/SLM_HOSTNAME=$STAGING_VM_HOSTNAME/" .env
+            sed -ir "s/^[#]*\s*SLM_IP=.*/SLM_IP=$STAGING_VM_IP/" .env
+            sed -ir "s/^[#]*\s*SLM_VERSION=.*/SLM_VERSION=$CORE_VERSION/" .env
+            echo ${{secrets.GITHUB_TOKEN}} | docker login -u${{github.actor}} --password-stdin ghcr.io
+            docker-compose pull
+            docker-compose up -d --force-recreate
+      - name: Test stack running on staging VM
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{env.STAGING_VM_IP}}
+          username: vfk
+          key: ${{secrets.RUNNER_PRIVATE_KEY}}
+          script: |
+            cd /staging/tmp/slm/tests/backend
+            mvn test -Dtest=DockerStackTests
+
+  test-external-components:
+    needs: deploy-staging-environment
+    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
+    runs-on: self-hosted
+    container:
+      image: maven:3.9-eclipse-temurin-19-focal
+      volumes:
+        - /tmp/.m2:/root/.m2
+    strategy:
+      matrix:
+        tests: [
+          {
+            component: "AWX",
+            test-class: "AWXTests"
+          },
+          {
+            component: "Consul",
+            test-class: "ConsulTests"
+          },
+          {
+            component: "Keycloak",
+            test-class: "KeycloakTests"
+          },
+          {
+            component: "Vault",
+            test-class: "VaultTests"
+          }
+        ]
+    env:
+      TARGET_HOST: ${{ github.ref_name == 'develop' && '10.3.7.166' || '10.3.7.145' }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run tests for '${{ matrix.tests.component }}' with Maven
+        run: |
+          cd tests/backend
+          mvn test -Dtest=${{ matrix.tests.test-class }}
+
+  test-internal-components:
+    needs: test-external-components
+    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
+    runs-on: self-hosted
+    container:
+      image: maven:3.9-eclipse-temurin-19-focal
+    strategy:
+      matrix:
+        tests: [
+          {
+            component: "Notification Service",
+            test-class: "NotificationServiceTests"
+          },
+          {
+            component: "Resource Management",
+            test-class: "ResourceManagementTests"
+          },
+          {
+            component: "Service Management",
+            test-class: "ServiceManagementTests"
+          }
+        ]
+    env:
+      TARGET_HOST: ${{ github.ref_name == 'develop' && '10.3.7.166' || '10.3.7.145' }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run tests for '${{ matrix.tests.component }}' with Maven
+        run: |
+          cd tests/backend
+          mvn test -Dtest=${{ matrix.tests.test-class }}

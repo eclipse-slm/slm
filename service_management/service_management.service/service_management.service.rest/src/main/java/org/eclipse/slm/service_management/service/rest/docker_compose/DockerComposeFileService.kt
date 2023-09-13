@@ -1,5 +1,6 @@
 package org.eclipse.slm.service_management.service.rest.docker_compose
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -49,11 +50,14 @@ data class DockerComposeFileService(
     var healthCheck: Map<String, Object>?,
 
     @JsonProperty("depends_on")
-    var dependsOn: List<String>?,
+    var dependsOn: DockerComposeFileDependsOn?,
 
     @JsonProperty("devices")
     var devices: List<String>?,
 
     @JsonProperty("network_mode")
     var networkMode: String?,
+
+    @JsonProperty("extra_hosts")
+    var extraHosts: List<String>?,
 )

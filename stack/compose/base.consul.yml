@@ -10,18 +10,26 @@ services:
       options:
         max-file: ${LOGGING_MAX_FILE}
         max-size: ${LOGGING_MAX_SIZE}
+    environment:
+      CONSUL_ADVERTISE: ${SLM_IP}
     networks:
       default:
         aliases:
           - consul
     ports:
       - "${CONSUL_PORT}:8500"
+      - "${CONSUL_PORT_RPC}:8300"
+      - "${CONSUL_PORT_LAN_SERF}:8301"
     volumes:
       - consul_data:/consul/data
       - consul_config_root:/config/root
       - consul_config_awx:/config/awx
       - consul_config_resource-management:/config/resource_management
+      - consul_config_resource-management-init:/config/resource_management_init
       - consul_config_service-management:/config/service_management
+      - consul_config_notification-service:/config/notification_service
+      - consul_config_catalog:/config/catalog
+      - consul_config_ui:/config/ui
     extra_hosts:
       - "${SLM_HOSTNAME}:172.17.0.1"
     healthcheck:
@@ -38,6 +46,9 @@ services:
       - consul_config_root:/config/consul/root
     extra_hosts:
       - "${SLM_HOSTNAME}:172.17.0.1"
+    depends_on:
+      - consul
+      - consul-esm
 
   consul-esm:
     image: hashicorp/consul-esm:${CONSUL_ESM_VERSION}
@@ -61,4 +72,8 @@ volumes:
   consul_config_root:
   consul_config_awx:
   consul_config_resource-management:
+  consul_config_resource-management-init:
   consul_config_service-management:
+  consul_config_notification-service:
+  consul_config_catalog:
+  consul_config_ui:

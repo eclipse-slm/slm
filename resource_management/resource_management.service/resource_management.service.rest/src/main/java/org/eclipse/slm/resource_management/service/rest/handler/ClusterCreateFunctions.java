@@ -20,10 +20,10 @@ import org.eclipse.slm.common.vault.client.VaultCredential;
 import org.eclipse.slm.common.vault.model.KvPath;
 import org.eclipse.slm.notification_service.model.*;
 import org.eclipse.slm.notification_service.service.client.NotificationServiceClient;
-import org.eclipse.slm.resource_management.model.capabilities.actions.AwxCapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionConfigParameter;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionConfigParameterRequiredType;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.AwxAction;
+import org.eclipse.slm.resource_management.model.actions.ActionConfigParameter;
+import org.eclipse.slm.resource_management.model.actions.ActionConfigParameterRequiredType;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.service.rest.capabilities.CapabilitiesConsulClient;
 import org.eclipse.slm.resource_management.service.rest.capabilities.MultiHostCapabilitiesConsulClient;
 import org.eclipse.slm.resource_management.model.cluster.ClusterCreateRequest;
@@ -31,7 +31,6 @@ import org.eclipse.slm.resource_management.model.consul.capability.CapabilitySer
 import org.eclipse.slm.resource_management.model.consul.capability.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.model.resource.ConnectionType;
 import org.eclipse.slm.resource_management.model.utils.KubernetesKubeConfig;
-import org.eclipse.slm.resource_management.service.rest.handler.ClusterJob;
 import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +90,7 @@ class ClusterCreateFunctions extends AbstractClusterFunctions implements IAwxJob
 
 
         var capability = multiHostCapabilityService.getCapability();
-        var capabilityAction = (AwxCapabilityAction) capability.getActions().get(CapabilityActionType.INSTALL);
+        var capabilityAction = (AwxAction) capability.getActions().get(ActionType.INSTALL);
 
         var extraVarsMap = new HashMap<String, Object>();
         String resourceId = multiHostCapabilityService.getId().toString();
@@ -207,12 +206,12 @@ class ClusterCreateFunctions extends AbstractClusterFunctions implements IAwxJob
             if (multiHostCapabilityService.getManaged()) {
 
                 // Parse config parameter from request to evaluate if values should be pushed to vault
-                List<CapabilityActionConfigParameter> configParametersFromCapabilityDefinition = multiHostCapabilityService.getCapability().getActions().get(CapabilityActionType.INSTALL).getConfigParameters();
+                List<ActionConfigParameter> configParametersFromCapabilityDefinition = multiHostCapabilityService.getCapability().getActions().get(ActionType.INSTALL).getConfigParameters();
 
                 for (var configParameterValueEntry : clusterCreateRequest.getConfigParameterValues().entrySet()) {
 
                     // check if parameter in request is in capability definition
-                    Optional<CapabilityActionConfigParameter> configParameterOptional = configParametersFromCapabilityDefinition.stream().filter(p -> p.getName().equals(configParameterValueEntry.getKey())).findFirst();
+                    Optional<ActionConfigParameter> configParameterOptional = configParametersFromCapabilityDefinition.stream().filter(p -> p.getName().equals(configParameterValueEntry.getKey())).findFirst();
                     if (configParameterOptional.isPresent()) {
 
                         // ToDo: Kubernetes - config parameter durchgehen
@@ -220,11 +219,11 @@ class ClusterCreateFunctions extends AbstractClusterFunctions implements IAwxJob
                         // if secret = true => vault + policy
 
                         // check for RequiredType (if always -> add always to vault; if skip -> only add if action is skipped)
-                        CapabilityActionConfigParameterRequiredType capabilityActionConfigParameterRequiredType = configParameterOptional.get().getRequiredType();
-                        if (capabilityActionConfigParameterRequiredType.equals(CapabilityActionConfigParameterRequiredType.ALWAYS)) {
+                        ActionConfigParameterRequiredType actionConfigParameterRequiredType = configParameterOptional.get().getRequiredType();
+                        if (actionConfigParameterRequiredType.equals(ActionConfigParameterRequiredType.ALWAYS)) {
                             configParametersForVault.put(configParameterValueEntry.getKey(), configParameterValueEntry.getValue());
                             LOG.info("Added config parameter with key '" + configParameterValueEntry.getKey() + "' (RequiredType: ALWAYS)");
-                        } else if (capabilityActionConfigParameterRequiredType.equals(CapabilityActionConfigParameterRequiredType.SKIP) && clusterCreateRequest.getSkipInstall()) {
+                        } else if (actionConfigParameterRequiredType.equals(ActionConfigParameterRequiredType.SKIP) && clusterCreateRequest.getSkipInstall()) {
                             configParametersForVault.put(configParameterValueEntry.getKey(), configParameterValueEntry.getValue());
                             LOG.info("Added config parameter with key '" + configParameterValueEntry.getKey() + "' (RequiredType: SKIP)");
                         }
@@ -273,13 +272,13 @@ class ClusterCreateFunctions extends AbstractClusterFunctions implements IAwxJob
             //region 4. prepare meta for consul
             Map<String, String> serviceMetaData = multiHostCapabilityService.getServiceMeta();
             Set<Map.Entry<String, String>> configParametersFromClusterRequest = clusterCreateRequest.getConfigParameterValues().entrySet();
-            List<CapabilityActionConfigParameter> configParametersFromCapabilityDefinition = multiHostCapabilityService.getCapability().getActions().get(CapabilityActionType.INSTALL).getConfigParameters();
+            List<ActionConfigParameter> configParametersFromCapabilityDefinition = multiHostCapabilityService.getCapability().getActions().get(ActionType.INSTALL).getConfigParameters();
 
             // iterate through config parameters from vault
             for(Map.Entry<String, String> secretConfigParameter : secretsOfClusterFromVault.entrySet()){
 
                 // if config parameter is in capability
-                Optional<CapabilityActionConfigParameter> configParameterOptional = configParametersFromCapabilityDefinition.stream().filter(p -> p.getName().equals(secretConfigParameter.getKey())).findFirst();
+                Optional<ActionConfigParameter> configParameterOptional = configParametersFromCapabilityDefinition.stream().filter(p -> p.getName().equals(secretConfigParameter.getKey())).findFirst();
 
                 if (configParameterOptional.isPresent()) {
                     switch (configParameterOptional.get().getValueType()){

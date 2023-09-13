@@ -19,6 +19,9 @@ database:
   password: password
 
 spring:
+  cloud:
+    consul:
+      enabled: false
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -42,6 +45,7 @@ logging:
         http: INFO
 
 keycloak:
+  enabled: false
   config:
     tenants:
       config-path: ../../src/test/resources/keycloak/

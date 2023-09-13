@@ -5,6 +5,7 @@ import com.orbitz.consul.Consul;
 import com.orbitz.consul.ConsulException;
 import com.orbitz.consul.model.acl.ImmutableLogin;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
+import org.eclipse.slm.common.consul.client.ConsulCredentialType;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import okhttp3.ConnectionPool;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 class AbstractConsulApiClient {
@@ -26,17 +28,18 @@ class AbstractConsulApiClient {
     protected RestTemplate restTemplate;
 
     protected String consulHost;
-
     protected int consulPort;
-
     protected String consulToken;
-
     protected String consulScheme;
-
     protected String consulDatacenter;
 
-    public AbstractConsulApiClient(String consulScheme, String consulHost, int consulPort,
-                                   String consulToken, String consulDatacenter) {
+    public AbstractConsulApiClient(
+            String consulScheme,
+            String consulHost,
+            int consulPort,
+            String consulToken,
+            String consulDatacenter
+    ) {
         this.consulScheme = consulScheme;
         this.consulHost = consulHost;
         this.consulPort = consulPort;
@@ -44,15 +47,39 @@ class AbstractConsulApiClient {
         this.consulDatacenter = consulDatacenter;
     }
 
-    private Map<String, Consul> consulClients = new HashMap<>();
+    private class ClientsKey {
+        String credentialIdentifier;
+        String consulHost;
 
-    private Map<String, Consul> keycloakTokenClients = new HashMap<>();
+        public ClientsKey(String credentialType, String consulHost) {
+            this.credentialIdentifier = credentialType;
+            this.consulHost = consulHost;
+        }
 
-    public Consul getConsulClient(ConsulCredential consulCredential) throws ConsulLoginFailedException {
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof ClientsKey that)) return false;
+            return Objects.equals(credentialIdentifier, that.credentialIdentifier) && Objects.equals(consulHost, that.consulHost);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(credentialIdentifier, consulHost);
+        }
+    }
+
+    private Map<ClientsKey, Consul> consulClients = new HashMap<>();
+
+    private Map<ClientsKey, Consul> keycloakTokenClients = new HashMap<>();
+
+    public Consul getConsulClient(ConsulCredential consulCredential, String consulHost, int consulPort) throws ConsulLoginFailedException {
+        ClientsKey clientsKey;
         switch (consulCredential.getConsulCredentialType()) {
             case APPLICATION_PROPERTIES -> {
-                if (consulClients.containsKey("APPLICATION_PROPERTIES")) {
-                    return consulClients.get("APPLICATION_PROPERTIES");
+                clientsKey = new ClientsKey(consulCredential.getConsulCredentialType().toString(), consulHost);
+                if (consulClients.containsKey(clientsKey)) {
+                    return consulClients.get(clientsKey);
                 } else {
                     var consulToken = this.consulToken;
                     var consulClient = Consul.builder()
@@ -60,22 +87,23 @@ class AbstractConsulApiClient {
                             .withReadTimeoutMillis(Duration.ofSeconds(2).toMillis())
                             .withTokenAuth(consulToken)
                             .build();
-                    this.consulClients.put("APPLICATION_PROPERTIES", consulClient);
+
+                    this.consulClients.put(clientsKey, consulClient);
                     return consulClient;
                 }
             }
 
             case CONSUL_TOKEN -> {
-                var consulToken = consulCredential.getConsulToken();
-                if (consulClients.containsKey(consulToken)) {
-                    return consulClients.get(consulToken);
+                clientsKey = new ClientsKey(consulCredential.getConsulToken(), consulHost);
+                if (consulClients.containsKey(clientsKey)) {
+                    return consulClients.get(clientsKey);
                 } else {
                     var consulClient = Consul.builder()
                             .withHostAndPort(HostAndPort.fromParts(consulHost, consulPort))
                             .withReadTimeoutMillis(Duration.ofSeconds(2).toMillis())
-                            .withTokenAuth(consulToken)
+                            .withTokenAuth(consulCredential.getConsulToken())
                             .build();
-                    this.consulClients.put(consulToken, consulClient);
+                    this.consulClients.put(clientsKey, consulClient);
                     return consulClient;
                 }
             }
@@ -83,10 +111,13 @@ class AbstractConsulApiClient {
             case KEYCLOAK_TOKEN -> {
                 var keycloakToken = consulCredential.getKeycloakPrincipal().getKeycloakSecurityContext().getTokenString();
                 var keycloakName = consulCredential.getKeycloakPrincipal().getName();
+                clientsKey = new ClientsKey(keycloakToken, consulHost);
+                ClientsKey keycloakClientsKey = new ClientsKey(keycloakName, consulHost);
+
                 Consul consulClient;
                 // Check if Keycloak token a consul client exists
-                if (consulClients.containsKey(keycloakToken)) {
-                    consulClient = consulClients.get(keycloakToken);
+                if (consulClients.containsKey(clientsKey)) {
+                    consulClient = consulClients.get(clientsKey);
                 }
                 else {
                     // Create new consul client for new Keycloak token
@@ -99,13 +130,13 @@ class AbstractConsulApiClient {
                             .withTokenAuth(consulTokenFromKeycloakToken)
                             .build();
                     // Check if an old consul client exists for Keycloak user
-                    if (this.keycloakTokenClients.containsKey(keycloakName)) {
-                        var oldConsulClient = this.keycloakTokenClients.get(keycloakName);
+                    if (this.keycloakTokenClients.containsKey(keycloakClientsKey)) {
+                        var oldConsulClient = this.keycloakTokenClients.get(keycloakClientsKey);
                         oldConsulClient.aclClient().logout();
                     }
 
-                    this.consulClients.put(keycloakToken, consulClient);
-                    this.keycloakTokenClients.put(keycloakName, consulClient);
+                    this.consulClients.put(clientsKey, consulClient);
+                    this.keycloakTokenClients.put(keycloakClientsKey, consulClient);
                 }
 
                 return consulClient;
@@ -113,6 +144,10 @@ class AbstractConsulApiClient {
         }
 
         throw new ConsulLoginFailedException("Unable to login to consul with consul credentials: " + consulCredential);
+    }
+
+    public Consul getConsulClient(ConsulCredential consulCredential) throws ConsulLoginFailedException {
+        return getConsulClient(consulCredential, this.consulHost, this.consulPort);
     }
 
     protected org.springframework.http.HttpHeaders getAuthHeaders(String consulToken)

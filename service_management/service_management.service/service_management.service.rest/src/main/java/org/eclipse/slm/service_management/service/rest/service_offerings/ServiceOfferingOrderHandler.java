@@ -1,14 +1,20 @@
 package org.eclipse.slm.service_management.service.rest.service_offerings;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.eclipse.slm.common.parent.service_rest.controller.TemplateVariableHandler;
+import org.eclipse.slm.common.consul.client.ConsulCredential;
+import org.eclipse.slm.common.consul.client.apis.ConsulNodesApiClient;
+import org.eclipse.slm.common.consul.model.catalog.Node;
+import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
+import org.eclipse.slm.common.parent.service_rest.controller.SystemVariableHandler;
 import org.eclipse.slm.resource_management.model.capabilities.provider.ServiceHosterFilter;
+import org.eclipse.slm.resource_management.model.consul.capability.CapabilityService;
 import org.eclipse.slm.resource_management.model.consul.capability.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.model.consul.capability.SingleHostCapabilityService;
 import org.eclipse.slm.resource_management.model.resource.MatchingResourceDTO;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
 import org.eclipse.slm.resource_management.service.client.handler.*;
 import org.eclipse.slm.service_management.model.exceptions.ServiceOptionNotFoundException;
+import org.eclipse.slm.service_management.model.offerings.options.DeploymentVariableType;
 import org.eclipse.slm.service_management.service.rest.service_deployment.CapabilityServiceNotFoundException;
 import org.eclipse.slm.service_management.service.rest.service_deployment.ServiceDeploymentHandler;
 import org.eclipse.slm.service_management.model.offerings.ServiceOrder;
@@ -26,13 +32,14 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.net.ssl.SSLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 public class ServiceOfferingOrderHandler {
 
-    private static final Logger Log = LoggerFactory.getLogger(ServiceOfferingOrderHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceOfferingOrderHandler.class);
 
     private final ServiceOfferingHandler serviceOfferingHandler;
 
@@ -44,27 +51,30 @@ public class ServiceOfferingOrderHandler {
 
     private final ServiceOfferingVersionRequirementsHandler serviceOfferingVersionRequirementsHandler;
 
-    private final TemplateVariableHandler templateVariableHandler;
+    private final SystemVariableHandler systemVariableHandler;
+
+    private final ConsulNodesApiClient consulNodesApiClient;
 
     public ServiceOfferingOrderHandler(ServiceOfferingHandler serviceOfferingHandler,
                                        ServiceOfferingVersionHandler serviceOfferingVersionHandler,
                                        ServiceDeploymentHandler serviceDeploymentHandler,
                                        ResourceManagementApiClientInitializer resourceManagementApiClientInitializer,
                                        ServiceOfferingVersionRequirementsHandler serviceOfferingVersionRequirementsHandler,
-                                       TemplateVariableHandler templateVariableHandler
-    ) {
+                                       SystemVariableHandler systemVariableHandler,
+                                       ConsulNodesApiClient consulNodesApiClient) {
         this.serviceOfferingHandler = serviceOfferingHandler;
         this.serviceOfferingVersionHandler = serviceOfferingVersionHandler;
         this.serviceDeploymentHandler = serviceDeploymentHandler;
         this.resourceManagementApiClientInitializer = resourceManagementApiClientInitializer;
         this.serviceOfferingVersionRequirementsHandler = serviceOfferingVersionRequirementsHandler;
-        this.templateVariableHandler = templateVariableHandler;
+        this.systemVariableHandler = systemVariableHandler;
+        this.consulNodesApiClient = consulNodesApiClient;
     }
 
     public void orderServiceOfferingById(UUID serviceOfferingId, UUID serviceOfferingVersionId,
                                          ServiceOrder serviceOrder,
                                          UUID deploymentCapabilityServiceId, KeycloakPrincipal keycloakPrincipal)
-            throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, ApiException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException {
+            throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, ApiException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException, ConsulLoginFailedException {
         var serviceOffering = this.serviceOfferingHandler.getServiceOfferingById(serviceOfferingId);
         var serviceOfferingVersion = this.serviceOfferingVersionHandler
                 .getServiceOfferingVersionById(serviceOfferingId, serviceOfferingVersionId);
@@ -80,7 +90,8 @@ public class ServiceOfferingOrderHandler {
                     }
                 }
 
-                if (serviceOption.getValueType().equals(ServiceOptionValueType.TEMPLATE_VARIABLE)) {
+                if (serviceOption.getValueType().equals(ServiceOptionValueType.SYSTEM_VARIABLE) ||
+                        serviceOption.getValueType().equals(ServiceOptionValueType.DEPLOYMENT_VARIABLE)) {
                     var optionalServiceOptionValue = serviceOrder.getServiceOptionValues()
                             .stream().filter(sov -> sov.getServiceOptionId().contentEquals(serviceOption.getId())).findAny();
 
@@ -89,11 +100,46 @@ public class ServiceOfferingOrderHandler {
                                 "Service option value for '" + serviceOption.getKey() + "' is missing");
                     }
                     else {
-                        var templateVariableKey = optionalServiceOptionValue.get().getValue().toString();
-                        var templateVariableValue = templateVariableHandler.getValueForTemplateVariable(templateVariableKey);
-                        optionalServiceOptionValue.get().setValue(templateVariableValue);
+                        switch (serviceOption.getValueType()) {
+                            case SYSTEM_VARIABLE -> {
+                                var templateVariableKey = optionalServiceOptionValue.get().getValue().toString();
+                                var templateVariableValue = systemVariableHandler.getValueForSystemVariable(templateVariableKey);
+                                optionalServiceOptionValue.get().setValue(templateVariableValue);
+                            }
+
+                            case DEPLOYMENT_VARIABLE -> {
+                                var deploymentVariableTypeString = optionalServiceOptionValue.get().getValue().toString();
+                                var deploymentVariable = DeploymentVariableType.valueOf(deploymentVariableTypeString);
+                                switch (deploymentVariable) {
+                                    case TARGET_RESOURCE_ID -> {
+                                        var resourceManagementApiClient = resourceManagementApiClientInitializer.init(keycloakPrincipal);
+                                        var capabilityProvidersRestControllerApi = new CapabilityProvidersRestControllerApi(resourceManagementApiClient);
+
+                                        var serviceHosterFilter = new ServiceHosterFilter.Builder()
+                                                .capabilityServiceId(deploymentCapabilityServiceId)
+                                                .build();
+                                        var serviceHosters = capabilityProvidersRestControllerApi.getServiceHosters("fabos", serviceHosterFilter);
+                                        var resourceId = this.getResourceIdOfServiceHoster(serviceHosters.get(0).getCapabilityService());
+                                        optionalServiceOptionValue.get().setValue(resourceId);
+                                    }
+
+                                    case TARGET_RESOURCE_IP -> {
+                                        var resourceManagementApiClient = resourceManagementApiClientInitializer.init(keycloakPrincipal);
+                                        var capabilityProvidersRestControllerApi = new CapabilityProvidersRestControllerApi(resourceManagementApiClient);
+
+                                        var serviceHosterFilter = new ServiceHosterFilter.Builder()
+                                                .capabilityServiceId(deploymentCapabilityServiceId)
+                                                .build();
+                                        var serviceHosters = capabilityProvidersRestControllerApi.getServiceHosters("fabos", serviceHosterFilter);
+                                        var resourceIp = this.getResourceIpOfServiceHoster(serviceHosters.get(0).getCapabilityService());
+                                        optionalServiceOptionValue.get().setValue(resourceIp);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
+
             }
         }
 
@@ -135,13 +181,7 @@ public class ServiceOfferingOrderHandler {
 
         var matchingResources = new ArrayList<MatchingResourceDTO>();
         for (var serviceHoster : serviceHosters) {
-            UUID resourceId;
-            if (serviceHoster.getCapabilityService() instanceof SingleHostCapabilityService) {
-                resourceId = ((SingleHostCapabilityService)serviceHoster.getCapabilityService()).getConsulNodeId();
-            }
-            else {
-                resourceId = serviceHoster.getCapabilityService().getId();
-            }
+            var resourceId = this.getResourceIdOfServiceHoster(serviceHoster.getCapabilityService());
 
             var matchingResource = new MatchingResourceDTO(
                     resourceId,
@@ -151,5 +191,30 @@ public class ServiceOfferingOrderHandler {
         }
 
         return matchingResources;
+    }
+
+    private UUID getResourceIdOfServiceHoster(CapabilityService capabilityService) {
+        UUID resourceId;
+        if (capabilityService instanceof SingleHostCapabilityService) {
+            resourceId = ((SingleHostCapabilityService)capabilityService).getConsulNodeId();
+        }
+        else {
+            resourceId = capabilityService.getId();
+        }
+
+        return resourceId;
+    }
+
+    private String getResourceIpOfServiceHoster(CapabilityService capabilityService) throws ConsulLoginFailedException {
+        var resourceId = this.getResourceIdOfServiceHoster(capabilityService);
+        Optional<Node> optionalNode = consulNodesApiClient.getNodeById(new ConsulCredential(), resourceId);
+
+        String resourceIp = "N/A";
+        if (optionalNode.isPresent()) {
+            resourceIp = optionalNode.get().getAddress();
+
+        }
+
+        return resourceIp;
     }
 }

@@ -2,10 +2,13 @@ version: '3'
 
 services:
   aas-registry:
-    image: eclipsebasyx/aas-registry:1.3.1
+    image: eclipsebasyx/aas-registry:1.4.0
     restart: always
     depends_on:
       - aas-database
+      - aas-server
+      - aas-gui
+      - aas-broker
     networks:
       default:
         aliases:
@@ -13,15 +16,20 @@ services:
     ports:
       - "4000:4000"
     environment:
+      basyxregistry_registry_events: MQTTV2_SIMPLE_ENCODING
+      basyxmqtt_server: tcp://aas-broker:1883
       basyxregistry_registry_backend: MongoDB
       basyxmongodb_dbconnectionstring: mongodb://aas-database:27017/
       basyxcontext_accesscontrolalloworigin: "*"
+    extra_hosts:
+      - "${SLM_HOSTNAME}:172.17.0.1"
 
   aas-server:
-    image: eclipsebasyx/aas-server:1.3.1
+    image: eclipsebasyx/aas-server:1.4.0
     restart: always
     depends_on:
       - aas-database
+      - aas-broker
     networks:
       default:
         aliases:
@@ -30,12 +38,16 @@ services:
       - "4001:4001"
     environment:
       basyxaas_registry_path: http://aas-registry:4000/registry/api/v1/registry
+      basyxaas_aas_events: MQTTV2_SIMPLE_ENCODING
       basyxaas_aas_backend: MongoDB
       basyxaas_aas_aasxupload: Enabled
       basyxaas_registry_host: http://${SLM_HOSTNAME}:4001/aasServer
       basyxmongodb_dbconnectionstring: mongodb://aas-database:27017/
+      basyxmqtt_server: tcp://aas-broker:1883
       basyxcontext_accesscontrolalloworigin: "*"
       waiting_for: '[{"host":"aas-registry","port":"4000"}]'
+    extra_hosts:
+      - "${SLM_HOSTNAME}:172.17.0.1"
 
   aas-database:
     image: mongo:latest
@@ -48,8 +60,7 @@ services:
       - "aas_database:/data/db"
 
   aas-gui:
-    # image: eclipsebasyx/aas-gui:230403 - replaced for HMI 2023
-    image: fabos4ai/aas-ui:1.2.0-SNAPSHOT
+    image: eclipsebasyx/aas-gui:v230703
     restart: always
     ports:
       - "3000:3000"
@@ -60,5 +71,36 @@ services:
     volumes:
       - "./config/aas-gui/logo:/app/src/assets/Logo"
 
+  aas-broker:
+    image: fabos4ai/aas-broker:1.0.0-SNAPSHOT
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "1801:9001"
+
+  aas-transformer:
+    image: fabos4ai/aas-transformer:1.0.0-SNAPSHOT
+    restart: unless-stopped
+    depends_on:
+      - aas-transformer-database
+    ports:
+      - "4010:4010"
+
+  aas-transformer-database:
+    image: mariadb:10.5
+    restart: unless-stopped
+    environment:
+      MYSQL_USER: aas-transformer
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: transformer
+      MARIADB_ROOT_PASSWORD: password
+    volumes:
+      - "aas_transformer_database:/var/lib/mysql"
+
+  aas-transformer-initializer:
+    image: fabos4ai/aas-transformer-initializer:1.0.0-SNAPSHOT
+    restart: "no"
+
 volumes:
   aas_database:
+  aas_transformer_database:

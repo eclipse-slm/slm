@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: aas-server
+  labels:
+    app: aas-server
+spec:
+  type: ClusterIP
+  selector:
+    app: aas-server
+  ports:
+    - protocol: TCP
+      port: 4001
+      targetPort: 4001

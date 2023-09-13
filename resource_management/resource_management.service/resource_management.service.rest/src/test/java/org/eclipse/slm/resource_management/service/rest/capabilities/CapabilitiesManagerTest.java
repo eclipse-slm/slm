@@ -20,8 +20,8 @@ import org.eclipse.slm.notification_service.model.JobGoal;
 import org.eclipse.slm.notification_service.model.JobTarget;
 import org.eclipse.slm.notification_service.service.client.NotificationServiceClient;
 import org.eclipse.slm.resource_management.model.capabilities.*;
-import org.eclipse.slm.resource_management.model.capabilities.actions.AwxCapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.AwxAction;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.consul.capability.SingleHostCapabilityService;
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.persistence.api.CapabilityJpaRepository;
@@ -118,18 +118,18 @@ public class CapabilitiesManagerTest {
             // Set AWX Capability Actions
             var dockerDeploymentCapabilityRepo = "https://github.com/FabOS-AI/fabos-slm-dc-docker.git";
             var dockerDeploymentCapabilityBranch = "1.0.0";
-            AwxCapabilityAction installAwxCapabilityAction = new AwxCapabilityAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "install.yml");
+            AwxAction installAwxCapabilityAction = new AwxAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "install.yml");
             installAwxCapabilityAction.setUsername("username");
             installAwxCapabilityAction.setPassword("password");
 
             dockerDeploymentCapability.getActions()
-                    .put(CapabilityActionType.INSTALL, installAwxCapabilityAction);
+                    .put(ActionType.INSTALL, installAwxCapabilityAction);
             dockerDeploymentCapability.getActions()
-                    .put(CapabilityActionType.UNINSTALL, new AwxCapabilityAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "uninstall.yml"));
+                    .put(ActionType.UNINSTALL, new AwxAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "uninstall.yml"));
             dockerDeploymentCapability.getActions()
-                    .put(CapabilityActionType.DEPLOY, new AwxCapabilityAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "deploy.yml"));
+                    .put(ActionType.DEPLOY, new AwxAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "deploy.yml"));
             dockerDeploymentCapability.getActions()
-                    .put(CapabilityActionType.UNDEPLOY, new AwxCapabilityAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "undeploy.yml"));
+                    .put(ActionType.UNDEPLOY, new AwxAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "undeploy.yml"));
             //endregion
         }
 
@@ -397,13 +397,13 @@ public class CapabilitiesManagerTest {
             var virtualizationCapabilityRepo = "https://github.com/FabOS-AI/fabos-slm-dc-dummy";
             var virtualizationCapabilityBranch = "main";
             virtualizationCapability.getActions()
-                    .put(CapabilityActionType.INSTALL, new AwxCapabilityAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "install.yml"));
+                    .put(ActionType.INSTALL, new AwxAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "install.yml"));
             virtualizationCapability.getActions()
-                    .put(CapabilityActionType.UNINSTALL, new AwxCapabilityAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "uninstall.yml"));
+                    .put(ActionType.UNINSTALL, new AwxAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "uninstall.yml"));
             virtualizationCapability.getActions()
-                    .put(CapabilityActionType.CREATE_VM, new AwxCapabilityAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "create_vm.yml"));
+                    .put(ActionType.CREATE_VM, new AwxAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "create_vm.yml"));
             virtualizationCapability.getActions()
-                    .put(CapabilityActionType.DELETE_VM, new AwxCapabilityAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "delete_vm.yml"));
+                    .put(ActionType.DELETE_VM, new AwxAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "delete_vm.yml"));
             //endregion
         }
 
@@ -499,7 +499,7 @@ public class CapabilitiesManagerTest {
         @Test
         @Order(75)
         public void testAddCapabilityWithParams() throws ConsulLoginFailedException, ResourceNotFoundException, AwxProjectUpdateFailedException, JsonProcessingException, SSLException, IllegalAccessException {
-            AwxCapabilityAction action = (AwxCapabilityAction) virtualizationCapability.getActions().get(CapabilityActionType.CREATE_VM);
+            AwxAction action = (AwxAction) virtualizationCapability.getActions().get(ActionType.CREATE_VM);
             action.setParameter(surveyItems);
 
             Mockito.when(jobTemplate.getId())

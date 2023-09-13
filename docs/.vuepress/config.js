@@ -1,9 +1,9 @@
 module.exports = {
     title: 'EclipseSLM',
     description: 'Eclipse Service Lifecycle Management',
-    base: `/slm/${process.env.VERSION_PATH || '/slm'}`,
+    base: `/slm/${process.env.VERSION_PATH || ''}`,
     themeConfig: {
-          repo: 'FabOS-AI/fabos-slm',
+          repo: 'eclipse-slm/slm',
           logo: '/img/logo.svg',
           editLinks: false,
           docsDir: '',
@@ -12,7 +12,6 @@ module.exports = {
           nav: [
               { text: 'Home', link: '/' },
           ],
-
           sidebar: {
               '/docs/': [
                 {

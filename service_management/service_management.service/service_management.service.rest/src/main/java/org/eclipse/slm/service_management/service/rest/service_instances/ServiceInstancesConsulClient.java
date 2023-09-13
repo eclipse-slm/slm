@@ -1,6 +1,7 @@
 package org.eclipse.slm.service_management.service.rest.service_instances;
 
 import org.eclipse.slm.common.consul.client.ConsulCredential;
+import org.eclipse.slm.common.consul.client.apis.ConsulGenericServicesClient;
 import org.eclipse.slm.common.consul.client.apis.ConsulServicesApiClient;
 import org.eclipse.slm.common.consul.model.catalog.ConsulService;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
@@ -18,15 +19,20 @@ public class ServiceInstancesConsulClient {
     private final static Logger LOG = LoggerFactory.getLogger(ServiceInstancesConsulClient.class);
 
     private final ConsulServicesApiClient consulServicesApiClient;
+    private final ConsulGenericServicesClient consulGenericServicesClient;
 
-    public ServiceInstancesConsulClient(ConsulServicesApiClient consulServicesApiClient) {
+    public ServiceInstancesConsulClient(
+            ConsulServicesApiClient consulServicesApiClient,
+            ConsulGenericServicesClient consulGenericServicesClient
+    ) {
         this.consulServicesApiClient = consulServicesApiClient;
+        this.consulGenericServicesClient = consulGenericServicesClient;
     }
 
     public void registerConsulServiceForServiceInstance(ServiceInstance serviceInstance) {
         try {
             var consulService = this.convertServiceInstanceToConsulService(serviceInstance);
-            this.consulServicesApiClient.registerServiceForNodeWithReadAccessViaKeycloakRole(
+            this.consulGenericServicesClient.registerServiceForNodeWithReadAccessViaKeycloakRole(
                     new ConsulCredential(),
                     consulService.getNodeId(),
                     consulService.getServiceName(),
@@ -43,7 +49,7 @@ public class ServiceInstancesConsulClient {
     public void updateConsulServiceForServiceInstance(ServiceInstance serviceInstance) {
         try {
             var consulService = this.convertServiceInstanceToConsulService(serviceInstance);
-            this.consulServicesApiClient.registerService(
+            this.consulGenericServicesClient.registerService(
                     new ConsulCredential(),
                     consulService.getNodeId(),
                     consulService.getServiceName(),
@@ -72,7 +78,11 @@ public class ServiceInstancesConsulClient {
     public void deregisterConsulServiceForServiceInstance(ServiceInstance serviceInstance) {
         try {
             var consulServiceName = this.getConsulServiceNameForServiceInstance(serviceInstance.getId());
-            this.consulServicesApiClient.removeServiceAndAclByName(new ConsulCredential(), serviceInstance.getResourceId(), consulServiceName);
+            this.consulGenericServicesClient.deregisterServiceAndPolicy(
+                    new ConsulCredential(),
+                    serviceInstance.getResourceId(),
+                    consulServiceName
+            );
         } catch (ConsulLoginFailedException e) {
             LOG.error("Error login in to Consul to remove undeployed service '" + serviceInstance.getId() + "'");
         }

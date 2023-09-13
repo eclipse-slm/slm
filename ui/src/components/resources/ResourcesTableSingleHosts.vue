@@ -14,8 +14,17 @@
     >
       <template #top>
         <v-toolbar flat>
+          <v-spacer></v-spacer>
           <v-toolbar-title>
-            Hosts
+            <v-btn
+                v-if="areProfilerAvailable"
+                color="primary"
+                @click="runProfiler"
+            >
+              <v-icon color="white">
+                mdi-magnify
+              </v-icon>
+            </v-btn>
           </v-toolbar-title>
         </v-toolbar>
         <v-toolbar-items
@@ -268,6 +277,7 @@
   import CapabilityParamsDialog from "@/components/resources/dialogs/CapabilityParamsDialog.vue";
   import ResourcesRestApi from '@/api/resource-management/resourcesRestApi'
   import { capabilityUtilsMixin } from '@/utils/capabilityUtils'
+  import ProfilerRestApi from "@/api/resource-management/profilerRestApi";
 
   export default {
     name: 'ResourcesTableSingleHosts',
@@ -308,10 +318,17 @@
       ...mapGetters([
         'resources',
         'locations',
+        'profiler',
         'searchResources',
         'selectedResourceForDelete',
         'availableSingleHostCapabilitiesNoDefault',
       ]),
+      areProfilerAvailable() {
+        if(this.profiler.length > 0)
+          return true
+        else
+          return false
+      },
       showCapabilityParamsDialog() {
         if(this.selectedResourceId !== null && this.selectedCapabilityId !== null && this.selectedSkipInstall !== null)
           return true
@@ -526,6 +543,9 @@
       },
       insertWhiteSpaceInCamelCase(string) {
         return string.replace(/([A-Z])/g, ' $1').trim()
+      },
+      runProfiler() {
+        ProfilerRestApi.runProfiler()
       }
     }
   }

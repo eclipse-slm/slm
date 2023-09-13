@@ -169,7 +169,8 @@ public final class DockerContainerServiceOfferingOrderUtil {
                 null,
                 null,
                 null,
-                new ArrayList<>(),
+                null,
+                null,
                 null,
                 null
         );

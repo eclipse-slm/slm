@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: awx-web
+  labels:
+    app: awx-web
+spec:
+      containers:
+        - name: awx-web
+          image: ghcr.io/eclipse-slm/awx/awx-web:{{.Values.awx.version}}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8052
+            - containerPort: 8053
+          env:
+            - name: AWX_ADMIN_USERNAME
+              value: {{ .Values.awx.admin_username  }}
+            - name: AWX_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: awx-secret
+                  key: admin-password
+
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: awx-supervisor-socket-pv
+              mountPath: /var/run/supervisor
+            - name: awx-rsyslog-socket-pv
+              mountPath: /var/run/awx-rsyslog/
+            - name: awx-rsyslog-config-pv
+              mountPath: /var/lib/awx/rsyslog/
+            - name: awx-redis-pv
+              mountPath: /var/run/redis
+
+          livenessProbe:
+            httpGet:
+              port: 8052
+              path: /
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
+
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: awx-web-nginx-config # place ConfigMap `awx-web-nginx-config` on /etc/nginx
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+        - name: awx-supervisor-socket-pv
+          persistentVolumeClaim:
+            claimName: awx-supervisor-socket-pvc
+        - name: awx-rsyslog-socket-pv
+          persistentVolumeClaim:
+            claimName: awx-rsyslog-socket-pvc
+        - name: awx-rsyslog-config-pv
+          persistentVolumeClaim:
+            claimName: awx-rsyslog-config-pvc
+        - name: awx-redis-pv
+          persistentVolumeClaim:
+            claimName: awx-redis-pvc
+{{/*        - name: log*/}}
+{{/*          emptyDir: { }*/}}
+
+      restartPolicy: Always

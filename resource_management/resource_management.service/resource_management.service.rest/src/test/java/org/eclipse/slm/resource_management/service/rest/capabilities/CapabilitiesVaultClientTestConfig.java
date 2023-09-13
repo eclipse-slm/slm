@@ -3,10 +3,10 @@ package org.eclipse.slm.resource_management.service.rest.capabilities;
 import org.eclipse.slm.common.model.DeploymentType;
 import org.eclipse.slm.common.vault.client.VaultClient;
 import org.eclipse.slm.common.vault.client.VaultCredential;
+import org.eclipse.slm.resource_management.model.actions.*;
 import org.eclipse.slm.resource_management.model.capabilities.Capability;
 import org.eclipse.slm.resource_management.model.capabilities.CapabilityType;
 import org.eclipse.slm.resource_management.model.capabilities.DeploymentCapability;
-import org.eclipse.slm.resource_management.model.capabilities.actions.*;
 import org.eclipse.slm.resource_management.model.consul.capability.CapabilityServiceStatus;
 import org.eclipse.slm.resource_management.model.consul.capability.SingleHostCapabilityService;
 import org.eclipse.slm.resource_management.model.resource.ConnectionType;
@@ -49,39 +49,39 @@ public class CapabilitiesVaultClientTestConfig {
             CapabilityType.SETUP,
             CapabilityType.DEPLOY
     );
-    private static AwxCapabilityAction awxCapabilityAction = new AwxCapabilityAction(
+    private static AwxAction awxCapabilityAction = new AwxAction(
             "repo",
             "branch",
             "playbook"
     );
-    private static Map<CapabilityActionType, CapabilityAction> actions = Map.of(
-            CapabilityActionType.INSTALL, awxCapabilityAction,
-            CapabilityActionType.UNINSTALL, awxCapabilityAction,
-            CapabilityActionType.DEPLOY, awxCapabilityAction,
-            CapabilityActionType.UNDEPLOY, awxCapabilityAction
+    private static Map<ActionType, Action> actions = Map.of(
+            ActionType.INSTALL, awxCapabilityAction,
+            ActionType.UNINSTALL, awxCapabilityAction,
+            ActionType.DEPLOY, awxCapabilityAction,
+            ActionType.UNDEPLOY, awxCapabilityAction
     );
     private static List<DeploymentType> deploymentTypes = Arrays.asList(
             DeploymentType.DOCKER_CONTAINER,
             DeploymentType.DOCKER_COMPOSE
     );
 
-    private static List<CapabilityActionConfigParameter> capabilityConfigParamters = Arrays.asList(
-            new CapabilityActionConfigParameter(
+    private static List<ActionConfigParameter> capabilityConfigParamters = Arrays.asList(
+            new ActionConfigParameter(
                     "username",
                     "Username",
                     "",
-                    CapabilityActionConfigParameterValueType.STRING,
+                    ActionConfigParameterValueType.STRING,
                     "",
-                    CapabilityActionConfigParameterRequiredType.ALWAYS,
+                    ActionConfigParameterRequiredType.ALWAYS,
                     false
             ),
-            new CapabilityActionConfigParameter(
+            new ActionConfigParameter(
                     "password",
                     "Password",
                     "",
-                    CapabilityActionConfigParameterValueType.STRING,
+                    ActionConfigParameterValueType.STRING,
                     "",
-                    CapabilityActionConfigParameterRequiredType.ALWAYS,
+                    ActionConfigParameterRequiredType.ALWAYS,
                     true
             )
     );
@@ -121,7 +121,7 @@ public class CapabilitiesVaultClientTestConfig {
         singleHostCapability.setActions(actions);
         singleHostCapability.
                 getActions()
-                .get(CapabilityActionType.INSTALL)
+                .get(ActionType.INSTALL)
                 .setConfigParameters(capabilityConfigParamters);
 
         return singleHostCapability;

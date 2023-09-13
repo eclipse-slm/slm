@@ -44,6 +44,15 @@ spring:
     user:
       name: admin
       password: password
+  cloud:
+    consul:
+      host: ${consul.host}
+      port: ${consul.port}
+      discovery:
+        ip-address: {{ local_host | default("172.17.0.1") }}
+        acl-token: ${consul.acl-token}
+        prefer-ip-address: true
+        register-health-check: true
   jpa:
     hibernate:
       ddl-auto: update
@@ -64,7 +73,7 @@ management:
 ### Components - Internal
 notification-service:
   scheme: "http"
-  host: "localhost"
+  host: {{ target_host }}
   port: ${server.port}
 
 ### Keycloak
@@ -90,3 +99,11 @@ awx:
   username: {{ awx_notification_service_username }}
   password: {{ awx_notification_service_password }}
   polling-interval-in-s: 4
+
+### Consul
+consul:
+  scheme: {{ consul_scheme }}
+  host: {{ consul_hostname }}
+  port: {{ consul_port }}
+  datacenter: fabos
+  acl-token: {{ consul_resource_management_token }}

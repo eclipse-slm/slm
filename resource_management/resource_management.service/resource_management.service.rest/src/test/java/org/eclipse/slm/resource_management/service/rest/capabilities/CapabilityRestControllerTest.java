@@ -9,8 +9,8 @@ import org.eclipse.slm.resource_management.model.capabilities.CapabilityFilter;
 import org.eclipse.slm.resource_management.model.capabilities.CapabilityType;
 import org.eclipse.slm.resource_management.model.capabilities.DeploymentCapability;
 import org.eclipse.slm.resource_management.model.capabilities.VirtualizationCapability;
-import org.eclipse.slm.resource_management.model.capabilities.actions.AwxCapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.AwxAction;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType;
 import org.eclipse.slm.resource_management.service.rest.Application;
 import org.eclipse.slm.resource_management.service.rest.resources.ResourcesManager;
@@ -123,13 +123,13 @@ public class CapabilityRestControllerTest {
         var dockerDeploymentCapabilityRepo = "https://github.com/FabOS-AI/fabos-slm-dc-docker.git";
         var dockerDeploymentCapabilityBranch = "1.0.0";
         dockerDeploymentCapability.getActions()
-                .put(CapabilityActionType.INSTALL, new AwxCapabilityAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "install.yml"));
+                .put(ActionType.INSTALL, new AwxAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "install.yml"));
         dockerDeploymentCapability.getActions()
-                .put(CapabilityActionType.UNINSTALL, new AwxCapabilityAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "uninstall.yml"));
+                .put(ActionType.UNINSTALL, new AwxAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "uninstall.yml"));
         dockerDeploymentCapability.getActions()
-                .put(CapabilityActionType.DEPLOY, new AwxCapabilityAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "deploy.yml"));
+                .put(ActionType.DEPLOY, new AwxAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "deploy.yml"));
         dockerDeploymentCapability.getActions()
-                .put(CapabilityActionType.UNDEPLOY, new AwxCapabilityAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "undeploy.yml"));
+                .put(ActionType.UNDEPLOY, new AwxAction(dockerDeploymentCapabilityRepo, dockerDeploymentCapabilityBranch, "undeploy.yml"));
         //endregion
 
         //region Create Java Object of Docker Swarm DeploymentCapability:
@@ -151,18 +151,18 @@ public class CapabilityRestControllerTest {
         // Set AWX Capability Actions
         var dockerSwarmDeploymentCapabilityRepo = "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm.git";
         var dockerSwarmDeploymentCapabilityBranch = "1.0.0";
-        dockerSwarmDeploymentCapability.getActions().put(CapabilityActionType.INSTALL,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "install.yml"));
-        dockerSwarmDeploymentCapability.getActions().put(CapabilityActionType.UNINSTALL,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "uninstall.yml"));
-        dockerSwarmDeploymentCapability.getActions().put(CapabilityActionType.DEPLOY,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "deploy.yml"));
-        dockerSwarmDeploymentCapability.getActions().put(CapabilityActionType.UNDEPLOY,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "undeploy.yml"));
-        dockerSwarmDeploymentCapability.getActions().put(CapabilityActionType.SCALE_UP,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaleup.yml"));
-        dockerSwarmDeploymentCapability.getActions().put(CapabilityActionType.SCALE_DOWN,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaledown.yml"));
+        dockerSwarmDeploymentCapability.getActions().put(ActionType.INSTALL,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "install.yml"));
+        dockerSwarmDeploymentCapability.getActions().put(ActionType.UNINSTALL,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "uninstall.yml"));
+        dockerSwarmDeploymentCapability.getActions().put(ActionType.DEPLOY,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "deploy.yml"));
+        dockerSwarmDeploymentCapability.getActions().put(ActionType.UNDEPLOY,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "undeploy.yml"));
+        dockerSwarmDeploymentCapability.getActions().put(ActionType.SCALE_UP,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaleup.yml"));
+        dockerSwarmDeploymentCapability.getActions().put(ActionType.SCALE_DOWN,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaledown.yml"));
 
         // Set Cluster Member Types:
         dockerSwarmDeploymentCapability.setClusterMemberTypes(Arrays.asList(
@@ -185,13 +185,13 @@ public class CapabilityRestControllerTest {
         var kvmQemuVirtualizationCapabilityRepo = "https://github.com/FabOS-AI/fabos-slm-vrp-kvm";
         var kvmQemuVirtualizationCapabilityBranch = "main";
         dockerDeploymentCapability.getActions()
-                .put(CapabilityActionType.INSTALL, new AwxCapabilityAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "install.yml"));
+                .put(ActionType.INSTALL, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "install.yml"));
         dockerDeploymentCapability.getActions()
-                .put(CapabilityActionType.UNINSTALL, new AwxCapabilityAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "uninstall.yml"));
+                .put(ActionType.UNINSTALL, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "uninstall.yml"));
         dockerDeploymentCapability.getActions()
-                .put(CapabilityActionType.CREATE_VM, new AwxCapabilityAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "create_vm.yml"));
+                .put(ActionType.CREATE_VM, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "create_vm.yml"));
         dockerDeploymentCapability.getActions()
-                .put(CapabilityActionType.DELETE_VM, new AwxCapabilityAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "delete_vm.yml"));
+                .put(ActionType.DELETE_VM, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "delete_vm.yml"));
         //endregion
     }
 

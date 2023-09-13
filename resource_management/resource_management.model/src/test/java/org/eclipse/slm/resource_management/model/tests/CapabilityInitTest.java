@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.slm.common.model.DeploymentType;
 import org.eclipse.slm.resource_management.model.capabilities.CapabilityType;
 import org.eclipse.slm.resource_management.model.capabilities.DeploymentCapability;
-import org.eclipse.slm.resource_management.model.capabilities.actions.AwxCapabilityAction;
+import org.eclipse.slm.resource_management.model.actions.AwxAction;
 import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -40,13 +40,13 @@ public class CapabilityInitTest {
         var deploymentCapabilityRepo = "https://github.com/FabOS-AI/fabos-slm-dc-docker.git";
         var deploymentCapabilityBranch = "1.0.0";
         capability.getActions()
-                .put(CapabilityActionType.INSTALL, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "install.yml"));
+                .put(ActionType.INSTALL, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "install.yml"));
         capability.getActions()
-                .put(CapabilityActionType.UNINSTALL, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "uninstall.yml"));
+                .put(ActionType.UNINSTALL, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "uninstall.yml"));
         capability.getActions()
-                .put(CapabilityActionType.DEPLOY, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "deploy.yml"));
+                .put(ActionType.DEPLOY, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "deploy.yml"));
         capability.getActions()
-                .put(CapabilityActionType.UNDEPLOY, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "undeploy.yml"));
+                .put(ActionType.UNDEPLOY, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "undeploy.yml"));
 
 
         String jsonString = mapper.writeValueAsString(capability);
@@ -76,18 +76,18 @@ public class CapabilityInitTest {
         // Set AWX Capability Actions
         var dockerSwarmDeploymentCapabilityRepo = "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm.git";
         var dockerSwarmDeploymentCapabilityBranch = "1.0.0";
-        capability.getActions().put(CapabilityActionType.INSTALL,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "install.yml"));
-        capability.getActions().put(CapabilityActionType.UNINSTALL,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "uninstall.yml"));
-        capability.getActions().put(CapabilityActionType.DEPLOY,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "deploy.yml"));
-        capability.getActions().put(CapabilityActionType.UNDEPLOY,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "undeploy.yml"));
-        capability.getActions().put(CapabilityActionType.SCALE_UP,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaleup.yml"));
-        capability.getActions().put(CapabilityActionType.SCALE_DOWN,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaledown.yml"));
+        capability.getActions().put(ActionType.INSTALL,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "install.yml"));
+        capability.getActions().put(ActionType.UNINSTALL,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "uninstall.yml"));
+        capability.getActions().put(ActionType.DEPLOY,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "deploy.yml"));
+        capability.getActions().put(ActionType.UNDEPLOY,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "undeploy.yml"));
+        capability.getActions().put(ActionType.SCALE_UP,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaleup.yml"));
+        capability.getActions().put(ActionType.SCALE_DOWN,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaledown.yml"));
 
         capability.setClusterMemberTypes(Arrays.asList(
                 new ClusterMemberType("Manager", "docker_manager", 3, false),
@@ -123,13 +123,13 @@ public class CapabilityInitTest {
         var deploymentCapabilityRepo = "https://github.com/FabOS-AI/fabos-slm-dc-docker.git";
         var deploymentCapabilityBranch = "1.0.0";
         capability1.getActions()
-                .put(CapabilityActionType.INSTALL, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "install.yml"));
+                .put(ActionType.INSTALL, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "install.yml"));
         capability1.getActions()
-                .put(CapabilityActionType.UNINSTALL, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "uninstall.yml"));
+                .put(ActionType.UNINSTALL, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "uninstall.yml"));
         capability1.getActions()
-                .put(CapabilityActionType.DEPLOY, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "deploy.yml"));
+                .put(ActionType.DEPLOY, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "deploy.yml"));
         capability1.getActions()
-                .put(CapabilityActionType.UNDEPLOY, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "undeploy.yml"));
+                .put(ActionType.UNDEPLOY, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "undeploy.yml"));
         //endregion
 
         //region Create Capability2
@@ -151,13 +151,13 @@ public class CapabilityInitTest {
 
         // Set AWX Capability Actions
         capability2.getActions()
-                .put(CapabilityActionType.INSTALL, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "install.yml"));
+                .put(ActionType.INSTALL, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "install.yml"));
         capability2.getActions()
-                .put(CapabilityActionType.UNINSTALL, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "uninstall.yml"));
+                .put(ActionType.UNINSTALL, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "uninstall.yml"));
         capability2.getActions()
-                .put(CapabilityActionType.DEPLOY, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "deploy.yml"));
+                .put(ActionType.DEPLOY, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "deploy.yml"));
         capability2.getActions()
-                .put(CapabilityActionType.UNDEPLOY, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "undeploy.yml"));
+                .put(ActionType.UNDEPLOY, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "undeploy.yml"));
         //endregion
 
         compareCapabilities(capability1, capability2);
@@ -186,18 +186,18 @@ public class CapabilityInitTest {
         // Set AWX Capability Actions
         var dockerSwarmDeploymentCapabilityRepo = "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm.git";
         var dockerSwarmDeploymentCapabilityBranch = "1.0.0";
-        capability1.getActions().put(CapabilityActionType.INSTALL,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "install.yml"));
-        capability1.getActions().put(CapabilityActionType.UNINSTALL,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "uninstall.yml"));
-        capability1.getActions().put(CapabilityActionType.DEPLOY,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "deploy.yml"));
-        capability1.getActions().put(CapabilityActionType.UNDEPLOY,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "undeploy.yml"));
-        capability1.getActions().put(CapabilityActionType.SCALE_UP,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaleup.yml"));
-        capability1.getActions().put(CapabilityActionType.SCALE_DOWN,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaledown.yml"));
+        capability1.getActions().put(ActionType.INSTALL,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "install.yml"));
+        capability1.getActions().put(ActionType.UNINSTALL,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "uninstall.yml"));
+        capability1.getActions().put(ActionType.DEPLOY,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "deploy.yml"));
+        capability1.getActions().put(ActionType.UNDEPLOY,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "undeploy.yml"));
+        capability1.getActions().put(ActionType.SCALE_UP,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaleup.yml"));
+        capability1.getActions().put(ActionType.SCALE_DOWN,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaledown.yml"));
 
         capability1.setClusterMemberTypes(Arrays.asList(
                 new ClusterMemberType("Manager", "docker_manager", 3, false),
@@ -224,18 +224,18 @@ public class CapabilityInitTest {
         ));
 
         // Set AWX Capability Actions
-        capability2.getActions().put(CapabilityActionType.INSTALL,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "install.yml"));
-        capability2.getActions().put(CapabilityActionType.UNINSTALL,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "uninstall.yml"));
-        capability2.getActions().put(CapabilityActionType.DEPLOY,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "deploy.yml"));
-        capability2.getActions().put(CapabilityActionType.UNDEPLOY,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "undeploy.yml"));
-        capability2.getActions().put(CapabilityActionType.SCALE_UP,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaleup.yml"));
-        capability2.getActions().put(CapabilityActionType.SCALE_DOWN,
-                new AwxCapabilityAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaledown.yml"));
+        capability2.getActions().put(ActionType.INSTALL,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "install.yml"));
+        capability2.getActions().put(ActionType.UNINSTALL,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "uninstall.yml"));
+        capability2.getActions().put(ActionType.DEPLOY,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "deploy.yml"));
+        capability2.getActions().put(ActionType.UNDEPLOY,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "undeploy.yml"));
+        capability2.getActions().put(ActionType.SCALE_UP,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaleup.yml"));
+        capability2.getActions().put(ActionType.SCALE_DOWN,
+                new AwxAction(dockerSwarmDeploymentCapabilityRepo, dockerSwarmDeploymentCapabilityBranch, "scaledown.yml"));
 
         capability2.setClusterMemberTypes(Arrays.asList(
                 new ClusterMemberType("Manager", "docker_manager", 3, false),

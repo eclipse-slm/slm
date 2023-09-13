@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui
+  labels:
+    app: ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ui
+  template:
+    metadata:
+      name: ui
+      labels:
+        app: ui
+    spec:
+      containers:
+        - name: ui
+          image: ghcr.io/eclipse-slm/slm/ui:{{ .Values.version }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: KEYCLOAK_URL
+              value: http://keycloak:{{.Values.keycloak.port}}/auth
+            - name: AWX_URL
+              value: http://awx-web:{{.Values.awx.port_http}}/
+            - name: BASYX_AAS_GUI_URL
+              value: http://{{.Values.hostname}}:3000
+
+
+          livenessProbe:
+            httpGet:
+              port: 80
+              path: /
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
+
+          volumeMounts:
+            - mountPath: /app/consul
+              name: consul-token
+      volumes:
+        - name: consul-token
+          secret:
+            secretName: consul-secret
+            items:
+              - key: consul-master-token
+                path: consul_token
+
+      restartPolicy: Always

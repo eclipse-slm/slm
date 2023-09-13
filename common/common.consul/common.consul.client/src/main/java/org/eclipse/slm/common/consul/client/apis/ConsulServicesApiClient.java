@@ -38,6 +38,7 @@ public class ConsulServicesApiClient extends AbstractConsulApiClient {
         this.consulAclApiClient = consulAclApiClient;
     }
 
+    //region GET
     public Map<String, List<String>> getServices(ConsulCredential consulCredential) {
         try {
             return this.getConsulClient(consulCredential).catalogClient().getServices().getResponse();
@@ -147,33 +148,9 @@ public class ConsulServicesApiClient extends AbstractConsulApiClient {
 
         return getNodeServices(consulCredential, optionalNode.get().getNode());
     }
+    //endregion
 
-    public Optional<CatalogService> registerServiceWithoutAccess(ConsulCredential consulCredential, UUID nodeId, CatalogNode.Service service)
-            throws ConsulLoginFailedException {
-        return registerServiceWithoutAccess(
-                consulCredential,
-                nodeId,
-                service.getService(),
-                service.getId(),
-                Optional.ofNullable(service.getPort()),
-                service.getTags(),
-                service.getServiceMeta()
-        );
-    }
-
-    public Optional<CatalogService> registerServiceWithoutAccess(
-            ConsulCredential consulCredential,
-            UUID nodeId,
-            String serviceName,
-            UUID serviceId,
-            Optional<Integer> servicePort,
-            List<String> serviceTags,
-            Map<String, String> serviceMetaData
-    )
-            throws ConsulLoginFailedException {
-        return this.registerService(consulCredential, nodeId, serviceName, serviceId, servicePort, serviceTags, serviceMetaData);
-    }
-
+    //region REGISTER
     public void registerServiceForNodeWithReadAccessViaKeycloakRole(
             ConsulCredential consulCredential,
             UUID nodeId,
@@ -218,7 +195,10 @@ public class ConsulServicesApiClient extends AbstractConsulApiClient {
         return getServiceById(consulCredential, serviceId);
     }
 
-    public void registerServices(ConsulCredential consulCredential, List<ConsulService> consulServices) throws ConsulLoginFailedException {
+    public void registerServices(
+            ConsulCredential consulCredential,
+            List<ConsulService> consulServices
+    ) throws ConsulLoginFailedException {
         for (var service : consulServices)
         {
             this.registerServiceForNodeWithReadAccessViaKeycloakRole(
@@ -231,6 +211,7 @@ public class ConsulServicesApiClient extends AbstractConsulApiClient {
                     service.getServiceMetaData());
         }
     }
+    //endregion
 
 //    public void removeServiceByName(ConsulCredential consulCredential, UUID resourceId, NodeService nodeService) throws ConsulLoginFailedException {
 //        this.removeServiceByName(
@@ -240,8 +221,12 @@ public class ConsulServicesApiClient extends AbstractConsulApiClient {
 //        );
 //    }
 
-    public void removeServiceByName(ConsulCredential consulCredential, UUID nodeId, String serviceName) throws ConsulLoginFailedException {
-
+    //region DEREGISTER
+    public void removeServiceByName(
+            ConsulCredential consulCredential,
+            UUID nodeId,
+            String serviceName
+    ) throws ConsulLoginFailedException {
         var optionalNode = this.consulNodesApiClient.getNodeById(consulCredential, nodeId);
         if(optionalNode.isEmpty())
             return;
@@ -264,29 +249,14 @@ public class ConsulServicesApiClient extends AbstractConsulApiClient {
             LOG.error("Service with name '" + serviceName + "' not found for node with id '" + nodeId + "'");
         }
     }
-
-    public void removeServiceAndAclByName(ConsulCredential consulCredential, UUID nodeId, String serviceName) throws ConsulLoginFailedException {
-
-        var policy = this.consulAclApiClient.getPolicyByName(consulCredential, serviceName);
-        if (policy != null) {
-            this.consulAclApiClient.deletePolicyById(consulCredential, policy.getId());
-        }
-
-        var role = this.consulAclApiClient.getRoleByName(consulCredential, serviceName);
-        if (role != null) {
-            this.consulAclApiClient.deleteRoleById(consulCredential, role.getId());
-        }
-
-        var bindingRules = this.consulAclApiClient.getBindingRules(consulCredential);
-        var bindingRulesOfService = bindingRules.stream().filter(r -> r.getBindName().equals(serviceName)).collect(Collectors.toList());
-                if (bindingRulesOfService.size() > 0)
-        {
-            for (var bindingRule : bindingRulesOfService)
-            {
-                this.consulAclApiClient.deleteBindingRuleById(consulCredential, bindingRule.getId());
-            }
-        }
-
-        this.removeServiceByName(consulCredential, nodeId, serviceName);
-    }
+//
+//    public void removeServiceAndAclByName(
+//            ConsulCredential consulCredential,
+//            UUID nodeId,
+//            String serviceName
+//    ) throws ConsulLoginFailedException {
+//        this.removePolicyOfService(consulCredential, serviceName);
+//        this.removeServiceByName(consulCredential, nodeId, serviceName);
+//    }
+    //endregion
 }

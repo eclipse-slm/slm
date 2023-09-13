@@ -81,6 +81,6 @@ target/
 site/
 
 # Terraform
-_test_env/.terraform
-_test_env/.terraform.lock.hcl
-_test_env/*.tfstate*
+**/.terraform
+**/.terraform.lock.hcl
+**/*.tfstate*

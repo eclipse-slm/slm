@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resource-management-database
+  labels:
+    app: resource-management-database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: resource-management-database
+  template:
+    metadata:
+      name: resource-management-database
+      labels:
+        app: resource-management-database
+    spec:
+      containers:
+        - name: resource-management-database
+          image: ghcr.io/eclipse-slm/mariadb:{{ .Values.resource_management.database_version }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3306
+          env:
+            - name: KEYCLOAK_AUTHSERVERURL
+              value: http://keycloak:{{.Values.keycloak.port}}/auth
+            - name: MYSQL_USER
+              value: resource-management
+            - name: MYSQL_DATABASE
+              value: resources
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: resource-management-database-data-pv
+            - mountPath: /config
+              name: resource-management-database-config-pv
+
+{{/*          livenessProbe:*/}}
+{{/*            exec:*/}}
+{{/*              command:*/}}
+{{/*                - mysqladmin*/}}
+{{/*                - ping*/}}
+{{/*                - --silent*/}}
+{{/*            initialDelaySeconds: 40*/}}
+{{/*            periodSeconds: 90*/}}
+{{/*            timeoutSeconds: 10*/}}
+
+      volumes:
+        - name: resource-management-database-config-pv
+          persistentVolumeClaim:
+            claimName: resource-management-database-config-pvc
+        - name: resource-management-database-data-pv
+          persistentVolumeClaim:
+            claimName: resource-management-database-data-pvc
+
+      restartPolicy: Always

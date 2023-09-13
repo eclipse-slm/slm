@@ -121,11 +121,16 @@ public class ResourceAASController implements ApplicationListener<ResourceEvent>
             } catch(NullPointerException e) {
                 LOG.warn("Unable to find resource with id = '"+uuid+"'.");
             } catch (ResourceNotFoundException | ConsulLoginFailedException e) {
-                throw new RuntimeException(e);
+                LOG.error(e.getMessage());
             }
         } else if (event.isDelete()) {
-            IIdentifier aasId = ResourceAAS.createIdentification(uuid);
-            aasManager.deleteAAS(aasId);
+            try {
+                IIdentifier aasId = ResourceAAS.createIdentification(uuid);
+                aasManager.deleteAAS(aasId);
+            }
+            catch (Exception e) {
+                LOG.error(e.getMessage());
+            }
         }
     }
 
