@@ -18,18 +18,12 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v3
-      - name: Build base docker image
-        working-directory: ./stack/compose
-        run: $DOCKER_COMPOSE_COMMAND build --no-cache awx-fixed-files
-      - name: Build AWX Web docker image
-        working-directory: ./stack/compose
-        run: $DOCKER_COMPOSE_COMMAND build --no-cache awx-web
-      - name: Build AWX Web No JWT docker image
-        working-directory: ./stack/compose
-        run: $DOCKER_COMPOSE_COMMAND build --no-cache awx-web-no-jwt
       - name: Build AWX Task docker image
         working-directory: ./stack/compose
         run: $DOCKER_COMPOSE_COMMAND build --no-cache awx-task
+      - name: Build AWX Web No JWT docker image
+        working-directory: ./stack/compose
+        run: $DOCKER_COMPOSE_COMMAND build --no-cache awx-web-no-jwt
       - name: Login to Docker Registry
         uses: docker/login-action@v2
         with:
