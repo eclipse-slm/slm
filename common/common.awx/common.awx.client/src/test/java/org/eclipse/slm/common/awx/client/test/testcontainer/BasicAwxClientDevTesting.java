@@ -23,6 +23,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 
 import javax.net.ssl.SSLException;
 import java.io.File;
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,16 +46,18 @@ public class BasicAwxClientDevTesting {
     public final static Logger LOG = LoggerFactory.getLogger(BasicAwxClientDevTesting.class);
     static final DockerComposeContainer awxContainer;
 
-    private static int AWX_PORT = 8052;
-    private static String AWX_WEB_SERVICE = "awx-web-no-jwt";
+    private static int AWX_PORT = 8013;
+    private static String AWX_WEB_SERVICE = "awx";
 
     @Autowired
     AwxClient awxClient;
 
     static {
         awxContainer = new DockerComposeContainer(new File("src/test/resources/docker-compose.yml"))
-                .withExposedService(AWX_WEB_SERVICE, AWX_PORT, Wait.forListeningPort())
-                .withLocalCompose(true);
+                .withExposedService(AWX_WEB_SERVICE,AWX_PORT,
+                        Wait.forHttp("/#/login").forPort(AWX_PORT).withStartupTimeout(Duration.ofMinutes(5))
+                )
+                .withLocalCompose(false);
         awxContainer.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> stopContainer()));
     }
@@ -126,21 +129,12 @@ public class BasicAwxClientDevTesting {
             );
         }
 
-        @AfterAll
-        public static void cleanup() {
-            Results<Credential> credentialsQueryResult = staticAwxClient.getCredentials();
-
-            credentialsQueryResult.getResults().forEach(
-                    c -> staticAwxClient.deleteCredential(c.getId())
-            );
-        }
-
         @Test
         @Order(10)
         public void getCredentials() {
             Results<Credential> credentials = awxClient.getCredentials();
 
-            assertEquals(0, credentials.getCount());
+            assertEquals(2, credentials.getCount());
         }
         @Test
         @Order(20)
@@ -260,8 +254,8 @@ public class BasicAwxClientDevTesting {
         public void getCredentialTypes() {
             Results<CredentialType> credentialTypes = awxClient.getCredentialTypes();
 
-            // AWX brings 23 default credential Types:
-            assertEquals(23, credentialTypes.getCount());
+            // AWX brings 28 default credential Types:
+            assertEquals(28, credentialTypes.getCount());
         }
 
         @Test
@@ -326,11 +320,11 @@ public class BasicAwxClientDevTesting {
             /**
              * Orgas to expect:
              * - Default
-             * - Self Service Portal
+             * - Self Service Portal ??
              * - Service Lifecycle Management
              * - Test Orga
              */
-            assertEquals(4, organizationsResult.getCount());
+            assertEquals(3, organizationsResult.getCount());
         }
 
         @Test
@@ -463,8 +457,7 @@ public class BasicAwxClientDevTesting {
 
                 Results<Team> teamResults = awxClient.getTeams();
 
-                //AWX is created by default with team named "user"
-                assertEquals(1, teamResults.getCount());
+                assertEquals(0, teamResults.getCount());
             }
             @Test
             @Order(20)
@@ -537,6 +530,7 @@ public class BasicAwxClientDevTesting {
         @Test
         @Order(10)
         public void createAwxProject() throws JsonProcessingException {
+            cleanup();
             Project projectCreated = awxClient.createProject(projectCreateDTO);
 
             assertEquals(projectCreateDTO.getName(),           projectCreated.getName());
@@ -667,6 +661,7 @@ public class BasicAwxClientDevTesting {
             //endregion
 
             @AfterAll
+            @BeforeAll
             public static void cleanup() {
                 Results<JobTemplate> jobTemplateQueryResult = staticAwxClient.getJobTemplates();
 

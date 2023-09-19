@@ -22,6 +22,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 
 import javax.net.ssl.SSLException;
 import java.io.File;
+import java.time.Duration;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
@@ -39,16 +40,18 @@ public class AwxClientCapabilityTest {
     //region Variables
     static final DockerComposeContainer awxContainer;
 
-    private static int AWX_PORT = 8052;
-    private static String AWX_WEB_SERVICE = "awx-web-no-jwt";
+    private static int AWX_PORT = 8013;
+    private static String AWX_WEB_SERVICE = "awx";
 
     @Autowired
     AwxClient awxClient;
 
     static {
         awxContainer = new DockerComposeContainer(new File("src/test/resources/docker-compose.yml"))
-                .withExposedService(AWX_WEB_SERVICE, AWX_PORT, Wait.forListeningPort())
-                .withLocalCompose(true);
+                .withExposedService(AWX_WEB_SERVICE,AWX_PORT,
+                        Wait.forHttp("/#/login").forPort(AWX_PORT).withStartupTimeout(Duration.ofMinutes(5))
+                )
+                .withLocalCompose(false);
 
         awxContainer.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> stopContainer()));

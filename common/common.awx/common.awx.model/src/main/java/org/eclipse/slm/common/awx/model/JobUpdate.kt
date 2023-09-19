@@ -40,6 +40,6 @@ data class JobUpdate(
     var project: Int,
     var job_type: String,
     var job_tags: String,
-    var host_status_counts: Map<String, Object>,
+//    var host_status_counts: Map<String, Object>,
     var playbook_counts: Map<String, Int>
 )
