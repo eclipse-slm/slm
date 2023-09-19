@@ -6,6 +6,7 @@ on:
       - main
       - develop
       - release-*
+      - feature/update-awx
 
 env:
   DOCKER_COMPOSE_COMMAND: docker-compose -f base.aas.yml -f base.awx.yml -f base.consul.yml -f base.keycloak.yml -f base.vault.yml -f slm.yml -f catalog.yml -f config-exporter.yml -f monitoring.yml -f build.yml
@@ -21,9 +22,6 @@ jobs:
       - name: Build AWX Task docker image
         working-directory: ./stack/compose
         run: $DOCKER_COMPOSE_COMMAND build --no-cache awx-task
-      - name: Build AWX Web No JWT docker image
-        working-directory: ./stack/compose
-        run: $DOCKER_COMPOSE_COMMAND build --no-cache awx-web-no-jwt
       - name: Login to Docker Registry
         uses: docker/login-action@v2
         with:
@@ -32,7 +30,7 @@ jobs:
           password: ${{secrets.GITHUB_TOKEN}}
       - name: Push docker image
         working-directory: ./stack/compose
-        run: $DOCKER_COMPOSE_COMMAND push awx-web awx-web-no-jwt awx-task
+        run: $DOCKER_COMPOSE_COMMAND push awx-task
 
   build-and-push:
     runs-on: ubuntu-latest
