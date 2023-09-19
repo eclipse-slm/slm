@@ -55,7 +55,7 @@ public class ProjectUpdateBugDevTesting {
                 .withExposedService(AWX_WEB_SERVICE,AWX_PORT,
                         Wait.forHttp("/#/login").forPort(AWX_PORT).withStartupTimeout(Duration.ofMinutes(5))
                 )
-                .withLocalCompose(true);
+                .withLocalCompose(false);
         awxContainer.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> stopContainer()));
     }
