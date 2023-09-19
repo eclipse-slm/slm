@@ -1,4 +1,4 @@
-FROM ghcr.io/eclipse-slm/awx/base:22.7.0
+FROM ghcr.io/ilgmi/awx/base:22.7.0
 
 ENV AWX_SKIP_MIGRATIONS="0" \
     AWX_ADMIN_USER="admin" \
