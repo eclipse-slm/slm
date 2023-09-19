@@ -53,8 +53,8 @@ public class ProjectUpdateBugDevTesting {
     static {
         awxContainer = new DockerComposeContainer(new File("src/test/resources/docker-compose.yml"))
                 .withExposedService(AWX_WEB_SERVICE,AWX_PORT,
-//                        Wait.forHttp("/#/login").forPort(AWX_PORT).withStartupTimeout(Duration.ofMinutes(5))
-                        Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(5))
+                        Wait.forHttp("/#/login").forPort(AWX_PORT).withStartupTimeout(Duration.ofMinutes(5))
+//                        Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(5))
                 )
                 .withLocalCompose(false);
         awxContainer.start();
