@@ -53,6 +53,8 @@ public class DockerComposeFileParserTest {
                   label3: service1LabelVal3
                 devices:
                   - /dev/device1
+                depends_on:
+                  - service2
                   
               service2:
                 image: https://sample-registry.org/test-image-service2:1.2.3
@@ -73,6 +75,9 @@ public class DockerComposeFileParserTest {
                   label1: service2LabelVal1
                   label2: service2LabelVal2
                   label3: customLabelService2.3
+                depends_on:
+                  service1:
+                    condition: service_healthy
             
             networks:
               backend:
@@ -111,6 +116,8 @@ public class DockerComposeFileParserTest {
                   label3: service1LabelVal3
                 devices:
                   - /dev/device1
+                depends_on:
+                  - service2
                   
               service2:
                 image: ${REGISTRY_HOST}/test-image-service2:${SERVICE2_VERSION}
@@ -129,6 +136,9 @@ public class DockerComposeFileParserTest {
                   - "label1=service2LabelVal1"
                   - "label2=service2LabelVal2"
                   - "label3=service2LabelVal3"
+                depends_on:
+                  service1:
+                    condition: service_healthy
             
             networks:     
               backend:

@@ -17,6 +17,7 @@
         <module>ui</module>
         <module>notification_service</module>
         <module>catalog</module>
+        <module>coverage</module>
     </modules>
 
     <profiles>
@@ -33,7 +34,7 @@
 
         <java.version>18</java.version>
         <kotlin.version>1.7.20</kotlin.version>
-        <jackson.version>2.13.4</jackson.version>
+        <jackson.version>2.13.2</jackson.version>
         <resource.delimiter>^</resource.delimiter>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -79,6 +80,10 @@
 
         <docker.image.registry>ghcr.io/eclipse-slm</docker.image.registry>
         <docker.image.skip>false</docker.image.skip>
+
+        <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
+        <jacoco.version>0.8.8</jacoco.version>
+        <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -151,6 +156,13 @@
                 <artifactId>junit-bom</artifactId>
                 <version>${junit.jupiter.version}</version>
                 <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.jacoco</groupId>
+                <artifactId>org.jacoco.agent</artifactId>
+                <version>${jacoco.version}</version>
+                <classifier>runtime</classifier>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -390,9 +402,11 @@
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.12.1</version>
             </plugin>
+            <!-- to generate code coverage -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-plugin.version}</version>
                 <executions>
                     <!-- set arg line property for surefire -->
                     <execution>
@@ -415,6 +429,22 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <!-- to push to coveralls -->
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>4.3.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.3.1</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <jacocoReports>coverage/target/site/jacoco-aggregate-ut/jacoco.xml</jacocoReports>
+                </configuration>
             </plugin>
             <!-- Compilation: Kotlin !-->
             <plugin>
@@ -545,6 +575,19 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
                 <version>3.3.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-plugin.version}</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <!-- select non-aggregate reports -->
+                            <report>report-aggregate</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
             </plugin>
         </plugins>
     </reporting>

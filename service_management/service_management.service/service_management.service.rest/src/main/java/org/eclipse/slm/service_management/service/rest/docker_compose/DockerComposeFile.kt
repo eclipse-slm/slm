@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 
@@ -24,6 +25,7 @@ data class DockerComposeFile(
 {
     fun toJsonString(): String {
         val objectMapper = ObjectMapper()
+        objectMapper.registerKotlinModule()
         return objectMapper.writeValueAsString(this)
     }
 }

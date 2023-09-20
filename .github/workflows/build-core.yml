@@ -22,6 +22,7 @@ jobs:
     env:
       MAVEN_CLI_OPTS: "-T 8 -s ci/ci_maven_settings.xml --batch-mode --errors --fail-at-end --show-version --no-transfer-progress -DinstallAtEnd=true -DdeployAtEnd=true"
       MAVEN_PROFILES: ""
+      COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
     strategy:
       matrix:
         build: [
@@ -58,7 +59,13 @@ jobs:
         run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' deploy
       - name: Build '${{ matrix.build.type }}' with Maven
         if: github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')
-        run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' verify
+        run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' clean org.jacoco:jacoco-maven-plugin:prepare-agent install -q org.jacoco:jacoco-maven-plugin:report -Pcoverage verify
+      - name: Build Coveralls Report
+        if: ${{ env.COVERALLS_TOKEN != '' && matrix.build.type == 'backend' && (github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')) }}
+        run: mvn jacoco:report coveralls:report  -DrepoToken=$COVERALLS_TOKEN
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       - name: Log test output on failure
         if: failure() || cancelled()
         run: find . -type f -path "*test-reports/*-output.txt" -exec tail -n +1 {} +
