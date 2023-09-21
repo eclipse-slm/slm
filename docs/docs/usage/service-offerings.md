@@ -34,7 +34,7 @@ The service offering version gets created and will be shown as a version of the 
 <img :src="$withBase('/img/figures/use/service-offerings/service-offering-create-via-wizard-7.png')">
 
 ### Git-based service offerings
-To automatically create a service offering based on a Git repository, a file named `fabos.yaml` must be stored in the repository. This file contains all the necessary information to describe a service offering. The file is structured as shown in the example below. Files (e.g., images, compose files, environment variable files) are referenced via their file name and the relative path to the root of the Git repository. An example is available in a [public Git repository](https://github.com/FabOS-AI/fabos-slm-so-test-repo).
+To automatically create a service offering based on a Git repository, a file named `fabos.yaml` must be stored in the repository. This file contains all the necessary information to describe a service offering. The file is structured as shown in the example below. Files (e.g., images, compose files, environment variable files) are referenced via their file name and the relative path to the root of the Git repository. An example is available in a [public Git repository](https://github.com/FabOS-AI/fabos-slm-so-grafana).
 
 ```yaml
 name: My Service
