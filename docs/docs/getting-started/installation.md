@@ -10,7 +10,7 @@ next: /docs/getting-started/first-steps/
 * Docker Compose
 
 ## Download
-Download the latest version of `elcipse-slm-setup-compose.zip` from the [releases page on GitHub](https://github.com/eclipse-slm/slm/releases), which contains the compose files of the stack.
+Download the latest version of `eclipse-slm-setup-compose.zip` from the [releases page on GitHub](https://github.com/eclipse-slm/slm/releases), which contains the compose files of the stack.
 
 <div id="start"></div>
 
