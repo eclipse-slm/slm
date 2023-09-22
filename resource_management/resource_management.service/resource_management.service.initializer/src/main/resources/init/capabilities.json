@@ -424,5 +424,54 @@
         "scalable": false
       }
     ]
+  },
+  {
+    "id": "53972d98-fad3-4d59-bf7d-775510dd33dd",
+    "capabilityClass": "DeploymentCapability",
+    "name": "K3s-single",
+    "logo": "mdi-alpha-k-box",
+    "type": [
+      "SETUP",
+      "DEPLOY"
+    ],
+    "connection": "tcp",
+    "actions": {
+      "DEPLOY": {
+        "actionClass": "AwxAction",
+        "actionType": "DEPLOY",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s-single",
+        "awxBranch": "main",
+        "playbook": "deploy.yml",
+        "connectionTypes": ["ssh"]
+      },
+      "UNINSTALL": {
+        "actionClass": "AwxAction",
+        "actionType": "UNINSTALL",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s-single",
+        "awxBranch": "main",
+        "playbook": "uninstall.yml",
+        "connectionTypes": ["ssh"]
+      },
+      "INSTALL": {
+        "actionClass": "AwxAction",
+        "actionType": "INSTALL",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s-single",
+        "awxBranch": "main",
+        "playbook": "install.yml",
+        "connectionTypes": ["ssh"]
+      },
+      "UNDEPLOY": {
+        "actionClass": "AwxAction",
+        "actionType": "UNDEPLOY",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s-single",
+        "awxBranch": "main",
+        "playbook": "undeploy.yml",
+        "connectionTypes": ["ssh"]
+      }
+    },
+    "supportedDeploymentTypes": [
+      "KUBERNETES"
+    ],
+    "clusterMemberTypes": []
   }
 ]
