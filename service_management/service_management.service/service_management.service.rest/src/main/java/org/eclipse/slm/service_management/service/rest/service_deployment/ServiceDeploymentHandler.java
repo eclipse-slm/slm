@@ -128,6 +128,8 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                     put("manifest_file", KubernetesManifestFileParser.manifestFinalizer(deployableManifestFile));
                 }};
 
+                extraVarsMap = this.addExtraVarsForServiceRepositories(extraVarsMap, serviceOfferingVersion);
+
                 awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, keycloakPrincipal, new ExtraVars(extraVarsMap), JobGoal.CREATE, this);
                 this.notificationServiceClient.postJobObserver(keycloakPrincipal, awxJobObserver);
                 break;
