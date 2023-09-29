@@ -138,8 +138,8 @@ public class AwxClientCapabilityTest {
                     repo,
                     branch,
                     playbook,
-                    jobTemplateCredentialNames
-            );
+                    jobTemplateCredentialNames,
+                    "");
 
             assertEquals(
                     projectsBefore.getCount()+1,
@@ -190,8 +190,8 @@ public class AwxClientCapabilityTest {
                     playbook,
                     username,
                     password,
-                    jobTemplateCredentialNames
-            );
+                    jobTemplateCredentialNames,
+                    "");
 
             Credential scmCredential = awxClient.getCredentialByUrlAndUsername(repo, username);
             assertEquals(username, scmCredential.getInputs().get("username"));

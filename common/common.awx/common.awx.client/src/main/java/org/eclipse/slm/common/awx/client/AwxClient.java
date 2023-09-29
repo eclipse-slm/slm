@@ -845,12 +845,17 @@ public class AwxClient {
         return response.getBody().getJob();
     }
 
-    public JobTemplate createJobTemplate(String scmUrl, String scmBranch, String playbook, List<String> referencedJobTemplateCredentials)
+    public JobTemplate createJobTemplate(String scmUrl, String scmBranch, String playbook, List<String> referencedJobTemplateCredentials, String defaultExecutionEnvironmentName)
             throws AwxProjectUpdateFailedException, SSLException, JsonProcessingException {
-        Project project = createProjectAndWait(new ProjectDTOApiCreate(
+        var projectToCreate = new ProjectDTOApiCreate(
                 scmUrl,
                 scmBranch
-        ));
+        );
+        var executionEnvironment = getExecutionEnvironmentByName(defaultExecutionEnvironmentName);
+        if (executionEnvironment.isPresent()) {
+            projectToCreate.setDefault_environment(executionEnvironment.get().getId());
+        }
+        Project project = createProjectAndWait(projectToCreate);
 
         JobTemplate createdJobTemplate = createJobTemplate(
                 project.getId(),
@@ -865,18 +870,24 @@ public class AwxClient {
         List<JobTemplate> jobTemplateList = new ArrayList<>();
         for(String playbook : playbooks) {
             jobTemplateList.add(
-                    createJobTemplate(scmUrl, scmBranch, playbook, referencedJobTemplateCredentials)
+                    createJobTemplate(scmUrl, scmBranch, playbook, referencedJobTemplateCredentials, "")
             );
         }
         return jobTemplateList;
     }
 
-    public JobTemplate createJobTemplate(String scmUrl, String scmBranch, String playbook, Credential scmCredential, List<String> referencedJobTemplateCredentials) throws AwxProjectUpdateFailedException, SSLException, JsonProcessingException {
-        Project project = createProjectAndWait(new ProjectDTOApiCreate(
+    public JobTemplate createJobTemplate(String scmUrl, String scmBranch, String playbook, Credential scmCredential, List<String> referencedJobTemplateCredentials, String defaultExecutionEnvironmentName) throws AwxProjectUpdateFailedException, SSLException, JsonProcessingException {
+        var projectToCreate = new ProjectDTOApiCreate(
                 scmUrl,
                 scmBranch,
                 scmCredential
-        ));
+        );
+        var executionEnvironment = getExecutionEnvironmentByName(defaultExecutionEnvironmentName);
+        if(executionEnvironment.isPresent()){
+            projectToCreate.setDefault_environment(executionEnvironment.get().getId());
+        }
+        Project project = createProjectAndWait(projectToCreate);
+
 
         JobTemplate createdJobTemplate = createJobTemplate(
                 project.getId(),
@@ -887,13 +898,30 @@ public class AwxClient {
         return createdJobTemplate;
     }
 
+    private Optional<ExecutionEnvironment> getExecutionEnvironmentByName(String name) {
+        String url = this.getAwxApiUrl() + "/execution_environments/?search=" + name;
+
+        ResponseEntity<Results<ExecutionEnvironment>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                new HttpEntity<>(null, getAdminAuthHeader()),
+                new ParameterizedTypeReference<Results<ExecutionEnvironment>>() {});
+        Results<ExecutionEnvironment> executionEnvironmentResults = response.getBody();
+        if(executionEnvironmentResults.getCount() == 1){
+
+            return executionEnvironmentResults.getResults().stream().findFirst();
+        }
+
+        return Optional.empty();
+    }
+
     public JobTemplate createJobTemplateAndAddExecuteRoleToDefaultTeam(
             String scmUrl,
             String scmBranch,
             String playbook,
-            List<String> referencedJobTemplateCredentials
-    ) throws JsonProcessingException, AwxProjectUpdateFailedException, SSLException {
-        JobTemplate jobTemplate = createJobTemplate(scmUrl, scmBranch, playbook, referencedJobTemplateCredentials);
+            List<String> referencedJobTemplateCredentials,
+            String defaultExecutionEnvironment) throws JsonProcessingException, AwxProjectUpdateFailedException, SSLException {
+        JobTemplate jobTemplate = createJobTemplate(scmUrl, scmBranch, playbook, referencedJobTemplateCredentials, defaultExecutionEnvironment);
 
         addProjectRoleToDefaultTeam(
                 jobTemplate.getProject(),
@@ -918,8 +946,8 @@ public class AwxClient {
                 scmUrl,
                 scmBranch,
                 playbook,
-                referencedJobTemplateCredentials
-        );
+                referencedJobTemplateCredentials,
+                "");
 
         Credential consulCredential = getCredentialByName(
                 DEFAULT_CONSUL_CREDENTIAL_TYPE_NAME
@@ -940,8 +968,8 @@ public class AwxClient {
             String playbook,
             String scmUsername,
             String scmPassword,
-            List<String> referencedJobTemplateCredentials
-    ) throws JsonProcessingException, AwxProjectUpdateFailedException, SSLException {
+            List<String> referencedJobTemplateCredentials,
+            String defaultExecutionEnvironment) throws JsonProcessingException, AwxProjectUpdateFailedException, SSLException {
         Credential scmCredential = createSourceControlCredentialForDefaultOrga(
                 scmUsername,
                 scmPassword,
@@ -953,7 +981,8 @@ public class AwxClient {
                 scmBranch,
                 playbook,
                 scmCredential,
-                referencedJobTemplateCredentials
+                referencedJobTemplateCredentials,
+                defaultExecutionEnvironment
         );
 
         addProjectRoleToDefaultTeam(
@@ -975,7 +1004,8 @@ public class AwxClient {
             String playbook,
             String username,
             String password,
-            List<String> referencedJobTemplateCredentials
+            List<String> referencedJobTemplateCredentials,
+            String defaultExecutionEnvironment
     ) throws JsonProcessingException, AwxProjectUpdateFailedException, SSLException {
 
         JobTemplate jobTemplate = createJobTemplateAddExecuteRoleToDefaultTeamAddScmCredential(
@@ -984,8 +1014,8 @@ public class AwxClient {
                 playbook,
                 username,
                 password,
-                referencedJobTemplateCredentials
-        );
+                referencedJobTemplateCredentials,
+                defaultExecutionEnvironment);
 
         Credential consulCredential = getCredentialByName(
                 DEFAULT_CONSUL_CREDENTIAL_TYPE_NAME

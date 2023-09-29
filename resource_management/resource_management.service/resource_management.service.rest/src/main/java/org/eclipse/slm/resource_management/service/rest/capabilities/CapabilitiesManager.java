@@ -33,6 +33,7 @@ import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
@@ -59,6 +60,9 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
     private final CapabilityUtil capabilityUtil;
     private final ObjectMapper objectMapper;
     public Map<AwxJobObserver, CapabilityJob> awxJobObserverToJobDetails = new HashMap<AwxJobObserver, CapabilityJob>();
+
+    @Value("${awx.default-execution-environment}")
+    private String defaultExecutionEnvironment;
 
     @Autowired
     public CapabilitiesManager(
@@ -144,15 +148,16 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                                         awxCapabilityAction.getPlaybook(),
                                         awxCapabilityAction.getUsername(),
                                         awxCapabilityAction.getPassword(),
-                                        jobTemplateCredentialNames
+                                        jobTemplateCredentialNames,
+                                        defaultExecutionEnvironment
                                 );
                             } else {
                                 jobTemplate = awxClient.createJobTemplateAndAddExecuteRoleToDefaultTeam(
                                         awxCapabilityAction.getAwxRepo(),
                                         awxCapabilityAction.getAwxBranch(),
                                         awxCapabilityAction.getPlaybook(),
-                                        jobTemplateCredentialNames
-                                );
+                                        jobTemplateCredentialNames,
+                                        defaultExecutionEnvironment);
                             }
 
                             List<SurveyItem> params = awxCapabilityAction.getParameter();

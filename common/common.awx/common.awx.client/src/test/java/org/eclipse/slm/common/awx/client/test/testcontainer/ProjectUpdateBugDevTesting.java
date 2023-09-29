@@ -170,8 +170,8 @@ public class ProjectUpdateBugDevTesting {
                         projectDTOApiCreate.getScm_url(),
                         projectDTOApiCreate.getScm_branch(),
                         playbook,
-                        new ArrayList<>()
-                );
+                        new ArrayList<>(),
+                        "");
             }
 
             //region Cleanup JobTemplates

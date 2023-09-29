@@ -509,8 +509,8 @@ public class CapabilitiesManagerTest {
                             Mockito.any(),
                             Mockito.any(),
                             Mockito.any(),
-                            Mockito.any()
-                    ))
+                            Mockito.any(),
+                            ""))
                     .thenReturn(jobTemplate);
 
             capabilitiesManager.addCapability(virtualizationCapability);

@@ -19,6 +19,7 @@ import org.eclipse.slm.resource_management.persistence.api.ProfilerJpaRepository
 import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
@@ -33,6 +34,9 @@ public class ProfilerManager implements IAwxJobObserverListener {
     ProfilerJpaRepository profilerJpaRepository;
     private final AwxClient awxClient;
     private final AwxJobExecutor awxJobExecutor;
+
+    @Value("${awx.default-execution-environment}")
+    private String defaultExecutionEnvironment;
 
     public ProfilerManager(
             ProfilerJpaRepository profilerJpaRepository, 
@@ -57,15 +61,15 @@ public class ProfilerManager implements IAwxJobObserverListener {
                             awxProfilerAction.getPlaybook(),
                             awxProfilerAction.getUsername(),
                             awxProfilerAction.getPassword(),
-                            jobTemplateCredentialNames
-                    );
+                            jobTemplateCredentialNames,
+                            defaultExecutionEnvironment);
                 } else {
                     jobTemplate = awxClient.createJobTemplateAndAddExecuteRoleToDefaultTeam(
                             awxProfilerAction.getAwxRepo(),
                             awxProfilerAction.getAwxBranch(),
                             awxProfilerAction.getPlaybook(),
-                            jobTemplateCredentialNames
-                    );
+                            jobTemplateCredentialNames,
+                            defaultExecutionEnvironment);
                 }
 
                 List<SurveyItem> params = awxProfilerAction.getParameter();
