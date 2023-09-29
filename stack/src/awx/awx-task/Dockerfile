@@ -1,5 +1,3 @@
-FROM ghcr.io/eclipse-slm/awx/base:22.7.0
-
 ENV AWX_SKIP_MIGRATIONS="0" \
     AWX_ADMIN_USER="admin" \
     AWX_ADMIN_PASSWORD="password" \
@@ -11,7 +9,11 @@ ENV AWX_SKIP_MIGRATIONS="0" \
     http_proxy="" \
     https_proxy="" \
     no_proxy="" \
-    SUPERVISOR_WEB_CONFIG_PATH='/etc/supervisord.conf'
+    SUPERVISOR_WEB_CONFIG_PATH='/etc/supervisord.conf' \
+    AWX_TAG=22.7.0
+
+FROM ghcr.io/eclipse-slm/awx/base:${AWX_TAG}
+
 
 COPY conf/ /etc/tower/conf.d/
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
@@ -27,7 +29,7 @@ WORKDIR /tmp/
 
 RUN git clone https://github.com/ansible/awx.git && \
     cd awx && \
-    git checkout tags/22.7.0
+    git checkout tags/${AWX_TAG}
 
 RUN cp -rf /tmp/awx /awx_devel/
 

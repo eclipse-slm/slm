@@ -11,6 +11,8 @@ services:
 
   awx-task:
     build: ../src/awx/awx-task
+    environment:
+      - AWX_TAG=22.7.0
 
   awx-web-no-jwt:
     image: ghcr.io/eclipse-slm/awx/awx-web-no-jwt:${AWX_VERSION}
