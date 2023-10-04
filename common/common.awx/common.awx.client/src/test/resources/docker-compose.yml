@@ -42,8 +42,6 @@ services:
 #      - "6899:6899"
 #      - "2222:2222"  # receptor foo node
 #      - "8052:8013"
-    healthcheck:
-      test: [ "CMD", "curl", "http://localhost:8052" ]
     links:
       - awx-postgres
       - awx-redis
@@ -72,7 +70,7 @@ services:
       - awx_test-redis:/var/run/redis/
 
   awx-postgres:
-    image: postgres:12
+    image: ghcr.io/ilgmi/awx/awx-postgres:12-AWX-22.7.0
     hostname: postgres
     command: postgres -c log_destination=stderr -c log_min_messages=info -c log_min_duration_statement=1000 -c max_connections=1024
     environment:
