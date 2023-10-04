@@ -1,3 +1,5 @@
+FROM ghcr.io/eclipse-slm/awx/base:22.7.0
+
 ENV AWX_SKIP_MIGRATIONS="0" \
     AWX_ADMIN_USER="admin" \
     AWX_ADMIN_PASSWORD="password" \
@@ -11,9 +13,6 @@ ENV AWX_SKIP_MIGRATIONS="0" \
     no_proxy="" \
     SUPERVISOR_WEB_CONFIG_PATH='/etc/supervisord.conf' \
     AWX_TAG=22.7.0
-
-FROM ghcr.io/eclipse-slm/awx/base:${AWX_TAG}
-
 
 COPY conf/ /etc/tower/conf.d/
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
