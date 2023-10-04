@@ -57,30 +57,30 @@ services:
       - "2222:2222"  # receptor foo node
       - "3001:3001"  # used by the UI dev env
 
-#  awx-jwt-authenticator:
-#    image: ghcr.io/eclipse-slm/awx-jwt-authenticator:1.0.0-snapshot
-#    restart: unless-stopped
-#    logging:
-#      driver: "json-file"
-#      options:
-#        max-file: ${LOGGING_MAX_FILE}
-#        max-size: ${LOGGING_MAX_SIZE}
-#    healthcheck:
-#      test: [ "CMD", "curl", "http://localhost:8051/swagger-ui.html" ]
-#    ports:
-#      - "8051:8051"
-#    environment:
-#      AWX_PORT: 8013
-#    networks:
-#      default:
-#        aliases:
-#          - awx-jwt-authenticator
-#    volumes:
-#      - vault_config_awx-jwt-authenticator:/opt/vault/awx-jwt-authenticator:ro
-#      - awx_config_jwt-authenticator:/app/awx
-#      - keycloak_config_awx-jwt-authenticator:/app/keycloak
-#    extra_hosts:
-#      - "${SLM_HOSTNAME}:172.17.0.1"
+  awx-jwt-authenticator:
+    image: ghcr.io/eclipse-slm/awx-jwt-authenticator:1.0.0-snapshot
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: ${LOGGING_MAX_FILE}
+        max-size: ${LOGGING_MAX_SIZE}
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:8051/swagger-ui.html" ]
+    ports:
+      - "8051:8051"
+    environment:
+      AWX_PORT: 8013
+    networks:
+      default:
+        aliases:
+          - awx-jwt-authenticator
+    volumes:
+      - vault_config_awx-jwt-authenticator:/opt/vault/awx-jwt-authenticator:ro
+      - awx_config_jwt-authenticator:/app/awx
+      - keycloak_config_awx-jwt-authenticator:/app/keycloak
+    extra_hosts:
+      - "${SLM_HOSTNAME}:172.17.0.1"
 
   awx-redis:
     image: ghcr.io/eclipse-slm/awx/redis:6
@@ -123,6 +123,8 @@ services:
     container_name: awx-postgres
     command: postgres -c log_destination=stderr -c log_min_messages=info -c log_min_duration_statement=1000 -c max_connections=1024
     restart: unless-stopped
+#    ports:
+#      - "5432:5432"
     logging:
       driver: "json-file"
       options:
