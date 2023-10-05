@@ -1,6 +1,6 @@
 {
   "name": "EclipseSLM",
-  "version": "1.3.0-SNAPSHOT",
+  "version": "1.3.0-RC",
   "description": "Eclipse Service Lifecycle Management",
   "main": "index.js",
   "authors": {

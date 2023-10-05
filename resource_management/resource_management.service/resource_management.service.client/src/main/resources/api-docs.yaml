@@ -7,7 +7,7 @@ info:
     name: Fraunhofer IPA
     url: https://www.ipa.fraunhofer.de
     email: matthias.schneider@ipa.fraunhofer.de
-  version: 1.3.0-SNAPSHOT
+  version: 1.3.0-RC
 servers:
 - url: http://localhost:9010
   description: Generated server url

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: resource-management
-          image: ghcr.io/eclipse-slm/slm/resource-management:1.3.0-SNAPSHOT
+          image: ghcr.io/eclipse-slm/slm/resource-management:1.3.0-RC
           imagePullPolicy: Always
           ports:
             - containerPort: 9010
