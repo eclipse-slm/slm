@@ -1,8 +1,8 @@
 # Eclipse Service Lifecycle Management
 
-![](https://github.com/eclipse-slm/slm/actions/workflows/build-core.yml/badge.svg)
-![](https://github.com/eclipse-slm/slm/actions/workflows/build-stack.yml/badge.svg)
-![](https://github.com/eclipse-slm/slm/actions/workflows/build-docs.yml/badge.svg)
+| main           | ![](https://github.com/eclipse-slm/slm/actions/workflows/build-core.yml/badge.svg) | ![](https://github.com/eclipse-slm/slm/actions/workflows/build-stack.yml/badge.svg)  | ![](https://github.com/eclipse-slm/slm/actions/workflows/build-docs.yml/badge.svg) | 
+|----------------|-------------|-------------|------------------------|
+| **develop** | ![](https://github.com/eclipse-slm/slm/actions/workflows/build-core.yml/badge.svg?branch=develop)  | ![](https://github.com/eclipse-slm/slm/actions/workflows/build-stack.yml/badge.svg?branch=develop)  | ![](https://github.com/eclipse-slm/slm/actions/workflows/build-docs.yml/badge.svg?branch=develop)  | 
 
 The Eclipse Service Lifecycle Management (SLM) provides a set of applications to manage the lifecycle of AI (artificial 
 intelligence) services in production environments. The service lifecycle consists of the release, deploy, and operate 
