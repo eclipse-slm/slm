@@ -19,7 +19,6 @@ Download the latest version of `eclipse-slm-setup-compose.zip` from the [release
 Set in the file `.env` the variable `SLM_HOSTNAME` and `SLM_IP` to the hostname and IP adress of the host where the stack will be started. E.g.:
 ```
 SLM_HOSTNAME=myhost.local
-SLM_IP=192.168.100.10
 ```
 
 ::: warning ATTENTION
