@@ -37,7 +37,7 @@ public class DockerStackTests {
         put("keycloak-database", "healthy");
         put("keycloak-init", "exited");
         put("vault", "healthy");
-        put("ui", "unhealthy");
+        put("ui", "running");
         put("notification-service", "healthy");
         put("notification-service-database", "healthy");
         put("resource-management", "healthy");
