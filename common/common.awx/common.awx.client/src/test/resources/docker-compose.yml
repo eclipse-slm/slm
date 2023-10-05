@@ -70,7 +70,7 @@ services:
       - awx_test-redis:/var/run/redis/
 
   awx-postgres:
-    image: ghcr.io/ilgmi/awx/awx-postgres:12-AWX-22.7.0
+    image: ghcr.io/eclipse-slm/awx/awx-postgres:12-AWX-22.7.0
     hostname: postgres
     command: postgres -c log_destination=stderr -c log_min_messages=info -c log_min_duration_statement=1000 -c max_connections=1024
     environment:
