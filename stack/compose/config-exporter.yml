@@ -7,6 +7,7 @@ services:
     environment:
       - CONFIGURE_CORE_PROJECT=true
       - LOCAL_HOST="${SLM_IP}"
+      - DISCOVERY_ENABLED=false
     env_file:
       - .env
     volumes:
