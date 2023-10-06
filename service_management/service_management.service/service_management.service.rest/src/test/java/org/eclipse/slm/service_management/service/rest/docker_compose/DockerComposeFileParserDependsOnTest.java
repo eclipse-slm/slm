@@ -95,7 +95,7 @@ public class DockerComposeFileParserDependsOnTest {
             var service = new DockerComposeFileService("test-image:1.0.0",
                     null, null, new ArrayList<>(), new ArrayList<>(), new DockerComposeFileEnvironment(),
                    null, null, new DockerComposeFileLabels(), null, null, null,
-                    dependsOn, null, null, null);
+                    dependsOn, null, null, null, "");
             var composeFile = new DockerComposeFile("3", Map.of("test-service", service), null, null);
 
             var actualComposeYAML = DockerComposeFileParser.composeFileToYAML(composeFile);
@@ -122,7 +122,7 @@ public class DockerComposeFileParserDependsOnTest {
             var service = new DockerComposeFileService("test-image:1.0.0",
                     null, null, new ArrayList<>(), new ArrayList<>(), new DockerComposeFileEnvironment(),
                     null, null, new DockerComposeFileLabels(), null, null, null,
-                    dependsOn, null, null, null);
+                    dependsOn, null, null, null, "");
             var composeFile = new DockerComposeFile("3", Map.of("test-service", service), null, null);
 
             var actualComposeYAML = DockerComposeFileParser.composeFileToYAML(composeFile);
