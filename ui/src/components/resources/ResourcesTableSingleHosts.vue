@@ -16,15 +16,22 @@
         <v-toolbar flat>
           <v-spacer></v-spacer>
           <v-toolbar-title>
-            <v-btn
-                v-if="areProfilerAvailable"
-                color="primary"
-                @click="runProfiler"
-            >
-              <v-icon color="white">
-                mdi-magnify
-              </v-icon>
-            </v-btn>
+            <v-tooltip left close-delay="2000">
+              <template #activator="{ on, attrs }">
+                <v-btn
+                    v-if="areProfilerAvailable"
+                    color="primary"
+                    @click="runProfiler"
+                    v-bind="attrs"
+                    v-on="on"
+                >
+                  <v-icon color="white">
+                    mdi-magnify
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span>Runs all <a href="https://eclipse-slm.github.io/slm/docs/usage/profiler/">profiler</a> on all devices</span>
+            </v-tooltip>
           </v-toolbar-title>
         </v-toolbar>
         <v-toolbar-items
@@ -555,5 +562,9 @@
 <style scoped>
 .row-pointer  {
   cursor: pointer;
+}
+
+.v-tooltip__content {
+  pointer-events: initial;
 }
 </style>
