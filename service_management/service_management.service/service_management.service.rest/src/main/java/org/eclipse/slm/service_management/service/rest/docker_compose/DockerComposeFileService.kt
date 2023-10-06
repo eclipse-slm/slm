@@ -60,4 +60,7 @@ data class DockerComposeFileService(
 
     @JsonProperty("extra_hosts")
     var extraHosts: List<String>?,
+
+    @JsonProperty("command")
+    var command: String?,
 )
