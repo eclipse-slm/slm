@@ -75,7 +75,7 @@ Example:
 Already existing clusters be added as managed clusters. To allow the addition of a managed cluster, a corresponding cluster deployment capability must be available. That deployment capability must have an `INSTALL` action with the property `skipable: true`. Configuration parameters in the action, can be used to query information required for accessing the cluster.
 <br><br>
 Example from the [official K8S deployment capability](https://github.com/eclipse-slm/slm-dc-k8s):
-```yaml:line-numbers
+```yaml
 {
     ...
     "actions": {
