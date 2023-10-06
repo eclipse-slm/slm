@@ -285,6 +285,7 @@
   import ResourcesRestApi from '@/api/resource-management/resourcesRestApi'
   import { capabilityUtilsMixin } from '@/utils/capabilityUtils'
   import ProfilerRestApi from "@/api/resource-management/profilerRestApi";
+  import Vue from "vue";
 
   export default {
     name: 'ResourcesTableSingleHosts',
@@ -552,7 +553,8 @@
         return string.replace(/([A-Z])/g, ' $1').trim()
       },
       runProfiler() {
-        ProfilerRestApi.runProfiler()
+        let result = ProfilerRestApi.runProfiler()
+        Vue.$toast.info('Started Profiler for all devices.')
       }
     }
   }
