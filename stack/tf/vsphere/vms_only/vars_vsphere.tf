@@ -60,19 +60,3 @@ variable "disk_size" {
   default = 40
   nullable = false
 }
-
-#SLM VARS:
-variable "slm_hostname" {
-  type = string
-  default = "localhost"
-}
-
-variable "slm_username" {
-  type = string
-  default = "fabos"
-}
-
-variable "slm_password" {
-  type = string
-  default = "password"
-}
