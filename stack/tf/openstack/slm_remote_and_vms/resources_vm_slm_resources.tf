@@ -17,6 +17,44 @@ resource "openstack_compute_instance_v2" "vms" {
 
   key_pair = openstack_compute_keypair_v2.slm_dev_keypair.id
 
+  # Reboot:
+  provisioner "remote-exec" {
+    inline = [
+      "(sleep 1 && sudo reboot) &"
+    ]
+
+    connection {
+      host     = openstack_networking_floatingip_v2.fip_vms[count.index].address
+      type     = "ssh"
+      user     = "ubuntu"
+      private_key = openstack_compute_keypair_v2.slm_dev_keypair.private_key
+    }
+  }
+
+  # Add User, Change Keyboard Layout, Enable, SSH User Auth, apt Update/Upgrade/Remove/Install:
+  provisioner "remote-exec" {
+    inline = [
+      "sudo useradd -m -s /usr/bin/bash -p $(openssl passwd -1 ${var.vm_password}) ${var.vm_username}",
+      "sudo usermod -aG sudo ${var.vm_username}",
+      "L='de' && sudo sed -i 's/XKBLAYOUT=\\\"\\w*\"/XKBLAYOUT=\\\"'$L'\\\"/g' /etc/default/keyboard",
+      "sudo sed -i 's/PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config",
+      "sudo systemctl restart sshd",
+      "sudo apt purge -y libappstream4",
+      "sudo export DEBIAN_FRONTEND=noninteractive && sudo apt update && sudo apt upgrade -y",
+      "sudo apt remove -y unattended-upgrades",
+      "sudo apt install -y dos2unix",
+      "(sleep 1 && sudo reboot) &",
+    ]
+
+    connection {
+      host     = openstack_networking_floatingip_v2.fip_vms[count.index].address
+      type     = "ssh"
+      user     = "ubuntu"
+      private_key = openstack_compute_keypair_v2.slm_dev_keypair.private_key
+    }
+  }
+
+  # Upload "Add VM to SLM" Script:
   provisioner "file" {
     content   = templatefile(
       "scripts/add_vm_to_slm.tftpl",
@@ -41,17 +79,10 @@ resource "openstack_compute_instance_v2" "vms" {
     }
   }
 
+  # Run "Add VM to SLM" Script:
   provisioner "remote-exec" {
     inline = [
-      "sudo apt update",
-      "sudo apt remove -y unattended-upgrades",
-      "sudo useradd -m -s /usr/bin/bash -p $(openssl passwd -1 ${var.vm_password}) ${var.vm_username}",
-      "sudo usermod -aG sudo ${var.vm_username}",
-      "L='de' && sudo sed -i 's/XKBLAYOUT=\\\"\\w*\"/XKBLAYOUT=\\\"'$L'\\\"/g' /etc/default/keyboard",
-      "sudo sed -i 's/PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config",
-      "sudo systemctl restart sshd",
       "sudo chmod +x /tmp/add_vm_to_slm.sh",
-      "sudo apt install -y dos2unix",
       "dos2unix /tmp/add_vm_to_slm.sh",
       "/tmp/add_vm_to_slm.sh"
     ]
