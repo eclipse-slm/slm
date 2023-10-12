@@ -34,6 +34,19 @@ resource "openstack_compute_instance_v2" "slm-vm" {
 
   provisioner "remote-exec" {
     inline = [
+      "sudo reboot &"
+    ]
+
+    connection {
+      host     = openstack_networking_floatingip_v2.fip_slm.address
+      type     = "ssh"
+      user     = "ubuntu"
+      private_key = openstack_compute_keypair_v2.slm_dev_keypair.private_key
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = [
       "sudo apt remove -y unattended-upgrades && sudo apt update",
       "sudo useradd -m -s /usr/bin/bash -p $(openssl passwd -1 ${var.vm_password}) ${var.vm_username}",
       "sudo usermod -aG sudo ${var.vm_username}",
