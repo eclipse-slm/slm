@@ -1,6 +1,7 @@
 package org.eclipse.slm.notification_service.service.rest.endpoints;
 
 import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
+import org.eclipse.slm.common.awx.client.observer.AwxJobObserverInitializer;
 import org.eclipse.slm.common.awx.client.observer.IAwxJobObserverListener;
 import org.eclipse.slm.notification_service.communication.websocket.NotificationWsService;
 import org.eclipse.slm.notification_service.model.*;
@@ -46,6 +47,8 @@ public class ObserverRestController implements IAwxJobObserverListener {
 
     private Map<Integer, List<String>> jobIdToNotifyUsers = new HashMap<>();
 
+    private AwxJobObserverInitializer awxJobObserverInitializer;
+
     public ObserverRestController(
             @Value("${awx.scheme}") String scheme,
             @Value("${awx.host}") String host,
@@ -54,7 +57,8 @@ public class ObserverRestController implements IAwxJobObserverListener {
             @Value("${awx.password}") String awxPassword,
             @Value("${awx.polling-interval-in-s}") int pollingInterval,
             NotificationRepository notificationRepository,
-            NotificationWsService notificationWsService
+            NotificationWsService notificationWsService,
+            AwxJobObserverInitializer awxJobObserverInitializer
     ) {
 
         this.awxUrl = scheme + "://" + host + ":" + port;
@@ -64,6 +68,8 @@ public class ObserverRestController implements IAwxJobObserverListener {
 
         this.notificationRepository = notificationRepository;
         this.notificationWsService = notificationWsService;
+
+        this.awxJobObserverInitializer = awxJobObserverInitializer;
     }
 
     @RequestMapping(value = "/job", method = RequestMethod.POST)
@@ -75,7 +81,7 @@ public class ObserverRestController implements IAwxJobObserverListener {
             @RequestParam(name="jobGoal", required = true) JobGoal jobGoal
     ) throws SSLException {
 
-        var awxJobObserver = new AwxJobObserver(this.awxUrl, this.awxUsername, this.awxPassword, this.pollingInterval, jobId, jobTarget, jobGoal, this);
+        var awxJobObserver = this.awxJobObserverInitializer.init(jobId, jobTarget, jobGoal, this);
         if (!jobIdToNotifyUsers.containsKey(jobId))
         {
             jobIdToNotifyUsers.put(jobId, new ArrayList<>());

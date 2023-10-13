@@ -37,11 +37,11 @@ services:
       - awx_test-redis:/var/run/redis
     privileged: true
     tty: true
-#    ports:
+    ports:
 #      - "7899-7999:7899-7999"  # sdb-listen
 #      - "6899:6899"
 #      - "2222:2222"  # receptor foo node
-#      - "8052:8013"
+      - "8013:8013"
     links:
       - awx-postgres
       - awx-redis

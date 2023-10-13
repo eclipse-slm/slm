@@ -4,8 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.eclipse.slm.common.awx.client.AwxClient;
 import org.eclipse.slm.common.awx.client.AwxCredential;
 import org.eclipse.slm.common.awx.client.AwxProjectUpdateFailedException;
+import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
+import org.eclipse.slm.common.awx.client.observer.AwxWebsocketClient;
+import org.eclipse.slm.common.awx.client.observer.IAwxJobObserverListener;
 import org.eclipse.slm.common.awx.model.*;
+import org.eclipse.slm.notification_service.model.JobFinalState;
+import org.eclipse.slm.notification_service.model.JobGoal;
 import org.eclipse.slm.notification_service.model.JobState;
+import org.eclipse.slm.notification_service.model.JobTarget;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
@@ -47,6 +53,7 @@ public class BasicAwxClientDevTesting {
     static final DockerComposeContainer awxContainer;
 
     private static int AWX_PORT = 8013;
+    private static int AWX_HTTPS_PORT = 8043;
     private static String AWX_WEB_SERVICE = "awx";
 
     @Autowired
@@ -54,7 +61,8 @@ public class BasicAwxClientDevTesting {
 
     static {
         awxContainer = new DockerComposeContainer(new File("src/test/resources/docker-compose.yml"))
-                .withExposedService(AWX_WEB_SERVICE,AWX_PORT,
+                .withExposedService(AWX_WEB_SERVICE, AWX_HTTPS_PORT)
+                .withExposedService(AWX_WEB_SERVICE, AWX_PORT,
                         Wait.forHttp("/#/login").forPort(AWX_PORT).withStartupTimeout(Duration.ofMinutes(5))
                 )
                 .withLocalCompose(true);
@@ -747,6 +755,68 @@ public class BasicAwxClientDevTesting {
                         Thread.sleep(1000);
                     }
                 }
+
+                assertEquals(
+                        JobState.SUCCESSFUL.name().toLowerCase(),
+                        job.getStatus()
+                );
+            }
+
+            @Test
+            @Order(42)
+            public void runAwxJobTemplateAndObserveTheJobStatus() throws JsonProcessingException, InterruptedException {
+                //Make sure default Inventory is available:
+                String port = String.valueOf(awxContainer.getServicePort(AWX_WEB_SERVICE, AWX_HTTPS_PORT));
+                awxClient.createDefaultInventory();
+                AwxWebsocketClient awxWebsocketClient;
+                awxWebsocketClient = new AwxWebsocketClient(awxClient.awxHost, awxClient.awxPort, "admin", "password");
+
+                try {
+                    awxWebsocketClient.start();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+                class AwxJobObserverListener implements IAwxJobObserverListener{
+                    public boolean stateChanged = false;
+                    public boolean stateFinished = false;
+
+                    @Override
+                    public void onJobStateChanged(AwxJobObserver sender, JobState newState) {
+                        stateChanged = true;
+                    }
+
+                    @Override
+                    public void onJobStateFinished(AwxJobObserver sender, JobFinalState finalState) {
+                        stateFinished = true;
+                    }
+                }
+
+                var listener = new AwxJobObserverListener();
+                var observer = new AwxJobObserver(listener);
+                awxWebsocketClient.registerObserver(observer);
+                int jobRunId = awxClient.runJobTemplate(
+                        new AwxCredential("admin", "password"),
+                        projectCreateAndWaitDTO.getScm_url(),
+                        projectCreateAndWaitDTO.getScm_branch(),
+                        playbook,
+                        new ExtraVars(new HashMap<>())
+                );
+                observer.observeJob(jobRunId, JobTarget.PROJECT, JobGoal.CREATE);
+
+                Job job = null;
+                for(int i = 0; i < 30; i++) {
+                    job = awxClient.getJob(jobRunId);
+
+                    if(job.getStatus().equals(JobState.SUCCESSFUL.name().toLowerCase())) {
+                        break;
+                    } else {
+                        Thread.sleep(1000);
+                    }
+                }
+
+                assertTrue(listener.stateChanged);
+                assertTrue(listener.stateFinished);
 
                 assertEquals(
                         JobState.SUCCESSFUL.name().toLowerCase(),

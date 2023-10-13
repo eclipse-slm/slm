@@ -2,7 +2,11 @@ package org.eclipse.slm.common.awx.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeCreator;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.fasterxml.jackson.module.kotlin.KotlinModule;
 import org.eclipse.slm.common.awx.model.*;
 import org.eclipse.slm.notification_service.model.JobFinalState;
@@ -58,6 +62,9 @@ public class AwxClient {
 //    @Value("${awx.url}")
     public String awxUrl;
 
+    public String awxHost;
+    public String awxPort;
+
     @Value("${awx.username}")
     private String awxUsername;
 
@@ -87,6 +94,8 @@ public class AwxClient {
             @Value("${awx.host}") String host,
             @Value("${awx.port}") String port
     ) {
+        this.awxHost = host;
+        this.awxPort = port;
         this.awxUrl = scheme + "://" + host + ":" + port;
     }
 
@@ -1541,6 +1550,7 @@ public class AwxClient {
 
     public void setAwxPort(int port) {
         try {
+            this.awxPort = String.valueOf(port);
             URL initialUrl = new URL(awxUrl);
             URL newURL = new URL(initialUrl.getProtocol(), initialUrl.getHost(), port, initialUrl.getFile());
 
