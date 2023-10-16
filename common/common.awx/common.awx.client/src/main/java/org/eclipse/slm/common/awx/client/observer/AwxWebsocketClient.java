@@ -1,7 +1,8 @@
 package org.eclipse.slm.common.awx.client.observer;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -12,9 +13,7 @@ import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import java.util.Objects;
 
 public class AwxWebsocketClient implements AutoCloseable{
 
@@ -37,21 +36,19 @@ public class AwxWebsocketClient implements AutoCloseable{
         this.password = password;
     }
 
-    private String loginToAwx(String username, String password) throws JsonProcessingException {
+    private String loginToAwx(String username, String password) {
         String uri = "http://"+ this.awxHost + ":" + this.awxPort;
 
-
-        HttpEntity<?> entity = new HttpEntity<>(null);
         var template = new RestTemplate();
         var csrfResponse = template.getForEntity(uri + "/api/login/", String.class );
         var csrfHeaders = csrfResponse.getHeaders();
         var csrfCookies = csrfHeaders.getFirst(HttpHeaders.SET_COOKIE);
 
-        this.xrfToken = csrfCookies.split(";")[0].split("=")[1];
+        this.xrfToken = Objects.requireNonNull(csrfCookies).split(";")[0].split("=")[1];
 
-        Document doc = Jsoup.parse(csrfResponse.getBody());
+        Document doc = Jsoup.parse(Objects.requireNonNull(csrfResponse.getBody()));
         var element = doc.selectFirst("input[name=\"csrfmiddlewaretoken\"]");
-        var csrfMiddlewareToken = element.attributes().get("value");
+        var csrfMiddlewareToken = Objects.requireNonNull(element).attributes().get("value");
 
         HttpHeaders header = new HttpHeaders();
         header.put(HttpHeaders.COOKIE, List.of(csrfCookies, "userLoggedIn=false"));
@@ -68,24 +65,20 @@ public class AwxWebsocketClient implements AutoCloseable{
 
         var loginHeaders = loginResponse.getHeaders();
         var loginCookies = loginHeaders.get(HttpHeaders.SET_COOKIE);
-        var sessionIdKey = loginHeaders.get("X-API-Session-Cookie-Name").get(0);
-        var sessionIdString = loginCookies.stream().filter(s -> s.contains(sessionIdKey)).findFirst().get();
-        var sessionId = sessionIdString.split(";")[0];
+        var sessionIdKey = Objects.requireNonNull(loginHeaders.get("X-API-Session-Cookie-Name")).get(0);
+        var sessionIdString = Objects.requireNonNull(loginCookies).stream().filter(s -> s.contains(sessionIdKey)).findFirst().get();
 
-        return sessionId;
+        return sessionIdString.split(";")[0];
     }
 
     public void start() throws IOException, DeploymentException {
 
         var sessionId = this.loginToAwx(username, password);
-
         ClientEndpointConfig config = ClientEndpointConfig.Builder.create()
                 .configurator(new SessionConfigurator(sessionId, this.xrfToken))
                 .build();
 
         this.awxJobEndpoint = new AwxJobEndpoint(this.xrfToken);
-
-
         this.session = this.container.connectToServer(this.awxJobEndpoint, config,
                 URI.create("ws://" + awxHost + ":" + awxPort + "/websocket/")
         );

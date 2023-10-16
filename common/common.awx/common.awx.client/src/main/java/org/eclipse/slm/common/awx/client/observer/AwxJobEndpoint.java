@@ -1,8 +1,6 @@
 package org.eclipse.slm.common.awx.client.observer;
 
 
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -53,8 +51,7 @@ public class AwxJobEndpoint extends Endpoint implements MessageHandler.Partial<S
 
 
         } catch (IOException e) {
-            // TODO: Logging
-            LOG.error(e.getMessage());
+            LOG.error("Could not connect to AWX server.");
         }
     }
 
@@ -72,19 +69,14 @@ public class AwxJobEndpoint extends Endpoint implements MessageHandler.Partial<S
                     }
                 }
             }
-        } catch (JsonProcessingException e) {
-            // TODO: Logging
-            LOG.error(e.getMessage());
         } catch (Exception e) {
-            // TODO: Logging
-            LOG.error(e.getMessage());
+            LOG.error("Mapping error of AWX Server");
         }
     }
 
     @Override
     public void onError(Session session, Throwable cause) {
-        // TODO: Logging
-        LOG.error("EofException for " + session.getRequestURI());
+        LOG.error("Connection Error");
     }
 
 

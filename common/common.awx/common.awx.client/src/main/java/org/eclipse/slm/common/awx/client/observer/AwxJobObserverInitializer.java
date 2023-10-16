@@ -41,8 +41,7 @@ public class AwxJobObserverInitializer {
         try {
             this.websocketClient.start();
         }catch (Exception e){
-            // TODO: Logging
-            LOG.error(e.getMessage());
+            LOG.error("Could not connect to AWX Websocket");
         }
 
 
