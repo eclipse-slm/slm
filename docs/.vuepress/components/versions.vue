@@ -79,9 +79,11 @@ export default {
           path = path.replace(versionPathSegment, targetVersionPath)
       }
       else {
-          path = targetVersionPath + path
+          let pathRest = path.split("/slm/")[1]
+          path = "/slm" + targetVersionPath + "/" + pathRest
       }
-      
+
+      console.log(path)
       window.location.pathname = path
     },
   },

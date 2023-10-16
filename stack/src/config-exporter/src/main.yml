@@ -10,6 +10,7 @@
         local_host: "{{ lookup('env', 'LOCAL_HOST') }}"
 
     - set_fact:
+        discovery_enabled: "{{ lookup('env', 'DISCOVERY_ENABLED') }}"
         keycloak_auth_server_url: "http://{{ lookup('env', 'SLM_HOSTNAME') }}:7080/auth"
         awx_scheme: "http"
         awx_hostname: "{{ lookup('env', 'SLM_HOSTNAME') }}"

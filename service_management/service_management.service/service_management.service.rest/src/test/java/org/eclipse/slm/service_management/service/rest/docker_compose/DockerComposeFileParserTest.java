@@ -31,6 +31,7 @@ public class DockerComposeFileParserTest {
               service1:
                 image: https://sample-registry.org/test-image-service1:1.0.0
                 restart: always
+                command: ls -l
                 ports:
                   - "8080:8080"
                   - "6060:9090"
@@ -99,6 +100,7 @@ public class DockerComposeFileParserTest {
               service1:
                 image: ${REGISTRY_HOST}/test-image-service1:${SERVICE1_VERSION}
                 restart: always
+                command: ls -l
                 ports:
                   - "8080:8080"
                   - "7070:9090"

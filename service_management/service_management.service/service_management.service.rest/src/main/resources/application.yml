@@ -48,6 +48,7 @@ spring:
       port: ${consul.port}
       discovery:
         ip-address: 172.17.0.1
+        enabled: true
         acl-token: ${consul.acl-token}
         prefer-ip-address: true
         register-health-check: true
