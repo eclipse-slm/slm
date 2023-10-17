@@ -13,7 +13,7 @@
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "install.yml",
         "skipable": true,
         "connectionTypes": ["ssh", "WinSsh"]
@@ -22,7 +22,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh", "WinSsh"]
       },
@@ -30,7 +30,7 @@
         "actionClass": "AwxAction",
         "actionType": "DEPLOY",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "deploy.yml",
         "connectionTypes": ["ssh", "WinSsh"]
       },
@@ -38,7 +38,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNDEPLOY",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "undeploy.yml",
         "connectionTypes": ["ssh", "WinSsh"]
       },
@@ -46,7 +46,7 @@
         "actionClass": "AwxAction",
         "actionType": "UPDATE",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "deploy.yml",
         "connectionTypes": ["ssh", "WinSsh"]
       }
@@ -72,7 +72,7 @@
         "actionClass": "AwxAction",
         "actionType": "DEPLOY",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-portainer",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "deploy.yml",
         "connectionTypes": ["http"]
       },
@@ -80,7 +80,7 @@
         "actionClass": "AwxAction",
         "actionType": "UPDATE",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-portainer",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "update.yml",
         "connectionTypes": ["http"]
       },
@@ -88,7 +88,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-portainer",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh", "WinSsh"]
       },
@@ -96,7 +96,7 @@
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-portainer",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "install.yml",
         "connectionTypes": ["ssh", "WinSsh"],
         "skipable": true,
@@ -124,7 +124,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNDEPLOY",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-portainer",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "undeploy.yml",
         "connectionTypes": ["http"]
       }
@@ -148,7 +148,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-cc-base",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "uninstall.yml",
         "connectionTypes": [
           "ssh"
@@ -158,7 +158,7 @@
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-cc-base",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "install.yml",
         "connectionTypes": [
           "ssh"
@@ -181,7 +181,7 @@
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-swarm",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "install.yml",
         "connectionTypes": ["ssh"]
       },
@@ -189,7 +189,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-swarm",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh"]
       },
@@ -197,7 +197,7 @@
         "actionClass": "AwxAction",
         "actionType": "SCALE_UP",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-swarm",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "scaleup.yml",
         "connectionTypes": ["ssh"]
       },
@@ -205,7 +205,7 @@
         "actionClass": "AwxAction",
         "actionType": "SCALE_DOWN",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-swarm",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "scaledown.yml",
         "connectionTypes": ["ssh"]
       },
@@ -213,7 +213,7 @@
         "actionClass": "AwxAction",
         "actionType": "DEPLOY",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-swarm",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "deploy.yml",
         "connectionTypes": ["ssh"]
       },
@@ -221,7 +221,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNDEPLOY",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker-swarm",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "undeploy.yml",
         "connectionTypes": ["ssh"]
       }
@@ -259,7 +259,7 @@
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "install.yml",
         "connectionTypes": ["ssh"]
       },
@@ -267,7 +267,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh"]
       },
@@ -275,7 +275,7 @@
         "actionClass": "AwxAction",
         "actionType": "SCALE_UP",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "scaleup.yml",
         "connectionTypes": ["ssh"]
       },
@@ -283,7 +283,7 @@
         "actionClass": "AwxAction",
         "actionType": "SCALE_DOWN",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "scaledown.yml",
         "connectionTypes": ["ssh"]
       },
@@ -291,7 +291,7 @@
         "actionClass": "AwxAction",
         "actionType": "DEPLOY",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "deploy.yml",
         "connectionTypes": ["ssh"]
       },
@@ -299,7 +299,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNDEPLOY",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "undeploy.yml",
         "connectionTypes": ["ssh"]
       }
@@ -337,7 +337,7 @@
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k8s",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "install.yml",
         "connectionTypes": ["ssh"],
         "skipable": true,
@@ -364,7 +364,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k8s",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh"]
       },
@@ -372,7 +372,7 @@
         "actionClass": "AwxAction",
         "actionType": "SCALE_UP",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k8s",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "scaleup.yml",
         "connectionTypes": ["ssh"]
       },
@@ -380,7 +380,7 @@
         "actionClass": "AwxAction",
         "actionType": "SCALE_DOWN",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k8s",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "scaledown.yml",
         "connectionTypes": ["ssh"]
       },
@@ -388,7 +388,7 @@
         "actionClass": "AwxAction",
         "actionType": "DEPLOY",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k8s",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "deploy.yml",
         "connectionTypes": ["http"]
       },
@@ -396,7 +396,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNDEPLOY",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k8s",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "undeploy.yml",
         "connectionTypes": ["http"]
       }
@@ -440,7 +440,7 @@
         "actionClass": "AwxAction",
         "actionType": "DEPLOY",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s-single",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "deploy.yml",
         "connectionTypes": ["ssh"]
       },
@@ -448,7 +448,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s-single",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh"]
       },
@@ -456,7 +456,7 @@
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s-single",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "install.yml",
         "connectionTypes": ["ssh"]
       },
@@ -464,7 +464,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNDEPLOY",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s-single",
-        "awxBranch": "main",
+        "awxBranch": "1.0.0",
         "playbook": "undeploy.yml",
         "connectionTypes": ["ssh"]
       }
