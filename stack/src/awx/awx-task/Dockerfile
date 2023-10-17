@@ -1,4 +1,4 @@
-FROM ghcr.io/eclipse-slm/awx/base:22.7.0
+FROM ghcr.io/ilgmi/awx/base:22.7.0
 
 ENV AWX_SKIP_MIGRATIONS="0" \
     AWX_ADMIN_USER="admin" \
@@ -32,6 +32,8 @@ RUN git clone https://github.com/ansible/awx.git && \
 
 RUN cp -rf /tmp/awx /awx_devel/
 
+RUN rm -rf /tmp/awx
+
 COPY ./admin_password.yml /awx_devel/tools/docker-compose/_sources/secrets
 
 WORKDIR /awx_devel
@@ -43,6 +45,6 @@ RUN make clean-ui ui-devel
 
 RUN cd awx/ui && npx update-browserslist-db@latest
 
-CMD "/awx_devel/launch_awx.sh"
+CMD "launch_awx.sh"
 
 
