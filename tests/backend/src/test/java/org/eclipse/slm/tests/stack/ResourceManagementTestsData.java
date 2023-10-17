@@ -14,29 +14,29 @@ public class ResourceManagementTestsData {
                 ],
                 "actions": {
                   "INSTALL": {
-                    "capabilityActionClass": "AwxCapabilityAction",
-                    "capabilityActionType": "INSTALL",
+                    "actionClass": "AwxAction",
+                    "actionType": "INSTALL",
                     "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
                     "awxBranch": "main",
                     "playbook": "install.yml"
                   },
                   "UNINSTALL": {
-                    "capabilityActionClass": "AwxCapabilityAction",
-                    "capabilityActionType": "UNINSTALL",
+                    "actionClass": "AwxAction",
+                    "actionType": "UNINSTALL",
                     "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
                     "awxBranch": "main",
                     "playbook": "uninstall.yml"
                   },
                   "DEPLOY": {
-                    "capabilityActionClass": "AwxCapabilityAction",
-                    "capabilityActionType": "DEPLOY",
+                    "actionClass": "AwxAction",
+                    "actionType": "DEPLOY",
                     "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
                     "awxBranch": "main",
                     "playbook": "deploy.yml"
                   },
                   "UNDEPLOY": {
-                    "capabilityActionClass": "AwxCapabilityAction",
-                    "capabilityActionType": "UNDEPLOY",
+                    "actionClass": "AwxAction",
+                    "actionType": "UNDEPLOY",
                     "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-dummy.git",
                     "awxBranch": "main",
                     "playbook": "undeploy.yml"

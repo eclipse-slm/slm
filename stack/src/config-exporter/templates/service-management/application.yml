@@ -42,6 +42,16 @@ spring:
     name: service_management
   main:
     allow-bean-definition-overriding: true
+  cloud:
+    consul:
+      host: ${consul.host}
+      port: ${consul.port}
+      discovery:
+        enabled: {{ discovery_enabled | lower }}
+        ip-address: {{ local_host | default("172.17.0.1") }}
+        acl-token: ${consul.acl-token}
+        prefer-ip-address: true
+        register-health-check: true
   security:
     user:
       name: "user"
@@ -77,11 +87,11 @@ git:
 ### Components - Internal
 notification-service:
   scheme: "http"
-  host: "localhost"
+  host: {{ target_host }}
   port: 9001
 
 resource-management:
-  url: "http://localhost:9010"
+  url: "http://{{ target_host }}:9010"
 
 ### Keycloak
 keycloak:

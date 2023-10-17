@@ -20,11 +20,10 @@ import org.eclipse.slm.notification_service.model.*;
 import org.eclipse.slm.notification_service.service.client.NotificationServiceClient;
 import org.eclipse.slm.resource_management.service.rest.capabilities.CapabilitiesConsulClient;
 import org.eclipse.slm.resource_management.service.rest.capabilities.MultiHostCapabilitiesConsulClient;
-import org.eclipse.slm.resource_management.model.capabilities.actions.AwxCapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.AwxAction;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.consul.capability.CapabilityServiceStatus;
 import org.eclipse.slm.resource_management.model.consul.capability.MultiHostCapabilityService;
-import org.eclipse.slm.resource_management.service.rest.handler.ClusterJob;
 import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,8 +67,8 @@ class ClusterDeleteFunctions extends AbstractClusterFunctions implements IAwxJob
     ) throws SSLException {
         var clusterJob = new ClusterJob(multiHostCapabilityService);
 
-        AwxCapabilityAction uninstallAction =
-                (AwxCapabilityAction) multiHostCapabilityService.getCapability().getActions().get(CapabilityActionType.UNINSTALL);
+        AwxAction uninstallAction =
+                (AwxAction) multiHostCapabilityService.getCapability().getActions().get(ActionType.UNINSTALL);
 
         Map<String, Object> extraVarsMap = new HashMap<>();
         extraVarsMap.put("resource_id",multiHostCapabilityService.getId().toString());

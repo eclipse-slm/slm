@@ -1,0 +1,24 @@
+[
+  {
+    "id": "24729ce0-a405-4b54-ab42-0b71011ad900",
+    "name": "ansible-facts",
+    "action": {
+      "actionClass": "AwxAction",
+      "actionType": "RUN",
+      "awxRepo": "https://github.com/eclipse-slm/slm-pr-ansible-facts",
+      "awxBranch": "1.0.0",
+      "playbook": "run.yml"
+    }
+  },
+  {
+    "id": "91508cd8-dc96-43a9-894c-e7384a381a0e",
+    "name": "webcams",
+    "action": {
+      "actionClass": "AwxAction",
+      "actionType": "RUN",
+      "awxRepo": "https://github.com/eclipse-slm/slm-pr-webcams",
+      "awxBranch": "1.0.0",
+      "playbook": "run.yml"
+    }
+  }
+]

@@ -12,7 +12,7 @@ JSON_STRING='window.configs = { \
 }'
 sed -i "s@// CONFIGURATIONS_PLACEHOLDER@${JSON_STRING}@" /usr/share/nginx/html/index.html
 
-envsubst '$RESOURCE_REGISTRY_URL,$SERVICE_REGISTRY_URL,$NOTIFICATION_SERVICE_URL,$CATALOG_SERVICE_URL' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
+#envsubst '$RESOURCE_REGISTRY_URL,$SERVICE_REGISTRY_URL,$NOTIFICATION_SERVICE_URL,$CATALOG_SERVICE_URL' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
 
 # Wait until Keycloak is running
 echo "Keycloak availability test URL: $KEYCLOAK_URL/realms/$KEYCLOAK_REALM/.well-known/openid-configuration"
@@ -38,5 +38,13 @@ until curl -m 5 -s --location --request GET "$SERVICE_REGISTRY_URL/v3/api-docs" 
   echo "Service Management is unavailable -> sleeping"
   sleep 1
 done
+
+# Wait until Consul configuration is present
+CONSUL_TOKEN_FILE="/app/consul/consul_token"
+until [ -f "$CONSUL_TOKEN_FILE" ]; do
+  echo "Consul token config file '$CONSUL_TOKEN_FILE' missing -> sleeping"
+  sleep 3
+done
+export CONSUL_TOKEN=$(cat "$CONSUL_TOKEN_FILE")
 
 exec "$@"

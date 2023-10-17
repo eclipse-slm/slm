@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  labels:
+    app: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      name: keycloak
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: ghcr.io/eclipse-slm/keycloak:{{ .Values.keycloak.version}}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KEYCLOAK_ADMIN
+              valueFrom:
+                configMapKeyRef:
+                  name: keycloak-config
+                  key: keycloak-admin
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-secret
+                  key: keycloak-admin-password
+            - name: KEYCLOAK_DEFAULT_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-secret
+                  key: keycloak-default-user-password
+          volumeMounts:
+            - name: keycloak-database-config-pv
+              mountPath: /keycloak/database/config
+
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /auth
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
+
+
+      volumes:
+        - name: keycloak-database-config-pv
+          persistentVolumeClaim:
+            claimName: keycloak-database-config-pvc
+
+
+      restartPolicy: Always
+      

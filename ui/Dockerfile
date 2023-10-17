@@ -2,6 +2,9 @@
 FROM node:lts as build-stage
 WORKDIR /app
 COPY package*.json ./
+RUN apt update && apt install wget unzip
+RUN wget https://releases.hashicorp.com/consul-template/0.32.0/consul-template_0.32.0_linux_amd64.zip && \
+    unzip consul-template_0.32.0_linux_amd64.zip
 RUN npm install --legacy-peer-deps --loglevel "error"
 COPY . .
 RUN npm run build --loglevel "error"
@@ -19,12 +22,16 @@ ENV NOTIFICATION_SERVICE_URL="http://notification-service:9001/" \
     AWX_URL="http://awxweb:80" \
     CATALOG_SERVICE_URL="http://catalog:10000/"
 
+COPY --from=build-stage /app/consul-template /usr/bin
 COPY --from=build-stage /app/dist /usr/share/nginx/html
+COPY src/docker/config.hcl /consul-template/
+COPY src/docker/default.ctmpl /consul-template/
 COPY nginx_conf/nginx.conf /etc/nginx/nginx.conf
-COPY nginx_conf/default.conf.template /etc/nginx/conf.d/default.conf.template
 
 COPY src/docker/entrypoint.sh /app/entrypoint.sh
+
+RUN rm /etc/nginx/conf.d/*
 RUN chmod +x /app/entrypoint.sh
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD consul-template -config /consul-template/config.hcl & nginx -g "daemon off;"

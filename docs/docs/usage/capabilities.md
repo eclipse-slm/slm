@@ -9,10 +9,10 @@ Deployment Capabilities are used to deploy a service on a resource. They can be 
 
 ### Import officially supported Deployment Capabilities
 After installation, a new Service Lifecycle Management instance has no deployment capabilities. By default, the compose stack of the Service Lifecycle Management includes a service `resource-registry-init`. This service imports the officially supported capabilities during the first startup:
-* [Docker](https://github.com/FabOS-AI/fabos-slm-dc-docker)
-* [Docker Swarm](https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm)
-* [K3S](https://github.com/FabOS-AI/fabos-slm-dc-k3s)
-* [K8S](https://github.com/FabOS-AI/fabos-slm-dc-k8s)
+* [Docker](https://github.com/eclipse-slm/slm-dc-docker)
+* [Docker Swarm](https://github.com/eclipse-slm/slm-dc-docker-swarm)
+* [K3S](https://github.com/eclipse-slm/slm-dc-k3s)
+* [K8S](https://github.com/eclipse-slm/slm-dc-k8s)
 
 ### Add a new Deployment Capability
 Additional deployment capabilites can be imported using the endpoint `POST /resources/capabilites` of the Resource Registry. A request at the example of the [Docker Deployment Capability](https://github.com/FabOS-AI/fabos-slm-dc-docker) looks like this:
@@ -39,28 +39,28 @@ curl -X 'POST' \
       "install": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "install",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
         "awxBranch": "main",
         "playbook": "install.yml"
       },
       "uninstall": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "uninstall",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
         "awxBranch": "main",
         "playbook": "uninstall.yml"
       },
       "undeploy": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "undeploy",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
         "awxBranch": "main",
         "playbook": "undeploy.yml"
       },
       "deploy": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "deploy",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-docker",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
         "awxBranch": "main",
         "playbook": "deploy.yml"
       },

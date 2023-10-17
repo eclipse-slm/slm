@@ -7,7 +7,10 @@
     - set_fact:
         configure_core_project: "{{ lookup('env', 'CONFIGURE_CORE_PROJECT') }}"
         target_host: "{{ lookup('env', 'SLM_HOSTNAME') }}"
+        local_host: "{{ lookup('env', 'LOCAL_HOST') }}"
+
     - set_fact:
+        discovery_enabled: "{{ lookup('env', 'DISCOVERY_ENABLED') }}"
         keycloak_auth_server_url: "http://{{ lookup('env', 'SLM_HOSTNAME') }}:7080/auth"
         awx_scheme: "http"
         awx_hostname: "{{ lookup('env', 'SLM_HOSTNAME') }}"
@@ -69,10 +72,13 @@
 
     - name: "Ensures /project/_config_generated dir exists"
       file:
-        path: "/project/_config_generated"
+        path: "{{ item }}"
         state: directory
+      loop:
+        - "/project/_config_generated"
+        - "/project/_config_generated/keycloak"
 
-    - name: "Copy application properties"
+    - name: "Copy slm-config, insomnia-env, postman-env"
       template:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
@@ -83,6 +89,19 @@
          dest: /project/_config_generated/insomnia-env.json
        - src: /templates/postman-env.json
          dest: /project/_config_generated/postman-env.json
+
+    - name: "Copy Keycloak config files"
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items:
+        - src: /config/keycloak/notification-service/
+          dest: /project/_config_generated/keycloak/notification-service/
+        - src: /config/keycloak/resource-management/
+          dest: /project/_config_generated/keycloak/resource-management/
+        - src: /config/keycloak/service-management/
+          dest: /project/_config_generated/keycloak/service-management/
+
 
     - name: "Copy application properties"
       template:

@@ -13,6 +13,7 @@
             rules="required"
           >
             <v-text-field
+              id="serviceNameInput"
               v-model="newServiceOffering.name"
               label="Name"
               outlined
@@ -48,8 +49,10 @@
             v-slot="{ errors, valid }"
             name="Short Description"
             rules="required"
+            id="shortDescriptionInput2"
           >
             <v-text-field
+              id="shortDescriptionInput"
               v-model="newServiceOffering.shortDescription"
               label="Short Description"
               outlined
@@ -66,6 +69,7 @@
             rules="required"
           >
             <v-text-field
+              id="descriptionInput"
               v-model="newServiceOffering.description"
               label="Description"
               outlined
@@ -77,6 +81,7 @@
 
           <!-- Cover Image !-->
           <v-file-input
+            id="coverImageInput"
             v-model="uploadedServiceOfferingImage"
             label="Click here to select image"
             auto-grow
@@ -101,19 +106,19 @@
           :color="$vuetify.theme.themes.light.secondary"
           @click="$emit('step-canceled', stepNumber)"
         >
-          {{ $t('buttons.Cancel') }}
+          {{ $t("buttons.Cancel") }}
         </v-btn>
         <v-spacer />
         <v-btn
-          :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
+          :color="
+            invalid
+              ? $vuetify.theme.disable
+              : $vuetify.theme.themes.light.secondary
+          "
           @click="invalid ? validate() : handleSubmit(onNextButtonClicked)"
         >
-          <div v-if="editMode">
-            Update
-          </div>
-          <div v-else>
-            Create
-          </div>
+          <div v-if="editMode">Update</div>
+          <div v-else>Create</div>
         </v-btn>
       </v-card-actions>
     </validation-observer>
@@ -121,40 +126,40 @@
 </template>
 
 <script>
-  import ServiceOfferingCardGrid from '@/components/service_offerings/ServiceOfferingCardGrid'
-  import { mapGetters } from 'vuex'
+import ServiceOfferingCardGrid from "@/components/service_offerings/ServiceOfferingCardGrid";
+import { mapGetters } from "vuex";
 
-  export default {
-    name: 'ServiceOfferingWizardManualStep1Common',
-    components: { ServiceOfferingCardGrid },
-    props: ['editMode', 'newServiceOffering'],
-    data () {
-      return {
-        stepNumber: 1,
-        uploadedServiceOfferingImage: null,
+export default {
+  name: "ServiceOfferingWizardManualStep1Common",
+  components: { ServiceOfferingCardGrid },
+  props: ["editMode", "newServiceOffering"],
+  data() {
+    return {
+      stepNumber: 1,
+      uploadedServiceOfferingImage: null,
+    };
+  },
+  computed: {
+    ...mapGetters([
+      "serviceOfferingCategories",
+      "serviceOfferingDeploymentTypes",
+    ]),
+  },
+  methods: {
+    loadServiceOfferingImage(files) {
+      if (!this.uploadedServiceOfferingImage) {
+        console.log("No File Chosen");
+      } else {
+        const reader = new FileReader();
+        reader.readAsDataURL(this.uploadedServiceOfferingImage);
+        reader.onload = () => {
+          this.newServiceOffering.coverImage = reader.result;
+        };
       }
     },
-    computed: {
-      ...mapGetters([
-        'serviceOfferingCategories',
-        'serviceOfferingDeploymentTypes',
-      ]),
+    async onNextButtonClicked() {
+      this.$emit("step-completed", this.stepNumber);
     },
-    methods: {
-      loadServiceOfferingImage (files) {
-        if (!this.uploadedServiceOfferingImage) {
-          console.log('No File Chosen')
-        } else {
-          const reader = new FileReader()
-          reader.readAsDataURL(this.uploadedServiceOfferingImage)
-          reader.onload = () => {
-            this.newServiceOffering.coverImage = reader.result
-          }
-        }
-      },
-      async onNextButtonClicked () {
-        this.$emit('step-completed', this.stepNumber)
-      },
-    },
-  }
+  },
+};
 </script>

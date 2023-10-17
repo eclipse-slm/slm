@@ -25,11 +25,10 @@ import java.util.Locale;
  */
 @Component
 @EnableConfigurationProperties({MultiTenantKeycloakApplicationProperties.class, KeycloakSpringBootProperties.class})
-@PropertySource("application.yml")
+//@PropertySource("application.yml")
 public class MultiTenantKeycloakConfigResolver implements KeycloakConfigResolver {
 
     private static final Logger LOG = LoggerFactory.getLogger(MultiTenantKeycloakConfigResolver.class);
-
     private KeycloakSpringBootProperties keycloakSpringBootProperties;
     private MultiTenantKeycloakApplicationProperties multiTenantKeycloakApplicationProperties;
     private MultiTenantKeycloakRegistration multiTenantKeycloakRegistration;

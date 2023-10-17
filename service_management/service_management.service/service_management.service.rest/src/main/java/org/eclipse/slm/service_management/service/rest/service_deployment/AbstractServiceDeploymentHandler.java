@@ -9,8 +9,8 @@ import org.eclipse.slm.common.awx.model.ExtraVars;
 import org.eclipse.slm.notification_service.model.JobGoal;
 import org.eclipse.slm.notification_service.model.JobTarget;
 import org.eclipse.slm.resource_management.model.capabilities.Capability;
-import org.eclipse.slm.resource_management.model.capabilities.actions.AwxCapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.AwxAction;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.capabilities.provider.ServiceHoster;
 import org.eclipse.slm.resource_management.model.capabilities.provider.ServiceHosterFilter;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
@@ -38,12 +38,12 @@ public class AbstractServiceDeploymentHandler {
         this.awxJobExecutor = awxJobExecutor;
     }
 
-    protected AwxCapabilityAction getAwxDeployCapabilityAction(CapabilityActionType actionType, Capability capability) {
+    protected AwxAction getAwxDeployCapabilityAction(ActionType actionType, Capability capability) {
         if (capability.getActions().containsKey(actionType)) {
             var capabilityAction = capability.getActions().get(actionType);
 
-            if (capabilityAction instanceof AwxCapabilityAction) {
-                var awxCapabilityAction = (AwxCapabilityAction) capabilityAction;
+            if (capabilityAction instanceof AwxAction) {
+                var awxCapabilityAction = (AwxAction) capabilityAction;
                 return awxCapabilityAction;
             }
             else {
@@ -56,7 +56,7 @@ public class AbstractServiceDeploymentHandler {
         }
     }
 
-    protected AwxJobObserver runAwxCapabilityAction(AwxCapabilityAction awxCapabilityAction,
+    protected AwxJobObserver runAwxCapabilityAction(AwxAction awxCapabilityAction,
                                                     KeycloakPrincipal keycloakPrincipal,
                                                     ExtraVars extraVars,
                                                     JobGoal jobGoal,

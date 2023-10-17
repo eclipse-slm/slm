@@ -13,7 +13,7 @@ import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.notification_service.model.*;
 import org.eclipse.slm.notification_service.service.client.NotificationServiceClient;
 import org.eclipse.slm.resource_management.model.capabilities.DeploymentCapability;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
 import org.eclipse.slm.resource_management.service.client.handler.ApiException;
 import org.eclipse.slm.service_management.model.exceptions.ServiceOptionNotFoundException;
@@ -27,7 +27,6 @@ import org.eclipse.slm.service_management.model.services.exceptions.ServiceInsta
 import org.eclipse.slm.service_management.persistence.api.ServiceOrderJpaRepository;
 import org.eclipse.slm.service_management.service.rest.docker_compose.DockerComposeFile;
 import org.eclipse.slm.service_management.service.rest.docker_compose.DockerComposeFileParser;
-import org.eclipse.slm.service_management.service.rest.service_deployment.UpdateJobRun;
 import org.eclipse.slm.service_management.service.rest.service_instances.ServiceInstancesConsulClient;
 import org.apache.commons.lang3.NotImplementedException;
 import org.keycloak.KeycloakPrincipal;
@@ -89,7 +88,7 @@ public class ServiceUpdateHandler extends AbstractServiceDeploymentHandler imple
             case DOCKER_CONTAINER:
             case DOCKER_COMPOSE: {
                 var deployableComposeFile = this.getDeployableComposeFile(serviceOfferingVersion, latestServiceOrder);
-                var awxCapabilityAction = this.getAwxDeployCapabilityAction(CapabilityActionType.UPDATE, deploymentCapability);
+                var awxCapabilityAction = this.getAwxDeployCapabilityAction(ActionType.UPDATE, deploymentCapability);
 
                 HashMap<String, Object> extraVarsMap = new HashMap<>() {{
                     put("keycloak_token", keycloakPrincipal.getKeycloakSecurityContext().getTokenString());

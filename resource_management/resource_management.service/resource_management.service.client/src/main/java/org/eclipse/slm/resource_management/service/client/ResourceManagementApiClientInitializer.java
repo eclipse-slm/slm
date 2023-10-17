@@ -9,21 +9,30 @@ import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 
 @Component
 public class ResourceManagementApiClientInitializer {
 
     public final static Logger LOG = LoggerFactory.getLogger(ResourceManagementApiClientInitializer.class);
+    private final static String CONSUL_SERVICE_ID = "resource-management";
+    private final DiscoveryClient discoveryClient;
 
     private String resourceManagementUrl;
 
     public ResourceManagementApiClientInitializer(
-            @Value("${resource-management.url}") String resourceManagementUrl) {
-
+            @Value("${resource-management.url}") String resourceManagementUrl,
+            DiscoveryClient discoveryClient
+    ) {
+        this.discoveryClient = discoveryClient;
         this.resourceManagementUrl = resourceManagementUrl;
     }
 
@@ -35,7 +44,7 @@ public class ResourceManagementApiClientInitializer {
 
         var apiClient = new ApiClient();
         apiClient.setAccessToken(accessToken);
-        apiClient.setBasePath(this.resourceManagementUrl);
+        apiClient.setBasePath(getResourceManagementUrl().toString());
         apiClient.getObjectMapper().registerModule(new KotlinModule.Builder().build());
 
         return apiClient;
@@ -47,4 +56,25 @@ public class ResourceManagementApiClientInitializer {
         return init(accessToken);
     }
 
+    private URL getResourceManagementUrl() {
+        List<ServiceInstance> instances = discoveryClient.getInstances(CONSUL_SERVICE_ID);
+
+        URL resourceManagementUrl;
+        try {
+            if(instances.size() > 0) {
+                resourceManagementUrl = new URL(
+                        "http",
+                        instances.get(0).getHost(),
+                        instances.get(0).getPort(),
+                        ""
+                );
+            } else {
+                resourceManagementUrl = new URL(this.resourceManagementUrl);
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return resourceManagementUrl;
+    }
 }

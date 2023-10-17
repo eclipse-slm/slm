@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vault
+  labels:
+    app: vault
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vault
+  template:
+    metadata:
+      name: vault
+      labels:
+        app: vault
+    spec:
+      containers:
+        - name: vault
+          image: ghcr.io/eclipse-slm/vault:{{ .Values.vault.version }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8200
+          env:
+            - name: KEYCLOAK_ADMIN
+              valueFrom:
+                configMapKeyRef:
+                  name: keycloak-config
+                  key: keycloak-admin
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: keycloak-admin-password
+                  name: keycloak-secret
+            - name: KEYCLOAK_DEFAULT_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-secret
+                  key: keycloak-default-user-password
+          volumeMounts:
+            - mountPath: /vault/config/root
+              name: vault-config-root-pv
+            - mountPath: /vault/file
+              name: vault-data-pv
+
+          livenessProbe:
+            httpGet:
+              path: /v1/sys/health
+              port: 8200
+            initialDelaySeconds: 180
+            periodSeconds: 90
+            timeoutSeconds: 10
+
+      volumes:
+        - name: vault-data-pv
+          persistentVolumeClaim:
+            claimName: vault-data-pvc
+        - name: vault-config-root-pv
+          persistentVolumeClaim:
+            claimName: vault-config-root-pvc
+      restartPolicy: Always

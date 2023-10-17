@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aas-server
+  labels:
+    app: aas-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aas-server
+  template:
+    metadata:
+      name: aas-server
+      labels:
+        app: aas-server
+    spec:
+      containers:
+        - name: aas-server
+          image: eclipsebasyx/aas-server:1.3.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 4001
+          env:
+            - name: basyxaas_registry_path
+              value: http://aas-registry:4000/registry/api/v1/registry
+            - name: basyxaas_aas_backend
+              value: MongoDB
+            - name: basyxaas_aas_aasxupload
+              value: Enabled
+            - name: basyxaas_registry_host
+              value: http://aas-server:4001/aasServer
+            - name: basyxmongodb_dbconnectionstring
+              value: mongodb://aas-database:27017/
+            - name: basyxcontext_accesscontrolalloworigin
+              value: "*"
+            - name: waiting_for
+              value: '[{"host":"aas-registry","port":"4000"}]'
+
+      restartPolicy: Always

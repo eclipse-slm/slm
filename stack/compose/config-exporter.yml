@@ -5,7 +5,9 @@ services:
     image: ghcr.io/eclipse-slm/slm/config-exporter:${SLM_VERSION}
     restart: "no"
     environment:
-      - CONFIGURE_CORE_PROJECT=false
+      - CONFIGURE_CORE_PROJECT=true
+      - LOCAL_HOST="${SLM_IP}"
+      - DISCOVERY_ENABLED=false
     env_file:
       - .env
     volumes:

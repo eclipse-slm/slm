@@ -74,6 +74,14 @@
         </v-list-group>
 
       </v-list>
+
+      <service-repository-select
+          v-model="serviceOfferingVersion.serviceRepositories"
+          label="Private Container Registries Credentials"
+          :service-vendor-id="serviceVendorId"
+          :multiple="true"
+      />
+
     </v-form>
 
     <!-- Navigation Buttons-->
@@ -101,11 +109,13 @@
   const { parse } = require('dot-properties')
   import DockerContainerEnvironmentVariables
     from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerEnvironmentVariables'
+  import ServiceRepositorySelect
+    from "@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect.vue";
 
   export default {
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes',
-    components: {DockerContainerEnvironmentVariables},
-    props: ['editMode', 'serviceOfferingVersion'],
+    components: {ServiceRepositorySelect, DockerContainerEnvironmentVariables},
+    props: ['editMode', 'serviceOfferingVersion', 'serviceVendorId'],
 
     data () {
       return {
@@ -311,8 +321,15 @@
           } catch (e) {
             if (e instanceof TypeError) {
               // catch specific error
-              console.log("Seams like the parsed spec of '" + parsedDefinition.apiVersion + "/" + parsedDefinition.kind + "' (" + parsedDefinition.metadata.name + ")has no containers in template spec! Skipping...")
-              throw e;
+              if (typeof parsedDefinition !== "undefined" && parsedDefinition !== null){
+                console.log(parsedDefinition)
+                if (Object.hasOwn(parsedDefinition, 'apiVersion') && Object.hasOwn(parsedDefinition, 'kind') && Object.hasOwn(parsedDefinition, 'metadata')){
+                  console.log("Seams like the parsed spec of '" + parsedDefinition.apiVersion + "/" + parsedDefinition.kind + "' (" + parsedDefinition.metadata.name + ")has no containers in template spec! Skipping...")
+                }
+              }
+               else {
+                console.error("TypeError. Cannot parse manifest...")
+              }
             } else {
               throw e; // let others bubble up
             }

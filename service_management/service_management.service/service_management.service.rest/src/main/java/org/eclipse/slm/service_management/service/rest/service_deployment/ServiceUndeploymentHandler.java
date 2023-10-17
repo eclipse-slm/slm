@@ -1,5 +1,18 @@
 package org.eclipse.slm.service_management.service.rest.service_deployment;
 
+import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
+import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
+import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
+import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
+import org.eclipse.basyx.aas.registration.api.IAASRegistry;
+import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
+import org.eclipse.basyx.aas.registration.restapi.AASRegistryModelProvider;
+import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
+import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
+import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
+import org.eclipse.basyx.submodel.metamodel.connected.ConnectedSubmodel;
+import org.eclipse.basyx.submodel.metamodel.map.Submodel;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.slm.common.awx.client.AwxCredential;
 import org.eclipse.slm.common.awx.client.observer.AwxJobExecutor;
 import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
@@ -13,7 +26,7 @@ import org.eclipse.slm.common.keycloak.config.KeycloakUtil;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.notification_service.model.*;
 import org.eclipse.slm.notification_service.service.client.NotificationServiceClient;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
 import org.eclipse.slm.resource_management.service.client.handler.ApiException;
 import org.eclipse.slm.service_management.model.offerings.exceptions.ServiceOfferingNotFoundException;
@@ -26,13 +39,11 @@ import org.eclipse.slm.service_management.service.rest.service_offerings.Service
 import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler implements IAwxJobObserverListener {
@@ -47,6 +58,10 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
 
     private final ServiceOfferingVersionHandler serviceOfferingVersionHandler;
 
+    private final ConnectedAssetAdministrationShellManager aasManager;
+
+    private final AASRegistryProxy aasRegistryProxy;
+
     private Map<AwxJobObserver, UndeploymentJobRun> observedAwxJobsToUndeploymentJobDetails = new HashMap<>();
 
     public ServiceUndeploymentHandler(
@@ -57,12 +72,16 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
             KeycloakUtil keycloakUtil,
             ResourceManagementApiClientInitializer resourceManagementApiClientInitializer,
             ServiceOfferingVersionHandler serviceOfferingVersionHandler,
-            ServiceInstancesConsulClient serviceInstancesConsulClient) {
+            ServiceInstancesConsulClient serviceInstancesConsulClient,
+            @Value("${basyx.aas-registry.url}") String aasRegistryUrl
+    ) {
         super(resourceManagementApiClientInitializer, serviceInstancesConsulClient, awxJobObserverInitializer, awxJobExecutor);
         this.notificationServiceClient = notificationServiceClient;
         this.consulServicesApiClient = consulServicesApiClient;
         this.keycloakUtil = keycloakUtil;
         this.serviceOfferingVersionHandler = serviceOfferingVersionHandler;
+        this.aasRegistryProxy = new AASRegistryProxy(aasRegistryUrl);
+        this.aasManager = new ConnectedAssetAdministrationShellManager(this.aasRegistryProxy);
     }
 
     public void deleteService(KeycloakPrincipal keycloakPrincipal, List<CatalogService> consulService)
@@ -81,7 +100,7 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
 
         var serviceHoster = this.getServiceHoster(keycloakPrincipal, serviceInstance.getCapabilityServiceId());
 
-        var awxCapabilityAction = this.getAwxDeployCapabilityAction(CapabilityActionType.UNDEPLOY, serviceHoster.getCapabilityService().getCapability());
+        var awxCapabilityAction = this.getAwxDeployCapabilityAction(ActionType.UNDEPLOY, serviceHoster.getCapabilityService().getCapability());
         var awxGitRepoOfProject = awxCapabilityAction.getAwxRepo();
         var awxGitBranchOfProject = awxCapabilityAction.getAwxBranch();
         var awxPlaybook = awxCapabilityAction.getPlaybook();
@@ -107,8 +126,39 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
         var jobGoal = JobGoal.DELETE;
         var awxJobId = awxJobExecutor.executeJob(new AwxCredential(keycloakPrincipal), awxGitRepoOfProject, awxGitBranchOfProject, awxPlaybook, extraVars);
         var awxJobObserver = awxJobObserverInitializer.init(awxJobId, jobTarget, jobGoal, this);
-        this.observedAwxJobsToUndeploymentJobDetails.put(awxJobObserver, new UndeploymentJobRun(keycloakPrincipal, serviceInstance.getId()));
+        this.observedAwxJobsToUndeploymentJobDetails.put(awxJobObserver, new UndeploymentJobRun(keycloakPrincipal, serviceInstance.getId(), serviceInstance.getResourceId()));
         this.notificationServiceClient.postJobObserver(keycloakPrincipal, awxJobId, jobTarget, jobGoal);
+    }
+
+    private void runSubmodelGarbageCollection(UUID resourceId) {
+        IIdentifier iIdentifier = new CustomId(resourceId.toString());
+        Map<String, ISubmodel> submodelMap;
+        ConnectedAssetAdministrationShell aas = aasManager.retrieveAAS(iIdentifier);
+
+        try {
+            submodelMap = aasManager.retrieveSubmodels(iIdentifier);
+        } catch (org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException e) {
+            LOG.info("Garbage collection stopped because no submodels were available in AAS with ID " + resourceId);
+            return;
+        }
+
+        for (Map.Entry<String, ISubmodel> entry: submodelMap.entrySet()) {
+            try {
+                LOG.info("Get information from submodel with ID = " + entry.getKey());
+                Submodel submodel = ((ConnectedSubmodel) entry.getValue()).getLocalCopy();
+            } catch(ResourceNotFoundException e) {
+                LOG.info("Delete submodel with idShort = " + entry.getKey() + " from AAS with ID = " + resourceId);
+                Optional<SubmodelDescriptor> optionalSubmodelDescriptor = this.aasRegistryProxy.lookupSubmodels(iIdentifier)
+                        .stream()
+                        .filter(sd -> sd.getIdShort().equals(entry.getKey()))
+                        .findFirst();
+                if(optionalSubmodelDescriptor.isPresent())
+                    aasRegistryProxy.delete(
+                            iIdentifier,
+                            optionalSubmodelDescriptor.get().getIdentifier()
+                    );
+            }
+        }
     }
 
     @Override
@@ -122,6 +172,7 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
             var keycloakPrincipal = jobDetails.getKeycloakPrincipal();
             var userUuid = KeycloakTokenUtil.getUserUuid(keycloakPrincipal);
             var serviceInstanceId = jobDetails.getServiceInstanceId();
+            var resourceId = jobDetails.getResourceId();
 
             switch (finalState) {
                 case SUCCESSFUL -> {
@@ -138,6 +189,7 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
                     } catch (ConsulLoginFailedException | ServiceInstanceNotFoundException e) {
                         LOG.error(e.getMessage());
                     }
+                    runSubmodelGarbageCollection(resourceId);
                 }
 
                 default -> {

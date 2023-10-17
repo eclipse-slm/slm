@@ -7,28 +7,28 @@ info:
     name: Fraunhofer IPA
     url: https://www.ipa.fraunhofer.de
     email: matthias.schneider@ipa.fraunhofer.de
-  version: 1.3.0-SNAPSHOT
+  version: 1.3.0-RELEASE
 servers:
-  - url: http://localhost:9010
-    description: Generated server url
+- url: http://localhost:9010
+  description: Generated server url
 security:
-  - bearer_auth: []
-  - spring_oauth: []
+- bearer_auth: []
+- spring_oauth: []
 paths:
   "/resources":
     get:
       tags:
-        - resources-rest-controller
+      - resources-rest-controller
       summary: Get all resources
       operationId: getResources
       parameters:
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -40,55 +40,61 @@ paths:
                   "$ref": "#/components/schemas/BasicResource"
     put:
       tags:
-        - resources-rest-controller
+      - resources-rest-controller
       summary: Add existing resource
       operationId: addExistingResource
       parameters:
-        - name: resourceUsername
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: resourcePassword
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: resourceHostname
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: resourceIp
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: resourceConnectionType
-          in: query
-          required: false
-          schema:
-            "$ref": "#/components/schemas/ConnectionType"
-        - name: resourceConnectionPort
-          in: query
-          required: false
-          schema:
-            type: integer
-            format: int32
-            default: 0
-        - name: resourceLocation
-          in: query
-          required: false
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: resourceUsername
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: resourcePassword
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: resourceHostname
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: resourceIp
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: resourceConnectionType
+        in: query
+        required: false
+        schema:
+          "$ref": "#/components/schemas/ConnectionType"
+      - name: resourceConnectionPort
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: resourceLocation
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: resourceBaseConfiguration
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -100,23 +106,23 @@ paths:
   "/resources/{resourceId}":
     get:
       tags:
-        - resources-rest-controller
+      - resources-rest-controller
       summary: Get resource
       operationId: getResource
       parameters:
-        - name: resourceId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -126,61 +132,67 @@ paths:
                 "$ref": "#/components/schemas/BasicResource"
     put:
       tags:
-        - resources-rest-controller
+      - resources-rest-controller
       summary: Add existing resource with id
       operationId: addExistingResourceWithId
       parameters:
-        - name: resourceId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: resourceUsername
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: resourcePassword
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: resourceHostname
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: resourceIp
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: resourceConnectionType
-          in: query
-          required: false
-          schema:
-            "$ref": "#/components/schemas/ConnectionType"
-        - name: resourceConnectionPort
-          in: query
-          required: false
-          schema:
-            type: integer
-            format: int32
-            default: 0
-        - name: resourceLocation
-          in: query
-          required: false
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceUsername
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: resourcePassword
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: resourceHostname
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: resourceIp
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: resourceConnectionType
+        in: query
+        required: false
+        schema:
+          "$ref": "#/components/schemas/ConnectionType"
+      - name: resourceConnectionPort
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: resourceLocation
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: resourceBaseConfiguration
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -190,23 +202,23 @@ paths:
                 type: string
     delete:
       tags:
-        - resources-rest-controller
+      - resources-rest-controller
       summary: Delete resource
       operationId: deleteResource
       parameters:
-        - name: resourceId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -217,29 +229,43 @@ paths:
   "/resources/{resourceId}/capabilities":
     put:
       tags:
-        - capabilities-rest-controller
+      - capabilities-rest-controller
       summary: Install capability on resource
       operationId: installCapabilityOnSingleHost
       parameters:
-        - name: resourceId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: capabilityId
-          in: query
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: capabilityId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: skipInstall
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
       responses:
         '200':
           description: OK
@@ -249,29 +275,29 @@ paths:
                 type: string
     delete:
       tags:
-        - capabilities-rest-controller
+      - capabilities-rest-controller
       summary: Uninstall capability from resource
       operationId: removeCapabilityFromSingleHost
       parameters:
-        - name: resourceId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: capabilityId
-          in: query
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: capabilityId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -282,23 +308,23 @@ paths:
   "/resources/{resourceId}/submodels":
     get:
       tags:
-        - submodels-rest-controller
+      - submodels-rest-controller
       summary: Get resource submodels
       operationId: getResourceSubmodels
       parameters:
-        - name: resourceId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -309,46 +335,166 @@ paths:
   "/resources/providers/virtual-resource-provider/{virtualResourceProviderId}/vm":
     post:
       tags:
-        - capability-providers-rest-controller
+      - capability-providers-rest-controller
       summary: Create Virtual Machine
       operationId: createVm
       parameters:
-        - name: virtualResourceProviderId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: virtualResourceProviderId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
+      responses:
+        '200':
+          description: OK
+  "/resources/profiler":
+    get:
+      tags:
+      - profiler-rest-controller
+      summary: Get all Profiler
+      operationId: getProfiler
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Profiler"
+    post:
+      tags:
+      - profiler-rest-controller
+      summary: Create Profiler
+      operationId: createProfiler
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ProfilerDTOApi"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/Profiler"
+  "/resources/profiler/{profilerId}":
+    get:
+      tags:
+      - profiler-rest-controller
+      summary: Get Profiler
+      operationId: getProfiler_1
+      parameters:
+      - name: profilerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/Profiler"
+    post:
+      tags:
+      - profiler-rest-controller
+      summary: Run one Profiler
+      operationId: runProfiler
+      parameters:
+      - name: profilerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+      - profiler-rest-controller
+      summary: Delete Profiler
+      operationId: deleteProfiler
+      parameters:
+      - name: profilerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
   "/resources/locations":
     get:
       tags:
-        - location-rest-controller
+      - location-rest-controller
       summary: Get locations
       operationId: getLocations
       parameters:
-        - name: id
-          in: query
-          required: false
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: id
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -360,28 +506,28 @@ paths:
                   "$ref": "#/components/schemas/Location"
     post:
       tags:
-        - location-rest-controller
+      - location-rest-controller
       summary: Create new Location
       operationId: addLocation
       parameters:
-        - name: id
-          in: query
-          required: false
-          schema:
-            type: string
-            format: uuid
-        - name: name
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: id
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: name
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -391,23 +537,23 @@ paths:
                 type: string
     delete:
       tags:
-        - location-rest-controller
+      - location-rest-controller
       summary: Delete Location
       operationId: deleteLocation
       parameters:
-        - name: id
-          in: query
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -418,17 +564,17 @@ paths:
   "/resources/clusters":
     get:
       tags:
-        - clusters-rest-controller
+      - clusters-rest-controller
       summary: Get all cluster resources of user
       operationId: getClusterResources
       parameters:
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -440,17 +586,17 @@ paths:
                   "$ref": "#/components/schemas/Cluster"
     post:
       tags:
-        - clusters-rest-controller
+      - clusters-rest-controller
       summary: Create a cluster
       operationId: createClusterResource
       parameters:
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       requestBody:
         content:
           application/json:
@@ -463,79 +609,79 @@ paths:
   "/resources/clusters/{clusterUuid}/members":
     post:
       tags:
-        - clusters-rest-controller
+      - clusters-rest-controller
       summary: Add new Member to cluster
       operationId: addClusterMember
       parameters:
-        - name: clusterUuid
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: resourceId
-          in: query
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: clusterUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
     delete:
       tags:
-        - clusters-rest-controller
+      - clusters-rest-controller
       summary: Remove member of cluster
       operationId: removeClusterMember
       parameters:
-        - name: clusterUuid
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: resourceId
-          in: query
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: clusterUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
   "/resources/capabilities":
     get:
       tags:
-        - capabilities-rest-controller
+      - capabilities-rest-controller
       summary: Get capabilities
       operationId: getCapabilities
       parameters:
-        - name: filter
-          in: query
-          required: false
-          schema:
-            "$ref": "#/components/schemas/CapabilityFilter"
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: filter
+        in: query
+        required: false
+        schema:
+          "$ref": "#/components/schemas/CapabilityFilter"
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -547,17 +693,17 @@ paths:
                     "$ref": "#/components/schemas/CapabilityDTOApi"
     post:
       tags:
-        - capabilities-rest-controller
+      - capabilities-rest-controller
       summary: Add capability
       operationId: createCapability
       parameters:
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       requestBody:
         content:
           application/json:
@@ -567,55 +713,26 @@ paths:
       responses:
         '200':
           description: OK
-  "/resources/{resourceId}/capability-services":
-    get:
-      tags:
-        - capabilities-rest-controller
-      summary: Get deployment capability services of resource
-      operationId: getDeploymentCapabilityServicesOfResource
-      parameters:
-        - name: resourceId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  "$ref": "#/components/schemas/CapabilityService"
   "/resources/{resourceId}/deployment-capabilities":
     get:
       tags:
-        - capabilities-rest-controller
+      - capabilities-rest-controller
       summary: Get deployment capabilities of resource
       operationId: getDeploymentCapabilitiesOfResource
       parameters:
-        - name: resourceId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -625,20 +742,50 @@ paths:
                 type: array
                 items:
                   "$ref": "#/components/schemas/DeploymentCapability"
+  "/resources/{resourceId}/capability-services":
+    get:
+      tags:
+      - capabilities-rest-controller
+      summary: Get capability services of resource
+      operationId: getCapabilityServicesOfResource
+      parameters:
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/CapabilityService"
+
   "/resources/providers/virtual-resource-provider":
     get:
       tags:
-        - capability-providers-rest-controller
+      - capability-providers-rest-controller
       summary: Get all virtual resource provider
       operationId: getVirtualResourceProviders
       parameters:
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -651,22 +798,22 @@ paths:
   "/resources/providers/service-hoster":
     get:
       tags:
-        - capability-providers-rest-controller
+      - capability-providers-rest-controller
       summary: Get all service hoster
       operationId: getServiceHosters
       parameters:
-        - name: filter
-          in: query
-          required: false
-          schema:
-            "$ref": "#/components/schemas/ServiceHosterFilter"
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: filter
+        in: query
+        required: false
+        schema:
+          "$ref": "#/components/schemas/ServiceHosterFilter"
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -679,17 +826,17 @@ paths:
   "/resources/connection-types":
     get:
       tags:
-        - resources-rest-controller
+      - resources-rest-controller
       summary: Get available remote connection types
       operationId: getResourceConnectionTypes
       parameters:
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -702,22 +849,22 @@ paths:
   "/resources/clusters/{clusterName}/members":
     get:
       tags:
-        - clusters-rest-controller
+      - clusters-rest-controller
       summary: Get members of cluster
       operationId: getClusterMembers
       parameters:
-        - name: clusterName
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: clusterName
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -730,17 +877,17 @@ paths:
   "/resources/clusters/types":
     get:
       tags:
-        - clusters-rest-controller
+      - clusters-rest-controller
       summary: Get all available cluster types
       operationId: getClusterTypes
       parameters:
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -753,22 +900,22 @@ paths:
   "/metrics/{resourceId}":
     get:
       tags:
-        - metrics-rest-controller
+      - metrics-rest-controller
       operationId: getMetric
       parameters:
-        - name: resourceId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -781,16 +928,16 @@ paths:
   "/jobs":
     get:
       tags:
-        - jobs-rest-controller
+      - jobs-rest-controller
       operationId: getJobs
       parameters:
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -801,22 +948,27 @@ paths:
   "/aas/submodels/templates/{smTemplateSemanticId}/instances":
     get:
       tags:
-        - submodel-templates-rest-controller
+      - submodel-templates-rest-controller
       summary: Get instances of submodel templates using semantic id
       operationId: getSubmodelTemplateInstancesBySemanticId
       parameters:
-        - name: smTemplateSemanticId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: smTemplateSemanticId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: filterByAasId
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -827,28 +979,28 @@ paths:
   "/resources/{resourceId}/submodels/{submodelIdShort}":
     delete:
       tags:
-        - submodels-rest-controller
+      - submodels-rest-controller
       summary: Delete resource submodel
       operationId: deleteSubmodel
       parameters:
-        - name: resourceId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: submodelIdShort
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: submodelIdShort
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -859,46 +1011,46 @@ paths:
   "/resources/clusters/{clusterUuid}":
     delete:
       tags:
-        - clusters-rest-controller
+      - clusters-rest-controller
       summary: Delete cluster resource
       operationId: deleteClusterResource
       parameters:
-        - name: clusterUuid
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: clusterUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
   "/resources/capabilities/{capabilityId}":
     delete:
       tags:
-        - capabilities-rest-controller
+      - capabilities-rest-controller
       summary: Delete capability
       operationId: deleteCapability
       parameters:
-        - name: capabilityId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: Realm
-          in: header
-          description: Keycloak Realm
-          required: true
-          schema:
-            type: string
-            default: fabos
+      - name: capabilityId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: true
+        schema:
+          type: string
+          default: fabos
       responses:
         '200':
           description: OK
@@ -911,89 +1063,44 @@ components:
     ConnectionType:
       type: string
       enum:
-        - ssh
-        - WinSsh
-        - WinRM
-        - http
-        - tcp
-    ClusterCreateRequest:
+      - ssh
+      - WinSsh
+      - WinRM
+      - http
+      - tcp
+    Action:
       required:
-        - clusterMembers
-        - clusterTypeId
-        - configParameterValues
-        - skipInstall
+      - actionClass
+      - configParameters
+      - connectionTypes
+      - skipable
       type: object
       properties:
-        clusterTypeId:
+        actionClass:
           type: string
-          format: uuid
-        skipInstall:
-          type: boolean
-        clusterMembers:
-          type: object
-          additionalProperties:
-            type: string
-        configParameterValues:
-          type: object
-          additionalProperties:
-            type: string
-    AwxCapabilityAction:
-      required:
-        - awxBranch
-        - awxRepo
-        - capabilityActionClass
-        - configParameters
-        - connectionTypes
-        - playbook
-        - skipable
-      type: object
-      allOf:
-        - "$ref": "#/components/schemas/CapabilityAction"
-        - type: object
-          properties:
-            awxRepo:
-              type: string
-            awxBranch:
-              type: string
-            playbook:
-              type: string
-            parameter:
-              type: array
-              items:
-                "$ref": "#/components/schemas/SurveyItem"
-    CapabilityAction:
-      required:
-        - capabilityActionClass
-        - configParameters
-        - connectionTypes
-        - skipable
-      type: object
-      properties:
-        capabilityActionClass:
-          type: string
-        capabilityActionType:
-          "$ref": "#/components/schemas/CapabilityActionType"
+        actionType:
+          "$ref": "#/components/schemas/ActionType"
         skipable:
           type: boolean
         configParameters:
           type: array
           items:
-            "$ref": "#/components/schemas/CapabilityActionConfigParameter"
+            "$ref": "#/components/schemas/ActionConfigParameter"
         connectionTypes:
           uniqueItems: true
           type: array
           items:
             "$ref": "#/components/schemas/ConnectionType"
       discriminator:
-        propertyName: capabilityActionClass
-    CapabilityActionConfigParameter:
+        propertyName: actionClass
+    ActionConfigParameter:
       required:
-        - description
-        - name
-        - prettyName
-        - requiredType
-        - secret
-        - valueType
+      - description
+      - name
+      - prettyName
+      - requiredType
+      - secret
+      - valueType
       type: object
       properties:
         name:
@@ -1003,152 +1110,84 @@ components:
         description:
           type: string
         valueType:
-          "$ref": "#/components/schemas/CapabilityActionConfigParameterValueType"
+          "$ref": "#/components/schemas/ActionConfigParameterValueType"
+        defaultValue:
+          type: string
         requiredType:
-          "$ref": "#/components/schemas/CapabilityActionConfigParameterRequiredType"
+          "$ref": "#/components/schemas/ActionConfigParameterRequiredType"
         secret:
           type: boolean
-    CapabilityActionConfigParameterRequiredType:
+    ActionConfigParameterRequiredType:
       type: string
       enum:
-        - ALWAYS
-        - SKIP
-    CapabilityActionConfigParameterValueType:
+      - ALWAYS
+      - SKIP
+    ActionConfigParameterValueType:
       type: string
       enum:
-        - STRING
-        - FILE
-        - KUBE_CONF
-    CapabilityActionType:
+      - SERVICE_PORT
+      - STRING
+      - FILE
+      - KUBE_CONF
+    ActionType:
       type: string
       enum:
-        - INSTALL
-        - UNINSTALL
-        - SCALE_UP
-        - SCALE_DOWN
-        - CREATE_VM
-        - DELETE_VM
-        - DEPLOY
-        - UNDEPLOY
-        - UPDATE
-    CapabilityDTOApi:
+      - INSTALL
+      - UNINSTALL
+      - SCALE_UP
+      - SCALE_DOWN
+      - CREATE_VM
+      - DELETE_VM
+      - DEPLOY
+      - UNDEPLOY
+      - UPDATE
+    AwxAction:
       required:
-        - actions
-        - capabilityClass
-        - clusterMemberTypes
-        - id
-        - logo
-        - name
-        - type
+      - actionClass
+      - awxBranch
+      - awxRepo
+      - configParameters
+      - connectionTypes
+      - playbook
+      - skipable
+      type: object
+      allOf:
+      - "$ref": "#/components/schemas/Action"
+      - type: object
+        properties:
+          awxRepo:
+            type: string
+          awxBranch:
+            type: string
+          playbook:
+            type: string
+          parameter:
+            type: array
+            items:
+              "$ref": "#/components/schemas/SurveyItem"
+    ProfilerDTOApi:
+      required:
+      - action
+      - name
       type: object
       properties:
+        name:
+          type: string
+        action:
+          oneOf:
+          - "$ref": "#/components/schemas/AwxAction"
         id:
           type: string
           format: uuid
-        capabilityClass:
-          type: string
-        name:
-          type: string
-        logo:
-          type: string
-        type:
-          type: array
-          items:
-            "$ref": "#/components/schemas/CapabilityType"
-        actions:
-          type: object
-          additionalProperties:
-            "$ref": "#/components/schemas/AwxCapabilityAction"
-        healthCheck:
-          "$ref": "#/components/schemas/CapabilityHealthCheck"
-        clusterMemberTypes:
-          type: array
-          items:
-            "$ref": "#/components/schemas/ClusterMemberType"
-        connection:
-          "$ref": "#/components/schemas/ConnectionType"
-      discriminator:
-        propertyName: capabilityClass
-    CapabilityHealthCheck:
-      required:
-        - interval
-        - path
-        - port
-        - type
-      type: object
-      properties:
-        type:
-          "$ref": "#/components/schemas/CapabilityHealthCheckType"
-        port:
-          type: integer
-          format: int32
-        path:
-          type: string
-        interval:
-          type: integer
-          format: int32
-    CapabilityHealthCheckType:
-      type: string
-      enum:
-        - HTTP
-    CapabilityType:
-      type: string
-      enum:
-        - SETUP
-        - DEPLOY
-        - SCALE
-        - VM
-    ClusterMemberType:
-      required:
-        - minNumber
-        - name
-        - prettyName
-        - scalable
-      type: object
-      properties:
-        name:
-          type: string
-        prettyName:
-          type: string
-        minNumber:
-          type: integer
-          format: int32
-        scalable:
-          type: boolean
-    DeploymentCapabilityDTOApi:
-      required:
-        - actions
-        - capabilityClass
-        - clusterMemberTypes
-        - id
-        - logo
-        - name
-        - supportedDeploymentTypes
-        - type
-      type: object
-      allOf:
-        - "$ref": "#/components/schemas/CapabilityDTOApi"
-        - type: object
-          properties:
-            supportedDeploymentTypes:
-              type: array
-              items:
-                "$ref": "#/components/schemas/DeploymentType"
-    DeploymentType:
-      type: string
-      enum:
-        - DOCKER_CONTAINER
-        - DOCKER_COMPOSE
-        - KUBERNETES
     SurveyItem:
       required:
-        - choices
-        - default
-        - question_description
-        - question_name
-        - required
-        - type
-        - variable
+      - choices
+      - default
+      - question_description
+      - question_name
+      - required
+      - type
+      - variable
       type: object
       properties:
         type:
@@ -1176,60 +1215,68 @@ components:
     SurveyItemType:
       type: string
       enum:
-        - text
-        - password
-        - integer
-        - float
-        - multiplechoice
-        - multiselect
-    VirtualizationCapabilityDTOApi:
+      - text
+      - password
+      - integer
+      - float
+      - multiplechoice
+      - multiselect
+    Profiler:
       required:
-        - actions
-        - capabilityClass
-        - clusterMemberTypes
-        - id
-        - logo
-        - name
-        - type
-      type: object
-      allOf:
-        - "$ref": "#/components/schemas/CapabilityDTOApi"
-    BasicResource:
-      required:
-        - clusterMember
-        - id
+      - id
+      - name
       type: object
       properties:
         id:
           type: string
           format: uuid
-        location:
-          "$ref": "#/components/schemas/Location"
-        ip:
+        name:
           type: string
-        hostname:
-          type: string
-        project:
-          type: string
-        clusterMember:
-          type: boolean
-        capabilities:
-          type: array
-          items:
-            "$ref": "#/components/schemas/Capability"
-        remoteAccessService:
-          "$ref": "#/components/schemas/RemoteAccessService"
-    Capability:
+        action:
+          oneOf:
+          - "$ref": "#/components/schemas/AwxAction"
+    ClusterCreateRequest:
       required:
-        - actions
-        - capabilityClass
-        - cluster
-        - clusterMemberTypes
-        - connectionTypes
-        - id
-        - logo
-        - name
-        - type
+      - clusterMembers
+      - clusterTypeId
+      - configParameterValues
+      - skipInstall
+      type: object
+      properties:
+        clusterTypeId:
+          type: string
+          format: uuid
+        skipInstall:
+          type: boolean
+        clusterMembers:
+          type: object
+          additionalProperties:
+            type: string
+        configParameterValues:
+          type: object
+          additionalProperties:
+            type: string
+    BaseConfigurationCapabilityDTOApi:
+      required:
+      - actions
+      - capabilityClass
+      - clusterMemberTypes
+      - id
+      - logo
+      - name
+      - type
+      type: object
+      allOf:
+      - "$ref": "#/components/schemas/CapabilityDTOApi"
+    CapabilityDTOApi:
+      required:
+      - actions
+      - capabilityClass
+      - clusterMemberTypes
+      - id
+      - logo
+      - name
+      - type
       type: object
       properties:
         id:
@@ -1248,7 +1295,7 @@ components:
         actions:
           type: object
           additionalProperties:
-            "$ref": "#/components/schemas/AwxCapabilityAction"
+            "$ref": "#/components/schemas/AwxAction"
         healthCheck:
           "$ref": "#/components/schemas/CapabilityHealthCheck"
         clusterMemberTypes:
@@ -1257,18 +1304,239 @@ components:
             "$ref": "#/components/schemas/ClusterMemberType"
         connection:
           "$ref": "#/components/schemas/ConnectionType"
-        cluster:
+      discriminator:
+        propertyName: capabilityClass
+    CapabilityHealthCheck:
+      required:
+      - interval
+      - path
+      - port
+      - type
+      type: object
+      properties:
+        type:
+          "$ref": "#/components/schemas/CapabilityHealthCheckType"
+        port:
+          type: integer
+          format: int32
+        path:
+          type: string
+        interval:
+          type: integer
+          format: int32
+    CapabilityHealthCheckType:
+      type: string
+      enum:
+      - HTTP
+    CapabilityType:
+      type: string
+      enum:
+      - SETUP
+      - DEPLOY
+      - SCALE
+      - VM
+    ClusterMemberType:
+      required:
+      - minNumber
+      - name
+      - prettyName
+      - scalable
+      type: object
+      properties:
+        name:
+          type: string
+        prettyName:
+          type: string
+        minNumber:
+          type: integer
+          format: int32
+        scalable:
           type: boolean
+    DeploymentCapabilityDTOApi:
+      required:
+      - actions
+      - capabilityClass
+      - clusterMemberTypes
+      - id
+      - logo
+      - name
+      - supportedDeploymentTypes
+      - type
+      type: object
+      allOf:
+      - "$ref": "#/components/schemas/CapabilityDTOApi"
+      - type: object
+        properties:
+          supportedDeploymentTypes:
+            type: array
+            items:
+              "$ref": "#/components/schemas/DeploymentType"
+    DeploymentType:
+      type: string
+      enum:
+      - DOCKER_CONTAINER
+      - DOCKER_COMPOSE
+      - KUBERNETES
+    VirtualizationCapabilityDTOApi:
+      required:
+      - actions
+      - capabilityClass
+      - clusterMemberTypes
+      - id
+      - logo
+      - name
+      - type
+      type: object
+      allOf:
+      - "$ref": "#/components/schemas/CapabilityDTOApi"
+    BaseConfigurationCapability:
+      required:
+      - actions
+      - capabilityClass
+      - cluster
+      - clusterMemberTypes
+      - connectionTypes
+      - id
+      - logo
+      - name
+      - type
+      type: object
+      allOf:
+      - "$ref": "#/components/schemas/Capability"
+    BasicResource:
+      required:
+      - clusterMember
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        location:
+          "$ref": "#/components/schemas/Location"
+        ip:
+          type: string
+        hostname:
+          type: string
+        project:
+          type: string
+        clusterMember:
+          type: boolean
+        capabilityServices:
+          type: array
+          items:
+            "$ref": "#/components/schemas/CapabilityService"
+
+        remoteAccessService:
+          "$ref": "#/components/schemas/RemoteAccessService"
+    Capability:
+      required:
+      - actions
+      - capabilityClass
+      - cluster
+      - clusterMemberTypes
+      - connectionTypes
+      - id
+      - logo
+      - name
+      - type
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        capabilityClass:
+          type: string
+        name:
+          type: string
+        logo:
+          type: string
+        type:
+          type: array
+          items:
+            "$ref": "#/components/schemas/CapabilityType"
+        actions:
+          type: object
+          additionalProperties:
+            "$ref": "#/components/schemas/AwxAction"
+
+        healthCheck:
+          "$ref": "#/components/schemas/CapabilityHealthCheck"
+        clusterMemberTypes:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ClusterMemberType"
+        connection:
+          "$ref": "#/components/schemas/ConnectionType"
         connectionTypes:
           uniqueItems: true
           type: array
           items:
             "$ref": "#/components/schemas/ConnectionType"
+        cluster:
+          type: boolean
       discriminator:
         propertyName: capabilityClass
+    CapabilityService:
+      required:
+      - ID
+      - capabilityServiceClass
+      - customMeta
+      - managed
+      - serviceClass
+      - serviceMeta
+      - status
+      - tags
+      type: object
+      properties:
+        service:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        serviceMeta:
+          type: object
+          additionalProperties:
+            type: string
+        capability:
+          oneOf:
+          - "$ref": "#/components/schemas/BaseConfigurationCapability"
+          - "$ref": "#/components/schemas/DeploymentCapability"
+          - "$ref": "#/components/schemas/VirtualizationCapability"
+        status:
+          "$ref": "#/components/schemas/CapabilityServiceStatus"
+        serviceClass:
+          type: string
+        customMeta:
+          type: object
+          additionalProperties:
+            type: string
+        managed:
+          type: boolean
+        ID:
+          type: string
+          format: uuid
+        Address:
+          type: string
+        Port:
+          type: integer
+          format: int32
+        capabilityServiceClass:
+          type: string
+      discriminator:
+        propertyName: capabilityServiceClass
+    CapabilityServiceStatus:
+      type: string
+      enum:
+      - INSTALL
+      - READY
+      - UNINSTALL
+      - FAILED
+      - UNKNOWN
     Credential:
       required:
-        - credentialClass
+      - credentialClass
       type: object
       properties:
         credentialClass:
@@ -1277,42 +1545,42 @@ components:
         propertyName: credentialClass
     CredentialUsernamePassword:
       required:
-        - password
-        - username
+      - password
+      - username
       type: object
       allOf:
-        - "$ref": "#/components/schemas/Credential"
-        - type: object
-          properties:
-            password:
-              type: string
-            username:
-              type: string
+      - "$ref": "#/components/schemas/Credential"
+      - type: object
+        properties:
+          password:
+            type: string
+          username:
+            type: string
     DeploymentCapability:
       required:
-        - actions
-        - capabilityClass
-        - cluster
-        - clusterMemberTypes
-        - connectionTypes
-        - id
-        - logo
-        - name
-        - supportedDeploymentTypes
-        - type
+      - actions
+      - capabilityClass
+      - cluster
+      - clusterMemberTypes
+      - connectionTypes
+      - id
+      - logo
+      - name
+      - supportedDeploymentTypes
+      - type
       type: object
       allOf:
-        - "$ref": "#/components/schemas/Capability"
-        - type: object
-          properties:
-            supportedDeploymentTypes:
-              type: array
-              items:
-                "$ref": "#/components/schemas/DeploymentType"
+      - "$ref": "#/components/schemas/Capability"
+      - type: object
+        properties:
+          supportedDeploymentTypes:
+            type: array
+            items:
+              "$ref": "#/components/schemas/DeploymentType"
     Location:
       required:
-        - id
-        - name
+      - id
+      - name
       type: object
       properties:
         id:
@@ -1320,11 +1588,34 @@ components:
           format: uuid
         name:
           type: string
+    MultiHostCapabilityService:
+      required:
+      - ID
+      - customMeta
+      - managed
+      - mapOfNodeIdsAndCatalogServices
+      - serviceClass
+      - serviceMeta
+      - status
+      - tags
+      type: object
+      allOf:
+      - "$ref": "#/components/schemas/CapabilityService"
+      - type: object
+        properties:
+          memberMapping:
+            type: object
+            additionalProperties:
+              type: string
+          mapOfNodeIdsAndCatalogServices:
+            type: object
+            additionalProperties:
+              "$ref": "#/components/schemas/Service"
     RemoteAccessService:
       required:
-        - ID
-        - serviceMeta
-        - tags
+      - ID
+      - serviceMeta
+      - tags
       type: object
       properties:
         service:
@@ -1349,86 +1640,11 @@ components:
         Port:
           type: integer
           format: int32
-    VirtualizationCapability:
-      required:
-        - actions
-        - capabilityClass
-        - cluster
-        - clusterMemberTypes
-        - connectionTypes
-        - id
-        - logo
-        - name
-        - type
-      type: object
-      allOf:
-        - "$ref": "#/components/schemas/Capability"
-    CapabilityService:
-      required:
-        - ID
-        - capabilityServiceClass
-        - customMeta
-        - managed
-        - serviceMeta
-        - tags
-      type: object
-      properties:
-        service:
-          type: string
-        tags:
-          type: array
-          items:
-            type: string
-        serviceMeta:
-          type: object
-          additionalProperties:
-            type: string
-        capability:
-          "$ref": "#/components/schemas/Capability"
-        customMeta:
-          type: object
-          additionalProperties:
-            type: string
-        managed:
-          type: boolean
-        ID:
-          type: string
-          format: uuid
-        Address:
-          type: string
-        Port:
-          type: integer
-          format: int32
-        capabilityServiceClass:
-          type: string
-      discriminator:
-        propertyName: capabilityServiceClass
-    MultiHostCapabilityService:
-      required:
-        - ID
-        - customMeta
-        - managed
-        - mapOfNodeIdsAndCatalogServices
-        - serviceMeta
-        - tags
-      type: object
-      allOf:
-        - "$ref": "#/components/schemas/CapabilityService"
-        - type: object
-          properties:
-            memberMapping:
-              type: object
-              additionalProperties:
-                type: string
-            mapOfNodeIdsAndCatalogServices:
-              type: object
-              additionalProperties:
-                "$ref": "#/components/schemas/Service"
     Service:
       required:
-        - ID
-        - Meta
-        - Tags
+      - ID
+      - Meta
+      - Tags
       type: object
       properties:
         ID:
@@ -1451,33 +1667,51 @@ components:
             type: string
     SingleHostCapabilityService:
       required:
-        - ID
-        - customMeta
-        - managed
-        - serviceMeta
-        - tags
+      - ID
+      - customMeta
+      - managed
+      - serviceClass
+      - serviceMeta
+      - status
+      - tags
       type: object
       allOf:
-        - "$ref": "#/components/schemas/CapabilityService"
-        - type: object
-          properties:
-            consulNodeId:
-              type: string
-              format: uuid
+      - "$ref": "#/components/schemas/CapabilityService"
+      - type: object
+        properties:
+          consulNodeId:
+            type: string
+            format: uuid
+    VirtualizationCapability:
+      required:
+      - actions
+      - capabilityClass
+      - cluster
+      - clusterMemberTypes
+      - connectionTypes
+      - id
+      - logo
+      - name
+      - type
+      type: object
+      allOf:
+      - "$ref": "#/components/schemas/Capability"
     VirtualResourceProvider:
       required:
-        - capabilityClass
+      - capabilityClass
       type: object
       properties:
         capabilityService:
+
           "$ref": "#/components/schemas/CapabilityService"
+
         capabilityClass:
           type: string
     CapabilityHostType:
       type: string
       enum:
-        - SINGLE_HOST
-        - MULTI_HOST
+      - SINGLE_HOST
+      - MULTI_HOST
     ServiceHosterFilter:
       type: object
       properties:
@@ -1490,18 +1724,19 @@ components:
           "$ref": "#/components/schemas/CapabilityHostType"
     ServiceHoster:
       required:
-        - capabilityClass
+      - capabilityClass
       type: object
       properties:
         capabilityService:
           "$ref": "#/components/schemas/CapabilityService"
+
         capabilityClass:
           type: string
     ConnectionTypeDTO:
       required:
-        - isRemote
-        - name
-        - prettyName
+      - isRemote
+      - name
+      - prettyName
       type: object
       properties:
         connectionType:
@@ -1517,12 +1752,12 @@ components:
           type: boolean
     Cluster:
       required:
-        - clusterMemberTypes
-        - clusterType
-        - id
-        - managed
-        - memberMapping
-        - nodes
+      - clusterMemberTypes
+      - clusterType
+      - id
+      - managed
+      - memberMapping
+      - nodes
       type: object
       properties:
         id:
@@ -1596,9 +1831,7 @@ components:
         Datacenter:
           type: string
         TaggedAddresses:
-          type: object
-          additionalProperties:
-            type: string
+          "$ref": "#/components/schemas/TaggedAddresses"
         NodeMeta:
           type: object
           additionalProperties:
@@ -1642,9 +1875,9 @@ components:
       description: Oauth2 flow
       flows:
         authorizationCode:
-          authorizationUrl: http://ipa-wn1152:7080/auth/realms/fabos/protocol/openid-connect/auth
-          tokenUrl: http://ipa-wn1152:7080/auth/realms/fabos/protocol/openid-connect/token
-          refreshUrl: http://ipa-wn1152:7080/auth/realms/fabos/protocol/openid-connect/token
+          authorizationUrl: http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth
+          tokenUrl: http://localhost:7080/auth/realms/fabos/protocol/openid-connect/token
+          refreshUrl: http://localhost:7080/auth/realms/fabos/protocol/openid-connect/token
           scopes: {}
     bearer_auth:
       type: http

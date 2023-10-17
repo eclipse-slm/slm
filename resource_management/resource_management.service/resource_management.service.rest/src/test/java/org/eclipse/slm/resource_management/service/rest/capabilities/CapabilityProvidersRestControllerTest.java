@@ -7,8 +7,8 @@ import org.eclipse.slm.resource_management.service.rest.handler.provider.Service
 import org.eclipse.slm.resource_management.service.rest.handler.provider.VirtualResourceProviderHandler;
 import org.eclipse.slm.resource_management.model.capabilities.CapabilityType;
 import org.eclipse.slm.resource_management.model.capabilities.VirtualizationCapability;
-import org.eclipse.slm.resource_management.model.capabilities.actions.AwxCapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.AwxAction;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.capabilities.provider.VirtualResourceProvider;
 import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType;
 import org.eclipse.slm.resource_management.model.consul.capability.CapabilityServiceStatus;
@@ -153,13 +153,13 @@ public class CapabilityProvidersRestControllerTest {
             var kvmQemuVirtualizationCapabilityRepo = "https://github.com/FabOS-AI/fabos-slm-vrp-kvm";
             var kvmQemuVirtualizationCapabilityBranch = "main";
             vc.getActions()
-                    .put(CapabilityActionType.INSTALL, new AwxCapabilityAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "install.yml"));
+                    .put(ActionType.INSTALL, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "install.yml"));
             vc.getActions()
-                    .put(CapabilityActionType.UNINSTALL, new AwxCapabilityAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "uninstall.yml"));
+                    .put(ActionType.UNINSTALL, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "uninstall.yml"));
             vc.getActions()
-                    .put(CapabilityActionType.CREATE_VM, new AwxCapabilityAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "create_vm.yml"));
+                    .put(ActionType.CREATE_VM, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "create_vm.yml"));
             vc.getActions()
-                    .put(CapabilityActionType.DELETE_VM, new AwxCapabilityAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "delete_vm.yml"));
+                    .put(ActionType.DELETE_VM, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "delete_vm.yml"));
             //endregion
 
             //region INIT - MultiHost VirtualizationCapability
@@ -174,13 +174,13 @@ public class CapabilityProvidersRestControllerTest {
             kvmQemuVirtualizationCapabilityRepo = "https://github.com/FabOS-AI/fabos-slm-vrp-kvm";
             kvmQemuVirtualizationCapabilityBranch = "main";
             mhvc.getActions()
-                    .put(CapabilityActionType.INSTALL, new AwxCapabilityAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "install.yml"));
+                    .put(ActionType.INSTALL, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "install.yml"));
             mhvc.getActions()
-                    .put(CapabilityActionType.UNINSTALL, new AwxCapabilityAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "uninstall.yml"));
+                    .put(ActionType.UNINSTALL, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "uninstall.yml"));
             mhvc.getActions()
-                    .put(CapabilityActionType.CREATE_VM, new AwxCapabilityAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "create_vm.yml"));
+                    .put(ActionType.CREATE_VM, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "create_vm.yml"));
             mhvc.getActions()
-                    .put(CapabilityActionType.DELETE_VM, new AwxCapabilityAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "delete_vm.yml"));
+                    .put(ActionType.DELETE_VM, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "delete_vm.yml"));
 
             mhvc.getClusterMemberTypes().add(new ClusterMemberType("memberTyp1", "memberTyp1", 1, false));
             mhvc.getClusterMemberTypes().add(new ClusterMemberType("memberTyp2", "memberTyp2", 1, false));

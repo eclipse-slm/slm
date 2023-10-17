@@ -22,6 +22,7 @@ jobs:
     env:
       MAVEN_CLI_OPTS: "-T 8 -s ci/ci_maven_settings.xml --batch-mode --errors --fail-at-end --show-version --no-transfer-progress -DinstallAtEnd=true -DdeployAtEnd=true"
       MAVEN_PROFILES: ""
+      COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
     strategy:
       matrix:
         build: [
@@ -53,8 +54,18 @@ jobs:
               "password": "${{secrets.GITHUB_TOKEN}}"
             }
           ]'
-      - name: Build '${{ matrix.build.type }}' with Maven
+      - name: Build '${{ matrix.build.type }}' with Maven and push Docker Images
+        if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
         run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' deploy
+      - name: Build '${{ matrix.build.type }}' with Maven
+        if: github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')
+        run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' clean org.jacoco:jacoco-maven-plugin:prepare-agent install -q org.jacoco:jacoco-maven-plugin:report -Pcoverage verify
+      - name: Build Coveralls Report
+        if: ${{ env.COVERALLS_TOKEN != '' && matrix.build.type == 'backend' && (github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')) }}
+        run: mvn jacoco:report coveralls:report  -DrepoToken=$COVERALLS_TOKEN
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       - name: Log test output on failure
         if: failure() || cancelled()
         run: find . -type f -path "*test-reports/*-output.txt" -exec tail -n +1 {} +
@@ -73,7 +84,7 @@ jobs:
           host: ${{env.STAGING_VM_IP}}
           username: vfk
           key: ${{secrets.RUNNER_PRIVATE_KEY}}
-          envs: STAGING_VM_HOSTNAME
+          envs: STAGING_VM_HOSTNAME,STAGING_VM_IP
           script: |
             cd /staging/tmp/slm/stack/compose || true
             docker-compose down --volumes || true
@@ -84,6 +95,7 @@ jobs:
             CORE_VERSION=$(cat pom.xml | grep -oPm1 "(?<=<revision>)[^<]+")
             cd /staging/tmp/slm/stack/compose
             sed -ir "s/^[#]*\s*SLM_HOSTNAME=.*/SLM_HOSTNAME=$STAGING_VM_HOSTNAME/" .env
+            sed -ir "s/^[#]*\s*SLM_IP=.*/SLM_IP=$STAGING_VM_IP/" .env
             sed -ir "s/^[#]*\s*SLM_VERSION=.*/SLM_VERSION=$CORE_VERSION/" .env
             echo ${{secrets.GITHUB_TOKEN}} | docker login -u${{github.actor}} --password-stdin ghcr.io
             docker-compose pull

@@ -1,9 +1,11 @@
 package org.eclipse.slm.common.consul.client.apis;
 
+import com.orbitz.consul.model.ConsulResponse;
 import com.orbitz.consul.model.agent.ImmutableCheckDefinition;
 import com.orbitz.consul.model.agent.ImmutableCheckV2;
 import com.orbitz.consul.model.catalog.ImmutableCatalogDeregistration;
 import com.orbitz.consul.model.catalog.ImmutableCatalogRegistration;
+import com.orbitz.consul.model.health.HealthCheck;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.client.utils.ConsulObjectMapper;
 import org.eclipse.slm.common.consul.model.catalog.CatalogNode;
@@ -15,13 +17,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
 public class ConsulHealthApiClient extends AbstractConsulApiClient {
 
     public final static Logger LOG = LoggerFactory.getLogger(ConsulHealthApiClient.class);
-
+    public final static String CHECK_ID_SERF = "serfHealth";
+    public final static String CHECK_STATUS_PASSING = "passing";
     private final ConsulNodesApiClient consulNodesApiClient;
     private final ConsulServicesApiClient consulServicesApiClient;
 
@@ -31,10 +35,10 @@ public class ConsulHealthApiClient extends AbstractConsulApiClient {
             @Value("${consul.port}") int consulPort,
             @Value("${consul.acl-token}") String consulToken,
             @Value("${consul.datacenter}") String consulDatacenter,
-            ConsulNodesApiClient consulNodesApiClient, ConsulServicesApiClient consulServicesApiClient) {
+            ConsulNodesApiClient consulNodesApiClient,
+            ConsulServicesApiClient consulServicesApiClient) {
         super(consulScheme, consulHost, consulPort, consulToken, consulDatacenter);
         this.consulNodesApiClient = consulNodesApiClient;
-
         this.consulServicesApiClient = consulServicesApiClient;
 
     }
@@ -79,8 +83,31 @@ public class ConsulHealthApiClient extends AbstractConsulApiClient {
 
     public List<CatalogNode.Check> getChecksOfNode(ConsulCredential consulCredential, String node)
             throws ConsulLoginFailedException {
-        var nodeChecks = this.getConsulClient(consulCredential).healthClient().getNodeChecks(node).getResponse();
-        return ConsulObjectMapper.mapAll(nodeChecks, CatalogNode.Check.class);
+        try {
+            ConsulResponse<List<HealthCheck>> getNodeChecks = this.getConsulClient(consulCredential).healthClient().getNodeChecks(node);
+
+            var nodeChecks = getNodeChecks.getResponse();
+            return ConsulObjectMapper.mapAll(nodeChecks, CatalogNode.Check.class);
+        } catch (IllegalArgumentException e) {
+            LOG.info("Unable to get checks of node '" + node + "' because of: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    public Optional<CatalogNode.Check> getSerfHealthCheckOfNode(ConsulCredential consulCredential, UUID nodeId) throws ConsulLoginFailedException {
+        List<CatalogNode.Check> checks = getChecksOfNode(consulCredential, nodeId);
+
+        return checks.stream().filter(check -> check.getCheckId().equals(CHECK_ID_SERF)).findFirst();
+    }
+
+    public Boolean hasNodeAgent(ConsulCredential consulCredential, UUID nodeId) throws ConsulLoginFailedException {
+        Optional<CatalogNode.Check> optionalSerfCheck =
+                getSerfHealthCheckOfNode(consulCredential, nodeId);
+
+        if(optionalSerfCheck.isEmpty() || !optionalSerfCheck.get().getStatus().equals(CHECK_STATUS_PASSING))
+            return false;
+        else
+            return true;
     }
 
     public void removeCheckFromNode(ConsulCredential consulCredential, String nodeName, String checkId) throws ConsulLoginFailedException {

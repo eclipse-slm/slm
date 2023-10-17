@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-management-database
+  labels:
+    app: service-management-database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-management-database
+  template:
+    metadata:
+      name: service-management-database
+      labels:
+        app: service-management-database
+    spec:
+      containers:
+
+        - name: service-management-database
+          image: mariadb:{{ .Values.service_management.database_version }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3306
+          env:
+            - name: KEYCLOAK_AUTHSERVERURL
+              value: http://keycloak:{{.Values.keycloak.port}}/auth
+            - name: MYSQL_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: service-management-database-mariadb-config
+                  key: database-user
+            - name: MARIADB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: service-management-database-mariadb-secret
+                  key: mysql-password
+            - name: MARIADB_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: service-management-database-mariadb-config
+                  key: database-schema
+            - name: MARIADB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: service-management-database-mariadb-secret
+                  key: mysql-root-password
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: service-management-database-data-pv
+
+
+
+      volumes:
+        - name: service-management-database-data-pv
+          persistentVolumeClaim:
+            claimName: service-management-database-data-pvc
+
+      restartPolicy: Always

@@ -264,42 +264,44 @@
       onStepCompleted (stepNumber) {
         switch (stepNumber) {
           case 4:
+            let serviceOfferingVersionDTO = JSON.parse(JSON.stringify(this.newServiceOfferingVersion))
+
             // Delete all port mappings, volumes, labels and environment variables which are service options
-            if (this.newServiceOfferingVersion.deploymentDefinition.deploymentType === 'DOCKER_CONTAINER') {
-              for (let i = this.newServiceOfferingVersion.deploymentDefinition.portMappings.length - 1; i >= 0; i--) {
-                if (this.newServiceOfferingVersion.deploymentDefinition.portMappings[i].isServiceOption) {
-                  this.newServiceOfferingVersion.deploymentDefinition.portMappings.splice(i, 1)
+            if (serviceOfferingVersionDTO.deploymentDefinition.deploymentType === 'DOCKER_CONTAINER') {
+              for (let i = serviceOfferingVersionDTO.deploymentDefinition.portMappings.length - 1; i >= 0; i--) {
+                if (serviceOfferingVersionDTO.deploymentDefinition.portMappings[i].isServiceOption) {
+                  serviceOfferingVersionDTO.deploymentDefinition.portMappings.splice(i, 1)
                 }
               }
 
-              for (let i = this.newServiceOfferingVersion.deploymentDefinition.volumes.length - 1; i >= 0; i--) {
-                if (this.newServiceOfferingVersion.deploymentDefinition.volumes[i].isServiceOption) {
-                  this.newServiceOfferingVersion.deploymentDefinition.volumes.splice(i, 1)
+              for (let i = serviceOfferingVersionDTO.deploymentDefinition.volumes.length - 1; i >= 0; i--) {
+                if (serviceOfferingVersionDTO.deploymentDefinition.volumes[i].isServiceOption) {
+                  serviceOfferingVersionDTO.deploymentDefinition.volumes.splice(i, 1)
                 }
               }
 
-              for (let i = this.newServiceOfferingVersion.deploymentDefinition.labels.length - 1; i >= 0; i--) {
-                if (this.newServiceOfferingVersion.deploymentDefinition.labels[i].isServiceOption) {
-                  this.newServiceOfferingVersion.deploymentDefinition.labels.splice(i, 1)
+              for (let i = serviceOfferingVersionDTO.deploymentDefinition.labels.length - 1; i >= 0; i--) {
+                if (serviceOfferingVersionDTO.deploymentDefinition.labels[i].isServiceOption) {
+                  serviceOfferingVersionDTO.deploymentDefinition.labels.splice(i, 1)
                 }
               }
 
-              for (let i = this.newServiceOfferingVersion.deploymentDefinition.environmentVariables.length - 1; i >= 0; i--) {
-                if (this.newServiceOfferingVersion.deploymentDefinition.environmentVariables[i].isServiceOption) {
-                  this.newServiceOfferingVersion.deploymentDefinition.environmentVariables.splice(i, 1)
+              for (let i = serviceOfferingVersionDTO.deploymentDefinition.environmentVariables.length - 1; i >= 0; i--) {
+                if (serviceOfferingVersionDTO.deploymentDefinition.environmentVariables[i].isServiceOption) {
+                  serviceOfferingVersionDTO.deploymentDefinition.environmentVariables.splice(i, 1)
                 }
               }
-            } else if (this.newServiceOfferingVersion.deploymentDefinition.deploymentType === 'DOCKER_COMPOSE') {
-              this.newServiceOfferingVersion.deploymentDefinition.composeFile = this.newServiceOfferingVersion.deploymentDefinition.composeFile
-              this.newServiceOfferingVersion.deploymentDefinition.dotEnvFile = this.newServiceOfferingVersion.deploymentDefinition.dotEnvFile.content
-              this.newServiceOfferingVersion.deploymentDefinition.envFiles = {}
+            } else if (serviceOfferingVersionDTO.deploymentDefinition.deploymentType === 'DOCKER_COMPOSE') {
+              serviceOfferingVersionDTO.deploymentDefinition.composeFile = this.newServiceOfferingVersion.deploymentDefinition.composeFile
+              serviceOfferingVersionDTO.deploymentDefinition.dotEnvFile = this.newServiceOfferingVersion.deploymentDefinition.dotEnvFile.content
+              serviceOfferingVersionDTO.deploymentDefinition.envFiles = {}
               for (const [key, value] of Object.entries(this.newServiceOfferingVersion.deploymentDefinition.envFiles)) {
-                this.newServiceOfferingVersion.deploymentDefinition.envFiles[key] = value.content
+                serviceOfferingVersionDTO.deploymentDefinition.envFiles[key] = value.content
               }
             }
 
             if (this.editMode) {
-              ServiceOfferingVersionsRestApi.updateServiceOfferingVersion(this.newServiceOfferingVersion).then(
+              ServiceOfferingVersionsRestApi.updateServiceOfferingVersion(serviceOfferingVersionDTO).then(
                 response => {
                   if (response.status === 200) {
                     Vue.$toast.info('Successfully updated service offering version')
@@ -314,7 +316,7 @@
                   console.log(exception)
                 })
             } else {
-              ServiceOfferingVersionsRestApi.addServiceOfferingVersion(this.newServiceOfferingVersion).then(
+              ServiceOfferingVersionsRestApi.addServiceOfferingVersion(serviceOfferingVersionDTO).then(
                 response => {
                   if (response.status === 200) {
                     Vue.$toast.info('Successfully created service offering version')

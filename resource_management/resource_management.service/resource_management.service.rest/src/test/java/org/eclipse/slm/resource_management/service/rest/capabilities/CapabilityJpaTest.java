@@ -7,9 +7,9 @@ import org.eclipse.slm.resource_management.model.capabilities.Capability;
 import org.eclipse.slm.resource_management.model.capabilities.CapabilityType;
 import org.eclipse.slm.resource_management.model.capabilities.DeploymentCapability;
 import org.eclipse.slm.resource_management.model.capabilities.VirtualizationCapability;
-import org.eclipse.slm.resource_management.model.capabilities.actions.AwxCapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityAction;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.AwxAction;
+import org.eclipse.slm.resource_management.model.actions.Action;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.persistence.api.CapabilityJpaRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -88,10 +88,10 @@ public class CapabilityJpaTest {
 
                 // Set AWX Capability Actions
 
-                HashMap<CapabilityActionType, CapabilityAction> capabilityActions = new HashMap();
+                HashMap<ActionType, Action> capabilityActions = new HashMap();
                 capabilityActions.put(
-                        CapabilityActionType.INSTALL,
-                        new AwxCapabilityAction("awxRepo", "awxBranch", "playbook")
+                        ActionType.INSTALL,
+                        new AwxAction("awxRepo", "awxBranch", "playbook")
                 );
 
                 dc.setActions(capabilityActions);
@@ -191,7 +191,7 @@ public class CapabilityJpaTest {
         void testUsernamePasswordGetNotPersisted() {
             //Add Username/Password to all actions of DC:
             dockerDeploymentCapability.getActions().forEach((k,v) -> {
-                AwxCapabilityAction awxCapabilityAction = (AwxCapabilityAction) v;
+                AwxAction awxCapabilityAction = (AwxAction) v;
                 awxCapabilityAction.setUsername("username");
                 awxCapabilityAction.setPassword("password");
             });
@@ -206,7 +206,7 @@ public class CapabilityJpaTest {
 
             //Assert all actions have empty username/password:
             persistedCapability.getActions().forEach((k,v) -> {
-                AwxCapabilityAction awxCapabilityAction = (AwxCapabilityAction) v;
+                AwxAction awxCapabilityAction = (AwxAction) v;
                 assertEquals("", awxCapabilityAction.getUsername());
                 assertEquals("", awxCapabilityAction.getPassword());
             });
@@ -247,22 +247,22 @@ public class CapabilityJpaTest {
                 vc.setCapabilityClass("VirtualizationCapability");
 
                 // Set AWX Capability Actions
-                HashMap<CapabilityActionType, CapabilityAction> capabilityActions = new HashMap();
+                HashMap<ActionType, Action> capabilityActions = new HashMap();
                 capabilityActions.put(
-                        CapabilityActionType.INSTALL,
-                        new AwxCapabilityAction("awxRepo", "awxBranch", "install.yml")
+                        ActionType.INSTALL,
+                        new AwxAction("awxRepo", "awxBranch", "install.yml")
                 );
                 capabilityActions.put(
-                        CapabilityActionType.UNINSTALL,
-                        new AwxCapabilityAction("awxRepo", "awxBranch", "uninstall.yml")
+                        ActionType.UNINSTALL,
+                        new AwxAction("awxRepo", "awxBranch", "uninstall.yml")
                 );
                 capabilityActions.put(
-                        CapabilityActionType.CREATE_VM,
-                        new AwxCapabilityAction("awxRepo", "awxBranch", "create_vm.yml")
+                        ActionType.CREATE_VM,
+                        new AwxAction("awxRepo", "awxBranch", "create_vm.yml")
                 );
                 capabilityActions.put(
-                        CapabilityActionType.DELETE_VM,
-                        new AwxCapabilityAction("awxRepo", "awxBranch", "delete_vm.yml")
+                        ActionType.DELETE_VM,
+                        new AwxAction("awxRepo", "awxBranch", "delete_vm.yml")
                 );
 
                 vc.setActions(capabilityActions);
@@ -436,7 +436,7 @@ public class CapabilityJpaTest {
         void testUsernamePasswordGetNotPersisted() {
             //Add Username/Password to all actions of DC:
             virtualizationCapability.getActions().forEach((k,v) -> {
-                AwxCapabilityAction awxCapabilityAction = (AwxCapabilityAction) v;
+                AwxAction awxCapabilityAction = (AwxAction) v;
                 awxCapabilityAction.setUsername("username");
                 awxCapabilityAction.setPassword("password");
             });
@@ -451,7 +451,7 @@ public class CapabilityJpaTest {
 
             //Assert all actions have empty username/password:
             persistedCapability.getActions().forEach((k,v) -> {
-                AwxCapabilityAction awxCapabilityAction = (AwxCapabilityAction) v;
+                AwxAction awxCapabilityAction = (AwxAction) v;
                 assertEquals("", awxCapabilityAction.getUsername());
                 assertEquals("", awxCapabilityAction.getPassword());
             });
@@ -463,7 +463,7 @@ public class CapabilityJpaTest {
         @Order(80)
         void persistCapabilityWithAwxActionContainingParameter() {
             //Add params to one Action:
-            AwxCapabilityAction action = (AwxCapabilityAction) virtualizationCapability.getActions().get(CapabilityActionType.CREATE_VM);
+            AwxAction action = (AwxAction) virtualizationCapability.getActions().get(ActionType.CREATE_VM);
             action.setParameter(awxCapabilityParams);
             List<SurveyItem> paramsToPersist = action.getParameter();
 
@@ -473,7 +473,7 @@ public class CapabilityJpaTest {
 
             assertEquals(capabilitiesBefore.size()+1, staticCapabilityJpaRepository.findAll().size());
 
-            AwxCapabilityAction persistedAction = (AwxCapabilityAction) persistedVirtualizationCapability.getActions().get(CapabilityActionType.CREATE_VM);
+            AwxAction persistedAction = (AwxAction) persistedVirtualizationCapability.getActions().get(ActionType.CREATE_VM);
             List<SurveyItem> paramsPersisted = persistedAction.getParameter();
 
             assertIterableEquals(paramsToPersist, paramsPersisted);

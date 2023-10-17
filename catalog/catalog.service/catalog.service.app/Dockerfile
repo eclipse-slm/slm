@@ -2,6 +2,12 @@ FROM openjdk:18.0.2.1-jdk-slim-buster
 MAINTAINER Matthias Schneider (matthias.schneider@ipa.fraunhofer.de)
 
 ENV KEYCLOAK_CONFIG_TENANTS_CONFIGPATH="/app/keycloak" \
+    SPRING_CLOUD_CONSUL_ENABLED=true \
+    CONSUL_SCHEME="http" \
+    CONSUL_HOST="consul" \
+    CONSUL_PORT=8500 \
+    CONSUL_DATACENTER="fabos" \
+    CONSUL_ACLTOKEN="password" \
     DATABASE_HOST="catalog-database" \
     DATABASE_PORT=3306
 

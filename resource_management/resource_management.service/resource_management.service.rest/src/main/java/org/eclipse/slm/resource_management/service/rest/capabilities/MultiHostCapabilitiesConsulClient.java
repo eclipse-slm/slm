@@ -1,9 +1,7 @@
 package org.eclipse.slm.resource_management.service.rest.capabilities;
 
 import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.client.apis.ConsulAclApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulNodesApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulServicesApiClient;
+import org.eclipse.slm.common.consul.client.apis.*;
 import org.eclipse.slm.common.consul.model.acl.BindingRule;
 import org.eclipse.slm.common.consul.model.catalog.CatalogService;
 import org.eclipse.slm.common.consul.model.catalog.Node;
@@ -26,21 +24,28 @@ public class MultiHostCapabilitiesConsulClient {
     private final static Logger LOG = LoggerFactory.getLogger(MultiHostCapabilitiesConsulClient.class);
     private final CapabilityUtil capabilityUtil;
     private final ConsulServicesApiClient consulServicesApiClient;
+    private final ConsulGenericServicesClient consulGenericServicesClient;
     private final CapabilityJpaRepository capabilityJpaRepository;
     private final ConsulNodesApiClient consulNodesApiClient;
     private final ConsulAclApiClient consulAclApiClient;
+    private final ConsulGenericNodeRemoveClient consulGenericNodeRemoveClient;
+
 
     public MultiHostCapabilitiesConsulClient(
             CapabilityJpaRepository capabilityJpaRepository,
             ConsulNodesApiClient consulNodesApiClient,
             ConsulServicesApiClient consulServicesApiClient,
+            ConsulGenericServicesClient consulGenericServicesClient,
             ConsulAclApiClient consulAclApiClient,
+            ConsulGenericNodeRemoveClient consulGenericNodeRemoveClient,
             CapabilityUtil capabilityUtil
     ) {
         this.capabilityJpaRepository = capabilityJpaRepository;
         this.consulNodesApiClient = consulNodesApiClient;
         this.consulServicesApiClient = consulServicesApiClient;
+        this.consulGenericServicesClient = consulGenericServicesClient;
         this.consulAclApiClient = consulAclApiClient;
+        this.consulGenericNodeRemoveClient = consulGenericNodeRemoveClient;
         this.capabilityUtil = capabilityUtil;
     }
 
@@ -268,7 +273,7 @@ public class MultiHostCapabilitiesConsulClient {
                 .stream()
                 .forEach(nodeId -> {
                     try {
-                        this.consulServicesApiClient.registerServiceWithoutAccess(
+                        this.consulGenericServicesClient.registerService(
                                 consulCredential,
                                 nodeId,
                                 multiHostCapabilityService.getService(),
@@ -318,7 +323,8 @@ public class MultiHostCapabilitiesConsulClient {
 
                 // delete dummy node first
                 var consulNode = consulNodeOptional.get();
-                this.consulNodesApiClient.deleteNode(consulCredential, consulNode.getNode());
+//                this.consulNodesApiClient.deleteNode(consulCredential, consulNode.getNode());
+                this.consulGenericNodeRemoveClient.removeNode(consulCredential, consulNode.getNode());
 
                 // remove read rule from policy
                 this.consulAclApiClient.removeReadRuleFromPolicy(
@@ -371,7 +377,7 @@ public class MultiHostCapabilitiesConsulClient {
                 .forEach(k -> {
                     try {
                         // Remove Capability Service:
-                        this.consulServicesApiClient.removeServiceByName(
+                        this.consulGenericServicesClient.deregisterService(
                                 new ConsulCredential(),
                                 k,
                                 multiHostCapabilityService.getService()
@@ -441,7 +447,7 @@ public class MultiHostCapabilitiesConsulClient {
 
         MultiHostCapabilityService multiHostCapabilityService = optionalMultiHostCapabilityService.get();
 
-        this.consulServicesApiClient.removeServiceByName(
+        this.consulGenericServicesClient.deregisterService(
                 new ConsulCredential(),
                 scaleDownOperation.getResourceId(),
                 multiHostCapabilityService.getService()
@@ -476,7 +482,7 @@ public class MultiHostCapabilitiesConsulClient {
 
         multiHostCapabilityService.applyScaleUp(scaleUpOperation);
 
-        this.consulServicesApiClient.registerServiceForNodeWithReadAccessViaKeycloakRole(
+        this.consulGenericServicesClient.registerServiceForNodeWithReadAccessViaKeycloakRole(
                 consulCredential,
                 nodeId,
                 multiHostCapabilityService.getService(),

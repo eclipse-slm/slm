@@ -1,6 +1,7 @@
 import ResourcesRestApi from '@/api/resource-management/resourcesRestApi.js'
 import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
 import LocationsRestApi from '@/api/resource-management/locationsRestApi.js'
+import ProfilerRestApi from '@/api/resource-management/profilerRestApi.js'
 import ApiState from '@/api/apiState'
 import Vue from 'vue'
 
@@ -10,6 +11,7 @@ export default {
 
         resources: [],
         locations: [],
+        profiler: [],
         resourceConnectionTypes: [],
         clusters: [],
 
@@ -40,6 +42,14 @@ export default {
                 return state.resources.filter(prop => {
                     return true
                 })
+            }
+        },
+
+        profiler: (state) => {
+            if (state.profiler === undefined) {
+                return []
+            } else {
+                return state.profiler
             }
         },
 
@@ -186,6 +196,19 @@ export default {
               })
         },
 
+        async getProfiler(context) {
+            return await  ProfilerRestApi.getProfiler()
+              .then(
+                profiler => {
+                    context.commit('SET_PROFILER', profiler)
+                }
+              )
+              .catch(e => {
+                  console.debug(e)
+                  context.commit('SET_PROFILER', [])
+              })
+        },
+
         async getResourceConnectionTypes(context) {
             return await ResourcesRestApi.getResourceConnectionTypes()
               .then(
@@ -247,6 +270,7 @@ export default {
                   context.dispatch('getResourceConnectionTypes')
                   context.dispatch('getVirtualResourceProviders')
                   context.dispatch('getServiceHosters')
+                  context.dispatch('getProfiler')
               })
         },
 
@@ -303,6 +327,9 @@ export default {
         },
         SET_LOCATIONS(state, locations) {
           state.locations = locations
+        },
+        SET_PROFILER(state, profiler) {
+            state.profiler = profiler
         },
         SET_RESOURCE_CONNECTION_TYPES (state, resourceConnectionTypes) {
           state.resourceConnectionTypes = resourceConnectionTypes

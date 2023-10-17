@@ -4,14 +4,10 @@ permalink: /docs/development/development-environment/
 
 # Development Environment
 
-::: warning INFO
-The source code of Service Lifecycle Management is not yet publicly available. At the moment, only the executables are available in the form of Docker images. The source code is expected to be made public by the end of 2022.
-:::
-
 ## Local development
 
 ### Install
-To setup the latest snapshot version, checkout the develop branch of the [fabos-slm-setup GitHub repository](https://github.com/FabOS-AI/fabos-slm-setup) and follow the [installation instructions](/docs/getting-started/installation/).
+To setup the latest snapshot version, checkout the develop branch of the [eclipse-slm/slm](https://github.com/eclipse-slm/slm) GitHub repository and follow the [installation instructions](/docs/getting-started/installation/) using the files in the directory `stack/compose` instead of the mentioned zip file.
 
 ### Configuration
 
@@ -47,7 +43,7 @@ docker-compose up --force-recreate config-exporter
 Stop the containers relevant for your development and start the components in your IDE. Through the Config Exporter, the your local project has been configured to allow the components started via IDE to connect to the locally deployed stack.
 
 ## Build
-To build the Docker images of in the [setup repository](https://github.com/FabOS-AI/fabos-slm-setup) use the following commands:
+To build the Docker images of the Eclipse Service Lifecycle Management use the following commands inside the directory `stack/compose`:
 ```
 docker-compose -f build.yml -f {{ compose file containing the service to be built }}.yml build --no-cache awx-fixed-files
 docker-compose -f build.yml -f {{ compose file containing the service to be built }}.yml build --no-cache

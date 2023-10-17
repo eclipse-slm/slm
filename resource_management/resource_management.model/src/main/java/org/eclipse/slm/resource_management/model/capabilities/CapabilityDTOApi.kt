@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityAction
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType
+import org.eclipse.slm.resource_management.model.actions.Action
+import org.eclipse.slm.resource_management.model.actions.ActionType
 import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType
 import org.eclipse.slm.resource_management.model.resource.ConnectionType
 import java.util.*
@@ -30,7 +30,7 @@ abstract class CapabilityDTOApi(id: UUID? = null, capabilityClass: String) {
 
     open var type: List<CapabilityType> = ArrayList()
 
-    open var actions: Map<CapabilityActionType, CapabilityAction> = HashMap()
+    open var actions: Map<ActionType, Action> = HashMap()
 
     open var healthCheck: CapabilityHealthCheck? = null
 

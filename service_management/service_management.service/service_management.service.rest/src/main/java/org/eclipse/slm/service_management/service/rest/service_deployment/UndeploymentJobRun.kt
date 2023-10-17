@@ -10,4 +10,6 @@ data class UndeploymentJobRun(
 
     val serviceInstanceId: UUID,
 
+    val resourceId: UUID
+
     )

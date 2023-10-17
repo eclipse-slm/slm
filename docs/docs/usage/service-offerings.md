@@ -34,7 +34,7 @@ The service offering version gets created and will be shown as a version of the 
 <img :src="$withBase('/img/figures/use/service-offerings/service-offering-create-via-wizard-7.png')">
 
 ### Git-based service offerings
-To automatically create a service offering based on a Git repository, a file named `fabos.yaml` must be stored in the repository. This file contains all the necessary information to describe a service offering. The file is structured as shown in the example below. Files (e.g., images, compose files, environment variable files) are referenced via their file name and the relative path to the root of the Git repository. An example is available in a [public Git repository](https://github.com/FabOS-AI/fabos-slm-so-test-repo).
+To automatically create a service offering based on a Git repository, a file named `fabos.yaml` must be stored in the repository. This file contains all the necessary information to describe a service offering. The file is structured as shown in the example below. Files (e.g., images, compose files, environment variable files) are referenced via their file name and the relative path to the root of the Git repository. An example is available in a [public Git repository](https://github.com/FabOS-AI/fabos-slm-so-grafana).
 
 ```yaml
 name: My Service
@@ -82,22 +82,23 @@ Service options allow the user to make configurations when ordering a service. T
 * Default Value: The default value of the service option.
 * Value Type: The value type is mainly used for how the input fields are queried from the user during an order of a service offering. Possible value types are:
 
-| Value Type | Description  |
-|------------|--------------|
-| STRING  | Input field for plain text  |
-| PASSWORD | Input field for plain text. The text is masked. |
-| BOOLEAN | Boolean value with checkbox as input. |
-| NUMBER | Integer or decimal numbers. |
-| INTEGER | Integer numbers. |
-| DECIMAL | Decimal numbers. |
-| EMAIL | Input field with format check for email addresses. |
-| IP | Input field with format check for IPv4 addresses. |
-| ENUM | Dropdown with values from `Value Options` as elements. |
-| AUTO_GENERATED_UUID | A UUID is generated automatically. |
-| PORT | Port in the range from 0 to 65535 |
-| VOLUME | Input field with format check for volumes. |
+| Value Type | Description                                                                                                                                                                                                                                                        |
+|------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| STRING  | Input field for plain text                                                                                                                                                                                                                                         |
+| PASSWORD | Input field for plain text. The text is masked.                                                                                                                                                                                                                    |
+| BOOLEAN | Boolean value with checkbox as input.                                                                                                                                                                                                                              |
+| NUMBER | Integer or decimal numbers.                                                                                                                                                                                                                                        |
+| INTEGER | Integer numbers.                                                                                                                                                                                                                                                   |
+| DECIMAL | Decimal numbers.                                                                                                                                                                                                                                                   |
+| EMAIL | Input field with format check for email addresses.                                                                                                                                                                                                                 |
+| IP | Input field with format check for IPv4 addresses.                                                                                                                                                                                                                  |
+| ENUM | Dropdown with values from `Value Options` as elements.                                                                                                                                                                                                             |
+| AUTO_GENERATED_UUID | A UUID is generated automatically.                                                                                                                                                                                                                                 |
+| PORT | Port in the range from 0 to 65535                                                                                                                                                                                                                                  |
+| VOLUME | Input field with format check for volumes.                                                                                                                                                                                                                         |
 | AAS_SM_TEMPLATE | The semantic ID of a Asset Administration Shell (AAS) submodel can be defined. When the user orders the service offering, all AAS that have an instance of this submodel are searched in the AAS register. The result is presented to the user as a dropdown list. |
-| TEMPLATE_VARIABLE | Common variables provided by the service registry (e.g., values from application properties) |
+| SYSTEM_VARIABLE | Common system variables provided by the SLM (e.g., values from application properties)                                                                                                                                                                             |
+| DEPLOYMENT_VARIABLE | Variables related to deployment: <br/>- TARGET_RESOURCE_ID: Id of the resource on which the service is deployed <br/>- TARGET_RESOURCE_IP: IP address of the resource on which the service is deployed                                                             |
 * Value Options: Possible options for values which the user can choose. Currently only relevant for Value Type `ENUM`.
 * Required: If set to `true`, the user will be forced to make an input when ordering the service offering.
 * Editable: If set to `true`, the user can change the default value when ordering the service offering. If set to `false`. The default value is visible (read-only) for the user.

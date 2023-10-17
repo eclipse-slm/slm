@@ -4,7 +4,7 @@
       class="px-5 py-3"
     >
       <template #heading>
-        <overview-heading text="Resources" />
+        <overview-heading text="Devices" />
       </template>
 
       <no-item-available-note

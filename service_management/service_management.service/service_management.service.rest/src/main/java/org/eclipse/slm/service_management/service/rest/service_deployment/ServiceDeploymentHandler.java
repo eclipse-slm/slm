@@ -11,7 +11,7 @@ import org.eclipse.slm.common.keycloak.config.KeycloakUtil;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.notification_service.model.*;
 import org.eclipse.slm.notification_service.service.client.NotificationServiceClient;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.consul.capability.SingleHostCapabilityService;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
 import org.eclipse.slm.resource_management.service.client.handler.ApiException;
@@ -27,7 +27,6 @@ import org.eclipse.slm.service_management.model.services.ServiceInstance;
 import org.eclipse.slm.service_management.persistence.api.ServiceOrderJpaRepository;
 import org.eclipse.slm.service_management.service.rest.docker_compose.DockerComposeFile;
 import org.eclipse.slm.service_management.service.rest.docker_compose.DockerComposeFileParser;
-import org.eclipse.slm.service_management.service.rest.service_deployment.DeploymentJobRun;
 import org.eclipse.slm.service_management.service.rest.service_instances.ServiceInstancesConsulClient;
 import org.eclipse.slm.service_management.service.rest.kubernetes.KubernetesManifestFile;
 import org.eclipse.slm.service_management.service.rest.kubernetes.KubernetesManifestFileParser;
@@ -82,7 +81,7 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
         var serviceOfferingDeploymentType = serviceOfferingVersion.getDeploymentType();
         var serviceHoster = this.getServiceHoster(keycloakPrincipal, deploymentCapabilityServiceId);
         serviceOrder.setDeploymentCapabilityServiceId(deploymentCapabilityServiceId);
-        var awxCapabilityAction = this.getAwxDeployCapabilityAction(CapabilityActionType.DEPLOY, serviceHoster.getCapabilityService().getCapability());
+        var awxCapabilityAction = this.getAwxDeployCapabilityAction(ActionType.DEPLOY, serviceHoster.getCapabilityService().getCapability());
 
         AwxJobObserver awxJobObserver;
         Map<String, String> serviceMetaData = new HashMap<>();
@@ -128,6 +127,8 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                     put("supported_connection_types", awxCapabilityAction.getConnectionTypes());
                     put("manifest_file", KubernetesManifestFileParser.manifestFinalizer(deployableManifestFile));
                 }};
+
+                extraVarsMap = this.addExtraVarsForServiceRepositories(extraVarsMap, serviceOfferingVersion);
 
                 awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, keycloakPrincipal, new ExtraVars(extraVarsMap), JobGoal.CREATE, this);
                 this.notificationServiceClient.postJobObserver(keycloakPrincipal, awxJobObserver);

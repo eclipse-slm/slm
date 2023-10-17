@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.vladmihalcea.hibernate.type.json.JsonStringType
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityAction
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType
+import org.eclipse.slm.resource_management.model.actions.Action
+import org.eclipse.slm.resource_management.model.actions.ActionType
 import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType
 import org.eclipse.slm.resource_management.model.resource.ConnectionType
 import org.hibernate.annotations.Type
@@ -53,7 +53,7 @@ abstract class Capability(id: UUID? = null) {
 
     @Column(name = "actions", columnDefinition = "LONGTEXT")
     @Type(type = "json")
-    open var actions: Map<CapabilityActionType, CapabilityAction> = HashMap()
+    open var actions: Map<ActionType, Action> = HashMap()
 
     @Column(name = "health_check")
     @Type(type = "json")

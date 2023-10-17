@@ -42,6 +42,16 @@ spring:
     name: service_management
   main:
     allow-bean-definition-overriding: true
+  cloud:
+    consul:
+      host: ${consul.host}
+      port: ${consul.port}
+      discovery:
+        ip-address: 172.17.0.1
+        enabled: true
+        acl-token: ${consul.acl-token}
+        prefer-ip-address: true
+        register-health-check: true
   security:
     user:
       name: "user"

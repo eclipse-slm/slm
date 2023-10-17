@@ -103,7 +103,7 @@ public class ServiceOfferingGitUpdater implements ServiceOfferingGitUpdateTaskLi
         this.serviceOfferingGitUpdateTaskToServiceOfferingGitRepository.remove(updateTask);
     }
 
-    private ServiceOfferingGitRepository checkoutTagsAndCreateDTOs(List<String> tagNames, ServiceOfferingGitRepository serviceOfferingGitRepository)
+    public ServiceOfferingGitRepository checkoutTagsAndCreateDTOs(List<String> tagNames, ServiceOfferingGitRepository serviceOfferingGitRepository)
             throws ServiceOfferingVersionCreateException, ServiceOfferingNotFoundException, ServiceVendorNotFoundException,
             ServiceCategoryNotFoundException, ServiceOfferingVersionNotFoundException {
         var gitRepo = this.serviceOfferingGitRepositoryToGit.get(serviceOfferingGitRepository);

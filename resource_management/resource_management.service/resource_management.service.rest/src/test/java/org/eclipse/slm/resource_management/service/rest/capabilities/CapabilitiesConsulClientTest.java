@@ -9,8 +9,9 @@ import org.eclipse.slm.common.consul.model.catalog.Node;
 import org.eclipse.slm.common.consul.model.catalog.NodeService;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.model.DeploymentType;
+import org.eclipse.slm.resource_management.model.actions.*;
 import org.eclipse.slm.resource_management.model.capabilities.*;
-import org.eclipse.slm.resource_management.model.capabilities.actions.*;
+import org.eclipse.slm.resource_management.model.actions.*;
 import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType;
 import org.eclipse.slm.resource_management.model.consul.capability.*;
 import org.eclipse.slm.resource_management.model.resource.BasicResource;
@@ -44,6 +45,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
         ConsulServicesApiClient.class,
+        ConsulGenericServicesClient.class,
+        ConsulGenericNodeRemoveClient.class,
+        ConsulAgentApiClient.class,
         ConsulNodesApiClient.class,
         ConsulAclApiClient.class,
         ConsulHealthApiClient.class,
@@ -100,7 +104,6 @@ public class CapabilitiesConsulClientTest {
                 .withEnv("CONSUL_LOCAL_CONFIG", "{\"datacenter\": \"fabos\", \"domain\": \".fabos\", \"bind_addr\": \"0.0.0.0\", \"retry_join\": [\"0.0.0.0\"], \"acl\":{\"enabled\": true, \"default_policy\": \"allow\", \"tokens\":{\"master\": \"myroot\"}}}");
         consulDockerContainer.start();
     }
-
 
     @AfterAll
     public static void afterAll(){
@@ -206,32 +209,32 @@ public class CapabilitiesConsulClientTest {
                     var deploymentCapabilityRepo = "https://github.com/FabOS-AI/fabos-slm-dc-dummy";
                     var deploymentCapabilityBranch = "main";
                     deploymentCapabilities.get(i).getActions()
-                            .put(CapabilityActionType.INSTALL, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "install.yml"));
+                            .put(ActionType.INSTALL, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "install.yml"));
                     deploymentCapabilities.get(i).getActions()
-                            .put(CapabilityActionType.UNINSTALL, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "uninstall.yml"));
+                            .put(ActionType.UNINSTALL, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "uninstall.yml"));
                     deploymentCapabilities.get(i).getActions()
-                            .put(CapabilityActionType.DEPLOY, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "deploy.yml"));
+                            .put(ActionType.DEPLOY, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "deploy.yml"));
                     deploymentCapabilities.get(i).getActions()
-                            .put(CapabilityActionType.UNDEPLOY, new AwxCapabilityAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "undeploy.yml"));
+                            .put(ActionType.UNDEPLOY, new AwxAction(deploymentCapabilityRepo, deploymentCapabilityBranch, "undeploy.yml"));
                 }
 
-                List<CapabilityActionConfigParameter> configParamters = Arrays.asList(
-                        new CapabilityActionConfigParameter(
+                List<ActionConfigParameter> configParamters = Arrays.asList(
+                        new ActionConfigParameter(
                                 "username",
                                 "Username",
                                 "",
-                                CapabilityActionConfigParameterValueType.STRING,
+                                ActionConfigParameterValueType.STRING,
                                 "",
-                                CapabilityActionConfigParameterRequiredType.ALWAYS,
+                                ActionConfigParameterRequiredType.ALWAYS,
                                 false
                         ),
-                        new CapabilityActionConfigParameter(
+                        new ActionConfigParameter(
                                 "password",
                                 "Password",
                                 "",
-                                CapabilityActionConfigParameterValueType.STRING,
+                                ActionConfigParameterValueType.STRING,
                                 "",
-                                CapabilityActionConfigParameterRequiredType.ALWAYS,
+                                ActionConfigParameterRequiredType.ALWAYS,
                                 true
                         )
                 );
@@ -252,7 +255,7 @@ public class CapabilitiesConsulClientTest {
                 //Set ConfigParameter
                 singleHostDeploymentCapabilityWithoutHealthcheckWithConfigParameter
                         .getActions()
-                        .get(CapabilityActionType.INSTALL)
+                        .get(ActionType.INSTALL)
                         .setConfigParameters(configParamters);
                 //endregion
             }
@@ -526,11 +529,10 @@ public class CapabilitiesConsulClientTest {
                 );
 
                 /**
-                 * +1 => Consul Node / Container
                  * +1 => static basicResource instance
                  */
                 assertEquals(
-                        resourceCount+1+1,
+                        resourceCount+1,
                         deploymentCapabilityServices.size()
                 );
             }
@@ -687,13 +689,13 @@ public class CapabilitiesConsulClientTest {
                     var virtualizationCapabilityRepo = "https://github.com/FabOS-AI/fabos-slm-dc-dummy";
                     var virtualizationCapabilityBranch = "main";
                     virtualizationCapabilities.get(i).getActions()
-                            .put(CapabilityActionType.INSTALL, new AwxCapabilityAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "install.yml"));
+                            .put(ActionType.INSTALL, new AwxAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "install.yml"));
                     virtualizationCapabilities.get(i).getActions()
-                            .put(CapabilityActionType.UNINSTALL, new AwxCapabilityAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "uninstall.yml"));
+                            .put(ActionType.UNINSTALL, new AwxAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "uninstall.yml"));
                     virtualizationCapabilities.get(i).getActions()
-                            .put(CapabilityActionType.CREATE_VM, new AwxCapabilityAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "create_vm.yml"));
+                            .put(ActionType.CREATE_VM, new AwxAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "create_vm.yml"));
                     virtualizationCapabilities.get(i).getActions()
-                            .put(CapabilityActionType.DELETE_VM, new AwxCapabilityAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "delete_vm.yml"));
+                            .put(ActionType.DELETE_VM, new AwxAction(virtualizationCapabilityRepo, virtualizationCapabilityBranch, "delete_vm.yml"));
                 }
                 //endregion
             }
@@ -827,18 +829,18 @@ public class CapabilitiesConsulClientTest {
             // Set AWX Capability Actions
             var repo = "https://github.com/FabOS-AI/fabos-slm-dc-docker-swarm.git";
             var branch = "1.0.0";
-            multiHostCapabilityWithoutHealthCheck.getActions().put(CapabilityActionType.INSTALL,
-                    new AwxCapabilityAction(repo, branch, "install.yml"));
-            multiHostCapabilityWithoutHealthCheck.getActions().put(CapabilityActionType.UNINSTALL,
-                    new AwxCapabilityAction(repo, branch, "uninstall.yml"));
-            multiHostCapabilityWithoutHealthCheck.getActions().put(CapabilityActionType.DEPLOY,
-                    new AwxCapabilityAction(repo, branch, "deploy.yml"));
-            multiHostCapabilityWithoutHealthCheck.getActions().put(CapabilityActionType.UNDEPLOY,
-                    new AwxCapabilityAction(repo, branch, "undeploy.yml"));
-            multiHostCapabilityWithoutHealthCheck.getActions().put(CapabilityActionType.SCALE_UP,
-                    new AwxCapabilityAction(repo, branch, "scaleup.yml"));
-            multiHostCapabilityWithoutHealthCheck.getActions().put(CapabilityActionType.SCALE_DOWN,
-                    new AwxCapabilityAction(repo, branch, "scaledown.yml"));
+            multiHostCapabilityWithoutHealthCheck.getActions().put(ActionType.INSTALL,
+                    new AwxAction(repo, branch, "install.yml"));
+            multiHostCapabilityWithoutHealthCheck.getActions().put(ActionType.UNINSTALL,
+                    new AwxAction(repo, branch, "uninstall.yml"));
+            multiHostCapabilityWithoutHealthCheck.getActions().put(ActionType.DEPLOY,
+                    new AwxAction(repo, branch, "deploy.yml"));
+            multiHostCapabilityWithoutHealthCheck.getActions().put(ActionType.UNDEPLOY,
+                    new AwxAction(repo, branch, "undeploy.yml"));
+            multiHostCapabilityWithoutHealthCheck.getActions().put(ActionType.SCALE_UP,
+                    new AwxAction(repo, branch, "scaleup.yml"));
+            multiHostCapabilityWithoutHealthCheck.getActions().put(ActionType.SCALE_DOWN,
+                    new AwxAction(repo, branch, "scaledown.yml"));
 
             multiHostCapabilityWithoutHealthCheck.setClusterMemberTypes(Arrays.asList(
                     new ClusterMemberType("Manager", "docker_manager", 3, false),

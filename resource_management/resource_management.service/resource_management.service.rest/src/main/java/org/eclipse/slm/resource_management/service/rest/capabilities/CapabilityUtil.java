@@ -10,9 +10,9 @@ import org.eclipse.slm.common.consul.model.catalog.NodeService;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.model.capabilities.Capability;
 import org.eclipse.slm.resource_management.model.capabilities.CapabilityHealthCheck;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionConfigParameter;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionConfigParameterValueType;
-import org.eclipse.slm.resource_management.model.capabilities.actions.CapabilityActionType;
+import org.eclipse.slm.resource_management.model.actions.ActionConfigParameter;
+import org.eclipse.slm.resource_management.model.actions.ActionConfigParameterValueType;
+import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType;
 import org.eclipse.slm.resource_management.model.consul.capability.CapabilityService;
 import org.eclipse.slm.resource_management.model.consul.capability.CapabilityServiceStatus;
@@ -222,9 +222,9 @@ public class CapabilityUtil {
             Map<String, String> configParameter,
             Boolean expectedSecretPropertyValue
     ) {
-        List<CapabilityActionConfigParameter> secretConfigParameters = capability
+        List<ActionConfigParameter> secretConfigParameters = capability
                 .getActions()
-                .get(CapabilityActionType.INSTALL)
+                .get(ActionType.INSTALL)
                 .getConfigParameters()
                 .stream()
                 .filter(cp -> cp.getSecret() == expectedSecretPropertyValue)
@@ -286,18 +286,18 @@ public class CapabilityUtil {
             Capability capability,
             Map<String, String> configParameter
     ) {
-        Optional<CapabilityActionConfigParameter> optionalServicePortConfigParamDefinition = capability
+        Optional<ActionConfigParameter> optionalServicePortConfigParamDefinition = capability
                 .getActions()
-                .get(CapabilityActionType.INSTALL)
+                .get(ActionType.INSTALL)
                 .getConfigParameters()
                 .stream()
-                .filter(cp -> cp.getValueType().equals(CapabilityActionConfigParameterValueType.SERVICE_PORT))
+                .filter(cp -> cp.getValueType().equals(ActionConfigParameterValueType.SERVICE_PORT))
                 .findFirst();
 
         if(optionalServicePortConfigParamDefinition.isEmpty())
             return Optional.empty();
 
-        CapabilityActionConfigParameter servicePortConfigParamDefinition = optionalServicePortConfigParamDefinition.get();
+        ActionConfigParameter servicePortConfigParamDefinition = optionalServicePortConfigParamDefinition.get();
         String servicePort = configParameter.get(servicePortConfigParamDefinition.getName());
 
         if(servicePort == null)

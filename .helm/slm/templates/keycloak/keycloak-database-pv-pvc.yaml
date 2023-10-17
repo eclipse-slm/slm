@@ -1,0 +1,207 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: keycloak-database-data-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/slm/keycloak-database-data
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: keycloak-database-config-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/slm/keycloak-database-config
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: keycloak-config-awx-jwt-authenticator-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/slm/keycloak-config-awx-jwt-authenticator
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: keycloak-config-notification-service-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/slm/keycloak-config-notification-service
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: keycloak-config-resource-management-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/slm/keycloak-config-resource-management
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: keycloak-config-service-management-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/slm/keycloak-config-service-management
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: keycloak-config-service-management-init-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 6Gi
+  hostPath:
+    path: /data/slm/keycloak-config-service-management-init
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-database-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: keycloak-database-data-pv
+
+  storageClassName: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-database-config-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: keycloak-database-config-pv
+
+  storageClassName: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-config-awx-jwt-authenticator-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: keycloak-config-awx-jwt-authenticator-pv
+
+  storageClassName: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-config-notification-service-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: keycloak-config-notification-service-pv
+
+  storageClassName: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-config-resource-management-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: keycloak-config-resource-management-pv
+
+  storageClassName: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-config-service-management-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: keycloak-config-service-management-pv
+
+  storageClassName: ""
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-config-service-management-init-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: keycloak-config-service-management-init-pv
+
+  storageClassName: ""
+
+---
