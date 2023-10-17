@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  node-red:
+    image: nodered/node-red:2.2.2
+    env_file:
+      - env.list
+    ports:
+      - "1880:1880"
