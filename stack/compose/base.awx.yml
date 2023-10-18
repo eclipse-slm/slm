@@ -50,7 +50,7 @@ services:
       - "6899:6899"
 #      - "8080:8080"  # unused but mapped for debugging
       - "8888:8888"  # jupyter notebook
-      - "8052:8013"  # http
+      - "8013:8013"  # http
       - "8053:8043"  # https
       - "2222:2222"  # receptor foo node
       - "3001:3001"  # used by the UI dev env

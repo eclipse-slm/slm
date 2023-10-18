@@ -14,7 +14,7 @@ ui_port: 8080
 awx:
   admin_username: "admin"
   version: 15.0.1
-  port_http: 8052
+  port_http: 8013
   port_https: 443
   redis_version: 6
   postgres_version: 10
