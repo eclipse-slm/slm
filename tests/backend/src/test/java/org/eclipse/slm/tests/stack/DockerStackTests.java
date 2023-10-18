@@ -25,8 +25,7 @@ public class DockerStackTests {
 
     private HashMap<String, String> stackContainerStateMap = new HashMap<>() {{
         put("awx-init", "exited");
-        put("awx-web", "healthy");
-        put("awx-task", "running");
+        put("awx", "running");
         put("awx-redis", "healthy");
         put("awx-redis-init", "exited");
         put("awx-postgres", "healthy");
