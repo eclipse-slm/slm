@@ -6,11 +6,6 @@ on:
       - main
       - develop
       - release/*
-  pull_request:
-    branches:
-      - main
-      - develop
-      - feature/update-awx
 
 env:
   DOCKER_COMPOSE_COMMAND: docker-compose -f base.aas.yml -f base.awx.yml -f base.consul.yml -f base.keycloak.yml -f base.vault.yml -f slm.yml -f catalog.yml -f config-exporter.yml -f monitoring.yml -f build.yml
