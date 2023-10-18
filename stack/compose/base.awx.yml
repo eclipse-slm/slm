@@ -5,7 +5,6 @@ services:
   awx:
     user: "0"
     image: ghcr.io/eclipse-slm/awx/awx-task:${AWX_VERSION}
-    hostname: awxweb
     command: launch_awx.sh
     environment:
       OS: " Operating System: Docker Desktop"
@@ -37,7 +36,7 @@ services:
     networks:
       default:
         aliases:
-          - awx
+          - awxweb
     volumes:
       - awx_supervisor_socket:/var/run/supervisor
       - awx_rsyslog_socket:/var/run/awx-rsyslog/

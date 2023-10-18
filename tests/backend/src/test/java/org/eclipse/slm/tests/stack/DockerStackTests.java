@@ -41,7 +41,6 @@ public class DockerStackTests {
         put("notification-service-database", "healthy");
         put("resource-management", "healthy");
         put("resource-management-database", "healthy");
-        put("resource-management-init", "exited");
         put("service-management", "healthy");
         put("service-management-database", "healthy");
         put("service-management-init", "exited");
