@@ -152,8 +152,6 @@ services:
       options:
         max-file: ${LOGGING_MAX_FILE}
         max-size: ${LOGGING_MAX_SIZE}
-    links:
-      - awx-task
     environment:
       AWX_URL: http://awxweb:8013/
     depends_on:
