@@ -4,9 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.eclipse.slm.common.awx.client.AwxClient;
 import org.eclipse.slm.common.awx.client.AwxProjectUpdateFailedException;
 import org.eclipse.slm.common.awx.model.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -24,6 +22,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 
 import javax.net.ssl.SSLException;
 import java.io.File;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,20 +37,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 })
 @ContextConfiguration(initializers = {ConfigDataApplicationContextInitializer.class} )
 @TestPropertySource(properties = { "spring.config.location=classpath:application.yml" })
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectUpdateBugDevTesting {
     //region Variables
     public final static Logger LOG = LoggerFactory.getLogger(ProjectUpdateBugDevTesting.class);
+    @Autowired
     private static AwxClient staticAwxClient;
     static final DockerComposeContainer awxContainer;
-    private static int AWX_PORT = 8052;
-    private static String AWX_WEB_SERVICE = "awx-web-no-jwt";
+    private static int AWX_PORT = 8013;
+    private static String AWX_WEB_SERVICE = "awx";
 
     @Autowired
     AwxClient awxClient;
 
     static {
         awxContainer = new DockerComposeContainer(new File("src/test/resources/docker-compose.yml"))
-                .withExposedService(AWX_WEB_SERVICE, AWX_PORT, Wait.forListeningPort())
+                .withExposedService(AWX_WEB_SERVICE,AWX_PORT,
+                        Wait.forHttp("/#/login").forPort(AWX_PORT).withStartupTimeout(Duration.ofMinutes(5))
+                )
                 .withLocalCompose(true);
         awxContainer.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> stopContainer()));
@@ -167,8 +170,8 @@ public class ProjectUpdateBugDevTesting {
                         projectDTOApiCreate.getScm_url(),
                         projectDTOApiCreate.getScm_branch(),
                         playbook,
-                        new ArrayList<>()
-                );
+                        new ArrayList<>(),
+                        "");
             }
 
             //region Cleanup JobTemplates

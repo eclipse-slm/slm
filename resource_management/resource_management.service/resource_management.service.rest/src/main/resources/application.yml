@@ -99,10 +99,11 @@ keycloak:
 awx:
   scheme: http
   host: localhost
-  port: 80
+  port: 8013
   username: admin
   password: password
   polling-interval-in-s: 4
+  default-execution-environment: AWX-EE-SLM-1.4.0-SNAPSHOT
 
 ### Consul
 consul:

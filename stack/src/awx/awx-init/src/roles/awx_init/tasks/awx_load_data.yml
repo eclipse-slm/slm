@@ -159,8 +159,21 @@
     inputs: "{{ item.inputs }}"
   with_items: "{{ awx_credentials }}"
 
+
+
+- name: "Add EE"
+  awx.awx.execution_environment:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_admin_user }}"
+    controller_password: "{{ awx_admin_password }}"
+    name: "AWX-EE-SLM-1.4.0-SNAPSHOT"
+    image: ghcr.io/eclipse-slm/awx-ee-slm:1.4.0-SNAPSHOT
+    organization: "{{ awx_slm_organization_name }}"
+
+# Deprecated because we use the resource service to add them now
 - name: "Create projects and job templates"
   include_tasks: awx_create_project_and_templates.yml
   vars:
     awx_project: "{{ item }}"
+    awx_ee_name: "AWX-EE-SLM"
   with_items: "{{ ansible_projects_and_templates }}"

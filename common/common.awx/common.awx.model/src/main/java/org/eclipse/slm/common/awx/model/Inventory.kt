@@ -25,5 +25,6 @@ data class Inventory(
         var total_inventory_sources: Int,
         var inventory_sources_with_failures: Int,
         var insights_credential: String? = "",
-        var pending_deletion: Boolean
+        var pending_deletion: Boolean,
+        var prevent_instance_group_fallback: Boolean = false
 )

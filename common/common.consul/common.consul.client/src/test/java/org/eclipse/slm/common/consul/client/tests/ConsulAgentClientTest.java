@@ -89,7 +89,7 @@ public class ConsulAgentClientTest {
                 .withExposedService(CONSUL_SERVER_SERVICE_NAME, CONSUL_SERVER_PORT, Wait.forListeningPort())
                 .withExposedService(CONSUL_CLIENT_1_SERVICE_NAME, CONSUL_CLIENT_PORT, Wait.forListeningPort())
                 .withExposedService(CONSUL_CLIENT_2_SERVICE_NAME, CONSUL_CLIENT_PORT, Wait.forListeningPort())
-                .withLocalCompose(true);
+                .withLocalCompose(false);
         consulServerClientCompose.start();
     }
 

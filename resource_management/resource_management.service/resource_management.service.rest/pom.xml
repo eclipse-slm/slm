@@ -59,6 +59,12 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.awx.model</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
             <artifactId>notification_service.service.client</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>

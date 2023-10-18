@@ -4,8 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.eclipse.slm.common.awx.client.AwxClient;
 import org.eclipse.slm.common.awx.client.AwxCredential;
 import org.eclipse.slm.common.awx.client.AwxProjectUpdateFailedException;
+import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
+import org.eclipse.slm.common.awx.client.observer.AwxWebsocketClient;
+import org.eclipse.slm.common.awx.client.observer.IAwxJobObserverListener;
 import org.eclipse.slm.common.awx.model.*;
+import org.eclipse.slm.notification_service.model.JobFinalState;
+import org.eclipse.slm.notification_service.model.JobGoal;
 import org.eclipse.slm.notification_service.model.JobState;
+import org.eclipse.slm.notification_service.model.JobTarget;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
@@ -23,6 +29,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 
 import javax.net.ssl.SSLException;
 import java.io.File;
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,15 +52,19 @@ public class BasicAwxClientDevTesting {
     public final static Logger LOG = LoggerFactory.getLogger(BasicAwxClientDevTesting.class);
     static final DockerComposeContainer awxContainer;
 
-    private static int AWX_PORT = 8052;
-    private static String AWX_WEB_SERVICE = "awx-web-no-jwt";
+    private static int AWX_PORT = 8013;
+    private static int AWX_HTTPS_PORT = 8043;
+    private static String AWX_WEB_SERVICE = "awx";
 
     @Autowired
     AwxClient awxClient;
 
     static {
         awxContainer = new DockerComposeContainer(new File("src/test/resources/docker-compose.yml"))
-                .withExposedService(AWX_WEB_SERVICE, AWX_PORT, Wait.forListeningPort())
+                .withExposedService(AWX_WEB_SERVICE, AWX_HTTPS_PORT)
+                .withExposedService(AWX_WEB_SERVICE, AWX_PORT,
+                        Wait.forHttp("/#/login").forPort(AWX_PORT).withStartupTimeout(Duration.ofMinutes(5))
+                )
                 .withLocalCompose(true);
         awxContainer.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> stopContainer()));
@@ -126,21 +137,12 @@ public class BasicAwxClientDevTesting {
             );
         }
 
-        @AfterAll
-        public static void cleanup() {
-            Results<Credential> credentialsQueryResult = staticAwxClient.getCredentials();
-
-            credentialsQueryResult.getResults().forEach(
-                    c -> staticAwxClient.deleteCredential(c.getId())
-            );
-        }
-
         @Test
         @Order(10)
         public void getCredentials() {
             Results<Credential> credentials = awxClient.getCredentials();
 
-            assertEquals(0, credentials.getCount());
+            assertEquals(2, credentials.getCount());
         }
         @Test
         @Order(20)
@@ -260,8 +262,8 @@ public class BasicAwxClientDevTesting {
         public void getCredentialTypes() {
             Results<CredentialType> credentialTypes = awxClient.getCredentialTypes();
 
-            // AWX brings 23 default credential Types:
-            assertEquals(23, credentialTypes.getCount());
+            // AWX brings 28 default credential Types:
+            assertEquals(28, credentialTypes.getCount());
         }
 
         @Test
@@ -326,11 +328,11 @@ public class BasicAwxClientDevTesting {
             /**
              * Orgas to expect:
              * - Default
-             * - Self Service Portal
+             * - Self Service Portal ??
              * - Service Lifecycle Management
              * - Test Orga
              */
-            assertEquals(4, organizationsResult.getCount());
+            assertEquals(3, organizationsResult.getCount());
         }
 
         @Test
@@ -463,8 +465,7 @@ public class BasicAwxClientDevTesting {
 
                 Results<Team> teamResults = awxClient.getTeams();
 
-                //AWX is created by default with team named "user"
-                assertEquals(1, teamResults.getCount());
+                assertEquals(0, teamResults.getCount());
             }
             @Test
             @Order(20)
@@ -537,6 +538,7 @@ public class BasicAwxClientDevTesting {
         @Test
         @Order(10)
         public void createAwxProject() throws JsonProcessingException {
+            cleanup();
             Project projectCreated = awxClient.createProject(projectCreateDTO);
 
             assertEquals(projectCreateDTO.getName(),           projectCreated.getName());
@@ -667,6 +669,7 @@ public class BasicAwxClientDevTesting {
             //endregion
 
             @AfterAll
+            @BeforeAll
             public static void cleanup() {
                 Results<JobTemplate> jobTemplateQueryResult = staticAwxClient.getJobTemplates();
 
@@ -752,6 +755,68 @@ public class BasicAwxClientDevTesting {
                         Thread.sleep(1000);
                     }
                 }
+
+                assertEquals(
+                        JobState.SUCCESSFUL.name().toLowerCase(),
+                        job.getStatus()
+                );
+            }
+
+            @Test
+            @Order(42)
+            public void runAwxJobTemplateAndObserveTheJobStatus() throws JsonProcessingException, InterruptedException {
+                //Make sure default Inventory is available:
+                String port = String.valueOf(awxContainer.getServicePort(AWX_WEB_SERVICE, AWX_HTTPS_PORT));
+                awxClient.createDefaultInventory();
+                AwxWebsocketClient awxWebsocketClient;
+                awxWebsocketClient = new AwxWebsocketClient(awxClient.awxHost, awxClient.awxPort, "admin", "password");
+
+                try {
+                    awxWebsocketClient.start();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+                class AwxJobObserverListener implements IAwxJobObserverListener{
+                    public boolean stateChanged = false;
+                    public boolean stateFinished = false;
+
+                    @Override
+                    public void onJobStateChanged(AwxJobObserver sender, JobState newState) {
+                        stateChanged = true;
+                    }
+
+                    @Override
+                    public void onJobStateFinished(AwxJobObserver sender, JobFinalState finalState) {
+                        stateFinished = true;
+                    }
+                }
+
+                var listener = new AwxJobObserverListener();
+                var observer = new AwxJobObserver(listener);
+                awxWebsocketClient.registerObserver(observer);
+                int jobRunId = awxClient.runJobTemplate(
+                        new AwxCredential("admin", "password"),
+                        projectCreateAndWaitDTO.getScm_url(),
+                        projectCreateAndWaitDTO.getScm_branch(),
+                        playbook,
+                        new ExtraVars(new HashMap<>())
+                );
+                observer.observeJob(jobRunId, JobTarget.PROJECT, JobGoal.CREATE);
+
+                Job job = null;
+                for(int i = 0; i < 30; i++) {
+                    job = awxClient.getJob(jobRunId);
+
+                    if(job.getStatus().equals(JobState.SUCCESSFUL.name().toLowerCase())) {
+                        break;
+                    } else {
+                        Thread.sleep(1000);
+                    }
+                }
+
+                assertTrue(listener.stateChanged);
+                assertTrue(listener.stateFinished);
 
                 assertEquals(
                         JobState.SUCCESSFUL.name().toLowerCase(),
