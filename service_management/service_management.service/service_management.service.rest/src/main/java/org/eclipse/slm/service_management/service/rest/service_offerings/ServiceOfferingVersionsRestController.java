@@ -1,6 +1,7 @@
 package org.eclipse.slm.service_management.service.rest.service_offerings;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
 import org.eclipse.slm.resource_management.model.resource.MatchingResourceDTO;
 import org.eclipse.slm.resource_management.service.client.handler.ApiException;
@@ -150,7 +151,7 @@ public class ServiceOfferingVersionsRestController {
             @RequestBody ServiceOrder serviceOrder,
             @RequestParam UUID deploymentCapabilityServiceId)
             throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, ApiException,
-            ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException {
+            ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException, ConsulLoginFailedException {
 
         var keycloakPrincipal = (KeycloakPrincipal)keycloakAuthenticationToken.getPrincipal();
         this.serviceOfferingOrderHandler

@@ -172,7 +172,8 @@ public final class DockerContainerServiceOfferingOrderUtil {
                 null,
                 null,
                 null,
-                null
+                null,
+                ""
         );
 
         Map<String, DockerComposeFileService> dockerComposeServices = new HashMap<>();

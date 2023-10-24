@@ -98,6 +98,7 @@
               rules="required"
             >
               <v-select
+                id="resource-select-connection-type"
                 v-model="resourceConnectionType"
                 required
                 label="Connection Type"

@@ -21,6 +21,8 @@ public class AwxJobObserverInitializer {
     private String awxUsername;
     private String awxPassword;
 
+    private AwxWebsocketClient websocketClient;
+
     public AwxJobObserverInitializer(
             @Value("${awx.scheme}") String schema,
             @Value("${awx.host}") String host,
@@ -33,6 +35,16 @@ public class AwxJobObserverInitializer {
         this.awxUsername = awxUsername;
         this.awxPassword = awxPassword;
         this.pollingInterval = pollingInterval;
+
+
+        this.websocketClient = new AwxWebsocketClient(host, port, awxUsername, awxPassword);
+        try {
+            this.websocketClient.start();
+        }catch (Exception e){
+            LOG.error("Could not connect to AWX Websocket");
+        }
+
+
     }
 
     public AwxJobObserver init(
@@ -40,23 +52,25 @@ public class AwxJobObserverInitializer {
             JobTarget jobTarget,
             JobGoal jobGoal,
             IAwxJobObserverListener jobObserverListener
-    ) throws SSLException {
-        return new AwxJobObserver(
-                this.awxUrl,
-                this.awxUsername,
-                this.awxPassword,
-                this.pollingInterval,
+    ) {
+        var observer = new AwxJobObserver(
                 jobId,
                 jobTarget,
                 jobGoal,
                 jobObserverListener
         );
+        this.websocketClient.registerObserver(observer);
+        return observer;
     }
 
     public AwxJobObserver init(int jobId, JobTarget jobTarget, JobGoal jobGoal) throws SSLException {
-        return new AwxJobObserver(
-                this.awxUrl, this.awxUsername, this.awxPassword, this.pollingInterval,
-                jobId, jobTarget, jobGoal);
+        var observer = new AwxJobObserver(
+                jobId,
+                jobTarget,
+                jobGoal
+        );
+        this.websocketClient.registerObserver(observer);
+        return observer;
     }
 
     public void setAwxPort(int port) {
@@ -69,5 +83,4 @@ public class AwxJobObserverInitializer {
             e.printStackTrace();
         }
     }
-
 }

@@ -53,7 +53,7 @@ public class TestConfig {
     ));
 
     // AWX
-    public static final int AWX_PORT = Integer.parseInt(System.getenv().getOrDefault("AWX_PORT", "80"));
+    public static final int AWX_PORT = Integer.parseInt(System.getenv().getOrDefault("AWX_PORT", "8013"));
     public static final String AWX_BASE_URL =  "http://" + TestConfig.HOST;
 
     // Consul

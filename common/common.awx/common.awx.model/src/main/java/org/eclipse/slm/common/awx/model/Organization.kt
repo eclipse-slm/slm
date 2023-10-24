@@ -14,4 +14,5 @@ data class Organization(
         var description: String,
         var max_hosts: Int,
         var custom_virtualenv: String? = null,
+        var default_environment: String? = null,
 )

@@ -1,0 +1,179 @@
+- assert:
+    that:
+      - awx_url
+      - awx_admin_user
+      - awx_admin_password
+      - awx_jwt_authenticator_awx_username
+      - awx_jwt_authenticator_awx_password
+      - consul_token
+      - vault_approle_role_id
+      - vault_approle_secret_id
+
+- name: "Save AWX credentials for resource management and service registry to file"
+  copy:
+    content: "{{ item.value }}"
+    dest: "{{ item.filepath }}"
+  with_items:
+    - { value: "{{ awx_admin_username }}", filepath: "{{ resource_management_username_file }}" }
+    - { value: "{{ awx_admin_password }}", filepath: "{{ resource_management_password_file }}" }
+    - { value: "{{ awx_admin_username }}", filepath: "{{ service_management_username_file }}" }
+    - { value: "{{ awx_admin_password }}", filepath: "{{ service_management_password_file }}" }
+    - { value: "{{ awx_admin_username }}", filepath: "{{ notification_service_username_file }}" }
+    - { value: "{{ awx_admin_password }}", filepath: "{{ notification_service_password_file }}" }
+  no_log: true
+
+- name: "Remove organization"
+  awx.awx.organization:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_admin_user }}"
+    controller_password: "{{ awx_admin_password }}"
+    name: "Self Service Portal"
+    description: ""
+    state: absent
+
+- name: "Add organization"
+  awx.awx.organization:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_admin_user }}"
+    controller_password: "{{ awx_admin_password }}"
+    name: "{{ awx_slm_organization_name }}"
+    description: ""
+    state: present
+
+###region AWX JWT Authenticator
+- name: "Add user '{{ awx_jwt_authenticator_awx_username }}'"
+  awx.awx.user:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_admin_username }}"
+    controller_password: "{{ awx_admin_password }}"
+    username: "{{ awx_jwt_authenticator_awx_username }}"
+    password: "{{ awx_jwt_authenticator_awx_password }}"
+    email: "{{ awx_jwt_authenticator_awx_username }}@fab-os.org"
+    first_name: AWX
+    last_name: JWT Authenticator
+    superuser: yes
+    state: present
+
+- include_tasks: helper/create_application.yml
+  vars:
+    awx_username: "{{ awx_admin_username }}"
+    awx_password: "{{ awx_admin_password }}"
+    awx_application_name: "awx-jwt-authenticator"
+    awx_application_description: "AWX JWT Authenticator"
+    awx_organization_name: "{{ awx_slm_organization_name }}"
+
+- name: "Save AWX JWT credentials to file"
+  copy:
+    content: "{{ item.value }}"
+    dest: "/config/awx-jwt-authenticator/{{ item.filename }}"
+  with_items:
+    - { value: "{{ awx_jwt_authenticator_awx_username }}", filename: "awx_username" }
+    - { value: "{{ awx_jwt_authenticator_awx_password }}", filename: "awx_password" }
+  no_log: true
+
+- name: "Create team in which AWX JWT Authenticator can add new users"
+  awx.awx.team:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_admin_user }}"
+    controller_password: "{{ awx_admin_password }}"
+    name: "user"
+    description: "Team for users added by AWX JWT Authenticator"
+    organization: "{{ awx_slm_organization_name }}"
+    state: present
+###endregion AWX JWT Authenticator
+
+- set_fact:
+    awx_scm_credential_name: "SCM Credentials"
+
+- name: "Create SCM credentials"
+  awx.awx.credential:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_admin_user }}"
+    controller_password: "{{ awx_admin_password }}"
+    name: "{{ awx_scm_credential_name }}"
+    organization: "{{ awx_slm_organization_name }}"
+    state: present
+    credential_type: Source Control
+    inputs:
+      username: "{{ awx_scm_username }}"
+      password: "{{ awx_scm_password }}"
+  when: (awx_scm_username is defined) and (awx_scm_username|length > 0) and (awx_scm_password is defined) and (awx_scm_password|length > 0)
+
+- name: "Create default inventory"
+  awx.awx.inventory:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_admin_user }}"
+    controller_password: "{{ awx_admin_password }}"
+    name: "Default"
+    description: "Default Inventory"
+    organization: "{{ awx_slm_organization_name }}"
+    state: present
+
+- name: "Remove Demo Inventory"
+  awx.awx.inventory:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_admin_user }}"
+    controller_password: "{{ awx_admin_password }}"
+    name: "Demo Inventory"
+    description: "Demo Inventory"
+    organization: "{{ awx_slm_organization_name }}"
+    state: absent
+
+- name: "Remove Demo Project"
+  awx.awx.project:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_admin_user }}"
+    controller_password: "{{ awx_admin_password }}"
+    name: "Demo Project"
+    state: absent
+
+- name: "Remove Demo Template Project"
+  awx.awx.project:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_admin_user }}"
+    controller_password: "{{ awx_admin_password }}"
+    name: "Demo Job Template"
+    state: absent
+
+- name: "Add credential types"
+  awx.awx.credential_type:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_admin_user }}"
+    controller_password: "{{ awx_admin_password }}"
+    name: "{{ item.name }}"
+    kind: cloud
+    inputs: "{{ item.inputs }}"
+    injectors: "{{ item.injectors }}"
+    state: present
+    validate_certs: false
+  with_items: "{{ awx_credential_types }}"
+
+- name: "Add credentials"
+  awx.awx.credential:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_admin_user }}"
+    controller_password: "{{ awx_admin_password }}"
+    name: "{{ item.name }}"
+    credential_type: "{{ item.credential_type }}"
+    organization: "{{ awx_slm_organization_name }}"
+    inputs: "{{ item.inputs }}"
+  with_items: "{{ awx_credentials }}"
+
+
+
+- name: "Add EE"
+  awx.awx.execution_environment:
+    controller_host: "{{ awx_url }}"
+    controller_username: "{{ awx_admin_user }}"
+    controller_password: "{{ awx_admin_password }}"
+    name: "AWX-EE-SLM-1.4.0-SNAPSHOT"
+    image: ghcr.io/eclipse-slm/awx-ee-slm:1.4.0-SNAPSHOT
+    organization: "{{ awx_slm_organization_name }}"
+
+# Deprecated because we use the resource service to add them now
+- name: "Create projects and job templates"
+  include_tasks: awx_create_project_and_templates.yml
+  vars:
+    awx_project: "{{ item }}"
+    awx_ee_name: "AWX-EE-SLM"
+  with_items: "{{ ansible_projects_and_templates }}"

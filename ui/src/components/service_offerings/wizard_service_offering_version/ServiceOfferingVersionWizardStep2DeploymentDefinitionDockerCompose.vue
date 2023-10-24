@@ -384,10 +384,13 @@
             this.serviceOfferingVersion.deploymentDefinition.envFiles[envFileName].content = reader.result
             const parsedVariables = parse(reader.result)
             for (const envVar in parsedVariables) {
-              this.serviceOfferingVersion.deploymentDefinition.envFiles[envFileName].environmentVariables.push({
-                key: envVar,
-                value: parsedVariables[envVar],
-              })
+              if (this.serviceOfferingVersion.deploymentDefinition.envFiles[envFileName].environmentVariables
+                  .filter(ev => ev.key === envVar).length === 0) {
+                this.serviceOfferingVersion.deploymentDefinition.envFiles[envFileName].environmentVariables.push({
+                  key: envVar,
+                  value: parsedVariables[envVar],
+                })
+              }
             }
           }
         }

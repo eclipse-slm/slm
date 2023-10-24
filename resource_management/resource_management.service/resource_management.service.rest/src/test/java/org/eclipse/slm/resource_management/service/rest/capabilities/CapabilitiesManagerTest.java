@@ -239,10 +239,6 @@ public class CapabilitiesManagerTest {
                     .when(capabilityJpaRepository.findAll())
                     .thenReturn(Collections.singletonList(dockerDeploymentCapability));
             AwxJobObserver awxJobObserver = new AwxJobObserver(
-                    "awxUrl",
-                    "awxUsername",
-                    "awxPassword",
-                    4,
                     0,
                     JobTarget.RESOURCE,
                     JobGoal.ADD,
@@ -509,8 +505,8 @@ public class CapabilitiesManagerTest {
                             Mockito.any(),
                             Mockito.any(),
                             Mockito.any(),
-                            Mockito.any()
-                    ))
+                            Mockito.any(),
+                            Mockito.any()))
                     .thenReturn(jobTemplate);
 
             capabilitiesManager.addCapability(virtualizationCapability);
@@ -528,10 +524,6 @@ public class CapabilitiesManagerTest {
                     .when(capabilityJpaRepository.findAll())
                     .thenReturn(Collections.singletonList(virtualizationCapability));
             AwxJobObserver awxJobObserver = new AwxJobObserver(
-                    "awxUrl",
-                    "awxUsername",
-                    "awxPassword",
-                    4,
                     0,
                     JobTarget.RESOURCE,
                     JobGoal.ADD,

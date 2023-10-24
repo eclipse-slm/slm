@@ -2,11 +2,16 @@
 
 # Wait until Vault configuration is present
 VAULT_CONFIG_DIRECTORY="/app/vault/"
-while [ -z "$(ls -A $VAULT_CONFIG_DIRECTORY)" ]; do
-  echo "Vault config file(s) in $VAULT_CONFIG_DIRECTORY missing -> sleeping"
+until [ -f "$VAULT_CONFIG_DIRECTORY/role_id" ]; do
+  echo "Vault role_id config file '$VAULT_CONFIG_DIRECTORY/role_id' missing -> sleeping"
   sleep 3
 done
 export VAULT_APPROLE_ROLEID=$(cat "$VAULT_CONFIG_DIRECTORY/role_id")
+
+until [ -f "$VAULT_CONFIG_DIRECTORY/secret_id" ]; do
+  echo "Vault secret_id config file '$VAULT_CONFIG_DIRECTORY/secret_id' missing -> sleeping"
+  sleep 3
+done
 export VAULT_APPROLE_SECRETID=$(cat "$VAULT_CONFIG_DIRECTORY/secret_id")
 
 # Wait until Keycloak configuration is present

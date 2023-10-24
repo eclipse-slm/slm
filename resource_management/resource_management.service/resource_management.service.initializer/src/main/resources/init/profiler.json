@@ -5,8 +5,8 @@
     "action": {
       "actionClass": "AwxAction",
       "actionType": "RUN",
-      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-pr-ansible-facts",
-      "awxBranch": "main",
+      "awxRepo": "https://github.com/eclipse-slm/slm-pr-ansible-facts",
+      "awxBranch": "1.0.0",
       "playbook": "run.yml"
     }
   },
@@ -16,8 +16,8 @@
     "action": {
       "actionClass": "AwxAction",
       "actionType": "RUN",
-      "awxRepo": "https://github.com/FabOS-AI/fabos-slm-pr-webcams",
-      "awxBranch": "main",
+      "awxRepo": "https://github.com/eclipse-slm/slm-pr-webcams",
+      "awxBranch": "1.0.0",
       "playbook": "run.yml"
     }
   }

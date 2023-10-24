@@ -1,31 +1,27 @@
 version: '3'
 
 services:
-  awx-web-no-jwt:
-    image: fabos4ai/slm-awx-web-no-jwt:15.0.1
+  awx:
+    image: ghcr.io/eclipse-slm/awx/awx-task:22.7.0
+    command: launch_awx.sh
+    hostname: awxweb
+    environment:
+      OS: " Operating System: Docker Desktop"
+      SDB_HOST: 0.0.0.0
+      SDB_PORT: 7899
+      AWX_GROUP_QUEUES: tower
+      MAIN_NODE_TYPE: "${MAIN_NODE_TYPE:-hybrid}"
+      RECEPTORCTL_SOCKET: /var/run/awx-receptor/receptor.sock
+      CONTROL_PLANE_NODE_COUNT: 1
+      EXECUTION_NODE_COUNT: 0
+      AWX_LOGGING_MODE: stdout
+      #      DJANGO_SUPERUSER_PASSWORD: PrXajTWYbthSGyRhqHDO
+      DJANGO_SUPERUSER_PASSWORD: password
+      UWSGI_MOUNT_PATH: /
+      RUN_MIGRATIONS: 1
     depends_on:
       - awx-redis
       - awx-redis-init
-      - awx-postgres
-    networks:
-      default:
-        aliases:
-          - awxweb
-    user: root
-    volumes:
-      - awx_test_supervisor_socket:/var/run/supervisor
-      - awx_test_rsyslog_socket:/var/run/awx-rsyslog/
-      - awx_test_rsyslog_config:/var/lib/awx/rsyslog/
-      - awx_test-redis:/var/run/redis
-    healthcheck:
-      test: [ "CMD", "curl", "http://localhost:8052" ]
-
-  awx-task:
-    image: fabos4ai/slm-awx-task:15.0.1
-    depends_on:
-      - awx-redis
-      - awx-redis-init
-      - awx-web-no-jwt
       - awx-postgres
     networks:
       default:
@@ -37,9 +33,22 @@ services:
       - awx_test_rsyslog_socket:/var/run/awx-rsyslog/
       - awx_test_rsyslog_config:/var/lib/awx/rsyslog/
       - awx_test-redis:/var/run/redis
+    privileged: true
+    tty: true
+    #    ports:
+    #      - "7899-7999:7899-7999"  # sdb-listen
+    #      - "6899:6899"
+    #      - "2222:2222"  # receptor foo node
+    #      - "8013:8013"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:8013" ]
+    links:
+      - awx-postgres
+      - awx-redis
 
   awx-redis:
-    image: fabos4ai/awx-redis:6
+    image: ghcr.io/eclipse-slm/awx/redis:6
+    entrypoint: [ "redis-server" ]
     restart: unless-stopped
     depends_on:
       - awx-redis-init
@@ -61,9 +70,15 @@ services:
       - awx_test-redis:/var/run/redis/
 
   awx-postgres:
-    image: fabos4ai/slm-awx-postgres:10
+    image: postgres:12
+    hostname: postgres
+    command: postgres -c log_destination=stderr -c log_min_messages=info -c log_min_duration_statement=1000 -c max_connections=1024
     environment:
       PGUSER: awx
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: awx
+      POSTGRES_DB: awx
+      POSTGRES_PASSWORD: awxpass
     volumes:
       - "awx_test_database_data:/var/lib/postgresql/data:Z"
     healthcheck:

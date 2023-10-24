@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - develop
-      - release-*
+      - release/*
 
 env:
   DOCKER_COMPOSE_COMMAND: docker-compose -f base.aas.yml -f base.awx.yml -f base.consul.yml -f base.keycloak.yml -f base.vault.yml -f slm.yml -f catalog.yml -f config-exporter.yml -f monitoring.yml -f build.yml
@@ -18,15 +18,6 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v3
-      - name: Build base docker image
-        working-directory: ./stack/compose
-        run: $DOCKER_COMPOSE_COMMAND build --no-cache awx-fixed-files
-      - name: Build AWX Web docker image
-        working-directory: ./stack/compose
-        run: $DOCKER_COMPOSE_COMMAND build --no-cache awx-web
-      - name: Build AWX Web No JWT docker image
-        working-directory: ./stack/compose
-        run: $DOCKER_COMPOSE_COMMAND build --no-cache awx-web-no-jwt
       - name: Build AWX Task docker image
         working-directory: ./stack/compose
         run: $DOCKER_COMPOSE_COMMAND build --no-cache awx-task
@@ -38,7 +29,7 @@ jobs:
           password: ${{secrets.GITHUB_TOKEN}}
       - name: Push docker image
         working-directory: ./stack/compose
-        run: $DOCKER_COMPOSE_COMMAND push awx-web awx-web-no-jwt awx-task
+        run: $DOCKER_COMPOSE_COMMAND push awx-task
 
   build-and-push:
     runs-on: ubuntu-latest

@@ -25,8 +25,7 @@ public class DockerStackTests {
 
     private HashMap<String, String> stackContainerStateMap = new HashMap<>() {{
         put("awx-init", "exited");
-        put("awx-web", "healthy");
-        put("awx-task", "running");
+        put("awx", "running");
         put("awx-redis", "healthy");
         put("awx-redis-init", "exited");
         put("awx-postgres", "healthy");
@@ -37,12 +36,11 @@ public class DockerStackTests {
         put("keycloak-database", "healthy");
         put("keycloak-init", "exited");
         put("vault", "healthy");
-        put("ui", "unhealthy");
+        put("ui", "running");
         put("notification-service", "healthy");
         put("notification-service-database", "healthy");
         put("resource-management", "healthy");
         put("resource-management-database", "healthy");
-        put("resource-management-init", "exited");
         put("service-management", "healthy");
         put("service-management-database", "healthy");
         put("service-management-init", "exited");

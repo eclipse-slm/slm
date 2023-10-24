@@ -10,7 +10,7 @@ ENV KEYCLOAK_CONFIG_TENANTS_CONFIGPATH="/app/keycloak" \
     CONSUL_ACLTOKEN="password" \
     AWX_SCHEME="http" \
     AWX_HOST="awxweb" \
-    AWX_PORT="8052" \
+    AWX_PORT="8013" \
     AWX_USER="admin" \
     AWX_PASSWORD="password"
 

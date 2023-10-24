@@ -8,7 +8,7 @@ The Service Lifecycle Management enables the [installation of new clusters](#ins
 ## Install new clusters
 A corresponding cluster deployment capability must be available to allow the installation of a new cluster. That deployment capability must have an `INSTALL` action and a definition for `clusterMemberTypes`.
 <br><br>
-Example from the [official K8S deployment capability](https://github.com/FabOS-AI/fabos-slm-dc-k8s):
+Example from the [official K8S deployment capability](https://github.com/eclipse-slm/slm-dc-k8s):
 ```yaml
 {
     ...
@@ -17,7 +17,7 @@ Example from the [official K8S deployment capability](https://github.com/FabOS-A
         "INSTALL": {
         "capabilityActionClass": "AwxCapabilityAction",
         "capabilityActionType": "INSTALL",
-        "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-k8s",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-k8s",
         "awxBranch": "main",
         "playbook": "install.yml",
         ...
@@ -48,7 +48,7 @@ Example from the [official K8S deployment capability](https://github.com/FabOS-A
 ```
 
 ### Install new Kubernetes clusters
-The Service Lifecycle Management provides an [official K8S deployment capability](https://github.com/FabOS-AI/fabos-slm-dc-k8s), which supports the installation of new clusters. At least 5 hosts are required to set up a new Kubernetes cluster.
+The Service Lifecycle Management provides an [official K8S deployment capability](https://github.com/eclipse-slm/slm-dc-k8s), which supports the installation of new clusters. At least 5 hosts are required to set up a new Kubernetes cluster.
 
 Example:
 * Go to the `Resource` tab and press the `+` button in the bottom right corner.
@@ -74,8 +74,8 @@ Example:
 ## Add managed clusters
 Already existing clusters be added as managed clusters. To allow the addition of a managed cluster, a corresponding cluster deployment capability must be available. That deployment capability must have an `INSTALL` action with the property `skipable: true`. Configuration parameters in the action, can be used to query information required for accessing the cluster.
 <br><br>
-Example from the [official K8S deployment capability](https://github.com/FabOS-AI/fabos-slm-dc-k8s):
-```yaml:line-numbers
+Example from the [official K8S deployment capability](https://github.com/eclipse-slm/slm-dc-k8s):
+```yaml
 {
     ...
     "actions": {
@@ -83,7 +83,7 @@ Example from the [official K8S deployment capability](https://github.com/FabOS-A
         "INSTALL": {
             "capabilityActionClass": "AwxCapabilityAction",
             "capabilityActionType": "INSTALL",
-            "awxRepo": "https://github.com/FabOS-AI/fabos-slm-dc-k8s",
+            "awxRepo": "https://github.com/eclipse-slm/slm-dc-k8s",
             "awxBranch": "main",
             "playbook": "install.yml",
             "skipable": true,
@@ -113,7 +113,7 @@ Example from the [official K8S deployment capability](https://github.com/FabOS-A
 ```
 
 ### Kubernetes Clusters
-The Service Lifecycle Management provides an [official K8S deployment capability](https://github.com/FabOS-AI/fabos-slm-dc-k8s), which supports managed clusters. It requires a [kubeconfig file](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/) and a namespace in the cluster. The Service Lifecycle Management will deploy all services into this namespace.
+The Service Lifecycle Management provides an [official K8S deployment capability](https://github.com/eclipse-slm/slm-dc-k8s), which supports managed clusters. It requires a [kubeconfig file](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/) and a namespace in the cluster. The Service Lifecycle Management will deploy all services into this namespace.
 
 Example:
 * Go to the `Resource` tab and press the `+` button in the bottom right corner.

@@ -48,6 +48,7 @@ spring:
       port: ${consul.port}
       discovery:
         ip-address: 172.17.0.1
+        enabled: true
         acl-token: ${consul.acl-token}
         prefer-ip-address: true
         register-health-check: true
@@ -111,7 +112,7 @@ keycloak:
 awx:
   scheme: http
   host: localhost
-  port: 80
+  port: 8013
   username: admin
   password: password
   polling-interval-in-s: 4

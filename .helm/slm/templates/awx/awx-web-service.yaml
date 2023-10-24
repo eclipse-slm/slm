@@ -12,11 +12,11 @@ spec:
 {{/*    - name: "http"*/}}
 {{/*      protocol: TCP*/}}
 {{/*      port: {{.Values.awx.port_http}}*/}}
-{{/*      targetPort: 8052*/}}
+{{/*      targetPort: 8013*/}}
     - name: "container"
       protocol: TCP
-      port: 8052
-      targetPort: 8052
+      port: 8013
+      targetPort: 8013
 
 {{/*    - name: "https"*/}}
 {{/*      protocol: TCP*/}}
