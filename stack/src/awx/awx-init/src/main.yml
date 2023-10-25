@@ -65,6 +65,11 @@
         tasks_from: helper/vault_import_config_shared_volume.yml
       when: vault_config_via == 'SHARED_VOLUME'
 
+    - name: "Import Keycloak configuration from shared volume"
+      include_role:
+        name: awx_init
+        tasks_from: helper/keycloak_import_config_shared_volume.yml
+
     - name: "Wait for AWX being up"
       uri:
         url: "{{ awx_url }}"
