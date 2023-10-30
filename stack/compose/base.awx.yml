@@ -25,6 +25,8 @@ services:
     links:
       - awx-postgres
       - awx-redis
+    extra_hosts:
+      - "${SLM_HOSTNAME}:172.17.0.1"
     restart: unless-stopped
     logging:
       driver: "json-file"
