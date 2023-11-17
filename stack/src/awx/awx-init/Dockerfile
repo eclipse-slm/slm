@@ -1,7 +1,7 @@
 FROM fabos4ai/ansible-core:2.11.9
 
 #ENV AWX_URL=http://localhost \
-ENV AWX_URL=http://awxweb:8052 \
+ENV AWX_URL=http://awxweb:8013 \
     AWX_ADMIN_USERNAME=admin \
     AWX_ADMIN_PASSWORD=password \
     CONSUL_CONFIG_VIA=SHARED_VOLUME \

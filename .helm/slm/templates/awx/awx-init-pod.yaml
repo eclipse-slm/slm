@@ -13,7 +13,7 @@ spec:
         - name: KEYCLOAK_AUTHSERVERURL
           value: "http://keycloak:{{ .Values.keycloak.port}}/auth"
         - name: AWX_URL
-          value: "http://awx-web:8052"
+          value: "http://awx-web:8013"
         - name: AWX_ADMIN_USERNAME
           value: {{ .Values.awx.admin_username }}
         - name: AWX_ADMIN_PASSWORD
@@ -62,6 +62,6 @@ spec:
     - name: vault-config-awx-pv
       persistentVolumeClaim:
         claimName: vault-config-awx-pvc
-    
+
 
   restartPolicy: OnFailure

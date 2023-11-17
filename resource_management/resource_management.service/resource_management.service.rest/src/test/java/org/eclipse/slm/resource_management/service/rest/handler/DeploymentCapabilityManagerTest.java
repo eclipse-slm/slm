@@ -137,7 +137,7 @@
 //    private static CredentialUsernamePassword credentialUsernamePassword = new CredentialUsernamePassword("username", "password");
 //    static DockerComposeContainer dockerComposeWorkload;
 //
-//    private static int AWX_PORT = 8052;
+//    private static int AWX_PORT = 8013;
 //    private static String AWX_WEB_SERVICE = "awx-web-no-jwt";
 //
 //    private AwxCredential awxCredential = new AwxCredential("admin", "password");
