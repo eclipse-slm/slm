@@ -2,6 +2,7 @@ package org.eclipse.slm.common.awx.client.test.unittests;
 
 import org.eclipse.slm.common.awx.client.AwxClient;
 import org.eclipse.slm.common.awx.client.AwxCredential;
+import org.eclipse.slm.common.awx.client.AwxLoginCache;
 import org.eclipse.slm.common.awx.model.JobTemplate;
 import org.eclipse.slm.common.awx.model.Results;
 import org.junit.jupiter.api.MethodOrderer;
@@ -27,7 +28,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
         RestTemplate.class,
-        AwxClient.class
+        AwxClient.class,
+        AwxLoginCache.class
 })
 
 @TestPropertySource(properties = { "spring.config.location=classpath:application.yml" })
