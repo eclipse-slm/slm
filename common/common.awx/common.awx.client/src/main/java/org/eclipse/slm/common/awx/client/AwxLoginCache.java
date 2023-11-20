@@ -1,6 +1,7 @@
 package org.eclipse.slm.common.awx.client;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
 import java.util.Collections;
@@ -8,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 
+@Configuration
 public class AwxLoginCache {
 
     @Bean
