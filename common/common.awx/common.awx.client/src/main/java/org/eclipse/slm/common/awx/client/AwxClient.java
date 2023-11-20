@@ -15,6 +15,7 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.apache.commons.codec.binary.Base64;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -36,6 +38,7 @@ import reactor.retry.Repeat;
 
 import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
@@ -75,6 +78,9 @@ public class AwxClient {
 
     @Autowired
     RestTemplate restTemplate;
+
+    @Autowired
+    AwxLoginCache awxLoginCache;
 
 //    private WebClient webClient;
 
@@ -1521,10 +1527,7 @@ public class AwxClient {
     private LinkedMultiValueMap<String, String> getAuthHeader(AwxCredential awxCredential) {
         LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap();
         if(awxCredential.keycloakPrincipal != null) {
-            linkedMultiValueMap.add(
-                    "Authorization",
-                    "Bearer " + getAccessToken(awxCredential.keycloakPrincipal.getKeycloakSecurityContext().getTokenString())
-            );
+            linkedMultiValueMap.add("Cookie", getSessionIdAndCRSPToken(awxCredential.keycloakPrincipal.getKeycloakSecurityContext().getTokenString()));
         } else {
             String str = (awxCredential.username == null ? "" : awxCredential.username) + ":" + (awxCredential.password == null ? "" : awxCredential.password);
             String encodedStr = new Base64().encodeAsString(str.getBytes());
@@ -1536,6 +1539,80 @@ public class AwxClient {
         }
 
         return linkedMultiValueMap;
+    }
+
+    public String getSessionIdAndCRSPToken(String token) {
+
+        if (this.awxLoginCache.has(token)) {
+            var loginCredentials = this.awxLoginCache.get(token);
+            if (isLoggedIn(loginCredentials)) {
+                return loginCredentials;
+            }
+        }
+
+        var sessionAndCSRFTokenCookies = loginUser(token);
+
+        if (isLoggedIn(sessionAndCSRFTokenCookies)) {
+            this.awxLoginCache.put(token, sessionAndCSRFTokenCookies);
+        }
+
+        return sessionAndCSRFTokenCookies;
+    }
+
+    private boolean isLoggedIn(String session) {
+
+        var sessionHeaders = new HttpHeaders();
+        sessionHeaders.set("Cookie", session);
+        ResponseEntity<String> response;
+        var restTemplate = new RestTemplate();
+        response = restTemplate.exchange(this.getAwxUrl() + "/api/v2/me/", HttpMethod.GET,
+                new HttpEntity<String>(sessionHeaders), String.class);
+
+        return response.getStatusCode() == HttpStatus.OK;
+    }
+
+    @NotNull
+    private String loginUser(String token) {
+        RestTemplate restTemplate = new RestTemplate(new SimpleClientHttpRequestFactory() {
+            @Override
+            protected void prepareConnection(HttpURLConnection connection, String httpMethod) {
+                connection.setInstanceFollowRedirects(false);
+            }
+        });
+        var url = this.getAwxUrl() + "/sso/login/oidc/";
+        ResponseEntity<String> response;
+        response = restTemplate.exchange(url, HttpMethod.GET,
+                new HttpEntity<String>(new HttpHeaders()),
+                String.class);
+
+        if (response.getStatusCode() != HttpStatus.FOUND) {
+            return "";
+        }
+
+        var awxCookies = response.getHeaders().get("Set-Cookie");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cookie", "KEYCLOAK_IDENTITY=" + token);
+
+        response = restTemplate.exchange(response.getHeaders().getLocation(), HttpMethod.GET,
+                new HttpEntity<String>(headers),
+                String.class);
+
+        if (response.getStatusCode() != HttpStatus.FOUND) {
+            return "";
+        }
+
+        headers = new HttpHeaders();
+        headers.set("Cookie", String.join(";", awxCookies));
+        response = restTemplate.exchange(response.getHeaders().getLocation(), HttpMethod.GET,
+                new HttpEntity<String>(headers),
+                String.class);
+
+        if (response.getStatusCode() != HttpStatus.FOUND) {
+            return "";
+        }
+
+        return String.join(";", response.getHeaders().get("Set-Cookie"));
     }
 
     private HttpHeaders getAdminAuthHeader() {
