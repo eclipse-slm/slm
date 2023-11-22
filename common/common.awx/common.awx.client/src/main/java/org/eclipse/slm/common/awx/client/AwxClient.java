@@ -1527,7 +1527,8 @@ public class AwxClient {
     private LinkedMultiValueMap<String, String> getAuthHeader(AwxCredential awxCredential) {
         LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap();
         if(awxCredential.keycloakPrincipal != null) {
-            linkedMultiValueMap.add("Cookie", getSessionIdAndCRSPToken(awxCredential.keycloakPrincipal.getKeycloakSecurityContext().getTokenString()));
+            linkedMultiValueMap.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken(awxCredential.keycloakPrincipal.getKeycloakSecurityContext().getTokenString()));
+//            linkedMultiValueMap.add("Cookie", getSessionIdAndCRSPToken(awxCredential.keycloakPrincipal.getKeycloakSecurityContext().getTokenString()));
         } else {
             String str = (awxCredential.username == null ? "" : awxCredential.username) + ":" + (awxCredential.password == null ? "" : awxCredential.password);
             String encodedStr = new Base64().encodeAsString(str.getBytes());
