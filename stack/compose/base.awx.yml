@@ -23,8 +23,6 @@ services:
     links:
       - awx-postgres
       - awx-redis
-    extra_hosts:
-      - "${SLM_HOSTNAME}:172.17.0.1"
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -165,7 +163,6 @@ services:
       - awx_config_resource-management:/config/resource-management
       - awx_config_service-management:/config/service-management
       - awx_config_jwt-authenticator:/config/awx-jwt-authenticator
-      - keycloak_config_awx-jwt-authenticator:/config/keycloak
       - consul_config_awx:/config/consul
       - vault_config_awx:/config/vault
 

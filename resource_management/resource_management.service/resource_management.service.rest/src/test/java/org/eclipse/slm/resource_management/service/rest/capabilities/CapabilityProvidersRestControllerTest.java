@@ -3,7 +3,6 @@ package org.eclipse.slm.resource_management.service.rest.capabilities;
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
 import com.c4_soft.springaddons.security.oauth2.test.annotations.keycloak.WithMockKeycloakAuth;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.eclipse.slm.common.awx.client.AwxLoginCache;
 import org.eclipse.slm.resource_management.service.rest.handler.provider.ServiceHosterHandler;
 import org.eclipse.slm.resource_management.service.rest.handler.provider.VirtualResourceProviderHandler;
 import org.eclipse.slm.resource_management.model.capabilities.CapabilityType;
@@ -49,8 +48,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
         Application.class,
-        CapabilityProvidersRestController.class,
-        AwxLoginCache.class
+        CapabilityProvidersRestController.class
 },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )

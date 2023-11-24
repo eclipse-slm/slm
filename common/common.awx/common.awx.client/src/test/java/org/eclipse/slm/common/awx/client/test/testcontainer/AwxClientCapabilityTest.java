@@ -2,7 +2,6 @@ package org.eclipse.slm.common.awx.client.test.testcontainer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.eclipse.slm.common.awx.client.AwxClient;
-import org.eclipse.slm.common.awx.client.AwxLoginCache;
 import org.eclipse.slm.common.awx.client.AwxProjectUpdateFailedException;
 import org.eclipse.slm.common.awx.model.*;
 import org.junit.jupiter.api.*;
@@ -31,8 +30,7 @@ import static org.junit.Assert.assertEquals;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
         RestTemplate.class,
-        AwxClient.class,
-        AwxLoginCache.class
+        AwxClient.class
 })
 @ContextConfiguration(initializers = {ConfigDataApplicationContextInitializer.class} )
 @TestPropertySource(properties = { "spring.config.location=classpath:application.yml" })
@@ -53,7 +51,7 @@ public class AwxClientCapabilityTest {
                 .withExposedService(AWX_WEB_SERVICE,AWX_PORT,
                         Wait.forHttp("/#/login").forPort(AWX_PORT).withStartupTimeout(Duration.ofMinutes(5))
                 )
-                .withLocalCompose(false);
+                .withLocalCompose(true);
 
         awxContainer.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> stopContainer()));

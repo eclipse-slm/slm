@@ -70,9 +70,6 @@ vault_config_directory: "/config/vault"
 vault_approle_role_id_file: "{{ vault_config_directory }}/role_id"
 vault_approle_secret_id_file: "{{ vault_config_directory }}/secret_id"
 
-keycloak_config_directory: "/config/keycloak"
-keycloak_oidc_file: "{{ keycloak_config_directory }}/fabos-keycloak.json"
-
 notification_service_config_directory: "/config/notification-service"
 notification_service_username_file: "{{ notification_service_config_directory }}/awx_username"
 notification_service_password_file: "{{ notification_service_config_directory }}/awx_password"

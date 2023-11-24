@@ -8,7 +8,6 @@
       - consul_token
       - vault_approle_role_id
       - vault_approle_secret_id
-      - keycloak_oidc_json
 
 - name: "Save AWX credentials for resource management and service registry to file"
   copy:
@@ -170,27 +169,6 @@
     name: "AWX-EE-SLM-1.4.0-SNAPSHOT"
     image: ghcr.io/eclipse-slm/awx-ee-slm:1.4.0-SNAPSHOT
     organization: "{{ awx_slm_organization_name }}"
-
-
-- name: "Configure AWX OIDC adapter "
-  awx.awx.settings:
-    controller_host: "{{ awx_url }}"
-    controller_username: "{{ awx_admin_user }}"
-    controller_password: "{{ awx_admin_password }}"
-    settings: "{{ new_oidc }}"
-    validate_certs: False
-
-- name: "Create Auth Mapping Settings"
-  set_fact:
-    auth_mapping: "{{ lookup('template', 'auth_mapping_settings.json.j2') }}"
-
-- name: "Configure Auth Organization and Team Map "
-  awx.awx.settings:
-    controller_host: "{{ awx_url }}"
-    controller_username: "{{ awx_admin_user }}"
-    controller_password: "{{ awx_admin_password }}"
-    settings: "{{ auth_mapping }}"
-    validate_certs: False
 
 # Deprecated because we use the resource service to add them now
 - name: "Create projects and job templates"
