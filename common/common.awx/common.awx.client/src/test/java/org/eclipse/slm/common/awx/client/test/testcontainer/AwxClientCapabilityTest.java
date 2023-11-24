@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
         RestTemplate.class,
-        AwxClient.class,
+        AwxClient.class
 })
 @ContextConfiguration(initializers = {ConfigDataApplicationContextInitializer.class} )
 @TestPropertySource(properties = { "spring.config.location=classpath:application.yml" })

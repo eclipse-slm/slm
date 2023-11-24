@@ -48,7 +48,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
         Application.class,
-        CapabilityProvidersRestController.class,
+        CapabilityProvidersRestController.class
 },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
