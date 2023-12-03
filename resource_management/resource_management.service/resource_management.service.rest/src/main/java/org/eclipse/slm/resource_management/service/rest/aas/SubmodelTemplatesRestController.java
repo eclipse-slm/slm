@@ -1,6 +1,9 @@
 package org.eclipse.slm.resource_management.service.rest.aas;
 
 import io.swagger.v3.oas.annotations.Operation;
+import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
+import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
+import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
 import org.slf4j.Logger;
@@ -12,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.eclipse.slm.resource_management.service.rest.aas.ResourceAASController.ID_SHORT_PLATFORM_RESOURCES;
+
 @RestController
 @RequestMapping("/aas")
 public class SubmodelTemplatesRestController {
@@ -19,9 +24,29 @@ public class SubmodelTemplatesRestController {
     public final static Logger LOG = LoggerFactory.getLogger(SubmodelTemplatesRestController.class);
 
     private final IAASRegistry aasRegistry;
+    private ConnectedAssetAdministrationShellManager aasManager;
 
     public SubmodelTemplatesRestController(@Value("${basyx.aas-registry.url}") String aasRegistryUrl) {
         this.aasRegistry = new AASRegistryProxy(aasRegistryUrl);
+        this.aasManager = new ConnectedAssetAdministrationShellManager(aasRegistry);
+    }
+
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @Operation(summary = "Get all AAS containing PlatformResources Submodel")
+    public List<AssetAdministrationShell> getResourceAASDescriptors() {
+        var allAASDescriptors = aasRegistry.lookupAll();
+        List<AASDescriptor> resourceAASDescriptors = allAASDescriptors.stream().filter(aasDescriptor ->
+                aasDescriptor
+                        .getSubmodelDescriptorFromIdShort(ID_SHORT_PLATFORM_RESOURCES) != null
+        ).collect(Collectors.toList());
+
+        List<AssetAdministrationShell> aasList = new ArrayList<>();
+
+        for(AASDescriptor aasd : resourceAASDescriptors) {
+            aasList.add(aasManager.retrieveAAS(aasd.getIdentifier()).getLocalCopy());
+        }
+
+        return aasList;
     }
 
     @RequestMapping(value = "/submodels/templates/{smTemplateSemanticId}/instances", method = RequestMethod.GET)
