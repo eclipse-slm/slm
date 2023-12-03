@@ -46,13 +46,17 @@
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
   import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
   import { Pie } from 'vue-chartjs'
+  import {mapGetters} from "vuex";
 
   ChartJS.register(ArcElement, Tooltip, Legend)
+
+  // TODO: parse Diagram based on resourceAAS
 
   export default {
     name: 'DashboardResourceStatistics',
     components: { NoItemAvailableNote, Pie },
     computed: {
+      ...mapGetters(['resourceAAS']),
       platform_resources() {
         return this.aas.filter(aas => aas.asset == this.target_asset)
       },
@@ -224,6 +228,9 @@
           maintainAspectRatio: false
         }
       }
+    },
+    mounted () {
+      this.$store.dispatch('getResourceAASFromBackend')
     },
     methods: {
       addFilterValue(value) {
