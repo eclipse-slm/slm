@@ -25,6 +25,7 @@
       this.$store.dispatch('getServiceInstanceGroups')
       this.$store.dispatch('getDeploymentCapabilities')
       this.$store.dispatch('getResourcesFromBackend')
+      this.$store.dispatch('getResourceAASFromBackend')
       this.$store.dispatch('getLocations')
       this.$store.dispatch('getProfiler')
       this.$store.dispatch('getCluster')
