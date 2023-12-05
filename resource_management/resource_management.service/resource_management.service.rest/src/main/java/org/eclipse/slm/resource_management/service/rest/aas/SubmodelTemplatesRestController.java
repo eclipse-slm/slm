@@ -6,6 +6,8 @@ import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
 import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
+import org.eclipse.basyx.submodel.metamodel.connected.ConnectedSubmodel;
+import org.eclipse.basyx.submodel.metamodel.map.Submodel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,9 +45,20 @@ public class SubmodelTemplatesRestController {
         List<AssetAdministrationShell> aasList = new ArrayList<>();
 
         for(AASDescriptor aasd : resourceAASDescriptors) {
-            aasList.add(aasManager.retrieveAAS(aasd.getIdentifier()).getLocalCopy());
-        }
+            Collection<Submodel> submodels = aasManager.retrieveSubmodels(aasd.getIdentifier())
+                    .entrySet()
+                    .stream()
+                    .collect((Collectors.toMap(
+                            Map.Entry::getKey,
+                            e -> ((ConnectedSubmodel) e.getValue()).getLocalCopy()
+                    )))
+                    .values();
 
+            aasList.add(new ResourceAASInclSubmodels(
+                    aasManager.retrieveAAS(aasd.getIdentifier()).getLocalCopy(),
+                    submodels
+            ));
+        }
         return aasList;
     }
 
