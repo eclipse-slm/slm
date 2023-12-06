@@ -1,0 +1,71 @@
+### Inputs
+- name: "Assert inputs of 'vault/client | configure_keycloak_jwt_auth_method.yml'"
+  assert:
+    that:
+      - (VAULT_URL is defined) and (VAULT_URL|length > 0)                       # URL of the Vault instance
+      - (_vault_token is defined) and (_vault_token|length > 0)                 # Token to authenticate with Vault
+      - (_mount_auth_path is defined) and (_mount_auth_path|length > 0)         # Mount path of the auth method
+      - (_oidc_discovery_url is defined) and (_oidc_discovery_url|length > 0)   # OIDC discovery URL
+    fail_msg: "Variable must be defined and not empty"
+
+- name: "Mount auth path '{{ _mount_auth_path }}'"
+  uri:
+    url: "{{ VAULT_URL }}/v1/sys/auth/{{ _mount_auth_path }}"
+    validate_certs: no
+    method: POST
+    headers:
+      Authorization: "Bearer {{ _vault_token }}"
+    body_format: json
+    body:
+      type: jwt
+    status_code: 204, 400
+  register: output__mount_auth_path
+  changed_when: output__mount_auth_path.status == 204
+
+- name: "Set base url for auth path '{{ _mount_auth_path }}'"
+  set_fact:
+    base_url: "{{ VAULT_URL }}/v1/auth/{{ _mount_auth_path }}"
+
+- debug:
+    var: _oidc_discovery_url
+
+- name: "Create config for auth path '{{ _mount_auth_path }}'"
+  uri:
+    url: "{{ base_url }}/config"
+    validate_certs: no
+    method: POST
+    headers:
+      Authorization: "Bearer {{ _vault_token }}"
+    body_format: json
+    body:
+      oidc_discovery_url: "{{ _oidc_discovery_url }}"
+      oidc_discovery_ca_pem: "{{ oidc_discovery_ca_pem | default('') }}"
+      oidc_client_id: "{{ oidc_client_id | default('') }}"
+      bound_issuer: "{{ bound_issuer | default('') }}"
+    status_code: 204
+
+- name: "Create default role for auth path '{{ _mount_auth_path }}'"
+  uri:
+    url: "{{ base_url }}/role/default"
+    validate_certs: no
+    method: POST
+    headers:
+      Authorization: "Bearer {{ _vault_token }}"
+    body_format: json
+    body:
+      name: default
+      role_type: jwt
+      token_ttl: 3600
+      token_max_ttl: 3600
+      user_claim: sub
+      bound_audiences:
+        - "ui"
+        - "resource-management"
+        - "service-management"
+      claim_mappings:
+        preferred_username: username
+        email: email
+      allowed_redirect_uris:
+        - "*"
+      groups_claim: "/realm_access/roles"
+    status_code: 200,204

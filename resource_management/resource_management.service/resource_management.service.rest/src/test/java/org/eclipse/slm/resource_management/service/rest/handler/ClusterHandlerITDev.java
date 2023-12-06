@@ -174,7 +174,7 @@ public class ClusterHandlerITDev {
     public ClusterHandlerITDev(
             MultiTenantKeycloakRegistration multiTenantKeycloakRegistration,
             ResourcesConsulClient resourcesConsulClient
-    ) {
+    ) throws IOException {
         ClusterHandlerITDev.resourcesConsulClient = resourcesConsulClient;
         multiTenantKeycloakRegistration.init();
     }

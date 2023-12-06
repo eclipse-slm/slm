@@ -39,16 +39,12 @@ jobs:
     strategy:
       matrix:
         service:
-          - common-database-mariadb
-#          - aas-broker
+          - aas-broker
+          - aas-gui
           - awx-postgres
-          - awx-init
           - consul
-          - consul-init
           - keycloak
-          - keycloak-init
           - vault
-          - vault-init
           - prometheus
           - config-exporter
     steps:

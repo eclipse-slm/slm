@@ -1,0 +1,230 @@
+version: '3'
+
+services:
+
+  ui:
+    image: "ghcr.io/eclipse-slm/slm/ui:1.4.0-SNAPSHOT"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    ports:
+      - "8080:80"
+    networks:
+      default:
+        aliases:
+          - ui
+    extra_hosts:
+      - "ipa-wn1152:172.17.0.1"
+    environment:
+      KEYCLOAK_URL: "http://ipa-wn1152:7080/auth"
+      AWX_URL: "http://ipa-wn1152:8013"
+      BASYX_AAS_GUI_URL: "http://ipa-wn1152:3000"
+      CONSUL_TOKEN: "7fnwPPu:GJNq0-nvKrrt"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:8080" ]
+
+  resource-management:
+    image: "ghcr.io/eclipse-slm/slm/resource-management:1.4.0-SNAPSHOT"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    environment:
+      CONSUL_SCHEME: "http"
+      CONSUL_HOST: "ipa-wn1152"
+      CONSUL_PORT: "8500"
+      CONSUL_ACLTOKEN: "7fnwPPu:GJNq0-nvKrrt"
+      KEYCLOAK_AUTHSERVERURL: "http://ipa-wn1152:7080/auth"
+      BASYX_AASREGISTRY_URL: "http://ipa-wn1152:4000/registry"
+      BASYX_AASSERVER_URL: "http://ipa-wn1152:4001/aasServer"
+      MONITORING_SERVICE_URL: "http://ipa-wn1152:9080"
+      SERVER_MAXHTTPHEADERSIZE: 100KB
+    ports:
+      - "9010:9010"
+    networks:
+      default:
+        aliases:
+          - resource-management
+    extra_hosts:
+      - "ipa-wn1152:172.17.0.1"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:9010/swagger-ui/index.html" ]
+
+  resource-management-database:
+    image: "mariadb:10.5"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    ports:
+      - "3310:3306"
+    networks:
+      default:
+        aliases:
+          - resource-management-database
+    environment:
+      MARIADB_ROOT_PASSWORD: "_KbJf3Ta66gqbnRMNoB,"
+      MARIADB_USER: "resource_management"
+      MARIADB_PASSWORD: ".zMD94T3,zeq-Qj.PA2V"
+      MARIADB_DATABASE: resources
+    volumes:
+      - resource-management-database_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+
+  resource-management-init:
+    image: "ghcr.io/eclipse-slm/slm/resource-management-init:1.4.0-SNAPSHOT"
+    restart: "no"
+    depends_on:
+      - resource-management
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    environment:
+      KEYCLOAK_AUTHSERVERURL: "http://ipa-wn1152:7080/auth"
+      KEYCLOAK_REALM: "fabos"
+      KEYCLOAK_USERNAME: "{{ keycloak_default_user.username }}"
+      KEYCLOAK_PASSWORD: "{{ keycloak_default_user.credentials[0].value }}"
+      CONSUL_ACL_TOKEN: "7fnwPPu:GJNq0-nvKrrt"
+    extra_hosts:
+      - "ipa-wn1152:172.17.0.1"
+
+  service-management:
+    image: "ghcr.io/eclipse-slm/slm/service-management:1.4.0-SNAPSHOT"
+    restart: unless-stopped
+    depends_on:
+      - service-management-database
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    environment:
+      CONSUL_SCHEME: "http"
+      CONSUL_HOST: "ipa-wn1152"
+      CONSUL_PORT: "8500"
+      CONSUL_ACLTOKEN: "7fnwPPu:GJNq0-nvKrrt"
+      KEYCLOAK_AUTHSERVERURL: "http://ipa-wn1152:7080/auth"
+      GIT_SERVICEOFFERINGIMPORTER_UPDATERINTERVALMINUTES: "15"
+      BASYX_AASREGISTRY_URL: "http://ipa-wn1152:4000/registry"
+      BASYX_AASSERVER_URL: "http://ipa-wn1152:4001/aasServer"
+      SERVICEMANAGEMENT_URL: "http://ipa-wn1152:9020"
+      SERVER_MAXHTTPHEADERSIZE: 100KB
+    ports:
+      - "9020:9020"
+    networks:
+      default:
+        aliases:
+          - service-management
+    extra_hosts:
+      - "ipa-wn1152:172.17.0.1"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:9020/swagger-ui/index.html" ]
+
+  service-management-init:
+    image: "ghcr.io/eclipse-slm/slm/service-management-init:1.4.0-SNAPSHOT"
+    restart: "no"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    extra_hosts:
+      - "ipa-wn1152:172.17.0.1"
+    environment:
+      SERVICEMANAGEMENT_INITDIRECTORIES: ""
+      SERVICEMANAGEMENT_GITREPOS_URLS: "https://github.com/FabOS-AI/fabos-slm-service-registry-content.git"
+      KEYCLOAK_AUTHSERVERURL: "http://ipa-wn1152:7080/auth"
+      KEYCLOAK_REALM: "fabos"
+      KEYCLOAK_USERNAME: "{{ keycloak_default_user.username }}"
+      KEYCLOAK_PASSWORD: "{{ keycloak_default_user.credentials[0].value }}"
+
+  service-management-database:
+    image: "mariadb:10.5"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    ports:
+      - "3320:3306"
+    networks:
+      default:
+        aliases:
+          - service-management-database
+    environment:
+      MARIADB_ROOT_PASSWORD: "TGmwticbwbLPyV09sXmF"
+      MARIADB_USER: "service_management"
+      MARIADB_PASSWORD: "nTRQbk.O_980sxUvxr00"
+      MARIADB_DATABASE: services
+    volumes:
+      - service-management-database_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+
+  notification-service:
+    image: "ghcr.io/eclipse-slm/slm/notification-service:1.4.0-SNAPSHOT"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    ports:
+      - "9001:9001"
+    environment:
+      CONSUL_SCHEME: "http"
+      CONSUL_HOST: "ipa-wn1152"
+      CONSUL_PORT: "8500"
+      CONSUL_ACLTOKEN: "7fnwPPu:GJNq0-nvKrrt"
+      KEYCLOAK_AUTHSERVERURL: "http://ipa-wn1152:7080/auth"
+    networks:
+      default:
+        aliases:
+          - notification-service
+    extra_hosts:
+      - "ipa-wn1152:172.17.0.1"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:9001/swagger-ui/index.html" ]
+
+  notification-service-database:
+    image: "mariadb:10.5"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    ports:
+      - "3301:3306"
+    networks:
+      default:
+        aliases:
+          - notification-service-database
+    environment:
+      MARIADB_ROOT_PASSWORD: "K:dTK-GL21SmO0J9YrXm"
+      MARIADB_USER: "notification_service"
+      MARIADB_PASSWORD: "1IJlxebXGb19sTsQGYnU"
+      MARIADB_DATABASE: notifications
+    volumes:
+      - notification-service-database_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+
+networks:
+  default:
+
+volumes:
+  notification-service-database_data:
+  resource-management-database_data:
+  service-management-database_data:

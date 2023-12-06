@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+  keycloak:
+    image: "ghcr.io/eclipse-slm/keycloak:19.0.2"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    ports:
+      - "7080:8080"
+    depends_on:
+      - keycloak-database
+    environment:
+      KC_HOSTNAME: "ipa-wn1152"
+      KC_DB_HOST: "keycloak-database"
+      KC_DB_URL_HOST: "keycloak-database"
+      KC_DB_SCHEMA: "keycloak"
+      KC_DB_USERNAME: "keycloak"
+      KC_DB_PASSWORD: "YTZTB6q2g6kmcPGdExL5"
+      KEYCLOAK_ADMIN: "admin"
+      KEYCLOAK_ADMIN_PASSWORD: "password"
+      KC_HTTP_RELATIVE_PATH: "/auth"
+    networks:
+      default:
+        aliases:
+          - 'keycloak'
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:8080/auth" ]
+
+  keycloak-database:
+    image: "mariadb:10.5"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    volumes:
+      - keycloak-database_data:/var/lib/mysql
+    ports:
+      - "4406:3306"
+    networks:
+      default:
+        aliases:
+          - keycloak-database
+    environment:
+      MARIADB_ROOT_PASSWORD: ".ymThHZGENN24PYh8JzK"
+      MARIADB_USER: "keycloak"
+      MARIADB_PASSWORD: "YTZTB6q2g6kmcPGdExL5"
+      MARIADB_DATABASE: "keycloak"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--silent"]
+
+volumes:
+  keycloak-database_data:

@@ -18,3 +18,4 @@ services:
     volumes:
       - C:\Users\maes\Daten\Dev\eclipse-slm\slm:/project
       - "./src:/src"
+      - "./templates:/templates"

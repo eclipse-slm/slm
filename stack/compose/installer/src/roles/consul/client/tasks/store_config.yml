@@ -1,0 +1,21 @@
+### Inputs
+- name: "Assert inputs of 'consul/client | store_config.yml'"
+  assert:
+    that:
+      - (CONSUL_SCHEME is defined) and (CONSUL_SCHEME|length > 0)               # Scheme of the Consul instance
+      - (CONSUL_HOST is defined) and (CONSUL_HOST|length > 0)                   # Host of the Consul instance
+      - (CONSUL_PORT is defined)                                                # Port of the Consul instance
+      - (_consul_token is defined) and (_consul_token|length > 0)               # Token to authenticate with Consul
+      - (_consul_kv_path is defined) and (_consul_kv_path|length > 0)           # KV Path where the config should be stored
+      - (_existing_dictionary is defined)                                       # Dictionary with existing values that should be store in Consul
+      - (_updated_values is defined) and (_updated_values|length > 0)           # Dictionary with values that should be updated in the existing dictionary
+
+- set_fact:
+    _existing_dictionary: "{{ _existing_dictionary | from_yaml | combine(_updated_values, recursive=true) }}"
+- name: "Store config in Consul"
+  community.general.consul_kv:
+    host: "{{ CONSUL_HOST }}"
+    port: "{{ CONSUL_PORT }}"
+    token: "{{ _consul_token }}"
+    key: "{{ _consul_kv_path }}"
+    value: "{{ _existing_dictionary | to_yaml }}"

@@ -42,9 +42,10 @@ spring:
     name: resource_management
   main:
     allow-bean-definition-overriding: true
+  config:
+    import: "consul:"
   cloud:
     consul:
-      enabled: false
       host: ${consul.host}
       port: ${consul.port}
       discovery:
@@ -53,6 +54,12 @@ spring:
         acl-token: ${consul.acl-token}
         prefer-ip-address: true
         register-health-check: true
+      config:
+        enabled: true
+        fail-fast: true
+        profileSeparator: '::'
+        format: YAML
+        acl-token: ${consul.acl-token}
   security:
     user:
       name: "user"
@@ -83,9 +90,9 @@ notification-service:
 ### Keycloak
 keycloak:
   config:
-    auth-white-list: "/broker/resource-manager/**"
+    auth-white-list:
     tenants:
-      config-path: keycloak/
+      config-path: consul:keycloak
       client-registration-enable: false
       client-update-enable: false
       resolve-by-path: true

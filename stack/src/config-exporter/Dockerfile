@@ -12,4 +12,4 @@ WORKDIR src
 
 RUN ansible-galaxy install -r requirements.yml
 
-CMD ansible-playbook main.yml
+CMD ansible-playbook main.yml -v

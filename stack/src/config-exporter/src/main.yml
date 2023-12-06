@@ -4,75 +4,95 @@
   vars:
     ansible_python_interpreter: /usr/bin/python3
   tasks:
-    - set_fact:
+    - name: "Load common config"
+      set_fact:
         configure_core_project: "{{ lookup('env', 'CONFIGURE_CORE_PROJECT') }}"
         target_host: "{{ lookup('env', 'SLM_HOSTNAME') }}"
         local_host: "{{ lookup('env', 'LOCAL_HOST') }}"
 
-    - set_fact:
-        discovery_enabled: "{{ lookup('env', 'DISCOVERY_ENABLED') }}"
-        keycloak_auth_server_url: "http://{{ lookup('env', 'SLM_HOSTNAME') }}:7080/auth"
-        awx_scheme: "http"
-        awx_hostname: "{{ lookup('env', 'SLM_HOSTNAME') }}"
-        awx_port:  "{{ lookup('env', 'AWX_PORT_HTTP') }}"
-        awx_notification_service_username: "{{ lookup('file', '/config/awx/notification-service/awx_username') }}"
-        awx_notification_service_password: "{{ lookup('file', '/config/awx/notification-service/awx_password') }}"
-        awx_resource_management_username: "{{ lookup('file', '/config/awx/resource-management/awx_username') }}"
-        awx_resource_management_password: "{{ lookup('file', '/config/awx/resource-management/awx_password') }}"
-        awx_service_management_username: "{{ lookup('file', '/config/awx/service-management/awx_username') }}"
-        awx_service_management_password: "{{ lookup('file', '/config/awx/service-management/awx_password') }}"
-        consul_scheme: "http"
-        consul_hostname: "{{ target_host }}"
-        consul_token: "{{ lookup('env', 'CONSUL_TOKEN') }}"
+    - name: "Load Consul config"
+      set_fact:
         consul_scheme: "{{ lookup('env', 'CONSUL_SCHEME') }}"
         consul_host: "{{ lookup('env', 'CONSUL_HOST') }}"
         consul_port: "{{ lookup('env', 'CONSUL_PORT') }}"
-        consul_master_token: "{{ lookup('file', '/config/consul/root/consul_master_token') }}"
-        consul_resource_management_token: "{{ lookup('file', '/config/consul/resource-management/consul_token') }}"
-        consul_service_management_token: "{{ lookup('file', '/config/consul/service-management/consul_token') }}"
-        vault_scheme: "http"
-        vault_hostname: "{{ target_host }}"
-        vault_port: "{{ lookup('env', 'VAULT_PORT') }}"
-        vault_root_token: "{{ lookup('file', '/config/vault/root/root_token') }}"
-        vault_resource_management_app_role_id: "{{ lookup('file', '/config/vault/resource-management/role_id') }}"
-        vault_resource_management_app_secret_id: "{{ lookup('file', '/config/vault/resource-management/secret_id') }}"
-        vault_service_management_app_role_id: "{{ lookup('file', '/config/vault/service-management/role_id') }}"
-        vault_service_management_app_secret_id: "{{ lookup('file', '/config/vault/service-management/secret_id') }}"
-        resource_management_scheme: "http"
-        resource_management_host: "{{ target_host }}"
-        resource_management_port: "{{ lookup('env', 'RESOURCE_MANAGEMENT_PORT') }}"
-        resource_management_database_user: "{{ lookup('file', '/config/resource-management/database/user') }}"
-        resource_management_database_password: "{{ lookup('file', '/config/resource-management/database/password') }}"
-        resource_management_database_schema: "{{ lookup('file', '/config/resource-management/database/schema') }}"
-        service_management_scheme: "http"
-        service_management_host: "{{ target_host }}"
-        service_management_port: "{{ lookup('env', 'SERVICE_MANAGEMENT_PORT') }}"
-        service_management_database_user: "{{ lookup('file', '/config/service-management/database/user') }}"
-        service_management_database_password: "{{ lookup('file', '/config/service-management/database/password') }}"
-        service_management_database_schema: "{{ lookup('file', '/config/service-management/database/schema') }}"
-        notification_service_scheme: "http"
-        notification_service_host: "{{ target_host }}"
-        notification_service_port: "{{ lookup('env', 'NOTIFICATION_SERVICE_PORT') }}"
-        notification_service_database_user: "{{ lookup('file', '/config/notification-service/database/user') }}"
-        notification_service_database_password: "{{ lookup('file', '/config/notification-service/database/password') }}"
-        notification_service_database_schema: "{{ lookup('file', '/config/notification-service/database/schema') }}"
-        catalog_service_scheme: "http"
-        catalog_service_host: "{{ target_host }}"
-        catalog_service_port: "{{ lookup('env', 'SLM_CATALOG_SERVICE_PORT') }}"
-        catalog_service_database_user: "{{ lookup('file', '/config/catalog/database/user') }}"
-        catalog_service_database_password: "{{ lookup('file', '/config/catalog/database/password') }}"
-        catalog_service_database_schema: "{{ lookup('file', '/config/catalog/database/schema') }}"
-        monitoring_service_scheme: "http"
-        monitoring_service_host: "{{ lookup('env', 'SLM_HOSTNAME') }}"
-        monitoring_service_port: "{{ lookup('env', 'MONITORING_SERVICE_PORT') }}"
-    - set_fact:
-        awx_url: "{{awx_scheme}}://{{awx_hostname}}:{{awx_port}}"
-        resource_management_url: "{{resource_management_scheme}}://{{resource_management_host}}:{{resource_management_port}}"
-        service_management_url: "{{service_management_scheme}}://{{service_management_host}}:{{service_management_port}}"
-        notification_service_url: "{{notification_service_scheme}}://{{notification_service_host}}:{{notification_service_port}}"
-        catalog_service_url: "{{catalog_service_scheme}}://{{catalog_service_host}}:{{catalog_service_port}}"
-        monitoring_service_url: "{{monitoring_service_scheme}}://{{monitoring_service_host}}:{{monitoring_service_port}}"
+        consul_token: "{{ lookup('env', 'CONSUL_TOKEN') }}"
 
+    - name: retrieving a KV from a remote cluster on non default port
+      ansible.builtin.debug:
+        msg: "{{ lookup('community.general.consul_kv', 'config/resource_management/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) }}"
+
+    - set_fact:
+        keycloak_config: "{{ lookup('community.general.consul_kv', 'config/keycloak/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        awx_config: "{{ lookup('community.general.consul_kv', 'config/awx/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        consul_config: "{{ lookup('community.general.consul_kv', 'config/consul/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        vault_config: "{{ lookup('community.general.consul_kv', 'config/vault/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        resource_management_config: "{{ lookup('community.general.consul_kv', 'config/resource_management/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        resource_management_keycloak_config: "{{ lookup('community.general.consul_kv', 'config/resource_management/keycloak', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        service_management_config: "{{ lookup('community.general.consul_kv', 'config/service_management/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        service_management_keycloak_config: "{{ lookup('community.general.consul_kv', 'config/service_management/keycloak', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        notification_service_config: "{{ lookup('community.general.consul_kv', 'config/notification_service/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        notification_service_keycloak_config: "{{ lookup('community.general.consul_kv', 'config/notification_service/keycloak', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        catalog_service_config: "{{ lookup('community.general.consul_kv', 'config/catalog_service/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        monitoring_config: "{{ lookup('community.general.consul_kv', 'config/monitoring/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+
+#    - set_fact:
+#        discovery_enabled: "{{ lookup('env', 'DISCOVERY_ENABLED') }}"
+#        keycloak_auth_server_url: "http://{{ lookup('env', 'SLM_HOSTNAME') }}:7080/auth"
+#        awx_scheme: "http"
+#        awx_hostname: "{{ lookup('env', 'SLM_HOSTNAME') }}"
+#        awx_port:  "{{ lookup('env', 'AWX_PORT') }}"
+#        awx_notification_service_username: "{{ lookup('file', '/config/awx/notification-service/awx_username') }}"
+#        awx_notification_service_password: "{{ lookup('file', '/config/awx/notification-service/awx_password') }}"
+#        awx_resource_management_username: "{{ lookup('file', '/config/awx/resource-management/awx_username') }}"
+#        awx_resource_management_password: "{{ lookup('file', '/config/awx/resource-management/awx_password') }}"
+#        awx_service_management_username: "{{ lookup('file', '/config/awx/service-management/awx_username') }}"
+#        awx_service_management_password: "{{ lookup('file', '/config/awx/service-management/awx_password') }}"
+#        consul_master_token: "{{ lookup('file', '/config/consul/root/consul_master_token') }}"
+#        consul_resource_management_token: "{{ lookup('file', '/config/consul/resource-management/consul_token') }}"
+#        consul_service_management_token: "{{ lookup('file', '/config/consul/service-management/consul_token') }}"
+#        vault_scheme: "http"
+#        vault_hostname: "{{ target_host }}"
+#        vault_port: "{{ lookup('env', 'VAULT_PORT') }}"
+#        vault_root_token: "{{ lookup('file', '/config/vault/root/root_token') }}"
+#        vault_resource_management_app_role_id: "{{ lookup('file', '/config/vault/resource-management/role_id') }}"
+#        vault_resource_management_app_secret_id: "{{ lookup('file', '/config/vault/resource-management/secret_id') }}"
+#        vault_service_management_app_role_id: "{{ lookup('file', '/config/vault/service-management/role_id') }}"
+#        vault_service_management_app_secret_id: "{{ lookup('file', '/config/vault/service-management/secret_id') }}"
+#        resource_management_scheme: "http"
+#        resource_management_host: "{{ target_host }}"
+#        resource_management_port: "{{ lookup('env', 'RESOURCE_MANAGEMENT_PORT') }}"
+#        resource_management_database_user: "{{ lookup('file', '/config/resource-management/database/user') }}"
+#        resource_management_database_password: "{{ lookup('file', '/config/resource-management/database/password') }}"
+#        resource_management_database_schema: "{{ lookup('file', '/config/resource-management/database/schema') }}"
+#        service_management_scheme: "http"
+#        service_management_host: "{{ target_host }}"
+#        service_management_port: "{{ lookup('env', 'SERVICE_MANAGEMENT_PORT') }}"
+#        service_management_database_user: "{{ lookup('file', '/config/service-management/database/user') }}"
+#        service_management_database_password: "{{ lookup('file', '/config/service-management/database/password') }}"
+#        service_management_database_schema: "{{ lookup('file', '/config/service-management/database/schema') }}"
+#        notification_service_scheme: "http"
+#        notification_service_host: "{{ target_host }}"
+#        notification_service_port: "{{ lookup('env', 'NOTIFICATION_SERVICE_PORT') }}"
+#        notification_service_database_user: "{{ lookup('file', '/config/notification-service/database/user') }}"
+#        notification_service_database_password: "{{ lookup('file', '/config/notification-service/database/password') }}"
+#        notification_service_database_schema: "{{ lookup('file', '/config/notification-service/database/schema') }}"
+#        catalog_service_scheme: "http"
+#        catalog_service_host: "{{ target_host }}"
+#        catalog_service_port: "{{ lookup('env', 'SLM_CATALOG_SERVICE_PORT') }}"
+#        catalog_service_database_user: "{{ lookup('file', '/config/catalog/database/user') }}"
+#        catalog_service_database_password: "{{ lookup('file', '/config/catalog/database/password') }}"
+#        catalog_service_database_schema: "{{ lookup('file', '/config/catalog/database/schema') }}"
+#        monitoring_service_scheme: "http"
+#        monitoring_service_host: "{{ lookup('env', 'SLM_HOSTNAME') }}"
+#        monitoring_service_port: "{{ lookup('env', 'MONITORING_SERVICE_PORT') }}"
+#    - set_fact:
+#        awx_url: "{{awx_scheme}}://{{awx_hostname}}:{{awx_port}}"
+#        resource_management_url: "{{resource_management_scheme}}://{{resource_management_host}}:{{resource_management_port}}"
+#        service_management_url: "{{service_management_scheme}}://{{service_management_host}}:{{service_management_port}}"
+#        notification_service_url: "{{notification_service_scheme}}://{{notification_service_host}}:{{notification_service_port}}"
+#        catalog_service_url: "{{catalog_service_scheme}}://{{catalog_service_host}}:{{catalog_service_port}}"
+#        monitoring_service_url: "{{monitoring_service_scheme}}://{{monitoring_service_host}}:{{monitoring_service_port}}"
+#
     - name: "Ensures /project/_config_generated dir exists"
       file:
         path: "{{ item }}"
@@ -80,6 +100,9 @@
       loop:
         - "/project/_config_generated"
         - "/project/_config_generated/keycloak"
+        - "/project/_config_generated/keycloak/notification-service"
+        - "/project/_config_generated/keycloak/resource-management"
+        - "/project/_config_generated/keycloak/service-management"
 
     - name: "Copy slm-config, insomnia-env, postman-env"
       template:
@@ -88,55 +111,53 @@
       with_items:
        - src: /templates/slm-config.yml
          dest: /project/_config_generated/slm-config.yml
-       - src: /templates/insomnia-env.json
-         dest: /project/_config_generated/insomnia-env.json
-       - src: /templates/postman-env.json
-         dest: /project/_config_generated/postman-env.json
-
+#       - src: /templates/postman-env.json
+#         dest: /project/_config_generated/postman-env.json
+#
     - name: "Copy Keycloak config files"
       copy:
-        src: "{{ item.src }}"
+        content: "{{ item.content }}"
         dest: "{{ item.dest }}"
       with_items:
-        - src: /config/keycloak/notification-service/
-          dest: /project/_config_generated/keycloak/notification-service/
-        - src: /config/keycloak/resource-management/
-          dest: /project/_config_generated/keycloak/resource-management/
-        - src: /config/keycloak/service-management/
-          dest: /project/_config_generated/keycloak/service-management/
-
-
-    - name: "Copy application properties"
-      template:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
-      with_items:
-        - src: /templates/notification-service/application.yml
-          dest: /project/notification_service/notification_service.service/notification_service.service.rest/src/main/resources/application.yml
-        - src: /templates/resource-management/application.yml
-          dest: /project/resource_management/resource_management.service/resource_management.service.rest/src/main/resources/application.yml
-        - src: /templates/resource-management-initializer/application.yml
-          dest: /project/resource_management/resource_management.service/resource_management.service.initializer/src/main/resources/application.yml
-        - src: /templates/service-management/application.yml
-          dest: /project/service_management/service_management.service/service_management.service.rest/src/main/resources/application.yml
-        - src: /templates/service-management-initializer/application.yml
-          dest: /project/service_management/service_management.service/service_management.service.initializer/src/main/resources/application.yml
-        - src: /templates/catalog/application.yml
-          dest: /project/catalog/catalog.service/catalog.service.app/src/main/resources/application.yml
-        - src: /templates/ui/.env
-          dest: /project/ui/.env
-      when: configure_core_project|default(false)|bool == true
-      ignore_errors: true
-
-    - name: "Copy Keycloak configs"
-      copy:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
-      with_items:
-        - src: /config/keycloak/notification-service/
-          dest: /project/notification_service/notification_service.service/notification_service.service.rest/src/main/resources/keycloak
-        - src: /config/keycloak/resource-management/
-          dest: /project/resource_management/resource_management.service/resource_management.service.rest/src/main/resources/keycloak
-        - src: /config/keycloak/service-management/
-          dest: /project/service_management/service_management.service/service_management.service.rest/src/main/resources/keycloak
-      when: configure_core_project|default(false)|bool == true
+        - content: "{{ notification_service_keycloak_config }}"
+          dest: /project/_config_generated/keycloak/notification-service/keycloak.json
+        - content: "{{ resource_management_keycloak_config }}"
+          dest: /project/_config_generated/keycloak/resource-management/keycloak.json
+        - content: "{{ service_management_keycloak_config }}"
+          dest: /project/_config_generated/keycloak/service-management/keycloak.json
+#
+#
+#    - name: "Copy application properties"
+#      template:
+#        src: "{{ item.src }}"
+#        dest: "{{ item.dest }}"
+#      with_items:
+#        - src: /templates/notification-service/application.yml
+#          dest: /project/notification_service/notification_service.service/notification_service.service.rest/src/main/resources/application.yml
+#        - src: /templates/resource-management/application.yml
+#          dest: /project/resource_management/resource_management.service/resource_management.service.rest/src/main/resources/application.yml
+#        - src: /templates/resource-management-initializer/application.yml
+#          dest: /project/resource_management/resource_management.service/resource_management.service.initializer/src/main/resources/application.yml
+#        - src: /templates/service-management/application.yml
+#          dest: /project/service_management/service_management.service/service_management.service.rest/src/main/resources/application.yml
+#        - src: /templates/service-management-initializer/application.yml
+#          dest: /project/service_management/service_management.service/service_management.service.initializer/src/main/resources/application.yml
+#        - src: /templates/catalog/application.yml
+#          dest: /project/catalog/catalog.service/catalog.service.app/src/main/resources/application.yml
+#        - src: /templates/ui/.env
+#          dest: /project/ui/.env
+#      when: configure_core_project|default(false)|bool == true
+#      ignore_errors: true
+#
+#    - name: "Copy Keycloak configs"
+#      copy:
+#        src: "{{ item.src }}"
+#        dest: "{{ item.dest }}"
+#      with_items:
+#        - src: /config/keycloak/notification-service/
+#          dest: /project/notification_service/notification_service.service/notification_service.service.rest/src/main/resources/keycloak
+#        - src: /config/keycloak/resource-management/
+#          dest: /project/resource_management/resource_management.service/resource_management.service.rest/src/main/resources/keycloak
+#        - src: /config/keycloak/service-management/
+#          dest: /project/service_management/service_management.service/service_management.service.rest/src/main/resources/keycloak
+#      when: configure_core_project|default(false)|bool == true

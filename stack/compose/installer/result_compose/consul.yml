@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+
+  consul:
+    image: "consul:1.14.5"
+    restart: unless-stopped
+    command: "consul agent -server -bootstrap-expect 1 -ui -bind=0.0.0.0 -client=0.0.0.0 -advertise 172.17.0.1 -data-dir=/consul/data -config-dir=/consul/config"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    environment:
+      CONSUL_LOCAL_CONFIG: '{"datacenter": "fabos", "domain": ".consul", "bind_addr": "0.0.0.0", "retry_join": ["0.0.0.0"], "retry_interval": "30s", "retry_max": 0, "encrypt": "PDfibAdpofFo2mpIvwwQEtuo5+Z7RmMR9CLGvBWSjK0=", "verify_incoming": false, "verify_outgoing": false, "verify_server_hostname": false, "ui_config": {"enabled": true}, "acl": {"enabled": true, "default_policy": "deny", "down_policy": "extend-cache", "enable_token_persistence": true, "enable_token_replication": true, "tokens": {"master": "7fnwPPu:GJNq0-nvKrrt"}}}'
+    networks:
+      default:
+        aliases:
+          - consul
+    ports:
+      - "8500:8500"
+      - "8300:8300"
+      - "8301:8301"
+    volumes:
+      - consul_data:/consul/data
+    extra_hosts:
+      - "ipa-wn1152:172.17.0.1"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:8500" ]
+
+  consul-esm:
+    image: "hashicorp/consul-esm:0.6.1"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    environment:
+      CONSUL_HTTP_ADDR: consul:8500
+    command: >
+      sh -c "export CONSUL_HTTP_TOKEN=$$(cat /consul/consul_master_token) && consul-esm"
+    extra_hosts:
+      - "ipa-wn1152:172.17.0.1"
+
+volumes:
+  consul_data:

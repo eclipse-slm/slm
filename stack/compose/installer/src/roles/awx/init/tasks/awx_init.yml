@@ -1,0 +1,84 @@
+### Inputs
+- name: "Assert inputs of 'awx/init | awx_init.yml'"
+  assert:
+    that:
+      - (AWX_URL is defined) and (AWX_URL|length > 0)
+      - (_awx_admin_username is defined) and (_awx_admin_username|length > 0)
+      - (_awx_admin_password is defined) and (_awx_admin_password|length > 0)
+      - (_consul_token is defined) and (_consul_token|length > 0)
+      - (_awx_consul_token is defined) and (_awx_consul_token|length > 0)
+
+- set_fact:
+    _consul_kv_path: "config/awx/data"
+
+- name: "Create Vault App Roles"
+  include_role:
+    name: vault/client
+    tasks_from: create_approle_with_policies.yml
+  vars:
+    _approle_name: "{{ approle.name }}"
+    _approle_policies: "{{ approle.policies }}"
+  loop: "{{ vault_approles }}"
+  loop_control:
+    loop_var: approle
+
+- debug:
+    var: _awx_admin_username
+
+- debug:
+    var: _awx_admin_password
+
+- name: "Remove organization"
+  awx.awx.organization:
+    controller_host: "{{ AWX_URL }}"
+    controller_username: "{{ _awx_admin_username }}"
+    controller_password: "{{ _awx_admin_password }}"
+    name: "Self Service Portal"
+    description: ""
+    state: absent
+
+- name: "Add organization"
+  awx.awx.organization:
+    controller_host: "{{ AWX_URL }}"
+    controller_username: "{{ _awx_admin_username }}"
+    controller_password: "{{ _awx_admin_password }}"
+    name: "{{ awx_slm_organization_name }}"
+    description: ""
+    state: present
+
+- name: "Create default inventory"
+  awx.awx.inventory:
+    controller_host: "{{ AWX_URL }}"
+    controller_username: "{{ _awx_admin_username }}"
+    controller_password: "{{ _awx_admin_password }}"
+    name: "Default"
+    description: "Default Inventory"
+    organization: "{{ awx_slm_organization_name }}"
+    state: present
+
+- name: "Remove demo data"
+  import_tasks: awx_remove_demo_data.yml
+
+- name: "Add credential types"
+  awx.awx.credential_type:
+    controller_host: "{{ AWX_URL }}"
+    controller_username: "{{ _awx_admin_username }}"
+    controller_password: "{{ _awx_admin_password }}"
+    name: "{{ item.name }}"
+    kind: cloud
+    inputs: "{{ item.inputs }}"
+    injectors: "{{ item.injectors }}"
+    state: present
+    validate_certs: false
+  with_items: "{{ awx_credential_types }}"
+
+- name: "Add credentials"
+  awx.awx.credential:
+    controller_host: "{{ AWX_URL }}"
+    controller_username: "{{ _awx_admin_username }}"
+    controller_password: "{{ _awx_admin_password }}"
+    name: "{{ item.name }}"
+    credential_type: "{{ item.credential_type }}"
+    organization: "{{ awx_slm_organization_name }}"
+    inputs: "{{ item.inputs }}"
+  with_items: "{{ awx_credentials }}"

@@ -1,0 +1,18 @@
+### Inputs
+- name: "Assert inputs of 'consul/client | add_consul_config_in_consul.yml'"
+  assert:
+    that:
+      - (CONSUL_SCHEME is defined) and (CONSUL_SCHEME|length > 0)     # Scheme of the Consul instance
+      - (CONSUL_HOST is defined) and (CONSUL_HOST|length > 0)         # Host of the Consul instance
+      - (CONSUL_PORT is defined)                                      # Port of the Consul instance
+      - (_consul_token is defined) and (_consul_token|length > 0)     # Token to authenticate with Consul
+      - (_consul_kv_path is defined) and (_consul_kv_path|length > 0) # KV Path where the config should be stored
+
+- name: "Add common Consul config in Consul to '{{ _consul_kv_path }}'"
+  include_tasks: create_or_add_config.yml
+  vars:
+    _config:
+      consul:
+        scheme: '{{ CONSUL_SCHEME }}'
+        host: '{{ CONSUL_HOST}}'
+        port: '{{ CONSUL_PORT}}'

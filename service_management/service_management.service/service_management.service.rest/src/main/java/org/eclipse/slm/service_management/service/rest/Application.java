@@ -37,9 +37,6 @@ import javax.transaction.Transactional;
 @EnableConfigurationProperties
 public class Application {
 
-    @Autowired
-    private MyProperties properties;
-
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }

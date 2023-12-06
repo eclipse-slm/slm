@@ -1,0 +1,65 @@
+version: '3'
+
+services:
+  aas-registry:
+    image: "eclipsebasyx/aas-registry:{{ AAS_BASYX_VERSION }}"
+    restart: always
+    depends_on:
+      - aas-database
+      - aas-server
+      - aas-gui
+    networks:
+      default:
+        aliases:
+          - aas-registry
+    ports:
+      - "4000:4000"
+    environment:
+      basyxregistry_registry_backend: MongoDB
+      basyxmongodb_dbconnectionstring: mongodb://aas-database:27017/
+      basyxcontext_accesscontrolalloworigin: "*"
+
+  aas-server:
+    image: "eclipsebasyx/aas-server:{{ AAS_BASYX_VERSION }}"
+    restart: always
+    depends_on:
+      - aas-database
+    networks:
+      default:
+        aliases:
+          - aas-server
+    ports:
+      - "4001:4001"
+    environment:
+      basyxaas_registry_path: http://aas-registry:4000/registry/api/v1/registry
+      basyxaas_aas_backend: MongoDB
+      basyxaas_aas_aasxupload: Enabled
+      basyxaas_registry_host: http://{{ SLM_HOSTNAME }}:4001/aasServer
+      basyxmongodb_dbconnectionstring: mongodb://aas-database:27017/
+      basyxcontext_accesscontrolalloworigin: "*"
+      waiting_for: '[{"host":"aas-registry","port":"4000"}]'
+
+  aas-database:
+    image: mongo:latest
+    restart: always
+    networks:
+      default:
+        aliases:
+          - aas-database
+    volumes:
+      - "aas_database:/data/db"
+
+  aas-gui:
+    image: "ghcr.io/eclipse-slm/aas/gui:{{ AAS_GUI_VERSION }}"
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      VITE_REGISTRY_PATH: "http://{{ SLM_HOSTNAME }}:4000/registry"
+      VITE_AAS_SERVER_PATH: "http://{{ SLM_HOSTNAME }}:4001/aasServer"
+      VITE_PRIMARY_COLOR: "00A0E3"
+    volumes:
+      - "./config/aas-gui/logo:/app/src/assets/Logo"
+
+volumes:
+  aas_database:

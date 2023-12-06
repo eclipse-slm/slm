@@ -42,16 +42,23 @@ spring:
     name: service_management
   main:
     allow-bean-definition-overriding: true
+  config:
+    import: "consul:"
   cloud:
     consul:
       host: ${consul.host}
       port: ${consul.port}
       discovery:
-        ip-address: 172.17.0.1
         enabled: true
         acl-token: ${consul.acl-token}
-        prefer-ip-address: true
         register-health-check: true
+        hostname: ipa-wn1152
+      config:
+        enabled: true
+        fail-fast: true
+        profileSeparator: '::'
+        format: YAML
+        acl-token: ${consul.acl-token}
   security:
     user:
       name: "user"
@@ -96,9 +103,9 @@ resource-management:
 ### Keycloak
 keycloak:
   config:
-    auth-white-list:
+    auth-white-list: /actuator/health
     tenants:
-      config-path: keycloak/
+      config-path: consul:keycloak
       client-registration-enable: false
       client-update-enable: false
       resolve-by-path: true

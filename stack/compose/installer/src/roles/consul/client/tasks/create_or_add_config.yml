@@ -1,0 +1,34 @@
+### Inputs
+- name: "Assert inputs of 'consul/client | create_or_add_config.yml'"
+  assert:
+    that:
+      - (CONSUL_SCHEME is defined) and (CONSUL_SCHEME|length > 0)     # Scheme of the Consul instance
+      - (CONSUL_HOST is defined) and (CONSUL_HOST|length > 0)         # Host of the Consul instance
+      - (CONSUL_PORT is defined)                                      # Port of the Consul instance
+      - (_consul_token is defined) and (_consul_token|length > 0)     # Token to authenticate with Consul
+      - (_consul_kv_path is defined) and (_consul_kv_path|length > 0) # KV Path where the config should be stored
+      - (_config is defined) and (_config|length > 0)                 # Dictionary with config values that should be created or added to existing config
+
+- name: "Check if config exists in Consul"
+  block:
+    - community.general.consul_kv:
+        scheme: "{{ CONSUL_SCHEME }}"
+        host: "{{ CONSUL_HOST }}"
+        port: "{{ CONSUL_PORT }}"
+        token: "{{ _consul_token }}"
+        key: "{{ _consul_kv_path }}"
+      register: consul_response
+    - set_fact:
+        app_config_consul: "{{ consul_response.data.Value | from_yaml | default({}) }}"
+
+- name: "Combine existing config in Consul with config values that should be added"
+  set_fact:
+    _config_combined: "{{ app_config_consul | from_yaml | combine(_config, recursive=true) }}"
+
+- name: "Store config in Consul"
+  community.general.consul_kv:
+    host: "{{ CONSUL_HOST }}"
+    port: "{{ CONSUL_PORT }}"
+    token: "{{ _consul_token }}"
+    key: "{{ _consul_kv_path }}"
+    value: "{{ _config_combined | to_yaml }}"

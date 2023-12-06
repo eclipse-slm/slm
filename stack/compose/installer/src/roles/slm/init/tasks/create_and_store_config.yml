@@ -1,0 +1,86 @@
+- name: "Add Vault config in Consul"
+  include_role:
+    name: vault/client
+    tasks_from: add_vault_config_in_consul
+  vars:
+    _consul_kv_path: "config/{{ app_name }}/data"
+
+- name: "Add Consul config in Consul"
+  include_role:
+    name: consul/client
+    tasks_from: add_consul_config_in_consul
+  vars:
+    _consul_kv_path: "config/{{ app_name }}/data"
+
+- name: "Check if config exists in Consul"
+  block:
+  - community.general.consul_kv:
+      scheme: "{{ CONSUL_SCHEME }}"
+      host: "{{ CONSUL_HOST }}"
+      port: "{{ CONSUL_PORT }}"
+      token: "{{ _consul_token }}"
+      key: "config/{{ app_name }}/data"
+    register: consul_response
+  - set_fact:
+      app_config_consul: "{{ consul_response.data.Value | from_yaml | default({}) }}"
+
+- name: "Create or get passwords"
+  block:
+  - name: "Create passwords"
+    set_fact:
+      database_root_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
+      database_user_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
+    when: app_config_consul["database"] is not defined
+
+  - name: "Get passwords"
+    set_fact:
+      database_root_password: "{{ app_config_consul['database']['root_password'] }}"
+      database_user_password: "{{ app_config_consul['database']['password'] }}"
+    when:  app_config_consul["database"] is defined
+
+- name: "Store config in Consul"
+  block:
+  - set_fact:
+      app_config_consul: "{{ app_config_consul | from_yaml | combine(
+          { 'scheme': scheme,
+            'host': host,
+            'port': port,
+            'awx': {
+              'scheme': AWX_SCHEME,
+              'host': AWX_HOST,
+              'port': AWX_PORT,
+              'username': awx_config.users.admin.username,
+              'password': awx_config.users.admin.password
+            },
+            'database': {
+              'host': database_host,
+              'port': database_port,
+              'username': app_name,
+              'password': database_user_password,
+              'root_password': database_root_password
+            }
+          }, recursive=true) }}"
+  - name:
+    community.general.consul_kv:
+      host: "{{ CONSUL_HOST }}"
+      port: "{{ CONSUL_PORT }}"
+      token: "{{ _consul_token }}"
+      key: "config/{{ app_name }}/data"
+      value: "{{ app_config_consul | to_yaml }}"
+
+- set_fact:
+    app_config_consul: "{{ app_config_consul | from_yaml | combine(
+        { 'consul': {
+            'scheme': CONSUL_SCHEME,
+            'host': CONSUL_HOST,
+            'port': CONSUL_PORT,
+            'acl-token': consul_app_token,
+          }
+        }, recursive=true) }}"
+
+
+
+- set_fact:
+    app_configs: "{{ app_configs | default({}) | combine(
+        { app_name: app_config_consul
+        }, recursive=true) }}"

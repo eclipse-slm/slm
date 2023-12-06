@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  monitoring-prometheus-aas:
+    image: "fabos4ai/fabos-monitoring-prometheus-aas:0.0.1-SNAPSHOT"
+    restart: unless-stopped
+    networks:
+      default:
+        aliases:
+          - monitoring
+    ports:
+      - "9080:8080"
+
+  monitoring-prometheus-configurator:
+    image: fabos4ai/fabos-monitoring-prometheus-configurator:0.0.1-SNAPSHOT
+    restart: unless-stopped
+    networks:
+      default:
+        aliases:
+          - monitoring-prometheus-configurator
+    ports:
+      - "5000:5000"
+    volumes:
+      - prometheus-targets:/code/targets
+
+  prometheus:
+    image: "ghcr.io/eclipse-slm/monitoring-prometheus:1.4.0-SNAPSHOT"
+    restart: unless-stopped
+    networks:
+      default:
+        aliases:
+          - prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus-targets:/etc/prometheus/targets/
+
+volumes:
+  prometheus-targets:

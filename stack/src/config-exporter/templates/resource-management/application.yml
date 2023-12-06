@@ -30,11 +30,11 @@ springdoc:
 
 ### Database
 database:
-  host: {{ target_host }}
+  host: {{ resource_management_config['database']['host'] }}
   port: 3310
-  schema: {{ resource_management_database_schema }}
-  username: {{ resource_management_database_user }}
-  password: {{ resource_management_database_password }}
+  schema: {{ resource_management_config['database']['schema'] }}
+  username: {{ resource_management_config['database']['username'] }}
+  password: {{ resource_management_config['database']['password'] }}
 
 ### Spring
 spring:
@@ -96,30 +96,30 @@ keycloak:
 
 ### AWX
 awx:
-  scheme: {{ awx_scheme }}
-  host: {{ awx_hostname }}
-  port: {{ awx_port }}
-  username: {{ awx_resource_management_username }}
-  password: {{ awx_resource_management_password }}
+  scheme: {{ awx_config['scheme'] }}
+  host: {{ awx_config['host'] }}
+  port: {{ awx_config['port'] }}
+  username: {{ resource_management_config['awx']['username'] }}
+  password: {{ resource_management_config['awx']['username'] }}
   polling-interval-in-s: 4
 
 ### Consul
 consul:
-  scheme: {{ consul_scheme }}
-  host: {{ consul_hostname }}
-  port: {{ consul_port }}
+  scheme: {{ consul_config['scheme'] }}
+  host: {{ consul_config['host'] }}
+  port: {{ consul_config['port'] }}
   datacenter: fabos
-  acl-token: {{ consul_resource_management_token }}
+  acl-token: {{ resource_management_config[ 'consul' ][ 'acl-token' ] }}
 
 ### Vault
 vault:
-  scheme: {{ vault_scheme }}
-  host: {{ vault_hostname }}
-  port: {{ vault_port }}
+  scheme: {{ vault_config['scheme'] }}
+  host: {{ vault_config['host'] }}
+  port: {{ vault_config['port'] }}
   authentication: APPROLE
   app-role:
-    role-id: {{ vault_resource_management_app_role_id }}
-    secret-id: {{ vault_resource_management_app_secret_id }}
+    role-id: {{ resource_management_config['vault']['app-role']['role-id'] }}
+    secret-id: {{ resource_management_config['vault']['app-role']['secret-id'] }}
     app-role-path: approle
 
 ### BaSyx
@@ -132,4 +132,4 @@ basyx:
 ### Monitoring
 monitoring:
   service:
-    url: {{ monitoring_service_url }}
+    url: "{{ monitoring_config['service']['scheme'] }}://{{ monitoring_config['service']['host'] }}:{{ monitoring_config['service']['port'] }}"

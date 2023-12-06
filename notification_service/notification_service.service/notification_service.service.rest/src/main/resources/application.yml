@@ -44,6 +44,8 @@ spring:
     user:
       name: admin
       password: password
+  config:
+    import: "consul:"
   cloud:
     consul:
       host: ${consul.host}
@@ -54,6 +56,12 @@ spring:
         acl-token: ${consul.acl-token}
         prefer-ip-address: true
         register-health-check: true
+      config:
+        enabled: true
+        fail-fast: true
+        profileSeparator: '::'
+        format: YAML
+        acl-token: ${consul.acl-token}
   jpa:
     hibernate:
       ddl-auto: update
@@ -82,7 +90,7 @@ keycloak:
   config:
     auth-white-list:
     tenants:
-      config-path: keycloak/
+      config-path: consul:keycloak
       client-registration-enable: false
       client-update-enable: false
       resolve-by-path: true

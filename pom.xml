@@ -50,10 +50,10 @@
         <maven.plugin.jacoco.version>0.8.8</maven.plugin.jacoco.version>
         <maven.plugin.openapi-generator.version>6.4.0</maven.plugin.openapi-generator.version>
 
-        <spring.version>5.3.23</spring.version>
-        <spring.boot.version>2.7.4</spring.boot.version>
+        <spring.version>5.3.30</spring.version>
+        <spring.boot.version>2.7.17</spring.boot.version>
         <spring.security.version>5.7.3</spring.security.version>
-        <spring-cloud.version>2021.0.4</spring-cloud.version>
+        <spring-cloud.version>2021.0.8</spring-cloud.version>
         <spring-cloud-contract-wiremock.version>3.1.4</spring-cloud-contract-wiremock.version>
         <springdoc.openapi.version>1.6.11</springdoc.openapi.version>
         <swagger.version>1.6.7</swagger.version>

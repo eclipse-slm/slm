@@ -1,18 +1,10 @@
 FROM openjdk:18.0.2.1-jdk-slim-buster
 
-ENV KEYCLOAK_CONFIG_TENANTS_CONFIGPATH="/app/keycloak" \
-    DATABASE_HOST="notification-service-database" \
-    DATABASE_PORT=3306 \
-    CONSUL_SCHEME="http" \
+ENV CONSUL_SCHEME="http" \
     CONSUL_HOST="consul" \
     CONSUL_PORT=8500 \
     CONSUL_DATACENTER="fabos" \
-    CONSUL_ACLTOKEN="password" \
-    AWX_SCHEME="http" \
-    AWX_HOST="awxweb" \
-    AWX_PORT="8013" \
-    AWX_USER="admin" \
-    AWX_PASSWORD="password"
+    CONSUL_ACLTOKEN="password"
 
 RUN apt update && \
     apt install -y curl jq

@@ -1,0 +1,17 @@
+### Inputs
+- name: "Assert inputs of 'keycloak/client | assign_realm_roles_to_user.yml'"
+  assert:
+    that:
+      - (KEYCLOAK_AUTH_URL is defined) and (KEYCLOAK_AUTH_URL|length > 0)                 # Auth URL of the Keycloak instance
+      - (_keycloak_realm_name is defined) and (_keycloak_realm_name|length > 0)           # Name of the Keycloak realm the users belongs to
+      - (_keycloak_access_token is defined) and (_keycloak_access_token|length > 0)       # Access token to authenticate with Keycloak
+      - (_keycloak_user is defined) and (_keycloak_user|length > 0)                       # Dictionary with 'username' and 'realmRoles'
+      - (_keycloak_user.realmRoles is defined) and (_keycloak_user.realmRoles|length > 0) # List of realm roles the user should be assigned to
+      - (_keycloak_user.username is defined) and (_keycloak_user.username|length > 0)     # Username of the user to which the realm roles should be assigned
+
+- name: "Assign realm roles to user '{{ _keycloak_user.username }}'"
+  include_tasks: roles/assign_realm_role_to_user.yml
+  vars:
+    _username: "{{ _keycloak_user.username }}"
+    _realm_role_name: "{{ item }}"
+  loop: "{{ _keycloak_user.realmRoles }}"
