@@ -52,6 +52,8 @@ services:
       - "8053:8043"  # https
       - "2222:2222"  # receptor foo node
       - "3001:3001"  # used by the UI dev env
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
 
   awx-jwt-authenticator:
     image: ghcr.io/eclipse-slm/awx-jwt-authenticator:1.0.0-SNAPSHOT

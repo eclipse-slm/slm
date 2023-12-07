@@ -76,8 +76,8 @@ public class AwxClient {
     @Autowired
     RestTemplate restTemplate;
 
-//    private WebClient webClient;
 
+//    private WebClient webClient;
     private List<String> finalStates = Stream.of(JobFinalState.values())
             .map(JobFinalState::name)
             .map(String::toLowerCase)
@@ -1522,8 +1522,9 @@ public class AwxClient {
         LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap();
         if(awxCredential.keycloakPrincipal != null) {
             linkedMultiValueMap.add(
-                    "Authorization",
-                    "Bearer " + getAccessToken(awxCredential.keycloakPrincipal.getKeycloakSecurityContext().getTokenString())
+                    HttpHeaders.AUTHORIZATION,
+                    "Bearer " +
+                            getAccessToken(awxCredential.keycloakPrincipal.getKeycloakSecurityContext().getTokenString())
             );
         } else {
             String str = (awxCredential.username == null ? "" : awxCredential.username) + ":" + (awxCredential.password == null ? "" : awxCredential.password);

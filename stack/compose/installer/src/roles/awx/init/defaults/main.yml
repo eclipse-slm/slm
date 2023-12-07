@@ -1,3 +1,10 @@
+awx:
+  keycloak_client:
+    client_id: awx
+    public_client: false
+    service_accounts_enabled: false
+    assign_client_role_to_service_account: false
+
 awx_slm_organization_name: "Service Lifecycle Management"
 
 awx_credential_types:

@@ -82,3 +82,64 @@
     organization: "{{ awx_slm_organization_name }}"
     inputs: "{{ item.inputs }}"
   with_items: "{{ awx_credentials }}"
+
+- name: "Add Execution Environment"
+  awx.awx.execution_environment:
+    controller_host: "{{ AWX_URL }}"
+    controller_username: "{{ _awx_admin_username }}"
+    controller_password: "{{ _awx_admin_password }}"
+    name: "AWX-EE-SLM-1.4.0-SNAPSHOT"
+    image: ghcr.io/eclipse-slm/awx-ee-slm:1.4.0-SNAPSHOT
+    organization: "{{ awx_slm_organization_name }}"
+
+- block:
+  - name: "Create Keycloak client for AWX"
+    include_role:
+      name: keycloak/client
+      tasks_from: clients/create_client.yml
+    vars:
+      _keycloak_client: "{{ awx.keycloak_client }}"
+      _keycloak_access_token: "{{ keycloak_access_token }}"
+      _keycloak_realm_name: "{{ KEYCLOAK_REALM }}"
+
+  - name: "Get OIDC JSON for Keycloak client '{{ client_id }}'"
+    include_role:
+      name: keycloak/client
+      tasks_from: clients/get_oidc-keycloak-json
+    vars:
+      _keycloak_access_token: "{{ keycloak_access_token }}"
+      _keycloak_realm_name: "{{ KEYCLOAK_REALM }}"
+      client_id: "{{ awx.keycloak_client.client_id }}"
+
+  - name: "Create OIDC JSON Object"
+    set_fact:
+      keycloak_oidc_settings: "{{ keycloak_oidc_json }}"
+
+  - name: "Create OIDC Settings"
+    set_fact:
+      new_oidc: "{{ lookup('template', 'oidc_settings.json.j2') }}"
+
+  - assert:
+      that:
+        - (keycloak_oidc_settings is defined) and (keycloak_oidc_settings|length > 0)
+      fail_msg: "Get of Keycloak OIDC settings failed"
+
+  - name: "Configure AWX OIDC adapter "
+    awx.awx.settings:
+      controller_host: "{{ AWX_URL }}"
+      controller_username: "{{ _awx_admin_username }}"
+      controller_password: "{{ _awx_admin_password }}"
+      settings: "{{ new_oidc }}"
+      validate_certs: False
+
+  - name: "Create Auth Mapping Settings"
+    set_fact:
+      auth_mapping: "{{ lookup('template', 'auth_mapping_settings.json.j2') }}"
+
+  - name: "Configure Auth Organization and Team Map "
+    awx.awx.settings:
+      controller_host: "{{ AWX_URL }}"
+      controller_username: "{{ _awx_admin_username }}"
+      controller_password: "{{ _awx_admin_password }}"
+      settings: "{{ auth_mapping }}"
+      validate_certs: False
