@@ -72,34 +72,73 @@ services:
       - "./config/aas-gui/logo:/app/src/assets/Logo"
 
   aas-broker:
-    image: fabos4ai/aas-broker:1.0.0-SNAPSHOT
+    image: ghcr.io/fabos-ai/aas-transformer/aas-broker:${AAS_TRANSFORMER_VERSION}
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: ${LOGGING_MAX_FILE}
+        max-size: ${LOGGING_MAX_SIZE}
     ports:
       - "1883:1883"
       - "1801:9001"
+    networks:
+      default:
+        aliases:
+          - aas-broker
 
   aas-transformer:
-    image: fabos4ai/aas-transformer:1.0.0-SNAPSHOT
+    image: ghcr.io/fabos-ai/aas-transformer/service:${AAS_TRANSFORMER_VERSION}
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: ${LOGGING_MAX_FILE}
+        max-size: ${LOGGING_MAX_SIZE}
     depends_on:
       - aas-transformer-database
     ports:
       - "4010:4010"
+    networks:
+      default:
+        aliases:
+          - aas-transformer
+    environment:
+      DATABASE_HOST: aas-transformer-database
+      DATABASE_SCHEMA: ${AAS_TRANSFORMER_DATABASE_NAME}
+      DATABASE_USERNAME: ${AAS_TRANSFORMER_DATABASE_USER}
+      DATABASE_PASSWORD: ${AAS_TRANSFORMER_DATABASE_PASSWORD}
+    extra_hosts:
+      - "${SLM_HOSTNAME}:172.17.0.1"
 
   aas-transformer-database:
     image: mariadb:10.5
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: ${LOGGING_MAX_FILE}
+        max-size: ${LOGGING_MAX_SIZE}
+    networks:
+      default:
+        aliases:
+          - aas-transformer-database
     environment:
-      MYSQL_USER: aas-transformer
-      MYSQL_PASSWORD: password
-      MYSQL_DATABASE: transformer
-      MARIADB_ROOT_PASSWORD: password
+      MARIADB_USER: ${AAS_TRANSFORMER_DATABASE_USER}
+      MARIADB_PASSWORD: ${AAS_TRANSFORMER_DATABASE_PASSWORD}
+      MARIADB_DATABASE: ${AAS_TRANSFORMER_DATABASE_NAME}
+      MARIADB_ROOT_PASSWORD: ${AAS_TRANSFORMER_DATABASE_ROOT_PASSWORD}
     volumes:
       - "aas_transformer_database:/var/lib/mysql"
 
   aas-transformer-initializer:
-    image: fabos4ai/aas-transformer-initializer:1.0.0-SNAPSHOT
+    image: ghcr.io/fabos-ai/aas-transformer/initializer:${AAS_TRANSFORMER_VERSION}
     restart: "no"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: ${LOGGING_MAX_FILE}
+        max-size: ${LOGGING_MAX_SIZE}
 
 volumes:
   aas_database:

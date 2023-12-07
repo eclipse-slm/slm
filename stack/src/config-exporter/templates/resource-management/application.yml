@@ -102,6 +102,7 @@ awx:
   username: {{ awx_resource_management_username }}
   password: {{ awx_resource_management_password }}
   polling-interval-in-s: 4
+  default-execution-environment: AWX-EE-SLM-1.4.0-SNAPSHOT
 
 ### Consul
 consul:
