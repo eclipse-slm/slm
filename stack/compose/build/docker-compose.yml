@@ -30,11 +30,7 @@ services:
 
   vault:
     image: ghcr.io/eclipse-slm/vault:1.11.3
-    build: ../src/vault/vault
-
-  consul:
-    image: ghcr.io/eclipse-slm/consul:1.14.5
-    build: ../src/consul/consul
+    build: ../../src/vault
 
   config-exporter:
     image: ghcr.io/eclipse-slm/slm/config-exporter:1.4.0-snapshot
