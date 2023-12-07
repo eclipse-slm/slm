@@ -108,6 +108,8 @@ services:
       DATABASE_SCHEMA: ${AAS_TRANSFORMER_DATABASE_NAME}
       DATABASE_USERNAME: ${AAS_TRANSFORMER_DATABASE_USER}
       DATABASE_PASSWORD: ${AAS_TRANSFORMER_DATABASE_PASSWORD}
+    extra_hosts:
+      - "${SLM_HOSTNAME}:172.17.0.1"
 
   aas-transformer-database:
     image: mariadb:10.5
