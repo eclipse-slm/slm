@@ -1,8 +1,8 @@
 FROM ghcr.io/eclipse-slm/ansible:2.11.9
 
-ENV CONSUL_URL=http://ipa-wn1152:8500 \
+ENV CONSUL_URL=http://consul:8500 \
     CONSUL_TOKEN=bOKGjerhQcCsjphbg3Wqg40r \
-    VAULT_URL=http://ipa-wn1152:8200
+    VAULT_URL=http://vault:8200
 
 RUN pip install docker docker-compose python-consul
 
