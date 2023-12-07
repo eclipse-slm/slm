@@ -29,17 +29,17 @@
       loop_var: app_role
   when: (_approle_policies|length > 0)
 
-- name: "Add common AWX config in Consul to '{{ _consul_kv_path }}'"
+- name: "Add common AWX config in Consul"
   include_role:
     name: consul/client
     tasks_from: create_or_add_config
   vars:
+    _app_name: "{{ _approle_name }}"
     _config:
       vault:
         app-role:
           role-id: '{{ vault_approle_role_id}}'
           secret-id: '{{ vault_approle_secret_id}}'
-  when: (_consul_kv_path is defined) and (_consul_kv_path|length > 0)
 
 ### Outputs
 # vault_approle_role_id   (from create_approle.yml)       # Role id of the created app role

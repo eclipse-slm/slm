@@ -72,3 +72,6 @@
       vars:
         _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
         _store_compose_file: /compose/slm.yml
+
+    - debug:
+        msg: "Eclipse Service Lifecycle Management version '{{ SLM_VERSION }}' successfully installed. Your Consul master token: {{ CONSUL_MASTER_TOKEN }}"

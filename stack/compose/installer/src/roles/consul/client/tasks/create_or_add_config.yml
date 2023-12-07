@@ -6,29 +6,48 @@
       - (CONSUL_HOST is defined) and (CONSUL_HOST|length > 0)         # Host of the Consul instance
       - (CONSUL_PORT is defined)                                      # Port of the Consul instance
       - (_consul_token is defined) and (_consul_token|length > 0)     # Token to authenticate with Consul
-      - (_consul_kv_path is defined) and (_consul_kv_path|length > 0) # KV Path where the config should be stored
+      - (_app_name is defined) and (_app_name|length > 0)             # Name of the app for which the config should be stored
       - (_config is defined) and (_config|length > 0)                 # Dictionary with config values that should be created or added to existing config
 
-- name: "Check if config exists in Consul"
+- set_fact:
+    __consul_kv_path: "config/{{ _app_name }}/data"
+
+- name: "Check if config exists in Consul at '{{ __consul_kv_path }}'"
   block:
     - community.general.consul_kv:
         scheme: "{{ CONSUL_SCHEME }}"
         host: "{{ CONSUL_HOST }}"
         port: "{{ CONSUL_PORT }}"
         token: "{{ _consul_token }}"
-        key: "{{ _consul_kv_path }}"
+        key: "{{ __consul_kv_path }}"
       register: consul_response
     - set_fact:
         app_config_consul: "{{ consul_response.data.Value | from_yaml | default({}) }}"
 
-- name: "Combine existing config in Consul with config values that should be added"
+- name: "Combine existing config in Consul with config values that should be created or updated"
   set_fact:
     _config_combined: "{{ app_config_consul | from_yaml | combine(_config, recursive=true) }}"
 
-- name: "Store config in Consul"
+- name: "Store config in Consul to '{{ __consul_kv_path }}'"
   community.general.consul_kv:
     host: "{{ CONSUL_HOST }}"
     port: "{{ CONSUL_PORT }}"
     token: "{{ _consul_token }}"
-    key: "{{ _consul_kv_path }}"
+    key: "{{ __consul_kv_path }}"
     value: "{{ _config_combined | to_yaml }}"
+
+- debug:
+    var: _app_name
+
+- debug:
+    var: _config_combined
+
+- name: "Add config to variable app_configs['{{ _app_name }}']"
+  set_fact:
+    app_configs: "{{ app_configs | default({}) | combine(
+    { 
+      _app_name: _config_combined
+    }, recursive=true) }}"
+
+- debug:
+    var: app_configs

@@ -9,7 +9,7 @@
       - (_awx_consul_token is defined) and (_awx_consul_token|length > 0)
 
 - set_fact:
-    _consul_kv_path: "config/awx/data"
+    _app_name: "awx"
 
 - name: "Create Vault App Roles"
   include_role:

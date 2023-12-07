@@ -2,7 +2,7 @@
   include_tasks:
     file: "create_and_store_config.yml"
   vars:
-    app_name: "{{ item.app_name }}"
+    _app_name: "{{ item.app_name }}"
     scheme: "{{ item.scheme }}"
     host: "{{ item.host }}"
     port: "{{ item.port }}"

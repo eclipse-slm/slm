@@ -23,7 +23,7 @@
         last_name: JWT Authenticator
         superuser: yes
         state: present
-    - name: "Add AWX JWT authenticator username and password in Consul to '{{ _consul_kv_path }}'"
+    - name: "Add AWX JWT authenticator username and password in Consul"
       include_role:
         name: consul/client
         tasks_from: create_or_add_config

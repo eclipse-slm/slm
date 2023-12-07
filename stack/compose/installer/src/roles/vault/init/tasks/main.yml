@@ -8,6 +8,9 @@
       - (CONSUL_PORT is defined)                                    # Port of the Consul instance
       - (_consul_token is defined) and (_consul_token|length > 0)   # Token to authenticate with Consul
 
+- set_fact:
+    _app_name: vault
+
 - name: "Start Vault"
   block:
   - name: "Create compose definition from template"
@@ -69,19 +72,14 @@
       vault_config_consul:
   - import_role:
       name: consul/client
-      tasks_from: store_config
+      tasks_from: create_or_add_config
     vars:
-      _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
-      _consul_kv_path: "config/vault/data"
-      _existing_dictionary: "{{ vault_config_consul }}"
-      _updated_values: "{ 
-          'scheme': '{{ VAULT_SCHEME }}',
-          'host': '{{ VAULT_HOST }}',
-          'port': '{{ VAULT_PORT }}',
-          'tokens': {
-            'root': '{{ vault_root_token }}'
-          }
-        }"
+      _config:
+        scheme: "{{ VAULT_SCHEME }}"
+        host: "{{ VAULT_HOST }}"
+        port: "{{ VAULT_PORT }}"
+        tokens:
+          root: "{{ vault_root_token }}"
 
 ### Outputs
 # - vault_root_token

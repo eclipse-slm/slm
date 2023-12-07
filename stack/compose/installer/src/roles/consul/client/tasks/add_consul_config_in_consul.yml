@@ -6,9 +6,9 @@
       - (CONSUL_HOST is defined) and (CONSUL_HOST|length > 0)         # Host of the Consul instance
       - (CONSUL_PORT is defined)                                      # Port of the Consul instance
       - (_consul_token is defined) and (_consul_token|length > 0)     # Token to authenticate with Consul
-      - (_consul_kv_path is defined) and (_consul_kv_path|length > 0) # KV Path where the config should be stored
+      - (_app_name is defined) and (_app_name|length > 0)             # Name of the app the Consul config should be added
 
-- name: "Add common Consul config in Consul to '{{ _consul_kv_path }}'"
+- name: "Add common Consul config in Consul to app '{{ _app_name }}'"
   include_tasks: create_or_add_config.yml
   vars:
     _config:

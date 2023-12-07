@@ -2,7 +2,7 @@ version: '3'
 
 services:
 
-  slm-uninstaller:
+  uninstaller:
     build: .
     image: ghcr.io/eclipse-slm/slm/uninstaller:1.4.0-SNAPSHOT
     restart: no

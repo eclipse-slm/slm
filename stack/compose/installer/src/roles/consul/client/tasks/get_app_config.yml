@@ -1,0 +1,28 @@
+### Inputs
+- name: "Assert inputs of 'consul/client | create_or_add_config.yml'"
+  assert:
+    that:
+      - (CONSUL_SCHEME is defined) and (CONSUL_SCHEME|length > 0)     # Scheme of the Consul instance
+      - (CONSUL_HOST is defined) and (CONSUL_HOST|length > 0)         # Host of the Consul instance
+      - (CONSUL_PORT is defined)                                      # Port of the Consul instance
+      - (_consul_token is defined) and (_consul_token|length > 0)     # Token to authenticate with Consul
+      - (_app_name is defined) and (_app_name|length > 0)             # Name of the app for which the config should be get
+
+- set_fact:
+    __consul_kv_path: "config/{{ _app_name }}/data"
+
+- name: "Get config of app '_app_name' from Consul"
+  community.general.consul_kv:
+    scheme: "{{ CONSUL_SCHEME }}"
+    host: "{{ CONSUL_HOST }}"
+    port: "{{ CONSUL_PORT }}"
+    token: "{{ _consul_token }}"
+    key: "{{ __consul_kv_path }}"
+  register: config_consul_response
+
+- name: "Add config to variable app_configs['{{ _app_name }}']"
+  set_fact:
+    app_configs: "{{ app_configs | default({}) | combine(
+      { 
+        _app_name: config_consul_response.data.Value | from_yaml
+      }, recursive=true) }}"

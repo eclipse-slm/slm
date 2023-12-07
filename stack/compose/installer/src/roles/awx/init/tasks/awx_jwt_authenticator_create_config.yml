@@ -8,7 +8,7 @@
       - (_consul_token is defined) and (_consul_token|length > 0)
 
 - set_fact:
-    _consul_kv_path: "config/awx_jwt_authenticator/data"
+    _app_name: "awx_jwt_authenticator"
 
 - name: "Add AWX config in Consul"
   include_role:
@@ -25,7 +25,7 @@
     name: consul/client
     tasks_from: add_consul_config_in_consul
 
-- name: "Add AWX credentials for AWX JWT Authenticator in Consul to '{{ _consul_kv_path }}'"
+- name: "Add AWX credentials for AWX JWT Authenticator in Consul"
   include_role:
     name: consul/client
     tasks_from: create_or_add_config
@@ -35,27 +35,16 @@
         username: "{{ _awx_jwt_authenticator_username }}"
         password: "{{ _awx_jwt_authenticator_password }}"
 
-- name: "Add Consul token to app_configs['awx_jwt_authenticator']"
-  set_fact:
-    app_configs: "{{ app_configs | default({}) | combine(
-    { 'awx_jwt_authenticator': {
-        'consul': {
-          'acl-token': _consul_token
-        }
-      }
-    }, recursive=true) }}"
+- name: "Add Consul token to app_configs['{{ _app_name }}']"
+  include_role:
+    name: utils
+    tasks_from: add_to_app_config
+  vars:
+    _config:
+      consul:
+        acl-token: "{{ _consul_token }}"
 
 - name: "Get config from Consul"
-  block:
-    - name: "Get config from Consul"
-      community.general.consul_kv:
-        scheme: "{{ CONSUL_SCHEME }}"
-        host: "{{ CONSUL_HOST }}"
-        port: "{{ CONSUL_PORT }}"
-        token: "{{ _consul_token }}"
-        key: "{{ _consul_kv_path }}"
-      register: config_consul_response
-    - set_fact:
-        app_configs: "{{ app_configs | default({}) | combine(
-          { 'awx_jwt_authenticator': config_consul_response.data.Value | from_yaml
-          }, recursive=true) }}"
+  include_role:
+    name: consul/client
+    tasks_from: get_app_config
