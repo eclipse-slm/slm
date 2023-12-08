@@ -292,6 +292,7 @@ export default {
               .then(refreshed => {
                   context.dispatch('getCluster')
                   context.dispatch('getResourcesFromBackend')
+                  context.dispatch('getResourceAASFromBackend')
                   context.dispatch('getResourceConnectionTypes')
                   context.dispatch('getVirtualResourceProviders')
                   context.dispatch('getServiceHosters')
