@@ -8,6 +8,7 @@ import org.eclipse.basyx.aas.registration.api.IAASRegistry;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
 import org.eclipse.basyx.submodel.metamodel.connected.ConnectedSubmodel;
 import org.eclipse.basyx.submodel.metamodel.map.Submodel;
+import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,14 +46,19 @@ public class SubmodelTemplatesRestController {
         List<AssetAdministrationShell> aasList = new ArrayList<>();
 
         for(AASDescriptor aasd : resourceAASDescriptors) {
-            Collection<Submodel> submodels = aasManager.retrieveSubmodels(aasd.getIdentifier())
-                    .entrySet()
+            Collection<Submodel> submodels = new ArrayList<>();
+
+            aasManager.retrieveSubmodels(aasd.getIdentifier())
+                    .values()
                     .stream()
-                    .collect((Collectors.toMap(
-                            Map.Entry::getKey,
-                            e -> ((ConnectedSubmodel) e.getValue()).getLocalCopy()
-                    )))
-                    .values();
+                    .forEach(e -> {
+                        try {
+                            submodels.add( ((ConnectedSubmodel) e).getLocalCopy() );
+                        } catch(ResourceNotFoundException exception) {
+                            LOG.error("Unable to lookup Submodel.");
+                            LOG.error(exception.getMessage());
+                        }
+                    });
 
             aasList.add(new ResourceAASInclSubmodels(
                     aasManager.retrieveAAS(aasd.getIdentifier()).getLocalCopy(),
