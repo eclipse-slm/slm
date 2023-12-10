@@ -1,13 +1,19 @@
 <template>
   <v-container>
-    <aas-pie-chart-filter-bar
+    <aas-circular-chart-filter-bar
         v-if="showBreadcrumbs"
         :filter-values="this.labelsForVSelect"
         :show-filter-selector="this.showFilterSelector"
         @selectedFilterValuesChanged="onSelectedFilterValuesChanged"
-    ></aas-pie-chart-filter-bar>
-    <v-card-text>
+    ></aas-circular-chart-filter-bar>
+    <v-card-text v-if="this.chartType=='Pie'">
       <Pie
+          :data="chartData"
+          :options="chartOptions"
+      />
+    </v-card-text>
+    <v-card-text v-if="this.chartType=='Doughnut'">
+      <Doughnut
           :data="chartData"
           :options="chartOptions"
       />
@@ -17,15 +23,19 @@
 
 <script>
   import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-  import {Pie} from "vue-chartjs";
-  import AasPieChartFilterBar from "@/components/charts/AasPieChartFilterBar.vue";
+  import { Pie, Doughnut } from "vue-chartjs";
+  import AasCircularChartFilterBar from "@/components/charts/AasCircularChartFilterBar.vue";
 
   ChartJS.register(ArcElement, Tooltip, Legend)
 
   export default {
-    name: 'AasPieChart',
-    components: {AasPieChartFilterBar, Pie},
+    name: 'AasCircularChart',
+    components: {AasCircularChartFilterBar, Pie, Doughnut},
     props: {
+      chartType: {
+        default: "Pie",
+        type: String,
+      },
       showUnknown: {
         default: true,
         type: Boolean
@@ -49,6 +59,7 @@
     },
     data() {
       return {
+        chartBackgroundColors: ["#004263", "#00A0E3", "#1E1E1E", "#71BD86", "#179C7D", "#FF7A5A"],
         selectedFilterValues: [],
         unkownLabel: "unknown",
         chartOptions: {
@@ -127,7 +138,8 @@
           labels: [...this.labels],
           datasets: [
             {
-              data: this.data
+              data: this.data,
+              backgroundColor: this.chartBackgroundColors
             }
           ]
         }

@@ -19,7 +19,7 @@
 </template>
 <script>
   export default {
-    name: 'AasPieChartFilterBar',
+    name: 'AasCircularChartFilterBar',
     props: {
       filterValues: Array,
       showFilterSelector: Boolean

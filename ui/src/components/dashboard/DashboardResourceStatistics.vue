@@ -22,24 +22,25 @@
         v-if="!resourceAAS.length"
         item="Device statistics">
     </no-item-available-note>
-    <aas-pie-chart
+    <aas-circular-chart
         v-else
+        chart-type="Doughnut"
         :show-unknown=true
         :aas="resourceAAS"
         submodel-id-short="operating_system"
         :submodel-element-keys="['system', 'distribution', 'distribution_major_version']">
-    </aas-pie-chart>
+    </aas-circular-chart>
   </base-material-card>
 </template>
 
 <script>
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
   import {mapGetters} from "vuex";
-  import AasPieChart from "@/components/charts/AasPieChart.vue";
+  import AasCircularChart from "@/components/charts/AasCircularChart.vue";
 
   export default {
     name: 'DashboardResourceStatistics',
-    components: {AasPieChart, NoItemAvailableNote },
+    components: {AasCircularChart, NoItemAvailableNote },
     computed: {
       ...mapGetters(['resourceAAS'])
     },
