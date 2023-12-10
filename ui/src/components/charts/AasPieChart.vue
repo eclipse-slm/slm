@@ -97,7 +97,7 @@
           labelValues.add(sm.submodelElements[this.currentSubmodelElementKey].value)
         })
 
-        if(this.addUnkown)
+        if(this.addUnkown && this.unknownData > 0)
           labelValues.add(this.unkownLabel)
 
         return labelValues
@@ -115,9 +115,12 @@
                 this.targetSubmodelElementValues.filter(tsev => tsev === l).length
             )
           else
-            data.push(this.aas.length - this.submodels.length)
+            data.push(this.unknownData)
         })
         return data
+      },
+      unknownData() {
+        return this.aas.length - this.submodels.length
       },
       chartData() {
         return {
