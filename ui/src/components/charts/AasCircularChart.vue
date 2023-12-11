@@ -18,6 +18,20 @@
           :options="chartOptions"
       />
     </v-card-text>
+    <v-footer class="mt-8 white">
+      <v-spacer></v-spacer>
+      <v-tooltip top>
+        <template #activator="{ on, attrs }">
+          <v-icon
+              v-bind="attrs"
+              v-on="on"
+          >
+            mdi-information-outline
+          </v-icon>
+        </template>
+        <span>Chart is based on "{{ this.submodelIdShort }}" submodel</span>
+      </v-tooltip>
+    </v-footer>
   </v-container>
 </template>
 
