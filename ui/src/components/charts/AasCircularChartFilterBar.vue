@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container v-if="this.filterValues.length > 0">
     <v-breadcrumbs class="grey lighten-5" >
       <v-breadcrumbs-item class="pr-3"><v-icon>mdi-home</v-icon></v-breadcrumbs-item>
       <div v-for="v in selectedFilterValues" v-bind:key="v">
