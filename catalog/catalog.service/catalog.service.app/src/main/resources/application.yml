@@ -4,6 +4,10 @@ application:
   version: "^project.version^"
   timestamp: "^timestamp^"
 
+### Deployment
+deployment:
+  hostname: localhost
+
 ### Server / API
 server:
   port: 10000
@@ -36,18 +40,28 @@ database:
 ### Spring
 spring:
   application:
-    name: slm_catalog
-  main:
-    allow-bean-definition-overriding: true
+    name: catalog_service
+  config:
+    import: "consul:"
   cloud:
     consul:
       host: ${consul.host}
       port: ${consul.port}
       discovery:
-        ip-address: "172.17.0.1"
+        enabled: true
         acl-token: ${consul.acl-token}
-        prefer-ip-address: true
         register-health-check: true
+        hostname: ${deployment.hostname}
+        tags: slm, backend, ${spring.application.name}
+        service-name: ${spring.application.name}
+        metadata:
+          version: ${application.version}
+      config:
+        enabled: true
+        fail-fast: true
+        profileSeparator: '::'
+        format: YAML
+        acl-token: ${consul.acl-token}
   jpa:
     properties:
       hibernate:
@@ -76,4 +90,4 @@ consul:
   host: localhost
   port: 8500
   datacenter: fabos
-  acl-token: myroot
+  acl-token: your-consul-acl-token

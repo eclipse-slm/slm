@@ -39,7 +39,7 @@
       scheme: "{{ SLM_CATALOG_SERVICE_SCHEME }}"
       host: "{{ SLM_HOSTNAME }}"
       port: "{{ SLM_CATALOG_SERVICE_PORT | int }}"
-      consul_app_token: ""
+      consul_app_token: "{{ CONSUL_MASTER_TOKEN }}"
 
 - name: "Get Keycloak admin access token"
   include_role:
@@ -86,3 +86,22 @@
     src: "slm.yml"
     dest: "{{ _store_compose_file }}"
   when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
+- name: "Start SLM catalog"
+  block:
+    - set_fact:
+        catalog_compose: "{{ lookup('template', 'catalog.yml') }}"
+    - name: "Start containers"
+      community.docker.docker_compose:
+        project_name: eclipse-slm
+        definition: "{{ catalog_compose | from_yaml }}"
+
+- name: "Store resulting compose file"
+  template:
+    src: "catalog.yml"
+    dest: "{{ _store_compose_file }}"
+  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
+
+
+

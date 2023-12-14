@@ -50,48 +50,51 @@
         - service_name: "awx"
         - service_name: "keycloak"
         - service_name: "aas-gui"
+        - service_name: "catalog-service"
 
     - debug:
         var: service_urls
 
-#    - name: "Ensures /project/_config_generated dir exists"
-#      file:
-#        path: "{{ item }}"
-#        state: directory
-#      loop:
-#        - "/project/_config_generated"
-#        - "/project/_config_generated/keycloak"
-#        - "/project/_config_generated/keycloak/notification-service"
-#        - "/project/_config_generated/keycloak/resource-management"
-#        - "/project/_config_generated/keycloak/service-management"
-#
-#    - name: "Copy slm-config, insomnia-env, postman-env"
-#      template:
-#        src: "{{ item.src }}"
-#        dest: "{{ item.dest }}"
-#      with_items:
-#       - src: /templates/slm-config.yml
-#         dest: /project/_config_generated/slm-config.yml
-#
-#    - name: "Update config in application.yml files"
-#      include_tasks: update_application_properties.yml
-#      vars:
-#        _application_yml_file: "{{ module.application_yml_file }}"
-#        _app_config: "{{ module.app_config }}"
-#      when: CONFIGURE_CORE_PROJECT|default(false)|bool == true
-#      loop_control:
-#        loop_var: module
-#      loop:
-#        - application_yml_file: /project/notification_service/notification_service.service/notification_service.service.rest/src/main/resources/application.yml
-#          app_config: "{{ notification_service_config }}"
-#        - application_yml_file: /project/resource_management/resource_management.service/resource_management.service.rest/src/main/resources/application.yml
-#          app_config: "{{ resource_management_config }}"
-#        - application_yml_file: /project/resource_management/resource_management.service/resource_management.service.initializer/src/main/resources/application.yml
-#          app_config: "{{ service_management_config }}"
-#        - application_yml_file: /project/service_management/service_management.service/service_management.service.rest/src/main/resources/application.yml
-#          app_config: "{{ service_management_config }}"
-#        - application_yml_file: /project/service_management/service_management.service/service_management.service.initializer/src/main/resources/application.yml
-#          app_config: "{{ service_management_config }}"
+    - name: "Ensures /project/_config_generated dir exists"
+      file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - "/project/_config_generated"
+        - "/project/_config_generated/keycloak"
+        - "/project/_config_generated/keycloak/notification-service"
+        - "/project/_config_generated/keycloak/resource-management"
+        - "/project/_config_generated/keycloak/service-management"
+
+    - name: "Copy slm-config"
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items:
+       - src: /templates/slm-config.yml
+         dest: /project/_config_generated/slm-config.yml
+
+    - name: "Update config in application.yml files"
+      include_tasks: update_application_properties.yml
+      vars:
+        _application_yml_file: "{{ module.application_yml_file }}"
+        _app_config: "{{ module.app_config }}"
+      when: CONFIGURE_CORE_PROJECT|default(false)|bool == true
+      loop_control:
+        loop_var: module
+      loop:
+        - application_yml_file: /project/notification_service/notification_service.service/notification_service.service.rest/src/main/resources/application.yml
+          app_config: "{{ notification_service_config }}"
+        - application_yml_file: /project/resource_management/resource_management.service/resource_management.service.rest/src/main/resources/application.yml
+          app_config: "{{ resource_management_config }}"
+        - application_yml_file: /project/resource_management/resource_management.service/resource_management.service.initializer/src/main/resources/application.yml
+          app_config: "{{ service_management_config }}"
+        - application_yml_file: /project/service_management/service_management.service/service_management.service.rest/src/main/resources/application.yml
+          app_config: "{{ service_management_config }}"
+        - application_yml_file: /project/service_management/service_management.service/service_management.service.initializer/src/main/resources/application.yml
+          app_config: "{{ service_management_config }}"
+        - application_yml_file: /project/catalog/catalog.service/catalog.service.app/src/main/resources/application.yml
+          app_config: "{{ catalog_service_config }}"
 
     - name: "Copy application properties"
       template:
