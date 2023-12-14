@@ -3,7 +3,7 @@ version: '3'
 services:
   aas-registry:
     image: "eclipsebasyx/aas-registry:{{ AAS_BASYX_VERSION }}"
-    restart: always
+    restart: unless-stopped
     depends_on:
       - aas-database
       - aas-server
@@ -21,7 +21,7 @@ services:
 
   aas-server:
     image: "eclipsebasyx/aas-server:{{ AAS_BASYX_VERSION }}"
-    restart: always
+    restart: unless-stopped
     depends_on:
       - aas-database
     networks:
@@ -40,8 +40,8 @@ services:
       waiting_for: '[{"host":"aas-registry","port":"4000"}]'
 
   aas-database:
-    image: mongo:latest
-    restart: always
+    image: mongo:7.0.4
+    restart: unless-stopped
     networks:
       default:
         aliases:
@@ -51,7 +51,7 @@ services:
 
   aas-gui:
     image: "ghcr.io/eclipse-slm/aas/gui:{{ AAS_GUI_VERSION }}"
-    restart: always
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:

@@ -4,6 +4,10 @@ application:
   version: "^project.version^"
   timestamp: "^timestamp^"
 
+### Deployment
+deployment:
+  hostname: localhost
+
 ### Server / API
 server:
   port: 9001
@@ -51,11 +55,14 @@ spring:
       host: ${consul.host}
       port: ${consul.port}
       discovery:
-        ip-address: 172.17.0.1
         enabled: true
+        hostname: ${deployment.hostname}
         acl-token: ${consul.acl-token}
-        prefer-ip-address: true
         register-health-check: true
+        tags: slm, backend, ${spring.application.name}
+        service-name: ${spring.application.name}
+        metadata:
+          version: ${application.version}
       config:
         enabled: true
         fail-fast: true
@@ -88,7 +95,7 @@ notification-service:
 ### Keycloak
 keycloak:
   config:
-    auth-white-list:
+    auth-white-list: /actuator/health
     tenants:
       config-path: consul:keycloak
       client-registration-enable: false
@@ -115,4 +122,4 @@ consul:
   host: localhost
   port: 8500
   datacenter: fabos
-  acl-token: myroot
+  acl-token: your-consul-acl-token

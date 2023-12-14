@@ -35,6 +35,7 @@ services:
         max-file: "{{ LOGGING_MAX_FILE }}"
         max-size: "{{ LOGGING_MAX_SIZE }}"
     environment:
+      DEPLOYMENT_HOSTNAME: "{{ RESOURCE_MANAGEMENT_HOST }}"
       CONSUL_SCHEME: "{{ app_configs['resource_management']['consul']['scheme'] }}"
       CONSUL_HOST: "{{ app_configs['resource_management']['consul']['host'] }}"
       CONSUL_PORT: "{{ app_configs['resource_management']['consul']['port'] }}"
@@ -73,7 +74,7 @@ services:
       MARIADB_ROOT_PASSWORD: "{{ app_configs['resource_management']['database']['root_password'] }}"
       MARIADB_USER: "{{ app_configs['resource_management']['database']['username'] }}"
       MARIADB_PASSWORD: "{{ app_configs['resource_management']['database']['password'] }}"
-      MARIADB_DATABASE: resources
+      MARIADB_DATABASE: "{{ app_configs['resource_management']['database']['schema'] }}"
     volumes:
       - resource-management-database_data:/var/lib/mysql
     healthcheck:
@@ -109,6 +110,7 @@ services:
         max-file: "{{ LOGGING_MAX_FILE }}"
         max-size: "{{ LOGGING_MAX_SIZE }}"
     environment:
+      DEPLOYMENT_HOSTNAME: "{{ SERVICE_MANAGEMENT_HOST }}"
       CONSUL_SCHEME: "{{ app_configs['service_management']['consul']['scheme'] }}"
       CONSUL_HOST: "{{ app_configs['service_management']['consul']['host'] }}"
       CONSUL_PORT: "{{ app_configs['service_management']['consul']['port'] }}"
@@ -166,7 +168,7 @@ services:
       MARIADB_ROOT_PASSWORD: "{{ app_configs['service_management']['database']['root_password'] }}"
       MARIADB_USER: "{{ app_configs['service_management']['database']['username'] }}"
       MARIADB_PASSWORD: "{{ app_configs['service_management']['database']['password'] }}"
-      MARIADB_DATABASE: services
+      MARIADB_DATABASE: "{{ app_configs['service_management']['database']['schema'] }}"
     volumes:
       - service-management-database_data:/var/lib/mysql
     healthcheck:
@@ -183,6 +185,7 @@ services:
     ports:
       - "{{ NOTIFICATION_SERVICE_PORT }}:9001"
     environment:
+      DEPLOYMENT_HOSTNAME: "{{ NOTIFICATION_SERVICE_HOST }}"
       CONSUL_SCHEME: "{{ app_configs['notification_service']['consul']['scheme'] }}"
       CONSUL_HOST: "{{ app_configs['notification_service']['consul']['host'] }}"
       CONSUL_PORT: "{{ app_configs['notification_service']['consul']['port'] }}"
@@ -215,7 +218,7 @@ services:
       MARIADB_ROOT_PASSWORD: "{{ app_configs['notification_service']['database']['root_password'] }}"
       MARIADB_USER: "{{ app_configs['notification_service']['database']['username'] }}"
       MARIADB_PASSWORD: "{{ app_configs['notification_service']['database']['password'] }}"
-      MARIADB_DATABASE: notifications
+      MARIADB_DATABASE: "{{ app_configs['notification_service']['database']['schema'] }}"
     volumes:
       - notification-service-database_data:/var/lib/mysql
     healthcheck:

@@ -57,6 +57,7 @@
       include_role:
         name: aas/init
       vars:
+        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
         _store_compose_file: /compose/aas.yml
 
     - name: "Start monitoring"

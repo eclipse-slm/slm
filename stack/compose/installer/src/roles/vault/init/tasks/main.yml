@@ -81,5 +81,17 @@
         tokens:
           root: "{{ vault_root_token }}"
 
+- name: "Register Vault instance at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: vault
+    _service_port: "{{ VAULT_PORT }}"
+    _service_address: "{{ VAULT_HOST }}"
+    _http: "{{ VAULT_URL }}/v1/sys/health"
+    _additional_tags:
+      - "vault"
+
 ### Outputs
 # - vault_root_token

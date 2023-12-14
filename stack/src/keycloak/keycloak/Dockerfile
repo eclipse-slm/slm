@@ -15,4 +15,4 @@ COPY themes/fabos /opt/keycloak/themes/fabos
 
 USER 1000
 
-CMD ["start-dev", "--db mariadb", "--transaction-xa-enabled=false"]
+CMD ["start-dev", "--db mariadb", "--transaction-xa-enabled=false", "--health-enabled=true"]

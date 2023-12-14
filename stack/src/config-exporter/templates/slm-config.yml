@@ -1,6 +1,3 @@
-slm:
-  host: "{{ target_host }}"
-
 keycloak:
   auth-server-url: "{{ keycloak_config['scheme'] }}://{{ keycloak_config['host'] }}:{{ keycloak_config['port'] }}{{ keycloak_config['http']['relative_path'] }}"
 
@@ -30,6 +27,10 @@ notification-service:
   awx:
     username: {{ notification_service_config['awx']['username'] }}
     password: {{ notification_service_config['awx']['password'] }}
+  consul:
+    scheme: {{ notification_service_config['consul']['scheme'] }}
+    host: {{ notification_service_config['consul']['host'] }}
+    port: {{ notification_service_config['consul']['port'] }}
 
 resource-management:
   url: "{{ resource_management_config['scheme'] }}://{{ resource_management_config['host'] }}:{{ resource_management_config['port'] }}"
@@ -43,7 +44,9 @@ resource-management:
     username: {{ resource_management_config['awx']['username'] }}
     password: {{ resource_management_config['awx']['password'] }}
   consul:
-    token: {{ resource_management_config['consul']['acl-token'] }}
+    scheme: {{ resource_management_config['consul']['scheme'] }}
+    host: {{ resource_management_config['consul']['host'] }}
+    port: {{ resource_management_config['consul']['port'] }}
   vault:
     app-role:
       role-id: {{ resource_management_config['vault']['app-role']['role-id'] }}
@@ -61,7 +64,9 @@ service-management:
     username: {{ service_management_config[ 'awx' ][ 'username' ] }}
     password: {{ service_management_config[ 'awx' ][ 'password' ] }}
   consul:
-    token: {{ service_management_config[ 'consul' ][ 'acl-token' ] }}
+    scheme: {{ service_management_config['consul']['scheme'] }}
+    host: {{ service_management_config['consul']['host'] }}
+    port: {{ service_management_config['consul']['port'] }}
   vault:
     app-role:
       role-id: {{ service_management_config[ 'vault' ][ 'app-role' ][ 'role-id' ] }}

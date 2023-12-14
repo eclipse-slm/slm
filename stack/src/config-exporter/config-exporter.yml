@@ -4,17 +4,16 @@ services:
   config-exporter:
     image: ghcr.io/eclipse-slm/slm/config-exporter:${SLM_VERSION}
     restart: "no"
+    build: .
     environment:
       - CONFIGURE_CORE_PROJECT=true
-      - LOCAL_HOST="${SLM_IP}"
-      - CONSUL_TOKEN=veLmhz5Up.DdON6CLCfd
-      - CONSUL_SCHEME=http
-      - CONSUL_HOST=172.17.0.1
-      - CONSUL_PORT=8500
+      - LOCAL_HOSTNAME="${LOCAL_HOSTNAME}"
+      - CONSUL_TOKEN=${CONSUL_TOKEN}
+      - CONSUL_SCHEME=${CONSUL_SCHEME}
+      - CONSUL_HOST=${CONSUL_HOST}
+      - CONSUL_PORT=${CONSUL_Port}
     extra_hosts:
-      - "{{ SLM_HOSTNAME }}:172.17.0.1"
-    env_file:
-      - ../../compose/.env
+      - "${SLM_HOSTNAME}:172.17.0.1"
     volumes:
       - C:\Users\maes\Daten\Dev\eclipse-slm\slm:/project
       - "./src:/src"

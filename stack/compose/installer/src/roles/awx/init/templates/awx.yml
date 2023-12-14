@@ -44,19 +44,13 @@ services:
     privileged: true
     tty: true
     ports:
-      - "7899-7999:7899-7999"  # sdb-listen
-      - "6899:6899"
-#      - "8080:8080"  # unused but mapped for debugging
-      - "8888:8888"  # jupyter notebook
       - "8013:8013"  # http
       - "8053:8043"  # https
-      - "2222:2222"  # receptor foo node
-      - "3001:3001"  # used by the UI dev env
     extra_hosts:
       - "{{ SLM_HOSTNAME }}:172.17.0.1"
 
   awx-jwt-authenticator:
-    image: ghcr.io/eclipse-slm/awx-jwt-authenticator:1.0.0-SNAPSHOT
+    image: ghcr.io/eclipse-slm/awx-jwt-authenticator:1.1.0-SNAPSHOT
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -68,6 +62,7 @@ services:
     ports:
       - "8051:8051"
     environment:
+      DEPLOYMENT_HOSTNAME: "{{ AWX_HOST }}"
       CONSUL_SCHEME: "{{ app_configs['awx_jwt_authenticator']['consul']['scheme'] }}"
       CONSUL_HOST: "{{ app_configs['awx_jwt_authenticator']['consul']['host'] }}"
       CONSUL_PORT: "{{ app_configs['awx_jwt_authenticator']['consul']['port'] }}"
@@ -124,6 +119,7 @@ services:
       default:
         aliases:
           - postgres
+          - awx-postgres
     logging:
       driver: "json-file"
       options:

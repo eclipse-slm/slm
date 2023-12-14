@@ -6,47 +6,36 @@
     project_name: eclipse-slm
     definition: "{{ monitoring_compose | from_yaml}}"
 
-- name: "Check if config exists in Consul"
-  community.general.consul_kv:
-    scheme: "{{ CONSUL_SCHEME }}"
-    host: "{{ CONSUL_HOST }}"
-    port: "{{ CONSUL_PORT }}"
-    token: "{{ _consul_token }}"
-    key: "config/monitoring/data"
-  register: monitoring_config_consul
-
-- set_fact:
-    monitoring_config_consul: {
-      data: {
-        Value:
-      }
-    }
-  when: monitoring_config_consul.data.Value is not defined
-
-- set_fact:
-    monitoring_config_consul: "{{ monitoring_config_consul.data.Value | from_yaml | combine(
-        { 'prometheus': {
-            'scheme': PROMETHEUS_SCHEME,
-            'host': PROMETHEUS_HOST,
-            'port': PROMETHEUS_PORT
-          },
-          'service': {
-            'scheme': MONITORING_SERVICE_SCHEME,
-            'host': MONITORING_SERVICE_HOST,
-            'port': MONITORING_SERVICE_PORT
-          }
-        }, recursive=true) }}"
-
 - name: "Store config in Consul"
-  community.general.consul_kv:
-    host: "{{ CONSUL_HOST }}"
-    port: "{{ CONSUL_PORT }}"
-    token: "{{ _consul_token }}"
-    key: "config/monitoring/data"
-    value: "{{ monitoring_config_consul | to_yaml }}"
+  include_role:
+    name: consul/client
+    tasks_from: create_or_add_config
+  vars:
+    _app_name: "monitoring"
+    _config:
+      prometheus:
+        scheme: "{{ PROMETHEUS_SCHEME }}"
+        host: "{{ PROMETHEUS_HOST }}"
+        port: "{{ PROMETHEUS_PORT }}"
+      service:
+        scheme: "{{ MONITORING_SERVICE_SCHEME }}"
+        host: "{{ MONITORING_SERVICE_HOST }}"
+        port: "{{ MONITORING_SERVICE_PORT }}"
 
 - name: "Store resulting compose file"
   template:
     src: "monitoring.yml"
     dest: "{{ _store_compose_file }}"
   when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
+- name: "Register Prometheus instance at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: prometheus
+    _service_port: "{{ PROMETHEUS_PORT }}"
+    _service_address: "{{ PROMETHEUS_HOST }}"
+    _http: "{{ PROMETHEUS_SCHEME }}://{{ PROMETHEUS_HOST }}:{{ PROMETHEUS_PORT }}/-/healthy"
+    _additional_tags:
+      - "monitoring"

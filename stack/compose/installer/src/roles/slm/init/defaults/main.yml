@@ -3,18 +3,30 @@ keycloak_clients:
     public_client: true
     service_accounts_enabled: false
     assign_client_role_to_service_account: false
+    protocol_mappers:
+      audience: true
+      groups: true
   - client_id: resource_management
     public_client: false
     service_accounts_enabled: true
     assign_client_role_to_service_account: true
+    protocol_mappers:
+      audience: true
+      groups: true
   - client_id: service_management
     public_client: false
     service_accounts_enabled: true
     assign_client_role_to_service_account: true
+    protocol_mappers:
+      audience: true
+      groups: true
   - client_id: notification_service
     public_client: false
     service_accounts_enabled: false
     assign_client_role_to_service_account: false
+    protocol_mappers:
+      audience: true
+      groups: true
 
 vault:
   approles:

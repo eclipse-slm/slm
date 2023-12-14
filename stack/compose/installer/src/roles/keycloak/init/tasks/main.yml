@@ -132,3 +132,29 @@
     src: "keycloak.yml"
     dest: "{{ _store_compose_file }}"
   when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
+- name: "Register Keycloak instance at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: keycloak
+    _service_port: "{{ KEYCLOAK_PORT }}"
+    _service_address: "{{ KEYCLOAK_HOST }}"
+    _http: "{{ KEYCLOAK_AUTH_URL }}/health"
+    _additional_tags:
+      - "keycloak"
+
+- name: "Register Keycloak database at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: keycloak-database
+    _service_port: 3306
+    _service_address: keycloak-database
+    _tcp: "keycloak-database:3306"
+    _additional_tags:
+      - "keycloak"
+      - "database"
+      - "docker-internal"

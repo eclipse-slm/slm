@@ -44,7 +44,7 @@
 - set_fact:
     client_uuid: "{{ output_get_client.json[0].id }}"
 
-- name: "Create protocol mapper 'Group Mapper' for '{{ _keycloak_client.client_id }}'"
+- name: "Create protocol mapper 'Groups' for '{{ _keycloak_client.client_id }}'"
   uri:
     url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ _keycloak_realm_name }}/clients/{{ client_uuid }}/protocol-mappers/models"
     method: POST
@@ -52,7 +52,7 @@
       authorization: "Bearer {{ _keycloak_access_token }}"
     body_format: json
     body:
-      name: "Group Mapper"
+      name: "Groups"
       protocol: "openid-connect"
       protocolMapper: "oidc-group-membership-mapper"
       config:
@@ -64,6 +64,7 @@
     status_code: 201, 409
   changed_when: output_create_client_protocol_mapper.status == 201
   register: output_create_client_protocol_mapper
+  when: (_keycloak_client.protocol_mappers.groups is defined) and (_keycloak_client.protocol_mappers.groups)
 
 - name: "Create protocol mapper 'Audience' for '{{ _keycloak_client.client_id }}'"
   uri:
@@ -83,6 +84,7 @@
     status_code: 201, 409
   changed_when: output_create_client_protocol_mapper.status == 201
   register: output_create_client_protocol_mapper
+  when: (_keycloak_client.protocol_mappers.audience is defined) and (_keycloak_client.protocol_mappers.audience)
 
 - name: "Assign client role 'realm-admin' to service account of client '{{ _keycloak_client.client_id }}'"
   include_role:

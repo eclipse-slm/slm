@@ -10,23 +10,24 @@
     database_host: "{{ item.database_host }}"
     database_port: "{{ item.database_port }}"
     database_user_username: "{{ item.database_user_username }}"
+    database_schema: "{{ item.app_name }}"
   with_items:
     - app_name: service_management
-      database_host: "{{ SLM_HOSTNAME }}"
+      database_host: "{{ SERVICE_MANAGEMENT_DATABASE_HOST }}"
       database_port: "{{ SERVICE_MANAGEMENT_DATABASE_PORT }}"
       scheme: "{{ SERVICE_MANAGEMENT_SCHEME }}"
       host: "{{ SLM_HOSTNAME }}"
       port: "{{ SERVICE_MANAGEMENT_PORT | int }}"
       consul_app_token: "{{ CONSUL_MASTER_TOKEN }}"
     - app_name: resource_management
-      database_host: "{{ SLM_HOSTNAME }}"
+      database_host: "{{ RESOURCE_MANAGEMENT_DATABASE_HOST }}"
       database_port: "{{ RESOURCE_MANAGEMENT_DATABASE_PORT }}"
       scheme: "{{ RESOURCE_MANAGEMENT_SCHEME }}"
       host: "{{ SLM_HOSTNAME }}"
       port: "{{ RESOURCE_MANAGEMENT_PORT | int }}"
       consul_app_token: "{{ CONSUL_MASTER_TOKEN }}"
     - app_name: notification_service
-      database_host: "{{ SLM_HOSTNAME }}"
+      database_host: "{{ NOTIFICATION_SERVICE_DATABASE_HOST }}"
       database_port: "{{ NOTIFICATION_SERVICE_DATABASE_PORT }}"
       scheme: "{{ NOTIFICATION_SERVICE_SCHEME }}"
       host: "{{ SLM_HOSTNAME }}"

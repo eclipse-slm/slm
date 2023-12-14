@@ -158,3 +158,29 @@
     src: "awx.yml"
     dest: "{{ _store_compose_file }}"
   when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
+- name: "Register AWX instance at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: awx
+    _service_port: "{{ AWX_PORT }}"
+    _service_address: "{{ AWX_HOST }}"
+    _http: "{{ AWX_URL }}"
+    _additional_tags:
+      - "awx"
+
+- name: "Register AWX database at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: awx-postgres
+    _service_port: "5432"
+    _service_address: "awx-postgres"
+    _tcp: "awx-postgres:5432"
+    _additional_tags:
+      - "awx"
+      - "database"
+      - "docker-internal"

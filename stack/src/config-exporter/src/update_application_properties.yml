@@ -1,0 +1,36 @@
+- debug:
+    var: _app_config
+
+- name: "Update Consul config in file '{{ _application_yml_file }}'"
+  ansible.builtin.lineinfile:
+    path: "{{ _application_yml_file }}"
+    insertafter: "consul:"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - regexp: "acl-token: .*"
+      line: "  acl-token: {{ _app_config['consul']['acl-token'] }}"
+    - regexp: "scheme: .*"
+      line: "  scheme: {{ _app_config['consul']['scheme'] }}"
+    - regexp: "host: .*"
+      line: "  host: {{ _app_config['consul']['host'] }}"
+    - regexp: "port: .*"
+      line: "  port: {{ _app_config['consul']['port'] }}"
+
+- name: "Check if deployment section exists in '{{ _application_yml_file }}'"
+  ansible.builtin.lineinfile:
+    path: "{{ _application_yml_file }}"
+    regexp: "### Deployment"
+    state: absent
+  check_mode: yes
+  changed_when: false
+  register: deployment_section
+
+- name: "Update deployment section in file '{{ _application_yml_file }}'"
+  ansible.builtin.lineinfile:
+    path: "{{ _application_yml_file }}"
+    insertafter: "### Deployment"
+    firstmatch: true
+    regexp: " hostname:"
+    line: "  hostname: {{ LOCAL_HOSTNAME }}"
+  when: deployment_section.found

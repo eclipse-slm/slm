@@ -4,6 +4,10 @@ application:
   version: "^project.version^"
   timestamp: "^timestamp^"
 
+### Deployment
+deployment:
+  hostname: localhost
+
 ### Server / API
 server:
   port: 9020
@@ -50,9 +54,13 @@ spring:
       port: ${consul.port}
       discovery:
         enabled: true
+        hostname: ${deployment.hostname}
         acl-token: ${consul.acl-token}
         register-health-check: true
-        hostname: ipa-wn1152
+        tags: slm, backend, ${spring.application.name}
+        service-name: ${spring.application.name}
+        metadata:
+          version: ${application.version}
       config:
         enabled: true
         fail-fast: true
@@ -124,14 +132,6 @@ awx:
   password: password
   polling-interval-in-s: 4
 
-### Consul
-consul:
-  scheme: http
-  host: localhost
-  port: 8500
-  datacenter: fabos
-  acl-token: test_secret
-
 ### Vault
 vault:
   scheme: http
@@ -143,6 +143,14 @@ vault:
   #  role-id: service-lifecycle-management
   #  secret-id: 75604ba4-902b-21d4-a3d3-9782af56ad1f
   #  app-role-path: approle
+
+### Consul
+consul:
+  scheme: http
+  host: localhost
+  port: 8500
+  datacenter: fabos
+  acl-token: your-consul-acl-token
 
 ### BaSyx
 basyx:

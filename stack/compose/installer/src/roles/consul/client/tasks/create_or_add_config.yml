@@ -13,16 +13,8 @@
     __consul_kv_path: "config/{{ _app_name }}/data"
 
 - name: "Check if config exists in Consul at '{{ __consul_kv_path }}'"
-  block:
-    - community.general.consul_kv:
-        scheme: "{{ CONSUL_SCHEME }}"
-        host: "{{ CONSUL_HOST }}"
-        port: "{{ CONSUL_PORT }}"
-        token: "{{ _consul_token }}"
-        key: "{{ __consul_kv_path }}"
-      register: consul_response
-    - set_fact:
-        app_config_consul: "{{ consul_response.data.Value | from_yaml | default({}) }}"
+  set_fact:
+    app_config_consul: "{{ lookup('community.general.consul_kv', __consul_kv_path, scheme=CONSUL_SCHEME, host=CONSUL_HOST, port=CONSUL_PORT, token=_consul_token) | from_yaml }}"
 
 - name: "Combine existing config in Consul with config values that should be created or updated"
   set_fact:
@@ -36,18 +28,9 @@
     key: "{{ __consul_kv_path }}"
     value: "{{ _config_combined | to_yaml }}"
 
-- debug:
-    var: _app_name
-
-- debug:
-    var: _config_combined
-
 - name: "Add config to variable app_configs['{{ _app_name }}']"
   set_fact:
     app_configs: "{{ app_configs | default({}) | combine(
     { 
       _app_name: _config_combined
     }, recursive=true) }}"
-
-- debug:
-    var: app_configs

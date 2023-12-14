@@ -40,8 +40,6 @@ services:
         max-size: "{{ LOGGING_MAX_SIZE }}"
     volumes:
       - keycloak-database_data:/var/lib/mysql
-    ports:
-      - "4406:3306"
     networks:
       default:
         aliases:
