@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class ConsulServicesApiClient extends AbstractConsulApiClient {
 
     public final static Logger LOG = LoggerFactory.getLogger(ConsulServicesApiClient.class);
+    public final static String CONSUL_SERVICE_NAME = "consul";
     private ConsulNodesApiClient consulNodesApiClient;
     private ConsulAclApiClient consulAclApiClient;
 

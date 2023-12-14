@@ -2,7 +2,7 @@ import axios, {AxiosResponse} from 'axios'
 import logRequestError from '@/api/restApiHelper.js'
 import {UUID} from "vue-uuid";
 import ServiceOffering from "@/model/serviceOffering"
-import {AnyObject} from "chart.js/types/basic";
+import {AnyObject} from "chart.js/dist/types/basic";
 import ServiceOfferingGitRepository from "@/model/serviceOfferingGitRepository";
 
 class ServiceOfferingsRestApi {

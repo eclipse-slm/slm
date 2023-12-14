@@ -33,6 +33,7 @@ import java.util.UUID;
 public class ResourceAASController implements ApplicationListener<ResourceEvent> {
 
     private final static Logger LOG = LoggerFactory.getLogger(ResourceAASController.class);
+    public static final String ID_SHORT_PLATFORM_RESOURCES = "PlatformResources";
     private final String aasServerUrl;
     private final String aasRegistryUrl;
     private final String monitoringServiceUrl;
@@ -95,9 +96,9 @@ public class ResourceAASController implements ApplicationListener<ResourceEvent>
 
     private void registerMetricsSubmodel(BasicResource resource) {
         IIdentifier aasIdentifier = ResourceAAS.createIdentification(resource.getId());
-        IIdentifier smIdentifier = new CustomId("PlatformResources-" + resource.getId());
-        String endpoint = this.monitoringServiceUrl + "/shells/" + resource.getId() + "/aas/submodels/PlatformResources/submodel";
-        SubmodelDescriptor smDescriptor = new SubmodelDescriptor("PlatformResources", smIdentifier, endpoint);
+        IIdentifier smIdentifier = new CustomId(ID_SHORT_PLATFORM_RESOURCES + "-" + resource.getId());
+        String endpoint = this.monitoringServiceUrl + "/shells/" + resource.getId() + "/aas/submodels/"+ID_SHORT_PLATFORM_RESOURCES+"/submodel";
+        SubmodelDescriptor smDescriptor = new SubmodelDescriptor(ID_SHORT_PLATFORM_RESOURCES, smIdentifier, endpoint);
         registry.register(aasIdentifier, smDescriptor);
     }
 
