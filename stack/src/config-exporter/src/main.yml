@@ -62,6 +62,12 @@
         monitoring_service_scheme: "http"
         monitoring_service_host: "{{ lookup('env', 'SLM_HOSTNAME') }}"
         monitoring_service_port: "{{ lookup('env', 'MONITORING_SERVICE_PORT') }}"
+        minio_scheme: "http"
+        minio_hostname: "{{ lookup('env', 'SLM_HOSTNAME') }}"
+        minio_port: "{{ lookup('env', 'MINIO_PORT_HTTP') }}"
+        minio_config_service_management_access_key: "{{ lookup('file', '/config/minio/service-management/service_management_access') }}"
+        minio_config_service_management_secret_key: "{{ lookup('file', '/config/minio/service-management/service_management_secret') }}"
+
     - set_fact:
         awx_url: "{{awx_scheme}}://{{awx_hostname}}:{{awx_port}}"
         resource_management_url: "{{resource_management_scheme}}://{{resource_management_host}}:{{resource_management_port}}"

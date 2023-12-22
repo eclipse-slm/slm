@@ -143,5 +143,13 @@ basyx:
   aas-server:
     url: http://{{ target_host }}:4001/aasServer
 
+### Minio
+minio:
+  scheme: {{ minio_scheme }}
+  host: {{ minio_hostname }}
+  port: {{ minio_port }}
+  access-key: {{ minio_config_service_management_access_key }}
+  secret-key: {{ minio_config_service_management_secret_key }}
+
 service-management:
   url: {{ service_management_scheme }}://{{ target_host }}:{{ service_management_port }}

@@ -91,7 +91,7 @@ awx_credentials:
     credential_type: Minio
     inputs:
       minio_url: "http://minio:9091/"
-      minio_access_key: "awx"
+      minio_access_key: "{{ minio_access_key }}"
       minio_secret_key: "{{ minio_secret_key }}"
 
 ansible_projects_and_templates: []
@@ -107,6 +107,7 @@ keycloak_config_directory: "/config/keycloak"
 keycloak_oidc_file: "{{ keycloak_config_directory }}/fabos-keycloak.json"
 
 minio_config_directory: "/config/minio"
+minio_access_key_file: "{{ minio_config_directory }}/awx_access"
 minio_secret_key_file: "{{ minio_config_directory }}/awx_secret"
 
 notification_service_config_directory: "/config/notification-service"

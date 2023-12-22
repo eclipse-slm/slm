@@ -37,3 +37,6 @@ services:
       - resource-management-database_config:/config/resource-management/database
       - service-management-database_config:/config/service-management/database
       - catalog-database_config:/config/catalog/database
+
+      - minio_config_awx:/config/minio/awx
+      - minio_config_service-management:/config/minio/service-management/
