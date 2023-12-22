@@ -144,5 +144,13 @@ basyx:
   aas-server:
     url: http://localhost:4001/aasServer
 
+### Minio
+minio:
+  scheme: http
+  host: fabos.local
+  port: 9091
+  access-key: AP6Mb0QwoquLxJHyyYvX
+  secret-key: fwCxKrPgQJTLhRE8spFs5KaWsRLb6nTZ
+
 service-management:
   url: http://localhost:9020
