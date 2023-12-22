@@ -1,7 +1,7 @@
 FROM ubuntu:latest
 LABEL authors="michi"
 
-RUN apt-get -y install curl
+RUN apt-get update; apt-get -y install curl
 
 RUN curl https://dl.min.io/client/mc/release/linux-amd64/mc \
       --create-dirs \

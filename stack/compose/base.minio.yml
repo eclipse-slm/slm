@@ -2,12 +2,12 @@ version: '3'
 
 services:
   minio:
-    image: quay.io/minio/minio:latest
+    image: quay.io/minio/minio:${MINIO_VERSION}
     restart: unless-stopped
     command: minio server --console-address ":9090"
     ports:
-      - "9000:9000"
-      - "9091:9090"
+      - "${MINIO_CONSOLE_PORT}:9000"
+      - "${MINIO_API_PORT}:9090"
     environment:
       KC_HOSTNAME: ${SLM_HOSTNAME}
     volumes:
@@ -24,10 +24,12 @@ services:
   minio-init:
     image: minio-init:latest
     volumes:
-      - minio_config_awx:/app/awx/awx_secret
-      - minio_config_service-management:/app/service-management/service_management_secret
+      - minio_config_awx:/app/awx/
+      - minio_config_service-management:/app/service-management/
 
 
 
 volumes:
   minio_data:
+  minio_config_awx:
+  minio_config_service-management:
