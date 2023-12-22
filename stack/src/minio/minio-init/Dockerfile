@@ -14,4 +14,4 @@ COPY startup.sh /app/startup.sh
 
 WORKDIR /app
 
-CMD tail -F anything
+ENTRYPOINT ["/bin/bash", "-c", "/app/startup.sh"]
