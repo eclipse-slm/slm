@@ -48,6 +48,33 @@ awx_credential_types:
         VAULT_APPROLE_ROLE_ID: "{% raw %}{{ vault_approle_role_id }}{% endraw %}"
         VAULT_APPROLE_SECRET_ID: "{% raw %}{{ vault_approle_secret_id }}{% endraw %}"
 
+  - name: Minio
+    inputs:
+      fields:
+        - id: minio_url
+          type: string
+          label: Minio URL
+          multiline: false
+        - id: minio_access_key
+          type: string
+          label: Minio Access Key
+          secret: false
+          multiline: false
+        - id: minio_secret_key
+          type: string
+          label: Minio Secret Key
+          secret: true
+          multiline: false
+      required:
+        - minio_url
+        - minio_access_key
+        - minio_secret_key
+    injectors:
+      env:
+        MINIO_URL: "{% raw %}{{ minio_url }}{% endraw %}"
+        MINIO_ACCESS_KEY: "{% raw %}{{ minio_accessKey }}{% endraw %}"
+        MINIO_SECRET_KEY: "{% raw %}{{ minio_secretKey }}{% endraw %}"
+
 awx_credentials:
   - name: Consul
     credential_type: Consul
@@ -60,6 +87,12 @@ awx_credentials:
       vault_url: "http://vault:8200"
       vault_approle_role_id: "{{ vault_approle_role_id }}"
       vault_approle_secret_id: "{{ vault_approle_secret_id }}"
+  - name: Minio
+    credential_type: Minio
+    inputs:
+      minio_url: "http://minio:9091/"
+      minio_access_key: "awx"
+      minio_secret_key: "{{ minio_secret_key }}"
 
 ansible_projects_and_templates: []
 
@@ -72,6 +105,9 @@ vault_approle_secret_id_file: "{{ vault_config_directory }}/secret_id"
 
 keycloak_config_directory: "/config/keycloak"
 keycloak_oidc_file: "{{ keycloak_config_directory }}/fabos-keycloak.json"
+
+minio_config_directory: "/config/minio"
+minio_secret_key_file: "{{ minio_config_directory }}/awx_secret"
 
 notification_service_config_directory: "/config/notification-service"
 notification_service_username_file: "{{ notification_service_config_directory }}/awx_username"

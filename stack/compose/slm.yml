@@ -133,6 +133,7 @@ services:
       - keycloak_config_service-management:/app/keycloak:ro
       - vault_config_service-management:/app/vault:ro
       - service-management-database_config:/app/database/config
+      - minio_config_service-management:/app/minio/:ro
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:9020/swagger-ui/index.html" ]
 

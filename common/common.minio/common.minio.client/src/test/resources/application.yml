@@ -1,0 +1,6 @@
+minio:
+  scheme: http
+  host: localhost
+  port: 9090
+  username: admin
+  password: password

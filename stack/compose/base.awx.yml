@@ -168,6 +168,7 @@ services:
       - keycloak_config_awx-jwt-authenticator:/config/keycloak
       - consul_config_awx:/config/consul
       - vault_config_awx:/config/vault
+      - minio_config_awx:/config/minio
 
 volumes:
   awx_database_data:

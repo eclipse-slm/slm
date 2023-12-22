@@ -48,4 +48,7 @@ services:
   prometheus:
     build: ../src/prometheus
 
+  minio-init:
+    build: ../src/minio/minio-init
+
 

@@ -56,6 +56,15 @@ until curl -m 5 -s --location --request GET "${BASYX_AASSERVER_PATH}/health" > /
   sleep 1
 done
 
+# Wait until Minio configuration is present
+MINIO_CONFIG_DIRECTORY="/app/minio/"
+while [ -z "$(ls -A $MINIO_CONFIG_DIRECTORY)" ]; do
+  echo "MINIO config file(s) in $MINIO_CONFIG_DIRECTORY missing -> sleeping"
+  sleep 3
+done
+export MINIO_ACCESS_KEY="service-management"
+export MINIO_SECRET_KEY=$(cat "$AWX_CONFIG_DIRECTORY/service_management_secret")
+
 # Get database configuration
 DATABASE_CONFIGDIR="/app/database/config"
 export DATABASE_USERNAME=$(cat "$DATABASE_CONFIGDIR/user")

@@ -1,0 +1,6 @@
+minio:
+  scheme: http
+  host: 10.3.7.42
+  port: 80
+  username: admin
+  password: password

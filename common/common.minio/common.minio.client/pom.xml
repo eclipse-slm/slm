@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.eclipse.slm</groupId>
+    <artifactId>common.minio.client</artifactId>
+    <version>${revision}</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.eclipse.slm</groupId>
+        <artifactId>common.minio</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <properties>
+        <jetty.version>12.0.0</jetty.version>
+    </properties>
+
+    <dependencies>
+
+        <!-- Spring !-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Minio SDK !-->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.5.7</version>
+        </dependency>
+
+        <!-- Testing !-->
+        <dependency>
+            <groupId>org.junit</groupId>
+            <artifactId>junit-bom</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <type>pom</type>
+        </dependency>
+
+
+    </dependencies>
+
+</project>
