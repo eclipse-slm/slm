@@ -10,13 +10,13 @@ deployment:
 
 ### Server / API
 server:
-  port: 9010
+  port: 9020
   error:
     include-message: always
 
 open-api:
-  title: Resource Management
-  description: REST API of Resource Management
+  title: Service Management
+  description: REST API of Service Management
   version: "^project.version^"
   contact:
     name: Fraunhofer IPA
@@ -35,15 +35,15 @@ springdoc:
 ### Database
 database:
   host: 127.0.0.1
-  port: 3310
-  schema: resources
-  username: resource-management
+  port: 3320
+  schema: services
+  username: service-management
   password: password
 
 ### Spring
 spring:
   application:
-    name: resource_management
+    name: service_management
   main:
     allow-bean-definition-overriding: true
   config:
@@ -60,15 +60,20 @@ spring:
       name: "user"
       password: "password"
   jpa:
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
     hibernate:
       ddl-auto: update
   datasource:
-    platform: mysql
-    initialization-mode: always
     driver-class-name=org: 'mariadb.jdbc.Driver'
     url: jdbc:mariadb://${database.host}:${database.port}/${database.schema}?createDatabaseIfNotExist=true&serverTimezone=UTC
     username: ${database.username}
     password: ${database.password}
+  sql:
+    init:
+      mode: always
+      platform: mysql
 
 management:
   endpoints:
@@ -76,16 +81,25 @@ management:
   info:
     git.enabled: false
 
+### Git
+git:
+  service-offering-importer:
+    clone-directory: tmp/
+    updater-interval-minutes: 15
+
 ### Components - Internal
 notification-service:
   scheme: "http"
   host: "localhost"
   port: 9001
 
+resource-management:
+  url: "http://localhost:9010"
+
 ### Keycloak
 keycloak:
   config:
-    auth-white-list:
+    auth-white-list: /actuator/health
     tenants:
       config-path: consul:keycloak
       client-registration-enable: false
@@ -105,18 +119,18 @@ awx:
   username: admin
   password: password
   polling-interval-in-s: 4
-  default-execution-environment: AWX-EE-SLM-1.4.0-SNAPSHOT
 
 ### Vault
 vault:
   scheme: http
   host: localhost
   port: 8200
-  authentication: APPROLE
-  app-role:
-    role-id: resource-management
-    secret-id: 48a319fa-f100-9b27-afa7-676809ba29fd
-    app-role-path: approle
+  authentication: TOKEN
+  token: secret
+  #app-role:
+  #  role-id: service-lifecycle-management
+  #  secret-id: 75604ba4-902b-21d4-a3d3-9782af56ad1f
+  #  app-role-path: approle
 
 ### Consul
 consul:
@@ -133,7 +147,5 @@ basyx:
   aas-server:
     url: http://localhost:4001/aasServer
 
-### Monitoring
-monitoring:
-  service:
-    url: http://localhost:9080
+service-management:
+  url: http://localhost:9020

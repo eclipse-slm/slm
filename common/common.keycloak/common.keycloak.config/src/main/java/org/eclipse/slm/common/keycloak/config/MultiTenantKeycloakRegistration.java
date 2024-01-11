@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -65,7 +66,7 @@ public class MultiTenantKeycloakRegistration {
 
     private Map<String, RealmResource> realmResourceMap = new HashMap<>();
 
-    private final ConsulClient consulClient;
+    private final Optional<ConsulClient> consulClient;
 
     @Value("${consul.acl-token}")
     private String consulAclToken;
@@ -86,10 +87,15 @@ public class MultiTenantKeycloakRegistration {
     public MultiTenantKeycloakRegistration(
             MultiTenantKeycloakApplicationProperties multiTenantKeycloakProperties,
             ApplicationContext context,
-            ConsulClient consulClient) {
+            @Nullable ConsulClient consulClient) {
         this.multiTenantKeycloakProperties = multiTenantKeycloakProperties;
         this.context = context;
-        this.consulClient = consulClient;
+        if (consulClient == null) {
+            this.consulClient = null;
+        }
+        else {
+            this.consulClient = Optional.of(consulClient);
+        }
     }
 
     /**
@@ -131,15 +137,20 @@ public class MultiTenantKeycloakRegistration {
     }
 
     private void loadKeycloakConfigFromConsul(String keyValuePath) throws IOException {
-        var response = this.consulClient.getKVValue(keyValuePath, this.consulAclToken);
-        var value = response.getValue().getDecodedValue();
-        value = value.replace("'", "\"");
+        if (this.consulClient.isPresent()) {
+            var response = this.consulClient.get().getKVValue(keyValuePath, this.consulAclToken);
+            var value = response.getValue().getDecodedValue();
+            value = value.replace("'", "\"");
 
-        var mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        var reader = mapper.readerFor(AdapterConfig.class);
-        var adapterConfig = reader.readValue(value, AdapterConfig.class);
-        this.processAdapterConfig(adapterConfig);
+            var mapper = new ObjectMapper();
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            var reader = mapper.readerFor(AdapterConfig.class);
+            var adapterConfig = reader.readValue(value, AdapterConfig.class);
+            this.processAdapterConfig(adapterConfig);
+        }
+        else {
+            LOG.error("Load of Keycloak config from Consul configured, but no Consul client available");
+        }
     }
 
     private void processAdapterConfig(AdapterConfig adapterConfig) {
