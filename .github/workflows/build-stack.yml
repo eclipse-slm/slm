@@ -8,7 +8,7 @@ on:
       - release/*
 
 env:
-  DOCKER_COMPOSE_COMMAND: docker-compose -f base.aas.yml -f base.awx.yml -f base.consul.yml -f base.keycloak.yml -f base.vault.yml -f slm.yml -f catalog.yml -f config-exporter.yml -f monitoring.yml -f build.yml
+  DOCKER_COMPOSE_COMMAND: docker-compose
 
 jobs:
   build-and-push-awx:
