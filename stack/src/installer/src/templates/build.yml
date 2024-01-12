@@ -15,19 +15,19 @@ services:
 
   awx-web-no-jwt:
     image: ghcr.io/eclipse-slm/awx/awx-web-no-jwt:${AWX_VERSION}
-    build: ../../../../src/awx/awx-web-no-jwt
+    build: ../../../awx/awx-web-no-jwt
 
   awx-task:
-    build: ../../../../src/awx/awx-task
+    build: ../../../awx/awx-task
 
   awx-postgres:
-    build: ../../../../src/awx/awx-postgres
+    build: ../../../awx/awx-postgres
 
   awx-init:
     build: ../roles/awx/init
 
   keycloak:
-    build: ../../../../src/keycloak/keycloak
+    build: ../../../keycloak/keycloak
 
   keycloak-init:
     build: ../../../../src/keycloak/keycloak-init
@@ -45,9 +45,9 @@ services:
     build: ../roles/consul/init
 
   config-exporter:
-    build: ../../../../src/config-exporter
+    build: ../../../config-exporter
 
   prometheus:
-    build: ../../../../src/prometheus
+    build: ../../../prometheus
 
 
