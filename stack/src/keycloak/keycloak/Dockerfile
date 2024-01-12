@@ -1,4 +1,4 @@
-FROM quay.io/keycloak/keycloak:19.0.2
+FROM quay.io/keycloak/keycloak:19.0.3
 
 ENV KC_DB_HOST=keycloak-database \
     KC_DB_URL_HOST=keycloak-database \

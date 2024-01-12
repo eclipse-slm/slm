@@ -9,6 +9,8 @@
   pre_tasks:
     - name: "Import config from env.yml"
       include_vars: "/env/env.yml"
+    - set_fact:
+        SLM_HOSTNAME: "{{ lookup('ansible.builtin.env', 'SLM_HOSTNAME') }}"
   tasks:
     - name: "Define global variables"
       block:
@@ -17,6 +19,11 @@
             KEYCLOAK_AUTH_URL: "{{ KEYCLOAK_SCHEME }}://{{ KEYCLOAK_HOST }}:{{ KEYCLOAK_PORT }}/auth"
             VAULT_URL: "{{ VAULT_SCHEME }}://{{ VAULT_HOST }}:{{ VAULT_PORT }}"
             AWX_URL: "{{ AWX_SCHEME }}://{{ AWX_HOST }}:{{ AWX_PORT }}"
+
+    - name: Display all variables/facts known for a host
+      debug:
+        var: hostvars['localhost']
+      tags: debug_info
 
     - name: "Start Consul"
       include_role:

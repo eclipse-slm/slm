@@ -42,7 +42,7 @@ public class ClusterHandlerITConfig {
 
     //region Vault Properties
     VaultCredential vaultCredential = new VaultCredential();
-    public static String VAULT_VERSION = "1.11.3";
+    public static String VAULT_VERSION = "1.11.11";
     public static String VAULT_HOST = "localhost";
     public static int VAULT_PORT = 8200;
     public static String VAULT_TOKEN = "myroot";

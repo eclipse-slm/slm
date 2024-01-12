@@ -4,7 +4,7 @@ services:
 
   installer:
     build: .
-    image: ghcr.io/eclipse-slm/slm/uninstaller:1.4.0-SNAPSHOT
+    image: ghcr.io/eclipse-slm/slm/installer:1.4.0-SNAPSHOT
     volumes:
       - "//var/run/docker.sock:/var/run/docker.sock"
       - "./env.yml:/env/env.yml"

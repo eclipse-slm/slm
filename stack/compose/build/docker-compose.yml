@@ -25,11 +25,11 @@ services:
     build: ../../src/awx/awx-postgres
 
   keycloak:
-    image: ghcr.io/eclipse-slm/keycloak:19.0.2
+    image: ghcr.io/eclipse-slm/keycloak:19.0.3
     build: ../../src/keycloak/keycloak
 
   vault:
-    image: ghcr.io/eclipse-slm/vault:1.11.3
+    image: ghcr.io/eclipse-slm/vault:1.11.11
     build: ../../src/vault
 
   config-exporter:
