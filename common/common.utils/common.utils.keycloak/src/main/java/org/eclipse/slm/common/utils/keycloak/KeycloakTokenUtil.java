@@ -38,7 +38,7 @@ public class KeycloakTokenUtil {
                 .build();
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("client_id", "self-service-portal");
+        formData.add("client_id", "ui");
         formData.add("grant_type", "password");
         formData.add("username", username);
         formData.add("password", password);

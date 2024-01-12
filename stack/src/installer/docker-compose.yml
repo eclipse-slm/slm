@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+
+  installer:
+    build: .
+    image: ghcr.io/eclipse-slm/slm/installer:${SLM_VERSION}
+    environment:
+      SLM_HOSTNAME: ${SLM_HOSTNAME}
+    volumes:
+      - "//var/run/docker.sock:/var/run/docker.sock"
+      - "./env.yml:/env/env.yml"
+      - "./src:/src"
+      - "./result_compose:/compose"
+    extra_hosts:
+      - "${SLM_HOSTNAME}:172.17.0.1"

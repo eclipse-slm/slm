@@ -2985,9 +2985,9 @@
         "description": "Oauth2 flow",
         "flows": {
           "authorizationCode": {
-            "authorizationUrl": "http://ipa-wn1152:7080/auth/realms/fabos/protocol/openid-connect/auth",
-            "tokenUrl": "http://ipa-wn1152:7080/auth/realms/fabos/protocol/openid-connect/token",
-            "refreshUrl": "http://ipa-wn1152:7080/auth/realms/fabos/protocol/openid-connect/token",
+            "authorizationUrl": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth",
+            "tokenUrl": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/token",
+            "refreshUrl": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/token",
             "scopes": {}
           }
         }

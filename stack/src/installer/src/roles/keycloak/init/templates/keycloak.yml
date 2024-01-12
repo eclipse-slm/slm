@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  keycloak:
+    image: "ghcr.io/eclipse-slm/keycloak:{{ KEYCLOAK_VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    ports:
+      - "{{ KEYCLOAK_PORT }}:8080"
+    depends_on:
+      - keycloak-database
+    environment:
+      KC_HOSTNAME: "{{ keycloak_config.host }}"
+      KC_DB_HOST: "{{ keycloak_config.database.host }}"
+      KC_DB_URL_HOST: "{{ keycloak_config.database.url_host }}"
+      KC_DB_SCHEMA: "{{ keycloak_config.database.schema }}"
+      KC_DB_USERNAME: "{{ keycloak_config.database.username }}"
+      KC_DB_PASSWORD: "{{ keycloak_config.database.password }}"
+      KEYCLOAK_ADMIN: "{{ keycloak_config.users.admin.username }}"
+      KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak_config.users.admin.password }}"
+      KC_HTTP_RELATIVE_PATH: "{{ keycloak_config.http.relative_path }}"
+    networks:
+      default:
+        aliases:
+          - 'keycloak'
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:8080/auth" ]
+
+  keycloak-database:
+    image: "mariadb:{{ KEYCLOAK_DATABASE_VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    volumes:
+      - keycloak-database_data:/var/lib/mysql
+    networks:
+      default:
+        aliases:
+          - keycloak-database
+    environment:
+      MARIADB_ROOT_PASSWORD: "{{ keycloak_config.database.root_password }}"
+      MARIADB_USER: "{{ keycloak_config.database.username }}"
+      MARIADB_PASSWORD: "{{ keycloak_config.database.password }}"
+      MARIADB_DATABASE: "{{ keycloak_config.database.schema }}"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--silent"]
+
+volumes:
+  keycloak-database_data:

@@ -1,0 +1,39 @@
+### Inputs
+- name: "Assert inputs of 'consul/init | main.yml'"
+  assert:
+    that:
+      - (CONSUL_URL is defined) and (CONSUL_URL|length > 0)                 # URL of the Consul instance to be configured
+      - (_consul_token is defined) and (_consul_token|length > 0)           # Token to authenticate with Consul
+      - (KEYCLOAK_AUTH_URL is defined) and (KEYCLOAK_AUTH_URL|length > 0)   # Auth URL of the Keycloak instance used for auth method
+
+- name: "Consul Init | Wait for Keycloak being up"
+  uri:
+    url: "{{ KEYCLOAK_AUTH_URL }}/realms/fabos/.well-known/openid-configuration"
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 120
+  delay: 3
+
+- name: "Consul Init | Create auth method for Keycloak"
+  uri:
+    url: "{{ CONSUL_URL }}/v1/acl/auth-method"
+    method: PUT
+    headers:
+      authorization: "Bearer {{ _consul_token }}"
+    body_format: json
+    body:
+      Name: keycloak
+      Type: jwt
+      Description: FabOS Keycloak Instance
+      Config:
+        OIDCDiscoveryURL: "{{ KEYCLOAK_AUTH_URL }}/realms/fabos"
+        OIDCDiscoveryCACert: ''
+        ClaimMappings:
+          given_name: first_name
+          family_name: last_name
+        ListClaimMappings:
+          groups: groups
+          "/realm_access/roles": resources
+    status_code: 200
+  register: output_put_auth_method

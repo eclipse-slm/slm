@@ -1,0 +1,143 @@
+version: '3'
+
+services:
+
+  awx:
+    image: "ghcr.io/eclipse-slm/awx/awx-task:{{ AWX_VERSION }}"
+    user: "0"
+    command: launch_awx.sh
+    environment:
+      OS: " Operating System: Docker Desktop"
+      SDB_HOST: 0.0.0.0
+      SDB_PORT: 7899
+      AWX_GROUP_QUEUES: tower
+      MAIN_NODE_TYPE: "${MAIN_NODE_TYPE:-hybrid}"
+      RECEPTORCTL_SOCKET: /var/run/awx-receptor/receptor.sock
+      CONTROL_PLANE_NODE_COUNT: 1
+      EXECUTION_NODE_COUNT: 0
+      AWX_LOGGING_MODE: stdout
+      DJANGO_SUPERUSER_PASSWORD: password
+      UWSGI_MOUNT_PATH: /
+      RUN_MIGRATIONS: 1
+    links:
+      - awx-postgres
+      - awx-redis
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    depends_on:
+      - awx-redis
+      - awx-redis-init
+      - awx-postgres
+    networks:
+      default:
+        aliases:
+          - awxweb
+    volumes:
+      - awx_supervisor_socket:/var/run/supervisor
+      - awx_rsyslog_socket:/var/run/awx-rsyslog/
+      - awx_rsyslog_config:/var/lib/awx/rsyslog/
+      - awx-redis:/var/run/redis
+    privileged: true
+    tty: true
+    ports:
+      - "8013:8013"  # http
+      - "8053:8043"  # https
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+
+  awx-jwt-authenticator:
+    image: ghcr.io/eclipse-slm/awx-jwt-authenticator:1.1.0-SNAPSHOT
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:8051/swagger-ui.html" ]
+    ports:
+      - "8051:8051"
+    environment:
+      DEPLOYMENT_HOSTNAME: "{{ AWX_HOST }}"
+      CONSUL_SCHEME: "{{ app_configs['awx_jwt_authenticator']['consul']['scheme'] }}"
+      CONSUL_HOST: "{{ app_configs['awx_jwt_authenticator']['consul']['host'] }}"
+      CONSUL_PORT: "{{ app_configs['awx_jwt_authenticator']['consul']['port'] }}"
+      CONSUL_ACLTOKEN: "{{ app_configs['awx_jwt_authenticator']['consul']['acl-token'] }}"
+    networks:
+      default:
+        aliases:
+          - awx-jwt-authenticator
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+
+  awx-redis:
+    image: "ghcr.io/eclipse-slm/awx/redis:{{ AWX_REDIS_VERSION }}"
+    entrypoint: [ "redis-server" ]
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    depends_on:
+      - awx-redis-init
+    environment:
+      http_proxy:
+      https_proxy:
+      no_proxy:
+    command: [ "/usr/local/etc/redis/redis.conf" ]
+    networks:
+      default:
+        aliases:
+          - awx-redis
+    volumes:
+      - awx-redis:/var/run/redis/
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-s", "/var/run/redis/redis.sock", "ping" ]
+
+  awx-redis-init:
+    image: busybox
+    restart: "no"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    command: sh -c "cd /var/run/redis/ && chmod -R 777 ."
+    volumes:
+      - awx-redis:/var/run/redis/
+
+  awx-postgres:
+    image: "ghcr.io/eclipse-slm/awx/awx-postgres:{{ AWX_POSTGRES_VERSION }}"
+    command: postgres -c log_destination=stderr -c log_min_messages=info -c log_min_duration_statement=1000 -c max_connections=1024
+    restart: unless-stopped
+    networks:
+      default:
+        aliases:
+          - postgres
+          - awx-postgres
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: awx
+      POSTGRES_DB: awx
+      POSTGRES_PASSWORD: awxpass
+    volumes:
+      - "awx_database_data:/var/lib/postgresql/data:Z"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+
+volumes:
+  awx_database_data:
+  awx_supervisor_socket:
+  awx_rsyslog_socket:
+  awx_rsyslog_config:
+  awx-redis:

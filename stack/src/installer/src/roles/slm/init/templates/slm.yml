@@ -1,0 +1,233 @@
+version: '3'
+
+services:
+
+  ui:
+    image: "ghcr.io/eclipse-slm/slm/ui:{{ SLM_VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    ports:
+      - "{{ UI_PORT }}:80"
+    networks:
+      default:
+        aliases:
+          - ui
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+    environment:
+      KEYCLOAK_URL: "http://{{ SLM_HOSTNAME }}:{{ KEYCLOAK_PORT }}/auth"
+      AWX_URL: "http://{{ SLM_HOSTNAME }}:{{ AWX_PORT }}"
+      BASYX_AAS_GUI_URL: "http://{{ SLM_HOSTNAME }}:3000"
+      CONSUL_TOKEN: "{{ app_configs['resource_management']['consul']['acl-token'] }}"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:8080" ]
+
+  resource-management:
+    image: "ghcr.io/eclipse-slm/slm/resource-management:{{ SLM_VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    environment:
+      DEPLOYMENT_HOSTNAME: "{{ RESOURCE_MANAGEMENT_HOST }}"
+      CONSUL_SCHEME: "{{ app_configs['resource_management']['consul']['scheme'] }}"
+      CONSUL_HOST: "{{ app_configs['resource_management']['consul']['host'] }}"
+      CONSUL_PORT: "{{ app_configs['resource_management']['consul']['port'] }}"
+      CONSUL_ACLTOKEN: "{{ app_configs['resource_management']['consul']['acl-token'] }}"
+      KEYCLOAK_AUTHSERVERURL: "{{ KEYCLOAK_AUTH_URL }}"
+      BASYX_AASREGISTRY_URL: "http://{{ SLM_HOSTNAME }}:4000/registry"
+      BASYX_AASSERVER_URL: "http://{{ SLM_HOSTNAME }}:4001/aasServer"
+      MONITORING_SERVICE_URL: "http://{{ SLM_HOSTNAME }}:{{ MONITORING_SERVICE_PORT }}"
+      SERVER_MAXHTTPHEADERSIZE: 100KB
+    ports:
+      - "{{ RESOURCE_MANAGEMENT_PORT }}:9010"
+    networks:
+      default:
+        aliases:
+          - resource-management
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:9010/swagger-ui/index.html" ]
+
+  resource-management-database:
+    image: "mariadb:{{ RESOURCE_MANAGEMENT_DATABASE_VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    ports:
+      - "{{ RESOURCE_MANAGEMENT_DATABASE_PORT }}:3306"
+    networks:
+      default:
+        aliases:
+          - resource-management-database
+    environment:
+      MARIADB_ROOT_PASSWORD: "{{ app_configs['resource_management']['database']['root_password'] }}"
+      MARIADB_USER: "{{ app_configs['resource_management']['database']['username'] }}"
+      MARIADB_PASSWORD: "{{ app_configs['resource_management']['database']['password'] }}"
+      MARIADB_DATABASE: "{{ app_configs['resource_management']['database']['schema'] }}"
+    volumes:
+      - resource-management-database_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+
+  resource-management-init:
+    image: "ghcr.io/eclipse-slm/slm/resource-management-init:{{ SLM_VERSION }}"
+    restart: "no"
+    depends_on:
+      - resource-management
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    environment:
+      KEYCLOAK_AUTHSERVERURL: "{{ KEYCLOAK_AUTH_URL }}"
+      KEYCLOAK_REALM: "{{ KEYCLOAK_REALM }}"
+      KEYCLOAK_USERNAME: "{{ keycloak_config['default_user_username'] }}"
+      KEYCLOAK_PASSWORD: "{{ keycloak_config['default_user_password'] }}"
+      CONSUL_ACL_TOKEN: "{{ app_configs['resource_management']['consul']['acl-token'] }}"
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+
+  service-management:
+    image: "ghcr.io/eclipse-slm/slm/service-management:{{ SLM_VERSION }}"
+    restart: unless-stopped
+    depends_on:
+      - service-management-database
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    environment:
+      DEPLOYMENT_HOSTNAME: "{{ SERVICE_MANAGEMENT_HOST }}"
+      CONSUL_SCHEME: "{{ app_configs['service_management']['consul']['scheme'] }}"
+      CONSUL_HOST: "{{ app_configs['service_management']['consul']['host'] }}"
+      CONSUL_PORT: "{{ app_configs['service_management']['consul']['port'] }}"
+      CONSUL_ACLTOKEN: "{{ app_configs['service_management']['consul']['acl-token'] }}"
+      KEYCLOAK_AUTHSERVERURL: "{{ KEYCLOAK_AUTH_URL }}"
+      GIT_SERVICEOFFERINGIMPORTER_UPDATERINTERVALMINUTES: "{{ SERVICE_MANAGEMENT_GIT_CHECK_INTERVAL_MINUTES }}"
+      BASYX_AASREGISTRY_URL: "http://{{ SLM_HOSTNAME }}:4000/registry"
+      BASYX_AASSERVER_URL: "http://{{ SLM_HOSTNAME }}:4001/aasServer"
+      SERVICEMANAGEMENT_URL: "http://{{ SLM_HOSTNAME }}:{{ SERVICE_MANAGEMENT_PORT }}"
+      SERVER_MAXHTTPHEADERSIZE: 100KB
+    ports:
+      - "{{ SERVICE_MANAGEMENT_PORT }}:9020"
+    networks:
+      default:
+        aliases:
+          - service-management
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:9020/swagger-ui/index.html" ]
+
+  service-management-init:
+    image: "ghcr.io/eclipse-slm/slm/service-management-init:{{ SLM_VERSION }}"
+    restart: "no"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+    environment:
+      SERVICEMANAGEMENT_INITDIRECTORIES: "{{ SERVICE_MANAGEMENT_INITIALIZATION_LOCAL_DIRECTORIES }}"
+      SERVICEMANAGEMENT_GITREPOS_URLS: "{{ SERVICE_MANAGEMENT_INITIALIZATION_GIT_REPOS }}"
+      KEYCLOAK_AUTHSERVERURL: "{{ KEYCLOAK_AUTH_URL }}"
+      KEYCLOAK_REALM: "{{ KEYCLOAK_REALM }}"
+      KEYCLOAK_USERNAME: "{{ keycloak_config['default_user_username'] }}"
+      KEYCLOAK_PASSWORD: "{{ keycloak_config['default_user_password'] }}"
+
+  service-management-database:
+    image: "mariadb:{{ SERVICE_MANAGEMENT_DATABASE_VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    ports:
+      - "{{ SERVICE_MANAGEMENT_DATABASE_PORT }}:3306"
+    networks:
+      default:
+        aliases:
+          - service-management-database
+    environment:
+      MARIADB_ROOT_PASSWORD: "{{ app_configs['service_management']['database']['root_password'] }}"
+      MARIADB_USER: "{{ app_configs['service_management']['database']['username'] }}"
+      MARIADB_PASSWORD: "{{ app_configs['service_management']['database']['password'] }}"
+      MARIADB_DATABASE: "{{ app_configs['service_management']['database']['schema'] }}"
+    volumes:
+      - service-management-database_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+
+  notification-service:
+    image: "ghcr.io/eclipse-slm/slm/notification-service:{{ SLM_VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    ports:
+      - "{{ NOTIFICATION_SERVICE_PORT }}:9001"
+    environment:
+      DEPLOYMENT_HOSTNAME: "{{ NOTIFICATION_SERVICE_HOST }}"
+      CONSUL_SCHEME: "{{ app_configs['notification_service']['consul']['scheme'] }}"
+      CONSUL_HOST: "{{ app_configs['notification_service']['consul']['host'] }}"
+      CONSUL_PORT: "{{ app_configs['notification_service']['consul']['port'] }}"
+      CONSUL_ACLTOKEN: "{{ app_configs['notification_service']['consul']['acl-token'] }}"
+      KEYCLOAK_AUTHSERVERURL: "{{ KEYCLOAK_AUTH_URL }}"
+    networks:
+      default:
+        aliases:
+          - notification-service
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:9001/swagger-ui/index.html" ]
+
+  notification-service-database:
+    image: "mariadb:{{ NOTIFICATION_SERVICE_DATABASE_VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    ports:
+      - "{{ NOTIFICATION_SERVICE_DATABASE_PORT }}:3306"
+    networks:
+      default:
+        aliases:
+          - notification-service-database
+    environment:
+      MARIADB_ROOT_PASSWORD: "{{ app_configs['notification_service']['database']['root_password'] }}"
+      MARIADB_USER: "{{ app_configs['notification_service']['database']['username'] }}"
+      MARIADB_PASSWORD: "{{ app_configs['notification_service']['database']['password'] }}"
+      MARIADB_DATABASE: "{{ app_configs['notification_service']['database']['schema'] }}"
+    volumes:
+      - notification-service-database_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+
+networks:
+  default:
+
+volumes:
+  notification-service-database_data:
+  resource-management-database_data:
+  service-management-database_data:

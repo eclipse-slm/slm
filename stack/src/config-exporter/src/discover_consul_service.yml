@@ -1,0 +1,20 @@
+- name: "Discover service instance in Consul"
+  uri:
+    url: "{{ consul_scheme }}://{{ consul_host }}:{{ consul_port }}/v1/catalog/service/{{ _service_name }}"
+    method: GET
+    headers:
+      authorization: "Bearer {{ consul_token }}"
+  register: get_consul_service
+
+- set_fact:
+    consul_service: "{{ get_consul_service.json }}"
+
+- set_fact:
+    service_url: "http://{{ consul_service[0].ServiceAddress }}:{{ consul_service[0].ServicePort  }}"
+
+- set_fact:
+    service_urls: "{{ service_urls | combine({
+      _service_name: {
+        'url': service_url
+      }
+    }, recursive=true) }}"

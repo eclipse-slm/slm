@@ -1,0 +1,50 @@
+### Inputs
+- name: "Assert inputs of 'awx/init | awx_create_config.yml'"
+  assert:
+    that:
+      - (AWX_URL is defined) and (AWX_URL|length > 0)
+      - (_awx_jwt_authenticator_username is defined) and (_awx_jwt_authenticator_username|length > 0)
+      - (_awx_jwt_authenticator_password is defined) and (_awx_jwt_authenticator_password|length > 0)
+      - (_consul_token is defined) and (_consul_token|length > 0)
+
+- set_fact:
+    _app_name: "awx_jwt_authenticator"
+
+- name: "Add AWX config in Consul"
+  include_role:
+    name: awx/client
+    tasks_from: add_awx_config_in_consul
+
+- name: "Add Vault config in Consul"
+  include_role:
+    name: vault/client
+    tasks_from: add_vault_config_in_consul
+
+- name: "Add Consul config in Consul"
+  include_role:
+    name: consul/client
+    tasks_from: add_consul_config_in_consul
+
+- name: "Add AWX credentials for AWX JWT Authenticator in Consul"
+  include_role:
+    name: consul/client
+    tasks_from: create_or_add_config
+  vars:
+    _config:
+      awx:
+        username: "{{ _awx_jwt_authenticator_username }}"
+        password: "{{ _awx_jwt_authenticator_password }}"
+
+- name: "Add Consul token to app_configs['{{ _app_name }}']"
+  include_role:
+    name: utils
+    tasks_from: add_to_app_config
+  vars:
+    _config:
+      consul:
+        acl-token: "{{ _consul_token }}"
+
+- name: "Get config from Consul"
+  include_role:
+    name: consul/client
+    tasks_from: get_app_config

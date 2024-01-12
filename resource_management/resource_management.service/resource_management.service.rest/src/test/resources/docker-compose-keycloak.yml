@@ -2,7 +2,7 @@ version: '3'
 
 services:
   keycloak:
-    image: quay.io/keycloak/keycloak:19.0.2
+    image: quay.io/keycloak/keycloak:19.0.3
     ports:
       - "7070:8080"
     environment:
@@ -16,4 +16,4 @@ services:
       - "7500:8500"
     environment:
       CONSUL_LOCAL_CONFIG: '{ "datacenter": "fabos", "domain": ".fabos", "bind_addr": "0.0.0.0", "retry_join": ["0.0.0.0"], "acl": { "enabled": true, "default_policy": "allow", "tokens": { "master": "ClusterHandlerITConfig.CONSUL_TOKEN" } }, "auto_config": { "authorization": { "enabled": true, "static": { "oidc_discovery_url": "http://localhost:8080/realms/fabos", "OIDC_Discovery_CA_Cert": "", "Claim_Mappings": { "given_name": "first_name", "family_name": "last_name" }, "List_Claim_Mappings": { "groups": "groups", "/realm_access/roles": "resources" } }  } } }'
-    
+

@@ -1,0 +1,139 @@
+### Application
+application:
+  name: "^project.artifactId^"
+  version: "^project.version^"
+  timestamp: "^timestamp^"
+
+### Deployment
+deployment:
+  hostname: localhost
+
+### Server / API
+server:
+  port: 9010
+  error:
+    include-message: always
+
+open-api:
+  title: Resource Management
+  description: REST API of Resource Management
+  version: "^project.version^"
+  contact:
+    name: Fraunhofer IPA
+    url: https://www.ipa.fraunhofer.de
+    email: matthias.schneider@ipa.fraunhofer.de
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+    oauth:
+      clientId: self-service-portal
+      clientSecret: unused-and-not-required
+
+### Database
+database:
+  host: 127.0.0.1
+  port: 3310
+  schema: resources
+  username: resource-management
+  password: password
+
+### Spring
+spring:
+  application:
+    name: resource_management
+  main:
+    allow-bean-definition-overriding: true
+  config:
+    import: "optional:consul:"
+  cloud:
+    consul:
+      enabled: false
+      discovery:
+        enabled: false
+      config:
+        enabled: false
+  security:
+    user:
+      name: "user"
+      password: "password"
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    platform: mysql
+    initialization-mode: always
+    driver-class-name=org: 'mariadb.jdbc.Driver'
+    url: jdbc:mariadb://${database.host}:${database.port}/${database.schema}?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: ${database.username}
+    password: ${database.password}
+
+management:
+  endpoints:
+    web.exposure.include: health,info
+  info:
+    git.enabled: false
+
+### Components - Internal
+notification-service:
+  scheme: "http"
+  host: "localhost"
+  port: 9001
+
+### Keycloak
+keycloak:
+  config:
+    auth-white-list:
+    tenants:
+      config-path: consul:keycloak
+      client-registration-enable: false
+      client-update-enable: false
+      resolve-by-path: true
+      resolve-by-header: true
+      resolver-base-path: /
+      resolver-header: Realm
+      redirect-uris:
+      web-origins:
+
+### AWX
+awx:
+  scheme: http
+  host: localhost
+  port: 8013
+  username: admin
+  password: password
+  polling-interval-in-s: 4
+  default-execution-environment: AWX-EE-SLM-1.4.0-SNAPSHOT
+
+### Vault
+vault:
+  scheme: http
+  host: localhost
+  port: 8200
+  authentication: APPROLE
+  app-role:
+    role-id: resource-management
+    secret-id: 48a319fa-f100-9b27-afa7-676809ba29fd
+    app-role-path: approle
+
+### Consul
+consul:
+  scheme: http
+  host: localhost
+  port: 8500
+  datacenter: fabos
+  acl-token: your-consul-acl-token
+
+### BaSyx
+basyx:
+  aas-registry:
+    url: http://localhost:4000/registry
+  aas-server:
+    url: http://localhost:4001/aasServer
+
+### Monitoring
+monitoring:
+  service:
+    url: http://localhost:9080

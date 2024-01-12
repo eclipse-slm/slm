@@ -1,0 +1,92 @@
+awx:
+  keycloak_client:
+    client_id: awx
+    public_client: false
+    service_accounts_enabled: false
+    assign_client_role_to_service_account: false
+    protocol_mappers: {}
+
+awx_slm_organization_name: "Service Lifecycle Management"
+
+awx_credential_types:
+  - name: Consul
+    inputs:
+      fields:
+        - id: consul_url
+          type: string
+          label: Consul URL
+          multiline: false
+        - id: consul_token
+          type: string
+          label: Consul Token
+          secret: true
+          multiline: false
+      required:
+        - consul_url
+        - consul_token
+    injectors:
+      env:
+        CONSUL_TOKEN: "{{ _awx_consul_token }}"
+        CONSUL_URL: "{{ CONSUL_URL }}"
+  - name: HashiCorp Vault
+    inputs:
+      fields:
+        - id: vault_url
+          type: string
+          label: Vault URL
+          secret: false
+          multiline: false
+        - id: vault_approle_role_id
+          type: string
+          label: Vault App Role - Role ID
+          secret: false
+          multiline: false
+        - id: vault_approle_secret_id
+          type: string
+          label: Vault App Role - Secret ID
+          secret: true
+          multiline: false
+      required:
+        - vault_url
+        - vault_approle_role_id
+        - vault_approle_secret_id
+    injectors:
+      env:
+        VAULT_URL: "{{ VAULT_URL }}"
+        VAULT_APPROLE_ROLE_ID: "{{ app_configs.awx.vault['app-role']['role-id'] }}"
+        VAULT_APPROLE_SECRET_ID: "{{ app_configs.awx.vault['app-role']['secret-id'] }}"
+
+awx_credentials:
+  - name: Consul
+    credential_type: Consul
+    inputs:
+      consul_url: "http://consul:8500"
+      consul_token: "{{ _awx_consul_token }}"
+  - name: HashiCorp Vault
+    credential_type: HashiCorp Vault
+    inputs:
+      vault_url: "http://vault:8200"
+      vault_approle_role_id: "{{ app_configs.awx.vault['app-role']['role-id']}}"
+      vault_approle_secret_id: "{{ app_configs.awx.vault['app-role']['secret-id'] }}"
+
+vault_approles:
+  - name: awx
+    policies:
+      - name: "awx"
+        policy: "path \"resources/*\" { capabilities = [\"read\", \"list\", \"create\", \"update\"] } \npath \"service-repositories/*\" { capabilities = [\"read\", \"list\"] }"
+
+awx_jwt_authenticator:
+  keycloak_client:
+    client_id: awx_jwt_authenticator
+    public_client: false
+    service_accounts_enabled: false
+    assign_client_role_to_service_account: false
+    protocol_mappers: {}
+  vault:
+    approle:
+      name: awx_jwt_authenticator
+      policies:
+        - name: "awx_jwt_authenticator"
+          policy: "path \"awx_jwt_authenticator/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
+    kv_secret_engines:
+    - "awx_jwt_authenticator"

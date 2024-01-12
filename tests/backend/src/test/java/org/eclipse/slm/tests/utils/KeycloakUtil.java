@@ -16,7 +16,7 @@ public class KeycloakUtil {
         String accessToken = given().spec(TestConfig.KEYCLOAK_SERVICE_SPEC)
                     .header("Content-Type", "application/x-www-form-urlencoded")
                     .formParam("grant_type", "password")
-                    .formParam("client_id", "self-service-portal")
+                    .formParam("client_id", "ui")
                     .formParam("username", TestConfig.KEYCLOAK_USERNAME)
                     .formParam("password", TestConfig.KEYCLOAK_PASSWORD)
 //                .log().all()

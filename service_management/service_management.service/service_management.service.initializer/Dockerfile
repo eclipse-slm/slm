@@ -5,12 +5,10 @@ ENV SERVICEMANAGEMENT_URL="http://service-management:9020"\
     SERVICEMANAGEMENT_INITDIRECTORIES=""\
     SERVICEMANAGEMENT_GITREPOS_CLONEDIRECTORY="/tmp"\
     SERVICEMANAGEMENT_GITREPOS_URLS="https://github.com/FabOS-AI/fabos-slm-service-registry-content.git"\
-    KEYCLOAK_CONFIG_VIA="SHARED_VOLUME"
-#    KEYCLOAK_CONFIG_VIA="ENVIRONMENT_VARIABLES" \
-#    KEYCLOAK_AUTHSERVERURL="http://keycloak:7080/auth" \
-#    KEYCLOAK_REALM="fabos" \
-#    KEYCLOAK_USERNAME="fabos" \
-#    KEYCLOAK_PASSWORD="password"
+    KEYCLOAK_AUTHSERVERURL="http://keycloak:7080/auth" \
+    KEYCLOAK_REALM="fabos" \
+    KEYCLOAK_USERNAME="fabos" \
+    KEYCLOAK_PASSWORD="password"
 
 RUN apt update && \
     apt install -y curl jq

@@ -1,0 +1,49 @@
+- name: "Uninstall SLM"
+  hosts: localhost
+  gather_facts: yes
+  become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    compose_project_name: eclipse-slm
+  tasks:
+    - name: Get running containers, volumes and networks
+      community.docker.docker_host_info:
+        containers: yes
+        containers_filters:
+          label: "com.docker.compose.project={{ compose_project_name }}"
+        volumes: yes
+        volumes_filters:
+          label: "com.docker.compose.project={{ compose_project_name }}"
+        networks: yes
+      register: docker_info
+
+    - name: Remove containers
+      community.docker.docker_container:
+        name: "{{ item }}"
+        state: absent
+        keep_volumes: no
+      loop: "{{ docker_info.containers | map(attribute='Id') | list }}"
+      async: 60
+      poll: 0
+      register: async_loop
+
+    - name: Wait until containers have been removed
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+        mode: status
+      retries: 11
+      delay: 1
+      loop: "{{ async_loop.results }}"
+      register: async_loop_jobs
+      until: async_loop_jobs.finished
+
+    - name: Remove volumes
+      community.docker.docker_volume:
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ docker_info.volumes | map(attribute='Name') | list }}"
+
+    - name: Remove network
+      community.docker.docker_network:
+        name: "{{ compose_project_name }}_default"
+        state: absent

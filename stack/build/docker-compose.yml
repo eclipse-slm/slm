@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+
+  installer:
+    image: ghcr.io/eclipse-slm/slm/installer:${SLM_VERSION}
+    build: ../src/installer
+
+  uninstaller:
+    image: ghcr.io/eclipse-slm/slm/uninstaller:${SLM_VERSION}
+    build: ../src/uninstaller
+
+  aas-broker:
+    image: ghcr.io/eclipse-slm/aas/broker:1.6
+    build: ../src/aas-broker
+
+  aas-gui:
+    image: ghcr.io/eclipse-slm/aas/gui:v230703
+    build: ../src/aas-gui
+
+  awx-task:
+    image: ghcr.io/eclipse-slm/awx/awx-task:${AWX_VERSION}
+    build: ../src/awx/awx-task
+    environment:
+      - AWX_TAG=22.7.0
+
+  awx-web-no-jwt:
+    image: ghcr.io/eclipse-slm/awx/awx-web-no-jwt:${AWX_VERSION}
+    build: ../src/awx/awx-web-no-jwt
+
+  awx-postgres:
+    image: ghcr.io/eclipse-slm/awx/awx-postgres:12-awx-${AWX_VERSION}
+    build: ../src/awx/awx-postgres
+
+  keycloak:
+    image: ghcr.io/eclipse-slm/keycloak:${KEYCLOAK_VERSION}
+    build: ../src/keycloak/keycloak
+
+  vault:
+    image: ghcr.io/eclipse-slm/vault:${VAULT_VERSION}
+    build: ../src/vault
+
+  config-exporter:
+    image: ghcr.io/eclipse-slm/slm/config-exporter:${SLM_VERSION}
+    build: ../src/config-exporter
+
+  prometheus:
+    image: ghcr.io/eclipse-slm/monitoring-prometheus:${SLM_VERSION}
+    build: ../src/prometheus
+
+

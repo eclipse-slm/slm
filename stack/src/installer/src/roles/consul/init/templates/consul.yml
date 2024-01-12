@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+
+  consul:
+    image: "consul:{{ CONSUL_VERSION }}"
+    restart: unless-stopped
+    command: "consul agent -server -bootstrap-expect 1 -ui -bind=0.0.0.0 -client=0.0.0.0 -advertise {{ SLM_IP }} -data-dir=/consul/data -config-dir=/consul/config"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    environment:
+      CONSUL_LOCAL_CONFIG: '{{ consul_local_config | to_json }}'
+    networks:
+      default:
+        aliases:
+          - consul
+    ports:
+      - "{{ CONSUL_PORT }}:8500"
+      - "{{ CONSUL_PORT_RPC }}:8300"
+      - "{{ CONSUL_PORT_LAN_SERF }}:8301"
+    volumes:
+      - consul_data:/consul/data
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:8500" ]
+
+  consul-esm:
+    image: "hashicorp/consul-esm:{{ CONSUL_ESM_VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    environment:
+      CONSUL_HTTP_ADDR: consul:8500
+    command: >
+      sh -c "export CONSUL_HTTP_TOKEN=$$(cat /consul/consul_master_token) && consul-esm"
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+
+volumes:
+  consul_data:

@@ -1,0 +1,64 @@
+### Inputs
+- name: "Assert inputs of 'vault/client | create_approle.yml'"
+  assert:
+    that:
+      - (VAULT_URL is defined) and (VAULT_URL|length > 0)           # URL of Vault
+      - (_vault_token is defined) and (_vault_token|length > 0)     # Token to authenticate with Vault
+      - (_vault_token is defined) and (_vault_token|length > 0)     # Token to authenticate with Consul
+      - (_consul_token is defined) and (_consul_token|length > 0)    # Token to authenticate with Consul
+      - (_approle_name is defined) and (_approle_name|length > 0)   # Name of the app rol to be created
+
+- name: "Create app role '{{ _approle_name }}'"
+  uri:
+    url: "{{ VAULT_URL }}/v1/auth/approle/role/{{ _approle_name }}"
+    validate_certs: no
+    method: POST
+    headers:
+      Authorization: "Bearer {{ _vault_token }}"
+    status_code: 200, 204
+  no_log: false
+
+- name: "Set app role id to app role name '{{ _approle_name }}'"
+  uri:
+    url: "{{ VAULT_URL }}/v1/auth/approle/role/{{ _approle_name }}/role-id"
+    validate_certs: no
+    method: POST
+    headers:
+      Authorization: "Bearer {{ _vault_token }}"
+    body_format: json
+    body:
+      role_id: "{{ _approle_name }}"
+    status_code: 200, 204
+  no_log: false
+
+- name: "Create secret id for app role with id '{{ _approle_name }}'"
+  uri:
+    url: "{{ VAULT_URL }}/v1/auth/approle/role/{{ _approle_name }}/secret-id"
+    validate_certs: no
+    method: POST
+    headers:
+      Authorization: "Bearer {{ _vault_token }}"
+    status_code: 200, 204
+  register: request_secret_id
+  no_log: false
+
+- set_fact:
+    role_id: "{{ _approle_name }}"
+    secret_id: "{{ request_secret_id.json.data.secret_id }}"
+
+- name: "Store config for app role '{{ _approle_name }}' in Consul"
+  include_role:
+    name: consul/client
+    tasks_from: create_or_add_config
+  vars:
+    _app_name: "{{ _approle_name }}"
+    _config:
+      vault:
+        app-role:
+          role-id: '{{ role_id}}'
+          secret-id: '{{ secret_id}}'
+
+### Outputs
+- set_fact:
+    vault_approle_role_id: "{{ role_id }}"        # Role id of the created app role
+    vault_approle_secret_id: "{{ secret_id }}"    # Secret id of the created app role

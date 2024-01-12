@@ -1,0 +1,48 @@
+### Inputs
+- name: "Assert inputs of 'keycloak/client | assign_realm_role_to_user.yml'"
+  assert:
+    that:
+      - (KEYCLOAK_AUTH_URL is defined) and (KEYCLOAK_AUTH_URL|length > 0)             # Auth URL of the Keycloak instance
+      - (_keycloak_realm_name is defined) and (_keycloak_realm_name|length > 0)       # Name of the Keycloak realm where the realm role should be created
+      - (_keycloak_access_token is defined) and (_keycloak_access_token|length > 0)   # Access token to authenticate with Keycloak
+      - (_username is defined) and (_username|length > 0)                             # Username of the user to which the realm role should be assigned
+      - (_realm_role_name is defined) and (_realm_role_name|length > 0)               # Name of the realm role to which the user should be assigned
+
+- name: "Get user '{{ _username }}'"
+  uri:
+    url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ _keycloak_realm_name }}/users?username={{ _username }}"
+    validate_certs: no
+    method: GET
+    headers:
+      authorization: "Bearer {{ _keycloak_access_token }}"
+    status_code: 200
+  register: output_get_keycloak_user
+  no_log: true
+- set_fact:
+    found_keycloak_user: "{{ output_get_keycloak_user.json | first }}"
+
+- name: "Get realm roles"
+  uri:
+    url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ _keycloak_realm_name }}/roles"
+    method: GET
+    headers:
+      authorization: "Bearer {{ _keycloak_access_token }}"
+    status_code: 200
+  register: output_get_realm_roles
+- set_fact:
+    _keycloak_realm_name_role: "{{ output_get_realm_roles.json | json_query(query) | first }} "
+  vars:
+    query: "[?name=='{{ _realm_role_name }}']"
+
+- name: "Map user '{{ found_keycloak_user.username }}' (id: '{{ found_keycloak_user.id }}') to realm role '{{ _keycloak_realm_name_role.name }}' (id: '{{ _keycloak_realm_name_role.id }}')"
+  uri:
+    url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ _keycloak_realm_name }}/users/{{ found_keycloak_user.id }}/role-mappings/realm"
+    validate_certs: no
+    method: POST
+    headers:
+      authorization: "Bearer {{ _keycloak_access_token }}"
+    body_format: json
+    body:
+      - id: "{{ _keycloak_realm_name_role.id }}"
+        name: "{{ _keycloak_realm_name_role.name }}"
+    status_code: 204

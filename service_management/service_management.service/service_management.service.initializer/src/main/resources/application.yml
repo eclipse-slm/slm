@@ -10,3 +10,11 @@ keycloak:
   realm: fabos
   username: fabos
   password: password
+
+### Consul
+consul:
+  scheme: http
+  host: localhost
+  port: 8500
+  datacenter: fabos
+  acl-token: your-consul-acl-token

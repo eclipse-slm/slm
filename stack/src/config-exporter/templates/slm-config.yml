@@ -1,75 +1,88 @@
-slm:
-  host: "{{ target_host }}"
-
 keycloak:
-  auth-server-url: "{{ keycloak_auth_server_url }}"
+  auth-server-url: "{{ keycloak_config['scheme'] }}://{{ keycloak_config['host'] }}:{{ keycloak_config['port'] }}{{ keycloak_config['http']['relative_path'] }}"
 
 awx:
-  url: "{{ awx_scheme }}://{{ awx_hostname }}:{{ awx_port }}"
+  url: "{{ awx_config['scheme'] }}://{{ awx_config['host'] }}:{{ awx_config['port'] }}"
   users:
-    notification-service:
-      username: "{{ awx_notification_service_username }}"
-      password: "{{ awx_notification_service_password }}"
-    resource-management:
-      username: "{{ awx_resource_management_username }}"
-      password: "{{ awx_resource_management_password }}"
-    service-management:
-      username: "{{ awx_service_management_username }}"
-      password: "{{ awx_service_management_password }}"
+    admin:
+      username: {{ awx_config['users']['admin']['username'] }}
+      password: {{ awx_config['users']['admin']['password'] }}
 
 consul:
-  url: "{{ consul_scheme }}://{{ consul_hostname }}:{{ consul_port }}"
-  master_token: "{{ consul_master_token }}"
-  tokens:
-    resource-management: "{{ consul_resource_management_token }}"
-    service-management: "{{ consul_service_management_token }}"
+  url: "{{ consul_config['scheme'] }}://{{ consul_config['host'] }}:{{ consul_config['port'] }}"
+  master_token: {{ consul_config['tokens']['master'] }}
 
 vault:
-  url: "{{ vault_scheme }}://{{ vault_hostname }}:{{ vault_port }}"
-  root_token: "{{ vault_root_token }}"
-  app-roles:
-    resource-management:
-      role-id: "{{ vault_resource_management_app_role_id }}"
-      secret-id: "{{ vault_resource_management_app_secret_id }}"
-    service-management:
-      role-id: "{{ vault_service_management_app_role_id }}"
-      secret-id: "{{ vault_service_management_app_secret_id }}"
+  url: "{{ vault_config['scheme'] }}://{{ vault_config['host'] }}:{{ vault_config['port'] }}"
+  root_token: {{ vault_config['tokens']['root'] }}
 
 notification-service:
-  url: "http://{{ notification_service_host }}:{{ notification_service_port }}"
+  url: "{{ notification_service_config['scheme'] }}://{{ notification_service_config['host'] }}:{{ notification_service_config['port'] }}"
   database:
-    host: {{ target_host }}
-    port: 3301
-    schema: {{ notification_service_database_schema }}
-    username: {{ notification_service_database_user }}
-    password: {{ notification_service_database_password }}
+    host: {{ notification_service_config['database']['host'] }}
+    port: {{ notification_service_config['database']['port'] }}
+    schema: {{ notification_service_config['database']['schema'] }}
+    username: {{ notification_service_config['database']['username'] }}
+    password: {{ notification_service_config['database']['password'] }}
+  awx:
+    username: {{ notification_service_config['awx']['username'] }}
+    password: {{ notification_service_config['awx']['password'] }}
+  consul:
+    scheme: {{ notification_service_config['consul']['scheme'] }}
+    host: {{ notification_service_config['consul']['host'] }}
+    port: {{ notification_service_config['consul']['port'] }}
 
 resource-management:
-  url: "http://{{ resource_management_host }}:{{ resource_management_port }}"
+  url: "{{ resource_management_config['scheme'] }}://{{ resource_management_config['host'] }}:{{ resource_management_config['port'] }}"
   database:
-    host: {{ target_host }}
-    port: 3310
-    schema: {{ resource_management_database_schema }}
-    username: {{ resource_management_database_user }}
-    password: {{ resource_management_database_password }}
+    host: {{ resource_management_config['database']['host'] }}
+    port: {{ resource_management_config['database']['port'] }}
+    schema: {{ resource_management_config['database']['schema'] }}
+    username: {{ resource_management_config['database']['username'] }}
+    password: {{ resource_management_config['database']['password'] }}
+  awx:
+    username: {{ resource_management_config['awx']['username'] }}
+    password: {{ resource_management_config['awx']['password'] }}
+  consul:
+    scheme: {{ resource_management_config['consul']['scheme'] }}
+    host: {{ resource_management_config['consul']['host'] }}
+    port: {{ resource_management_config['consul']['port'] }}
+  vault:
+    app-role:
+      role-id: {{ resource_management_config['vault']['app-role']['role-id'] }}
+      secret-id: {{ resource_management_config['vault']['app-role']['secret-id'] }}
 
 service-management:
-  url: "http://{{ service_management_host }}:{{ service_management_port }}"
+  url: "{{ service_management_config['scheme'] }}://{{ service_management_config['host'] }}:{{ service_management_config['port'] }}"
   database:
-    host: {{ target_host }}
-    port: 3320
-    schema: {{ service_management_database_schema }}
-    username: {{ service_management_database_user }}
-    password: {{ service_management_database_password }}
+    host: {{ service_management_config['database']['host'] }}
+    port: {{ service_management_config['database']['port'] }}
+    schema: {{ service_management_config['database']['schema'] }}
+    username: {{ service_management_config['database']['username'] }}
+    password: {{ service_management_config['database']['password'] }}
+  awx:
+    username: {{ service_management_config[ 'awx' ][ 'username' ] }}
+    password: {{ service_management_config[ 'awx' ][ 'password' ] }}
+  consul:
+    scheme: {{ service_management_config['consul']['scheme'] }}
+    host: {{ service_management_config['consul']['host'] }}
+    port: {{ service_management_config['consul']['port'] }}
+  vault:
+    app-role:
+      role-id: {{ service_management_config[ 'vault' ][ 'app-role' ][ 'role-id' ] }}
+      secret-id: {{ service_management_config[ 'vault' ][ 'app-role' ][ 'secret-id' ] }}
 
 catalog:
-  url: "http://{{catalog_service_host}}:{{catalog_service_port}}"
+  url: "{{ catalog_service_config['scheme'] }}://{{ catalog_service_config['host'] }}:{{ catalog_service_config['port'] }}"
   database:
-    host: {{ target_host }}
-    port: 3300
-    schema: {{ catalog_service_database_schema }}
-    username: {{ catalog_service_database_user }}
-    password: {{ catalog_service_database_password }}
+    host: {{ catalog_service_config['database']['host'] }}
+    port: {{ catalog_service_config['database']['port'] }}
+    schema: {{ catalog_service_config['database']['schema'] }}
+    username: {{ catalog_service_config['database']['username'] }}
+    password: {{ catalog_service_config['database']['password'] }}
 
 monitoring:
-    url: "http://{{monitoring_service_host}}:{{monitoring_service_port}}"
+  prometheus:
+    url: "{{ monitoring_config['prometheus']['scheme'] }}://{{ monitoring_config['prometheus']['host'] }}:{{ monitoring_config['prometheus']['port'] }}"
+  service:
+    url: "{{ monitoring_config['service']['scheme'] }}://{{ monitoring_config['service']['host'] }}:{{ monitoring_config['service']['port'] }}"

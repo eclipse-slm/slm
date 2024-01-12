@@ -1,0 +1,72 @@
+### Inputs
+- name: "Assert inputs of 'slm/init | create_and_store_config.yml'"
+  assert:
+    that:
+      - (_app_name is defined) and (_app_name|length > 0)   # Name of the app a config should be created and stored
+
+- name: "Add Vault config in Consul"
+  include_role:
+    name: vault/client
+    tasks_from: add_vault_config_in_consul
+
+- name: "Add Consul config in Consul"
+  include_role:
+    name: consul/client
+    tasks_from: add_consul_config_in_consul
+
+- name: "Get config from Consul"
+  include_role:
+    name: consul/client
+    tasks_from: get_app_config
+
+- name: "Create or get passwords"
+  block:
+  - name: "Create passwords"
+    set_fact:
+      database_root_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
+      database_user_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
+    when: app_configs[_app_name]['database'] is not defined
+
+  - name: "Get passwords"
+    set_fact:
+      database_root_password: "{{ app_configs[_app_name]['database']['root_password'] }}"
+      database_user_password: "{{ app_configs[_app_name]['database']['password'] }}"
+    when: app_configs[_app_name]['database'] is defined
+
+- name: "Store config in Consul"
+  include_role:
+    name: consul/client
+    tasks_from: create_or_add_config
+  vars:
+    _config:
+      scheme: "{{ scheme }}"
+      host: "{{ host }}"
+      port: "{{ port }}"
+      awx:
+        scheme: "{{ AWX_SCHEME }}"
+        host: "{{ AWX_HOST }}"
+        port: "{{ AWX_PORT }}"
+        username: "{{ awx_config.users.admin.username }}"
+        password: "{{ awx_config.users.admin.password }}"
+      database:
+        host: "{{ database_host }}"
+        port: "{{ database_port }}"
+        username: "{{ _app_name }}"
+        password: "{{ database_user_password }}"
+        root_password: "{{ database_root_password }}"
+        schema: "{{ database_schema }}"
+      consul:
+        acl-token: "{{ consul_app_token }}"
+
+- name: "Register {{ _app_name }} database at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: "{{ _app_name }}-database"
+    _service_port: "{{ database_port }}"
+    _service_address: "{{ database_host }}"
+    _tcp: "{{ database_host }}:{{ database_port }}"
+    _additional_tags:
+      - "{{ _app_name }}"
+      - "database"

@@ -1,0 +1,45 @@
+keycloak_clients:
+  - client_id: ui
+    public_client: true
+    service_accounts_enabled: false
+    assign_client_role_to_service_account: false
+    protocol_mappers:
+      audience: true
+      groups: true
+  - client_id: resource_management
+    public_client: false
+    service_accounts_enabled: true
+    assign_client_role_to_service_account: true
+    protocol_mappers:
+      audience: true
+      groups: true
+  - client_id: service_management
+    public_client: false
+    service_accounts_enabled: true
+    assign_client_role_to_service_account: true
+    protocol_mappers:
+      audience: true
+      groups: true
+  - client_id: notification_service
+    public_client: false
+    service_accounts_enabled: false
+    assign_client_role_to_service_account: false
+    protocol_mappers:
+      audience: true
+      groups: true
+
+vault:
+  approles:
+    - name: "resource_management"
+      policies:
+        - name: "resource_management"
+          policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"resources/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
+    - name: "service_management"
+      policies:
+        - name: "service_management"
+          policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"services/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"service-repositories/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
+  kv_secret_engines:
+    - "awx_jwt_authenticator"
+    - "resources"
+    - "services"
+    - "service-repositories"

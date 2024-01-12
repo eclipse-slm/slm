@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+
+  uninstaller:
+    build: .
+    image: ghcr.io/eclipse-slm/slm/uninstaller:1.4.0-SNAPSHOT
+    restart: no
+    volumes:
+      - "//var/run/docker.sock:/var/run/docker.sock"
+      - "./src:/src"

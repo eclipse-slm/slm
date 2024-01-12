@@ -21,6 +21,15 @@ logging.level.org.hibernate.SQL: TRACE
 
 ### Spring
 spring:
+  config:
+    import: "optional:consul:"
+  cloud:
+    consul:
+      enabled: false
+      discovery:
+        enabled: false
+      config:
+        enabled: false
   jpa:
     hibernate:
       ddl-auto: create-drop

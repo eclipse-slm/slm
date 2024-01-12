@@ -1,0 +1,85 @@
+- name: "Install Service Lifecycle Management"
+  hosts: localhost
+  gather_facts: yes
+  become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  vars_files:
+    - config.yml
+  pre_tasks:
+    - name: "Import config from env.yml"
+      include_vars: "/env/env.yml"
+    - set_fact:
+        SLM_HOSTNAME: "{{ lookup('ansible.builtin.env', 'SLM_HOSTNAME') }}"
+  tasks:
+    - name: "Define global variables"
+      block:
+        - set_fact:
+            CONSUL_URL: "{{ CONSUL_SCHEME }}://{{ CONSUL_HOST }}:{{ CONSUL_PORT }}"
+            KEYCLOAK_AUTH_URL: "{{ KEYCLOAK_SCHEME }}://{{ KEYCLOAK_HOST }}:{{ KEYCLOAK_PORT }}/auth"
+            VAULT_URL: "{{ VAULT_SCHEME }}://{{ VAULT_HOST }}:{{ VAULT_PORT }}"
+            AWX_URL: "{{ AWX_SCHEME }}://{{ AWX_HOST }}:{{ AWX_PORT }}"
+
+    - name: Display all variables/facts known for a host
+      debug:
+        var: hostvars['localhost']
+      tags: debug_info
+
+    - name: "Start Consul"
+      include_role:
+        name: consul/init
+        tasks_from: start.yml
+      vars:
+        _store_compose_file: /compose/consul.yml
+
+    - name: "Start Keycloak"
+      include_role:
+        name: keycloak/init
+      vars:
+        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+        _store_compose_file: /compose/keycloak.yml
+
+    - name: "Init Consul"
+      include_role:
+        name: consul/init
+      vars:
+        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+
+    - name: "Start Vault"
+      include_role:
+        name: vault/init
+      vars:
+        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+        _store_compose_file: /compose/vault.yml
+
+    - name: "Start AWX"
+      include_role:
+        name: awx/init
+      vars:
+        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+        _vault_token: "{{ vault_root_token }}"
+        _store_compose_file: /compose/awx.yml
+
+    - name: "Start AAS infrastructure"
+      include_role:
+        name: aas/init
+      vars:
+        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+        _store_compose_file: /compose/aas.yml
+
+    - name: "Start monitoring"
+      ansible.builtin.include_role:
+        name: monitoring/init
+      vars:
+        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+        _store_compose_file: /compose/monitoring.yml
+
+    - name: "Start internal SLM components"
+      include_role:
+        name: slm/init
+      vars:
+        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+        _store_compose_file: /compose/slm.yml
+
+    - debug:
+        msg: "Eclipse Service Lifecycle Management version '{{ SLM_VERSION }}' successfully installed. Your Consul master token: {{ CONSUL_MASTER_TOKEN }}"

@@ -1,0 +1,21 @@
+- assert:
+    that:
+      - (AWX_URL is defined) and (AWX_URL|length > 0)
+      - (awx_username is defined) and (awx_username|length > 0)
+      - (awx_password is defined) and (awx_password|length > 0)
+      - (awx_organization_name is defined) and (awx_organization_name|length > 0)
+
+- name: "Get organizations"
+  uri:
+    url: "{{ AWX_URL }}/api/v2/organizations"
+    method: GET
+    force_basic_auth: yes
+    url_username: "{{ awx_username }}"
+    url_password: "{{ awx_password }}"
+    status_code: 200
+  register: output_get_organizations
+
+- set_fact:
+    awx_organization: "{{ output_get_organizations.json.results | json_query(query) | first }} "
+  vars:
+    query: "[?name=='{{ awx_organization_name }}']"

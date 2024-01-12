@@ -1,0 +1,46 @@
+### Inputs
+- name: "Assert inputs of 'create_approle_with_policies.yml'"
+  assert:
+    that:
+      - (VAULT_URL is defined) and (VAULT_URL|length > 0)         # URL of Vault
+      - (_vault_token is defined) and (_vault_token|length > 0)     # Token to authenticate with Vault
+      - (_approle_name is defined) and (_approle_name|length > 0)   # Name of the app rol to be created
+      # Optional
+      # _approle_policies:                                          # List of policies to be added to the create app role
+      #   - name: "sample_policy"
+      #     policy: "path \"sample_path/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
+
+- import_tasks: create_approle.yml
+
+- block:
+  - include_tasks: create_policy.yml
+    vars:
+      _policy_name: "{{ app_role.name }}"
+      _policy_content: "{{ app_role.policy }}"
+    loop: "{{ _approle_policies }}"
+    loop_control:
+      loop_var: app_role
+
+  - include_tasks: add_policy_to_approle.yml
+    vars:
+      _new_approle_token_policy: "{{ app_role.name }}"
+    loop: "{{ _approle_policies }}"
+    loop_control:
+      loop_var: app_role
+  when: (_approle_policies|length > 0)
+
+- name: "Add common AWX config in Consul"
+  include_role:
+    name: consul/client
+    tasks_from: create_or_add_config
+  vars:
+    _app_name: "{{ _approle_name }}"
+    _config:
+      vault:
+        app-role:
+          role-id: '{{ vault_approle_role_id}}'
+          secret-id: '{{ vault_approle_secret_id}}'
+
+### Outputs
+# vault_approle_role_id   (from create_approle.yml)       # Role id of the created app role
+# vault_approle_secret_id (from create_approle.yml)       # Secret id of the created app role
