@@ -1,6 +1,0 @@
----
-roles:
-  - src: "git+https://github.com/eclipse-slm/slm-ansible-role-docker"
-    scm: git
-    version: main
-    name: docker
