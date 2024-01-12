@@ -15,6 +15,6 @@ services:
     extra_hosts:
       - "${SLM_HOSTNAME}:172.17.0.1"
     volumes:
-      - C:\Users\maes\Daten\Dev\eclipse-slm\slm:/project
+      - "${LOCAL_PROJECT_PATH}:/project"
       - "./src:/src"
       - "./templates:/templates"
