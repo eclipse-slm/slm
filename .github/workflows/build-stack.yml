@@ -42,7 +42,6 @@ jobs:
           - aas-broker
           - aas-gui
           - awx-postgres
-          - consul
           - keycloak
           - vault
           - prometheus
