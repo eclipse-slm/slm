@@ -1,6 +1,7 @@
 package org.eclipse.slm.common.minio.client.test;
 
 import org.eclipse.slm.common.minio.client.MinioClient;
+import org.eclipse.slm.common.minio.model.exceptions.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.security.InvalidKeyException;
@@ -75,14 +77,14 @@ public class BasicMinioClientTests {
     }
 
     @Test
-    public void shouldCreateANewBucket() throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+    public void shouldCreateANewBucket() throws MinioBucketCreateException, MinioBucketNameException {
         var bucketName = "should-create-a-new-bucket";
         minioClient.createBucket(bucketName);
         assertTrue(minioClient.bucketExist(bucketName));
     }
 
     @Test
-    public void shouldUploadFileToNotExistedBucketAndCheckIfExist() throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+    public void shouldUploadFileToNotExistedBucketAndCheckIfExist() throws MinioUploadException, MinioBucketCreateException, MinioBucketNameException, MinioObjectPathNameException {
 
         var bucketName = "upload-file-not-existed-bucket";
         var objectName = "/test/Object";
@@ -95,7 +97,7 @@ public class BasicMinioClientTests {
     }
 
     @Test
-    public void shouldUploadFileToBucketAndCheckIfExist() throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+    public void shouldUploadFileToBucketAndCheckIfExist() throws MinioBucketCreateException, MinioUploadException, MinioBucketNameException, MinioObjectPathNameException {
 
         var bucketName = "upload-file-existed-bucket";
         var objectName = "/test/Object";
@@ -109,7 +111,7 @@ public class BasicMinioClientTests {
     }
 
     @Test
-    public void shouldGetContentOfUploadedObject() throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+    public void shouldGetContentOfUploadedObject() throws IOException, MinioUploadException, MinioBucketCreateException, MinioBucketNameException, MinioObjectPathNameException {
 
         var bucketName = "get-content-of-uploaded-object";
         var objectName = "/test/Object";
@@ -121,6 +123,39 @@ public class BasicMinioClientTests {
         var objectContent = minioClient.getObjectContentAsString(bucketName, objectName);
 
         assertEquals(fileContent, objectContent);
+    }
+
+    @Test
+    public void shouldUploadFileStreamToBucketAndCheckIfExist() throws IOException, MinioBucketCreateException, MinioUploadException, MinioBucketNameException, MinioObjectPathNameException {
+
+        var bucketName = "upload-file-existed-bucket";
+        var objectName = "/test/Object";
+        var file = new File("src/test/resources/test.txt");
+        var stream = new FileInputStream(file);
+
+        minioClient.createBucket(bucketName);
+        minioClient.putObject(bucketName, objectName, stream, stream.available(), "text/plain");
+
+        assertTrue(minioClient.bucketExist(bucketName));
+        assertTrue(minioClient.objectExist(bucketName, objectName));
+    }
+
+    @Test
+    public void shouldRemoveObjectFromBucket() throws IOException, MinioBucketCreateException, MinioUploadException, MinioRemoveObjectException, MinioObjectPathNameException, MinioBucketNameException {
+
+        var bucketName = "upload-file-existed-bucket";
+        var objectName = "/test/Object";
+        var file = new File("src/test/resources/test.txt");
+        var stream = new FileInputStream(file);
+
+        minioClient.createBucket(bucketName);
+        minioClient.putObject(bucketName, objectName, stream, stream.available(), "text/plain");
+
+        assertTrue(minioClient.objectExist(bucketName, objectName));
+
+        minioClient.removeObject(bucketName, objectName);
+
+        assertFalse(minioClient.objectExist(bucketName, objectName));
     }
 
 
