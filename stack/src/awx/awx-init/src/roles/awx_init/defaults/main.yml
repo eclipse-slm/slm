@@ -90,7 +90,7 @@ awx_credentials:
   - name: Minio
     credential_type: Minio
     inputs:
-      minio_url: "http://minio:9091/"
+      minio_url: "http://minio:9000"
       minio_access_key: "{{ minio_access_key }}"
       minio_secret_key: "{{ minio_secret_key }}"
 

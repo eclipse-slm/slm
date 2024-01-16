@@ -64,7 +64,7 @@
         monitoring_service_port: "{{ lookup('env', 'MONITORING_SERVICE_PORT') }}"
         minio_scheme: "http"
         minio_hostname: "{{ lookup('env', 'SLM_HOSTNAME') }}"
-        minio_port: "{{ lookup('env', 'MINIO_PORT_HTTP') }}"
+        minio_port: "{{ lookup('env', 'MINIO_API_PORT') }}"
         minio_config_service_management_access_key: "{{ lookup('file', '/config/minio/service-management/service_management_access') }}"
         minio_config_service_management_secret_key: "{{ lookup('file', '/config/minio/service-management/service_management_secret') }}"
 

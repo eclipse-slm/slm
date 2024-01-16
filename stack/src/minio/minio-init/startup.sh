@@ -11,30 +11,36 @@ done
 
 ALIAS="slm"
 
-service_access_key=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 20)
-service_password=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32)
-
-awx_access_key=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 20)
-awx_password=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32)
-
 ./mc alias set $ALIAS http://minio:9000/ admin password
 
-USER="service-management"
-./mc admin user add $ALIAS $USER $service_password
-./mc admin policy attach $ALIAS readwrite --user $USER
-./mc admin user svcacct add --access-key $service_access_key --secret-key $service_password $ALIAS $USER &> /dev/null
-echo Access Key for $USER created
+service_access_key_file=/app/service-management/service_management_access
+service_password_file=/app/service-management/service_management_secret
+if ! test -f "$service_access_key_file" && ! test -f "$service_password_file"; then
+  service_access_key=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 20)
+  service_password=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32)
 
+  USER="service-management"
+  ./mc admin user add $ALIAS $USER $service_password
+  ./mc admin policy attach $ALIAS readwrite --user $USER
+  ./mc admin user svcacct add --access-key $service_access_key --secret-key $service_password $ALIAS $USER &> /dev/null
+  echo Access Key for $USER created
 
-USER="awx"
-./mc admin user add $ALIAS $USER $service_password
-./mc admin policy attach $ALIAS readwrite --user $USER
-./mc admin user svcacct add --access-key $awx_access_key --secret-key $awx_password $ALIAS $USER &> /dev/null
-echo Access Key for $USER created
+  echo $service_access_key > $service_access_key_file
+  echo $service_password > $service_password_file
+fi
 
+awx_access_key_file=/app/awx/awx_access
+awx_password_file=/app/awx/awx_secret
+if ! test -f "$awx_access_key_file" && ! test -f "$awx_password_file"; then
+  awx_access_key=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 20)
+  awx_password=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32)
 
-echo $service_access_key > /app/service-management/service_management_access
-echo $service_password > /app/service-management/service_management_secret
+  USER="awx"
+  ./mc admin user add $ALIAS $USER $service_password
+  ./mc admin policy attach $ALIAS readwrite --user $USER
+  ./mc admin user svcacct add --access-key $awx_access_key --secret-key $awx_password $ALIAS $USER &> /dev/null
+  echo Access Key for $USER created
 
-echo $awx_access_key > /app/awx/awx_access
-echo $awx_password > /app/awx/awx_secret
+  echo $awx_access_key > $awx_access_key_file
+  echo $awx_password > $awx_password_file
+fi
