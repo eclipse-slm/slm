@@ -16,6 +16,7 @@
     </parent>
     <modules>
         <module>common.minio.client</module>
+        <module>common.minio.model</module>
     </modules>
 
 </project>
