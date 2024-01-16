@@ -7,5 +7,6 @@ import org.eclipse.slm.service_management.model.offerings.DeploymentDefinition
 
 @JsonTypeName("CODESYS")
 class CodesysDeploymentDefinition : DeploymentDefinition(DeploymentType.CODESYS) {
-
+    @JsonProperty("applicationPath")
+    var applicationPath = ""
 }
