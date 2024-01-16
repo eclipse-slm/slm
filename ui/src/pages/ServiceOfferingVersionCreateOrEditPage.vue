@@ -208,7 +208,8 @@
 
             manifestFile: '',
 
-            codesysFile: ''
+            codesysFile: '',
+            applicationPath: ''
           },
           serviceRequirements: []
         },
@@ -318,6 +319,18 @@
               ServiceOfferingVersionsRestApi.updateServiceOfferingVersion(serviceOfferingVersionDTO).then(
                 response => {
                   if (response.status === 200) {
+
+                    if(serviceOfferingVersionDTO.deploymentDefinition.deploymentType === 'CODESYS'){
+                      ServiceOfferingVersionsRestApi.uploadFileForServiceOfferingVersion(
+                          response.data.serviceOfferingId,
+                          response.data.serviceOfferingVersionId,
+                          serviceOfferingVersionDTO.deploymentDefinition.deploymentType,
+                          this.newServiceOfferingVersion.deploymentDefinition.codesysFile
+                      ).then(uploadFileResponse => {
+                        Vue.$toast.info('Successfully uploaded file for offering')
+                      }).catch(error => console.log(error));
+                    }
+
                     Vue.$toast.info('Successfully updated service offering version')
                     this.$store.dispatch('getServiceOfferings')
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
@@ -333,6 +346,18 @@
               ServiceOfferingVersionsRestApi.addServiceOfferingVersion(serviceOfferingVersionDTO).then(
                 response => {
                   if (response.status === 200) {
+
+                    if(serviceOfferingVersionDTO.deploymentDefinition.deploymentType === 'CODESYS'){
+                      ServiceOfferingVersionsRestApi.uploadFileForServiceOfferingVersion(
+                          response.data.serviceOfferingId,
+                          response.data.serviceOfferingVersionId,
+                          serviceOfferingVersionDTO.deploymentDefinition.deploymentType,
+                          this.newServiceOfferingVersion.deploymentDefinition.codesysFile
+                      ).then(uploadFileResponse => {
+                        Vue.$toast.info('Successfully uploaded file for offering')
+                      }).catch(error => console.log(error));
+                    }
+
                     Vue.$toast.info('Successfully created service offering version')
                     this.$store.dispatch('getServiceOfferings')
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })

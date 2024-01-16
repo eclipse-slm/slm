@@ -22,17 +22,22 @@
                 auto-grow
                 dense
                 outlined
-                @change="onLoadCodesysZipFileClicked"
+                @change="onLoadCodesysApplicationFileClicked($event)"
               />
             </v-col>
             <v-spacer />
           </v-row>
-          <v-textarea
-            v-model="serviceOfferingVersion.deploymentDefinition.codesysFile"
-            class="full-width"
-            outlined
-            dense
-          />
+          <v-row>
+            <v-col>
+              <v-btn
+                :disabled="!isApplicationEmpty"
+                :color="$vuetify.theme.themes.light.primary"
+                @click="onDownloadCodesysApplicationClick()"
+              >
+                application.zip
+              </v-btn>
+            </v-col>
+          </v-row>
         </v-list-group>
       </v-list>
     </v-form>
@@ -62,6 +67,7 @@
   import 'vue-json-pretty/lib/styles.css'
   import YAML from 'yaml'
   import ServiceRepositorySelect from '@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect'
+  import ServiceOfferingVersionsRestApi from "@/api/service-management/serviceOfferingVersionsRestApi";
   const { parse } = require('dot-properties')
 
   export default {
@@ -77,6 +83,11 @@
         uploadedCodesysFile: null,
       }
     },
+    computed: {
+      isApplicationEmpty(){
+        return this.serviceOfferingVersion.deploymentDefinition.applicationPath && this.serviceOfferingVersion.deploymentDefinition.applicationPath.length > 0;
+      }
+    },
     mounted() {
       if (this.editMode) {
 
@@ -90,17 +101,24 @@
 
         this.$emit('step-completed', this.stepNumber)
       },
-      onLoadCodesysZipFileClicked (files) {
-        if (!this.uploadedCodesysFile) {
+      onLoadCodesysApplicationFileClicked (files) {
+        if (!files) {
           this.serviceOfferingVersion.deploymentDefinition.codesysFile = 'No file chosen'
         } else {
-          const reader = new FileReader()
-          reader.readAsArrayBuffer(this.uploadedCodesysFile)
-          reader.onload = () => {
-            this.serviceOfferingVersion.deploymentDefinition.codesysFile = this.uploadedCodesysFile
-          }
+          this.serviceOfferingVersion.deploymentDefinition.codesysFile = files;
+          this.uploadedCodesysFile = files;
         }
       },
+      onDownloadCodesysApplicationClick(){
+        ServiceOfferingVersionsRestApi.downloadFileForServiceOfferingVersion(this.serviceOfferingVersion.serviceOfferingId, this.serviceOfferingVersion.id, 'application.zip').then(response => {
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'application.zip');
+          document.body.appendChild(link);
+          link.click();
+        });
+      }
     },
 
   }

@@ -100,6 +100,21 @@ class ServiceOfferingVersionsRestApi {
                 return response
             })
     }
+
+    async uploadFileForServiceOfferingVersion(serviceOfferingId, serviceOfferingVersionId, deploymentType, file) {
+        let formData = new FormData();
+        formData.append('file', file);
+        return axios.post(`${this.API_URL}/${serviceOfferingId}/versions/${serviceOfferingVersionId}/file`, formData)
+            .then(response => {
+                return response
+            });
+    }
+
+    async downloadFileForServiceOfferingVersion(serviceOfferingId, serviceOfferingVersionId,fileName){
+        return axios.get(`${this.API_URL}/${serviceOfferingId}/versions/${serviceOfferingVersionId}/file/${fileName}`,
+            {responseType: 'blob'});
+    }
+
 }
 
 export default new ServiceOfferingVersionsRestApi()
