@@ -93,11 +93,13 @@ jobs:
             
             echo ${{secrets.GITHUB_TOKEN}} | docker login -u${{github.actor}} --password-stdin ghcr.io
             
+            docker pull ghcr.io/eclipse-slm/slm/uninstaller:$CORE_VERSION
             docker run \
               --rm \
               --volume /var/run/docker.sock:/var/run/docker.sock \
               ghcr.io/eclipse-slm/slm/uninstaller:$CORE_VERSION
 
+            docker pull ghcr.io/eclipse-slm/slm/installer:$CORE_VERSION
             docker run \
               --rm \
               --env SLM_HOSTNAME=$STAGING_VM_HOSTNAME \
