@@ -91,6 +91,8 @@ jobs:
             cd /staging/tmp/slm
             CORE_VERSION=$(cat pom.xml | grep -oPm1 "(?<=<revision>)[^<]+")
             
+            echo ${{secrets.GITHUB_TOKEN}} | docker login -u${{github.actor}} --password-stdin ghcr.io
+            
             docker run \
               --rm \
               --volume /var/run/docker.sock:/var/run/docker.sock \
