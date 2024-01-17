@@ -39,6 +39,8 @@
       community.docker.docker_compose:
         project_name: eclipse-slm
         definition: "{{ consul_compose | from_yaml}}"
+        state: present
+        pull: true
     - name: "Consul | Wait for Consul ('{{ CONSUL_URL }}') being up"
       uri:
         url: "{{ CONSUL_URL }}"

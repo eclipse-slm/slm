@@ -20,10 +20,10 @@
             VAULT_URL: "{{ VAULT_SCHEME }}://{{ VAULT_HOST }}:{{ VAULT_PORT }}"
             AWX_URL: "{{ AWX_SCHEME }}://{{ AWX_HOST }}:{{ AWX_PORT }}"
 
-    - name: Display all variables/facts known for a host
-      debug:
-        var: hostvars['localhost']
-      tags: debug_info
+#    - name: Display all variables/facts known for a host
+#      debug:
+#        var: hostvars['localhost']
+#      tags: debug_info
 
     - name: "Start Consul"
       include_role:

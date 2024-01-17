@@ -5,6 +5,8 @@
   community.docker.docker_compose:
     project_name: eclipse-slm
     definition: "{{ aas_compose | from_yaml}}"
+    state: present
+    pull: true
 
 - name: "Store resulting compose file"
   template:

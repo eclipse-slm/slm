@@ -78,6 +78,8 @@
       community.docker.docker_compose:
         project_name: eclipse-slm
         definition: "{{ keycloak_compose | from_yaml}}"
+        state: present
+        pull: true
     - name: "Wait for Keycloak being up"
       uri:
         url: "{{ KEYCLOAK_AUTH_URL }}"

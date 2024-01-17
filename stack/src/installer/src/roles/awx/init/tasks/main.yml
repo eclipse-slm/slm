@@ -130,6 +130,8 @@
       community.docker.docker_compose:
         project_name: eclipse-slm
         definition: "{{ awx_compose | from_yaml}}"
+        state: present
+        pull: true
     - name: "Wait for AWX being up"
       uri:
         url: "{{ AWX_URL }}"

@@ -20,6 +20,8 @@
     community.docker.docker_compose:
       project_name: eclipse-slm
       definition: "{{ vault_compose | from_yaml}}"
+      state: present
+      pull: true
     register: vault_compose_start_output
   - name: "Wait for Vault being up"
     uri:
