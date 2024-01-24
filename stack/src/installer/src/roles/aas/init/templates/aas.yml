@@ -49,7 +49,7 @@ services:
     volumes:
       - "aas_database:/data/db"
     healthcheck:
-      test: [ "CMD","mongo", "--eval", "db.adminCommand('ping')" ]
+      test: [ "CMD","mongosh", "--eval", "db.runCommand('ping').ok", "--quiet" ]
       interval: 10s
       timeout: 10s
       retries: 5
