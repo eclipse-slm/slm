@@ -35,10 +35,9 @@ services:
     volumes:
       - prometheus-targets:/etc/prometheus/targets/
     healthcheck:
-      test: curl --fail http://localhost:9090/-/healthy || exit 1
+      test:  wget --quiet --tries=1 --spider http://localhost:9090/-/healthy || exit
       interval: 60s
       retries: 5
-      start_period: 20s
       timeout: 10s
 
 volumes:

@@ -23,8 +23,6 @@ services:
       AWX_URL: "http://{{ SLM_HOSTNAME }}:{{ AWX_PORT }}"
       BASYX_AAS_GUI_URL: "http://{{ SLM_HOSTNAME }}:3000"
       CONSUL_TOKEN: "{{ app_configs['resource_management']['consul']['acl-token'] }}"
-    healthcheck:
-      test: [ "CMD", "curl", "http://localhost:8080" ]
 
   resource-management:
     image: "ghcr.io/eclipse-slm/slm/resource-management:{{ SLM_VERSION }}"

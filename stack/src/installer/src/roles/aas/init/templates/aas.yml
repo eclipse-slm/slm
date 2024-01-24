@@ -48,6 +48,11 @@ services:
           - aas-database
     volumes:
       - "aas_database:/data/db"
+    healthcheck:
+      test: [ "CMD","mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
 
   aas-gui:
     image: "ghcr.io/eclipse-slm/aas/gui:{{ AAS_GUI_VERSION }}"
@@ -76,6 +81,11 @@ services:
       default:
         aliases:
           - aas-broker
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9001" ]
+      interval: 10s
+      timeout: 10s
+      retries: 6
 
   aas-transformer:
     image: "ghcr.io/fabos-ai/aas-transformer/service:{{ AAS_TRANSFORMER_VERSION }}"
@@ -120,6 +130,8 @@ services:
       MARIADB_ROOT_PASSWORD: "{{ AAS_TRANSFORMER_DATABASE_ROOT_PASSWORD }}"
     volumes:
       - "aas_transformer_database:/var/lib/mysql"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "--silent" ]
 
   aas-transformer-initializer:
     image: "ghcr.io/fabos-ai/aas-transformer/initializer:{{ AAS_TRANSFORMER_VERSION }}"

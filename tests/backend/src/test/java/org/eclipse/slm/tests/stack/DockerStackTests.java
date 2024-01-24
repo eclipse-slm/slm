@@ -24,26 +24,36 @@ public class DockerStackTests {
     private static final Logger LOG = LoggerFactory.getLogger(DockerStackTests.class);
 
     private HashMap<String, String> stackContainerStateMap = new HashMap<>() {{
-        put("awx-init", "exited");
-        put("awx", "running");
-        put("awx-redis", "healthy");
-        put("awx-redis-init", "exited");
-        put("awx-postgres", "healthy");
+        put("aas-broker", "healthy");
+        put("aas-database", "healthy");
+        put("aas-gui", "running");
+        put("aas-registry", "running");
+        put("aas-server", "running");
+        put("aas-transformer", "running");
+        put("aas-transformer-database", "healthy");
+        put("aas-transformer-initializer", "exited");
         put("awx-jwt-authenticator", "healthy");
-        put("consul", "healthy");
+        put("awx-postgres", "healthy");
+        put("awx-redis-init", "exited");
+        put("awx-redis", "healthy");
+        put("awx", "running");
         put("consul-esm", "running");
+        put("consul", "healthy");
         put("keycloak", "healthy");
         put("keycloak-database", "healthy");
-        put("keycloak-init", "exited");
-        put("vault", "healthy");
-        put("ui", "running");
-        put("notification-service", "healthy");
+        put("monitoring-prometheus-aas", "running");
+        put("monitoring-prometheus-configurator", "running");
         put("notification-service-database", "healthy");
-        put("resource-management", "healthy");
+        put("notification-service", "healthy");
+        put("prometheus", "healthy");
         put("resource-management-database", "healthy");
-        put("service-management", "healthy");
+        put("resource-management-init", "exited");
+        put("resource-management", "healthy");
         put("service-management-database", "healthy");
         put("service-management-init", "exited");
+        put("service-management", "healthy");
+        put("ui", "running");
+        put("vault", "healthy");
     }};
 
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -64,7 +74,7 @@ public class DockerStackTests {
         DockerClient dockerClient = DockerClientImpl.getInstance(dockerClientConfig, httpClient);
 
         long start_time = System.currentTimeMillis();
-        long timeout = 600000;
+        long timeout = 300000;
         while (System.currentTimeMillis() < start_time + timeout) {
 
             List<Container> containers = dockerClient.listContainersCmd()
