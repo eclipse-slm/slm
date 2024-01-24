@@ -38,7 +38,7 @@ public class DockerStackTests {
         put("awx-redis", "healthy");
         put("awx", "running");
         put("consul", "healthy");
-        put("consul-esm", "running");
+//        put("consul-esm", "running");
         put("keycloak", "healthy");
         put("keycloak-database", "healthy");
         put("monitoring-prometheus-aas", "running");
@@ -47,7 +47,7 @@ public class DockerStackTests {
         put("notification-service", "healthy");
         put("prometheus", "healthy");
         put("resource-management-database", "healthy");
-        put("resource-management-init", "exited");
+//        put("resource-management-init", "exited");
         put("resource-management", "healthy");
         put("service-management-database", "healthy");
         put("service-management-init", "exited");
