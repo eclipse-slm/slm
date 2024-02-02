@@ -151,6 +151,7 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                 awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, keycloakPrincipal, new ExtraVars(extraVarsMap), JobGoal.CREATE, this);
                 this.notificationServiceClient.postJobObserver(keycloakPrincipal, awxJobObserver);
             }
+            break;
             default:
                 throw new NotImplementedException("Deployment Type '" + serviceOfferingDeploymentType + "' not supported");
         }

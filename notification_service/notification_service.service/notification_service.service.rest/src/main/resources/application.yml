@@ -107,7 +107,8 @@ consul:
   host: localhost
   port: 8500
   datacenter: fabos
-  acl-token: myroot
+  acl-token: vlX3rwRUDFzQ2hKxyaffX7wi
+
 ### Vault
 vault:
   scheme: http
