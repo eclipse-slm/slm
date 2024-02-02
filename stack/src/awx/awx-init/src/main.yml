@@ -70,41 +70,10 @@
         name: awx_init
         tasks_from: helper/keycloak_import_config_shared_volume.yml
 
-    - name: "Check if Minio configuration file '{{ minio_access_key_file }}' exists"
-      stat:
-        path: "{{ minio_access_key_file }}"
-      register: stat_result
-      until:
-        - stat_result.stat.exists
-      retries: 1000
-      delay: 1
-
-    - name: "Read Minio secret key from file '{{ minio_access_key_file }}'"
-      set_fact:
-        minio_access_key: "{{ lookup('file', minio_access_key_file) }}"
-
-    - assert:
-        that:
-          - (minio_access_key is defined) and (minio_access_key|length > 0)
-        fail_msg: "Import of Minio secret key from file '{{ minio_access_key_file }}' failed"
-
-    - name: "Check if Minio configuration file '{{ minio_secret_key_file }}' exists"
-      stat:
-        path: "{{ minio_secret_key_file }}"
-      register: stat_result
-      until:
-        - stat_result.stat.exists
-      retries: 1000
-      delay: 1
-
-    - name: "Read Minio secret key from file '{{ minio_secret_key_file }}'"
-      set_fact:
-        minio_secret_key: "{{ lookup('file', minio_secret_key_file) }}"
-
-    - assert:
-        that:
-          - (minio_secret_key is defined) and (minio_secret_key|length > 0)
-        fail_msg: "Import of Minio secret key from file '{{ minio_secret_key_file }}' failed"
+    - name: "Import Minio configuration from shared volume"
+      include_role:
+        name: awx_init
+        tasks_from: helper/minio_import_config_shared_volume.yml
 
 
     - name: "Wait for AWX being up"

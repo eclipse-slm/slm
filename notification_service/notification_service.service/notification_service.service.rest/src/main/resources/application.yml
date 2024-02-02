@@ -108,3 +108,13 @@ consul:
   port: 8500
   datacenter: fabos
   acl-token: myroot
+### Vault
+vault:
+  scheme: http
+  host: fabos.local
+  port: 8200
+  authentication: APPROLE
+  app-role:
+    role-id: service-management
+    secret-id: be23b99f-e438-2c38-e2cc-ba354bf340cb
+    app-role-path: approle

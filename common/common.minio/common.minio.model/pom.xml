@@ -6,15 +6,14 @@
     <parent>
         <groupId>org.eclipse.slm</groupId>
         <artifactId>common.minio</artifactId>
-        <version>1.4.0-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
+    <groupId>org.eclipse.slm</groupId>
     <artifactId>common.minio.model</artifactId>
+    <version>${revision}</version>
+    <packaging>jar</packaging>
 
-    <properties>
-        <maven.compiler.source>19</maven.compiler.source>
-        <maven.compiler.target>19</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+
 
 </project>

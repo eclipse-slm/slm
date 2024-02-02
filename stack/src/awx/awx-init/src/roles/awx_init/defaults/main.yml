@@ -72,8 +72,8 @@ awx_credential_types:
     injectors:
       env:
         MINIO_URL: "{% raw %}{{ minio_url }}{% endraw %}"
-        MINIO_ACCESS_KEY: "{% raw %}{{ minio_accessKey }}{% endraw %}"
-        MINIO_SECRET_KEY: "{% raw %}{{ minio_secretKey }}{% endraw %}"
+        MINIO_ACCESS_KEY: "{% raw %}{{ minio_access_key }}{% endraw %}"
+        MINIO_SECRET_KEY: "{% raw %}{{ minio_secret_key }}{% endraw %}"
 
 awx_credentials:
   - name: Consul

@@ -16,6 +16,7 @@ import org.eclipse.slm.resource_management.model.consul.capability.SingleHostCap
 import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
 import org.eclipse.slm.resource_management.service.client.handler.ApiException;
 import org.eclipse.slm.service_management.model.exceptions.ServiceOptionNotFoundException;
+import org.eclipse.slm.service_management.model.offerings.codesys.CodesysDeploymentDefinition;
 import org.eclipse.slm.service_management.service.rest.utils.DockerContainerServiceOfferingOrderUtil;
 import org.eclipse.slm.service_management.model.offerings.ServiceOrder;
 import org.eclipse.slm.service_management.model.offerings.ServiceOfferingVersion;
@@ -133,6 +134,22 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                 awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, keycloakPrincipal, new ExtraVars(extraVarsMap), JobGoal.CREATE, this);
                 this.notificationServiceClient.postJobObserver(keycloakPrincipal, awxJobObserver);
                 break;
+            }
+
+            case CODESYS:{
+                var codesysDeploymentDefinition = (CodesysDeploymentDefinition)serviceOfferingVersion.getDeploymentDefinition();
+                HashMap<String, Object> extraVarsMap = new HashMap<>() {{
+                    put("service_id", serviceId);
+                    put("keycloak_token", keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+                    put("service_name", serviceHoster.getCapabilityService().getService());
+                    put("supported_connection_types", awxCapabilityAction.getConnectionTypes());
+                    put("application_path", codesysDeploymentDefinition.getApplicationPath());
+                }};
+
+                extraVarsMap = this.addExtraVarsForServiceRepositories(extraVarsMap, serviceOfferingVersion);
+
+                awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, keycloakPrincipal, new ExtraVars(extraVarsMap), JobGoal.CREATE, this);
+                this.notificationServiceClient.postJobObserver(keycloakPrincipal, awxJobObserver);
             }
             default:
                 throw new NotImplementedException("Deployment Type '" + serviceOfferingDeploymentType + "' not supported");
