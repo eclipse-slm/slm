@@ -157,12 +157,6 @@
             <artifactId>commons-validator</artifactId>
             <version>1.7</version>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.slm</groupId>
-            <artifactId>common.awx.model</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
