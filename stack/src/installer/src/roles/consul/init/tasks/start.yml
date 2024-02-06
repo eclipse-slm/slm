@@ -44,9 +44,11 @@
     - name: "Consul | Wait for Consul ('{{ CONSUL_URL }}') being up"
       uri:
         url: "{{ CONSUL_URL }}/v1/status/leader"
+        return_content: yes
+        body_format: json
         status_code: 200
       register: result
-      until: result.json|length > 0
+      until: (result.json is defined) and (result.json|length > 0)
       retries: 120
       delay: 3
 
