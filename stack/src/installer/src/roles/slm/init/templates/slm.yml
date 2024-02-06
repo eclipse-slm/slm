@@ -147,6 +147,7 @@ services:
       KEYCLOAK_REALM: "{{ KEYCLOAK_REALM }}"
       KEYCLOAK_USERNAME: "{{ keycloak_config['default_user_username'] }}"
       KEYCLOAK_PASSWORD: "{{ keycloak_config['default_user_password'] }}"
+      CONSUL_ACLTOKEN: "{{ app_configs['service_management']['consul']['acl-token'] }}"
 
   service-management-database:
     image: "mariadb:{{ SERVICE_MANAGEMENT_DATABASE_VERSION }}"
