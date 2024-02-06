@@ -147,6 +147,9 @@ services:
       KEYCLOAK_REALM: "{{ KEYCLOAK_REALM }}"
       KEYCLOAK_USERNAME: "{{ keycloak_config['default_user_username'] }}"
       KEYCLOAK_PASSWORD: "{{ keycloak_config['default_user_password'] }}"
+      CONSUL_SCHEME: "{{ app_configs['service_management']['consul']['scheme'] }}"
+      CONSUL_HOST: "{{ app_configs['service_management']['consul']['host'] }}"
+      CONSUL_PORT: "{{ app_configs['service_management']['consul']['port'] }}"
       CONSUL_ACLTOKEN: "{{ app_configs['service_management']['consul']['acl-token'] }}"
 
   service-management-database:
