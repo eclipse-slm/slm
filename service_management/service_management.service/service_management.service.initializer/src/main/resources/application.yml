@@ -1,3 +1,4 @@
+# Service Management
 service-management:
   url: http://localhost:9020
   init-directories:
@@ -5,6 +6,7 @@ service-management:
     urls: "https://github.com/FabOS-AI/fabos-slm-service-registry-content.git"
     clone-directory: tmp/
 
+# Keycloak
 keycloak:
   auth-server-url: http://localhost:7080/auth
   realm: fabos
@@ -18,3 +20,13 @@ consul:
   port: 8500
   datacenter: fabos
   acl-token: your-consul-acl-token
+
+# Spring
+spring:
+  cloud:
+    consul:
+      host: ${consul.host}
+      port: ${consul.port}
+      discovery:
+        enabled: true
+        acl-token: ${consul.acl-token}
