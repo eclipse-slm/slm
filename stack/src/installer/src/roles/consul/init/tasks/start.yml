@@ -43,10 +43,10 @@
         pull: true
     - name: "Consul | Wait for Consul ('{{ CONSUL_URL }}') being up"
       uri:
-        url: "{{ CONSUL_URL }}"
+        url: "{{ CONSUL_URL }}/v1/status/leader"
         status_code: 200
       register: result
-      until: result.status == 200
+      until: result.json|length > 0
       retries: 120
       delay: 3
 
