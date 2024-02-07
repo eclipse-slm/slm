@@ -106,6 +106,9 @@ jobs:
               --volume /var/run/docker.sock:/var/run/docker.sock \
               --add-host $STAGING_VM_HOSTNAME:172.17.0.1\
               ghcr.io/eclipse-slm/slm/installer:$CORE_VERSION
+            
+            docker system prune -f
+
       - name: Test stack running on staging VM
         uses: appleboy/ssh-action@v0.1.10
         with:
