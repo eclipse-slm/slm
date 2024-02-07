@@ -16,6 +16,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 
@@ -38,6 +39,8 @@ public class Application {
 
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
 
+    private final ConfigurableApplicationContext applicationContext;
+
     private final ServiceOfferingInitializer serviceOfferingInitializer;
 
     private final ServiceVendorsInitializer serviceVendorsInitializer;
@@ -51,7 +54,8 @@ public class Application {
     private final DiscoveryClient discoveryClient;
 
     @Autowired
-    public Application(ServiceOfferingInitializer serviceOfferingInitializer, ServiceVendorsInitializer serviceVendorsInitializer, ServiceRepositoriesInitializer serviceRepositoriesInitializer, ServiceCategoriesInitializer serviceCategoriesInitializer, GitRepoInitializer gitRepoInitializer, DiscoveryClient discoveryClient) {
+    public Application(ConfigurableApplicationContext applicationContext, ServiceOfferingInitializer serviceOfferingInitializer, ServiceVendorsInitializer serviceVendorsInitializer, ServiceRepositoriesInitializer serviceRepositoriesInitializer, ServiceCategoriesInitializer serviceCategoriesInitializer, GitRepoInitializer gitRepoInitializer, DiscoveryClient discoveryClient) {
+        this.applicationContext = applicationContext;
         this.serviceOfferingInitializer = serviceOfferingInitializer;
         this.serviceVendorsInitializer = serviceVendorsInitializer;
         this.serviceRepositoriesInitializer = serviceRepositoriesInitializer;
@@ -104,6 +108,8 @@ public class Application {
             this.serviceOfferingInitializer.init(initDirectory);
             LOG.info("Finished initialization from directory '" + initDirectory + "'");
         }
+
+        applicationContext.close();
     }
 
 }
