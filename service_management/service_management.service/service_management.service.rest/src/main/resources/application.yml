@@ -149,8 +149,8 @@ minio:
   scheme: http
   host: fabos.local
   port: 9091
-  access-key: AP6Mb0QwoquLxJHyyYvX
-  secret-key: fwCxKrPgQJTLhRE8spFs5KaWsRLb6nTZ
+  access-key: admin
+  secret-key: password
 
 service-management:
   url: http://localhost:9020
