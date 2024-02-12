@@ -128,7 +128,7 @@ public class BasicMinioClientTests {
     @Test
     public void shouldUploadFileStreamToBucketAndCheckIfExist() throws IOException, MinioBucketCreateException, MinioUploadException, MinioBucketNameException, MinioObjectPathNameException {
 
-        var bucketName = "upload-file-existed-bucket";
+        var bucketName = "upload-file-existed-bucket-with";
         var objectName = "/test/Object";
         var file = new File("src/test/resources/test.txt");
         var stream = new FileInputStream(file);
@@ -143,7 +143,7 @@ public class BasicMinioClientTests {
     @Test
     public void shouldRemoveObjectFromBucket() throws IOException, MinioBucketCreateException, MinioUploadException, MinioRemoveObjectException, MinioObjectPathNameException, MinioBucketNameException {
 
-        var bucketName = "upload-file-existed-bucket";
+        var bucketName = "upload-file-existed-bucket-with-string";
         var objectName = "/test/Object";
         var file = new File("src/test/resources/test.txt");
         var stream = new FileInputStream(file);

@@ -10,6 +10,9 @@ services:
       - "9091:9090"
     environment:
       KC_HOSTNAME: ${SLM_HOSTNAME}
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password
+      MINIO_VOLUMES: "/mnt/data"
     volumes:
       - minio_data:/mnt/data
     networks:
@@ -18,20 +21,3 @@ services:
           - 'minio'
     extra_hosts:
       - "${SLM_HOSTNAME}:172.17.0.1"
-    env_file:
-      - "config/minio.cfg"
-
-  minio-init:
-    image: minio-init:latest
-    volumes:
-      - minio_config_awx:/app/awx/awx_secret
-      - minio_config_service-management:/app/service-management/service_management_secret
-
-
-
-volumes:
-  awx_test_database_data:
-  awx_test_supervisor_socket:
-  awx_test_rsyslog_socket:
-  awx_test_rsyslog_config:
-  awx_test-redis:

@@ -1,5 +1,5 @@
 ### Inputs
-- name: "Assert inputs of 'minio/init | main.yml'"
+- name: "MINIO | Assert inputs of 'minio/init | main.yml'"
   assert:
     that:
       - (MINIO_API_URL is defined) and (MINIO_API_URL|length > 0)           # URL of the Minio instance
@@ -9,9 +9,9 @@
       - (CONSUL_PORT is defined)                                    # Port of the Consul instance
       - (_consul_token is defined) and (_consul_token|length > 0)   # Token to authenticate with Consul
 
-- name: "Get config"
+- name: "MINIO | Get config"
   block:
-    - name: "minio | Check if config exists in Consul"
+    - name: "MINIO | Check if config exists in Consul"
       community.general.consul_kv:
         scheme: "{{ CONSUL_SCHEME }}"
         host: "{{ CONSUL_HOST }}"
@@ -24,14 +24,14 @@
         minio_config: "{{ minio_config_consul.data.Value | from_yaml }}"
       when: minio_config_consul.data.Value is defined
 
-    - name: "Create Minio config"
+    - name: "MINIO | Create Minio config"
       block:
-        - name: "Create admin password"
+        - name: "MINIO | Create admin password"
           set_fact:
             MINIO_ADMIN_PASSWORD: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
           when: (MINIO_ADMIN_PASSWORD is not defined) or (MINIO_ADMIN_PASSWORD | default([]) | length == 0)
 
-        - name: "Update minio_config dictionary and override default values"
+        - name: "MINIO | Update minio_config dictionary and override default values"
           set_fact:
             minio_config: "{{ minio_config | combine(
             { 'scheme': '{{ MINIO_SCHEME }}',
@@ -46,7 +46,7 @@
               }
             }
         , recursive=true) }}"
-        - name: "Store Minio config in Consul"
+        - name: "MINIO | Store Minio config in Consul"
           community.general.consul_kv:
             scheme: "{{ CONSUL_SCHEME }}"
             host: "{{ CONSUL_HOST }}"
@@ -58,19 +58,19 @@
             - { key: "config/minio/data", value: "{{ minio_config | to_yaml }}"  }
       when: minio_config_consul.data.Value is not defined
 
-- name: "Start Minio"
+- name: "MINIO | Start Minio"
   block:
-    - name: "Create compose definition from template"
+    - name: "MINIO | Create compose definition from template"
       set_fact:
         minio_compose: "{{ lookup('template', 'minio.yml') }}"
-    - name: "Start Minio containers"
+    - name: "MINIO | Start Minio containers"
       community.docker.docker_compose:
         project_name: eclipse-slm
         definition: "{{ minio_compose | from_yaml}}"
         state: present
         pull: true
       register: minio_compose_start_output
-    - name: "Wait for Minio being up"
+    - name: "MINIO | Wait for Minio being up"
       uri:
         url: "{{ MINIO_CONSOLE_URL }}"
         status_code: 200
@@ -80,13 +80,13 @@
       delay: 3
 
 
-- name: "Store resulting compose file"
+- name: "MINIO | Store resulting compose file"
   template:
     src: "minio.yml"
     dest: "{{ _store_compose_file }}"
   when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
 
-- name: "Register Minio instance at Consul (discovery server)"
+- name: "MINIO | Register Minio instance at Consul (discovery server)"
   include_role:
     name: consul/client
     tasks_from: register_service
@@ -98,7 +98,7 @@
     _additional_tags:
       - "minio"
 
-- name: "Install Minio Client"
+- name: "MINIO | Install Minio Client"
   include_tasks: config_minio.yml
   vars:
     _minio_root_user: "admin"

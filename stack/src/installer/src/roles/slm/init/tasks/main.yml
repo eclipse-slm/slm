@@ -41,7 +41,7 @@
       port: "{{ SLM_CATALOG_SERVICE_PORT | int }}"
       consul_app_token: "{{ CONSUL_MASTER_TOKEN }}"
 
-- name: "Create Mino access"
+- name: "Create Minio access"
   include_tasks: "create_and_store_minio_config.yml"
   vars:
     _app_name: "service_management"
