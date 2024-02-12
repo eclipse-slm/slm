@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  minio:
+    image: quay.io/minio/minio:{{ MINIO_VERSION }}
+    restart: unless-stopped
+    command: minio server --console-address :{{ MINIO_CONSOLE_PORT }} --address :{{ MINIO_API_PORT }}
+    ports:
+      - "{{ MINIO_API_PORT }}:{{ MINIO_API_PORT }}"
+      - "{{ MINIO_CONSOLE_PORT }}:{{ MINIO_CONSOLE_PORT }}"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    environment:
+      KC_HOSTNAME: {{SLM_HOSTNAME}}
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: {{ MINIO_ADMIN_PASSWORD }}
+      MINIO_VOLUMES: "/mnt/data"
+    volumes:
+      - minio_data:/mnt/data
+    networks:
+      default:
+        aliases:
+          - 'minio'
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+
+
+
+volumes:
+  minio_data:

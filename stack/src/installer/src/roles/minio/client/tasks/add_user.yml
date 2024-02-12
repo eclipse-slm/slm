@@ -1,0 +1,30 @@
+---
+
+- name: "Assert inputs of 'minio/client | create_user.yml'"
+  assert:
+    that:
+      - (_alias is defined) and (_alias|length > 0)
+      - (_user is defined) and (_user|length > 0)
+      - (_password is defined) and (_password|length > 0)
+      - (_access_key is defined) and (_access_key|length > 0)
+      - (_secret_key is defined) and (_secret_key|length > 0)
+    fail_msg: "Variable must be defined and not empty"
+
+- name: Set secure mc command
+  set_fact:
+    mc_command: "mc"
+
+- name: Check whether user is already configured
+  command: "{{ mc_command }} admin user info {{ _alias }} {{ _user }}"
+  register: get_user
+  changed_when: false
+  ignore_errors: true
+
+- name: Create user
+  command: "{{ mc_command }} admin user add {{ _alias }} {{ _user }} {{ _password }}"
+
+- name: Add user policy
+  command: "{{ mc_command }} admin policy attach {{ _alias }} readwrite --user {{ _user }}"
+
+- name: Add user policy
+  command: "{{ mc_command }} admin user svcacct add --access-key {{ _access_key }} --secret-key {{ _secret_key }} {{ _alias }} {{ _user }}"
