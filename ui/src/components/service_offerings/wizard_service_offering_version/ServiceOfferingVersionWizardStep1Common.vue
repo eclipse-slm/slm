@@ -118,7 +118,7 @@ const { parse } = require('dot-properties')
             this.$emit('step-completed', this.stepNumber)
         } else {
           // check if service version has already been used in service offering
-          if((this.serviceOfferings.find(so => so.id === this.serviceOfferingVersion.serviceOfferingId)?.versions.map(sov => sov.version)).includes(this.serviceOfferingVersion.version)){
+          if(this.serviceOfferings.length > 0 && (this.serviceOfferings.find(so => so.id === this.serviceOfferingVersion.serviceOfferingId)?.versions.map(sov => sov.version)).includes(this.serviceOfferingVersion.version)){
             this.$toast.error(`Version '${this.serviceOfferingVersion.version}' has already been used for this service offering!`)
           } else {
             this.$emit('step-completed', this.stepNumber)

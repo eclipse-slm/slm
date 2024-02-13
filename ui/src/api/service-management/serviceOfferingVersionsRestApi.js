@@ -54,6 +54,9 @@ class ServiceOfferingVersionsRestApi {
             case 'Kubernetes':
                 serviceOfferingVersion.deploymentDefinition = 'KUBERNETES'
                 break
+            case 'Codesys':
+                serviceOfferingVersion.deploymentDefinition = 'CODESYS'
+                break
             default:
                 break
         }

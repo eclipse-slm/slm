@@ -101,6 +101,15 @@
               @step-canceled="onStepCanceled"
               @step-completed="onStepCompleted"
             />
+            <!-- Codesys -->
+            <service-offering-version-wizard-step2-deployment-definition-codesys
+              v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'CODESYS'"
+              :edit-mode="editMode"
+              :service-offering-version="newServiceOfferingVersion"
+              :service-vendor-id="serviceVendorId"
+              @step-canceled="onStepCanceled"
+              @step-completed="onStepCompleted"
+            />
           </v-stepper-content>
 
           <!-- Step 3 - Service Options -->
@@ -130,6 +139,7 @@
 
 <script>
   import ServiceOfferingVersionWizardStep1Common from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep1Common'
+  import ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys from "@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys.vue";
   import ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer'
   import ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose'
   import ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes'
@@ -148,6 +158,7 @@
       ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer,
       ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose,
       ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes,
+      ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys,
       ServiceOfferingVersionWizardStep3ServiceOptions,
       ServiceOfferingVersionWizardStep4Requirements,
     },
@@ -195,7 +206,9 @@
             },
             envFiles: {},
 
-            manifestFile: ''
+            manifestFile: '',
+
+            codesysFile: ''
           },
           serviceRequirements: []
         },
@@ -237,6 +250,7 @@
         'serviceOfferingDeploymentTypePrettyName',
       ]),
       apiStateLoaded () {
+        console.log('asdf', this.apiStateServices.serviceOfferingDeploymentTypes)
         return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADED
       },
       apiStateLoading () {
