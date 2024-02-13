@@ -1,0 +1,40 @@
+### Inputs
+- name: "Assert inputs of 'vault/client | add_policy_to_approle.yml'"
+  assert:
+    that:
+      - (VAULT_URL is defined) and (VAULT_URL|length > 0)
+      - (_vault_token is defined) and (_vault_token|length > 0)
+      - (_approle_name is defined) and (_approle_name|length > 0)
+      - (_new_approle_token_policy is defined) and (_new_approle_token_policy|length > 0)
+    fail_msg: "Variable must be defined and not empty"
+
+- name: "Get token policies of '{{ _approle_name }}'"
+  uri:
+    url: "{{ VAULT_URL }}/v1/auth/approle/role/{{ _approle_name }}/policies"
+    validate_certs: no
+    method: GET
+    headers:
+      Authorization: "Bearer {{ _vault_token }}"
+    status_code: 200
+  register: output_approle_policies
+  no_log: true
+
+- set_fact:
+    token_policies: "{{ output_approle_policies.json.data.token_policies }}"
+
+- set_fact:
+    token_policies: "{{ (token_policies + [ _new_approle_token_policy ]) | unique }}"
+
+- name: "Write Token Policies of '{{ _approle_name }}'"
+  uri:
+    url: "{{ VAULT_URL }}/v1/auth/approle/role/{{ _approle_name }}/policies"
+    validate_certs: no
+    method: POST
+    headers:
+      Authorization: "Bearer {{ _vault_token }}"
+    status_code: 200, 204
+    body_format: json
+    body:
+      token_policies: "{{ token_policies | join(',') }}"
+  register: output_approle_policies
+  no_log: true

@@ -1,0 +1,96 @@
+- name: "Assert inputs of 'consul/init | start.yml'"
+  assert:
+    that:
+      - (CONSUL_SCHEME is defined) and (CONSUL_SCHEME|length > 0)
+      - (CONSUL_HOST is defined) and (CONSUL_HOST|length > 0)
+      - (CONSUL_PORT is defined)
+
+- name: "Consul | Config"
+  block:
+    - name: "Consul | Check if instance is already running"
+      docker_container_info:
+        name: eclipse-slm_consul_1
+      register: consul_container
+    - name: "Consul | Get master token of existing instance"
+      set_fact:
+        CONSUL_MASTER_TOKEN: "{{ consul_container.container.Config.Env | regex_search('\\\"master\\\": \\\"(.*)\\\"', '\\1') | first }}"
+      when: consul_container.exists
+    - name: "Consul | Create master token"
+      set_fact:
+        CONSUL_MASTER_TOKEN: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
+      when: (CONSUL_MASTER_TOKEN is not defined) or (CONSUL_MASTER_TOKEN | default([]) | length == 0) and not consul_container.exists
+    - name: "Consul | Update consul_local_config dictionary and override default values"
+      set_fact:
+        consul_local_config: "{{ consul_local_config | combine(
+        { 'acl': {
+            'tokens': {
+              'master': CONSUL_MASTER_TOKEN
+            }
+          }
+        }
+        , recursive=true) }}"
+
+- name: "Consul | Start"
+  block:
+    - name: "Consul | Create compose definition from template"
+      set_fact:
+        consul_compose: "{{ lookup('template', 'consul.yml') }}"
+    - name: "Consul | Start containers"
+      community.docker.docker_compose:
+        project_name: eclipse-slm
+        definition: "{{ consul_compose | from_yaml}}"
+        state: present
+        pull: true
+    - name: "Consul | Wait for Consul ('{{ CONSUL_URL }}') being up"
+      uri:
+        url: "{{ CONSUL_URL }}/v1/status/leader"
+        return_content: yes
+        body_format: json
+        status_code: 200
+      register: result
+      until: (result.json is defined) and (result.json|length > 0)
+      retries: 120
+      delay: 3
+
+- name: "Consul | Store Consul local_config in Consul"
+  community.general.consul_kv:
+    scheme: "{{ CONSUL_SCHEME }}"
+    host: "{{ CONSUL_HOST }}"
+    port: "{{ CONSUL_PORT }}"
+    token: "{{ CONSUL_MASTER_TOKEN }}"
+    key: "{{ item.key }}"
+    value: "{{ item.value }}"
+  with_items:
+    - { key: "config/consul/local_config", value: "{{ consul_local_config | to_yaml }}" }
+
+- name: "Consul | Create Consul config dictionary and override default values"
+  set_fact:
+    consul_config: "{{ consul_config | combine(
+    { 'scheme': '{{ CONSUL_SCHEME }}',
+      'host': '{{ CONSUL_HOST }}',
+      'port': '{{ CONSUL_PORT }}',
+      'tokens': {
+        'master': '{{ CONSUL_MASTER_TOKEN }}'
+      }
+    }
+    , recursive=true) }}"
+
+- name: "Consul | Store Consul config in Consul"
+  community.general.consul_kv:
+    scheme: "{{ CONSUL_SCHEME }}"
+    host: "{{ CONSUL_HOST }}"
+    port: "{{ CONSUL_PORT }}"
+    token: "{{ CONSUL_MASTER_TOKEN }}"
+    key: "{{ item.key }}"
+    value: "{{ item.value }}"
+  with_items:
+    - { key: "config/consul/data", value: "{{ consul_config | to_yaml }}" }
+
+- name: "Store resulting compose file"
+  template:
+    src: "consul.yml"
+    dest: "{{ _store_compose_file }}"
+  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
+### Outputs
+# CONSUL_MASTER_TOKEN    # Master token of the started Consul instance

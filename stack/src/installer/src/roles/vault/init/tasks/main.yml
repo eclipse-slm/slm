@@ -1,0 +1,99 @@
+### Inputs
+- name: "Assert inputs of 'vault/init | main.yml'"
+  assert:
+    that:
+      - (VAULT_URL is defined) and (VAULT_URL|length > 0)           # URL of the Vault instance
+      - (CONSUL_SCHEME is defined) and (CONSUL_SCHEME|length > 0)   # Scheme of the Consul instance
+      - (CONSUL_HOST is defined) and (CONSUL_HOST|length > 0)       # Host of the Consul instance
+      - (CONSUL_PORT is defined)                                    # Port of the Consul instance
+      - (_consul_token is defined) and (_consul_token|length > 0)   # Token to authenticate with Consul
+
+- set_fact:
+    _app_name: vault
+
+- name: "Start Vault"
+  block:
+  - name: "Create compose definition from template"
+    set_fact:
+      vault_compose: "{{ lookup('template', 'vault.yml') }}"
+  - name: "Start Vault containers"
+    community.docker.docker_compose:
+      project_name: eclipse-slm
+      definition: "{{ vault_compose | from_yaml}}"
+      state: present
+      pull: true
+    register: vault_compose_start_output
+  - name: "Wait for Vault being up"
+    uri:
+      url: "{{ VAULT_URL }}"
+      status_code: 200
+    register: result
+    until: result.status == 200
+    retries: 120
+    delay: 3
+  - name: "Get Vault root token"
+    community.docker.docker_container_exec:
+      container: "{{ vault_compose_start_output.services.vault | first }}"
+      command: "grep 'Token' /vault/config/root/vault_init_msg"
+    register: vault_root_token_line
+    until: "vault_root_token_line is not failed"
+    retries: 10
+    delay: 3
+  - set_fact:
+      vault_root_token: "{{ vault_root_token_line.stdout | regex_search('Initial Root Token: (.*)', '\\1') | first }}"
+
+- name: "Init Vault"
+  block:
+  - set_fact:
+      vault_token: "{{ vault_root_token }}"
+  - name: "Create app role Auth Method 'approle'"
+    import_role:
+      name: vault/client
+      tasks_from: create_approle_auth_method
+
+  - name: "Wait for Keycloak being up"
+    uri:
+      url: "{{ KEYCLOAK_AUTH_URL }}/realms/{{ KEYCLOAK_REALM }}/.well-known/openid-configuration"
+      status_code: 200
+    register: result
+    until: result.status == 200
+    retries: 120
+    delay: 3
+  - name: "Configure JWT auth via Keycloak"
+    import_role:
+      name: vault/client
+      tasks_from: configure_keycloak_jwt_auth_method
+    vars:
+      _vault_token: "{{ vault_root_token }}"
+      _mount_auth_path: "jwt"
+      _oidc_discovery_url: "{{ KEYCLOAK_AUTH_URL }}/realms/{{ KEYCLOAK_REALM }}"
+
+- name: "Store config"
+  block:
+  - set_fact:
+      vault_config_consul:
+  - import_role:
+      name: consul/client
+      tasks_from: create_or_add_config
+    vars:
+      _config:
+        scheme: "{{ VAULT_SCHEME }}"
+        host: "{{ VAULT_HOST }}"
+        port: "{{ VAULT_PORT }}"
+        tokens:
+          root: "{{ vault_root_token }}"
+
+- name: "Register Vault instance at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: vault
+    _service_port: "{{ VAULT_PORT }}"
+    _service_address: "{{ VAULT_HOST }}"
+    _http: "{{ VAULT_URL }}/v1/sys/health"
+    _additional_tags:
+      - "vault"
+
+### Outputs
+# - vault_root_token

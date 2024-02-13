@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+
+  common-database-mariadb:
+    image: ghcr.io/eclipse-slm/mariadb:10.5
+    build: ../../../../src/common/database/mariadb
+
+  awx-fixed-files:
+    image: ghcr.io/eclipse-slm/awx/awx-fixed-files:${AWX_VERSION}
+    build: ../../../../src/awx/awx-fixed-files
+
+  awx-web:
+    build: ../../../../src/awx/awx-web
+
+  awx-web-no-jwt:
+    image: ghcr.io/eclipse-slm/awx/awx-web-no-jwt:${AWX_VERSION}
+    build: ../../../awx/awx-web-no-jwt
+
+  awx-task:
+    build: ../../../awx/awx-task
+
+  awx-postgres:
+    build: ../../../awx/awx-postgres
+
+  awx-init:
+    build: ../roles/awx/init
+
+  keycloak:
+    build: ../../../keycloak/keycloak
+
+  keycloak-init:
+    build: ../../../../src/keycloak/keycloak-init
+
+  vault:
+    build: ../../../../src/vault/vault
+
+  vault-init:
+    build: ../../../../src/vault/vault-init
+
+  consul:
+    build: ../../../../src/consul/consul
+
+  consul-init:
+    build: ../roles/consul/init
+
+  config-exporter:
+    build: ../../../config-exporter
+
+  prometheus:
+    build: ../../../prometheus
+
+

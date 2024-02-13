@@ -1,27 +1,11 @@
 FROM openjdk:18.0.2.1-jdk-slim-buster
 MAINTAINER Matthias Schneider (matthias.schneider@ipa.fraunhofer.de)
 
-ENV KEYCLOAK_CONFIG_TENANTS_CONFIGPATH="/app/keycloak" \
-    DATABASE_HOST="resource-management-database" \
-    DATABASE_PORT=3306 \
-    NOTIFICATIONSERVICE_SCHEME="http" \
-    NOTIFICATIONSERVICE_HOST="notification-service"  \
-    NOTIFICATIONSERVICE_PORT=9001 \
-    SPRING_CLOUD_CONSUL_ENABLED=true \
-    CONSUL_SCHEME="http" \
+ENV CONSUL_SCHEME="http" \
     CONSUL_HOST="consul" \
     CONSUL_PORT=8500 \
     CONSUL_DATACENTER="fabos" \
     CONSUL_ACLTOKEN="password" \
-    AWX_SCHEME="http" \
-    AWX_HOST="awxweb" \
-    AWX_PORT="8013" \
-    AWX_USER="admin" \
-    AWX_PASSWORD="password" \
-    VAULT_SCHEME="http" \
-    VAULT_HOST="vault" \
-    VAULT_PORT=8200 \
-    VAULT_AUTHENTICATION="APPROLE" \
     BASYX_AASREGISTRY_PATH="http://aas-registry:4000" \
     BASYX_AASSERVER_PATH="http://aas-server:4001"
 

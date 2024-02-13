@@ -1,9 +1,0 @@
----
-version: '3'
-
-services:
-  slm-runner:
-    image: slm-runner:1.4.0-SNAPSHOT
-    volumes:
-      - ../../compose:/runner/compose
-      - /var/run/docker.sock:/var/run/docker.sock

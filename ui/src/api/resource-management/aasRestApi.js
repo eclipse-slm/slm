@@ -3,11 +3,18 @@ import axios from 'axios'
 class AASRestApi {
     API_URL = '/resource-management/aas'
 
+    async getResourceAAS() {
+        return axios.get(`${this.API_URL}/`)
+          .then(response => {
+              return response.data;
+          });
+    }
+
     async getSubmodelTemplateInstancesBySemanticId (submodelTemplateSemanticId) {
         return axios.get(`${this.API_URL}/submodels/templates/${submodelTemplateSemanticId}/instances`)
             .then(response => {
-                return response.data
-            })
+                return response.data;
+            });
     }
 
     async getSubmoduleTemplateInstanceOfAas (submodelTemplateSemanticId, aasId) {
@@ -17,8 +24,8 @@ class AASRestApi {
             }
         })
         .then(response => {
-            return response.data
-        })
+            return response.data;
+        });
     }
 }
 

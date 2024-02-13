@@ -317,7 +317,7 @@
         }
       ],
       "resource-management": [],
-      "self-service-portal": [],
+      "ui": [],
       "security-admin-console": [],
       "admin-cli": [],
       "account-console": [],
@@ -921,7 +921,7 @@
     },
     {
       "id": "3b868488-4d70-4d38-a969-bb45eeb043e3",
-      "clientId": "self-service-portal",
+      "clientId": "ui",
       "name": "",
       "description": "",
       "rootUrl": "",
@@ -972,7 +972,7 @@
           "protocolMapper": "oidc-audience-mapper",
           "consentRequired": false,
           "config": {
-            "included.client.audience": "self-service-portal",
+            "included.client.audience": "ui",
             "id.token.claim": "false",
             "access.token.claim": "true",
             "userinfo.token.claim": "false"
@@ -2515,7 +2515,7 @@
     "clientOfflineSessionIdleTimeout": "0",
     "cibaInterval": "5"
   },
-  "keycloakVersion": "19.0.2",
+  "keycloakVersion": "19.0.3",
   "userManagedAccessAllowed": false,
   "clientProfiles": {
     "profiles": []

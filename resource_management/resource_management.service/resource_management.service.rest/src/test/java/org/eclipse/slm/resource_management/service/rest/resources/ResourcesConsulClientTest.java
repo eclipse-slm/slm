@@ -111,8 +111,6 @@ public class ResourcesConsulClientTest {
     public void testGetResources() throws ConsulLoginFailedException {
         List<BasicResource> resources = resourcesConsulClient.getResources(new ConsulCredential());
 
-        // Consul server is registered by default as node
-        // Change to 0 because they do not return consul as node
         assertEquals(0, resources.size());
         return;
     }

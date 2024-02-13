@@ -63,7 +63,6 @@ public class MultiTenantKeycloakConfigResolver implements KeycloakConfigResolver
             }
         }
         return multiTenantKeycloakRegistration.getFirstRealm();
-        //return multiTenantKeycloakRegistration.getRealm(keycloakSpringBootProperties.getRealm());
     }
 
     private KeycloakDeployment resolveSecurityContext() {

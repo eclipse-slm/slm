@@ -1,0 +1,162 @@
+### Inputs
+- name: "Assert inputs of 'keycloak/init | main.yml'"
+  assert:
+    that:
+      - (KEYCLOAK_AUTH_URL is defined) and (KEYCLOAK_AUTH_URL|length > 0)
+      - (KEYCLOAK_ADMIN_USERNAME is defined) and (KEYCLOAK_ADMIN_USERNAME|length > 0)
+      - (KEYCLOAK_DEFAULT_USER_PASSWORD is defined) and (KEYCLOAK_DEFAULT_USER_PASSWORD|length > 0)
+      - (CONSUL_SCHEME is defined) and (CONSUL_SCHEME|length > 0)
+      - (CONSUL_HOST is defined) and (CONSUL_HOST|length > 0)
+      - (CONSUL_PORT is defined)
+      - (_consul_token is defined) and (_consul_token|length > 0)
+
+- name: "Get config"
+  block:
+  - name: "Keycloak | Check if config exists in Consul"
+    community.general.consul_kv:
+      scheme: "{{ CONSUL_SCHEME }}"
+      host: "{{ CONSUL_HOST }}"
+      port: "{{ CONSUL_PORT }}"
+      token: "{{ _consul_token }}"
+      key: "config/keycloak/data"
+    register: keycloak_config_consul
+
+  - set_fact:
+      keycloak_config: "{{ keycloak_config_consul.data.Value | from_yaml }}"
+    when: keycloak_config_consul.data.Value is defined
+
+  - name: "Create Keycloak config"
+    block:
+    - name: "Create admin password"
+      set_fact:
+        KEYCLOAK_ADMIN_PASSWORD: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
+      when: (KEYCLOAK_ADMIN_PASSWORD is not defined) or (KEYCLOAK_ADMIN_PASSWORD | default([]) | length == 0)
+    - name: "Create database password"
+      set_fact:
+        KEYCLOAK_DATABASE_PASSWORD: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
+      when: (KEYCLOAK_DATABASE_PASSWORD is not defined) or (KEYCLOAK_DATABASE_PASSWORD | default([]) | length == 0)
+    - name: "Create database root password"
+      set_fact:
+        KEYCLOAK_DATABASE_ROOT_PASSWORD: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
+      when: (KEYCLOAK_DATABASE_ROOT_PASSWORD is not defined) or (KEYCLOAK_DATABASE_ROOT_PASSWORD | default([]) | length == 0)
+    - name: "Update keycloak_config dictionary and override default values"
+      set_fact:
+        keycloak_config: "{{ keycloak_config | combine(
+        { 'scheme': '{{ KEYCLOAK_SCHEME }}',
+          'host': '{{ KEYCLOAK_HOST }}',
+          'port': '{{ KEYCLOAK_PORT }}',
+          'users': {
+            'admin': {
+              'username': 'admin',
+              'password': '{{ KEYCLOAK_ADMIN_PASSWORD }}'
+            }
+          },
+          'database': {
+            'password': '{{ KEYCLOAK_DATABASE_PASSWORD }}',
+            'root_password': '{{ KEYCLOAK_DATABASE_ROOT_PASSWORD }}'
+          }
+        }
+        , recursive=true) }}"
+    - name: "Store Keycloak config in Consul"
+      community.general.consul_kv:
+        scheme: "{{ CONSUL_SCHEME }}"
+        host: "{{ CONSUL_HOST }}"
+        port: "{{ CONSUL_PORT }}"
+        token: "{{ _consul_token }}"
+        key: "{{ item.key }}"
+        value: "{{ item.value }}"
+      with_items:
+        - { key: "config/keycloak/data", value: "{{ keycloak_config | to_yaml }}"  }
+    when: keycloak_config_consul.data.Value is not defined
+
+- name: "Start Keycloak containers"
+  block:
+    - name: "Create compose definition from template"
+      set_fact:
+        keycloak_compose: "{{ lookup('template', 'keycloak.yml') }}"
+    - name: "Start containers"
+      community.docker.docker_compose:
+        project_name: eclipse-slm
+        definition: "{{ keycloak_compose | from_yaml}}"
+        state: present
+        pull: true
+    - name: "Wait for Keycloak being up"
+      uri:
+        url: "{{ KEYCLOAK_AUTH_URL }}"
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 120
+      delay: 3
+
+- name: "Initialize Keycloak"
+  block:
+  - name: "Get admin access token"
+    include_role:
+      name: keycloak/client
+      tasks_from: authentication/get_admin_access_token.yml
+
+  - name: "Create realms"
+    include_role:
+      name: "keycloak/client"
+      tasks_from: realms/create_realm.yml
+    vars:
+      _keycloak_access_token: "{{ keycloak_access_token }}"
+      _keycloak_realm: "{{ item }}"
+    loop: "{{ keycloak_realms }}"
+
+  - name: "Create realm roles"
+    include_role:
+      name: "keycloak/client"
+      tasks_from: roles/create_realm_role.yml
+    vars:
+      _keycloak_access_token: "{{ keycloak_access_token }}"
+      _keycloak_realm_name: "{{ KEYCLOAK_REALM }}"
+      _keycloak_realm_role: "{{ item }}"
+    with_items: "{{ keycloak_realm_roles }}"
+
+  - name: "Create users"
+    import_tasks: create_users.yml
+
+- name: "Update keycloak_config dictionary"
+  set_fact:
+    keycloak_config: "{{ keycloak_config | combine(
+  { 'default_user_username': '{{ keycloak_default_user.username }}',
+    'default_user_password': '{{ keycloak_default_user.credentials[0].value }}'
+  }
+  , recursive=true) }}"
+
+- debug:
+    var: keycloak_config
+
+- name: "Store resulting compose file"
+  template:
+    src: "keycloak.yml"
+    dest: "{{ _store_compose_file }}"
+  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
+- name: "Register Keycloak instance at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: keycloak
+    _service_port: "{{ KEYCLOAK_PORT }}"
+    _service_address: "{{ KEYCLOAK_HOST }}"
+    _http: "{{ KEYCLOAK_AUTH_URL }}/health"
+    _additional_tags:
+      - "keycloak"
+
+- name: "Register Keycloak database at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: keycloak-database
+    _service_port: 3306
+    _service_address: keycloak-database
+    _tcp: "keycloak-database:3306"
+    _additional_tags:
+      - "keycloak"
+      - "database"
+      - "docker-internal"

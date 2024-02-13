@@ -4,12 +4,14 @@ import LocationsRestApi from '@/api/resource-management/locationsRestApi.js'
 import ProfilerRestApi from '@/api/resource-management/profilerRestApi.js'
 import ApiState from '@/api/apiState'
 import Vue from 'vue'
+import AasRestApi from "@/api/resource-management/aasRestApi";
 
 export default {
     state: {
         apiStateResources: ApiState.INIT,
 
         resources: [],
+        aas: [],
         locations: [],
         profiler: [],
         resourceConnectionTypes: [],
@@ -43,6 +45,14 @@ export default {
                     return true
                 })
             }
+        },
+
+        resourceAAS: (state) => {
+          if (state.aas === undefined) {
+              return []
+          }   else {
+              return state.aas
+          }
         },
 
         profiler: (state) => {
@@ -183,6 +193,21 @@ export default {
                 })
         },
 
+        async getResourceAASFromBackend (context) {
+            if (context.state.apiStateResources === ApiState.INIT) {
+                context.commit('SET_API_STATE_RESOURCES', ApiState.LOADING)
+            } else {
+                context.commit('SET_API_STATE_RESOURCES', ApiState.UPDATING)
+            }
+
+            return await AasRestApi.getResourceAAS().then(
+              aas => {
+                  context.commit('SET_RESOURCES_AAS', aas)
+                  context.commit('SET_API_STATE_RESOURCES', ApiState.LOADED)
+              }
+            )
+        },
+
         async getLocations(context) {
             return await  LocationsRestApi.getLocations()
               .then(
@@ -267,6 +292,7 @@ export default {
               .then(refreshed => {
                   context.dispatch('getCluster')
                   context.dispatch('getResourcesFromBackend')
+                  context.dispatch('getResourceAASFromBackend')
                   context.dispatch('getResourceConnectionTypes')
                   context.dispatch('getVirtualResourceProviders')
                   context.dispatch('getServiceHosters')
@@ -324,6 +350,9 @@ export default {
                 }
                 state.resources = resources
             }
+        },
+        SET_RESOURCES_AAS (state, aas) {
+            state.aas = aas
         },
         SET_LOCATIONS(state, locations) {
           state.locations = locations

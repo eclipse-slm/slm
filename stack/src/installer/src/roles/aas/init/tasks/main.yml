@@ -1,0 +1,49 @@
+- set_fact:
+    aas_compose: "{{ lookup('template', 'aas.yml') }}"
+
+- name: "Start containers"
+  community.docker.docker_compose:
+    project_name: eclipse-slm
+    definition: "{{ aas_compose | from_yaml}}"
+    state: present
+    pull: true
+
+- name: "Store resulting compose file"
+  template:
+    src: "aas.yml"
+    dest: "{{ _store_compose_file }}"
+  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
+- name: "Register AAS components at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: "{{ item.name }}"
+    _service_port: "{{ item.port }}"
+    _service_address: "{{ SLM_HOSTNAME }}"
+    _http: "{{ item.url }}"
+  loop:
+    - name: aas-registry
+      port: 4000
+      url: "http://{{ SLM_HOSTNAME }}:4000/registry/api/v1/registry"
+    - name: aas-server
+      port: 4001
+      url: "http://{{ SLM_HOSTNAME }}:4001/aasServer/shells"
+    - name: aas-gui
+      port: 3000
+      url: "http://{{ SLM_HOSTNAME }}:3000"
+
+- name: "Register AAS database at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: aas-database
+    _service_port: 27017
+    _service_address: aas-database
+    _tcp: "aas-database:27017"
+    _additional_tags:
+      - "aas"
+      - "database"
+      - "docker-internal"

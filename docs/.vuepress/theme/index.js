@@ -1,6 +1,6 @@
 module.exports = {
   extend: '@vuepress/theme-default',
-  plugins: [['vuepress-plugin-global-variables', { 
+  plugins: [['vuepress-plugin-global-variables', {
     variables: {
       awx: {
         version: {
@@ -15,13 +15,13 @@ module.exports = {
       },
       keycloak: {
         version: {
-          full: '19.0.2',
+          full: '19.0.3',
           api: '18.0'
         }
       },
       vault: {
         version: {
-          full: '1.11.3',
+          full: '1.11.11',
           api: 'v1.11.x'
         }
       },

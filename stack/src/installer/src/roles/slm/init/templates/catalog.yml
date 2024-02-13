@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+
+  catalog:
+    image: "ghcr.io/eclipse-slm/slm/catalog:{{ SLM_CATALOG_VERSION }}"
+    restart: unless-stopped
+    depends_on:
+      - catalog-database
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    environment:
+      DEPLOYMENT_HOSTNAME: "{{ SLM_CATALOG_SERVICE_HOST }}"
+      CONSUL_SCHEME: "{{ app_configs['catalog_service']['consul']['scheme'] }}"
+      CONSUL_HOST: "{{ app_configs['catalog_service']['consul']['host'] }}"
+      CONSUL_PORT: "{{ app_configs['catalog_service']['consul']['port'] }}"
+      CONSUL_ACLTOKEN: "{{ app_configs['catalog_service']['consul']['acl-token'] }}"
+    ports:
+      - "{{ SLM_CATALOG_SERVICE_PORT }}:10000"
+    networks:
+      default:
+        aliases:
+          - catalog
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:10000/swagger-ui/index.html" ]
+
+  catalog-database:
+    image: "ghcr.io/eclipse-slm/mariadb:{{ SLM_CATALOG_SERVICE_DATABASE_VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ LOGGING_MAX_FILE }}"
+        max-size: "{{ LOGGING_MAX_SIZE }}"
+    ports:
+      - "{{ SLM_CATALOG_SERVICE_DATABASE_PORT }}:3306"
+    networks:
+      default:
+        aliases:
+          - catalog-database
+    environment:
+      MARIADB_ROOT_PASSWORD: "{{ app_configs['catalog_service']['database']['root_password'] }}"
+      MARIADB_USER: "{{ app_configs['catalog_service']['database']['username'] }}"
+      MARIADB_PASSWORD: "{{ app_configs['catalog_service']['database']['password'] }}"
+      MARIADB_DATABASE: "{{ app_configs['catalog_service']['database']['schema'] }}"
+    volumes:
+      - catalog-database_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+
+networks:
+  default:
+
+volumes:
+  catalog-database_data:

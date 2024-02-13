@@ -8,7 +8,7 @@ on:
       - release/*
 
 env:
-  DOCKER_COMPOSE_COMMAND: docker-compose -f base.aas.yml -f base.awx.yml -f base.consul.yml -f base.keycloak.yml -f base.vault.yml -f slm.yml -f catalog.yml -f config-exporter.yml -f monitoring.yml -f build.yml
+  DOCKER_COMPOSE_COMMAND: docker-compose
 
 jobs:
   build-and-push-awx:
@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build AWX Task docker image
-        working-directory: ./stack/compose
+        working-directory: ./stack/build
         run: $DOCKER_COMPOSE_COMMAND build --no-cache awx-task
       - name: Login to Docker Registry
         uses: docker/login-action@v2
@@ -28,7 +28,7 @@ jobs:
           username: ${{github.actor}}
           password: ${{secrets.GITHUB_TOKEN}}
       - name: Push docker image
-        working-directory: ./stack/compose
+        working-directory: ./stack/build
         run: $DOCKER_COMPOSE_COMMAND push awx-task
 
   build-and-push:
@@ -39,22 +39,19 @@ jobs:
     strategy:
       matrix:
         service:
-          - common-database-mariadb
-#          - aas-broker
+          - aas-broker
+          - aas-gui
           - awx-postgres
-          - awx-init
-          - consul
-          - consul-init
           - keycloak
-          - keycloak-init
           - vault
-          - vault-init
           - prometheus
           - config-exporter
+          - installer
+          - uninstaller
     steps:
       - uses: actions/checkout@v3
       - name: Build docker image
-        working-directory: ./stack/compose
+        working-directory: ./stack/build
         run: $DOCKER_COMPOSE_COMMAND build --no-cache ${{ matrix.service }}
       - name: Login to Docker Registry
         uses: docker/login-action@v2
@@ -63,5 +60,5 @@ jobs:
           username: ${{github.actor}}
           password: ${{secrets.GITHUB_TOKEN}}
       - name: Push docker image
-        working-directory: ./stack/compose
+        working-directory: ./stack/build
         run: $DOCKER_COMPOSE_COMMAND push ${{ matrix.service }}

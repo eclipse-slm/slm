@@ -1,0 +1,159 @@
+### Application
+application:
+  name: "^project.artifactId^"
+  version: "^project.version^"
+  timestamp: "^timestamp^"
+
+### Deployment
+deployment:
+  hostname: localhost
+
+### Server / API
+server:
+  port: 9020
+  error:
+    include-message: always
+
+open-api:
+  title: Service Management
+  description: REST API of Service Management
+  version: "^project.version^"
+  contact:
+    name: Fraunhofer IPA
+    url: https://www.ipa.fraunhofer.de
+    email: matthias.schneider@ipa.fraunhofer.de
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+    oauth:
+      clientId: self-service-portal
+      clientSecret: unused-and-not-required
+
+### Database
+database:
+  host: 127.0.0.1
+  port: 3320
+  schema: services
+  username: service-management
+  password: password
+
+### Spring
+spring:
+  application:
+    name: service_management
+  main:
+    allow-bean-definition-overriding: true
+  config:
+    import: "optional:consul:"
+  cloud:
+    consul:
+      enabled: false
+      discovery:
+        enabled: false
+      config:
+        enabled: false
+  security:
+    user:
+      name: "user"
+      password: "password"
+  jpa:
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driver-class-name=org: 'mariadb.jdbc.Driver'
+    url: jdbc:mariadb://${database.host}:${database.port}/${database.schema}?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: ${database.username}
+    password: ${database.password}
+  sql:
+    init:
+      mode: always
+      platform: mysql
+
+management:
+  endpoints:
+    web.exposure.include: health,info
+  info:
+    git.enabled: false
+
+### Git
+git:
+  service-offering-importer:
+    clone-directory: tmp/
+    updater-interval-minutes: 15
+
+### Components - Internal
+notification-service:
+  scheme: "http"
+  host: "localhost"
+  port: 9001
+
+resource-management:
+  url: "http://localhost:9010"
+
+### Keycloak
+keycloak:
+  config:
+    auth-white-list: /actuator/health
+    tenants:
+      config-path: consul:keycloak
+      client-registration-enable: false
+      client-update-enable: false
+      resolve-by-path: true
+      resolve-by-header: true
+      resolver-base-path: /
+      resolver-header: Realm
+      redirect-uris:
+      web-origins:
+
+### AWX
+awx:
+  scheme: http
+  host: localhost
+  port: 8013
+  username: admin
+  password: password
+  polling-interval-in-s: 4
+
+### Vault
+vault:
+  scheme: http
+  host: localhost
+  port: 8200
+  authentication: TOKEN
+  token: secret
+  #app-role:
+  #  role-id: service-lifecycle-management
+  #  secret-id: 75604ba4-902b-21d4-a3d3-9782af56ad1f
+  #  app-role-path: approle
+
+### Consul
+consul:
+  scheme: http
+  host: localhost
+  port: 8500
+  datacenter: fabos
+  acl-token: your-consul-acl-token
+
+### BaSyx
+basyx:
+  aas-registry:
+    url: http://localhost:4000/registry
+  aas-server:
+    url: http://localhost:4001/aasServer
+
+### Minio
+minio:
+  scheme: {{ minio_scheme }}
+  host: {{ minio_hostname }}
+  port: {{ minio_port }}
+  access-key: {{ minio_config_service_management_access_key }}
+  secret-key: {{ minio_config_service_management_secret_key }}
+
+service-management:
+  url: http://localhost:9020

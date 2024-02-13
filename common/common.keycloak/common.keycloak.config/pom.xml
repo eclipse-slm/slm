@@ -53,6 +53,12 @@
             <groupId>org.keycloak</groupId>
             <version>${keycloak.version}</version>
         </dependency>
+        <!-- Consul !-->
+        <dependency>
+            <groupId>com.ecwid.consul</groupId>
+            <artifactId>consul-api</artifactId>
+            <version>1.4.5</version>
+        </dependency>
         <!-- Logging !-->
         <dependency>
             <groupId>org.slf4j</groupId>

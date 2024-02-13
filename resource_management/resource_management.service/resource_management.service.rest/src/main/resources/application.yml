@@ -4,6 +4,10 @@ application:
   version: "^project.version^"
   timestamp: "^timestamp^"
 
+### Deployment
+deployment:
+  hostname: localhost
+
 ### Server / API
 server:
   port: 9010
@@ -42,17 +46,27 @@ spring:
     name: resource_management
   main:
     allow-bean-definition-overriding: true
+  config:
+    import: "consul:"
   cloud:
     consul:
-      enabled: false
       host: ${consul.host}
       port: ${consul.port}
       discovery:
-        ip-address: 172.17.0.1
         enabled: true
+        hostname: ${deployment.hostname}
         acl-token: ${consul.acl-token}
-        prefer-ip-address: true
         register-health-check: true
+        tags: slm, backend, ${spring.application.name}
+        service-name: ${spring.application.name}
+        metadata:
+          version: ${application.version}
+      config:
+        enabled: true
+        fail-fast: true
+        profileSeparator: '::'
+        format: YAML
+        acl-token: ${consul.acl-token}
   security:
     user:
       name: "user"
@@ -83,9 +97,9 @@ notification-service:
 ### Keycloak
 keycloak:
   config:
-    auth-white-list: "/broker/resource-manager/**"
+    auth-white-list:
     tenants:
-      config-path: keycloak/
+      config-path: consul:keycloak
       client-registration-enable: false
       client-update-enable: false
       resolve-by-path: true
@@ -105,14 +119,6 @@ awx:
   polling-interval-in-s: 4
   default-execution-environment: AWX-EE-SLM-1.4.0-SNAPSHOT
 
-### Consul
-consul:
-  scheme: http
-  host: localhost
-  port: 8500
-  datacenter: fabos
-  acl-token: 8NKqzleSFgDPKy7HZ76MtS8h
-
 ### Vault
 vault:
   scheme: http
@@ -123,6 +129,14 @@ vault:
     role-id: resource-management
     secret-id: 48a319fa-f100-9b27-afa7-676809ba29fd
     app-role-path: approle
+
+### Consul
+consul:
+  scheme: http
+  host: localhost
+  port: 8500
+  datacenter: fabos
+  acl-token: your-consul-acl-token
 
 ### BaSyx
 basyx:

@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  config-exporter:
+    image: ghcr.io/eclipse-slm/slm/config-exporter:${SLM_VERSION}
+    restart: "no"
+    environment:
+      - CONFIGURE_CORE_PROJECT=true
+      - LOCAL_HOSTNAME="${LOCAL_HOSTNAME}"
+      - CONSUL_TOKEN=${CONSUL_TOKEN}
+      - CONSUL_SCHEME=${CONSUL_SCHEME}
+      - CONSUL_HOST=${CONSUL_HOST}
+      - CONSUL_PORT=${CONSUL_Port}
+    extra_hosts:
+      - "${SLM_HOSTNAME}:172.17.0.1"
+    volumes:
+      - "${LOCAL_PROJECT_PATH}:/project"

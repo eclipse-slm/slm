@@ -134,7 +134,7 @@ public class ClusterHandlerITDev {
 
     //region TestContainer
     @Container
-    static KeycloakContainer keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:19.0.2")
+    static KeycloakContainer keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:19.0.3")
             .withExposedPorts(8080)
             .withAdminUsername("admin")
             .withAdminPassword("password")
@@ -174,7 +174,7 @@ public class ClusterHandlerITDev {
     public ClusterHandlerITDev(
             MultiTenantKeycloakRegistration multiTenantKeycloakRegistration,
             ResourcesConsulClient resourcesConsulClient
-    ) {
+    ) throws IOException {
         ClusterHandlerITDev.resourcesConsulClient = resourcesConsulClient;
         multiTenantKeycloakRegistration.init();
     }
@@ -242,7 +242,7 @@ public class ClusterHandlerITDev {
             WebClient webclient = WebClient.builder().build();
             MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
             formData.put("grant_type", Collections.singletonList("password"));
-            formData.put("client_id", Collections.singletonList("self-service-portal"));
+            formData.put("client_id", Collections.singletonList("ui"));
             formData.put("username", Collections.singletonList("fabos"));
             formData.put("password", Collections.singletonList("password"));
 

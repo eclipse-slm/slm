@@ -42,7 +42,7 @@ public class ClusterHandlerITConfig {
 
     //region Vault Properties
     VaultCredential vaultCredential = new VaultCredential();
-    public static String VAULT_VERSION = "1.11.3";
+    public static String VAULT_VERSION = "1.11.11";
     public static String VAULT_HOST = "localhost";
     public static int VAULT_PORT = 8200;
     public static String VAULT_TOKEN = "myroot";
@@ -110,7 +110,7 @@ public class ClusterHandlerITConfig {
             put("token_ttl","3600");
             put("token_max_ttl","3600");
             put("user_claim","sub");
-            put("bound_audiences", new String[] {"self-service-portal","resource-management","service-management"});
+            put("bound_audiences", new String[] {"ui","resource-management","service-management"});
             put("claim_mappings", new HashMap<>() {{
                 put("preferred_username","username");
                 put("email","email");

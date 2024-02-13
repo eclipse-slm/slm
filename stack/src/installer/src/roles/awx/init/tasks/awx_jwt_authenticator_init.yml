@@ -1,0 +1,96 @@
+### Inputs
+- name: "Assert inputs of 'awx/init | awx_jwt_authenticator_init.yml'"
+  assert:
+    that:
+      - (AWX_URL is defined) and (AWX_URL|length > 0)
+      - (_awx_admin_username is defined) and (_awx_admin_username|length > 0)
+      - (_awx_admin_password is defined) and (_awx_admin_password|length > 0)
+      - (_awx_jwt_authenticator_username is defined) and (_awx_jwt_authenticator_username|length > 0)
+      - (_awx_jwt_authenticator_password is defined) and (_awx_jwt_authenticator_password|length > 0)
+      - (_consul_token is defined) and (_consul_token|length > 0)
+
+- name: "Add user '{{ _awx_jwt_authenticator_username }}'"
+  block:
+    - name: "Add user in AWX"
+      awx.awx.user:
+        controller_host: "{{ AWX_URL }}"
+        controller_username: "{{ _awx_admin_username }}"
+        controller_password: "{{ _awx_admin_password }}"
+        username: "{{ _awx_jwt_authenticator_username }}"
+        password: "{{ _awx_jwt_authenticator_password }}"
+        email: "{{ _awx_jwt_authenticator_username }}@fab-os.org"
+        first_name: AWX
+        last_name: JWT Authenticator
+        superuser: yes
+        state: present
+    - name: "Add AWX JWT authenticator username and password in Consul"
+      include_role:
+        name: consul/client
+        tasks_from: create_or_add_config
+      vars:
+        _config:
+          awx:
+            username: '{{ _awx_jwt_authenticator_username }}'
+            password: '{{ _awx_jwt_authenticator_password}}'
+
+- name: "Create application 'awx_jwt_authenticator'"
+  include_role:
+    name: awx/client
+    tasks_from: application_create.yml
+  vars:
+    awx_username: "{{ _awx_admin_username }}"
+    awx_password: "{{ _awx_admin_password }}"
+    awx_application_name: "awx_jwt_authenticator"
+    awx_application_description: "AWX JWT Authenticator"
+    awx_organization_name: "{{ awx_slm_organization_name }}"
+
+- name: "Create team in which AWX JWT Authenticator can add new users"
+  awx.awx.team:
+    controller_host: "{{ AWX_URL }}"
+    controller_username: "{{ _awx_admin_username }}"
+    controller_password: "{{ _awx_admin_password }}"
+    name: "user"
+    description: "Team for users added by AWX JWT Authenticator"
+    organization: "{{ awx_slm_organization_name }}"
+    state: present
+
+- name: "Get Keycloak admin access token"
+  include_role:
+    name: keycloak/client
+    tasks_from: authentication/get_admin_access_token.yml
+- name: "Create Keycloak client for AWX JWT Authenticator"
+  include_role:
+    name: keycloak/client
+    tasks_from: clients/create_client.yml
+  vars:
+    _keycloak_client: "{{ awx_jwt_authenticator.keycloak_client }}"
+    _keycloak_access_token: "{{ keycloak_access_token }}"
+    _keycloak_realm_name: "{{ KEYCLOAK_REALM }}"
+
+- name: "Get client secret of awx-jwt-authenticator"
+  block:
+    - include_role:
+        name: keycloak/client
+        tasks_from: clients/get_client_secret.yml
+      vars:
+        _client_id: "{{ awx_jwt_authenticator.keycloak_client.client_id }}"
+        _keycloak_access_token: "{{ keycloak_access_token }}"
+        _keycloak_realm_name: "{{ KEYCLOAK_REALM }}"
+    - set_fact:
+        awx_jwt_authenticator_keycloak_secret_id: "{{ client_secret }}"
+
+- name: "Create Vault app role for AWX JWT Authenticator"
+  include_role:
+    name: vault/client
+    tasks_from: create_approle_with_policies
+  vars:
+    _approle_name: "{{ awx_jwt_authenticator.vault.approle.name }}"
+    _approle_policies: "{{ awx_jwt_authenticator.vault.approle.policies }}"
+
+- name: "Create Vault secret engine for AWX JWT Authenticator"
+  include_role:
+    name: vault/client
+    tasks_from: create_kv_secret_engine
+  vars:
+    _kv_secret_engine_name: "{{ item }}"
+  loop: "{{ awx_jwt_authenticator.vault.kv_secret_engines }}"

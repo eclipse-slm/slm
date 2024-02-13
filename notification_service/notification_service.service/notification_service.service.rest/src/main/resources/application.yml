@@ -4,6 +4,10 @@ application:
   version: "^project.version^"
   timestamp: "^timestamp^"
 
+### Deployment
+deployment:
+  hostname: localhost
+
 ### Server / API
 server:
   port: 9001
@@ -44,16 +48,27 @@ spring:
     user:
       name: admin
       password: password
+  config:
+    import: "consul:"
   cloud:
     consul:
       host: ${consul.host}
       port: ${consul.port}
       discovery:
-        ip-address: 172.17.0.1
         enabled: true
+        hostname: ${deployment.hostname}
         acl-token: ${consul.acl-token}
-        prefer-ip-address: true
         register-health-check: true
+        tags: slm, backend, ${spring.application.name}
+        service-name: ${spring.application.name}
+        metadata:
+          version: ${application.version}
+      config:
+        enabled: true
+        fail-fast: true
+        profileSeparator: '::'
+        format: YAML
+        acl-token: ${consul.acl-token}
   jpa:
     hibernate:
       ddl-auto: update
@@ -80,9 +95,9 @@ notification-service:
 ### Keycloak
 keycloak:
   config:
-    auth-white-list:
+    auth-white-list: /actuator/health
     tenants:
-      config-path: keycloak/
+      config-path: consul:keycloak
       client-registration-enable: false
       client-update-enable: false
       resolve-by-path: true
@@ -107,15 +122,4 @@ consul:
   host: localhost
   port: 8500
   datacenter: fabos
-  acl-token: vlX3rwRUDFzQ2hKxyaffX7wi
-
-### Vault
-vault:
-  scheme: http
-  host: fabos.local
-  port: 8200
-  authentication: APPROLE
-  app-role:
-    role-id: service-management
-    secret-id: be23b99f-e438-2c38-e2cc-ba354bf340cb
-    app-role-path: approle
+  acl-token: your-consul-acl-token

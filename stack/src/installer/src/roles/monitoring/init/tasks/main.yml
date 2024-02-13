@@ -1,0 +1,43 @@
+- set_fact:
+    monitoring_compose: "{{ lookup('template', 'monitoring.yml') }}"
+
+- name: "Start containers"
+  community.docker.docker_compose:
+    project_name: eclipse-slm
+    definition: "{{ monitoring_compose | from_yaml}}"
+    state: present
+    pull: true
+
+- name: "Store config in Consul"
+  include_role:
+    name: consul/client
+    tasks_from: create_or_add_config
+  vars:
+    _app_name: "monitoring"
+    _config:
+      prometheus:
+        scheme: "{{ PROMETHEUS_SCHEME }}"
+        host: "{{ PROMETHEUS_HOST }}"
+        port: "{{ PROMETHEUS_PORT }}"
+      service:
+        scheme: "{{ MONITORING_SERVICE_SCHEME }}"
+        host: "{{ MONITORING_SERVICE_HOST }}"
+        port: "{{ MONITORING_SERVICE_PORT }}"
+
+- name: "Store resulting compose file"
+  template:
+    src: "monitoring.yml"
+    dest: "{{ _store_compose_file }}"
+  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
+- name: "Register Prometheus instance at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: prometheus
+    _service_port: "{{ PROMETHEUS_PORT }}"
+    _service_address: "{{ PROMETHEUS_HOST }}"
+    _http: "{{ PROMETHEUS_SCHEME }}://{{ PROMETHEUS_HOST }}:{{ PROMETHEUS_PORT }}/-/healthy"
+    _additional_tags:
+      - "monitoring"

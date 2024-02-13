@@ -19,8 +19,15 @@ database:
   password: password
 
 spring:
-  cloud:
-    consul:
+  application:
+    name: resource_management
+  config:
+    import: "optional:consul:"
+  consul:
+    enabled: false
+    discovery:
+      enabled: false
+    config:
       enabled: false
   jpa:
     hibernate:

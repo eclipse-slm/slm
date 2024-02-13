@@ -76,7 +76,7 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col>
+      <v-col cols="12" lg="8">
         <base-material-card class="px-5 py-3">
           <template #heading>
             <v-container
@@ -210,6 +210,9 @@
           </v-card-text>
         </base-material-card>
       </v-col>
+      <v-col cols="12" lg="4">
+        <dashboard-resource-statistics></dashboard-resource-statistics>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -217,10 +220,12 @@
 <script>
   import { mapGetters, mapActions } from 'vuex'
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+  import DashboardResourceStatistics from "@/components/dashboard/DashboardResourceStatistics.vue";
 
   export default {
     name: 'DashboardDashboard',
     components: {
+      DashboardResourceStatistics,
       NoItemAvailableNote,
     },
 

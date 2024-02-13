@@ -21,6 +21,8 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static org.eclipse.slm.common.consul.client.apis.ConsulServicesApiClient.CONSUL_SERVICE_NAME;
+
 @Component
 public class ResourcesConsulClient {
 
@@ -60,7 +62,13 @@ public class ResourcesConsulClient {
         var consulNodes = this.consulNodesApiClient.getNodes(consulCredential);
         List<BasicResource> resources = new ArrayList<>();
         for (var node : consulNodes) {
-            if (node.getMeta() != null) {
+            Optional<NodeService> optionalConsulService = consulServicesApiClient
+                    .getNodeServices(consulCredential, node.getNode())
+                    .stream()
+                    .filter(nodeService -> nodeService.getService().equals(CONSUL_SERVICE_NAME))
+                    .findFirst();
+
+            if (node.getMeta() != null && optionalConsulService.isEmpty()) {
                 var basicResource = this.convertConsulNodeToBasicResource(node);
                 resources.add(basicResource);
             }

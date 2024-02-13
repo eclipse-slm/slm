@@ -36,5 +36,5 @@ consul:
   host: localhost
   port: 8500
   datacenter: fabos
-  acl-token: fBQjSo6nGOjiIDA5ZewZYZz4
+  acl-token: your-consul-acl-token
 

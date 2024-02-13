@@ -1,4 +1,4 @@
-FROM quay.io/keycloak/keycloak:19.0.2
+FROM quay.io/keycloak/keycloak:19.0.3
 
 ENV KC_DB_HOST=keycloak-database \
     KC_DB_URL_HOST=keycloak-database \
@@ -12,13 +12,7 @@ ENV KC_DB_HOST=keycloak-database \
 USER 0
 
 COPY themes/fabos /opt/keycloak/themes/fabos
-#COPY themes/base/login/login.ftl /opt/jboss/keycloak/themes/base/login/login.ftl
-
-COPY startup.sh /keycloak/startup.sh
-RUN chmod +x /keycloak/startup.sh
 
 USER 1000
 
-ENTRYPOINT [ "/keycloak/startup.sh" ]
-
-CMD [ "/keycloak/startup.sh" ]
+CMD ["start-dev", "--db mariadb", "--transaction-xa-enabled=false", "--health-enabled=true"]

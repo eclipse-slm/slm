@@ -1,0 +1,43 @@
+- assert:
+    that:
+      - (AWX_URL is defined) and (AWX_URL|length > 0)
+      - (awx_username is defined) and (awx_username|length > 0)
+      - (awx_password is defined) and (awx_password|length > 0)
+      - (awx_application_name is defined) and (awx_application_name|length > 0)
+      - (awx_application_description is defined) and (awx_application_description|length > 0)
+      - (awx_organization_name is defined) and (awx_organization_name|length > 0)
+
+- include_tasks: organization_get.yml
+
+- name: "Delete application '{{ awx_application_name }}' if exists"
+  awx.awx.application:
+    controller_host: "{{ AWX_URL }}"
+    controller_username: "{{ awx_config.users.admin.username }}"
+    controller_password: "{{ awx_config.users.admin.password }}"
+    name: "{{ awx_application_name }}"
+    organization: "{{ awx_organization.id }}"
+    state: absent
+
+- name: "Create application '{{ awx_application_name }}'"
+  uri:
+    url: "{{ AWX_URL }}/api/v2/applications/"
+    method: POST
+    force_basic_auth: yes
+    url_username: "{{ awx_username }}"
+    url_password: "{{ awx_password }}"
+    body_format: json
+    body:
+      name: "{{ awx_application_name }}"
+      description: "{{ awx_application_description }}"
+      client_type: "confidential"
+      redirect_uris: ""
+      authorization_grant_type: "password"
+      skip_authorization: false
+      organization: "{{ awx_organization.id }}"
+    status_code: 201, 400 # 400 if application exists already
+  register: output_create_application
+  changed_when: output_create_application.status == 201
+
+- set_fact:
+    awx_application_client_id: "{{ output_create_application.json.client_id }}"
+    awx_application_client_secret: "{{ output_create_application.json.client_secret }}"

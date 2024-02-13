@@ -7,37 +7,35 @@ next: /docs/getting-started/first-steps/
 
 ## Prerequisites
 * Docker
-* Docker Compose
 
-## Download
-Download the latest version of `eclipse-slm-setup-compose.zip` from the [releases page on GitHub](https://github.com/eclipse-slm/slm/releases), which contains the compose files of the stack.
+## Install
 
-<div id="start"></div>
-
-## Start
-
-Set in the file `.env` the variable `SLM_HOSTNAME` to the hostname of the host where the stack will be started. E.g.:
+Set in your current shell the environment variable `SLM_HOSTNAME` to the hostname of the host where the stack will be 
+started. E.g.:
+```sh
+export SLM_HOSTNAME=myhost.local
 ```
-SLM_HOSTNAME=myhost.local
-```
-
 ::: warning ATTENTION
 **Use lowercase for the hostname to avoid case problems (e.g. with token authentication)**
 :::
 
-Start the whole stack:
-```
-docker-compose up -d
+Run the following command to start the SLM installer:
+```sh
+docker run \
+  --rm \
+  --env SLM_HOSTNAME=$SLM_HOSTNAME \
+  --volume /var/run/docker.sock:/var/run/docker.sock \
+  --add-host $SLM_HOSTNAME:172.17.0.1\
+  ghcr.io/eclipse-slm/slm/installer:1.4.0-SNAPSHOT
 ```
 
-## Stop
-Stop the whole docker compose:
-```
-docker-compose down --remove-orphans
-```
-If you want to delete the data add the `--volumes` flag:
-```
-docker-compose down --remove-orphans --volumes
+## Uninstall
+Run the following command to start the SLM uninstaller:
+```sh
+docker run \
+  --rm \
+  --volume /var/run/docker.sock:/var/run/docker.sock \
+  ghcr.io/eclipse-slm/slm/uninstaller:1.4.0-SNAPSHOT
 ```
 
 ## Components
