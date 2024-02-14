@@ -20,6 +20,13 @@ keycloak_config:
   http:
     relative_path: /auth
 
+minio_config:
+  users:
+    admin:
+      username: admin
+      password: 'password'
+
+
 consul_config:
   scheme: http
   host: localhost

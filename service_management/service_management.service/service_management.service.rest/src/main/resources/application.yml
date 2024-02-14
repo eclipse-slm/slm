@@ -159,5 +159,13 @@ basyx:
   aas-server:
     url: http://localhost:4001/aasServer
 
+### Minio
+minio:
+  scheme: http
+  host: localhost
+  port: 9091
+  access-key: admin
+  secret-key: password
+
 service-management:
   url: http://localhost:9020

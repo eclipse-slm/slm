@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  minio:
+    image: quay.io/minio/minio:latest
+    restart: unless-stopped
+    command: minio server --console-address ":9090"
+    ports:
+      - "9000:9000"
+      - "9091:9090"
+    environment:
+      KC_HOSTNAME: ${SLM_HOSTNAME}
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password
+      MINIO_VOLUMES: "/mnt/data"
+    volumes:
+      - minio_data:/mnt/data
+    networks:
+      default:
+        aliases:
+          - 'minio'
+    extra_hosts:
+      - "${SLM_HOSTNAME}:172.17.0.1"

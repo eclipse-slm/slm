@@ -158,6 +158,9 @@ export default {
                     case 'KUBERNETES':
                         state.serviceOfferingDeploymentTypes.push({ value: deploymentType, prettyName: 'Kubernetes' })
                         break
+                    case 'CODESYS':
+                        state.serviceOfferingDeploymentTypes.push({ value: deploymentType, prettyName: 'Codesys' })
+                        break
                     default:
                         state.serviceOfferingDeploymentTypes.push({ value: deploymentType, prettyName: deploymentType })
                         break

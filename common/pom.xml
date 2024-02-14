@@ -23,6 +23,7 @@
         <module>common.vault</module>
         <module>common.keycloak</module>
         <module>common.model</module>
+        <module>common.minio</module>
     </modules>
 
 </project>

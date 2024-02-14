@@ -35,6 +35,7 @@
         notification_service_keycloak_config: "{{ lookup('community.general.consul_kv', 'config/notification_service/keycloak', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         catalog_service_config: "{{ lookup('community.general.consul_kv', 'config/catalog_service/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         monitoring_config: "{{ lookup('community.general.consul_kv', 'config/monitoring/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        minio_config: "{{ lookup('community.general.consul_kv', 'config/minio/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
 
     - set_fact:
         service_urls: {}
@@ -51,6 +52,7 @@
         - service_name: "keycloak"
         - service_name: "aas-gui"
         - service_name: "catalog-service"
+        - service_name: "minio"
 
     - debug:
         var: service_urls

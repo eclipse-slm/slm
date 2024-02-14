@@ -16,6 +16,11 @@ vault:
   url: "{{ vault_config['scheme'] }}://{{ vault_config['host'] }}:{{ vault_config['port'] }}"
   root_token: {{ vault_config['tokens']['root'] }}
 
+minio:
+  url: "{{ minio_config['scheme'] }}://{{ minio_config['host'] }}:{{ minio_config['port'] }}"
+  root_user: {{ minio_config['users']['admin']['username'] }}
+  root_token: {{ minio_config['users']['admin']['password'] }}
+
 notification-service:
   url: "{{ notification_service_config['scheme'] }}://{{ notification_service_config['host'] }}:{{ notification_service_config['port'] }}"
   database:
@@ -71,6 +76,9 @@ service-management:
     app-role:
       role-id: {{ service_management_config[ 'vault' ][ 'app-role' ][ 'role-id' ] }}
       secret-id: {{ service_management_config[ 'vault' ][ 'app-role' ][ 'secret-id' ] }}
+  minio:
+    access-token: {{ service_management_config[ 'minio' ][ 'access-token' ] }}
+    security-token: {{ service_management_config[ 'minio' ][ 'security-token' ] }}
 
 catalog:
   url: "{{ catalog_service_config['scheme'] }}://{{ catalog_service_config['host'] }}:{{ catalog_service_config['port'] }}"

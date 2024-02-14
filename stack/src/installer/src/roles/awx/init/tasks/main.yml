@@ -92,6 +92,13 @@
         value: "{{ item.value }}"
       with_items:
         - { key: "config/awx/data", value: "{{ app_configs.awx | to_yaml }}" }
+
+    - name: "AWX | Create MINIO password"
+      include_tasks: awx_minio_create_credentials.yml
+      vars:
+        _app_name: "awx"
+      when: (app_configs.awx.minio is not defined)
+
     - name: "AWX | Decode Consul token"
       set_fact:
         app_configs: "{{ app_configs | combine(
