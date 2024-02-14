@@ -162,7 +162,7 @@ basyx:
 ### Minio
 minio:
   scheme: http
-  host: fabos.local
+  host: localhost
   port: 9091
   access-key: admin
   secret-key: password

@@ -1,6 +1,6 @@
 minio:
   scheme: http
-  host: 10.3.7.42
+  host: localhost
   port: 80
   access-key: admin
   secret-key: password
