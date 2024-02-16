@@ -94,7 +94,7 @@
     _service_name: minio
     _service_port: "{{ MINIO_API_PORT }}"
     _service_address: "{{ MINIO_HOST }}"
-    _http: "{{ MINIO_API_PORT }}/minio/health/live"
+    _http: "{{ MINIO_API_URL }}/minio/health/live"
     _additional_tags:
       - "minio"
 
