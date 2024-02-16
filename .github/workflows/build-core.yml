@@ -86,9 +86,9 @@ jobs:
           key: ${{secrets.RUNNER_PRIVATE_KEY}}
           envs: STAGING_VM_HOSTNAME,STAGING_VM_IP
           script: |
-            sudo rm -r /staging/tmp && mkdir /staging/tmp && cd /staging/tmp
+            rm -r ~/staging/tmp || true && mkdir ~/staging/tmp && cd ~/staging/tmp
             git clone -b ${{github.ref_name}} https://github.com/${{github.repository}}.git
-            cd /staging/tmp/slm
+            cd ~/staging/tmp/slm
             CORE_VERSION=$(cat pom.xml | grep -oPm1 "(?<=<revision>)[^<]+")
             
             echo ${{secrets.GITHUB_TOKEN}} | docker login -u${{github.actor}} --password-stdin ghcr.io
@@ -115,7 +115,7 @@ jobs:
           username: operation
           key: ${{secrets.RUNNER_PRIVATE_KEY}}
           script: |
-            cd /staging/tmp/slm/tests/backend
+            cd ~/staging/tmp/slm/tests/backend
             mvn test -Dtest=DockerStackTests
 
   test-external-components:
