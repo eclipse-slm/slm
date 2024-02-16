@@ -147,7 +147,7 @@ jobs:
           }
         ]
     env:
-      TARGET_HOST: ${{ github.ref_name == 'develop' && '10.3.7.166' || '10.3.7.145' }}
+      TARGET_HOST: ${{ github.ref_name == 'develop' && '10.17.165.36' || '10.17.166.74' }}
     steps:
       - uses: actions/checkout@v3
       - name: Run tests for '${{ matrix.tests.component }}' with Maven
@@ -178,7 +178,7 @@ jobs:
           }
         ]
     env:
-      TARGET_HOST: ${{ github.ref_name == 'develop' && '10.3.7.166' || '10.3.7.145' }}
+      TARGET_HOST: ${{ github.ref_name == 'develop' && '10.17.165.36' || '10.17.166.74' }}
     steps:
       - uses: actions/checkout@v3
       - name: Run tests for '${{ matrix.tests.component }}' with Maven
