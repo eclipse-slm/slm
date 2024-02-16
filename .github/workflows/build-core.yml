@@ -82,7 +82,7 @@ jobs:
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{env.STAGING_VM_IP}}
-          username: vfk
+          username: operation
           key: ${{secrets.RUNNER_PRIVATE_KEY}}
           envs: STAGING_VM_HOSTNAME,STAGING_VM_IP
           script: |
@@ -112,7 +112,7 @@ jobs:
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{env.STAGING_VM_IP}}
-          username: vfk
+          username: operation
           key: ${{secrets.RUNNER_PRIVATE_KEY}}
           script: |
             cd /staging/tmp/slm/tests/backend
