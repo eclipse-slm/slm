@@ -75,8 +75,8 @@ jobs:
     if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
     runs-on: self-hosted
     env:
-      STAGING_VM_IP: ${{ github.ref_name == 'develop' && '10.3.7.166' || '10.3.7.145' }}
-      STAGING_VM_HOSTNAME: ${{ github.ref_name == 'develop' && 'develop.stage.slm.vfk' || 'main.stage.slm.vfk' }}
+      STAGING_VM_IP: ${{ github.ref_name == 'develop' && '10.17.165.36' || '10.17.166.74' }}
+      STAGING_VM_HOSTNAME: ${{ github.ref_name == 'develop' && '10.17.165.36' || '10.17.166.74' }}
     steps:
       - name: Deploy stack von staging VM
         uses: appleboy/ssh-action@v0.1.10
