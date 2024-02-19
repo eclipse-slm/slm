@@ -86,7 +86,7 @@ jobs:
           key: ${{secrets.RUNNER_PRIVATE_KEY}}
           envs: STAGING_VM_HOSTNAME,STAGING_VM_IP
           script: |
-            rm -r ~/staging/tmp || true && mkdir ~/staging/tmp && cd ~/staging/tmp
+            rm -r ~/staging/tmp || true && mkdir -p ~/staging/tmp && cd ~/staging/tmp
             git clone -b ${{github.ref_name}} https://github.com/${{github.repository}}.git
             cd ~/staging/tmp/slm
             CORE_VERSION=$(cat pom.xml | grep -oPm1 "(?<=<revision>)[^<]+")
