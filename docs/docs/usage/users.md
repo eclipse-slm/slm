@@ -11,7 +11,7 @@ In Order to modify SLM users you have to log into keycloak.
 
 The following steps describe the process of adding a new user:
 
-1. Open Keycloak Admin Console by entering the following URL in your Browser: http://{{ hostname-of-slm }}:7080/auth/admin
+1. Open Keycloak Admin Console by entering the following URL in your Browser: http://\<hostname-of-slm\>:7080/auth/admin
 2. Login with the admin credentials of Keycloak (default: admin/password)
 3. Switch to realm "fabos"
 
@@ -35,7 +35,7 @@ The following steps describe the process of adding a new user:
 
 <img :src="$withBase('/img/figures/use/user-add-5.png')">
 
-10. Go to SLM Web UI at http://{{ hostname-of-slm }}:8080 and login with new username/password
+10. Go to SLM Web UI at http://\<hostname-of-slm\>:8080 and login with new username/password
 11. Check user details by opening the user profile
 
 <img :src="$withBase('/img/figures/use/user-add-6.png')">
@@ -44,7 +44,7 @@ The following steps describe the process of adding a new user:
 
 ## Delete User
 
-1. Open Keycloak Admin Console by entering the following URL in your Browser: http://{{ hostname-of-slm }}:7080/auth/admin
+1. Open Keycloak Admin Console by entering the following URL in your Browser: http://\<hostname-of-slm\>:7080/auth/admin
 2. Login with the admin credentials of Keycloak (default: admin/password)
 3. Switch to realm "fabos"
 4. Switch to "users" view
