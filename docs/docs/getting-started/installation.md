@@ -25,7 +25,7 @@ docker run \
   --rm \
   --env SLM_HOSTNAME=$SLM_HOSTNAME \
   --volume /var/run/docker.sock:/var/run/docker.sock \
-  --add-host $SLM_HOSTNAME:172.17.0.1\
+  --add-host $SLM_HOSTNAME:host-gateway \
   ghcr.io/eclipse-slm/slm/installer:1.4.0-SNAPSHOT
 ```
 
