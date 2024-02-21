@@ -4,12 +4,12 @@ permalink: /docs/usage/users
 
 # Users
 
+Eclipse Service Lifecycle Management uses [Keycloak](https://www.keycloak.org/) as the user management system.
+In Order to modify SLM users you have to log into keycloak.
+
 ## Add User
 
-Eclipse Service Lifecycle Management uses [Keycloak](https://www.keycloak.org/) as the user management system. 
-In Order to add a new SLM user you have to log into keycloak and add a new user in the SLM realm.
-
-The following steps describe the process:
+The following steps describe the process of adding a new user:
 
 1. Open Keycloak Admin Console by entering the following URL in your Browser: http://<hostname-of-slm>:7080/auth/admin
 2. Login with the admin credentials of Keycloak (default: admin/password)
@@ -41,3 +41,15 @@ The following steps describe the process:
 <img :src="$withBase('/img/figures/use/user-add-6.png')">
 
 <img :src="$withBase('/img/figures/use/user-add-7.png')">
+
+## Delete User
+
+1. Open Keycloak Admin Console by entering the following URL in your Browser: http://<hostname-of-slm>:7080/auth/admin
+2. Login with the admin credentials of Keycloak (default: admin/password)
+3. Switch to realm "fabos"
+4. Switch to "users" view
+5. Select user to be deleted and click "delete user"
+
+<img :src="$withBase('/img/figures/use/user-delete-1.png')">
+
+6. Confirm Delete by clicking "delete"
