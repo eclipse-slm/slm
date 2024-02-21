@@ -105,7 +105,7 @@ jobs:
               --rm \
               --env SLM_HOSTNAME=$STAGING_VM_HOSTNAME \
               --volume /var/run/docker.sock:/var/run/docker.sock \
-              --add-host $STAGING_VM_HOSTNAME:172.17.0.1\
+              --add-host $STAGING_VM_HOSTNAME:host-gateway \
               ghcr.io/eclipse-slm/slm/installer:$CORE_VERSION
 
       - name: Test stack running on staging VM
