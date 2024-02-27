@@ -144,6 +144,14 @@ vault:
   #  secret-id: 75604ba4-902b-21d4-a3d3-9782af56ad1f
   #  app-role-path: approle
 
+### Minio
+minio:
+  scheme: http
+  host: localhost
+  port: 9091
+  access-key: admin
+  secret-key: password
+
 ### Consul
 consul:
   scheme: http
@@ -158,14 +166,6 @@ basyx:
     url: http://localhost:4000/registry
   aas-server:
     url: http://localhost:4001/aasServer
-
-### Minio
-minio:
-  scheme: http
-  host: localhost
-  port: 9091
-  access-key: admin
-  secret-key: password
 
 service-management:
   url: http://localhost:9020
