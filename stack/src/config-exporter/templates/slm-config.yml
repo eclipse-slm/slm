@@ -17,7 +17,7 @@ vault:
   root_token: {{ vault_config['tokens']['root'] }}
 
 minio:
-  url: "{{ minio_config['scheme'] }}://{{ minio_config['host'] }}:{{ minio_config['port'] }}"
+  url: "{{ minio_config['scheme'] }}://{{ minio_config['host'] }}:{{ minio_config['api-port'] }}"
   root_user: {{ minio_config['users']['admin']['username'] }}
   root_token: {{ minio_config['users']['admin']['password'] }}
 
@@ -77,8 +77,8 @@ service-management:
       role-id: {{ service_management_config[ 'vault' ][ 'app-role' ][ 'role-id' ] }}
       secret-id: {{ service_management_config[ 'vault' ][ 'app-role' ][ 'secret-id' ] }}
   minio:
-    access-token: {{ service_management_config[ 'minio' ][ 'access-token' ] }}
-    security-token: {{ service_management_config[ 'minio' ][ 'security-token' ] }}
+    access-token: {{ service_management_config[ 'minio' ][ 'access-key' ] }}
+    security-token: {{ service_management_config[ 'minio' ][ 'secret-key' ] }}
 
 catalog:
   url: "{{ catalog_service_config['scheme'] }}://{{ catalog_service_config['host'] }}:{{ catalog_service_config['port'] }}"
