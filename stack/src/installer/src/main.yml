@@ -73,6 +73,7 @@
       vars:
         _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
         _store_compose_file: /compose/monitoring.yml
+        _store_config_file: /compose/config/prometheus/prometheus.yml
 
     - name: "Start internal SLM components"
       include_role:

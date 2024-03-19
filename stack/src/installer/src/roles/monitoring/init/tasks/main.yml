@@ -1,5 +1,12 @@
 - set_fact:
     monitoring_compose: "{{ lookup('template', 'monitoring.yml') }}"
+    prometheus_config: "{{ lookup('template', 'prometheus.yml') }}"
+
+- name: "Store prometheus config file"
+  template:
+    src: "prometheus.yml"
+    dest: "{{ _store_config_file }}"
+  when: (_store_config_file is defined) and (_store_config_file|length > 0)
 
 - name: "Start containers"
   community.docker.docker_compose:
