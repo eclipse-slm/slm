@@ -23,9 +23,9 @@
       state: present
       pull: true
     register: vault_compose_start_output
-  - name: "Wait for Vault being up"
+  - name: "Wait for Vault ('{{ VAULT_URL }}') being up"
     uri:
-      url: "{{ VAULT_URL }}"
+      url: "{{ VAULT_URL }}/v1/sys/health"
       status_code: 200
     register: result
     until: result.status == 200

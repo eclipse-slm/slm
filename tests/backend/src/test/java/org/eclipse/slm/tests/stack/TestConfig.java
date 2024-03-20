@@ -27,10 +27,10 @@ public class TestConfig {
             .build();
 
     // Test Resource
-    public static final String TEST_RESOURCE_HOSTNAME = System.getenv().getOrDefault("TEST_RESOURCE_HOSTNAME", "10.3.7.168");
-    public static final String TEST_RESOURCE_IP = System.getenv().getOrDefault("TEST_RESOURCE_IP", "10.3.7.168");
-    public static final String TEST_RESOURCE_USERNAME = System.getenv().getOrDefault("TEST_RESOURCE_USERNAME", "vfk");
-    public static final String TEST_RESOURCE_PASSWORD = System.getenv().getOrDefault("TEST_RESOURCE_PASSWORD", "667d0224");
+    public static final String TEST_RESOURCE_HOSTNAME = System.getenv().getOrDefault("TEST_RESOURCE_HOSTNAME", "10.17.165.103");
+    public static final String TEST_RESOURCE_IP = System.getenv().getOrDefault("TEST_RESOURCE_IP", "10.17.165.103");
+    public static final String TEST_RESOURCE_USERNAME = System.getenv().getOrDefault("TEST_RESOURCE_USERNAME", "operation");
+    public static final String TEST_RESOURCE_PASSWORD = System.getenv().getOrDefault("TEST_RESOURCE_PASSWORD", "2ZiDLjTF");
 
     // Test Resource List
     public static List<TestResource> testResourceList = new ArrayList<>(List.of(

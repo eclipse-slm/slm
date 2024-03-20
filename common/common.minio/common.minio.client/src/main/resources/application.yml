@@ -1,0 +1,6 @@
+minio:
+  scheme: http
+  host: localhost
+  port: 80
+  access-key: admin
+  secret-key: password

@@ -46,6 +46,7 @@ module.exports = {
                     'usage/clusters',
                     'usage/profiler',
                     'usage/service-offerings',
+                    'usage/users',
                     'usage/api',
                     'usage/reporting-issues',
                   ],

@@ -101,6 +101,15 @@
               @step-canceled="onStepCanceled"
               @step-completed="onStepCompleted"
             />
+            <!-- Codesys -->
+            <service-offering-version-wizard-step2-deployment-definition-codesys
+              v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'CODESYS'"
+              :edit-mode="editMode"
+              :service-offering-version="newServiceOfferingVersion"
+              :service-vendor-id="serviceVendorId"
+              @step-canceled="onStepCanceled"
+              @step-completed="onStepCompleted"
+            />
           </v-stepper-content>
 
           <!-- Step 3 - Service Options -->
@@ -130,6 +139,7 @@
 
 <script>
   import ServiceOfferingVersionWizardStep1Common from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep1Common'
+  import ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys from "@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys.vue";
   import ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer'
   import ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose'
   import ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes'
@@ -148,6 +158,7 @@
       ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer,
       ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose,
       ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes,
+      ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys,
       ServiceOfferingVersionWizardStep3ServiceOptions,
       ServiceOfferingVersionWizardStep4Requirements,
     },
@@ -195,7 +206,10 @@
             },
             envFiles: {},
 
-            manifestFile: ''
+            manifestFile: '',
+
+            codesysFile: '',
+            applicationPath: ''
           },
           serviceRequirements: []
         },
@@ -237,6 +251,7 @@
         'serviceOfferingDeploymentTypePrettyName',
       ]),
       apiStateLoaded () {
+        console.log('asdf', this.apiStateServices.serviceOfferingDeploymentTypes)
         return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADED
       },
       apiStateLoading () {
@@ -304,6 +319,18 @@
               ServiceOfferingVersionsRestApi.updateServiceOfferingVersion(serviceOfferingVersionDTO).then(
                 response => {
                   if (response.status === 200) {
+
+                    if(serviceOfferingVersionDTO.deploymentDefinition.deploymentType === 'CODESYS'){
+                      ServiceOfferingVersionsRestApi.uploadFileForServiceOfferingVersion(
+                          response.data.serviceOfferingId,
+                          response.data.serviceOfferingVersionId,
+                          serviceOfferingVersionDTO.deploymentDefinition.deploymentType,
+                          this.newServiceOfferingVersion.deploymentDefinition.codesysFile
+                      ).then(uploadFileResponse => {
+                        Vue.$toast.info('Successfully uploaded file for offering')
+                      }).catch(error => console.log(error));
+                    }
+
                     Vue.$toast.info('Successfully updated service offering version')
                     this.$store.dispatch('getServiceOfferings')
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
@@ -319,6 +346,18 @@
               ServiceOfferingVersionsRestApi.addServiceOfferingVersion(serviceOfferingVersionDTO).then(
                 response => {
                   if (response.status === 200) {
+
+                    if(serviceOfferingVersionDTO.deploymentDefinition.deploymentType === 'CODESYS'){
+                      ServiceOfferingVersionsRestApi.uploadFileForServiceOfferingVersion(
+                          response.data.serviceOfferingId,
+                          response.data.serviceOfferingVersionId,
+                          serviceOfferingVersionDTO.deploymentDefinition.deploymentType,
+                          this.newServiceOfferingVersion.deploymentDefinition.codesysFile
+                      ).then(uploadFileResponse => {
+                        Vue.$toast.info('Successfully uploaded file for offering')
+                      }).catch(error => console.log(error));
+                    }
+
                     Vue.$toast.info('Successfully created service offering version')
                     this.$store.dispatch('getServiceOfferings')
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })

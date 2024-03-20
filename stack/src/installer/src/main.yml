@@ -19,6 +19,8 @@
             KEYCLOAK_AUTH_URL: "{{ KEYCLOAK_SCHEME }}://{{ KEYCLOAK_HOST }}:{{ KEYCLOAK_PORT }}/auth"
             VAULT_URL: "{{ VAULT_SCHEME }}://{{ VAULT_HOST }}:{{ VAULT_PORT }}"
             AWX_URL: "{{ AWX_SCHEME }}://{{ AWX_HOST }}:{{ AWX_PORT }}"
+            MINIO_API_URL: "{{ MINIO_SCHEME }}://{{ MINIO_HOST }}:{{ MINIO_API_PORT }}"
+            MINIO_CONSOLE_URL: "{{ MINIO_SCHEME }}://{{ MINIO_HOST }}:{{ MINIO_CONSOLE_PORT }}"
 
 #    - name: Display all variables/facts known for a host
 #      debug:
@@ -51,6 +53,13 @@
       vars:
         _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
         _store_compose_file: /compose/vault.yml
+
+    - name: "Start Minio"
+      include_role:
+        name: minio/init
+      vars:
+        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+        _store_compose_file: /compose/minio.yml
 
     - name: "Start AWX"
       include_role:

@@ -2,6 +2,7 @@ package org.eclipse.slm.service_management.service.rest.service_offerings;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
+import org.eclipse.slm.common.minio.model.exceptions.*;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
 import org.eclipse.slm.resource_management.model.resource.MatchingResourceDTO;
 import org.eclipse.slm.resource_management.service.client.handler.ApiException;
@@ -22,11 +23,14 @@ import org.keycloak.KeycloakPrincipal;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.net.ssl.SSLException;
 import java.util.List;
@@ -172,6 +176,37 @@ public class ServiceOfferingVersionsRestController {
         var matchingResources = this.serviceOfferingOrderHandler
                 .getCapabilityServicesMatchingServiceRequirements(serviceOfferingId, serviceOfferingVersionId, keycloakPrincipal);
         return ResponseEntity.ok().body(matchingResources);
+    }
+
+    @RequestMapping(value = "/{serviceOfferingVersionId}/file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, method = RequestMethod.POST)
+    @Operation(summary = "Upload new service offering file for deployment ")
+    public ResponseEntity<Void> createOrUpdateServiceOfferingFileWithId(
+            @PathVariable("serviceOfferingId") UUID serviceOfferingId,
+            @PathVariable("serviceOfferingVersionId") UUID serviceOfferingVersionId,
+            @RequestPart("file") MultipartFile file
+    )
+            throws ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, MinioUploadException, MinioBucketCreateException, MinioRemoveObjectException, MinioObjectPathNameException, MinioBucketNameException {
+
+        this.serviceOfferingVersionHandler
+                .createOrUpdateServiceOfferingFile(serviceOfferingId, serviceOfferingVersionId, file);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/{serviceOfferingVersionId}/file/{fileName}", method = RequestMethod.GET)
+    @Operation(summary = "Download service offering file ")
+    public ResponseEntity<InputStreamResource> getServiceOfferingFileWithId(
+            @PathVariable("serviceOfferingId") UUID serviceOfferingId,
+            @PathVariable("serviceOfferingVersionId") UUID serviceOfferingVersionId,
+            @PathVariable("fileName") String fileName
+    ) throws Exception {
+
+        var result = this.serviceOfferingVersionHandler
+                .getServiceOfferingFile(serviceOfferingId, serviceOfferingVersionId, fileName);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + result.getFileName())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE).body(new InputStreamResource(result.getFileStream()));
     }
 
 }

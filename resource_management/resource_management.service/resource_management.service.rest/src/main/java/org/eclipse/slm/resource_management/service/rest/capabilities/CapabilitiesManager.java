@@ -59,6 +59,8 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
     private final KeycloakUtil keycloakUtil;
     private final CapabilityUtil capabilityUtil;
     private final ObjectMapper objectMapper;
+
+    private final List<String> jobTemplateCredentialNames = List.of("Consul", "HashiCorp Vault", "Minio");
     public Map<AwxJobObserver, CapabilityJob> awxJobObserverToJobDetails = new HashMap<AwxJobObserver, CapabilityJob>();
 
     @Value("${awx.default-execution-environment}")
@@ -139,7 +141,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                     if(capabilityAction.getActionClass().equals(AwxAction.class.getSimpleName())) {
                         AwxAction awxCapabilityAction = (AwxAction) capabilityAction;
                         try {
-                            var jobTemplateCredentialNames = List.of("Consul", "HashiCorp Vault");
+                            var jobTemplateCredentialNames = this.jobTemplateCredentialNames;
                             JobTemplate jobTemplate;
                             if(!awxCapabilityAction.getUsername().equals("") && !awxCapabilityAction.getPassword().equals("")) {
                                 jobTemplate = awxClient.createJobTemplateAddExecuteRoleToDefaultTeamAddScmCredential(

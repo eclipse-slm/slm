@@ -15,10 +15,26 @@
     name: awx/client
     tasks_from: add_awx_config_in_consul
 
-- name: "Add Vault config in Consul"
+- name: "Add common Vault config in Consul"
   include_role:
     name: vault/client
     tasks_from: add_vault_config_in_consul
+
+- name: "Create Vault app role for AWX JWT Authenticator"
+  include_role:
+    name: vault/client
+    tasks_from: create_approle_with_policies
+  vars:
+    _approle_name: "{{ awx_jwt_authenticator.vault.approle.name }}"
+    _approle_policies: "{{ awx_jwt_authenticator.vault.approle.policies }}"
+
+- name: "Create Vault secret engine for AWX JWT Authenticator"
+  include_role:
+    name: vault/client
+    tasks_from: create_kv_secret_engine
+  vars:
+    _kv_secret_engine_name: "{{ item }}"
+  loop: "{{ awx_jwt_authenticator.vault.kv_secret_engines }}"
 
 - name: "Add Consul config in Consul"
   include_role:
@@ -43,6 +59,31 @@
     _config:
       consul:
         acl-token: "{{ _consul_token }}"
+
+- name: "Get Keycloak admin access token"
+  include_role:
+    name: keycloak/client
+    tasks_from: authentication/get_admin_access_token.yml
+- name: "Create Keycloak client for AWX JWT Authenticator"
+  include_role:
+    name: keycloak/client
+    tasks_from: clients/create_client.yml
+  vars:
+    _keycloak_client: "{{ awx_jwt_authenticator.keycloak_client }}"
+    _keycloak_access_token: "{{ keycloak_access_token }}"
+    _keycloak_realm_name: "{{ KEYCLOAK_REALM }}"
+
+- name: "Get client secret of awx-jwt-authenticator"
+  block:
+    - include_role:
+        name: keycloak/client
+        tasks_from: clients/get_client_secret.yml
+      vars:
+        _client_id: "{{ awx_jwt_authenticator.keycloak_client.client_id }}"
+        _keycloak_access_token: "{{ keycloak_access_token }}"
+        _keycloak_realm_name: "{{ KEYCLOAK_REALM }}"
+    - set_fact:
+        awx_jwt_authenticator_keycloak_secret_id: "{{ client_secret }}"
 
 - name: "Get config from Consul"
   include_role:

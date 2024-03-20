@@ -13,14 +13,6 @@ keycloak:
   username: fabos
   password: password
 
-### Consul
-consul:
-  scheme: http
-  host: localhost
-  port: 8500
-  datacenter: fabos
-  acl-token: your-consul-acl-token
-
 # Spring
 spring:
   cloud:
@@ -30,3 +22,11 @@ spring:
       discovery:
         enabled: true
         acl-token: ${consul.acl-token}
+
+### Consul
+consul:
+  scheme: http
+  host: localhost
+  port: 8500
+  datacenter: fabos
+  acl-token: your-consul-acl-token

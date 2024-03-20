@@ -29,7 +29,7 @@
       loop_var: app_role
   when: (_approle_policies|length > 0)
 
-- name: "Add common AWX config in Consul"
+- name: "Add Vault Ap Role config in Consul"
   include_role:
     name: consul/client
     tasks_from: create_or_add_config
