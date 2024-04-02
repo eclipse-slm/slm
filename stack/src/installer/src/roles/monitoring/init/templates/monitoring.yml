@@ -14,19 +14,19 @@ services:
   prometheus:
     image: "ghcr.io/eclipse-slm/monitoring-prometheus:{{ SLM_VERSION }}"
     restart: unless-stopped
+    environment:
+      CONSUL_URL: "{{ CONSUL_URL }}"
+      CONSUL_TOKEN: "{{ _consul_token }}"
     networks:
       default:
         aliases:
           - prometheus
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
     ports:
       - "{{ PROMETHEUS_PORT }}:9090"
-    volumes:
-      - config-prometheus:/etc/prometheus/
     healthcheck:
       test:  wget --quiet --tries=1 --spider http://localhost:9090/-/healthy || exit
       interval: 60s
       retries: 5
       timeout: 10s
-
-volumes:
-  config-prometheus:

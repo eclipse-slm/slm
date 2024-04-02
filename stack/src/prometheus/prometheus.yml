@@ -1,6 +1,20 @@
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  query_log_file: /prometheus/query.log
+
 scrape_configs:
-  - job_name: "resources"
-    scrape_interval: 1s
-    file_sd_configs:
-      - files:
-        - "targets/targets.json"
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'consul'
+    consul_sd_configs:
+      - server: %%CONSUL_URL%%
+        token: %%CONSUL_TOKEN%%
+    relabel_configs:
+      - source_labels: [ __meta_consul_tags ]
+        regex: .*,prometheus,.*
+        action: keep
+      - source_labels: [ __meta_consul_service ]
+        target_label: job

@@ -12,7 +12,6 @@ services:
       - "./env.yml:/env/env.yml"
       - "./src:/src"
       - "./result_compose:/compose"
-      - "config-prometheus:/compose/config/prometheus/"
     extra_hosts:
       - "${SLM_HOSTNAME}:172.17.0.1"
 
