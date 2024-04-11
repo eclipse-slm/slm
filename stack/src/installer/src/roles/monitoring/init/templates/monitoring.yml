@@ -12,7 +12,7 @@ services:
       - "{{ MONITORING_SERVICE_PORT }}:8080"
 
   prometheus:
-    image: "ghcr.io/eclipse-slm/monitoring-prometheus:{{ SLM_VERSION }}"
+    image: "ghcr.io/eclipse-slm/monitoring-prometheus:{{ PROMETHEUS_VERSION }}"
     restart: unless-stopped
     environment:
       CONSUL_URL: "{{ CONSUL_URL }}"

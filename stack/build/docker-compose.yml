@@ -45,7 +45,7 @@ services:
     build: ../src/config-exporter
 
   prometheus:
-    image: ghcr.io/eclipse-slm/monitoring-prometheus:${SLM_VERSION}
+    image: ghcr.io/eclipse-slm/monitoring-prometheus:${PROMETHEUS_VERSION}
     build: ../src/prometheus
 
 
