@@ -14,6 +14,3 @@ services:
       - "./result_compose:/compose"
     extra_hosts:
       - "${SLM_HOSTNAME}:172.17.0.1"
-
-volumes:
-  config-prometheus:
