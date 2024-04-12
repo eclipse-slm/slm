@@ -2,7 +2,7 @@ version: '3'
 
 services:
   monitoring-prometheus-aas:
-    image: "fabos4ai/fabos-monitoring-prometheus-aas:{{ MONITORING_SERVICE_VERSION }}"
+    image: "ghcr.io/eclipse-slm/slm-monitoring-prometheus-aas:{{ MONITORING_SERVICE_VERSION }}"
     restart: unless-stopped
     networks:
       default:
