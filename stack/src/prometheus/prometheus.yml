@@ -18,5 +18,5 @@ scrape_configs:
         action: keep
       - source_labels: [ __meta_consul_service ]
         target_label: job
-      - source_labels: [ __meta_consul_service_metadata_slm_id ]
-        target_label: slm_id
+      - source_labels: [ __meta_consul_service_metadata_resource_id ]
+        target_label: resource_id
