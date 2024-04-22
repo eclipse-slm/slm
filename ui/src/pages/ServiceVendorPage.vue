@@ -29,7 +29,7 @@
             return-object
             label="Select Service Vendor"
             autofocus
-            @change="onServiceVendorSelected"
+            @update:modelValue="onServiceVendorSelected"
           >
             <template
               #selection="data"
@@ -65,7 +65,7 @@
               v-if="serviceOfferingsOfVendor == null && serviceOfferingsOfVendorLoaded"
             >
               <v-alert
-                outlined
+                variant="outlined"
                 type="info"
               >
                 No service offerings available
@@ -84,8 +84,8 @@
               @click="serviceOfferingCreateDialog = true"
             >
               <v-icon
-                dense
-                small
+                density="compact"
+                size="small"
                 class="mr-2"
               >
                 mdi-plus
@@ -102,7 +102,7 @@
             <!-- Service Offering Delete Dialog !-->
             <confirm-dialog
               v-if="serviceOfferingDeleteDialog"
-              :show="serviceOfferingDeleteDialog"
+              :isActive="serviceOfferingDeleteDialog"
               title="Delete service offering?"
               :text="`Do you really want to delete service offering '${serviceOfferingToDelete.name}'?`"
               @canceled="serviceOfferingDeleteDialog = false"
@@ -112,7 +112,7 @@
             <!-- Service Offering Version Delete Dialog !-->
             <confirm-dialog
               v-if="serviceOfferingVersionDeleteDialog"
-              :show="serviceOfferingVersionDeleteDialog"
+              :isActive="serviceOfferingVersionDeleteDialog"
               title="Delete service offering version?"
               :text="`Do you really want to delete service offering version '${serviceOfferingVersionToDelete.version}'?`"
               @canceled="serviceOfferingVersionDeleteDialog = false"
@@ -152,9 +152,9 @@
                     <td>
                       <v-btn
                         class="ma-1"
-                        small
-                        outlined
-                        fab
+                        size="small"
+                        variant="outlined"
+
                         color="red"
                         @click="onDeleteRepositoryClicked(repository)"
                       >
@@ -173,8 +173,8 @@
               @click="serviceRepositoryCreateDialog = true"
             >
               <v-icon
-                dense
-                small
+                density="compact"
+                size="small"
                 class="mr-2"
               >
                 mdi-plus
@@ -195,7 +195,7 @@
                 :avatar="getImageUrl(selectedServiceVendor.logo)"
               >
                 <v-card-text class="text-center">
-                  <div class="text-h4 font-weight-light mb-3 black--text">
+                  <div class="text-h4 font-weight-light mb-3 text-black">
                     {{ selectedServiceVendor.name }}
                   </div>
 
@@ -213,8 +213,8 @@
                     @click="showEditServiceVendorDialog = true"
                   >
                     <v-icon
-                      dense
-                      small
+                      density="compact"
+                      size="small"
                       class="mr-2"
                     >
                       mdi-pencil

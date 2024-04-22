@@ -1,6 +1,6 @@
 <template>
   <v-container v-if="this.filterValues.length > 0">
-    <v-breadcrumbs class="grey lighten-5" >
+    <v-breadcrumbs class="bg-grey-lighten-5" >
       <v-breadcrumbs-item class="pr-3"><v-icon>mdi-home</v-icon></v-breadcrumbs-item>
       <div v-for="v in selectedFilterValues" v-bind:key="v">
         <v-breadcrumbs-divider>/</v-breadcrumbs-divider>
@@ -9,7 +9,7 @@
       <div v-if="this.showFilterSelector" class="mt-3">
         <v-breadcrumbs-divider>/</v-breadcrumbs-divider>
         <v-breadcrumbs-item>
-          <v-select dense :items="filterValues" @change="addFilterValueToSelectedValues" v-model="selectedFilterValue" />
+          <v-select density="compact" :items="filterValues" @update:modelValue="addFilterValueToSelectedValues" v-model="selectedFilterValue" />
         </v-breadcrumbs-item>
       </div>
       <v-spacer></v-spacer>

@@ -1,7 +1,7 @@
 <template>
   <v-card-text>
     <v-alert
-      outlined
+      variant="outlined"
       type="info"
     >
       No {{ item }} available

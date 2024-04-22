@@ -8,7 +8,7 @@
         <v-row class="warn text-h3 font-weight-light">
           <v-col>
             <v-icon
-                large
+                size="large"
                 class="ml-2 mr-4"
             >
               mdi-chart-arc

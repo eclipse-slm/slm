@@ -20,7 +20,7 @@
             <div class="text-subtitle-1 font-weight-light">
               See all available
               <a
-                class="white--text"
+                class="text-white"
                 href="https://materialdesignicons.com/"
                 target="_blank"
               >
@@ -40,12 +40,11 @@
             >
               <v-tooltip
                 content-class="top"
-                top
+                location="top"
               >
-                <template v-slot:activator="{ attrs, on }">
+                <template v-slot:#activator="{ props }">
                   <v-icon
-                    v-bind="attrs"
-                    v-on="on"
+                    v-bind="props"
                   >
                     {{ icon }}
                   </v-icon>
@@ -64,10 +63,10 @@
         <v-btn
           color="success"
           href="https://materialdesignicons.com/"
-          large
+          size="large"
           target="_blank"
         >
-          <v-icon left>
+          <v-icon start>
             mdi-material-design
           </v-icon>
           <span>See all icons</span>

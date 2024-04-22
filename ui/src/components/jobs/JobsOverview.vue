@@ -17,7 +17,6 @@
           v-else
           id="jobsTable"
           :sort-by.sync="sortBy"
-          :sort-desc.sync="sortDesc"
           :footer-props="{
             'items-per-page-options': [5, 10, 20, -1],
           }"

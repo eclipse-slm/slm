@@ -2,7 +2,7 @@
   <v-card
     class="mx-1 my-1"
     :elevation="hovered"
-    outlined
+    variant="outlined"
     :disabled="passive"
     @mouseenter="hovered = 24"
     @mouseleave="hovered = 0"
@@ -11,12 +11,12 @@
     <v-container>
       <v-list-item>
         <v-list-item-avatar><v-img :src="'data:image/jpeg;base64,' + serviceVendorById(service.serviceVendorId).logo" /></v-list-item-avatar>
-        <v-list-item-content>
+        <v-list-item>
           <v-list-item-title class="text-h5">
             {{ service.title }}
           </v-list-item-title>
           <v-list-item-subtitle>{{ serviceVendorById(service.serviceVendorId).name }}</v-list-item-subtitle>
-        </v-list-item-content>
+        </v-list-item>
       </v-list-item>
 
       <v-row class="mx-2 my-2">

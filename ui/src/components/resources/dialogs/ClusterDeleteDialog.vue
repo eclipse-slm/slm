@@ -1,14 +1,14 @@
 <template>
   <v-dialog
-    v-model="showDialog"
+    v-model="active"
     width="600"
     @click:outside="$emit('canceled')"
   >
     <template>
-      <v-card v-if="showDialog">
+      <v-card v-if="active">
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           Delete Cluster
         </v-toolbar>
@@ -20,15 +20,15 @@
             <div>
               There are '{{ serviceInstancesForCluster.length }}' service instances running on this cluster:<br>
               <v-list-item v-for="item in serviceInstancesForCluster" v-bind:key="item.id">
-                <v-list-item-icon>
+                <v-list-item>
                   <v-icon>mdi-apps</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
+                </v-list-item>
+                <v-list-item>
                   <v-list-item-title> {{ item.id }}</v-list-item-title>
                   <v-list-item-subtitle>
                     ({{ serviceOfferingById(item.serviceOfferingId).name }} - Version: {{ serviceOfferingById(item.serviceOfferingId).versions.find(version => version.id === item.metaData.service_offering_version_id)?.version }})
                   </v-list-item-subtitle>
-                </v-list-item-content>
+                </v-list-item>
               </v-list-item>
               <strong>Cannot delete!</strong>
             </div>
@@ -37,11 +37,10 @@
         <v-card-actions class="justify-center">
           <v-spacer />
 
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
+          <v-tooltip location="bottom">
+            <template v-slot:#activator="{ props }">
               <v-btn
-                  v-bind="attrs"
-                  v-on="on"
+                  v-bind="props"
                   color="error"
                   @click="deleteCluster"
                   :disabled="serviceInstancesForCluster.length > 0"
@@ -67,6 +66,7 @@
 <script>
   import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
   import { mapGetters } from "vuex";
+  import {toRef} from "vue";
 
   export default {
     name: 'ClusterDeleteDialog',
@@ -87,5 +87,11 @@
         return this.services.filter(svc => svc.resourceId === this.cluster.id)
       },
     },
+    setup(props){
+      const active = toRef(props, 'showDialog')
+      return{
+        active
+      }
+    }
   }
 </script>

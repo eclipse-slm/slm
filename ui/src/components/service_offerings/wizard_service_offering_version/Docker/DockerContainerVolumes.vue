@@ -2,9 +2,9 @@
   <div>
     <v-row>
       <v-col cols="3">
-        <v-subheader>
+        <v-list-subheader>
           Volumes
-        </v-subheader>
+        </v-list-subheader>
       </v-col>
 
       <v-col cols="9">
@@ -14,8 +14,8 @@
           @click="addVolume"
         >
           <v-icon
-            dense
-            small
+            density="compact"
+            size="small"
             class="mr-2"
           >
             mdi-plus-circle
@@ -40,7 +40,7 @@
         >
           <template #item.name="{ item }">
             <ValidationProvider
-              v-slot="{ errors, valid }"
+              v-slot="{ errors }"
               name="Volume Name"
               rules="required|alpha_dash"
             >
@@ -49,7 +49,7 @@
                 v-model="item.name"
                 placeholder="Name of volume"
                 :error-messages="errors"
-                :success="valid"
+
               />
               <div
                 v-else
@@ -61,7 +61,7 @@
 
           <template #item.containerPath="{ item }">
             <ValidationProvider
-              v-slot="{ errors, valid }"
+              v-slot="{ errors }"
               name="Container Path"
               rules="required"
             >
@@ -70,7 +70,7 @@
                 v-model="item.containerPath"
                 placeholder="e.g. /path/in/container"
                 :error-messages="errors"
-                :success="valid"
+
               />
               <div
                 v-else

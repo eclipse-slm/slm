@@ -16,39 +16,39 @@
       >
         <tr v-for="(serviceOption, index) in props.items" :key="index">
           <td>
-            <v-icon small class="page__grab-icon"> mdi-arrow-all </v-icon>
+            <v-icon size="small" class="page__grab-icon"> mdi-arrow-all </v-icon>
           </td>
           <td>{{ serviceOption.key }}</td>
           <td :id="serviceOption.key + '_DisplayName'">
             <ValidationProvider
-              v-slot="{ errors, valid }"
+              v-slot="{ errors }"
               name="Display Name"
               rules="required"
             >
               <v-text-field
                 v-model="serviceOption.name"
                 :error-messages="errors"
-                :success="valid"
+
               />
             </ValidationProvider>
           </td>
           <td :id="serviceOption.key + '_Desc'">
             <ValidationProvider
-              v-slot="{ errors, valid }"
+              v-slot="{ errors }"
               name="Description"
               rules="required"
             >
               <v-text-field
                 v-model="serviceOption.description"
                 :error-messages="errors"
-                :success="valid"
+
               />
             </ValidationProvider>
           </td>
           <td :id="serviceOption.key + '_Value'">
-            <v-tooltip bottom :disabled="!serviceOption.required">
-              <template #activator="{ on, attrs }">
-                <div v-on="on">
+            <v-tooltip location="bottom" :disabled="!serviceOption.required">
+              <template #activator="{ props }">
+                <div v-bind="props">
                   <service-option-value
                     :service-option="serviceOption"
                     :disabled="
@@ -74,18 +74,18 @@
                 serviceOption.optionType == 'VOLUME' ||
                 serviceOption.optionType == 'PORT_MAPPING'
               "
-              @change="
+              @update:modelValue="
                 onValueTypeChanged(serviceOption, serviceOption.valueType)
               "
             />
           </td>
           <td :id="serviceOption.key + '_RequiredCheckbox'">
-            <v-tooltip bottom>
-              <template #activator="{ on, attrs }">
-                <v-simple-checkbox
+            <v-tooltip location="bottom">
+              <template #activator="{ props }">
+                <v-checkbox-btn
                   id="requiredCheckbox"
                   v-model="serviceOption.required"
-                  v-bind="attrs"
+                  v-bind="props"
                   color="primary"
                   :ripple="false"
                   :disabled="
@@ -93,7 +93,6 @@
                     serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
                     serviceOption.valueType === 'AAS_SM_TEMPLATE'
                   "
-                  v-on="on"
                   @click="onServiceOptionRequiredChanged(serviceOption)"
                 />
               </template>
@@ -104,7 +103,7 @@
             </v-tooltip>
           </td>
           <td :id="serviceOption.key + '_EditableCheckbox'">
-            <v-simple-checkbox
+            <v-checkbox-btn
               id="editableCheckbox"
               v-model="serviceOption.editable"
               color="primary"

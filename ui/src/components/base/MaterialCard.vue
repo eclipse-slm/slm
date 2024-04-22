@@ -23,7 +23,7 @@
         :width="icon ? 'auto' : '100%'"
         elevation="6"
         class="text-start v-card--material__heading mb-n6"
-        dark
+        theme="dark"
       >
         <slot
           v-if="$slots.heading"

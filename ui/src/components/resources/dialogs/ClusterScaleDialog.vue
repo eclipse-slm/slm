@@ -8,7 +8,7 @@
       <v-card v-if="page=='scale-virtual'">
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           Scale Resource  <strong>{{ selectedClusterForScale.name }}</strong>
         </v-toolbar>
@@ -17,14 +17,14 @@
         </v-card-text>
         <v-card-actions>
           <v-btn
-            text
+            variant="text"
             @click="page=''"
           >
             Back
           </v-btn>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             @click="closeDialog"
           >
             Submit
@@ -34,7 +34,7 @@
       <v-card v-else-if="page=='scale-bare-metal'">
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           Select Bare Metal Resource
         </v-toolbar>
@@ -46,20 +46,20 @@
             v-model="selectedBareMetalResource"
             label="Select Resource"
             :items="nonClusterResources"
-            item-text="hostname"
+            item-title="hostname"
             item-value="id"
           />
         </v-container>
         <v-card-actions>
           <v-btn
-            text
+            variant="text"
             @click="page=''"
           >
             Back
           </v-btn>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             @click="scaleCluster"
           >
             Submit
@@ -73,7 +73,7 @@
         >
           <v-toolbar
             color="primary"
-            dark
+            theme="dark"
           >
             Add Bare Metal Machine / Create Virtual Machine
           </v-toolbar>
@@ -82,14 +82,14 @@
               <v-col class="text-center">
                 <v-btn
                   color="secondary"
-                  x-large
+                  size="x-large"
                   tile
                   @click="page='scale-bare-metal'"
                 >
                   <v-icon
                     class="mr-5 ml-2"
-                    x-large
-                    left
+                    size="x-large"
+                    start
                   >
                     mdi-plus
                   </v-icon>
@@ -99,14 +99,14 @@
               <v-col class="text-center">
                 <v-btn
                   color="secondary"
-                  x-large
+                  size="x-large"
                   tile
                   @click="page='scale-virtual'"
                 >
                   <v-icon
                     class="mr-5 ml-2"
-                    large
-                    left
+                    size="large"
+                    start
                   >
                     mdi-pencil-outline
                   </v-icon>
@@ -122,7 +122,7 @@
         >
           <v-toolbar
             color="primary"
-            dark
+            theme="dark"
           >
             Select resource to be removed from cluster
           </v-toolbar>
@@ -131,27 +131,27 @@
             <v-select
               v-model="selectedClusterMemberTypeName"
               :items="availableClusterMemberTypes"
-              item-text="prettyName"
+              item-title="prettyName"
               label="Cluster Member Type"
             />
             <v-select
               v-model="selectedBareMetalResource"
               :items="downScalableClusterMembers"
-              item-text="Node"
+              item-title="Node"
               item-value="ID"
               label="Node to be removed from Cluster"
             />
           </v-container>
           <v-card-actions>
             <v-btn
-              text
+              variant="text"
               @click="closeDialog"
             >
               Close
             </v-btn>
             <v-spacer />
             <v-btn
-              text
+              variant="text"
               @click="scaleCluster"
             >
               Submit

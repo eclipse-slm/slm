@@ -7,7 +7,7 @@
       <v-card v-if="showDialog">
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           {{ getServiceOfferingText(serviceInstance) }} | Service Instance {{ serviceInstance.id }}
         </v-toolbar>
@@ -27,19 +27,19 @@
 
           <v-list v-if="apiStateLoaded">
             <v-list-group
-              :value="true"
+              :model-value="true"
             >
               <template #activator>
-                <v-list-item-icon>
+                <v-list-item>
                   <v-icon>mdi-information</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
+                </v-list-item>
+                <v-list-item>
                   <v-list-item-title>
                     Common
                   </v-list-item-title>
-                </v-list-item-content>
+                </v-list-item>
               </template>
-              <v-simple-table v-slot>
+              <v-table v-slot>
                 <tbody>
                   <tr>
                     <th>{{ 'Id' }}</th>
@@ -126,20 +126,20 @@
                     </td>
                   </tr>
                 </tbody>
-              </v-simple-table>
+              </v-table>
             </v-list-group>
             <v-list-group>
               <template #activator>
-                <v-list-item-icon>
+                <v-list-item>
                   <v-icon>mdi-adjust</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
+                </v-list-item>
+                <v-list-item>
                   <v-list-item-title>
                     Service Options
                   </v-list-item-title>
-                </v-list-item-content>
+                </v-list-item>
               </template>
-              <v-simple-table
+              <v-table
                 v-if="serviceInstanceDetails.serviceOptions.length>0"
                 fixed-header
               >
@@ -162,12 +162,11 @@
                       <td>
                         <v-tooltip
                           v-if="serviceOption.description != null"
-                          bottom
+                          location="bottom"
                         >
-                          <template #activator="{ on, attrs }">
+                          <template #activator="{ props }">
                             <div
-                              v-bind="attrs"
-                              v-on="on"
+                              v-bind="props"
                             >
                               {{ serviceOption.name }}
                             </div>
@@ -202,7 +201,7 @@
                     </tr>
                   </tbody>
                 </template>
-              </v-simple-table>
+              </v-table>
               <no-item-available-note
                 v-else
                 item="Service Options"
@@ -210,16 +209,16 @@
             </v-list-group>
             <v-list-group>
               <template #activator>
-                <v-list-item-icon>
+                <v-list-item>
                   <v-icon>mdi-history</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
+                </v-list-item>
+                <v-list-item>
                   <v-list-item-title>
                     Order History
                   </v-list-item-title>
-                </v-list-item-content>
+                </v-list-item>
               </template>
-              <v-simple-table fixed-header>
+              <v-table fixed-header>
                 <template #default>
                   <thead>
                     <tr>
@@ -245,13 +244,13 @@
                     </tr>
                   </tbody>
                 </template>
-              </v-simple-table>
+              </v-table>
             </v-list-group>
           </v-list>
 
           <v-card-actions class="justify-end">
             <v-btn
-              text
+              variant="text"
               @click="onCloseButtonClicked"
             >
               Close

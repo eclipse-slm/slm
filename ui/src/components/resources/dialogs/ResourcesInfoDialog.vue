@@ -7,7 +7,7 @@
       <v-card v-if="showDialog">
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           {{ resource.hostname }}
         </v-toolbar>
@@ -19,7 +19,7 @@
         </v-card-text>
         <v-card-actions class="justify-end">
           <v-btn
-            text
+            variant="text"
             @click="onCloseButtonClicked"
           >
             Close

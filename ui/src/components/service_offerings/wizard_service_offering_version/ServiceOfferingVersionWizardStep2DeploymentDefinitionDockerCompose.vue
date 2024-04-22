@@ -3,15 +3,15 @@
     <v-form
       v-model="validForm"
     >
-      <v-list expand>
+      <v-list>
         <!-- Docker Compose File !-->
         <v-list-group :value="true">
           <template #activator>
-            <v-list-item-content>
+            <v-list-item>
               <v-list-item-title>
                 Compose File
               </v-list-item-title>
-            </v-list-item-content>
+            </v-list-item>
           </template>
           <v-row>
             <v-col>
@@ -20,9 +20,9 @@
                 accept=".yml,.yaml"
                 label="Click here to select Docker Compose file"
                 auto-grow
-                dense
-                outlined
-                @change="onLoadComposeFileClicked"
+                density="compact"
+                variant="outlined"
+                @update:modelValue="onLoadComposeFileClicked"
               />
             </v-col>
             <v-spacer />
@@ -30,28 +30,28 @@
           <v-textarea
             v-model="serviceOfferingVersion.deploymentDefinition.composeFile"
             class="full-width"
-            outlined
-            dense
+            variant="outlined"
+            density="compact"
           />
         </v-list-group>
 
         <!-- .env File !-->
         <v-list-group :value="false">
           <template #activator>
-            <v-list-item-content>
+            <v-list-item>
               <v-list-item-title>
                 .env File (Optional)
               </v-list-item-title>
-            </v-list-item-content>
+            </v-list-item>
           </template>
           <v-row>
             <v-col>
               <v-file-input
                 v-model="uploadedDotEnvFile"
                 label="Click here to select .env file"
-                outlined
-                dense
-                @change="onLoadDotEnvFileClicked"
+                variant="outlined"
+                density="compact"
+                @update:modelValue="onLoadDotEnvFileClicked"
               />
             </v-col>
             <v-spacer />
@@ -60,8 +60,8 @@
           <v-textarea
             v-model="serviceOfferingVersion.deploymentDefinition.dotEnvFile.content"
             class="full-width"
-            outlined
-            dense
+            variant="outlined"
+            density="compact"
           />
           <docker-container-environment-variables
             :environment-variables="serviceOfferingVersion.deploymentDefinition.dotEnvFile.environmentVariables"
@@ -73,11 +73,11 @@
           :value="true"
         >
           <template #activator>
-            <v-list-item-content>
+            <v-list-item>
               <v-list-item-title>
                 Environment Variable Files
               </v-list-item-title>
-            </v-list-item-content>
+            </v-list-item>
           </template>
           <v-list>
             <v-list-group
@@ -86,11 +86,11 @@
               :value="true"
             >
               <template #activator>
-                <v-list-item-content>
+                <v-list-item>
                   <v-list-item-title class="mx-8">
                     {{ environmentVariableFile.fileName }}
                   </v-list-item-title>
-                </v-list-item-content>
+                </v-list-item>
               </template>
               <div>
                 <v-row>
@@ -99,9 +99,9 @@
                       v-model="uploadedEnvFiles[environmentVariableFile.fileName]"
                       :accept="environmentVariableFile.fileName"
                       :label="'Click here to select ' + environmentVariableFile.fileName"
-                      dense
-                      outlined
-                      @change="onLoadEnvFileClicked(environmentVariableFile.fileName)"
+                      density="compact"
+                      variant="outlined"
+                      @update:modelValue="onLoadEnvFileClicked(environmentVariableFile.fileName)"
                     />
                   </v-col>
                   <v-col>
@@ -116,7 +116,7 @@
                 <v-textarea
                   v-model="environmentVariableFile.content"
                   class="full-width mx-4"
-                  outlined
+                  variant="outlined"
                   auto-grow
                 />
                 <docker-container-environment-variables
@@ -133,11 +133,11 @@
           :value="true"
         >
           <template #activator>
-            <v-list-item-content>
+            <v-list-item>
               <v-list-item-title>
                 Environment
               </v-list-item-title>
-            </v-list-item-content>
+            </v-list-item>
           </template>
           <docker-container-environment-variables
             :environment-variables="serviceOfferingVersion.deploymentDefinition.environmentVariables"

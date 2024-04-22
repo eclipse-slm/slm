@@ -3,15 +3,15 @@
     <v-form
       v-model="validForm"
     >
-      <v-list expand>
+      <v-list>
         <!-- Codesys File !-->
         <v-list-group :value="true">
           <template #activator>
-            <v-list-item-content>
+            <v-list-item>
               <v-list-item-title>
                 Codesys Application Files
               </v-list-item-title>
-            </v-list-item-content>
+            </v-list-item>
           </template>
           <v-row>
             <v-col>
@@ -20,9 +20,9 @@
                 accept=".zip"
                 label="Click here to select Application Zip file"
                 auto-grow
-                dense
-                outlined
-                @change="onLoadCodesysApplicationFileClicked($event)"
+                density="compact"
+                variant="outlined"
+                @update:modelValue="onLoadCodesysApplicationFileClicked($event)"
               />
             </v-col>
             <v-spacer />

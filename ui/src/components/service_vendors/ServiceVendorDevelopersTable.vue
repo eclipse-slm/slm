@@ -19,11 +19,11 @@
           v-model="addedDevelopers"
           :items="developersAvailableForSharing"
           label="Add developer"
-          item-text="username"
+          item-title="username"
           return-object
           multiple
           chips
-          deletable-chips
+          closable-chips
         />
 
         <v-divider />
@@ -50,7 +50,7 @@
                   <v-btn
                     class="ma-1"
                     color="error"
-                    small
+                    size="small"
                     @click="onDeleteDeveloperClicked(developer)"
                   >
                     <v-icon>
@@ -72,8 +72,8 @@
           @click="onSaveDevelopersClicked()"
         >
           <v-icon
-            dense
-            small
+            density="compact"
+            size="small"
             class="mr-2"
           >
             mdi-check

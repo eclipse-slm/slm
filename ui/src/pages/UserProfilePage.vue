@@ -44,7 +44,7 @@
                     <v-text-field
                       label="Id"
                       :readonly="true"
-                      :value="userId"
+                      :model-value="userId"
                     />
                   </v-col>
 
@@ -55,7 +55,7 @@
                     <v-text-field
                       class="purple-input"
                       label="User Name"
-                      :value="userName"
+                      :model-value="userName"
                       :readonly="true"
                     />
                   </v-col>
@@ -67,7 +67,7 @@
                     <v-text-field
                       label="Email Address"
                       class="purple-input"
-                      :value="userInfo.email"
+                      :model-value="userInfo.email"
                       :readonly="true"
                     />
                   </v-col>
@@ -79,7 +79,7 @@
                     <v-text-field
                       label="First Name"
                       class="purple-input"
-                      :value="userInfo.given_name"
+                      :model-value="userInfo.given_name"
                       :readonly="true"
                     />
                   </v-col>
@@ -91,7 +91,7 @@
                     <v-text-field
                       label="Last Name"
                       class="purple-input"
-                      :value="userInfo.family_name"
+                      :model-value="userInfo.family_name"
                       :readonly="true"
                     />
                   </v-col>

@@ -6,8 +6,7 @@
       :items="filteredResources"
       :search="searchResources"
       :sort-by.sync="sortBy"
-      :sort-desc.sync="sortDesc"
-      :item-class="rowClass"
+      :row-props="rowClass"
       item-key="id"
       :group-by="groupBy"
       @click:row="setSelectedResource"
@@ -16,14 +15,13 @@
         <v-toolbar flat>
           <v-spacer></v-spacer>
           <v-toolbar-title>
-            <v-tooltip left close-delay="2000">
-              <template #activator="{ on, attrs }">
+            <v-tooltip start close-delay="2000">
+              <template #activator="{ props }">
                 <v-btn
                     v-if="areProfilerAvailable"
                     color="primary"
                     @click="runProfiler"
-                    v-bind="attrs"
-                    v-on="on"
+                    v-bind="props"
                 >
                   <v-icon color="white">
                     mdi-magnify
@@ -44,16 +42,16 @@
               mandatory
             >
               <v-btn
-                small
-                :value="null"
+                size="small"
+                :model-value="null"
                 :color="groupBy == null ? 'secondary' : 'disabled'"
                 style="height:40px"
               >
                 <v-icon>mdi-ungroup</v-icon>
               </v-btn>
               <v-btn
-                small
-                value="location.name"
+                size="small"
+                model-value="location.name"
                 :color="groupBy == 'location.name' ? 'secondary' : 'disabled'"
                 style="height:40px"
               >
@@ -65,17 +63,16 @@
             <v-select
               v-model="filterResourcesByLocations"
               :items="locations"
-              item-text="name"
+              item-title="name"
               item-value="id"
               label="filter by location"
-              dense
-              outlined
+              density="compact"
+              variant="outlined"
               hide-details
-              small-chips
-              deletable-chips
+              closable-chips
               multiple
               clearable
-              @input="filterResources"
+              @update:modelValue="filterResources"
             />
           </div>
         </v-toolbar-items>
@@ -96,18 +93,17 @@
         <v-tooltip
           v-for="capabilityService in getDeploymentCapabilityServices(item.capabilityServices)"
           :key="capabilityService.capability.name"
-          top
+          location="top"
         >
           <template
-            #activator="{ on, attrs }"
+              #activator="{ props }"
           >
             <v-chip
-              v-bind="attrs"
+              v-bind="props"
               :key="capabilityService.capability.name"
               class="ma-1"
-              v-on="on"
             >
-              <v-icon left>
+              <v-icon start>
                 {{ getChipIconByCapabilityService(capabilityService) }}
               </v-icon>
               {{ capabilityService.capability.name }}
@@ -120,15 +116,14 @@
       <template #item.fabosDevice="{ item }">
         <v-tooltip
           v-if="hasBaseConfigurationCapabilityService(item.capabilityServices)"
-          right
+          location="right"
         >
           <template
-            #activator="{ on, attrs }"
+              #activator="{ props }"
           >
             <v-icon
               :color="getFabOSDeviceIcon(item.capabilityServices).color"
-              v-bind="attrs"
-              v-on="on"
+              v-bind="props"
             >
               {{ getFabOSDeviceIcon(item.capabilityServices).logo }}
             </v-icon>
@@ -173,14 +168,13 @@
           class="text-right btn-col"
         >
           <v-menu>
-            <template #activator="{ on, attrs }">
+            <template #activator="{ props }">
               <v-btn
                 id="mushroom-button"
                 color="info"
-                v-bind="attrs"
+                v-bind="props"
                 :disabled="item.clusterMember || availableSingleHostCapabilitiesNoDefault.length == 0"
                 class="resource-single-host-add-capability"
-                v-on="on"
               >
                 <v-icon>
                   mdi-mushroom-outline
@@ -210,7 +204,7 @@
                     @click="openDefineCapabilityParamsDialog(item.id, capability.id, false)"
                   >
                     <v-icon
-                      left
+                      start
                       color="white"
                     >
                       {{ capability.logo }}
@@ -236,7 +230,7 @@
                     @click="removeCapability(item.id, capability.id)"
                   >
                     <v-icon
-                      left
+                      start
                       color="white"
                     >
                       {{ capability.logo }}
@@ -259,7 +253,7 @@
       </template>
     </v-data-table>
     <confirm-dialog
-      :show="resourceToDelete != null"
+      :isActive="resourceToDelete != null"
       :title="'Delete resource ' + (resourceToDelete == null ? '' : resourceToDelete.hostname)"
       text="Do you really want to delete this resource?"
       @confirmed="deleteResource(resourceToDelete)"
@@ -425,7 +419,7 @@
         this.$emit('resource-selected', resource)
       },
       rowClass (resource) {
-        return resource.markedForDelete ? 'grey--text text--lighten-1 row-pointer' : 'row-pointer'
+        return resource.markedForDelete ? 'text-grey text--lighten-1 row-pointer' : 'row-pointer'
       },
       isCapabilityInstalledOnResource (resource, capability) {
         if(resource.capabilityServices != null)

@@ -1,14 +1,14 @@
 <template>
   <v-row>
     <v-col cols="3">
-      <v-subheader>
+      <v-list-subheader>
         Restart Policy
-      </v-subheader>
+      </v-list-subheader>
     </v-col>
 
     <v-col cols="9">
       <ValidationProvider
-        v-slot="{ errors, valid }"
+        v-slot="{ errors }"
         name="Image Tag"
         rules="required"
       >
@@ -16,13 +16,13 @@
           v-model="newServiceOffering.deploymentDefinition.restartPolicy"
           class="full-width"
           hide-details
-          dense
+          density="compact"
           flat
           :items="restartPoliciesList"
-          item-text="prettyName"
+          item-title="prettyName"
           item-value="value"
           :error-messages="errors"
-          :success="valid"
+
         />
       </ValidationProvider>
     </v-col>

@@ -55,12 +55,10 @@
         class="mb-10 elevation-15"
         color="primary"
         absolute
-        bottom
-        right
-        fab
+        location="bottom right"
         @click="showCreateDialog = true"
       >
-        <v-icon large>
+        <v-icon size="large">
           mdi-plus
         </v-icon>
       </v-btn>

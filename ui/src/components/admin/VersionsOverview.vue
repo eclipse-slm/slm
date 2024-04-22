@@ -3,7 +3,7 @@
     fluid
     tag="section"
   >
-    <base-material-card color="secondary">
+    <base-material-card color="bg-secondary">
       <template #heading>
         <overview-heading text="Components" />
       </template>
@@ -39,7 +39,7 @@
                 </v-icon>
                 <v-icon
                   v-else-if="component.status === undefined"
-                  color="yellow darken-2"
+                  color="yellow-darken-2"
                 >
                   mdi-help-circle
                 </v-icon>

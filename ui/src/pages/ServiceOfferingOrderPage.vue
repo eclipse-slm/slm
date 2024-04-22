@@ -31,15 +31,14 @@
                   <span>Found '<strong>{{ matchingResources.length }}</strong>' suitable target resources, from '<strong>{{ totalResourcesCount }}</strong>' available resources</span>
 
                   <v-tooltip
-                    bottom
+                    location="bottom"
                   >
-                    <template #activator="{ on, attrs }">
+                    <template #activator="{ props }">
                       <v-icon
                         class="mx-3"
                         color="primary"
-                        dark
-                        v-bind="attrs"
-                        v-on="on"
+                        theme="dark"
+                        v-bind="props"
                       >
                         mdi-information
                       </v-icon>
@@ -70,7 +69,7 @@
                       </v-list-item-title>
                     </template>
                     <template #item="{ item }">
-                      <v-list-item-content>
+                      <v-list-item>
                         <v-list-item-title>
                           <div v-if="item.isCluster">
                             Cluster <strong>{{ clusterById(item.resourceId).metaData.cluster_user }} @ {{ clusterById(item.resourceId).metaData.cluster_name }}</strong>
@@ -80,7 +79,7 @@
                             <strong>{{ resourceById(item.resourceId).hostname }}</strong>{{ ` | ${item.resourceId} | ${resourceById(item.resourceId).ip}` }}
                           </div>
                         </v-list-item-title>
-                      </v-list-item-content>
+                      </v-list-item>
                     </template>
                   </v-select>
                 </v-col>
@@ -117,15 +116,14 @@
                     {{ serviceOption.name }}
                     <v-tooltip
                       v-if="serviceOption.description != null"
-                      bottom
+                      location="bottom"
                     >
-                      <template #activator="{ on, attrs }">
+                      <template #activator="{ props }">
                         <v-icon
                           class="mx-3"
                           color="primary"
-                          dark
-                          v-bind="attrs"
-                          v-on="on"
+                          theme="dark"
+                          v-bind="props"
                         >
                           mdi-information
                         </v-icon>

@@ -1,4 +1,4 @@
-import Vue from 'vue'
+import Vue, {createApp} from 'vue'
 import App from './App.vue'
 import router from './pages/router'
 import store from './store/store'
@@ -17,23 +17,26 @@ import enums from 'vue-enums'
 import moment from 'moment'
 
 import { Chart, registerables } from 'chart.js'
+import {createVuetify} from "vuetify";
 
-Vue.config.productionTip = false
-Vue.config.devtools = true
+let app = createApp(App);
+
+app.config.productionTip = false
+app.config.devtools = true
 
 Chart.register(...registerables)
 
-Vue.prototype.moment = moment
+app.prototype.moment = moment
 
-Vue.use(enums)
+app.use(enums)
 
-Vue.use(VueToast, {
+app.use(VueToast, {
     position: 'bottom',
     duration: 5000,
     dismissible: true,
 })
 
-Vue.use(VueKeycloakJs, {
+app.use(VueKeycloakJs, {
     init: {
         onLoad: 'login-required',
         checkLoginIframe: false,
@@ -46,13 +49,45 @@ Vue.use(VueKeycloakJs, {
     onReady (keycloak) {
         setupTokenInterceptor()
 
-        new Vue({
-            router,
-            store,
-            vuetify,
-            i18n,
-            keycloak,
-            render: h => h(App),
-        }).$mount('#app')
+        // new Vue({
+        //     router,
+        //     store,
+        //     vuetify,
+        //     i18n,
+        //     keycloak,
+        //     render: h => h(App),
+        // }).$mount('#app')
     },
 })
+
+const theme = {
+    primary: '#004263',
+    secondary: '#00A0E3',
+    accent: '#17A6A6',
+    error: '#FF7A5A',
+    warning: '#F39430',
+    info: '#71BD86',
+    success: '#00A0E3',
+};
+
+const v = createVuetify({
+    lang: {
+        t: (key, ...params) => i18n.t(key, params),
+    },
+    theme: {
+        themes: {
+            dark: theme,
+            light: theme,
+        },
+    },
+});
+
+app.use(router);
+app.use(store);
+app.use(v);
+app.use(i18n);
+
+
+app.mount('#app');
+
+

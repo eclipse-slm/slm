@@ -8,7 +8,7 @@
         >
           <v-row>
             <v-col
-              class="secondary text-h3 font-weight-light"
+              class="bg-secondary text-h3 font-weight-light"
             >
               Notifications
             </v-col>
@@ -26,9 +26,8 @@
             </span>
             <v-btn
               class="mr-2"
-              outlined
+              variant="outlined"
               icon
-              :text="filterRead !== true"
               @click="filter(true)"
             >
               <v-icon>
@@ -37,9 +36,8 @@
             </v-btn>
 
             <v-btn
-              outlined
+              variant="outlined"
               icon
-              :text="filterRead !== false"
               @click="filter(false)"
             >
               <v-icon>
@@ -50,13 +48,12 @@
           <v-col class="text-right">
             <v-btn
               v-if="notifications_unread.length > 0"
-              text
-              outlined
+              variant="outlined"
               @click="markAsRead"
             >
               Mark all
               <v-icon
-                right
+                location="right"
               >
                 mdi-email-open-outline
               </v-icon>
@@ -70,7 +67,6 @@
       <v-data-table
         id="notificationsTable"
         :sort-by.sync="sortBy"
-        :sort-desc.sync="sortDesc"
         :footer-props="{
           'items-per-page-options': [5, 10, 20, -1],
         }"

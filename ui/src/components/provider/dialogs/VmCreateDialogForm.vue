@@ -31,12 +31,11 @@
         chips
         :items="param.choices"
       />
-      <v-tooltip top>
-        <template #activator="{ on, attrs }">
+      <v-tooltip location="top">
+        <template #activator="{ props }">
           <v-icon
-            v-bind="attrs"
+            v-bind="props"
             class="ml-8"
-            v-on="on"
           >
             mdi-information
           </v-icon>

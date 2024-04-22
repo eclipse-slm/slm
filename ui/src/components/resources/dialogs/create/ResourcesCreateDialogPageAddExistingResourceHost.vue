@@ -7,15 +7,14 @@
       <v-container class="pa-8">
         <v-row>
           <v-tooltip
-            bottom
+            location="bottom"
           >
-            <template #activator="{ on, attrs }">
+            <template #activator="{ props }">
               <v-icon
                 class="mx-3"
                 color="primary"
-                dark
-                v-bind="attrs"
-                v-on="on"
+                theme="dark"
+                v-bind="props"
               >
                 mdi-information
               </v-icon>
@@ -29,7 +28,7 @@
           />
         </v-row>
         <validation-provider
-          v-slot="{ errors, valid }"
+          v-slot="{ errors }"
           name="Hostname"
           rules="required"
         >
@@ -40,11 +39,11 @@
             required
             prepend-icon="mdi-dns"
             :error-messages="errors"
-            :success="valid"
+
           />
         </validation-provider>
         <validation-provider
-          v-slot="{ errors, valid }"
+          v-slot="{ errors }"
           name="IP"
           :rules="{ required: true, regex: '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$' }"
         >
@@ -55,7 +54,7 @@
             required
             prepend-icon="mdi-ip"
             :error-messages="errors"
-            :success="valid"
+
           />
         </validation-provider>
         <v-select
@@ -64,19 +63,18 @@
           label="Resource Location"
           prepend-icon="mdi-map-marker"
           :items="locations"
-          item-text="name"
+          item-title="name"
           item-value="id"
           clearable
         />
         <v-tooltip
           v-if="showBaseConfigurationSwitch()"
-          right
+          location="right"
         >
-          <template #activator="{ on, attrs }">
+          <template #activator="{ props }">
             <div
-              style="width:min-content;border: 1px solid white"
-              v-bind="attrs"
-              v-on="on"
+              style="width:min-content;border: 1px solid bg-white"
+              v-bind="props"
             >
               <v-switch
                 id="resource-base-configuration-switch"
@@ -93,7 +91,7 @@
           <v-col cols="9">
             <validation-provider
               v-if="resourceAccessAvailable"
-              v-slot="{ errors, valid }"
+              v-slot="{ errors }"
               name="Resource Connection"
               rules="required"
             >
@@ -104,18 +102,18 @@
                 label="Connection Type"
                 prepend-icon="mdi-connection"
                 :items="resourceConnectionTypes"
-                item-text="prettyName"
+                item-title="prettyName"
                 item-value="name"
                 :error-messages="errors"
-                :success="valid"
-                @change="updateConnectionPort"
+
+                @update:modelValue="updateConnectionPort"
               />
             </validation-provider>
           </v-col>
           <v-col cols="3">
             <validation-provider
               v-if="resourceAccessAvailable"
-              v-slot="{ errors, valid }"
+              v-slot="{ errors }"
               name="Connection Port"
               rules="required"
             >
@@ -126,14 +124,14 @@
                 label="Connection Port"
                 prepend-icon="mdi-counter"
                 :error-messages="errors"
-                :success="valid"
+
               />
             </validation-provider>
           </v-col>
         </v-row>
         <validation-provider
           v-if="resourceAccessAvailable"
-          v-slot="{ errors, valid }"
+          v-slot="{ errors }"
           name="Username"
           rules="required"
         >
@@ -145,12 +143,12 @@
             required
             prepend-icon="mdi-account"
             :error-messages="errors"
-            :success="valid"
+
           />
         </validation-provider>
         <validation-provider
           v-if="resourceAccessAvailable"
-          v-slot="{ errors, valid }"
+          v-slot="{ errors }"
           name="Password"
           rules="required"
         >
@@ -163,28 +161,28 @@
             required
             prepend-icon="mdi-lock"
             :error-messages="errors"
-            :success="valid"
+
           />
         </validation-provider>
       </v-container>
 
       <v-card-actions>
         <v-btn
-          text
+          variant="text"
           @click="onBackButtonClicked"
         >
           Back
         </v-btn>
         <v-spacer />
         <v-btn
-          text
+          variant="text"
           @click="onCancelButtonClicked"
         >
           Cancel
         </v-btn>
         <v-btn
           id="resource-create-button-add"
-          text
+          variant="text"
           :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
           @click="invalid ? validate() : handleSubmit(onAddButtonClicked)"
         >

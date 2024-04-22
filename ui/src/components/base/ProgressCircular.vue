@@ -2,7 +2,7 @@
   <v-overlay
     v-if="showAsOverlay"
     :absolute="true"
-    :value="overlay"
+    :model-value="overlay"
   >
     <v-progress-circular
       :size="size"

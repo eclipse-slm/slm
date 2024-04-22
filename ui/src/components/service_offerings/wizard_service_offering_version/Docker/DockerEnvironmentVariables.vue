@@ -2,9 +2,9 @@
   <div>
     <v-row>
       <v-col cols="6">
-        <v-subheader>
+        <v-list-subheader>
           {{ subheader }}
-        </v-subheader>
+        </v-list-subheader>
       </v-col>
 
       <v-col cols="9">
@@ -15,8 +15,8 @@
           @click="addEnvironmentVariable"
         >
           <v-icon
-            dense
-            small
+            density="compact"
+            size="small"
             class="mr-2"
           >
             mdi-plus-circle
@@ -39,7 +39,7 @@
     >
       <template #item.key="{ item }">
         <ValidationProvider
-          v-slot="{ errors, valid }"
+          v-slot="{ errors }"
           name="Key"
           rules="required|alpha_dash"
         >
@@ -48,7 +48,7 @@
             v-model="item.key"
             placeholder="Key of environment variable"
             :error-messages="errors"
-            :success="valid"
+
           />
           <div
             v-else
@@ -60,7 +60,7 @@
 
       <template #item.value="{ item }">
         <ValidationProvider
-          v-slot="{ errors, valid }"
+          v-slot="{ errors }"
           name="Value"
           rules="required"
         >
@@ -69,7 +69,7 @@
             v-model="item.value"
             placeholder="Value of environment variable"
             :error-messages="errors"
-            :success="valid"
+
           />
           <div
             v-else

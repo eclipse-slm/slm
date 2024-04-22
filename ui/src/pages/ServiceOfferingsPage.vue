@@ -20,7 +20,7 @@
               fluid
               class="ma-0 pa-0"
             >
-              <v-row class="secondary">
+              <v-row class="bg-secondary">
                 <v-col
                   class="text-h3 font-weight-light"
                 >

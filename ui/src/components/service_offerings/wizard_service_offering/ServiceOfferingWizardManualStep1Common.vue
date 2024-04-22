@@ -8,7 +8,7 @@
         <v-col cols="8">
           <!-- Name !-->
           <validation-provider
-            v-slot="{ errors, valid }"
+            v-slot="{ errors }"
             name="Service Name"
             rules="required"
           >
@@ -16,37 +16,37 @@
               id="serviceNameInput"
               v-model="newServiceOffering.name"
               label="Name"
-              outlined
+              variant="outlined"
               required
-              dense
+              density="compact"
               :error-messages="errors"
-              :success="valid"
+
             />
           </validation-provider>
 
           <!-- Category !-->
           <validation-provider
-            v-slot="{ errors, valid }"
+            v-slot="{ errors }"
             name="Category"
             rules="required"
           >
             <v-select
               v-model="newServiceOffering.serviceCategoryId"
               :items="serviceOfferingCategories"
-              item-text="name"
+              item-title="name"
               item-value="id"
               label="Service Category"
-              outlined
-              dense
+              variant="outlined"
+              density="compact"
               :error-messages="errors"
-              :success="valid"
+
             />
             <span>{{ errors[0] }}</span>
           </validation-provider>
 
           <!-- Short Description !-->
           <validation-provider
-            v-slot="{ errors, valid }"
+            v-slot="{ errors }"
             name="Short Description"
             rules="required"
             id="shortDescriptionInput2"
@@ -55,16 +55,16 @@
               id="shortDescriptionInput"
               v-model="newServiceOffering.shortDescription"
               label="Short Description"
-              outlined
-              dense
+              variant="outlined"
+              density="compact"
               :error-messages="errors"
-              :success="valid"
+
             />
           </validation-provider>
 
           <!-- Description !-->
           <validation-provider
-            v-slot="{ errors, valid }"
+            v-slot="{ errors }"
             name="Description"
             rules="required"
           >
@@ -72,10 +72,10 @@
               id="descriptionInput"
               v-model="newServiceOffering.description"
               label="Description"
-              outlined
-              dense
+              variant="outlined"
+              density="compact"
               :error-messages="errors"
-              :success="valid"
+
             />
           </validation-provider>
 
@@ -85,9 +85,9 @@
             v-model="uploadedServiceOfferingImage"
             label="Click here to select image"
             auto-grow
-            dense
-            outlined
-            @change="loadServiceOfferingImage"
+            density="compact"
+            variant="outlined"
+            @update:modelValue="loadServiceOfferingImage"
           />
         </v-col>
         <v-col cols="4">

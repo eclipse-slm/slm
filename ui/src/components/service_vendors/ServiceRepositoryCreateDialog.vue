@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="active"
     width="400"
     @click:outside="$emit('canceled')"
   >
@@ -12,7 +12,7 @@
         <v-card>
           <v-toolbar
             color="primary"
-            dark
+            theme="dark"
           >
             Create new service repository
           </v-toolbar>
@@ -20,7 +20,7 @@
             {{ repository.id }}
             <v-container class="pa-8">
               <validation-provider
-                v-slot="{ errors, valid }"
+                v-slot="{ errors }"
                 name="Address"
                 :rules="repository.id != null ? { regex: /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i } : {}"
               >
@@ -30,11 +30,11 @@
                   placeholder="Generated"
                   prepend-icon="mdi-fingerprint"
                   :error-messages="errors"
-                  :success="valid"
+
                 />
               </validation-provider>
               <validation-provider
-                v-slot="{ errors, valid }"
+                v-slot="{ errors }"
                 name="Address"
                 rules="required"
               >
@@ -43,11 +43,11 @@
                   label="Address"
                   prepend-icon="mdi-earth"
                   :error-messages="errors"
-                  :success="valid"
+
                 />
               </validation-provider>
               <validation-provider
-                v-slot="{ errors, valid }"
+                v-slot="{ errors }"
                 name="Username"
                 rules="required"
               >
@@ -57,11 +57,11 @@
                   required
                   prepend-icon="mdi-account"
                   :error-messages="errors"
-                  :success="valid"
+
                 />
               </validation-provider>
               <validation-provider
-                v-slot="{ errors, valid }"
+                v-slot="{ errors }"
                 name="Password"
                 rules="required"
               >
@@ -73,7 +73,7 @@
                   pass
                   prepend-icon="mdi-lock"
                   :error-messages="errors"
-                  :success="valid"
+
                   @click:append="showPassword = !showPassword"
                 />
               </validation-provider>
@@ -107,6 +107,8 @@
 </template>
 
 <script>
+  import {toRef} from "vue";
+
   export default {
     name: 'ServiceRepositoryCreateDialog',
     props: ['show'],
@@ -135,5 +137,11 @@
         }
       },
     },
+    setup(props){
+      const active = toRef(props, 'show')
+      return{
+        active
+      }
+    }
   }
 </script>

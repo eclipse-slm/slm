@@ -14,7 +14,7 @@
           color="primary"
           icon="mdi-desktop-classic"
           title="Resources"
-          :value="overviewResources.length.toString()"
+          :model-value="overviewResources.length.toString()"
           @click.native="onResourcesCardClicked"
         />
       </v-col>
@@ -28,7 +28,7 @@
           color="error"
           icon="mdi-server"
           title="Cluster"
-          :value="clusters.length.toString()"
+          :model-value="clusters.length.toString()"
           @click.native="onResourcesCardClicked"
         />
       </v-col>
@@ -56,7 +56,7 @@
           color="secondary"
           icon="mdi-offer"
           title="Service Offerings"
-          :value="serviceOfferings.length.toString()"
+          :model-value="serviceOfferings.length.toString()"
           @click.native="onServicesCardClicked"
         />
       </v-col>
@@ -70,7 +70,7 @@
           color="warn"
           icon="apps"
           title="Services"
-          :value="services.length.toString()"
+          :model-value="services.length.toString()"
           @click.native="onServicesCardClicked"
         />
       </v-col>
@@ -83,10 +83,10 @@
               fluid
               class="ma-0 pa-0"
             >
-              <v-row class="info text-h3 font-weight-light">
+              <v-row class="bg-info text-h3 font-weight-light">
                 <v-col>
                   <v-icon
-                    large
+                    size="large"
                     class="ml-2 mr-4"
                   >
                     mdi-run-fast
@@ -107,7 +107,6 @@
             <v-data-table
               id="jobsDashboardTable"
               :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
               :hide-default-footer="true"
               :footer-props="{'items-per-page-options':[jobCount]}"
               :headers="DataTableHeaders"
@@ -116,33 +115,33 @@
               style="border-bottom:1px solid #E0E0E0"
             >
               <template #header.id="{ header }">
-                <v-icon small>
+                <v-icon size="small">
                   mdi-pound
                 </v-icon> {{ header.text }}
               </template>
               <template #header.name="{ header }">
-                <v-icon small>
+                <v-icon size="small">
                   mdi-form-textbox
                 </v-icon>
                 {{ header.text }}
               </template>
               <template #header.started="{ header }">
-                <v-icon small>
+                <v-icon size="small">
                   mdi-clock-start
                 </v-icon> {{ header.text }}
               </template>
               <template #header.finished="{ header }">
-                <v-icon small>
+                <v-icon size="small">
                   mdi-clock-end
                 </v-icon> {{ header.text }}
               </template>
               <template #header.elapsed="{ header }">
-                <v-icon small>
+                <v-icon size="small">
                   mdi-alarm
                 </v-icon> {{ header.text }}
               </template>
               <template #header.status="{ header }">
-                <v-icon small>
+                <v-icon size="small">
                   mdi-list-status
                 </v-icon> {{ header.text }}
               </template>
@@ -166,12 +165,11 @@
                       {{ Math.round(job.elapsed % 60) }}s
                     </td>
                     <td>
-                      <v-tooltip right>
-                        <template #activator="{ on, attrs }">
+                      <v-tooltip location="right">
+                        <template #activator="{ props }">
                           <v-icon
                             v-if="job.status == 'successful'"
-                            v-bind="attrs"
-                            v-on="on"
+                            v-bind="props"
                           >
                             mdi-check-circle-outline
                           </v-icon>

@@ -12,11 +12,11 @@
           prepend-inner-icon="search"
           :placeholder="$t('labels.SearchLabel')"
           single-line
-          outlined
-          dense
+          variant="outlined"
+          density="compact"
           rounded
           hide-details
-          @input="filterServices()"
+          @update:modelValue="filterServices()"
         />
       </div>
 
@@ -27,16 +27,15 @@
           :items="serviceOfferingCategories"
           :label="$t('labels.CategoryFilterLabel')"
           :menu-props="{ closeOnContentClick: true } "
-          item-text="name"
+          item-title="name"
           item-value="id"
-          deletable-chips
-          dense
-          outlined
+          closable-chips
+          density="compact"
+          variant="outlined"
           hide-details
-          small-chips
           multiple
           max-width="10px"
-          @input="filterServices()"
+          @update:modelValue="filterServices()"
         />
       </div>
 
@@ -47,20 +46,20 @@
           :items="serviceVendors"
           label="Service Vendors"
           :menu-props="{ closeOnContentClick: true } "
-          item-text="name"
+          item-title="name"
           item-value="id"
           clearable
-          dense
-          outlined
+          density="compact"
+          variant="outlined"
           hide-details
           max-width="10px"
-          @input="filterServices()"
+          @update:modelValue="filterServices()"
         />
       </div>
 
       <!--Button to remove all activated filters -->
       <v-btn
-        text
+        variant="text"
         @click="removeFilter()"
       >
         <v-icon>mdi-close</v-icon>

@@ -2,9 +2,9 @@
   <div>
     <v-row>
       <v-col cols="3">
-        <v-subheader>
+        <v-list-subheader>
           Labels
-        </v-subheader>
+        </v-list-subheader>
       </v-col>
 
       <v-col cols="9">
@@ -14,8 +14,8 @@
           @click="addLabel"
         >
           <v-icon
-            dense
-            small
+            density="compact"
+            size="small"
             class="mr-2"
           >
             mdi-plus-circle
@@ -40,7 +40,7 @@
         >
           <template #item.name="{ item }">
             <ValidationProvider
-              v-slot="{ errors, valid }"
+              v-slot="{ errors }"
               name="Label"
               rules="required|alpha_num"
             >
@@ -49,7 +49,7 @@
                 v-model="item.name"
                 placeholder="Name of label"
                 :error-messages="errors"
-                :success="valid"
+
               />
               <div
                 v-else
@@ -61,7 +61,7 @@
 
           <template #item.value="{ item }">
             <ValidationProvider
-              v-slot="{ errors, valid }"
+              v-slot="{ errors }"
               name="Value"
               rules="required"
             >
@@ -70,7 +70,7 @@
                 v-model="item.value"
                 placeholder="Value of label"
                 :error-messages="errors"
-                :success="valid"
+
               />
               <div
                 v-else

@@ -18,13 +18,12 @@
           :options="chartOptions"
       />
     </v-card-text>
-    <v-footer class="mt-8 white">
+    <v-footer class="mt-8 bg-white">
       <v-spacer></v-spacer>
-      <v-tooltip top>
-        <template #activator="{ on, attrs }">
+      <v-tooltip location="top">
+        <template #activator="{ props }">
           <v-icon
-              v-bind="attrs"
-              v-on="on"
+              v-bind="props"
           >
             mdi-information-outline
           </v-icon>

@@ -1,13 +1,13 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="active"
     max-width="800px"
     @click:outside="closeDialog"
   >
     <template>
       <v-toolbar
         color="primary"
-        dark
+        theme="dark"
       >
         <v-row
           align="center"
@@ -95,6 +95,7 @@
     from "@/components/resources/dialogs/create/ResourcesCreateDialogPageCreateNewResource";
   import ResourcesCreateDialogPageCreateNewResourceCluster
     from "@/components/resources/dialogs/create/ResourcesCreateDialogPageCreateNewResourceCluster";
+  import {toRef} from "vue";
 
   export default {
     name: 'ResourcesCreateDialog',
@@ -129,5 +130,11 @@
         this.title= ''
       },
     },
+    setup(props){
+      const active = toRef(props, 'show')
+      return{
+        active
+      }
+    }
   }
 </script>

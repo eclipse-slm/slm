@@ -1,13 +1,13 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="active"
     max-width="800px"
     @click:outside="closeDialog"
   >
     <template>
       <v-toolbar
         color="primary"
-        dark
+        theme="dark"
       >
         <v-row
           align="center"
@@ -64,6 +64,7 @@
     from "@/components/clusters/dialogs/ClustersCreateDialogPageCreateNewCluster.vue";
   import ClustersCreateDialogPageAddExistingCluster
     from "@/components/clusters/dialogs/ClustersCreateDialogPageAddExistingCluster.vue";
+  import {toRef} from "vue";
 
   export default {
     name: 'ClusterCreateDialog',
@@ -96,6 +97,12 @@
         this.page = ClustersCreateDialogPage.START
         this.title= ''
       },
+    },
+    setup(props){
+      const active = toRef(props, 'show')
+      return{
+        active
+      }
     }
   }
 </script>

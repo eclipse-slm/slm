@@ -12,14 +12,14 @@
         <v-col>
           <v-btn
             color="secondary"
-            x-large
+            size="x-large"
             tile
             @click="onAddServiceOfferingClicked('manual')"
           >
             <v-icon
               class="mr-5 ml-2"
-              large
-              left
+              size="large"
+              start
             >
               mdi-account
             </v-icon>
@@ -29,14 +29,14 @@
         <v-col>
           <v-btn
             color="secondary"
-            x-large
+            size="x-large"
             tile
             @click="onAddServiceOfferingClicked('git')"
           >
             <v-icon
               class="mr-5 ml-2"
-              large
-              left
+              size="large"
+              start
             >
               mdi-git
             </v-icon>

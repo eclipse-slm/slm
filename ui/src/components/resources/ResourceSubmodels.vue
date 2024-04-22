@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-simple-table v-slot v-if="submodels.length > 0">
+    <v-table v-slot v-if="submodels.length > 0">
       <thead>
         <tr>
           <th>{{ 'IdShort' }}</th>
@@ -27,9 +27,9 @@
           </td>
         </tr>
       </tbody>
-    </v-simple-table>
+    </v-table>
     <div v-else>
-      <v-alert outlined type="info">
+      <v-alert variant="outlined" type="info">
         {{ 'No submodels found.' }}
       </v-alert>
     </div>
@@ -43,7 +43,7 @@
         </v-btn>
       </v-col>
     </v-row>
-    <confirm-dialog :show="submodelToDelete != null"
+    <confirm-dialog :isActive="submodelToDelete != null"
       :title="'Delete submodel ' + (submodelToDelete == null ? '' : submodelToDelete.idShort)"
       text="Do you really want to delete this submodel?" @confirmed="deleteSubmodel(submodelToDelete)"
       @canceled="submodelToDelete = null" />

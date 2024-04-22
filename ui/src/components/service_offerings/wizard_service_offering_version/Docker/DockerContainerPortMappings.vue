@@ -2,9 +2,9 @@
   <div>
     <v-row>
       <v-col cols="3">
-        <v-subheader>
+        <v-list-subheader>
           Port Mappings
-        </v-subheader>
+        </v-list-subheader>
       </v-col>
 
       <v-col cols="9">
@@ -14,8 +14,8 @@
           @click="addPortMapping"
         >
           <v-icon
-            dense
-            small
+            density="compact"
+            size="small"
             class="mr-2"
           >
             mdi-plus-circle
@@ -40,7 +40,7 @@
         >
           <template #item.hostPort="{ item }">
             <ValidationProvider
-              v-slot="{ errors, valid }"
+              v-slot="{ errors }"
               name="Container Port"
               rules="required|numeric|min_value:1|max_value:65536"
             >
@@ -48,7 +48,7 @@
                 v-if="editable"
                 v-model="item.hostPort"
                 :error-messages="errors"
-                :success="valid"
+
               />
               <div
                 v-else
@@ -60,7 +60,7 @@
 
           <template #item.containerPort="{ item }">
             <ValidationProvider
-              v-slot="{ errors, valid }"
+              v-slot="{ errors }"
               name="Container Port"
               rules="required|numeric|min_value:1|max_value:65536"
             >
@@ -68,7 +68,7 @@
                 v-if="editable"
                 v-model="item.containerPort"
                 :error-messages="errors"
-                :success="valid"
+
               />
               <div
                 v-else

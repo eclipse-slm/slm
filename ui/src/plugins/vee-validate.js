@@ -4,7 +4,7 @@ import {
   ValidationObserver,
   ValidationProvider,
   setInteractionMode,
-} from 'vee-validate/dist/vee-validate.full.esm'
+} from 'vee-validate/dist/vee-validate.esm'
 import {
   email,
   max,
@@ -13,7 +13,7 @@ import {
   double,
   required,
   regex,
-} from 'vee-validate/dist/rules'
+} from 'vee-validate/dist/vee-validate.esm'
 
 extend('email', email)
 extend('max', max)

@@ -6,14 +6,14 @@
       ref="observer"
       v-slot="{ invalid, handleSubmit, validate }"
     >
-      <v-list expand>
+      <v-list>
         <v-list-group value="true">
           <template #activator>
-            <v-list-item-content>
+            <v-list-item>
               <v-list-item-title>
                 Container
               </v-list-item-title>
-            </v-list-item-content>
+            </v-list-item>
           </template>
 
           <div v-if="config_Container">
@@ -53,11 +53,11 @@
           <v-col>
             <v-list-group value="true">
               <template #activator>
-                <v-list-item-content>
+                <v-list-item>
                   <v-list-item-title>
                     Environment
                   </v-list-item-title>
-                </v-list-item-content>
+                </v-list-item>
               </template>
 
               <docker-container-environment-variables

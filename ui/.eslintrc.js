@@ -4,6 +4,8 @@ module.exports = {
     node: true,
   },
   extends: [
+    'plugin:vue/base',
+    'plugin:vuetify/base',
     'plugin:vue/recommended',
     'plugin:vuetify/recommended',
   ],
@@ -15,6 +17,6 @@ module.exports = {
     'vue/no-mutating-props': 'warn',
   },
   parserOptions: {
-    parser: 'babel-eslint',
+    parser: '@babel/eslint-parser',
   },
 }

@@ -1,14 +1,14 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="isActive"
     width="400"
     @click:outside="$emit('canceled')"
   >
     <template>
-      <v-card v-if="show">
+      <v-card v-if="isActive">
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           {{ title }}
         </v-toolbar>
@@ -40,8 +40,16 @@
 </template>
 
 <script>
+  import {toRef} from "vue";
+
   export default {
     name: 'ConfirmDialog',
     props: ['show', 'title', 'text'],
+    setup(props){
+      const isActive = toRef(props, 'show')
+      return{
+        isActive
+      }
+    }
   }
 </script>

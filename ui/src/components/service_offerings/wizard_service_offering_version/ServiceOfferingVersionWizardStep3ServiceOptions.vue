@@ -12,7 +12,7 @@
           <v-row class="my-1">
             <v-btn
               icon
-              small
+              size="small"
               class="mx-2"
               @click="
                 onMoveServiceOptionCategoryUpClicked(serviceOptionCategory.id)
@@ -22,7 +22,7 @@
             </v-btn>
             <v-btn
               icon
-              small
+              size="small"
               @click="
                 onMoveServiceOptionCategoryDownClicked(serviceOptionCategory.id)
               "
@@ -32,11 +32,11 @@
             <v-text-field
               v-model="serviceOptionCategory.name"
               class="mx-6"
-              dense
+              density="compact"
             />
             <v-btn
               icon
-              small
+              size="small"
               class="mx-4"
               @click="
                 onServiceOptionCategoryDeleteClicked(serviceOptionCategory.id)

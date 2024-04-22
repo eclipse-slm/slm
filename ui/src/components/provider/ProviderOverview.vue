@@ -10,8 +10,8 @@
       <v-card flat>
         <v-tabs
           v-model="tab"
-          align-with-title
-          background-color="grey lighten-5"
+          align-tabs="title"
+          bg-color="bg-grey-lighten-5"
         >
           <v-tab
             v-for="item in provider"
@@ -21,19 +21,17 @@
           </v-tab>
         </v-tabs>
 
-        <v-tabs-items v-model="tab">
-          <v-tab-item
+        <v-window-item
             v-for="item in provider"
             :key="item.id"
-          >
-            <v-card flat>
-              <v-card-text>
-                <virtual-resource-provider-table v-if="item.id=='VirtualResourceProvider'" />
-                <service-hoster-table v-if="item.id=='ServiceHoster'" />
-              </v-card-text>
-            </v-card>
-          </v-tab-item>
-        </v-tabs-items>
+        >
+          <v-card flat>
+            <v-card-text>
+              <virtual-resource-provider-table v-if="item.id=='VirtualResourceProvider'" />
+              <service-hoster-table v-if="item.id=='ServiceHoster'" />
+            </v-card-text>
+          </v-card>
+        </v-window-item>
       </v-card>
     </base-material-card>
   </div>

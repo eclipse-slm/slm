@@ -50,13 +50,13 @@
           justify="space-around"
         >
           <v-btn
-            text
+            variant="text"
             @click="SelectedServiceOverview = true"
           >
             {{ $t('ServiceLabels.Overview') }}
           </v-btn>
           <v-btn
-            text
+            variant="text"
             @click="SelectedServiceOverview = false"
           >
             {{ $t('ServiceLabels.Service_Requirements') }}

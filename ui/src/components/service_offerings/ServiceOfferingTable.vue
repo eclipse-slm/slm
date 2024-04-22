@@ -20,16 +20,16 @@
           <td>
             <v-row>
               <v-tooltip
-                bottom
+                location="bottom"
                 :disabled="!item.scmBased"
               >
-                <template #activator="{ on }">
-                  <div v-on="on">
+                <template #activator="{ props }">
+                  <div v-bind="props">
                     <v-btn
                       :disabled="item.scmBased"
                       class="ma-1"
                       color="accent"
-                      small
+                      size="small"
                       @click="onAddServiceOfferingVersionClicked(item)"
                     >
                       <v-icon>
@@ -41,15 +41,15 @@
                 <span>This action is only available for service offerings that are not based on a Git repository</span>
               </v-tooltip>
               <v-tooltip
-                bottom
+                location="bottom"
                 :disabled="!item.scmBased"
               >
-                <template #activator="{ on }">
-                  <div v-on="on">
+                <template #activator="{ props }">
+                  <div v-bind="props">
                     <v-btn
                       id="editServiceOfferingButton"
                       class="ma-1"
-                      small
+                      size="small"
                       color="info"
                       :disabled="item.scmBased"
                       @click.stop="onEditServiceOfferingClicked(item)"
@@ -65,7 +65,7 @@
               <v-btn
                 class="ma-1"
                 color="error"
-                small
+                size="small"
                 @click.stop="onDeleteServiceOfferingClicked(item)"
               >
                 <v-icon>
@@ -114,7 +114,6 @@
               item-key="id"
               :headers="ServiceOfferingVersionsTableHeaders"
               sort-by="version"
-              :sort-desc="true"
               disable-pagination
               hide-default-footer
             >
@@ -126,16 +125,16 @@
                   <td>
                     <v-row>
                       <v-tooltip
-                        bottom
+                        location="bottom"
                         :disabled="!expandedServiceOffering.scmBased"
                       >
-                        <template #activator="{ on }">
-                          <div v-on="on">
+                        <template #activator="{ props }">
+                          <div v-bind="props">
                             <v-btn
                               :disabled="expandedServiceOffering.scmBased"
                               class="ma-1"
                               color="info"
-                              small
+                              size="small"
                               @click="onEditServiceOfferingVersionClicked(item)"
                             >
                               <v-icon>
@@ -148,16 +147,16 @@
                       </v-tooltip>
 
                       <v-tooltip
-                        bottom
+                        location="bottom"
                         :disabled="!expandedServiceOffering.scmBased"
                       >
-                        <template #activator="{ on }">
-                          <div v-on="on">
+                        <template #activator="{ props }">
+                          <div v-bind="props">
                             <v-btn
                               :disabled="expandedServiceOffering.scmBased"
                               class="ma-1"
                               color="error"
-                              small
+                              size="small"
                               @click="onDeleteServiceOfferingVersionClicked(item)"
                             >
                               <v-icon>
@@ -184,8 +183,8 @@
                   @click="onAddServiceOfferingVersionClicked(expandedServiceOffering)"
                 >
                   <v-icon
-                    dense
-                    small
+                    density="compact"
+                    size="small"
                     class="mr-2"
                   >
                     mdi-plus-circle

@@ -2,7 +2,7 @@
   <v-alert
     v-bind="$attrs"
     class="v-alert--material"
-    dark
+    theme="dark"
     v-on="$listeners"
   >
     <template
@@ -10,8 +10,8 @@
       v-slot:prepend
     >
       <v-icon
-        class="v-alert__icon elevation-6 white"
-        light
+        class="v-alert__icon elevation-6 bg-white"
+        theme="light"
         :color="$attrs.color"
       >
         {{ $attrs.icon }}
@@ -26,9 +26,7 @@
     >
       <v-btn
         :aria-label="$vuetify.lang.t('$vuetify.close')"
-        color
-        icon
-        small
+        size="smale"
         @click="toggle"
       >
         <v-icon>

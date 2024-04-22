@@ -4,20 +4,20 @@
   >
     <v-list>
       <v-list-group
-        :value="true"
+        :model-value="true"
       >
         <template #activator>
-          <v-list-item-icon>
+          <v-list-item>
             <v-icon>mdi-information</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
+          </v-list-item>
+          <v-list-item>
             <v-list-item-title>
               Common
             </v-list-item-title>
-          </v-list-item-content>
+          </v-list-item>
         </template>
 
-        <v-simple-table v-slot>
+        <v-table v-slot>
           <tbody>
             <tr>
               <th>{{ 'Hostname' }}</th>
@@ -48,7 +48,7 @@
               <td>
                 <v-text-field
                   :type="showPassword ? 'text' : 'password'"
-                  :value="resource.remoteAccessService.credential.password"
+                  :model-value="resource.remoteAccessService.credential.password"
                   disabled
                   hide-details="auto"
                 />
@@ -89,7 +89,7 @@
               </td>
             </tr>
           </tbody>
-        </v-simple-table>
+        </v-table>
       </v-list-group>
       <input
         id="otp"
@@ -98,14 +98,14 @@
       >
       <v-list-group>
         <template #activator>
-          <v-list-item-icon>
+          <v-list-item>
             <v-icon>mdi-expansion-card</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
+          </v-list-item>
+          <v-list-item>
             <v-list-item-title>
               Hardware
             </v-list-item-title>
-          </v-list-item-content>
+          </v-list-item>
         </template>
         <resource-metrics
           ref="resourceMetrics"
@@ -114,14 +114,14 @@
       </v-list-group>
       <v-list-group>
         <template #activator>
-          <v-list-item-icon>
+          <v-list-item>
             <v-icon>mdi-adjust</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
+          </v-list-item>
+          <v-list-item>
             <v-list-item-title>
               Submodels
             </v-list-item-title>
-          </v-list-item-content>
+          </v-list-item>
         </template>
         <resource-submodels
           ref="resourceSubmodels"

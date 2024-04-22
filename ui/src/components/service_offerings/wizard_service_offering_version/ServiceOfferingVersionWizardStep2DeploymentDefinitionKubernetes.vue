@@ -3,15 +3,15 @@
     <v-form
       v-model="validForm"
     >
-      <v-list expand>
+      <v-list>
         <!-- Kubernetes Manifest File !-->
         <v-list-group :value="true">
           <template #activator>
-            <v-list-item-content>
+            <v-list-item>
               <v-list-item-title>
                 Kubernetes Manifest File
               </v-list-item-title>
-            </v-list-item-content>
+            </v-list-item>
           </template>
           <v-row>
             <v-col>
@@ -20,9 +20,9 @@
                 accept=".yml,.yaml"
                 label="Click here to select Kubernetes Manifest file"
                 auto-grow
-                dense
-                outlined
-                @change="onLoadManifestFileClicked"
+                density="compact"
+                variant="outlined"
+                @update:modelValue="onLoadManifestFileClicked"
               />
             </v-col>
             <v-spacer />
@@ -30,8 +30,8 @@
           <v-textarea
             v-model="serviceOfferingVersion.deploymentDefinition.manifestFile"
             class="full-width"
-            outlined
-            dense
+            variant="outlined"
+            density="compact"
           />
         </v-list-group>
 
@@ -41,11 +41,11 @@
             :value="true"
         >
           <template #activator>
-            <v-list-item-content>
+            <v-list-item>
               <v-list-item-title>
                 Environment (parsed from Kubernetes Objects)
               </v-list-item-title>
-            </v-list-item-content>
+            </v-list-item>
           </template>
           <docker-container-environment-variables
               subheader="Environment Variables"
@@ -60,11 +60,11 @@
             :value="true"
         >
           <template #activator>
-            <v-list-item-content>
+            <v-list-item>
               <v-list-item-title>
                 String Replacement (parsed from regular expression)
               </v-list-item-title>
-            </v-list-item-content>
+            </v-list-item>
           </template>
           <docker-container-environment-variables
               subheader="String Replacement Variables"

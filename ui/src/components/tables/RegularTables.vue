@@ -17,19 +17,19 @@
       <v-simple-table>
         <thead>
           <tr>
-            <th class="primary--text">
+            <th class="text-primary">
               ID
             </th>
-            <th class="primary--text">
+            <th class="text-primary">
               Name
             </th>
-            <th class="primary--text">
+            <th class="text-primary">
               Country
             </th>
-            <th class="primary--text">
+            <th class="text-primary">
               City
             </th>
-            <th class="text-right primary--text">
+            <th class="text-right text-primary">
               Salary
             </th>
           </tr>
@@ -103,7 +103,7 @@
 
     <base-material-card
       color="success"
-      dark
+      theme="dark"
       icon="mdi-clipboard-plus"
       title="Table on Dark Background"
       class="px-5 py-3"

@@ -1,7 +1,7 @@
 <template>
   <v-card
     class="mx-1 my-1"
-    outlined
+    variant="outlined"
     :elevation="hovered"
     height="100%"
     @mouseenter="passive ? hovered = 0 : hovered = 24"
@@ -10,13 +10,13 @@
   >
     <v-container fluid>
       <v-list-item>
-        <v-list-item-avatar><v-img :src="getImageUrl(serviceVendorById(serviceOffering.serviceVendorId).logo)" /></v-list-item-avatar>
-        <v-list-item-content>
+        <v-list-item><v-img :src="getImageUrl(serviceVendorById(serviceOffering.serviceVendorId).logo)" /></v-list-item>
+        <v-list-item>
           <v-list-item-title class="text-h5">
             {{ serviceOffering.name }}
           </v-list-item-title>
           <v-list-item-subtitle>{{ serviceVendorById(serviceOffering.serviceVendorId).name }}</v-list-item-subtitle>
-        </v-list-item-content>
+        </v-list-item>
       </v-list-item>
 
       <v-row class="mx-2 my-2">
@@ -39,9 +39,9 @@
             v-model="selectedServiceOfferingVersion"
             label="Versions"
             :items="serviceOffering.versions"
-            item-text="version"
+            item-title="version"
             item-value="id"
-            @change="onServiceOfferingVersionSelected"
+            @update:modelValue="onServiceOfferingVersionSelected"
           />
         </v-col>
       </v-row>
@@ -50,7 +50,7 @@
         <v-img
           ref="coverImage"
           :src="createOrEditMode ? getImageUrl(serviceOffering.coverImage) : coverImage"
-          contain
+          cover
           :aspect-ratio="4/3"
         >
           <template

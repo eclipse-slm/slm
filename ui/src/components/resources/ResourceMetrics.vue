@@ -40,7 +40,7 @@
     </v-data-table>
     <div v-else>
       <v-alert
-        outlined
+        variant="outlined"
         type="info"
       >
         No hardware information available

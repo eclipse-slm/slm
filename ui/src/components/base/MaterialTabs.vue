@@ -1,7 +1,7 @@
 <template>
   <v-tabs
     v-model="internalValue"
-    :active-class="`${color} ${$vuetify.theme.dark ? 'black' : 'white'}--text`"
+    :class="`${color} ${$vuetify.theme.dark ? 'black' : 'white'}--text`"
     class="v-tabs--pill"
     hide-slider
     v-bind="$attrs"
@@ -14,7 +14,7 @@
 
 <script>
   // Mixins
-  import Proxyable from 'vuetify/lib/mixins/proxyable'
+  import Proxyable from 'vuetify'
 
   export default {
     name: 'MaterialTabs',

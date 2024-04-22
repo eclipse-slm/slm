@@ -8,35 +8,35 @@
         <v-col cols="8">
           <!-- Git Repository URL !-->
           <validation-provider
-            v-slot="{ errors, valid }"
+            v-slot="{ errors }"
             name="Git Repository URL"
             rules="required"
           >
             <v-text-field
               v-model="serviceOfferingGitRepository.repositoryUrl"
               label="Git Repository URL"
-              outlined
+              variant="outlined"
               required
-              dense
+              density="compact"
               :error-messages="errors"
-              :success="valid"
+
             />
           </validation-provider>
 
           <!-- Git Tag Regular Expression !-->
           <validation-provider
-            v-slot="{ errors, valid }"
+            v-slot="{ errors }"
             name="Git Tag Regular Expression"
             rules="required"
           >
             <v-text-field
               v-model="serviceOfferingGitRepository.gitTagRegEx"
               label="Git Tag Regular Expression"
-              outlined
+              variant="outlined"
               required
-              dense
+              density="compact"
               :error-messages="errors"
-              :success="valid"
+
             />
           </validation-provider>
 
@@ -48,25 +48,25 @@
           <!-- Git Repository Username !-->
           <validation-provider
             v-if="privateRepository"
-            v-slot="{ errors, valid }"
+            v-slot="{ errors }"
             name="Username"
             rules="required"
           >
             <v-text-field
               v-model="serviceOfferingGitRepository.gitUsername"
               label="Username"
-              outlined
+              variant="outlined"
               required
-              dense
+              density="compact"
               :error-messages="errors"
-              :success="valid"
+
             />
           </validation-provider>
 
           <!-- Git Repository Password !-->
           <validation-provider
             v-if="privateRepository"
-            v-slot="{ errors, valid }"
+            v-slot="{ errors }"
             name="Password"
             rules="required"
           >
@@ -75,11 +75,11 @@
               :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               :type="showPassword ? 'text' : 'password'"
               label="Password"
-              outlined
+              variant="outlined"
               required
-              dense
+              density="compact"
               :error-messages="errors"
-              :success="valid"
+
               @click:append="showPassword = !showPassword"
             />
           </validation-provider>

@@ -18,7 +18,7 @@
           <!--              :items="availableServiceTypes"-->
           <!--              label="Resource Type"-->
           <!--              clearable-->
-          <!--              @change="updateSelectedResourceType"-->
+          <!--              @update:modelValue="updateSelectedResourceType"-->
           <!--            />-->
           <v-spacer />
           <!--            <v-text-field-->

@@ -4,7 +4,7 @@
       <v-data-table
         :headers="clusterHeaders"
         :items="clusters"
-        :item-class="rowClass"
+        :row-props="rowClass"
         :single-expand="true"
         :expanded.sync="expanded"
         show-expand
@@ -52,7 +52,7 @@
             class="text-start"
           >
             <v-btn
-              text
+              variant="text"
               icon
               :class="{'v-data-table__expand-icon--active' : isExpanded}"
             >
@@ -63,7 +63,7 @@
 
         <template #expanded-item="{headers, item}">
           <td :colspan="headers.length">
-            <v-simple-table
+            <v-table
               dense
               class="my-5"
             >
@@ -87,7 +87,7 @@
                     <td>
                       <v-chip
                         class="mx-1"
-                        small
+                        size="small"
                         value="test"
                       >
                         {{ getClusterMemberTypeByNodeId(item.memberMapping[node.ID], item.clusterMemberTypes) }}
@@ -96,7 +96,7 @@
                   </tr>
                 </tbody>
               </template>
-            </v-simple-table>
+            </v-table>
           </td>
         </template>
       </v-data-table>
@@ -175,7 +175,7 @@
         }
       },
       rowClass (item) {
-        return item.markedForDelete ? 'grey--text text--lighten-1 row-pointer' : 'row-pointer'
+        return item.markedForDelete ? 'text-grey text--lighten-1 row-pointer' : 'row-pointer'
       },
       getClusterMemberTypeByNodeId (clusterMemberTypeName, clusterMemberTypes) {
         return clusterMemberTypes.find((clusterMemberType) => {

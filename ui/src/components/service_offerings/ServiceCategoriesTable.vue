@@ -38,7 +38,7 @@
               <td>
                 <v-btn
                   class="ma-1"
-                  small
+                  size="small"
                   color="info"
                   @click="onEditServiceCategoryClicked(serviceCategory)"
                 >
@@ -49,7 +49,7 @@
 
                 <v-btn
                   class="ma-1"
-                  small
+                  size="small"
                   color="error"
                   @click="onDeleteServiceCategoryClicked(serviceCategory)"
                 >

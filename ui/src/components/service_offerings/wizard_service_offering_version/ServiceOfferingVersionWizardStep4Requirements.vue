@@ -5,8 +5,8 @@
         <base-material-card color="secondary">
           <template #heading>
             <v-row class="my-1">
-              <v-text-field v-model="requirement.name" class="mx-6" dense />
-              <v-btn icon small class="mx-4" @click="onRequirementDeleteClicked(requirement)">
+              <v-text-field v-model="requirement.name" class="mx-6" density="compact" />
+              <v-btn icon size="small" class="mx-4" @click="onRequirementDeleteClicked(requirement)">
                 <v-icon>
                   mdi-delete
                 </v-icon>
@@ -17,8 +17,8 @@
             v-model="requirement.activeLogic"
           >
             <v-tab v-for="logic in requirement.logics" :key="logic.id" :value="logic.id">
-              <v-select v-model="logic.type" :items="logicList" dense />
-              <v-btn icon small class="mx-4" @click="onLogicDeleteClicked(requirement, logic)">
+              <v-select v-model="logic.type" :items="logicList" density="compact" />
+              <v-btn icon size="small" class="mx-4" @click="onLogicDeleteClicked(requirement, logic)">
                 <v-icon>
                   mdi-delete
                 </v-icon>
@@ -34,8 +34,8 @@
               <v-window-item v-for="logic in requirement.logics" :key="logic.id" :value="logic.id">
                 <v-card v-for="property in logic.properties" :key="property.id" class="mt-0">
                   <v-card-title>
-                    <v-text-field v-model="property.name" dense />
-                    <v-btn icon small class="mx-4" @click="onPropertyDeleteClicked(logic, property)">
+                    <v-text-field v-model="property.name" density="compact" />
+                    <v-btn icon size="small" class="mx-4" @click="onPropertyDeleteClicked(logic, property)">
                       <v-icon>
                         mdi-delete
                       </v-icon>

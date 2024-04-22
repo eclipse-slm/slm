@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="active"
     width="400"
     @click:outside="$emit('canceled')"
   >
@@ -8,7 +8,7 @@
       <v-card>
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           Create new service vendor
         </v-toolbar>
@@ -32,9 +32,9 @@
               prepend-icon="mdi-file-image"
               label="Logo"
               auto-grow
-              dense
-              outlined
-              @change="loadServiceVendorLogo"
+              density="compact"
+              variant="outlined"
+              @update:modelValue="loadServiceVendorLogo"
             />
 
             <v-row>
@@ -80,7 +80,7 @@
 <script>
 
   import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
-  import Vue from 'vue'
+  import Vue, {toRef} from 'vue'
   import getImageUrl from '@/utils/imageUtil'
 
   export default {
@@ -140,5 +140,11 @@
         })
       },
     },
+    setup(props){
+      const active = toRef(props, 'show')
+      return{
+        active
+      }
+    }
   }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="active"
     width="400"
     @click:outside="$emit('canceled')"
   >
@@ -8,7 +8,7 @@
       <v-card>
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           Create new service category
         </v-toolbar>
@@ -50,7 +50,7 @@
 <script>
 
   import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
-  import Vue from 'vue'
+  import Vue, {toRef} from 'vue'
 
   export default {
     name: 'ServiceCategoryCreateOrEditDialog',
@@ -88,5 +88,11 @@
         })
       },
     },
+    setup(props){
+      const active = toRef(props, 'show')
+      return{
+        active
+      }
+    }
   }
 </script>

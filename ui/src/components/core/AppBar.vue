@@ -2,7 +2,6 @@
   <v-app-bar
     id="app-bar"
     absolute
-    app
     color="transparent"
     flat
     height="75"
@@ -10,8 +9,8 @@
     <v-btn
       class="mr-3"
       elevation="1"
-      fab
-      small
+
+      size="small"
       @click="setDrawer(!drawer)"
     >
       <v-icon v-if="value">
@@ -34,21 +33,20 @@
     <v-menu
       v-model="menu"
       :close-on-content-click="false"
-      bottom
-      left
-      offset-y
+      location="bottom"
+      start
+
       origin="top right"
       transition="scale-transition"
       content-class="v-settings"
-      nudge-left="8"
+      offset="8"
     >
-      <template #activator="{ attrs, on }">
+      <template #activator="{ props }">
         <v-btn
           class="ml-2"
           min-width="0"
-          text
-          v-bind="attrs"
-          v-on="on"
+          variant="text"
+          v-bind="props"
         >
           <v-icon color="primary">
             settings
@@ -127,24 +125,23 @@
 
     <v-menu
       :close-on-content-click="false"
-      bottom
-      left
-      offset-y
+      location="bottom"
+      start
+
       origin="top right"
     >
-      <template #activator="{ attrs }">
+      <template #activator="{ props }">
         <v-btn
           v-if="notifications.length > 0"
           class="notification-btn ml-2"
           min-width="0"
-          text
-          v-bind="attrs"
+          variant="text"
+          v-bind="props"
           to="/notifications"
         >
           <v-badge
             v-if="notifications_unread.length"
             color="red"
-            overlap
             bordered
             :content="notifications_unread.length"
           >
@@ -165,7 +162,7 @@
           class="ml-2"
           min-width="0"
           disabled
-          text
+          variant="text"
         >
           <v-icon color="primary">
             mdi-bell
@@ -193,20 +190,19 @@
     </v-menu>
 
     <v-menu
-      bottom
-      left
-      offset-y
+      location="bottom"
+      start
+
       origin="top right"
       transition="scale-transition"
     >
-      <template #activator="{ attrs, on }">
+      <template #activator="{ props }">
         <v-btn
-          v-bind="attrs"
+          v-bind="props"
           id="user-menu-button"
           class="ml-2"
           min-width="0"
-          text
-          v-on="on"
+          variant="text"
         >
           <v-icon color="primary">
             mdi-account
@@ -221,13 +217,13 @@
           :key="index"
           @click="userIconMenuItemClick(index)"
         >
-          <v-list-item-icon>
+          <v-list-item>
             <v-icon
               color="primary"
             >
               {{ item.icon }}
             </v-icon>
-          </v-list-item-icon>
+          </v-list-item>
           <v-list-item-title>{{ item.title }}</v-list-item-title>
         </v-list-item>
       </v-list>

@@ -4,10 +4,10 @@
       v-model="groupByServiceInstanceGroups"
       class="px-4 py-4"
       mandatory
-      @change="onGroupByServiceInstanceGroupsClicked"
+      @update:modelValue="onGroupByServiceInstanceGroupsClicked"
     >
       <v-btn
-        small
+        size="small"
         :color="groupByServiceInstanceGroups == 0 ? 'secondary' : 'disabled'"
       >
         <v-icon color="white">
@@ -15,7 +15,7 @@
         </v-icon>
       </v-btn>
       <v-btn
-        small
+        size="small"
         :color="groupByServiceInstanceGroups == 1 ? 'secondary' : 'disabled'"
       >
         <v-icon color="white">
@@ -28,7 +28,7 @@
       :headers="headers"
       :items="groupedServices"
       item-key="rowId"
-      :item-class="rowClass"
+      :row-props="rowClass"
       :group-by="groupByServiceInstanceGroups ? 'groupName' : null"
       @click:row="onServiceInstanceClicked"
     >
@@ -106,16 +106,15 @@
           </v-btn>
 
           <v-menu>
-            <template #activator="{ on: onMenu, attrs: attrsMenu }">
-              <v-tooltip top>
-                <template #activator="{ on }">
-                  <div v-on="!availableVersionChangesOfServices[serviceInstance.id] ? on : ''">
+            <template #activator="{ propsM }">
+              <v-tooltip location="top">
+                <template #activator="{ props }">
+                  <div v-bind="!availableVersionChangesOfServices[serviceInstance.id] ? props : ''">
                     <v-btn
                       :disabled="!availableVersionChangesOfServices[serviceInstance.id]"
                       color="blue"
                       class="ml-4"
-                      v-bind="attrsMenu"
-                      v-on="onMenu"
+                      v-bind="propsM"
                     >
                       <v-icon>
                         mdi-upload
@@ -128,7 +127,7 @@
             </template>
 
             <v-list>
-              <v-subheader>Available versions</v-subheader>
+              <v-list-subheader>Available versions</v-list-subheader>
               <v-list-item
                 v-for="(availableVersionChange, i) in availableVersionChangesOfServices[serviceInstance.id]"
                 :key="i"
@@ -169,7 +168,7 @@
 
     <confirm-dialog
       v-if="serviceVersionChange.dialog"
-      :show="serviceVersionChange.dialog"
+      :isActive="serviceVersionChange.dialog"
       :title="`Change version of service instance '${serviceVersionChange.serviceInstance.id}'?`"
       :text="`Do you really want to change to version '${serviceVersionChange.targetServiceVersion.version}'?`"
       @canceled="serviceVersionChange.dialog = false"
@@ -301,7 +300,7 @@
       },
 
       rowClass (item) {
-        return item.markedForDelete ? 'grey--text text--lighten-1 row-pointer' : 'row-pointer'
+        return item.markedForDelete ? 'text-grey text--lighten-1 row-pointer' : 'row-pointer'
       },
 
     },

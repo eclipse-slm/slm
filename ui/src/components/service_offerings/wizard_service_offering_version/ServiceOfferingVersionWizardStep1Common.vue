@@ -8,49 +8,48 @@
         <v-col cols="8">
           <v-card
             class="mx-1 my-1"
-            outlined
+            variant="outlined"
           >
             <validation-provider
-              v-slot="{ errors, valid }"
+              v-slot="{ errors }"
               name="Version"
               rules="required"
             >
               <v-text-field
                 v-model="serviceOfferingVersion.version"
                 label="Version"
-                outlined
-                dense
+                variant="outlined"
+                density="compact"
                 :error-messages="errors"
-                :success="valid"
+
               />
             </validation-provider>
 
 
             <v-tooltip
-              bottom
+              location="bottom"
               :disabled="!editMode"
             >
-              <template #activator="{ on, attrs }">
+              <template #activator="{ props }">
                 <div
-                  v-bind="attrs"
-                  v-on="on"
+                  v-bind="props"
                 >
                   <validation-provider
-                    v-slot="{ errors, valid }"
+                    v-slot="{ errors }"
                     name="Service Deployment"
                     rules="required"
                   >
                     <v-select
                       v-model="serviceOfferingVersion.deploymentDefinition.deploymentType"
                       :items="serviceOfferingDeploymentTypes"
-                      item-text="prettyName"
+                      item-title="prettyName"
                       item-value="value"
                       label="Deployment Type"
-                      outlined
-                      dense
+                      variant="outlined"
+                      density="compact"
                       :readonly="editMode"
                       :error-messages="errors"
-                      :success="valid"
+
                     />
                     <span>{{ errors[0] }}</span>
                   </validation-provider>

@@ -3,7 +3,7 @@
     <div class="pt-6">
       <v-icon
         color="black"
-        x-large
+        size="x-large"
       >
         mdi-format-quote-close
       </v-icon>
@@ -18,7 +18,7 @@
     >{{author}}</div>
 
     <div
-      class="text-body-2 text-uppercase grey--text"
+      class="text-body-2 text-uppercase text-grey"
     >{{handle}}</div>
 
     <v-avatar

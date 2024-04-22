@@ -1,5 +1,5 @@
 <script>
-  import { VCard } from 'vuetify/lib'
+  import { VCard } from 'vuetify'
 
   export default {
     // eslint-disable-next-line vue/multi-word-component-names

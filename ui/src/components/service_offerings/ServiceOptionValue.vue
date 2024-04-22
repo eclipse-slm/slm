@@ -7,7 +7,7 @@
 
     <validation-provider
       v-else
-      v-slot="{ errors, valid }"
+      v-slot="{ errors }"
       :name="serviceOption.name"
       :rules="getValidationRulesForServiceOption(serviceOption)"
     >
@@ -27,7 +27,7 @@
         :readonly="!(serviceOption.editable || definitionMode)"
         :disabled="!(serviceOption.editable || definitionMode)"
         :error-messages="errors"
-        :success="valid"
+
       />
 
       <v-select
@@ -35,7 +35,7 @@
         v-model="serviceOption.defaultValue"
         :items="serviceOption.valueOptions"
         :error-messages="errors"
-        :success="valid"
+
       />
 
       <vue-ip
@@ -50,7 +50,7 @@
         v-model="serviceOption.defaultValue"
         :readonly="!serviceOption.editable && !definitionMode"
         :error-messages="errors"
-        :success="valid"
+
       />
 
       <!-- AAS !-->
@@ -59,10 +59,10 @@
         v-model="serviceOption.defaultValue"
         placeholder="Select required submodel template"
         item-value="semanticId"
-        item-text="name"
+        item-title="name"
         :items="aasSubmodelTemplates"
         :error-messages="errors"
-        :success="valid"
+
       />
 
       <v-select
@@ -70,10 +70,10 @@
         v-model="serviceOption.defaultValue"
         placeholder="Select AAS"
         item-value="id"
-        item-text="name"
+        item-title="name"
         :items="aasSubmodelTemplateInstances"
         :error-messages="errors"
-        :success="valid"
+
       />
 
       <!-- System Variables !-->
@@ -82,23 +82,22 @@
         v-model="serviceOption.defaultValue"
         placeholder="Select system variable"
         item-value="key"
-        item-text="name"
+        item-title="name"
         :items="serviceManagementSystemVariables"
         :error-messages="errors"
-        :success="valid"
+
       />
 
       <v-tooltip
         v-if="serviceOption.valueType === 'SYSTEM_VARIABLE' && !definitionMode"
-        bottom
+        location="bottom"
       >
-        <template #activator="{ on, attrs }">
+        <template #activator="{ props }">
           <div
-            v-bind="attrs"
-            v-on="on"
+            v-bind="props"
           >
             <v-text-field
-              :value="valueOfTemplateVariable(serviceOption.defaultValue)"
+              :model-value="valueOfTemplateVariable(serviceOption.defaultValue)"
               :readonly="true"
               :disabled="true"
             />
@@ -113,23 +112,22 @@
           v-model="serviceOption.defaultValue"
           placeholder="Select deployment variable"
           item-value="key"
-          item-text="prettyName"
+          item-title="prettyName"
           :items="serviceManagementDeploymentVariables"
           :error-messages="errors"
-          :success="valid"
+
       />
 
       <v-tooltip
           v-if="serviceOption.valueType === 'DEPLOYMENT_VARIABLE' && !definitionMode"
-          bottom
+          location="bottom"
       >
-        <template #activator="{ on, attrs }">
+        <template #activator="{ props }">
           <div
-              v-bind="attrs"
-              v-on="on"
+              v-bind="props"
           >
             <v-text-field
-                :value="serviceOption.defaultValue"
+                :model-value="serviceOption.defaultValue"
                 :readonly="true"
                 :disabled="true"
             />

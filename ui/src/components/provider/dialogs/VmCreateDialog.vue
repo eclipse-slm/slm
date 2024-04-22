@@ -1,13 +1,13 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="active"
     max-width="800px"
     @click:outside="closeDialog"
   >
     <template>
       <v-toolbar
         color="primary"
-        dark
+        theme="dark"
       >
         <v-row
           align="center"
@@ -37,14 +37,14 @@
         </v-container>
         <v-card-actions>
           <v-btn
-            text
+            variant="text"
             @click="closeDialog"
           >
             Cancel
           </v-btn>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             :color="$vuetify.theme.themes.light.secondary"
           >
             Create
@@ -58,6 +58,7 @@
 <script>
 import {mapGetters} from "vuex";
 import VmCreateDialogForm from "@/components/provider/dialogs/VmCreateDialogForm.vue";
+import {toRef} from "vue";
 
 export default {
   name: 'VmCreateDialog',
@@ -81,5 +82,11 @@ export default {
       this.$emit('canceled')
     }
   },
+  setup(props){
+    const active = toRef(props, 'show')
+    return{
+      active
+    }
+  }
 }
 </script>

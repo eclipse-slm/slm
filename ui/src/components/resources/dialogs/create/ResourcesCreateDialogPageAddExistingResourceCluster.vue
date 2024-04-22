@@ -9,13 +9,13 @@
         class="pa-8"
       >
         <validation-provider
-          v-slot="{ errors, valid }"
+          v-slot="{ errors }"
           name="Cluster Type"
           rules="required"
         >
           <v-row id="resource-create-select-cluster-type">
             <v-icon
-              large
+              size="large"
               class="mr-7 ml-2"
             >
               mdi-selection-multiple
@@ -23,13 +23,13 @@
             <v-select
               v-model="selectedClusterType"
               :items="availableClusterTypesWithSkipInstall"
-              item-text="name"
+              item-title="name"
               label="Cluster Type"
               required
               return-object
               :error-messages="errors"
-              :success="valid"
-              @change="onSelectedClusterTypeChanged"
+
+              @update:modelValue="onSelectedClusterTypeChanged"
             />
           </v-row>
         </validation-provider>
@@ -44,15 +44,14 @@
             <v-col cols="3">
               {{ configParameter.prettyName }}
               <v-tooltip
-                bottom
+                location="bottom"
               >
-                <template #activator="{ on, attrs }">
+                <template #activator="{ props }">
                   <v-icon
                     class="mx-3"
                     color="primary"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
+                    theme="dark"
+                    v-bind="props"
                   >
                     mdi-information
                   </v-icon>
@@ -69,9 +68,9 @@
                 accept=".yml,.yaml"
                 label="Click here to select file"
                 auto-grow
-                dense
-                outlined
-                @change="onFileChanged(configParameter.name)"
+                density="compact"
+                variant="outlined"
+                @update:modelValue="onFileChanged(configParameter.name)"
               />
             </v-col>
             <v-col
@@ -93,15 +92,15 @@
                   accept=".yml,.yaml"
                   label="Click here to select kube config file"
                   auto-grow
-                  dense
-                  outlined
-                  @change="onFileChanged(configParameter.name)"
+                  density="compact"
+                  variant="outlined"
+                  @update:modelValue="onFileChanged(configParameter.name)"
               />
             </v-col>
           </v-row>
           <validation-provider
             v-if="configParameter.valueType == 'FILE'"
-            v-slot="{ errors, valid }"
+            v-slot="{ errors }"
             :name="configParameter.prettyName"
             rules="required"
           >
@@ -109,16 +108,16 @@
               <v-textarea
                 :key="textAreaFileContentComponentKey"
                 v-model="configParameterValues[configParameter.name]"
-                outlined
-                dense
+                variant="outlined"
+                density="compact"
                 :error-messages="errors"
-                :success="valid"
+
               />
             </v-row>
           </validation-provider>
           <validation-provider
               v-if="configParameter.valueType == 'KUBE_CONF'"
-              v-slot="{ errors, valid }"
+              v-slot="{ errors }"
               :name="configParameter.prettyName"
               rules="required"
           >
@@ -126,10 +125,10 @@
               <v-textarea
                   :key="textAreaFileContentComponentKey"
                   v-model="configParameterValues[configParameter.name]"
-                  outlined
-                  dense
+                  variant="outlined"
+                  density="compact"
                   :error-messages="errors"
-                  :success="valid"
+
               />
             </v-row>
           </validation-provider>
@@ -138,21 +137,21 @@
 
       <v-card-actions>
         <v-btn
-          text
+          variant="text"
           @click="onBackButtonClicked"
         >
           Back
         </v-btn>
         <v-spacer />
         <v-btn
-          text
+          variant="text"
           @click="onCancelButtonClicked"
         >
           Cancel
         </v-btn>
         <v-btn
           id="resource-create-button-create-cluster"
-          text
+          variant="text"
           :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
           @click="invalid ? validate() : handleSubmit(onAddButtonClicked)"
         >

@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    v-model="showDialog"
+    v-model="active"
     width="600"
     @click:outside="$emit('canceled')"
   >
@@ -8,7 +8,7 @@
       <v-card>
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           {{ title }}
         </v-toolbar>
@@ -49,6 +49,7 @@
 <script>
   import { capabilityUtilsMixin } from '@/utils/capabilityUtils'
   import CapabilityParamsDialogInputField from "@/components/resources/dialogs/CapabilityParamsDialogInputField.vue";
+  import {toRef} from "vue";
  export default {
    name: "CapabilityParamsDialog",
    components: {CapabilityParamsDialogInputField},
@@ -81,6 +82,12 @@
      },
      updateParamMap(key, value) {
        this.paramMap[key] = value
+     }
+   },
+   setup(props){
+     const active = toRef(props, 'showDialog')
+     return{
+       active
      }
    }
  }

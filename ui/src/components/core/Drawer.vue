@@ -3,12 +3,11 @@
   <v-navigation-drawer
     id="core-navigation-drawer"
     v-model="drawer"
-    class="primary"
-    dark
+    class="bg-primary"
+    theme="dark"
     :expand-on-hover="expandOnHover"
-    :right="$vuetify.rtl"
+    :location="right"
     mobile-breakpoint="960"
-    app
     width="260"
     v-bind="$attrs"
   >
@@ -22,7 +21,7 @@
     <v-divider class="mb-1" />
 
     <v-list
-      dense
+      density="compact"
       nav
     >
       <v-list-item
@@ -38,7 +37,6 @@
     <v-divider class="mb-2" />
 
     <v-list
-      expand
       nav
     >
       <!-- Style cascading bug  -->
@@ -81,6 +79,7 @@
     mapState,
   } from 'vuex'
   import i18n from '@/localisation/i18n'
+  import {right} from "core-js/internals/array-reduce";
 
   export default {
     name: 'DashboardCoreDrawer',
@@ -191,6 +190,7 @@
     mounted () { },
 
     methods: {
+      right,
       mapItem (item) {
         return {
           ...item,
@@ -209,7 +209,7 @@
 </style>
 
 <style lang="sass">
-  @import '~vuetify/src/styles/tools/_rtl.sass'
+  @import 'vuetify/settings'
 
   #core-navigation-drawer
     .v-list-group__header.v-list-item--active:before
@@ -222,13 +222,14 @@
         text-align: center
         width: 20px
 
-        +ltr()
-          margin-right: 24px
-          margin-left: 12px !important
 
-        +rtl()
-          margin-left: 24px
-          margin-right: 12px !important
+        //+ltr()
+        //  margin-right: 24px
+        //  margin-left: 12px !important
+        //
+        //+rtl()
+        //  margin-left: 24px
+        //  margin-right: 12px !important
 
     .v-list--dense
       .v-list-item
@@ -238,18 +239,18 @@
 
     .v-list-group--sub-group
       .v-list-item
-        +ltr()
-          padding-left: 8px
-
-        +rtl()
-          padding-right: 8px
+        //+ltr()
+        //  padding-left: 8px
+        //
+        //+rtl()
+        //  padding-right: 8px
 
       .v-list-group__header
-        +ltr()
-          padding-right: 0
-
-        +rtl()
-          padding-right: 0
+        //+ltr()
+        //  padding-right: 0
+        //
+        //+rtl()
+        //  padding-right: 0
 
         .v-list-item__icon--text
           margin-top: 19px
@@ -258,9 +259,9 @@
         .v-list-group__header__prepend-icon
           order: 2
 
-          +ltr()
-            margin-right: 8px
-
-          +rtl()
-            margin-left: 8px
+          //+ltr()
+          //  margin-right: 8px
+          //
+          //+rtl()
+          //  margin-left: 8px
 </style>

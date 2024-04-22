@@ -5,14 +5,14 @@
         <v-col class="text-center">
           <v-btn
             color="secondary"
-            x-large
+            size="x-large"
             tile
             @click="$emit('page-changed', ResourcesCreateDialogPage.ADD_EXISTING_RESOURCE_HOST)"
           >
             <v-icon
               class="mr-5 ml-2"
-              x-large
-              left
+              size="x-large"
+              start
             >
               mdi-desktop-classic
             </v-icon>
@@ -23,15 +23,15 @@
           <v-btn
             id="resource-create-button-cluster"
             color="secondary"
-            x-large
+            size="x-large"
             tile
             :disabled="availableClusterTypes.length === 0"
             @click="$emit('page-changed', ResourcesCreateDialogPage.ADD_EXISTING_RESOURCE_CLUSTER)"
           >
             <v-icon
               class="mr-5 ml-2"
-              x-large
-              left
+              size="x-large"
+              start
             >
               mdi-server
             </v-icon>
@@ -43,14 +43,14 @@
 
     <v-card-actions>
       <v-btn
-        text
+        variant="text"
         @click="$emit('page-changed', ResourcesCreateDialogPage.START)"
       >
         Back
       </v-btn>
       <v-spacer />
       <v-btn
-        text
+        variant="text"
         @click="$emit('canceled')"
       >
         Cancel
