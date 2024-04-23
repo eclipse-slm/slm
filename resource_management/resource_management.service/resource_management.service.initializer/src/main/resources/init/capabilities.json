@@ -148,7 +148,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-cc-base",
-        "awxBranch": "1.0.0",
+        "awxBranch": "main",
         "playbook": "uninstall.yml",
         "connectionTypes": [
           "ssh"
@@ -158,7 +158,7 @@
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-cc-base",
-        "awxBranch": "1.0.0",
+        "awxBranch": "main",
         "playbook": "install.yml",
         "connectionTypes": [
           "ssh"
