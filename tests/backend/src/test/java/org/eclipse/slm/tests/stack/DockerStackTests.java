@@ -42,7 +42,6 @@ public class DockerStackTests {
         put("keycloak", "healthy");
         put("keycloak-database", "healthy");
         put("monitoring-prometheus-aas", "running");
-        put("monitoring-prometheus-configurator", "running");
         put("notification-service-database", "healthy");
         put("notification-service", "healthy");
         put("prometheus", "healthy");
