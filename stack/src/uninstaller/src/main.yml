@@ -11,6 +11,7 @@
         containers: yes
         containers_filters:
           label: "com.docker.compose.project={{ compose_project_name }}"
+        containers_all: yes
         volumes: yes
         volumes_filters:
           label: "com.docker.compose.project={{ compose_project_name }}"
@@ -31,7 +32,7 @@
       async_status:
         jid: "{{ item.ansible_job_id }}"
         mode: status
-      retries: 11
+      retries: 120
       delay: 1
       loop: "{{ async_loop.results }}"
       register: async_loop_jobs
