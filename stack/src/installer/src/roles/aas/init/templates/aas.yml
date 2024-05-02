@@ -5,7 +5,7 @@ services:
     image: "eclipsebasyx/aas-discovery:{{ AAS_BASYX_VERSION }}"
     restart: unless-stopped
     ports:
-      - 8084:8081
+      - "{{ AAS_AAS_DISCOVERY_PORT }}:8081"
     networks:
       default:
         aliases:
@@ -22,12 +22,14 @@ services:
       SPRING_DATA_MONGODB_PASSWORD: "{{ AAS_DATABASE_PASSWORD }}"
       BASYX_CORS_ALLOWEDORIGINS: "*"
       BASYX_CORS_ALLOWEDMETHODS: GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+      MANAGEMENT_INFO_GIT_ENABLED: "false"
 
   aas-registry:
     image: "eclipsebasyx/aas-registry-log-mem:{{ AAS_BASYX_VERSION }}"
     restart: unless-stopped
     ports:
-      - 8082:8080
+      - "{{ AAS_AAS_REGISTRY_PORT }}:8080"
     networks:
       default:
         aliases:
@@ -36,12 +38,14 @@ services:
       BASYX_CORS_ALLOWEDORIGINS: "*"
       BASYX_CORS_ALLOWEDMETHODS: GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
       SPRING_DATA_MONGODB_URI: "mongodb://{{ AAS_DATABASE_USERNAME }}:{{ AAS_DATABASE_PASSWORD }}@aas-database:27017"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+      MANAGEMENT_INFO_GIT_ENABLED: "false"
 
   submodel-registry:
     image: "eclipsebasyx/submodel-registry-log-mem:{{ AAS_BASYX_VERSION }}"
     restart: unless-stopped
     ports:
-      - 8083:8080
+      - "{{ AAS_SUBMODEL_REGISTRY_PORT }}:8080"
     networks:
       default:
         aliases:
@@ -50,6 +54,8 @@ services:
       BASYX_CORS_ALLOWEDORIGINS: "*"
       BASYX_CORS_ALLOWEDMETHODS: GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
       SPRING_DATA_MONGODB_URI: "mongodb://{{ AAS_DATABASE_USERNAME }}:{{ AAS_DATABASE_PASSWORD }}@aas-database:27017"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+      MANAGEMENT_INFO_GIT_ENABLED: "false"
 
   aas-environment:
     image: "eclipsebasyx/aas-environment:{{ AAS_BASYX_VERSION }}"
@@ -72,8 +78,10 @@ services:
       BASYX_AASREPOSITORY_FEATURE_REGISTRYINTEGRATION: http://aas-registry:8080
       BASYX_SUBMODELREPOSITORY_FEATURE_REGISTRYINTEGRATION: http://submodel-registry:8080
       BASYX_EXTERNALURL: http://{{ SLM_HOSTNAME }}:8081
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+      MANAGEMENT_INFO_GIT_ENABLED: "false"
     ports:
-      - 8081:8081
+      - "{{ AAS_AAS_REPOSITORY_PORT }}:8081"
     networks:
       default:
         aliases:
@@ -85,12 +93,12 @@ services:
     ports:
       - "3000:3000"
     environment:
-      AAS_REGISTRY_PATH: "http://{{ SLM_HOSTNAME }}:8082"
-      SUBMODEL_REGISTRY_PATH: "http://{{ SLM_HOSTNAME }}:8083"
-      AAS_DISCOVERY_PATH: "http://{{ SLM_HOSTNAME }}:8084"
-      AAS_REPO_PATH: "http://{{ SLM_HOSTNAME }}:8081/shells"
-      SUBMODEL_REPO_PATH: "http://{{ SLM_HOSTNAME }}:8081/submodels"
-      CD_REPO_PATH: "http://{{ SLM_HOSTNAME }}:8081/concept-descriptions"
+      AAS_DISCOVERY_PATH: "{{ AAS_AAS_DISCOVERY_URL }}"
+      AAS_REGISTRY_PATH: "{{ AAS_AAS_REGISTRY_URL }}"
+      SUBMODEL_REGISTRY_PATH: "{{ AAS_SUBMODEL_REGISTRY_URL }}"
+      AAS_REPO_PATH: "{{ AAS_AAS_REPOSITORY_URL }}/shells"
+      SUBMODEL_REPO_PATH: "{{ AAS_SUBMODEL_REPOSITORY_URL }}/submodels"
+      CD_REPO_PATH: "{{ AAS_CONCEPTDESCRIPTION_REPOSITORY_URL }}/concept-descriptions"
 
   aas-database:
     image: mongo:5.0.10
@@ -119,7 +127,7 @@ services:
         max-file: "{{ LOGGING_MAX_FILE }}"
         max-size: "{{ LOGGING_MAX_SIZE }}"
     ports:
-      - "1884:1884"
+      - "{{ AAS_BROKER_PORT }}:1884"
     networks:
       default:
         aliases:
