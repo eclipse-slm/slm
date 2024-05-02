@@ -26,7 +26,7 @@ services:
       MANAGEMENT_INFO_GIT_ENABLED: "false"
 
   aas-registry:
-    image: "eclipsebasyx/aas-registry-log-mem:{{ AAS_BASYX_VERSION }}"
+    image: "eclipsebasyx/aas-registry-log-mongodb:{{ AAS_BASYX_VERSION }}"
     restart: unless-stopped
     ports:
       - "{{ AAS_AAS_REGISTRY_PORT }}:8080"
@@ -42,7 +42,7 @@ services:
       MANAGEMENT_INFO_GIT_ENABLED: "false"
 
   submodel-registry:
-    image: "eclipsebasyx/submodel-registry-log-mem:{{ AAS_BASYX_VERSION }}"
+    image: "eclipsebasyx/submodel-registry-log-mongodb:{{ AAS_BASYX_VERSION }}"
     restart: unless-stopped
     ports:
       - "{{ AAS_SUBMODEL_REGISTRY_PORT }}:8080"
