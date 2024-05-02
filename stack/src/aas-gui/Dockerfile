@@ -1,3 +1,5 @@
-FROM eclipsebasyx/aas-gui:v230703
+FROM eclipsebasyx/aas-gui:v2-240327
 
-COPY ./logo /app/src/assets/Logo
+ENV PRIMARY_COLOR=00A0E3
+
+COPY ./logo /usr/src/app/dist/Logo
