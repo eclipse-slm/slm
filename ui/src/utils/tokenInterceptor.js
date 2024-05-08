@@ -1,12 +1,13 @@
 import axios from 'axios'
-import Vue from 'vue'
 import getEnv from '@/utils/env'
+import {app} from "@/main";
 
 export default function setup () {
     axios.interceptors.request.use(config => {
-        if (Vue.prototype.$keycloak.authenticated) {
-            config.headers.Authorization = `Bearer ${Vue.prototype.$keycloak.token}`
-            config.headers.RefreshToken = Vue.prototype.$keycloak.refreshToken
+
+        if (app.config.globalProperties.$keycloak.authenticated) {
+            config.headers.Authorization = `Bearer ${app.config.globalProperties.$keycloak.token}`
+            config.headers.RefreshToken = app.config.globalProperties.$keycloak.refreshToken
             config.headers.Realm = getEnv('VUE_APP_KEYCLOAK_REALM')
         }
         return config
@@ -28,12 +29,12 @@ export default function setup () {
                     originalConfig._retry = true
 
                     try {
-                        const refreshed = await Vue.prototype.$keycloak.keycloak.updateToken(60)
+                        const refreshed = await app.config.globalProperties.$keycloak.keycloak.updateToken(60)
                         if (refreshed) {
                             console.log('Token refreshed' + refreshed)
                         } else {
                             console.warn('Token not refreshed, valid for ' +
-                                Math.round(Vue.prototype.$keycloak.tokenParsed.exp + Vue.prototype.$keycloak.keycloak.timeSkew - new Date().getTime() / 1000) + ' seconds')
+                                Math.round(app.config.globalProperties.$keycloak.tokenParsed.exp + app.config.globalProperties.$keycloak.timeSkew - new Date().getTime() / 1000) + ' seconds')
                         }
                         console.log('return original config')
                         return axios(originalConfig)

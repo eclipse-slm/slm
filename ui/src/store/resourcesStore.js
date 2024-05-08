@@ -3,8 +3,8 @@ import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
 import LocationsRestApi from '@/api/resource-management/locationsRestApi.js'
 import ProfilerRestApi from '@/api/resource-management/profilerRestApi.js'
 import ApiState from '@/api/apiState'
-import Vue from 'vue'
 import AasRestApi from "@/api/resource-management/aasRestApi";
+import {app} from "@/main";
 
 export default {
     state: {
@@ -288,7 +288,7 @@ export default {
 
         updateResourcesStore (context) {
             // assure token gets refreshed
-            Vue.prototype.$keycloak.keycloak.updateToken(1000000)
+            app.config.globalProperties.$keycloak.keycloak.updateToken(1000000)
               .then(refreshed => {
                   context.dispatch('getCluster')
                   context.dispatch('getResourcesFromBackend')

@@ -1,8 +1,6 @@
 import Vue from 'vue'
-import Vuex from 'vuex'
+import Vuex, {createStore} from 'vuex'
 import axios from 'axios'
-import VueAxios from 'vue-axios'
-import cors from 'cors'
 import VuexPersistence from 'vuex-persist'
 import resourcesStore from '@/store/resourcesStore'
 import servicesStore from '@/store/servicesStore'
@@ -13,15 +11,12 @@ import overviewStore from '@/store/overviewStore'
 import providerStore from '@/store/providerStore'
 import catalogStore from "@/store/catalogStore";
 
-Vue.use(Vuex)
-Vue.use(VueAxios, axios)
-Vue.use(cors)
 
 const vuexLocal = new VuexPersistence({
   storage: window.sessionStorage,
 })
 
-export default new Vuex.Store({
+export const store = createStore({
   modules: {
     jobsStore,
     resourcesStore,
@@ -91,4 +86,5 @@ export default new Vuex.Store({
       return onlineDevice
     },
   },
-})
+});
+

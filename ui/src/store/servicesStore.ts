@@ -7,6 +7,7 @@ import ServiceOffering from "@/model/serviceOffering";
 import {UUID} from "vue-uuid";
 import ServiceManagementTemplatesRestApi from "@/api/service-management/serviceManagementVariablesRestApi";
 import ServiceInstancesGroupsRestApi from "@/api/service-management/serviceInstancesGroupsRestApi";
+import {app} from "@/main";
 
 export default {
     state: {
@@ -289,7 +290,7 @@ export default {
         updateServicesStore (context) {
             context.dispatch('getServices')
             // assure token gets refreshed
-            Vue.prototype.$keycloak.keycloak.updateToken(1000000)
+            app.config.globalProperties.$keycloak.keycloak?.updateToken(1000000)
                 .then(refreshed => {
                     context.dispatch('getServices')
                 })

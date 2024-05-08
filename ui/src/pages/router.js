@@ -1,8 +1,7 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+
+import {createRouter, createWebHashHistory, createWebHistory} from 'vue-router'
 import userStore from '@/store/userStore'
 
-Vue.use(Router)
 
 const routes = [
   {
@@ -151,14 +150,10 @@ const routes = [
   },
 ]
 
-const router = new Router({
-  mode: 'hash',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHashHistory(process.env.BASE_URL),
   routes: routes,
-
-})
-
-router.beforeEach((to, from, next) => {
+}).beforeEach((to, from, next) => {
   if (to.meta.developerPermissionRequired) {
     if (userStore.getters.isUserDeveloper) {
       next()
@@ -174,6 +169,6 @@ router.beforeEach((to, from, next) => {
   } else {
     next()
   }
-})
+});
 
-export default router
+export default router;

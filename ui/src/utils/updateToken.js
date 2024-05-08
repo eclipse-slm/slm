@@ -1,6 +1,7 @@
 import Vue from 'vue'
+import {app} from "@/main";
 
 export default async function () {
-    await Vue.prototype.$keycloak.keycloak.updateToken(70)
-    return Vue.prototype.$keycloak.token
+    await app.config.globalProperties.$keycloak.keycloak.updateToken(70)
+    return app.config.globalProperties.$keycloak
 }

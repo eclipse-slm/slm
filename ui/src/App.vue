@@ -1,5 +1,6 @@
 <template>
-  <router-view />
+  <router-view>
+  </router-view>
 </template>
 
 <script>
@@ -17,22 +18,9 @@
       this.$store.dispatch('getUserDetails')
     },
     mounted () {
-      NotificationServiceWebsocketClient.connect()
-      this.$store.dispatch('updateCatalogStore')
-      this.$store.dispatch('initServiceStore')
-      this.$store.dispatch('getVirtualResourceProviders')
-      this.$store.dispatch('getServiceHosters')
-      this.$store.dispatch('getServiceInstanceGroups')
-      this.$store.dispatch('getDeploymentCapabilities')
-      this.$store.dispatch('getResourcesFromBackend')
-      this.$store.dispatch('getResourceAASFromBackend')
-      this.$store.dispatch('getLocations')
-      this.$store.dispatch('getProfiler')
-      this.$store.dispatch('getCluster')
-      this.$store.dispatch('getNotifications')
-      this.$store.dispatch('getClusterTypes')
+
     },
-    destroyed () {
+    unmounted () {
       NotificationServiceWebsocketClient.disconnect()
     },
   }

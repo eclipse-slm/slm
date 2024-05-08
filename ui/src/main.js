@@ -1,40 +1,43 @@
-import Vue, {createApp} from 'vue'
+import {createApp, configureCompat } from 'vue'
 import App from './App.vue'
 import router from './pages/router'
-import store from './store/store'
+import {store} from './store/store'
 import '@/plugins/base'
-import '@/plugins/chartist'
+// import '@/plugins/chartist'
+import 'chartist/dist/chartist.min.css'
 import '@/plugins/vee-validate'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
-import vuetify from './plugins/vuetify'
-import i18n from './localisation/i18n'
+import {i18n} from './localisation/i18n'
 import setupTokenInterceptor from '@/utils/tokenInterceptor'
 import VueKeycloakJs from '@dsb-norge/vue-keycloak-js'
 import getEnv from '@/utils/env'
+import ToastPlugin from 'vue-toast-notification'
 import VueToast from 'vue-toast-notification'
 import 'vue-toast-notification/dist/theme-sugar.css'
 import enums from 'vue-enums'
-import moment from 'moment'
+// import moment from 'moment'
 
 import { Chart, registerables } from 'chart.js'
 import {createVuetify} from "vuetify";
+import VueAxios from "vue-axios";
+import axios from "axios";
+import cors from "cors";
+import NotificationServiceWebsocketClient from "@/api/notification-service/notificationServiceWebsocketClient";
 
-let app = createApp(App);
 
-app.config.productionTip = false
-app.config.devtools = true
+configureCompat({
+    MODE:3,
+    CONFIG_PRODUCTION_TIP: false
+});
+
+export let app = createApp(App);
 
 Chart.register(...registerables)
 
-app.prototype.moment = moment
+// app.prototype.moment = moment
 
 app.use(enums)
 
-app.use(VueToast, {
-    position: 'bottom',
-    duration: 5000,
-    dismissible: true,
-})
 
 app.use(VueKeycloakJs, {
     init: {
@@ -48,15 +51,20 @@ app.use(VueKeycloakJs, {
     },
     onReady (keycloak) {
         setupTokenInterceptor()
-
-        // new Vue({
-        //     router,
-        //     store,
-        //     vuetify,
-        //     i18n,
-        //     keycloak,
-        //     render: h => h(App),
-        // }).$mount('#app')
+        NotificationServiceWebsocketClient.connect();
+        app.config.globalProperties.$store.dispatch('updateCatalogStore')
+        app.config.globalProperties.$store.dispatch('initServiceStore')
+        app.config.globalProperties.$store.dispatch('getVirtualResourceProviders')
+        app.config.globalProperties.$store.dispatch('getServiceHosters')
+        app.config.globalProperties.$store.dispatch('getServiceInstanceGroups')
+        app.config.globalProperties.$store.dispatch('getDeploymentCapabilities')
+        app.config.globalProperties.$store.dispatch('getResourcesFromBackend')
+        app.config.globalProperties.$store.dispatch('getResourceAASFromBackend')
+        app.config.globalProperties.$store.dispatch('getLocations')
+        app.config.globalProperties.$store.dispatch('getProfiler')
+        app.config.globalProperties.$store.dispatch('getCluster')
+        app.config.globalProperties.$store.dispatch('getNotifications')
+        app.config.globalProperties.$store.dispatch('getClusterTypes')
     },
 })
 
@@ -82,12 +90,21 @@ const v = createVuetify({
     },
 });
 
+app.use(VueAxios, axios)
+app.use(cors)
+
 app.use(router);
 app.use(store);
 app.use(v);
 app.use(i18n);
 
+app.use(require('vue-chartist'));
+
+app.use(ToastPlugin);
+app.use(VueToast,{
+    position: 'bottom',
+    duration: 5000,
+    dismissible: true,}
+);
 
 app.mount('#app');
-
-

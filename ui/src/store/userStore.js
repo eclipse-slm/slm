@@ -1,5 +1,5 @@
 import ApiState from '@/api/apiState'
-import Vue from 'vue'
+import {app} from "@/main";
 
 export default {
     state: {
@@ -26,7 +26,7 @@ export default {
         },
 
         userRoles: () => {
-            var roles = Vue.prototype.$keycloak.realmAccess.roles
+            var roles = app.config.globalProperties.$keycloak.realmAccess.roles
             return roles
         },
 
@@ -42,7 +42,7 @@ export default {
         },
 
         userGroups: () => {
-            const groups = Vue.prototype.$keycloak.tokenParsed.groups
+            const groups = app.config.globalProperties.$keycloak.tokenParsed.groups
 
             if (groups === undefined) {
                 return []
@@ -66,9 +66,13 @@ export default {
         async getUserDetails (context) {
             context.commit('SET_API_STATE_USER', ApiState.LOADING)
 
-            await Vue.prototype.$keycloak.keycloak.loadUserInfo().then(userInfo => {
-                 context.commit('SET_USERINFO', userInfo)
-            })
+            // console.log('MyLOG', app.config.globalProperties.$keycloak.ready);
+
+            if (app.config.globalProperties.$keycloak.authenticated){
+                await app.config.globalProperties.$keycloak.loadUserInfo().then(userInfo => {
+                    context.commit('SET_USERINFO', userInfo)
+                })
+            }
 
             context.commit('SET_API_STATE_USER', ApiState.LOADED)
         },

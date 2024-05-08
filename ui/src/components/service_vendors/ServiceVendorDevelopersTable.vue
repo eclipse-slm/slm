@@ -91,6 +91,7 @@
   import UsersRestApi from '@/api/service-management/usersRestApi'
   import Vue from 'vue'
   import OverviewHeading from "@/components/base/OverviewHeading.vue";
+  import {app} from "@/main";
 
   export default {
     name: 'ServiceVendorDevelopersTable',
@@ -159,8 +160,8 @@
         this.addedDevelopers.forEach(developer => {
           ServiceVendorsRestApi.addDeveloperToServiceVendor(this.serviceVendor.id, developer.id).then(() => {
             this.developersOfServiceVendor.push(developer)
-            Vue.$toast.info(`Successfully added developer '${developer.username}'`)
-            Vue.prototype.$keycloak.keycloak.updateToken(100000) // Force refresh of token
+            app.config.globalProperties.$toast.info(`Successfully added developer '${developer.username}'`)
+            app.config.globalProperties.$keycloak.keycloak.updateToken(100000) // Force refresh of token
           })
         })
         this.addedDevelopers = []

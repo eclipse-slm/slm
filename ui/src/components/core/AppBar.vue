@@ -233,7 +233,7 @@
 
 <script>
   import { mapState, mapMutations, mapGetters } from 'vuex'
-  import Vue from 'vue'
+  import {app} from "@/main";
 
   export default {
     name: 'DashboardCoreAppBar',
@@ -274,7 +274,7 @@
           id: 'logout-button',
           icon: 'mdi-logout',
           click () {
-            Vue.prototype.$keycloak.logoutFn()
+            app.config.globalProperties.$keycloak.logoutFn()
           },
         },
       ],

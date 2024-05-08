@@ -21,9 +21,3 @@ declare module 'vue' {
     const { configureCompat } = Vue
     export { configureCompat }
 }
-
-declare module '@vue/runtime-core' {
-    interface ComponentCustomProperties  {
-        $keycloak: VueKeycloakInstance
-    }
-}
