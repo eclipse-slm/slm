@@ -20,9 +20,9 @@
         host: "{{ PROMETHEUS_HOST }}"
         port: "{{ PROMETHEUS_PORT }}"
       service:
-        scheme: "{{ MONITORING_SERVICE_SCHEME }}"
-        host: "{{ MONITORING_SERVICE_HOST }}"
-        port: "{{ MONITORING_SERVICE_PORT }}"
+        scheme: "{{ MONITORING_PROMETHEUS_AAS_SCHEME }}"
+        host: "{{ MONITORING_PROMETHEUS_AAS_HOST }}"
+        port: "{{ MONITORING_PROMETHEUS_AAS_PORT }}"
 
 - name: "Store resulting compose file"
   template:

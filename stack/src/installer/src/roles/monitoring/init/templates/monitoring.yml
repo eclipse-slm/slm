@@ -2,14 +2,14 @@ version: '3'
 
 services:
   monitoring-prometheus-aas:
-    image: "ghcr.io/eclipse-slm/slm-monitoring-prometheus-aas:{{ MONITORING_SERVICE_VERSION }}"
+    image: "ghcr.io/eclipse-slm/slm-monitoring-prometheus-aas:{{ MONITORING_PROMETHEUS_AAS_VERSION }}"
     restart: unless-stopped
     networks:
       default:
         aliases:
           - monitoring
     ports:
-      - "{{ MONITORING_SERVICE_PORT }}:8080"
+      - "{{ MONITORING_PROMETHEUS_AAS_PORT }}:8080"
 
   prometheus:
     image: "ghcr.io/eclipse-slm/monitoring-prometheus:{{ PROMETHEUS_VERSION }}"
