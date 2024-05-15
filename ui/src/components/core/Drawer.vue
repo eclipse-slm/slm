@@ -6,7 +6,7 @@
     class="bg-primary"
     theme="dark"
     :expand-on-hover="expandOnHover"
-    :location="right"
+    location="right"
     mobile-breakpoint="960"
     width="260"
     v-bind="$attrs"
@@ -123,62 +123,62 @@
           {
             id: 'main-menu-button-dashboard',
             icon: 'mdi-view-dashboard',
-            title: i18n.t('drawer.section.dashboard.title'),
+            title: this.$t('drawer.section.dashboard.title'),
             to: '/',
             visible: true,
           },
           {
             id: 'main-menu-button-jobs',
             icon: 'mdi-account-hard-hat',
-            title: i18n.t('drawer.section.jobs.title'),
+            title: this.$t('drawer.section.jobs.title'),
             to: '/jobs',
             visible: true,
           },
           {
             id: 'main-menu-button-resources',
             icon: 'mdi-desktop-classic',
-            title: i18n.t('drawer.section.resources.title'),
+            title: this.$t('drawer.section.resources.title'),
             to: '/resources',
             visible: true,
           },
           {
             id: 'main-menu-button-clusters',
             icon: 'mdi-server',
-            title: i18n.t('drawer.section.clusters.title'),
+            title: this.$t('drawer.section.clusters.title'),
             to: '/clusters',
             visible: true,
           },
           // {
           //   id: 'main-menu-button-provider',
           //   icon: 'mdi-usb',
-          //   title: i18n.t('drawer.section.provider.title'),
+          //   title: this.$t('drawer.section.provider.title'),
           //   to: '/provider',
           //   visible: true,
           // },
           {
             id: 'main-menu-button-service-offering',
-            title: i18n.t('drawer.section.serviceOfferings.title'),
+            title: this.$t('drawer.section.serviceOfferings.title'),
             icon: 'mdi-offer',
             to: '/services/offerings',
             visible: true,
           },
           {
             id: 'main-menu-button-service-instances',
-            title: i18n.t('drawer.section.services.title'),
+            title: this.$t('drawer.section.services.title'),
             icon: 'apps',
             to: '/services/instances',
             visible: true,
           },
           {
             id: 'main-menu-button-service-vendors',
-            title: i18n.t('drawer.section.serviceVendor.title'),
+            title: this.$t('drawer.section.serviceVendor.title'),
             icon: 'smart_button',
             to: '/services/vendors',
             visible: this.isUserDeveloper,
           },
           {
             id: 'main-menu-button-admin',
-            title: i18n.t('drawer.section.admin.title'),
+            title: this.$t('drawer.section.admin.title'),
             icon: 'admin_panel_settings',
             to: '/admin',
             visible: this.userRoles.includes('slm-admin'),

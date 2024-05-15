@@ -6,9 +6,15 @@
 <script>
   import updateToken from '@/utils/updateToken'
   import NotificationServiceWebsocketClient from '@/api/notification-service/notificationServiceWebsocketClient'
+  import {app} from "@/main";
 
   export default {
     name: 'App',
+    computed: {
+      app() {
+        return app
+      }
+    },
     watch: {
       $route () {
         updateToken()

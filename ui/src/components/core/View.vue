@@ -8,11 +8,13 @@
 </template>
 
 <script>
+  import DashboardCoreFooter from "@/components/core/Footer.vue";
+
   export default {
     name: 'DashboardCoreView',
 
     components: {
-      DashboardCoreFooter: () => import('./Footer'),
+      DashboardCoreFooter
     },
   }
 </script>

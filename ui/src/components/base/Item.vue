@@ -24,14 +24,13 @@
   </v-list-item>
 </template>
 
-<script>
-  import Themeable from 'vuetify'
+<script lang="js">
+import {useTheme} from 'vuetify'
 
   export default {
     // eslint-disable-next-line vue/multi-word-component-names
     name: 'Item',
 
-    mixins: [Themeable],
 
     props: {
       item: {
@@ -48,6 +47,12 @@
         type: Boolean,
         default: false,
       },
+    },
+
+    setup(){
+      const theme = useTheme()
+      const isDark = theme.current.value.dark
+      return {isDark}
     },
 
     computed: {

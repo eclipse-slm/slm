@@ -33,19 +33,19 @@
         />
       </v-col>
 
-      <!--      <v-col-->
-      <!--        cols="12"-->
-      <!--        sm="6"-->
-      <!--        lg="3"-->
-      <!--      >-->
-      <!--        <base-material-stats-card-->
-      <!--          color="green"-->
-      <!--          icon="mdi-account-hard-hat"-->
-      <!--          title="Jobs"-->
-      <!--          :value="jobs.length.toString()"-->
-      <!--          @click.native="onResourcesCardClicked"-->
-      <!--        />-->
-      <!--      </v-col>-->
+            <v-col
+              cols="12"
+              sm="6"
+              lg="3"
+            >
+              <base-material-stats-card
+                color="green"
+                icon="mdi-account-hard-hat"
+                title="Jobs"
+                :value="jobs.length.toString()"
+                @click.native="onResourcesCardClicked"
+              />
+            </v-col>
 
       <v-col
         cols="12"

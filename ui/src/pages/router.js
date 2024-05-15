@@ -150,10 +150,12 @@ const routes = [
   },
 ]
 
-const router = createRouter({
-  history: createWebHashHistory(process.env.BASE_URL),
+export const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes: routes,
-}).beforeEach((to, from, next) => {
+});
+
+router.beforeEach((to, from, next) => {
   if (to.meta.developerPermissionRequired) {
     if (userStore.getters.isUserDeveloper) {
       next()
@@ -169,6 +171,6 @@ const router = createRouter({
   } else {
     next()
   }
-});
+})
 
 export default router;

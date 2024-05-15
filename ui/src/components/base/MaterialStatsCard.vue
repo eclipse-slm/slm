@@ -3,7 +3,6 @@
     :icon="icon"
     class="v-card--material-stats"
     v-bind="$attrs"
-    v-on="$listeners"
   >
     <template v-slot:after-heading>
       <div class="ml-auto text-right">

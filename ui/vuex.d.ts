@@ -1,5 +1,4 @@
 import { Store } from 'vuex'
-import {VueKeycloakInstance} from "@dsb-norge/vue-keycloak-js/dist/types";
 
 declare module '@vue/runtime-core' {
     // declare your own store states
@@ -12,6 +11,8 @@ declare module '@vue/runtime-core' {
         $store: Store<State>
     }
 }
+
+export {}
 
 declare module 'vue' {
     import { CompatVue } from '@vue/runtime-dom'
