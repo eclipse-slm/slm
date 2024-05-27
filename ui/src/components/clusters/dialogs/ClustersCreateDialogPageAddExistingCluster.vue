@@ -155,8 +155,8 @@
         <v-btn
           id="resource-create-button-create-cluster"
           variant="text"
-          :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-          @click="invalid ? validate() : handleSubmit(onAddButtonClicked)"
+          :color="!meta.valid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
+          @click="!meta.valid ? validate() : handleSubmit(onAddButtonClicked)"
         >
           Add
         </v-btn>
