@@ -4,7 +4,7 @@
     max-width="800px"
     @click:outside="closeDialog"
   >
-    <template>
+    <template v-slot:default="{}">
       <v-toolbar
         color="primary"
         theme="dark"
@@ -111,10 +111,17 @@
     enums: {
       ResourcesCreateDialogPage,
     },
+    setup(props){
+      const active = toRef(props, 'show')
+      return{
+        active
+      }
+    },
     data () {
       return {
         page: ResourcesCreateDialogPage.START,
-        title: ''
+        title: '',
+        dialog: this.active
       }
     },
     methods: {
@@ -129,12 +136,6 @@
         this.page = ResourcesCreateDialogPage.START
         this.title= ''
       },
-    },
-    setup(props){
-      const active = toRef(props, 'show')
-      return{
-        active
-      }
     }
   }
 </script>

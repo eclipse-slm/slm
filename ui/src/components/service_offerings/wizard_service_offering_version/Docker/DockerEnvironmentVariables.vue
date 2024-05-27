@@ -38,14 +38,15 @@
       }"
     >
       <template #item.key="{ item }">
-        <ValidationProvider
-          v-slot="{ errors }"
+        <Field
+          v-slot="{ field, errors }"
+          v-model="item.key"
           name="Key"
-          rules="required|alpha_dash"
+          :rules="required_alpha_dash"
         >
           <v-text-field
             v-if="editable"
-            v-model="item.key"
+            v-bind="field"
             placeholder="Key of environment variable"
             :error-messages="errors"
 
@@ -55,18 +56,19 @@
           >
             {{ item.key }} ({{ item.serviceName }})
           </div>
-        </ValidationProvider>
+        </Field>
       </template>
 
       <template #item.value="{ item }">
-        <ValidationProvider
-          v-slot="{ errors }"
+        <Field
+          v-slot="{ field, errors }"
+          v-model="item.value"
           name="Value"
-          rules="required"
+          :rules="required"
         >
           <v-text-field
             v-if="editable"
-            v-model="item.value"
+            v-bind="field"
             placeholder="Value of environment variable"
             :error-messages="errors"
 
@@ -76,7 +78,7 @@
           >
             {{ item.value }}
           </div>
-        </ValidationProvider>
+        </Field>
       </template>
 
       <template #item.isServiceOption="{ item }">
@@ -101,8 +103,12 @@
 </template>
 
 <script>
+import {Field } from "vee-validate";
+import * as yup from 'yup';
+
   export default {
     name: 'DockerContainerConfigEnvironment',
+    components: {Field},
     props: {
       environmentVariables: {},
       editable: {},
@@ -112,6 +118,13 @@
         type: String
         },
       },
+    setup(){
+      const required_alpha_dash = yup.string().required().matches(new RegExp("/.[a-zA-Z0-9_\/]/"))
+      const required = yup.string().required()
+      return {
+        required,required_alpha_dash
+      }
+    },
 
     data () {
       return {

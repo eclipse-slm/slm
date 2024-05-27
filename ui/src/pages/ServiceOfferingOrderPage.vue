@@ -12,9 +12,9 @@
       v-if="apiStateLoaded"
       class="mx-auto"
     >
-      <validation-observer
+      <ValidationForm
         ref="observer"
-        v-slot="{ invalid, handleSubmit, validate }"
+        v-slot="{ meta, handleSubmit, validate }"
       >
         <base-material-card color="secondary">
           <template #heading>
@@ -153,14 +153,14 @@
           </v-btn>
           <v-spacer />
           <v-btn
-            :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-            @click="invalid ? validate() : handleSubmit(order)"
+            :color="!meta.valid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
+            @click="!meta.valid ? validate() : handleSubmit(order)"
           >
             {{ $t('buttons.Checkout') }}
           </v-btn>
           <v-spacer />
         </v-row>
-      </validation-observer>
+      </ValidationForm>
     </v-container>
 
     <progress-circular
@@ -177,13 +177,21 @@
   import ServiceOptionValue from '@/components/service_offerings/ServiceOptionValue'
   import logRequestError from '@/api/restApiHelper'
   import ProgressCircular from "@/components/base/ProgressCircular";
+  import {Form as ValidationForm } from "vee-validate";
+  import * as yup from 'yup';
 
   export default {
     name: 'ServiceOrderView',
     components: {
-      ServiceOptionValue, ProgressCircular
+      ServiceOptionValue, ProgressCircular, ValidationForm
     },
     props: ['serviceOfferingId', 'serviceOfferingVersionId'],
+    setup(){
+      const required = yup.string().required();
+      return {
+        required
+      }
+    },
     data () {
       return {
         selectedResourceId: '',

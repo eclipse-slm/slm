@@ -20,30 +20,32 @@
           </td>
           <td>{{ serviceOption.key }}</td>
           <td :id="serviceOption.key + '_DisplayName'">
-            <ValidationProvider
-              v-slot="{ errors }"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="serviceOption.name"
               name="Display Name"
-              rules="required"
+              :rules="required"
             >
               <v-text-field
-                v-model="serviceOption.name"
+                v-bind="field"
                 :error-messages="errors"
 
               />
-            </ValidationProvider>
+            </Field>
           </td>
           <td :id="serviceOption.key + '_Desc'">
-            <ValidationProvider
-              v-slot="{ errors }"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="serviceOption.description"
               name="Description"
-              rules="required"
+              :rules="required"
             >
               <v-text-field
-                v-model="serviceOption.description"
+                v-bind="field"
                 :error-messages="errors"
 
               />
-            </ValidationProvider>
+            </Field>
           </td>
           <td :id="serviceOption.key + '_Value'">
             <v-tooltip location="bottom" :disabled="!serviceOption.required">
@@ -125,14 +127,23 @@
 <script>
 import draggable from "vuedraggable";
 import ServiceOptionValue from "@/components/service_offerings/ServiceOptionValue";
+import {Field } from "vee-validate";
+import * as yup from 'yup';
 
 export default {
   name: "ServiceOptionsDefinitionTable",
   components: {
     draggable,
     ServiceOptionValue,
+    Field
   },
   props: ["serviceOptionCategory"],
+  setup(){
+    const required = yup.string().required()
+    return {
+      required
+    }
+  },
   data() {
     return {
       validatorList: [

@@ -12,6 +12,11 @@
 <script>
 export default {
   name: 'NoItemAvailableNote',
-  props: ['item']
+  props: {
+    item: {
+      type: String,
+      default: () => ''
+    }
+  }
 }
 </script>

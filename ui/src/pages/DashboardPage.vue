@@ -11,10 +11,10 @@
         lg="3"
       >
         <base-material-stats-card
-          color="primary"
+          color="bg-primary"
           icon="mdi-desktop-classic"
           title="Resources"
-          :model-value="overviewResources.length.toString()"
+          :value="overviewResources.length.toString()"
           @click.native="onResourcesCardClicked"
         />
       </v-col>
@@ -28,7 +28,7 @@
           color="error"
           icon="mdi-server"
           title="Cluster"
-          :model-value="clusters.length.toString()"
+          :value="clusters.length.toString()"
           @click.native="onResourcesCardClicked"
         />
       </v-col>
@@ -56,7 +56,7 @@
           color="secondary"
           icon="mdi-offer"
           title="Service Offerings"
-          :model-value="serviceOfferings.length.toString()"
+          :value="serviceOfferings.length.toString()"
           @click.native="onServicesCardClicked"
         />
       </v-col>
@@ -70,7 +70,7 @@
           color="warn"
           icon="apps"
           title="Services"
-          :model-value="services.length.toString()"
+          :value="services.length.toString()"
           @click.native="onServicesCardClicked"
         />
       </v-col>
@@ -285,6 +285,10 @@
         ],
         tabs: 0,
       }
+    },
+
+    setup(){
+
     },
 
     computed: {

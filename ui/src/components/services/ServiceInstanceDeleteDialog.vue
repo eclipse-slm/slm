@@ -4,7 +4,7 @@
     width="400"
     @click:outside="$emit('canceled')"
   >
-    <template>
+    <template #default>
       <v-card v-if="service">
         <v-toolbar
           color="primary"

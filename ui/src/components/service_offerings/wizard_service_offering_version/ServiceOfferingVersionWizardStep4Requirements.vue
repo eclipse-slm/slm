@@ -1,6 +1,6 @@
 <template>
   <div>
-    <validation-observer ref="observer" v-slot="{ invalid, handleSubmit, validate }">
+    <ValidationForm ref="observer" v-slot="{ meta, handleSubmit, validate }">
       <div v-for="requirement in serviceOfferingVersion.serviceRequirements" :key="requirement.id">
         <base-material-card color="secondary">
           <template #heading>
@@ -84,8 +84,8 @@
           {{ $t('buttons.Back') }}
         </v-btn>
         <v-spacer />
-        <v-btn :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-          @click="invalid ? validate() : handleSubmit(emitStepCompleted)">
+        <v-btn :color="!meta.valid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
+          @click="!meta.valid ? validate() : handleSubmit(emitStepCompleted)">
           <div v-if="editMode">
             {{ $t('buttons.Update') }}
           </div>
@@ -94,16 +94,18 @@
           </div>
         </v-btn>
       </v-card-actions>
-    </validation-observer>
+    </ValidationForm>
   </div>
 </template>
 
 <script>
 import 'vue-json-pretty/lib/styles.css'
+import {Field, Form as ValidationForm } from "vee-validate";
+import * as yup from 'yup';
 
 export default {
   name: 'ServiceOfferingVersionWizardStep4Requirements',
-  components: {},
+  components: {ValidationForm},
   props: ['editMode', 'serviceOfferingVersion'],
 
   data() {

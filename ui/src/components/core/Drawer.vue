@@ -6,7 +6,7 @@
     class="bg-primary"
     theme="dark"
     :expand-on-hover="expandOnHover"
-    location="right"
+
     mobile-breakpoint="960"
     width="260"
     v-bind="$attrs"
@@ -18,7 +18,7 @@
       />
     </template>
 
-    <v-divider class="mb-1" />
+    <v-divider class="mb-1" style="background-color: rgb(33,33,33) !important" />
 
     <v-list
       density="compact"

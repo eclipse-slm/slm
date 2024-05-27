@@ -148,7 +148,7 @@
   import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
   import { mapGetters } from 'vuex'
   import ApiState from '@/api/apiState'
-  import Vue from 'vue'
+  import {app} from "@/main";
 
   export default {
     name: 'ServiceOfferingCreatePage',
@@ -327,11 +327,11 @@
                           serviceOfferingVersionDTO.deploymentDefinition.deploymentType,
                           this.newServiceOfferingVersion.deploymentDefinition.codesysFile
                       ).then(uploadFileResponse => {
-                        Vue.$toast.info('Successfully uploaded file for offering')
+                        app.config.globalProperties.$toast.info('Successfully uploaded file for offering')
                       }).catch(error => console.log(error));
                     }
 
-                    Vue.$toast.info('Successfully updated service offering version')
+                    app.config.globalProperties.$toast.info('Successfully updated service offering version')
                     this.$store.dispatch('getServiceOfferings')
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
                   } else {
@@ -354,11 +354,11 @@
                           serviceOfferingVersionDTO.deploymentDefinition.deploymentType,
                           this.newServiceOfferingVersion.deploymentDefinition.codesysFile
                       ).then(uploadFileResponse => {
-                        Vue.$toast.info('Successfully uploaded file for offering')
+                        app.config.globalProperties.$toast.info('Successfully uploaded file for offering')
                       }).catch(error => console.log(error));
                     }
 
-                    Vue.$toast.info('Successfully created service offering version')
+                    app.config.globalProperties.$toast.info('Successfully created service offering version')
                     this.$store.dispatch('getServiceOfferings')
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
                   } else {
@@ -366,7 +366,7 @@
                   }
                 })
                 .catch(exception => {
-                  Vue.$toast.error('Failed to create service offering version')
+                  app.config.globalProperties.$toast.error('Failed to create service offering version')
                   console.log('Service offering version creation failed: ' + exception.response.data.message)
                   console.log(exception)
                 })

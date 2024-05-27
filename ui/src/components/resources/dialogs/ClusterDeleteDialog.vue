@@ -4,7 +4,7 @@
     width="600"
     @click:outside="$emit('canceled')"
   >
-    <template>
+    <template v-slot:default="{}">
       <v-card v-if="active">
         <v-toolbar
           color="primary"
@@ -71,11 +71,11 @@
   export default {
     name: 'ClusterDeleteDialog',
     props: ['showDialog', 'cluster'],
-    methods: {
-      deleteCluster () {
-        ClustersRestApi.deleteClusterResource(this.cluster.id)
-        this.$emit('confirmed')
-      },
+    setup(props){
+      const active = toRef(props, 'showDialog')
+      return{
+        active
+      }
     },
     computed: {
       ...mapGetters([
@@ -87,11 +87,11 @@
         return this.services.filter(svc => svc.resourceId === this.cluster.id)
       },
     },
-    setup(props){
-      const active = toRef(props, 'showDialog')
-      return{
-        active
-      }
+    methods: {
+      deleteCluster () {
+        ClustersRestApi.deleteClusterResource(this.cluster.id)
+        this.$emit('confirmed')
+      },
     }
   }
 </script>

@@ -39,14 +39,15 @@
           }"
         >
           <template #item.hostPort="{ item }">
-            <ValidationProvider
-              v-slot="{ errors }"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="item.hostPort"
               name="Container Port"
-              rules="required|numeric|min_value:1|max_value:65536"
+              :rules="required"
             >
               <v-text-field
                 v-if="editable"
-                v-model="item.hostPort"
+                v-bind="field"
                 :error-messages="errors"
 
               />
@@ -55,18 +56,19 @@
               >
                 {{ item.key }}
               </div>
-            </ValidationProvider>
+            </Field>
           </template>
 
           <template #item.containerPort="{ item }">
-            <ValidationProvider
-              v-slot="{ errors }"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="item.containerPort"
               name="Container Port"
-              rules="required|numeric|min_value:1|max_value:65536"
+              :rules="required"
             >
               <v-text-field
                 v-if="editable"
-                v-model="item.containerPort"
+                v-bind="field"
                 :error-messages="errors"
 
               />
@@ -75,7 +77,7 @@
               >
                 {{ item.value }}
               </div>
-            </ValidationProvider>
+            </Field>
           </template>
 
           <template #item.protocol="{ item }">
@@ -123,9 +125,18 @@
 </template>
 
 <script>
+import {Field } from "vee-validate";
+import * as yup from 'yup';
   export default {
     name: 'DockerContainerPortMappings',
+    components: {Field},
     props: ['portMappings', 'editable'],
+    setup(){
+      const required = yup.number().required().min(1).max(65536)
+      return {
+        required
+      }
+    },
     data () {
       return {
         tableHeaders: [

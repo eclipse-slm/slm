@@ -1,7 +1,7 @@
 <template>
-  <validation-observer
+  <ValidationForm
     ref="observer"
-    v-slot="{ invalid, handleSubmit, validate }"
+    v-slot="{ meta, handleSubmit, validate }"
   >
     <div
       v-for="serviceOptionCategory in serviceOfferingVersion.serviceOptionCategories"
@@ -79,26 +79,30 @@
       <v-spacer />
       <v-btn
         :color="
-          invalid
+          !meta.valid
             ? $vuetify.theme.disable
             : $vuetify.theme.themes.light.secondary
         "
-        @click="invalid ? validate() : handleSubmit(emitStepCompleted)"
+        @click="!meta.valid ? validate() : handleSubmit(emitStepCompleted)"
       >
         {{ $t("buttons.Next") }}
       </v-btn>
     </v-card-actions>
-  </validation-observer>
+  </ValidationForm>
 </template>
 
 <script>
 import { serviceOptionMixin } from "@/utils/serviceOptionUtil";
-import Vue from "vue";
 import serviceOptionsDefinitionTable from "@/components/service_offerings/wizard_service_offering_version/serviceOptions/serviceOptionsDefinitionTable";
+import {app} from "@/main";
+import {Field, Form as ValidationForm } from "vee-validate";
+import * as yup from 'yup';
+
 export default {
   name: "ServiceOfferingVersionWizardStep3ServiceOptions",
   components: {
     serviceOptionsDefinitionTable,
+    ValidationForm
   },
   mixins: [serviceOptionMixin],
   props: ["editMode", "serviceOfferingVersion"],
@@ -130,7 +134,7 @@ export default {
           1
         );
       } else {
-        Vue.$toast.warning(
+        app.config.globalProperties.$toast.warning(
           `A category that contains service options cannot be deleted`
         );
       }

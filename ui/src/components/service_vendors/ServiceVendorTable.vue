@@ -90,6 +90,7 @@
   import Vue from 'vue'
   import OverviewHeading from "@/components/base/OverviewHeading.vue";
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+  import {app} from "@/main";
 
   export default {
     name: 'ServiceVendorTable',
@@ -128,11 +129,11 @@
         this.editServiceVendor = false
         ServiceVendorsRestApi.deleteServiceVendorById(serviceVendor.id).then(
           response => {
-            Vue.$toast.info('Service vendor successfully deleted')
+            app.config.globalProperties.$toast.info('Service vendor successfully deleted')
             this.$store.dispatch('getServiceVendors')
           })
           .catch(exception => {
-            Vue.$toast.error('Failed to create service offering')
+            app.config.globalProperties.$toast.error('Failed to create service offering')
             console.log('Service vendor deletion failed: ' + exception.response.data.message)
             console.log(exception)
           })

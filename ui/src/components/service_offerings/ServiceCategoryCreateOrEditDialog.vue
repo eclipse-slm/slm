@@ -51,6 +51,7 @@
 
   import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
   import Vue, {toRef} from 'vue'
+  import {app} from "@/main";
 
   export default {
     name: 'ServiceCategoryCreateOrEditDialog',
@@ -75,14 +76,14 @@
 
         apiCall.then(() => {
           if (this.editMode) {
-            Vue.$toast.info('Service category successfully updated')
+            app.config.globalProperties.$toast.info('Service category successfully updated')
           } else {
-            Vue.$toast.info('Service category successfully created')
+            app.config.globalProperties.$toast.info('Service category successfully created')
           }
           this.$store.dispatch('getServiceOfferingCategories')
           this.$emit('confirmed', this.serviceVendorUpdate)
         }).catch(exception => {
-          Vue.$toast.error('Failed to create service category')
+          app.config.globalProperties.$toast.error('Failed to create service category')
           console.log('Service category creation failed: ' + exception.response.data.message)
           console.log(exception)
         })

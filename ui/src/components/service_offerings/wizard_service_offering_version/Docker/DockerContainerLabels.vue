@@ -39,14 +39,15 @@
           }"
         >
           <template #item.name="{ item }">
-            <ValidationProvider
-              v-slot="{ errors }"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="item.name"
               name="Label"
-              rules="required|alpha_num"
+              :rules="required"
             >
               <v-text-field
                 v-if="editable"
-                v-model="item.name"
+                v-bind="field"
                 placeholder="Name of label"
                 :error-messages="errors"
 
@@ -56,18 +57,19 @@
               >
                 {{ item.key }}
               </div>
-            </ValidationProvider>
+            </Field>
           </template>
 
           <template #item.value="{ item }">
-            <ValidationProvider
-              v-slot="{ errors }"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="item.value"
               name="Value"
-              rules="required"
+              :rules="required_string"
             >
               <v-text-field
                 v-if="editable"
-                v-model="item.value"
+                v-bind="field"
                 placeholder="Value of label"
                 :error-messages="errors"
 
@@ -77,7 +79,7 @@
               >
                 {{ item.value }}
               </div>
-            </ValidationProvider>
+            </Field>
           </template>
 
           <template #item.isServiceOption="{ item }">
@@ -104,9 +106,22 @@
 </template>
 
 <script>
+import {Field} from "vee-validate";
+import * as yup from "yup";
+
+
+
   export default {
     name: 'DockerContainerLabels',
+    components: {Field},
     props: ['labels', 'editable'],
+    setup(){
+      const required = yup.number().required()
+      const required_string = yup.string().required()
+      return {
+        required, required_string
+      }
+    },
     data () {
       return {
         tableHeaders: [

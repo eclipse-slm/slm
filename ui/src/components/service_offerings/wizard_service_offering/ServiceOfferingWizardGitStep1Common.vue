@@ -1,36 +1,37 @@
 <template>
   <v-container fluid>
-    <validation-observer
+    <ValidationForm
       ref="observer"
-      v-slot="{ invalid, handleSubmit, validate }"
+      v-slot="{ meta, handleSubmit, validate }"
     >
       <v-row>
         <v-col cols="8">
           <!-- Git Repository URL !-->
-          <validation-provider
-            v-slot="{ errors }"
+          <Field
+            v-slot="{ field, errors }"
+            v-model="serviceOfferingGitRepository.repositoryUrl"
             name="Git Repository URL"
-            rules="required"
+            :rules="required"
           >
             <v-text-field
-              v-model="serviceOfferingGitRepository.repositoryUrl"
+              v-bind="field"
               label="Git Repository URL"
               variant="outlined"
               required
               density="compact"
               :error-messages="errors"
-
             />
-          </validation-provider>
+          </Field>
 
           <!-- Git Tag Regular Expression !-->
-          <validation-provider
-            v-slot="{ errors }"
+          <Field
+            v-slot="{ field, errors }"
+            v-model="serviceOfferingGitRepository.gitTagRegEx"
             name="Git Tag Regular Expression"
-            rules="required"
+            :rules="required"
           >
             <v-text-field
-              v-model="serviceOfferingGitRepository.gitTagRegEx"
+              v-bind="field"
               label="Git Tag Regular Expression"
               variant="outlined"
               required
@@ -38,7 +39,7 @@
               :error-messages="errors"
 
             />
-          </validation-provider>
+          </Field>
 
           <v-switch
             v-model="privateRepository"
@@ -46,14 +47,15 @@
           />
 
           <!-- Git Repository Username !-->
-          <validation-provider
+          <Field
             v-if="privateRepository"
-            v-slot="{ errors }"
+            v-slot="{ field, errors }"
+            v-model="serviceOfferingGitRepository.gitUsername"
             name="Username"
-            rules="required"
+            :rules="required"
           >
             <v-text-field
-              v-model="serviceOfferingGitRepository.gitUsername"
+              v-bind="field"
               label="Username"
               variant="outlined"
               required
@@ -61,17 +63,18 @@
               :error-messages="errors"
 
             />
-          </validation-provider>
+          </Field>
 
           <!-- Git Repository Password !-->
-          <validation-provider
+          <Field
             v-if="privateRepository"
-            v-slot="{ errors }"
+            v-slot="{ field, errors }"
+            v-model="serviceOfferingGitRepository.gitPassword"
             name="Password"
-            rules="required"
+            :rules="required"
           >
             <v-text-field
-              v-model="serviceOfferingGitRepository.gitPassword"
+              v-bind="field"
               :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               :type="showPassword ? 'text' : 'password'"
               label="Password"
@@ -82,7 +85,7 @@
 
               @click:append="showPassword = !showPassword"
             />
-          </validation-provider>
+          </Field>
         </v-col>
         <v-col cols="4">
           <!--          <service-offering-card-grid-->
@@ -109,8 +112,8 @@
         </v-btn>
         <v-spacer />
         <v-btn
-          :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-          @click="invalid ? validate() : handleSubmit(onNextButtonClicked)"
+          :color="!meta.valid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
+          @click="!meta.valid ? validate() : handleSubmit(onNextButtonClicked)"
         >
           <div v-if="editMode">
             Update
@@ -120,7 +123,7 @@
           </div>
         </v-btn>
       </v-card-actions>
-    </validation-observer>
+    </ValidationForm>
   </v-container>
 </template>
 
@@ -128,14 +131,22 @@
   // import ServiceOfferingCardGrid from '@/components/service_offerings/ServiceOfferingCardGrid'
   import { mapGetters } from 'vuex'
   import ServiceOfferingsRestApi from "@/api/service-management/serviceOfferingsRestApi.ts";
-  import Vue from "vue";
   import ProgressCircular from "@/components/base/ProgressCircular";
+  import {app} from "@/main";
+  import {Field, Form as ValidationForm } from "vee-validate";
+  import * as yup from 'yup';
 
   export default {
     name: 'ServiceOfferingWizardStep1Common',
-    components: {ProgressCircular},
+    components: {ProgressCircular, Field, ValidationForm},
     // components: { ServiceOfferingCardGrid },
     props: ['editMode', 'serviceVendorId'],
+    setup(){
+      const required = yup.string().required();
+      return {
+        required
+      }
+    },
     data () {
       return {
         stepNumber: 1,
@@ -167,7 +178,7 @@
             response => {
               this.loading = false
               if (response.status === 200) {
-                Vue.$toast.info('Successfully created git-based service offering')
+                app.config.globalProperties.$toast.info('Successfully created git-based service offering')
                 this.$store.dispatch('getServiceOfferings')
                 this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
               } else {
@@ -176,7 +187,7 @@
             })
             .catch(exception => {
               this.loading = false
-              Vue.$toast.error('Failed to create git-based service offering')
+              app.config.globalProperties.$toast.error('Failed to create git-based service offering')
               console.log('Service offering creation failed: ' + exception.response.data.message)
               console.log(exception)
             })

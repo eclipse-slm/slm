@@ -1,20 +1,21 @@
 <template>
   <v-container fluid>
-    <validation-observer
+    <ValidationForm
       ref="observer"
-      v-slot="{ invalid, handleSubmit, validate }"
+      v-slot="{ meta, handleSubmit, validate }"
     >
       <v-row>
         <v-col cols="8">
           <!-- Name !-->
-          <validation-provider
-            v-slot="{ errors }"
+          <Field
+            v-slot="{ field, errors }"
+            v-model="newServiceOffering.name"
             name="Service Name"
-            rules="required"
+            :rules="required"
           >
             <v-text-field
               id="serviceNameInput"
-              v-model="newServiceOffering.name"
+              v-bind="field"
               label="Name"
               variant="outlined"
               required
@@ -22,16 +23,17 @@
               :error-messages="errors"
 
             />
-          </validation-provider>
+          </Field>
 
           <!-- Category !-->
-          <validation-provider
-            v-slot="{ errors }"
+          <Field
+            v-slot="{ field, errors }"
+            v-model="newServiceOffering.serviceCategoryId"
             name="Category"
-            rules="required"
+            :rules="required"
           >
             <v-select
-              v-model="newServiceOffering.serviceCategoryId"
+              v-bind="field"
               :items="serviceOfferingCategories"
               item-title="name"
               item-value="id"
@@ -42,42 +44,44 @@
 
             />
             <span>{{ errors[0] }}</span>
-          </validation-provider>
+          </Field>
 
           <!-- Short Description !-->
-          <validation-provider
-            v-slot="{ errors }"
+          <Field
+            v-slot="{ field, errors }"
+            v-model="newServiceOffering.shortDescription"
             name="Short Description"
-            rules="required"
+            :rules="required"
             id="shortDescriptionInput2"
           >
             <v-text-field
               id="shortDescriptionInput"
-              v-model="newServiceOffering.shortDescription"
+              v-bind="field"
               label="Short Description"
               variant="outlined"
               density="compact"
               :error-messages="errors"
 
             />
-          </validation-provider>
+          </Field>
 
           <!-- Description !-->
-          <validation-provider
-            v-slot="{ errors }"
+          <Field
+            v-slot="{ field, errors }"
+            v-model="newServiceOffering.description"
             name="Description"
-            rules="required"
+            :rules="required"
           >
             <v-text-field
               id="descriptionInput"
-              v-model="newServiceOffering.description"
+              v-bind="field"
               label="Description"
               variant="outlined"
               density="compact"
               :error-messages="errors"
 
             />
-          </validation-provider>
+          </Field>
 
           <!-- Cover Image !-->
           <v-file-input
@@ -111,28 +115,36 @@
         <v-spacer />
         <v-btn
           :color="
-            invalid
+            !meta.valid
               ? $vuetify.theme.disable
               : $vuetify.theme.themes.light.secondary
           "
-          @click="invalid ? validate() : handleSubmit(onNextButtonClicked)"
+          @click="!meta.valid ? validate() : handleSubmit(onNextButtonClicked)"
         >
           <div v-if="editMode">Update</div>
           <div v-else>Create</div>
         </v-btn>
       </v-card-actions>
-    </validation-observer>
+    </ValidationForm>
   </v-container>
 </template>
 
 <script>
 import ServiceOfferingCardGrid from "@/components/service_offerings/ServiceOfferingCardGrid";
 import { mapGetters } from "vuex";
+import {Field, Form as ValidationForm } from "vee-validate";
+import * as yup from 'yup';
 
 export default {
   name: "ServiceOfferingWizardManualStep1Common",
-  components: { ServiceOfferingCardGrid },
+  components: { ServiceOfferingCardGrid, Field, ValidationForm },
   props: ["editMode", "newServiceOffering"],
+  setup(){
+    const required = yup.string().required();
+    return {
+      required
+    }
+  },
   data() {
     return {
       stepNumber: 1,

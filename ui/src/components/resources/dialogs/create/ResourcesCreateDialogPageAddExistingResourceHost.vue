@@ -1,7 +1,7 @@
 <template>
-  <validation-observer
-    ref="observer"
-    v-slot="{ invalid, handleSubmit, validate }"
+  <ValidationForm
+      ref="observer"
+    v-slot="{ meta, handleSubmit, validate }"
   >
     <v-card>
       <v-container class="pa-8">
@@ -27,36 +27,37 @@
             label="Remote access to resource available?"
           />
         </v-row>
-        <validation-provider
-          v-slot="{ errors }"
+        <Field 
+          v-slot="{ field, errors }"
+          v-model="resourceHostname"
           name="Hostname"
-          rules="required"
+          :rules="string_required"
         >
           <v-text-field
             id="resource-create-text-field-hostname"
-            v-model="resourceHostname"
+            v-bind="field"
             label="Hostname"
             required
             prepend-icon="mdi-dns"
             :error-messages="errors"
-
           />
-        </validation-provider>
-        <validation-provider
-          v-slot="{ errors }"
+        </Field>
+        <Field
+          v-slot="{ field, errors }"
+          v-model="resourceIp"
           name="IP"
-          :rules="{ required: true, regex: '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$' }"
+          :rules="ip_required"
         >
           <v-text-field
             id="resource-create-text-field-ip"
-            v-model="resourceIp"
+            v-bind="field"
             label="IP"
             required
             prepend-icon="mdi-ip"
             :error-messages="errors"
 
           />
-        </validation-provider>
+        </Field>
         <v-select
           v-if="locations.length>0"
           v-model="resourceLocation"
@@ -89,15 +90,16 @@
 
         <v-row>
           <v-col cols="9">
-            <validation-provider
+            <Field
               v-if="resourceAccessAvailable"
-              v-slot="{ errors }"
+              v-slot="{ errors, field }"
+              v-model="resourceConnectionType"
               name="Resource Connection"
-              rules="required"
+              :rules="string_required"
             >
               <v-select
                 id="resource-select-connection-type"
-                v-model="resourceConnectionType"
+                v-bind="field"
                 required
                 label="Connection Type"
                 prepend-icon="mdi-connection"
@@ -108,62 +110,62 @@
 
                 @update:modelValue="updateConnectionPort"
               />
-            </validation-provider>
+            </Field>
           </v-col>
           <v-col cols="3">
-            <validation-provider
+            <Field
               v-if="resourceAccessAvailable"
-              v-slot="{ errors }"
+              v-slot="{ errors, field }"
+              v-model="resourceConnectionPort"
               name="Connection Port"
-              rules="required"
+              :rules="string_required"
             >
               <v-text-field
-                v-model="resourceConnectionPort"
+                v-bind="field"
                 type="number"
                 required
                 label="Connection Port"
                 prepend-icon="mdi-counter"
                 :error-messages="errors"
-
               />
-            </validation-provider>
+            </Field>
           </v-col>
         </v-row>
-        <validation-provider
+        <Field
           v-if="resourceAccessAvailable"
-          v-slot="{ errors }"
+          v-slot="{ errors, field }"
+          v-model="resourceUsername"
           name="Username"
-          rules="required"
+          :rules="string_required"
         >
           <v-text-field
             id="resource-create-text-field-username"
-            v-model="resourceUsername"
+            v-bind="field"
             autocomplete="username"
             label="Username"
             required
             prepend-icon="mdi-account"
             :error-messages="errors"
-
           />
-        </validation-provider>
-        <validation-provider
+        </Field>
+        <Field
           v-if="resourceAccessAvailable"
-          v-slot="{ errors }"
+          v-slot="{ errors, field }"
+          v-model="resourcePassword"
           name="Password"
-          rules="required"
+          :rules="string_required"
         >
           <v-text-field
             id="resource-create-text-field-password"
-            v-model="resourcePassword"
+            v-bind="field"
             autocomplete="current-password"
             label="Password"
             type="password"
             required
             prepend-icon="mdi-lock"
             :error-messages="errors"
-
           />
-        </validation-provider>
+        </Field>
       </v-container>
 
       <v-card-actions>
@@ -183,14 +185,14 @@
         <v-btn
           id="resource-create-button-add"
           variant="text"
-          :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-          @click="invalid ? validate() : handleSubmit(onAddButtonClicked)"
+          :color="!meta.valid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
+          @click="!meta.valid ? validate() : handleSubmit(onAddButtonClicked)"
         >
           Add
         </v-btn>
       </v-card-actions>
     </v-card>
-  </validation-observer>
+  </ValidationForm >
 </template>
 
 <script>
@@ -199,11 +201,21 @@ import resourcesRestApi from '@/api/resource-management/resourcesRestApi'
   import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
   import NotificationServiceWebsocketClient from "@/api/notification-service/notificationServiceWebsocketClient";
   import {mapGetters} from "vuex";
+import {Field, Form as ValidationForm } from "vee-validate";
+import * as yup from 'yup';
+
 
   export default {
     name: 'ResourcesCreateDialogPageAddExistingResourceHost',
+    components: {Field, ValidationForm },
     enums: {
       ResourcesCreateDialogPage,
+    },
+    setup(){
+      const string_required = yup.string().required();
+      const reg = new RegExp('^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+      const ip_required = yup.string().matches(reg)
+      return {string_required, ip_required}
     },
     data () {
       return {

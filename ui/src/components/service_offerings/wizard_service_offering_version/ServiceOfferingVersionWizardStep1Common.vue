@@ -1,8 +1,8 @@
 <template>
   <div>
-    <validation-observer
+    <ValidationForm
       ref="observer"
-      v-slot="{ invalid, handleSubmit, validate }"
+      v-slot="{ meta, handleSubmit, validate }"
     >
       <v-row>
         <v-col cols="8">
@@ -10,20 +10,21 @@
             class="mx-1 my-1"
             variant="outlined"
           >
-            <validation-provider
-              v-slot="{ errors }"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="serviceOfferingVersion.version"
               name="Version"
-              rules="required"
+              :rules="required"
             >
               <v-text-field
-                v-model="serviceOfferingVersion.version"
+                v-bind="field"
                 label="Version"
                 variant="outlined"
                 density="compact"
                 :error-messages="errors"
 
               />
-            </validation-provider>
+            </Field>
 
 
             <v-tooltip
@@ -34,13 +35,14 @@
                 <div
                   v-bind="props"
                 >
-                  <validation-provider
-                    v-slot="{ errors }"
+                  <Field
+                    v-slot="{ field, errors }"
+                    v-model="serviceOfferingVersion.deploymentDefinition.deploymentType"
                     name="Service Deployment"
-                    rules="required"
+                    :rules="required"
                   >
                     <v-select
-                      v-model="serviceOfferingVersion.deploymentDefinition.deploymentType"
+                      v-bind="field"
                       :items="serviceOfferingDeploymentTypes"
                       item-title="prettyName"
                       item-value="value"
@@ -52,7 +54,7 @@
 
                     />
                     <span>{{ errors[0] }}</span>
-                  </validation-provider>
+                  </Field>
                 </div>
               </template>
             </v-tooltip>
@@ -71,27 +73,33 @@
         </v-btn>
         <v-spacer />
         <v-btn
-          :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-          @click="invalid ? validate() : handleSubmit(onNextButtonClicked)"
+          :color="!meta.valid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
+          @click="!meta.valid ? validate() : handleSubmit(onNextButtonClicked)"
         >
           {{ $t('buttons.Next') }}
         </v-btn>
       </v-card-actions>
-    </validation-observer>
+    </ValidationForm>
   </div>
 </template>
 
 <script>
 import 'vue-json-pretty/lib/styles.css'
 import {mapGetters} from "vuex";
-
+import {Field, Form as ValidationForm } from "vee-validate";
+import * as yup from 'yup';
 const { parse } = require('dot-properties')
 
   export default {
     name: 'ServiceOfferingVersionWizardStep1Common',
-    components: {},
+    components: {Field, ValidationForm},
     props: ['editMode', 'serviceOfferingVersion'],
-
+    setup(){
+      const required = yup.string().required();
+      return {
+        required
+      }
+    },
     data () {
       return {
         stepNumber: 1,

@@ -5,9 +5,10 @@
       :disabled="disabled"
     />
 
-    <validation-provider
+    <Field
       v-else
-      v-slot="{ errors }"
+      v-slot="{ field, errors }"
+      v-model="serviceOption.defaultValue"
       :name="serviceOption.name"
       :rules="getValidationRulesForServiceOption(serviceOption)"
     >
@@ -20,7 +21,7 @@
           serviceOption.valueType === 'DECIMAL' ||
           serviceOption.valueType === 'PORT' ||
           serviceOption.valueType === 'VOLUME'"
-        v-model="serviceOption.defaultValue"
+        v-bind="field"
         :type="(serviceOption.valueType === 'INTEGER' || serviceOption.valueType === 'DECIMAL') ? 'number' : serviceOption.valueType === 'PASSWORD' ? 'password' : 'text'"
         required
         :clearable="serviceOption.editable || definitionMode"
@@ -135,7 +136,7 @@
         </template>
         <span>Deployment variables cannot be edited</span>
       </v-tooltip>
-    </validation-provider>
+    </Field>
   </div>
 </template>
 
@@ -144,11 +145,13 @@
   import { serviceOptionMixin } from '@/utils/serviceOptionUtil'
   import AASRestApi from "@/api/resource-management/aasRestApi";
   import { mapGetters } from "vuex";
+  import {Field } from "vee-validate";
 
   export default {
     name: 'ServiceOptionValue',
     components: {
       VueIp,
+      Field
     },
     mixins: [serviceOptionMixin],
     props: ['serviceOption', 'disabled', 'definitionMode'],

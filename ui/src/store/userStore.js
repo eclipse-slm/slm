@@ -26,8 +26,13 @@ export default {
         },
 
         userRoles: () => {
-            var roles = app.config.globalProperties.$keycloak.realmAccess.roles
-            return roles
+
+            const roles = app.config.globalProperties.$keycloak?.realmAccess?.roles
+            if(roles === undefined){
+                return [];
+            }
+
+            return roles;
         },
 
         isUserDeveloper: (state, getters) => {
@@ -42,8 +47,8 @@ export default {
         },
 
         userGroups: () => {
-            const groups = app.config.globalProperties.$keycloak.tokenParsed.groups
 
+            const groups = app.config.globalProperties.$keycloak?.tokenParsed?.groups
             if (groups === undefined) {
                 return []
             } else {

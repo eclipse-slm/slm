@@ -4,10 +4,10 @@
     width="400"
     @click:outside="$emit('canceled')"
   >
-    <template>
-      <validation-observer
+    <template v-slot:default="{}">
+      <ValidationForm
         ref="observer"
-        v-slot="{ invalid, handleSubmit, validate }"
+        v-slot="{ meta, handleSubmit, validate }"
       >
         <v-card>
           <v-toolbar
@@ -19,54 +19,58 @@
           <v-card-text>
             {{ repository.id }}
             <v-container class="pa-8">
-              <validation-provider
-                v-slot="{ errors }"
+              <Field
+                v-slot="{ field, errors }"
+                v-model="repository.id"
                 name="Address"
                 :rules="repository.id != null ? { regex: /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i } : {}"
               >
                 <v-text-field
-                  v-model="repository.id"
+                  v-bind="field"
                   label="Id"
                   placeholder="Generated"
                   prepend-icon="mdi-fingerprint"
                   :error-messages="errors"
 
                 />
-              </validation-provider>
-              <validation-provider
-                v-slot="{ errors }"
+              </Field>
+              <Field
+                v-slot="{ field, errors }"
+                v-model="repository.address"
                 name="Address"
-                rules="required"
+                :rules="required"
               >
                 <v-text-field
-                  v-model="repository.address"
+                  v-bind="field"
                   label="Address"
                   prepend-icon="mdi-earth"
                   :error-messages="errors"
 
                 />
-              </validation-provider>
-              <validation-provider
-                v-slot="{ errors }"
+              </Field>
+              <Field
+                v-slot="{ field, errors }"
+                v-model="repository.username"
                 name="Username"
-                rules="required"
+                :rules="required"
               >
                 <v-text-field
-                  v-model="repository.username"
+                  v-bind="field"
                   label="Username"
                   required
                   prepend-icon="mdi-account"
                   :error-messages="errors"
 
                 />
-              </validation-provider>
-              <validation-provider
-                v-slot="{ errors }"
+              </Field>
+              <Field
+                v-slot="{ field, errors }"
+                v-model="repository.password"
                 name="Password"
-                rules="required"
+                :rules="required"
               >
                 <v-text-field
-                  v-model="repository.password"
+                  v-bind="field"
                   :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                   :type="showPassword ? 'text' : 'password'"
                   label="Password"
@@ -76,7 +80,7 @@
 
                   @click:append="showPassword = !showPassword"
                 />
-              </validation-provider>
+              </Field>
               <v-select
                 v-model="repository.type"
                 :items="repositoryTypes"
@@ -94,24 +98,35 @@
             </v-btn>
             <v-spacer />
             <v-btn
-              :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-              @click="invalid ? validate() : handleSubmit(onConfirmedClicked)"
+              :color="!meta.valid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
+              @click="!meta.valid ? validate() : handleSubmit(onConfirmedClicked)"
             >
               Create
             </v-btn>
           </v-card-actions>
         </v-card>
-      </validation-observer>
+      </ValidationForm>
     </template>
   </v-dialog>
 </template>
 
 <script>
   import {toRef} from "vue";
+  import {Field, Form as ValidationForm } from "vee-validate";
+  import * as yup from 'yup';
 
   export default {
     name: 'ServiceRepositoryCreateDialog',
     props: ['show'],
+    components: {Field, ValidationForm},
+    setup(){
+      const required = yup.string().required();
+      const active = toRef(props, 'show')
+      return {
+        required,
+        active
+      }
+    },
     data () {
       return {
         showPassword: false,
@@ -137,11 +152,5 @@
         }
       },
     },
-    setup(props){
-      const active = toRef(props, 'show')
-      return{
-        active
-      }
-    }
   }
 </script>

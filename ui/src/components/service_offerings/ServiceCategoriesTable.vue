@@ -85,9 +85,9 @@
   import { mapGetters } from 'vuex'
   import ServiceCategoryCreateOrEditDialog from '@/components/service_offerings/ServiceCategoryCreateOrEditDialog'
   import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
-  import Vue from 'vue'
   import OverviewHeading from "@/components/base/OverviewHeading.vue";
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+  import {app} from "@/main";
 
   export default {
     name: 'ServiceCategoriesTable',
@@ -125,11 +125,11 @@
         this.editServiceCategory = false
         ServiceOfferingsRestApi.deleteServiceCategory(serviceVendor.id).then(
           response => {
-            Vue.$toast.info('Service category successfully deleted')
+            app.config.globalProperties.$toast.info('Service category successfully deleted')
             this.$store.dispatch('getServiceOfferingCategories')
           })
           .catch(exception => {
-            Vue.$toast.error('Failed to create service category')
+            app.config.globalProperties.$toast.error('Failed to create service category')
             console.log('Service category deletion failed: ' + exception.response.data.message)
             console.log(exception)
           })

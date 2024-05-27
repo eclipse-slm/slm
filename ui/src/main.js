@@ -17,7 +17,7 @@ import enums from 'vue-enums'
 // import moment from 'moment'
 
 import { Chart, registerables } from 'chart.js'
-import {createVuetify} from "vuetify";
+import {createVuetify, ThemeDefinition} from "vuetify";
 import VueAxios from "vue-axios";
 import axios from "axios";
 import cors from "cors";
@@ -103,6 +103,8 @@ const theme = {
     info: '#71BD86',
     success: '#00A0E3',
 };
+
+import 'vuetify/styles';
 
 const v = createVuetify({
     lang: {

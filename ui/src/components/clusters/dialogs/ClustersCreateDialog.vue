@@ -4,7 +4,7 @@
     max-width="800px"
     @click:outside="closeDialog"
   >
-    <template>
+    <template #default>
       <v-toolbar
         color="primary"
         theme="dark"
@@ -74,6 +74,12 @@
       ClustersCreateDialogPageAddExistingCluster
     },
     props: ['show'],
+    setup(props){
+      const active = toRef(props, 'show')
+      return{
+        active
+      }
+    },
     data () {
       return {
         page: ClustersCreateDialogPage.START,
@@ -97,12 +103,6 @@
         this.page = ClustersCreateDialogPage.START
         this.title= ''
       },
-    },
-    setup(props){
-      const active = toRef(props, 'show')
-      return{
-        active
-      }
     }
   }
 </script>

@@ -7,13 +7,14 @@
     </v-col>
 
     <v-col cols="9">
-      <ValidationProvider
-        v-slot="{ errors }"
+      <Field
+        v-slot="{ field, errors }"
+        v-model="newServiceOffering.deploymentDefinition.restartPolicy"
         name="Image Tag"
         rules="required"
       >
         <v-select
-          v-model="newServiceOffering.deploymentDefinition.restartPolicy"
+          v-bind="field"
           class="full-width"
           hide-details
           density="compact"
@@ -22,17 +23,25 @@
           item-title="prettyName"
           item-value="value"
           :error-messages="errors"
-
         />
-      </ValidationProvider>
+      </Field>
     </v-col>
   </v-row>
 </template>
 
 <script>
+import {Field } from "vee-validate";
+import * as yup from 'yup';
   export default {
     name: 'DockerContainerRestartPolicy',
+    components: {Field},
     props: ['newServiceOffering'],
+    setup(){
+      const required = yup.string().required()
+      return {
+        required
+      }
+    },
     data () {
       return {
         restartPoliciesList: [

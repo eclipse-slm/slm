@@ -23,13 +23,14 @@
         </v-col>
 
         <v-col cols="9">
-          <ValidationProvider
-            v-slot="{ errors }"
+          <Field
+            v-slot="{ field, errors }"
+            v-model="newServiceOffering.deploymentDefinition.imageRepository"
             name="Image Repository"
-            rules="required"
+            :rules="required"
           >
             <v-text-field
-              v-model="newServiceOffering.deploymentDefinition.imageRepository"
+              v-bind="field"
               class="full-width"
               placeholder="e.g. registry:port/myImage"
               required
@@ -38,7 +39,7 @@
               :error-messages="errors"
 
             />
-          </ValidationProvider>
+          </Field>
         </v-col>
       </v-row>
       <v-row>
@@ -63,13 +64,14 @@
         </v-col>
 
         <v-col cols="9">
-          <ValidationProvider
-            v-slot="{ errors }"
+          <Field
+            v-slot="{ field, errors }"
+            v-model="newServiceOffering.deploymentDefinition.imageTag"
             name="Image Tag"
-            rules="required"
+            :rules="required"
           >
             <v-text-field
-              v-model="newServiceOffering.deploymentDefinition.imageTag"
+              v-bind="field"
               class="full-width"
               placeholder="e.g. latest"
               required
@@ -78,7 +80,7 @@
               :error-messages="errors"
 
             />
-          </ValidationProvider>
+          </Field>
         </v-col>
       </v-row>
     </v-col>
@@ -86,10 +88,20 @@
 </template>
 
 <script>
+import {Field } from "vee-validate";
+import * as yup from 'yup';
+
   export default {
     name: 'DockerContainerImageName',
+    components: {Field},
     comments: {
     },
     props: ['newServiceOffering'],
+    setup(){
+      const required = yup.string().required()
+      return {
+        required
+      }
+    },
   }
 </script>

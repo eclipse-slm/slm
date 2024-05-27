@@ -28,7 +28,7 @@ class NotificationServiceWebsocketClient {
           () => {
               this.stompClient.subscribe(subscriptionName, response => {
                   const content = JSON.parse(response.body)
-                  store.dispatch('processIncomingNotification', content)
+                  app.config.globalProperties.$store.dispatch('processIncomingNotification', content)
               })
           })
   }

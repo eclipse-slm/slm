@@ -4,7 +4,7 @@
     width="600"
     @click:outside="$emit('canceled')"
   >
-    <template>
+    <template v-slot:default="{}">
       <v-card>
         <v-toolbar
           color="primary"
@@ -55,6 +55,12 @@
    components: {CapabilityParamsDialogInputField},
    mixins: [capabilityUtilsMixin],
    props: ['showDialog', 'resourceId', 'capabilityId', 'skipInstall'],
+   setup(props){
+     const active = toRef(props, 'showDialog')
+     return{
+       active
+     }
+   },
    data() {
      return {
        title: "Set Configuration Parameter of Capability",
@@ -82,12 +88,6 @@
      },
      updateParamMap(key, value) {
        this.paramMap[key] = value
-     }
-   },
-   setup(props){
-     const active = toRef(props, 'showDialog')
-     return{
-       active
      }
    }
  }

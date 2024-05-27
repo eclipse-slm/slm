@@ -2,8 +2,8 @@
   <v-card class="text-center v-card--testimony">
     <div class="pt-6">
       <v-icon
-        color="black"
-        size="x-large"
+          color="black"
+          size="x-large"
       >
         mdi-format-quote-close
       </v-icon>
@@ -11,15 +11,19 @@
 
     <v-card-text
       class="text-h4 font-weight-light font-italic mb-3"
-    >{{blurb}}</v-card-text>
+    >
+      {{ blurb }}
+    </v-card-text>
 
     <div
       class="text-h3 font-weight-light mb-2"
-    >{{author}}</div>
+    >{{ author }}
+    </div>
 
     <div
       class="text-body-2 text-uppercase text-grey"
-    >{{handle}}</div>
+    >{{ handle }}
+    </div>
 
     <v-avatar
       class="elevation-12"
@@ -37,37 +41,37 @@
 </template>
 
 <script>
-  export default {
-    name: 'BaseMaterialTestimony',
+export default {
+  name: 'BaseMaterialTestimony',
 
-    props: {
-      author: {
-        type: String,
-        default: '',
-      },
-      avatar: {
-        type: String,
-        default: 'https://demos.creative-tim.com/material-dashboard/assets/img/faces/card-profile1-square.jpg',
-      },
-      blurb: {
-        type: String,
-        default: '',
-      },
-      handle: {
-        type: String,
-        default: '',
-      },
+  props: {
+    author: {
+      type: String,
+      default: '',
     },
-  }
+    avatar: {
+      type: String,
+      default: 'https://demos.creative-tim.com/material-dashboard/assets/img/faces/card-profile1-square.jpg',
+    },
+    blurb: {
+      type: String,
+      default: '',
+    },
+    handle: {
+      type: String,
+      default: '',
+    },
+  },
+}
 </script>
 
 <style lang="sass">
-  .v-card--testimony
-    padding-bottom: 72px
-    margin-bottom: 64px
+.v-card--testimony
+  padding-bottom: 72px
+  margin-bottom: 64px
 
-    .v-avatar
-      position: absolute
-      left: calc(50% - 64px)
-      top: calc(100% - 64px)
+  .v-avatar
+    position: absolute
+    left: calc(50% - 64px)
+    top: calc(100% - 64px)
 </style>

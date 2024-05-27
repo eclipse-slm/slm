@@ -39,14 +39,15 @@
           }"
         >
           <template #item.name="{ item }">
-            <ValidationProvider
-              v-slot="{ errors }"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="item.name"
               name="Volume Name"
-              rules="required|alpha_dash"
+              :rules="required_alpha_dash"
             >
               <v-text-field
                 v-if="editable"
-                v-model="item.name"
+                v-bind="field"
                 placeholder="Name of volume"
                 :error-messages="errors"
 
@@ -56,18 +57,19 @@
               >
                 {{ item.key }}
               </div>
-            </ValidationProvider>
+            </Field>
           </template>
 
           <template #item.containerPath="{ item }">
-            <ValidationProvider
-              v-slot="{ errors }"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="item.containerPath"
               name="Container Path"
-              rules="required"
+              :rules="required"
             >
               <v-text-field
                 v-if="editable"
-                v-model="item.containerPath"
+                v-bind="field"
                 placeholder="e.g. /path/in/container"
                 :error-messages="errors"
 
@@ -77,7 +79,7 @@
               >
                 {{ item.value }}
               </div>
-            </ValidationProvider>
+            </Field>
           </template>
 
           <template #item.isServiceOption="{ item }">
@@ -104,9 +106,20 @@
 </template>
 
 <script>
+import {Field } from "vee-validate";
+import * as yup from 'yup';
+
   export default {
     name: 'DockerContainerVolumeMappings',
+    components: {Field},
     props: ['volumes', 'editable'],
+    setup(){
+      const required_alpha_dash = yup.string().required().matches(new RegExp("/.[a-zA-Z0-9_\/]/"))
+      const required = yup.string().required()
+      return {
+        required,required_alpha_dash
+      }
+    },
     data () {
       return {
         tableHeaders: [

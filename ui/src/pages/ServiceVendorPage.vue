@@ -102,7 +102,7 @@
             <!-- Service Offering Delete Dialog !-->
             <confirm-dialog
               v-if="serviceOfferingDeleteDialog"
-              :isActive="serviceOfferingDeleteDialog"
+              :show="serviceOfferingDeleteDialog"
               title="Delete service offering?"
               :text="`Do you really want to delete service offering '${serviceOfferingToDelete.name}'?`"
               @canceled="serviceOfferingDeleteDialog = false"
@@ -112,7 +112,7 @@
             <!-- Service Offering Version Delete Dialog !-->
             <confirm-dialog
               v-if="serviceOfferingVersionDeleteDialog"
-              :isActive="serviceOfferingVersionDeleteDialog"
+              :show="serviceOfferingVersionDeleteDialog"
               title="Delete service offering version?"
               :text="`Do you really want to delete service offering version '${serviceOfferingVersionToDelete.version}'?`"
               @canceled="serviceOfferingVersionDeleteDialog = false"
@@ -272,6 +272,7 @@
   import ServiceOfferingCreateDialog from "@/components/service_offerings/dialogs/ServiceOfferingCreateDialog";
   import ProgressCircular from "@/components/base/ProgressCircular";
   import OverviewHeading from "@/components/base/OverviewHeading.vue";
+  import {app} from "@/main";
 
   export default {
     components: {
@@ -368,7 +369,7 @@
       },
       onDeleteServiceOfferingConfirmed () {
         ServiceOfferingsRestApi.deleteServiceOffering(this.serviceOfferingToDelete.id).then(response => {
-          Vue.$toast.info(`Successfully delete service offering '${this.serviceOfferingToDelete.name}'`)
+          app.config.globalProperties.$toast.info(`Successfully delete service offering '${this.serviceOfferingToDelete.name}'`)
           this.serviceOfferingDeleteDialog = false
           this.$store.dispatch('getServiceOfferings')
           ServiceOfferingsRestApi.getOfferings(false, this.selectedServiceVendor.id).then(
@@ -389,7 +390,7 @@
         ServiceOfferingVersionsRestApi.deleteServiceOfferingVersion(
             this.serviceOfferingVersionToDelete.serviceOfferingId, this.serviceOfferingVersionToDelete.id)
         .then(response => {
-          Vue.$toast.info(`Successfully delete service offering version '${this.serviceOfferingVersionToDelete.version}'`)
+          app.config.globalProperties.$toast.info(`Successfully delete service offering version '${this.serviceOfferingVersionToDelete.version}'`)
           this.serviceOfferingVersionDeleteDialog = false
           this.serviceOfferingVersionToDelete = undefined
           this.$options.serviceOfferingTableInterface.updateExpanded()
@@ -412,18 +413,18 @@
       onServiceRepositoryCreateDialogConfirmed (repository) {
         ServiceVendorsRestApi.addRepositoryToServiceVendor(this.selectedServiceVendor.id, repository).then(response => {
           this.loadRepositories()
-          Vue.$toast.info(`Successfully created repository '${repository.address}'`)
+          app.config.globalProperties.$toast.info(`Successfully created repository '${repository.address}'`)
           this.serviceRepositoryCreateDialog = false
         })
           .catch((error) => {
-            Vue.$toast.error(`Failed to created repository '${repository.address}'`)
+            app.config.globalProperties.$toast.error(`Failed to created repository '${repository.address}'`)
             logRequestError(error)
           })
       },
       onDeleteRepositoryClicked (repository) {
         ServiceVendorsRestApi.deleteRepositoryOfServiceVendor(this.selectedServiceVendor.id, repository.id).then(() => {
           this.loadRepositories()
-          Vue.$toast.info(`Successfully removed repository '${repository.address}'`)
+          app.config.globalProperties.$toast.info(`Successfully removed repository '${repository.address}'`)
         })
       },
 

@@ -1,10 +1,10 @@
 <template>
   <v-dialog
-    v-model="isActive"
+    v-model="active"
     width="400"
     @click:outside="$emit('canceled')"
   >
-    <template>
+    <template v-slot:default="{isActive}">
       <v-card v-if="isActive">
         <v-toolbar
           color="primary"
@@ -46,9 +46,9 @@
     name: 'ConfirmDialog',
     props: ['show', 'title', 'text'],
     setup(props){
-      const isActive = toRef(props, 'show')
+      const active = toRef(props, 'show')
       return{
-        isActive
+        active
       }
     }
   }

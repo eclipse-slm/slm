@@ -4,7 +4,7 @@
     width="600"
     @click:outside="closeDialog"
   >
-    <template>
+    <template v-slot:default="{}">
       <v-card v-if="page=='scale-virtual'">
         <v-toolbar
           color="primary"

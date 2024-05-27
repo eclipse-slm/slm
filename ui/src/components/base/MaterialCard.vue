@@ -1,50 +1,52 @@
 <template>
   <v-card
-    v-bind="$attrs"
-    :class="classes"
-    class="v-card--material pa-3"
+      v-bind="$attrs"
+      :class="classes"
+      class="v-card--material pa-3"
   >
     <div class="d-flex grow flex-wrap">
       <v-avatar
-        v-if="avatar"
-        size="128"
-        class="mx-auto v-card--material__avatar elevation-6"
+          v-if="avatar"
+          size="128"
+          class="mx-auto v-card--material__avatar elevation-6"
       >
-        <v-img :src="avatar" />
+        <v-img :src="avatar"/>
       </v-avatar>
 
       <v-sheet
-        v-else
-        :class="{
+          v-else
+          :class="{
           'pa-3': !$slots.image
         }"
-        :color="color ? color : themeColorMain"
-        :max-height="icon ? 90 : undefined"
-        :width="icon ? 'auto' : '100%'"
-        elevation="6"
-        class="text-start v-card--material__heading mb-n6"
-        theme="dark"
+          :color="color ? color : themeColorMain"
+          :max-height="icon ? 90 : undefined"
+          :width="icon ? 'auto' : '100%'"
+          elevation="6"
+          class="text-start v-card--material__heading mb-n6"
+          theme="dark"
       >
         <slot
-          v-if="$slots.heading"
-          name="heading"
+            v-if="$slots.heading"
+            name="heading"
         />
 
         <slot
-          v-else-if="$slots.image"
-          name="image"
+            v-else-if="$slots.image"
+            name="image"
         />
 
         <div
-          v-else-if="title && !icon"
-          class="text-h4 font-weight-light"
-          v-text="title"
+            v-else-if="title && !icon"
+            class="text-h4 font-weight-light"
+            v-text="title"
         />
 
         <v-icon
           v-else-if="icon"
           size="32"
-        >{{icon}}</v-icon>
+        >
+          {{ icon }}
+        </v-icon>
 
         <div
           v-if="text"
@@ -57,7 +59,7 @@
         v-if="$slots['after-heading']"
         class="ml-6"
       >
-        <slot name="after-heading" />
+        <slot name="after-heading"/>
       </div>
 
       <div
@@ -85,67 +87,67 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+import {mapGetters} from 'vuex'
 
-  export default {
-    name: 'MaterialCard',
+export default {
+  name: 'MaterialCard',
 
-    props: {
-      avatar: {
-        type: String,
-        default: '',
-      },
-      color: {
-        type: String,
-        default: null,
-      },
-      icon: {
-        type: String,
-        default: undefined,
-      },
-      image: {
-        type: Boolean,
-        default: false,
-      },
-      text: {
-        type: String,
-        default: '',
-      },
-      title: {
-        type: String,
-        default: '',
-      },
+  props: {
+    avatar: {
+      type: String,
+      default: '',
     },
-
-    computed: {
-      ...mapGetters([
-        'themeColorMain',
-      ]),
-      classes () {
-        return {
-          'v-card--material--has-heading': this.hasHeading,
-        }
-      },
-      hasHeading () {
-        return Boolean(this.$slots.heading || this.title || this.icon)
-      },
-      hasAltHeading () {
-        return Boolean(this.$slots.heading || (this.title && this.icon))
-      },
+    color: {
+      type: String,
+      default: null,
     },
-  }
+    icon: {
+      type: String,
+      default: undefined,
+    },
+    image: {
+      type: Boolean,
+      default: false,
+    },
+    text: {
+      type: String,
+      default: '',
+    },
+    title: {
+      type: String,
+      default: '',
+    },
+  },
+
+  computed: {
+    ...mapGetters([
+      'themeColorMain',
+    ]),
+    classes() {
+      return {
+        'v-card--material--has-heading': this.hasHeading,
+      }
+    },
+    hasHeading() {
+      return Boolean(this.$slots.heading || this.title || this.icon)
+    },
+    hasAltHeading() {
+      return Boolean(this.$slots.heading || (this.title && this.icon))
+    },
+  },
+}
 </script>
 
 <style lang="sass">
-  .v-card--material
-    &__avatar
-      position: relative
-      top: -64px
-      margin-bottom: -32px
+.v-card--material
+  &__avatar
+    position: relative
+    top: -64px
+    margin-bottom: -32px
 
-    &__heading
-      position: relative
-      top: -40px
-      transition: .3s ease
-      z-index: 1
+  &__heading
+    position: relative
+    top: -40px
+    transition: .3s ease
+    z-index: 1
 </style>

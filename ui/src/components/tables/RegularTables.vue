@@ -14,7 +14,7 @@
       title="Simple Table"
       class="px-5 py-3"
     >
-      <v-simple-table>
+      <v-table>
         <thead>
           <tr>
             <th class="text-primary">
@@ -96,7 +96,7 @@
             </td>
           </tr>
         </tbody>
-      </v-simple-table>
+      </v-table>
     </base-material-card>
 
     <div class="py-3" />
@@ -108,7 +108,7 @@
       title="Table on Dark Background"
       class="px-5 py-3"
     >
-      <v-simple-table>
+      <v-table>
         <thead>
           <tr>
             <th>ID</th>
@@ -182,7 +182,7 @@
             </td>
           </tr>
         </tbody>
-      </v-simple-table>
+      </v-table>
     </base-material-card>
   </v-container>
 </template>

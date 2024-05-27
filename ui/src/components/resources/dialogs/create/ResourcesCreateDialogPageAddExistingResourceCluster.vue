@@ -1,17 +1,18 @@
 <template>
-  <validation-observer
+  <ValidationForm
     ref="observer"
-    v-slot="{ invalid, handleSubmit, validate }"
+    v-slot="{ meta, handleSubmit, validate }"
   >
     <v-card>
       <v-container
         fluid
         class="pa-8"
       >
-        <validation-provider
-          v-slot="{ errors }"
+        <Field
+          v-slot="{ field, errors }"
+          v-model="selectedClusterType"
           name="Cluster Type"
-          rules="required"
+          :rules="is_required"
         >
           <v-row id="resource-create-select-cluster-type">
             <v-icon
@@ -21,7 +22,7 @@
               mdi-selection-multiple
             </v-icon>
             <v-select
-              v-model="selectedClusterType"
+              v-bind="field"
               :items="availableClusterTypesWithSkipInstall"
               item-title="name"
               label="Cluster Type"
@@ -32,7 +33,7 @@
               @update:modelValue="onSelectedClusterTypeChanged"
             />
           </v-row>
-        </validation-provider>
+        </Field>
         <div
           v-for="configParameter in configParameters"
           :key="configParameter.name"
@@ -84,54 +85,54 @@
               />
             </v-col>
             <v-col
-                v-if="configParameter.valueType == 'KUBE_CONF'"
-                cols="9"
+              v-if="configParameter.valueType == 'KUBE_CONF'"
+              cols="9"
             >
               <v-file-input
-                  v-model="uploadedFiles[configParameter.name]"
-                  accept=".yml,.yaml"
-                  label="Click here to select kube config file"
-                  auto-grow
-                  density="compact"
-                  variant="outlined"
-                  @update:modelValue="onFileChanged(configParameter.name)"
+                v-model="uploadedFiles[configParameter.name]"
+                accept=".yml,.yaml"
+                label="Click here to select kube config file"
+                auto-grow
+                density="compact"
+                variant="outlined"
+                @update:modelValue="onFileChanged(configParameter.name)"
               />
             </v-col>
           </v-row>
-          <validation-provider
+          <Field
             v-if="configParameter.valueType == 'FILE'"
-            v-slot="{ errors }"
+            v-slot="{ field, errors }"
+            v-model="configParameterValues[configParameter.name]"
             :name="configParameter.prettyName"
-            rules="required"
+            :rules="is_required"
           >
             <v-row>
               <v-textarea
                 :key="textAreaFileContentComponentKey"
-                v-model="configParameterValues[configParameter.name]"
+                v-bind="field"
                 variant="outlined"
                 density="compact"
                 :error-messages="errors"
-
               />
             </v-row>
-          </validation-provider>
-          <validation-provider
-              v-if="configParameter.valueType == 'KUBE_CONF'"
-              v-slot="{ errors }"
-              :name="configParameter.prettyName"
-              rules="required"
+          </Field>
+          <Field
+            v-if="configParameter.valueType == 'KUBE_CONF'"
+            v-slot="{ field, errors }"
+            v-model="configParameterValues[configParameter.name]"
+            :name="configParameter.prettyName"
+            :rules="is_required"
           >
             <v-row>
               <v-textarea
-                  :key="textAreaFileContentComponentKey"
-                  v-model="configParameterValues[configParameter.name]"
-                  variant="outlined"
-                  density="compact"
-                  :error-messages="errors"
-
+                :key="textAreaFileContentComponentKey"
+                v-bind="field"
+                variant="outlined"
+                density="compact"
+                :error-messages="errors"
               />
             </v-row>
-          </validation-provider>
+          </Field>
         </div>
       </v-container>
 
@@ -152,14 +153,14 @@
         <v-btn
           id="resource-create-button-create-cluster"
           variant="text"
-          :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-          @click="invalid ? validate() : handleSubmit(onAddButtonClicked)"
+          :color="!meta.valid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
+          @click="!meta.valid ? validate() : handleSubmit(onAddButtonClicked)"
         >
           Add
         </v-btn>
       </v-card-actions>
     </v-card>
-  </validation-observer>
+  </ValidationForm>
 </template>
 
 <script>
@@ -167,13 +168,22 @@
   import clustersRestApi from '@/api/resource-management/clustersRestApi'
   import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
   import {ref} from "vue";
+  import {Field, Form as ValidationForm } from "vee-validate";
+  import * as yup from 'yup';
 
   const textAreaFileContentComponentKey = ref(0);
 
   export default {
     name: 'ResourcesCreateDialogPageAddExistingResourceCluster',
+    components: {Field, ValidationForm },
     enums: {
       ResourcesCreateDialogPage,
+    },
+    setup(){
+      const is_required = yup.string().required();
+      return {
+        is_required
+      }
     },
     data () {
       return {

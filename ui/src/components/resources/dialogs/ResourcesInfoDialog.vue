@@ -3,7 +3,7 @@
     v-model="showDialog"
     @click:outside="onCloseButtonClicked"
   >
-    <template>
+    <template v-slot:default="{}">
       <v-card v-if="showDialog">
         <v-toolbar
           color="primary"
@@ -39,6 +39,7 @@
     props: ['resource'],
     computed: {
       showDialog () {
+        console.log(this.resource)
         return this.resource !== null
       },
     },

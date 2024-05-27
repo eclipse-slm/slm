@@ -2,9 +2,9 @@
   <v-container
     fluid
   >
-    <validation-observer
+    <ValidationForm
       ref="observer"
-      v-slot="{ invalid, handleSubmit, validate }"
+      v-slot="{ meta, handleSubmit, validate }"
     >
       <v-list>
         <v-list-group value="true">
@@ -81,13 +81,13 @@
         </v-btn>
         <v-spacer />
         <v-btn
-          :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-          @click="invalid ? validate() : handleSubmit(onNextButtonClicked)"
+          :color="!meta.valid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
+          @click="!meta.valid ? validate() : handleSubmit(onNextButtonClicked)"
         >
           {{ $t('buttons.Next') }}
         </v-btn>
       </v-card-actions>
-    </validation-observer>
+    </ValidationForm>
   </v-container>
 </template>
 
@@ -102,6 +102,8 @@
     from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerPortMappings'
   import DockerContainerImageName from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerImageName'
   import ServiceRepositorySelect from '@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect'
+  import {Field, Form as ValidationForm } from "vee-validate";
+  import * as yup from 'yup';
 
   export default {
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer',
@@ -113,8 +115,10 @@
       DockerContainerImageName,
       DockerContainerEnvironmentVariables,
       ServiceRepositorySelect,
+      ValidationForm
     },
     props: ['editMode', 'serviceOfferingVersion', 'serviceVendorId'],
+
     data () {
       return {
         stepNumber: 2,

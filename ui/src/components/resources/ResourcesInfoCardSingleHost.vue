@@ -4,20 +4,17 @@
   >
     <v-list>
       <v-list-group
-        :model-value="true"
+        value="Common"
       >
-        <template #activator>
-          <v-list-item>
-            <v-icon>mdi-information</v-icon>
-          </v-list-item>
-          <v-list-item>
-            <v-list-item-title>
-              Common
-            </v-list-item-title>
-          </v-list-item>
+        <template #activator="{ props }">
+          <v-list-item
+            v-bind="props"
+            prepend-icon="mdi-information"
+            title="Common"
+          />
         </template>
 
-        <v-table v-slot>
+        <v-table>
           <tbody>
             <tr>
               <th>{{ 'Hostname' }}</th>
@@ -96,32 +93,26 @@
         type="hidden"
         :value="resource.password"
       >
-      <v-list-group>
-        <template #activator>
-          <v-list-item>
-            <v-icon>mdi-expansion-card</v-icon>
-          </v-list-item>
-          <v-list-item>
-            <v-list-item-title>
-              Hardware
-            </v-list-item-title>
-          </v-list-item>
+      <v-list-group value="Hardware">
+        <template #activator="{props}">
+          <v-list-item
+            v-bind="props"
+            prepend-icon="mdi-expansion-card"
+            title="Hardware"
+          />
         </template>
         <resource-metrics
           ref="resourceMetrics"
           :resource-id="resource.id"
         />
       </v-list-group>
-      <v-list-group>
-        <template #activator>
-          <v-list-item>
-            <v-icon>mdi-adjust</v-icon>
-          </v-list-item>
-          <v-list-item>
-            <v-list-item-title>
-              Submodels
-            </v-list-item-title>
-          </v-list-item>
+      <v-list-group value="Submodels">
+        <template #activator="{props}">
+          <v-list-item
+            v-bind="props"
+            prepend-icon="mdi-adjust"
+            title="Submodels"
+          />
         </template>
         <resource-submodels
           ref="resourceSubmodels"
@@ -144,6 +135,9 @@
         type: Object,
         default: null,
       },
+    },
+    setup(props){
+      console.log(props.resource);
     },
     data () {
       return {

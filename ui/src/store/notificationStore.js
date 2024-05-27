@@ -1,5 +1,5 @@
 import notificationServiceRestApi from '@/api/notification-service/notificationServiceRestApi'
-import Vue from 'vue'
+import {app} from "@/main";
 
 export default {
   state: {
@@ -27,7 +27,7 @@ export default {
       context.dispatch('getNotifications')
 
       if (notification.category !== undefined) {
-        Vue.$toast.info(notification.text)
+        app.config.globalProperties.$toast.info(notification.text)
         switch (notification.category) {
           case 'Jobs':
             // console.log('Update jobs store')

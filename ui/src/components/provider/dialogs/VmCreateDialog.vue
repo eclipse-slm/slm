@@ -4,7 +4,7 @@
     max-width="800px"
     @click:outside="closeDialog"
   >
-    <template>
+    <template #default>
       <v-toolbar
         color="primary"
         theme="dark"
@@ -56,7 +56,6 @@
 </template>
 
 <script>
-import {mapGetters} from "vuex";
 import VmCreateDialogForm from "@/components/provider/dialogs/VmCreateDialogForm.vue";
 import {toRef} from "vue";
 
@@ -64,6 +63,12 @@ export default {
   name: 'VmCreateDialog',
   components: {VmCreateDialogForm},
   props: ['show','virtualResourceProvider'],
+  setup(props){
+    const active = toRef(props, 'show')
+    return{
+      active
+    }
+  },
   data () {
     return {
       title: 'Create VM'
@@ -80,12 +85,6 @@ export default {
   methods: {
     closeDialog () {
       this.$emit('canceled')
-    }
-  },
-  setup(props){
-    const active = toRef(props, 'show')
-    return{
-      active
     }
   }
 }

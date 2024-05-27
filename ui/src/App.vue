@@ -21,7 +21,6 @@
       },
     },
     created () {
-      this.$store.dispatch('getUserDetails')
     },
     mounted () {
 

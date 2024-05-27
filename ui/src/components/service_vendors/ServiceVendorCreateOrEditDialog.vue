@@ -4,7 +4,7 @@
     width="400"
     @click:outside="$emit('canceled')"
   >
-    <template v-if="serviceVendorUpdate != null">
+    <template v-if="serviceVendorUpdate != null" v-slot:default="{}">
       <v-card>
         <v-toolbar
           color="primary"
@@ -82,10 +82,17 @@
   import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
   import Vue, {toRef} from 'vue'
   import getImageUrl from '@/utils/imageUtil'
+  import {app} from "@/main";
 
   export default {
     name: 'ServiceVendorCreateOrEditDialog',
     props: ['show', 'editMode', 'serviceVendor'],
+    setup(props){
+      const active = toRef(props, 'show')
+      return{
+        active
+      }
+    },
     data () {
       return {
         uploadedServiceVendorLogo: null,
@@ -127,24 +134,18 @@
 
         apiCall.then(() => {
           if (this.editMode) {
-            Vue.$toast.info('Service vendor successfully updated')
+            app.config.globalProperties.$toast.info('Service vendor successfully updated')
           } else {
-            Vue.$toast.info('Service vendor successfully created')
+            app.config.globalProperties.$toast.info('Service vendor successfully created')
           }
           this.$store.dispatch('getServiceVendors')
           this.$emit('confirmed', this.serviceVendorUpdate)
         }).catch(exception => {
-          Vue.$toast.error('Failed to create service vendor')
+          app.config.globalProperties.$toast.error('Failed to create service vendor')
           console.log('Service vendor creation failed: ' + exception.response.data.message)
           console.log(exception)
         })
       },
-    },
-    setup(props){
-      const active = toRef(props, 'show')
-      return{
-        active
-      }
     }
   }
 </script>

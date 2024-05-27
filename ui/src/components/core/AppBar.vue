@@ -2,6 +2,7 @@
   <v-app-bar
     id="app-bar"
     absolute
+    order="1"
     color="transparent"
     flat
     height="75"
@@ -35,7 +36,7 @@
       :close-on-content-click="false"
       location="bottom"
       start
-
+      target="[y]"
       origin="top right"
       transition="scale-transition"
       content-class="v-settings"
@@ -48,8 +49,8 @@
           variant="text"
           v-bind="props"
         >
-          <v-icon color="primary">
-            settings
+          <v-icon color="primary" >
+            mdi-cog
           </v-icon>
         </v-btn>
       </template>
@@ -92,11 +93,13 @@
             <v-spacer />
 
             <v-col cols="auto">
+
               <v-switch
-                v-model="$vuetify.theme.dark"
+                :model-value="currentTheme === 'dark'"
                 class="ma-0 pa-0"
                 color="secondary"
                 hide-details
+                @click="toggleTheme"
               />
             </v-col>
           </v-row>
@@ -127,7 +130,7 @@
       :close-on-content-click="false"
       location="bottom"
       start
-
+      target="[y]"
       origin="top right"
     >
       <template #activator="{ props }">
@@ -234,6 +237,7 @@
 <script>
   import { mapState, mapMutations, mapGetters } from 'vuex'
   import {app} from "@/main";
+  import {useTheme} from "vuetify";
 
   export default {
     name: 'DashboardCoreAppBar',
@@ -246,6 +250,14 @@
         type: Boolean,
         default: false,
       },
+    },
+    setup(){
+      const theme = useTheme();
+      const currentTheme = theme.global.name;
+      const toggleTheme = () => {
+        theme.global.name = theme.global.current.dark ? 'light' : 'dark';
+      };
+      return {toggleTheme, currentTheme}
     },
 
     data: () => ({

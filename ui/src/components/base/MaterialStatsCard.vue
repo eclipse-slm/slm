@@ -4,7 +4,7 @@
     class="v-card--material-stats"
     v-bind="$attrs"
   >
-    <template v-slot:after-heading>
+    <template #after-heading>
       <div class="ml-auto text-right">
         <div
           class="body-3 text-grey font-weight-light"
@@ -82,6 +82,10 @@
         type: String,
         default: undefined,
       },
+    },
+
+    setup(props){
+      console.log(props)
     },
   }
 </script>

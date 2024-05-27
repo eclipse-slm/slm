@@ -8,7 +8,7 @@
       :sort-by.sync="sortBy"
       :row-props="rowClass"
       item-key="id"
-      :group-by="groupBy"
+
       @click:row="setSelectedResource"
     >
       <template #top>
@@ -253,7 +253,7 @@
       </template>
     </v-data-table>
     <confirm-dialog
-      :isActive="resourceToDelete != null"
+      :show="resourceToDelete != null"
       :title="'Delete resource ' + (resourceToDelete == null ? '' : resourceToDelete.hostname)"
       text="Do you really want to delete this resource?"
       @confirmed="deleteResource(resourceToDelete)"
@@ -280,6 +280,7 @@
   import { capabilityUtilsMixin } from '@/utils/capabilityUtils'
   import ProfilerRestApi from "@/api/resource-management/profilerRestApi";
   import Vue from "vue";
+  import {app} from "@/main";
 
   export default {
     name: 'ResourcesTableSingleHosts',
@@ -287,22 +288,22 @@
     data () {
       return {
         tableHeaders: [
-          { text: 'Capabilities', value: 'capabilityServices' },
-          { text: 'Hostname', value: 'hostname' },
-          { text: 'IP', value: 'ip' },
-          { text: 'Location', value: 'location.name'},
-          { text: 'FabOS Device', value: "fabosDevice" },
-          { text: 'Connection Type', value:'remoteAccessService.connectionType'},
-          { text: 'Port', value:'remoteAccessService.Port'},
+          { title: 'Capabilities', value: 'capabilityServices' },
+          { title: 'Hostname', value: 'hostname' },
+          { title: 'IP', value: 'ip' },
+          { title: 'Location', value: 'location.name'},
+          { title: 'FabOS Device', value: "fabosDevice" },
+          { title: 'Connection Type', value:'remoteAccessService.connectionType'},
+          { title: 'Port', value:'remoteAccessService.Port'},
           // { text: 'CPU Arch', value: 'cpuArch' },
           // { text: 'CPU Cores', value: 'cpuCores' },
-          { text: 'OS', value: 'os' },
-          { text: 'UUID', value: 'id', sortable: false },
-          { text: 'Cluster Member', value: 'clusterMember' },
-          { value: 'actions', sortable: false },
+          { title: 'OS', value: 'os' },
+          { title: 'UUID', value: 'id', sortable: false },
+          { title: 'Cluster Member', value: 'clusterMember' },
+          { title:'test', value: 'actions', sortable: false },
         ],
-        groupBy: null,
-        sortBy: 'ip',
+        groupBy: [],
+        sortBy: [{key: 'ip', order: 'asc'}],
         sortDesc: false,
         showLvlUpMenu: false,
         showResourcesDeleteDialog: false,
@@ -415,11 +416,16 @@
       removeCapability (resourceId, capabilityId) {
         ResourcesRestApi.removeCapabilityFromSingleHost(resourceId, capabilityId)
       },
-      setSelectedResource (resource) {
-        this.$emit('resource-selected', resource)
+      setSelectedResource (event, { item }) {
+        this.$emit('resource-selected', item)
       },
       rowClass (resource) {
-        return resource.markedForDelete ? 'text-grey text--lighten-1 row-pointer' : 'row-pointer'
+        return {
+          class: {
+            'text-grey text--lighten-1 row-pointer': resource.markedForDelete,
+            'row-pointer': resource.markedForDelete
+          }
+        }
       },
       isCapabilityInstalledOnResource (resource, capability) {
         if(resource.capabilityServices != null)
@@ -548,7 +554,7 @@
       },
       runProfiler() {
         let result = ProfilerRestApi.runProfiler()
-        Vue.$toast.info('Started Profiler for all devices.')
+        app.config.globalProperties.$toast.info('Started Profiler for all devices.')
       }
     }
   }

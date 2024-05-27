@@ -84,7 +84,7 @@
   import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
   import { mapGetters } from 'vuex'
   import ApiState from '@/api/apiState'
-  import Vue from 'vue'
+  import {app} from "@/main";
 
   export default {
     name: 'ServiceOfferingCreatePage',
@@ -172,7 +172,7 @@
               ServiceOfferingsRestApi.updateServiceOffering(this.newServiceOffering).then(
                 response => {
                   if (response.status === 200) {
-                    Vue.$toast.info('Successfully updated service offering')
+                    app.config.globalProperties.$toast.info('Successfully updated service offering')
                     this.$store.dispatch('getServiceOfferings')
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
                   } else {
@@ -187,7 +187,7 @@
               ServiceOfferingsRestApi.addServiceOffering(this.newServiceOffering).then(
                 response => {
                   if (response.status === 200) {
-                    Vue.$toast.info('Successfully created service offering')
+                    app.config.globalProperties.$toast.info('Successfully created service offering')
                     this.$store.dispatch('getServiceOfferings')
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
                   } else {
@@ -195,7 +195,7 @@
                   }
                 })
                 .catch(exception => {
-                  Vue.$toast.error('Failed to create service offering')
+                  app.config.globalProperties.$toast.error('Failed to create service offering')
                   console.log('Service offering creation failed: ' + exception.response.data.message)
                   console.log(exception)
                 })

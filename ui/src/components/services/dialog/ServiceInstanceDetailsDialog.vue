@@ -3,7 +3,7 @@
     v-model="showDialog"
     @click:outside="onCloseButtonClicked"
   >
-    <template>
+    <template v-slot:default="{}">
       <v-card v-if="showDialog">
         <v-toolbar
           color="primary"
@@ -258,13 +258,14 @@
           </v-card-actions>
         </v-card-text>
       </v-card>
-    </template>
 
-    <resources-info-dialog
-      :resource="selectedResource"
-      @closed="selectedResource = null"
-    />
+      <resources-info-dialog
+          :resource="selectedResource"
+          @closed="selectedResource = null"
+      />
+    </template>
   </v-dialog>
+
 </template>
 
 <script>

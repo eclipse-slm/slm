@@ -144,14 +144,14 @@
     methods: {
       onDeleteDeveloperClicked (deletedDeveloper) {
         if (this.developersOfServiceVendor.length === 1) {
-          Vue.$toast.warning('Last developer of service vendor cannot be deleted')
+          app.config.globalProperties.$toast.warning('Last developer of service vendor cannot be deleted')
         } else {
           ServiceVendorsRestApi.removeDeveloperFromServiceVendor(this.serviceVendor.id, deletedDeveloper.id).then(() => {
-            Vue.$toast.info(`Successfully removed developer '${deletedDeveloper.username}'`)
+            app.config.globalProperties.$toast.info(`Successfully removed developer '${deletedDeveloper.username}'`)
             this.loadDevelopersOfServiceVendor()
           })
             .catch(() => {
-              Vue.$toast.error(`Failed to remove developer '${deletedDeveloper.username}'`)
+              app.config.globalProperties.$toast.error(`Failed to remove developer '${deletedDeveloper.username}'`)
             })
         }
       },

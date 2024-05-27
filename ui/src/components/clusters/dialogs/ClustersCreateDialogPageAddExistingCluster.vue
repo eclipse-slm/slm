@@ -1,17 +1,18 @@
 <template>
-  <validation-observer
+  <ValidationForm
     ref="observer"
-    v-slot="{ invalid, handleSubmit, validate }"
+    v-slot="{ meta, handleSubmit, validate }"
   >
     <v-card>
       <v-container
         fluid
         class="pa-8"
       >
-        <validation-provider
-          v-slot="{ errors }"
+        <Field
+          v-slot="{ field, errors }"
+          v-model="selectedClusterType"
           name="Cluster Type"
-          rules="required"
+          :rules="required"
         >
           <v-row id="resource-create-select-cluster-type">
             <v-icon
@@ -21,7 +22,7 @@
               mdi-selection-multiple
             </v-icon>
             <v-select
-              v-model="selectedClusterType"
+              v-bind="field"
               :items="availableClusterTypesWithSkipInstall"
               item-title="name"
               label="Cluster Type"
@@ -32,7 +33,7 @@
               @update:modelValue="onSelectedClusterTypeChanged"
             />
           </v-row>
-        </validation-provider>
+        </Field>
         <div
           v-for="configParameter in configParameters"
           :key="configParameter.name"
@@ -98,40 +99,42 @@
               />
             </v-col>
           </v-row>
-          <validation-provider
+          <Field
             v-if="configParameter.valueType == 'FILE'"
-            v-slot="{ errors }"
+            v-slot="{ field, errors }"
+            v-model="configParameterValues[configParameter.name]"
             :name="configParameter.prettyName"
-            rules="required"
+            :rules="required"
           >
             <v-row>
               <v-textarea
                 :key="textAreaFileContentComponentKey"
-                v-model="configParameterValues[configParameter.name]"
+                v-bind="field"
                 variant="outlined"
                 density="compact"
                 :error-messages="errors"
 
               />
             </v-row>
-          </validation-provider>
-          <validation-provider
+          </Field>
+          <Field
             v-if="configParameter.valueType == 'KUBE_CONF'"
-            v-slot="{ errors }"
+            v-slot="{ field, errors }"
+            v-model="configParameterValues[configParameter.name]"
             :name="configParameter.prettyName"
-            rules="required"
+            :rules="required"
           >
             <v-row>
               <v-textarea
                 :key="textAreaFileContentComponentKey"
-                v-model="configParameterValues[configParameter.name]"
+                v-bind="field"
                 variant="outlined"
                 density="compact"
                 :error-messages="errors"
 
               />
             </v-row>
-          </validation-provider>
+          </Field>
         </div>
       </v-container>
 
@@ -159,7 +162,7 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </validation-observer>
+  </ValidationForm>
 </template>
 
 <script>
@@ -167,13 +170,22 @@
   import clustersRestApi from '@/api/resource-management/clustersRestApi'
   import ClustersCreateDialogPage from "@/components/clusters/dialogs/ClustersCreateDialogPage";
   import {ref} from "vue";
-
+  import {Field, Form as ValidationForm } from "vee-validate";
+  import * as yup from 'yup';
+  import ProgressCircular from "@/components/base/ProgressCircular.vue";
   const textAreaFileContentComponentKey = ref(0);
 
   export default {
     name: 'ClustersCreateDialogPageAddExistingCluster',
+    components: {Field, ValidationForm},
     enums: {
       ClustersCreateDialogPage,
+    },
+    setup(){
+      const required = yup.string().required();
+      return {
+        required
+      }
     },
     data () {
       return {
