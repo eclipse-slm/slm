@@ -29,6 +29,7 @@
               required
               return-object
               :error-messages="errors"
+              :model-value="availableClusterTypesWithSkipInstall"
 
               @update:modelValue="onSelectedClusterTypeChanged"
             />

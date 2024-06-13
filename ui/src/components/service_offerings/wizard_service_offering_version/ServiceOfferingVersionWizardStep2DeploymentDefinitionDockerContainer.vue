@@ -6,14 +6,13 @@
       ref="observer"
       v-slot="{ meta, handleSubmit, validate }"
     >
-      <v-list>
-        <v-list-group value="true">
-          <template #activator>
-            <v-list-item>
-              <v-list-item-title>
-                Container
-              </v-list-item-title>
-            </v-list-item>
+      <v-list :opened="['Container', 'Environment']">
+        <v-list-group value="Container">
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title="Container"
+            />
           </template>
 
           <div v-if="config_Container">
@@ -49,24 +48,23 @@
           </div>
         </v-list-group>
 
+        <v-list-group value="Environment">
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title="Environment"
+            />
+          </template>
+
+          <docker-container-environment-variables
+            v-if="config_Environment"
+            :environment-variables="serviceOfferingVersion.deploymentDefinition.environmentVariables"
+            :editable="true"
+            :addable="true"
+          />
+        </v-list-group>
         <v-row>
           <v-col>
-            <v-list-group value="true">
-              <template #activator>
-                <v-list-item>
-                  <v-list-item-title>
-                    Environment
-                  </v-list-item-title>
-                </v-list-item>
-              </template>
-
-              <docker-container-environment-variables
-                v-if="config_Environment"
-                :environment-variables="serviceOfferingVersion.deploymentDefinition.environmentVariables"
-                :editable="true"
-                :addable="true"
-              />
-            </v-list-group>
           </v-col>
         </v-row>
       </v-list>

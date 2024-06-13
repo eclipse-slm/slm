@@ -7,8 +7,7 @@
       <v-row>
         <v-col cols="8">
           <v-card
-            class="mx-1 my-1"
-            variant="outlined"
+            class="mx-1 my-1 pt-5"
           >
             <Field
               v-slot="{ field, errors }"
@@ -22,7 +21,7 @@
                 variant="outlined"
                 density="compact"
                 :error-messages="errors"
-
+                :model-value="serviceOfferingVersion.version"
               />
             </Field>
 
@@ -43,6 +42,7 @@
                   >
                     <v-select
                       v-bind="field"
+                      v-model="serviceOfferingVersion.deploymentDefinition.deploymentType"
                       :items="serviceOfferingDeploymentTypes"
                       item-title="prettyName"
                       item-value="value"

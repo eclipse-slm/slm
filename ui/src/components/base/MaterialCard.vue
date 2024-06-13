@@ -22,7 +22,7 @@
           :max-height="icon ? 90 : undefined"
           :width="icon ? 'auto' : '100%'"
           elevation="6"
-          class="text-start v-card--material__heading mb-n6"
+          class="text-start v-card--material__heading"
           theme="dark"
       >
         <slot
@@ -147,7 +147,6 @@ export default {
 
   &__heading
     position: relative
-    top: -40px
     transition: .3s ease
     z-index: 1
 </style>

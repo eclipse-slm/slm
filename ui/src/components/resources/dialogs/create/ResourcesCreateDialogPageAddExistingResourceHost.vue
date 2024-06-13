@@ -40,6 +40,7 @@
             required
             prepend-icon="mdi-dns"
             :error-messages="errors"
+            :model-value="resourceHostname"
           />
         </Field>
         <Field
@@ -55,7 +56,7 @@
             required
             prepend-icon="mdi-ip"
             :error-messages="errors"
-
+            :model-value="resourceIp"
           />
         </Field>
         <v-select
@@ -146,6 +147,7 @@
             required
             prepend-icon="mdi-account"
             :error-messages="errors"
+            :model-value="resourceUsername"
           />
         </Field>
         <Field

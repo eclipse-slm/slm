@@ -49,7 +49,7 @@
             v-bind="field"
             placeholder="Key of environment variable"
             :error-messages="errors"
-
+            :model-value="item.key"
           />
           <div
             v-else
@@ -71,7 +71,7 @@
             v-bind="field"
             placeholder="Value of environment variable"
             :error-messages="errors"
-
+            :model-value="item.value"
           />
           <div
             v-else

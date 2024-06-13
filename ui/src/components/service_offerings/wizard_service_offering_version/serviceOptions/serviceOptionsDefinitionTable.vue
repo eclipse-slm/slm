@@ -29,6 +29,7 @@
               <v-text-field
                 v-bind="field"
                 :error-messages="errors"
+                :model-value="serviceOption.name"
 
               />
             </Field>
@@ -43,7 +44,7 @@
               <v-text-field
                 v-bind="field"
                 :error-messages="errors"
-
+                :model-value="serviceOption.description"
               />
             </Field>
           </td>
@@ -125,7 +126,7 @@
 </template>
 
 <script>
-import draggable from "vuedraggable";
+import { VueDraggableNext } from 'vue-draggable-next'
 import ServiceOptionValue from "@/components/service_offerings/ServiceOptionValue";
 import {Field } from "vee-validate";
 import * as yup from 'yup';
@@ -133,7 +134,7 @@ import * as yup from 'yup';
 export default {
   name: "ServiceOptionsDefinitionTable",
   components: {
-    draggable,
+    draggable: VueDraggableNext,
     ServiceOptionValue,
     Field
   },
@@ -164,14 +165,14 @@ export default {
         "DEPLOYMENT_VARIABLE",
       ],
       tableHeaders: [
-        { text: "", value: "", sortable: false },
-        { text: "Key", value: "key", sortable: false },
-        { text: "Display Name", value: "name", sortable: false },
-        { text: "Description", value: "description", sortable: false },
-        { text: "Value", value: "value", sortable: false },
-        { text: "Value Type", value: "valueType", sortable: false },
-        { text: "Required", value: "required", sortable: false },
-        { text: "Editable", value: "editable", sortable: false },
+        { title: "", value: "", sortable: false },
+        { title: "Key", value: "key", sortable: false },
+        { title: "Display Name", value: "name", sortable: false },
+        { title: "Description", value: "description", sortable: false },
+        { title: "Value", value: "value", sortable: false },
+        { title: "Value Type", value: "valueType", sortable: false },
+        { title: "Required", value: "required", sortable: false },
+        { title: "Editable", value: "editable", sortable: false },
       ],
     };
   },

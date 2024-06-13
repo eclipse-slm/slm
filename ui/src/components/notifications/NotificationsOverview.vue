@@ -27,23 +27,14 @@
             <v-btn
               class="mr-2"
               variant="outlined"
-              icon
+              icon="mdi-email-open"
               @click="filter(true)"
-            >
-              <v-icon>
-                mdi-email-open
-              </v-icon>
-            </v-btn>
-
+            />
             <v-btn
               variant="outlined"
-              icon
+              icon="mdi-email"
               @click="filter(false)"
-            >
-              <v-icon>
-                mdi-email
-              </v-icon>
-            </v-btn>
+            />
           </v-col>
           <v-col class="text-right">
             <v-btn
@@ -105,7 +96,7 @@
     components: {},
     data: function () {
       return {
-        sortBy: 'id',
+        sortBy: ['id'],
         sortDesc: true,
         filterRead: null,
       }

@@ -3,15 +3,14 @@
     <v-form
       v-model="validForm"
     >
-      <v-list>
+      <v-list :opened="['Compose File', '.env File (Optional)']">
         <!-- Docker Compose File !-->
-        <v-list-group :value="true">
-          <template #activator>
-            <v-list-item>
-              <v-list-item-title>
-                Compose File
-              </v-list-item-title>
-            </v-list-item>
+        <v-list-group value="Compose File">
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title="Compose File"
+            />
           </template>
           <v-row>
             <v-col>
@@ -36,13 +35,12 @@
         </v-list-group>
 
         <!-- .env File !-->
-        <v-list-group :value="false">
-          <template #activator>
-            <v-list-item>
-              <v-list-item-title>
-                .env File (Optional)
-              </v-list-item-title>
-            </v-list-item>
+        <v-list-group value=".env File (Optional)">
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title=".env File (Optional)"
+            />
           </template>
           <v-row>
             <v-col>
@@ -70,27 +68,26 @@
         <!-- Environment Variable Files !-->
         <v-list-group
           v-if="envFilesDefined"
-          :value="true"
+          value="Environment Variable Files"
         >
-          <template #activator>
-            <v-list-item>
-              <v-list-item-title>
-                Environment Variable Files
-              </v-list-item-title>
-            </v-list-item>
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title="Environment Variable Files"
+            />
           </template>
           <v-list>
             <v-list-group
               v-for="environmentVariableFile in serviceOfferingVersion.deploymentDefinition.envFiles"
               :key="environmentVariableFile.fileName"
-              :value="true"
+              :value="environmentVariableFile.fileName"
             >
-              <template #activator>
-                <v-list-item>
-                  <v-list-item-title class="mx-8">
-                    {{ environmentVariableFile.fileName }}
-                  </v-list-item-title>
-                </v-list-item>
+              <template #activator="{props}">
+                <v-list-item
+                  class="mx-8"
+                  v-bind="props"
+                  :title="environmentVariableFile.fileName"
+                />
               </template>
               <div>
                 <v-row>
@@ -130,14 +127,13 @@
         <!-- Environment Variables !-->
         <v-list-group
           v-if="envVarsDefined"
-          :value="true"
+          value="Environment"
         >
-          <template #activator>
-            <v-list-item>
-              <v-list-item-title>
-                Environment
-              </v-list-item-title>
-            </v-list-item>
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title="Environment"
+            />
           </template>
           <docker-container-environment-variables
             :environment-variables="serviceOfferingVersion.deploymentDefinition.environmentVariables"

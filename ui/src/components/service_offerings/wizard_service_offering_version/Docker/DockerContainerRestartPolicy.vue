@@ -10,8 +10,8 @@
       <Field
         v-slot="{ field, errors }"
         v-model="newServiceOffering.deploymentDefinition.restartPolicy"
-        name="Image Tag"
-        rules="required"
+        name="Restart Policy"
+        :rules="required"
       >
         <v-select
           v-bind="field"
@@ -23,6 +23,7 @@
           item-title="prettyName"
           item-value="value"
           :error-messages="errors"
+          :model-value="newServiceOffering.deploymentDefinition.restartPolicy"
         />
       </Field>
     </v-col>

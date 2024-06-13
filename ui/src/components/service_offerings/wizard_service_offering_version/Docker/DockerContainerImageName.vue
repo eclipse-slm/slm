@@ -37,6 +37,7 @@
               density="compact"
               clearable
               :error-messages="errors"
+              :model-value="newServiceOffering.deploymentDefinition.imageRepository"
 
             />
           </Field>
@@ -78,6 +79,7 @@
               density="compact"
               clearable
               :error-messages="errors"
+              :model-value="newServiceOffering.deploymentDefinition.imageTag"
 
             />
           </Field>

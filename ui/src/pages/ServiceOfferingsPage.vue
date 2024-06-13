@@ -71,7 +71,7 @@
               <service-offering-card-grid
                 :service-offering="serviceOffering"
                 :show-only-latest-version="true"
-                @click="onServiceOfferingClicked"
+                @click="onServiceOfferingClicked(serviceOffering)"
               />
             </v-col>
           </v-row>

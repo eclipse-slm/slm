@@ -22,8 +22,8 @@
               <Field
                 v-slot="{ field, errors }"
                 v-model="repository.id"
-                name="Address"
-                :rules="repository.id != null ? { regex: /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i } : {}"
+                name="Id"
+                :rules="repository.id != null ? reg_required : {}"
               >
                 <v-text-field
                   v-bind="field"
@@ -31,7 +31,7 @@
                   placeholder="Generated"
                   prepend-icon="mdi-fingerprint"
                   :error-messages="errors"
-
+                  :model-value="repository.id"
                 />
               </Field>
               <Field
@@ -45,7 +45,7 @@
                   label="Address"
                   prepend-icon="mdi-earth"
                   :error-messages="errors"
-
+                  :model-value="repository.address"
                 />
               </Field>
               <Field
@@ -60,7 +60,7 @@
                   required
                   prepend-icon="mdi-account"
                   :error-messages="errors"
-
+                  :model-value="repository.username"
                 />
               </Field>
               <Field
@@ -77,7 +77,7 @@
                   pass
                   prepend-icon="mdi-lock"
                   :error-messages="errors"
-
+                  :model-value="repository.password"
                   @click:append="showPassword = !showPassword"
                 />
               </Field>
@@ -119,12 +119,14 @@
     name: 'ServiceRepositoryCreateDialog',
     props: ['show'],
     components: {Field, ValidationForm},
-    setup(){
+    setup(props){
       const required = yup.string().required();
+      const reg_required = yup.string().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)
       const active = toRef(props, 'show')
       return {
         required,
-        active
+        active,
+        reg_required
       }
     },
     data () {

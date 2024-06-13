@@ -72,7 +72,7 @@ export default {
   methods: {
     onAddServiceOfferingClicked (creationType) {
       this.$emit('selected')
-      this.$router.push({ path: `/services/vendors/${this.serviceVendorId}/offerings?creationType=${creationType}` })
+      this.$router.push({ path: `/services/vendors/${this.serviceVendorId}/offerings`, query: {creationType: creationType} })
     },
   }
 }

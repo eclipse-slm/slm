@@ -20,6 +20,7 @@
               required
               density="compact"
               :error-messages="errors"
+              :model-value="serviceOfferingGitRepository.repositoryUrl"
             />
           </Field>
 
@@ -37,6 +38,7 @@
               required
               density="compact"
               :error-messages="errors"
+              :model-value="serviceOfferingGitRepository.gitTagRegEx"
 
             />
           </Field>
@@ -61,6 +63,7 @@
               required
               density="compact"
               :error-messages="errors"
+              :model-value="serviceOfferingGitRepository.gitUsername"
 
             />
           </Field>
@@ -82,6 +85,7 @@
               required
               density="compact"
               :error-messages="errors"
+              :model-value="serviceOfferingGitRepository.gitPassword"
 
               @click:append="showPassword = !showPassword"
             />

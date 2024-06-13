@@ -143,7 +143,9 @@ export default {
 
         SET_SERVICE_OFFERING_COVER_IMAGE (state, { serviceOfferingId, coverImage }) {
             const serviceOffering = state.serviceOfferings.find(serviceOffering => serviceOffering.id === serviceOfferingId)
-            serviceOffering.coverImage = coverImage
+            if(serviceOffering){
+                serviceOffering.coverImage = coverImage
+            }
         },
 
         SET_DEPLOYMENT_TYPES (state, deploymentTypeValues) {

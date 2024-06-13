@@ -3,15 +3,14 @@
     <v-form
       v-model="validForm"
     >
-      <v-list>
+      <v-list :opened="['Codesys Application Files']">
         <!-- Codesys File !-->
-        <v-list-group :value="true">
-          <template #activator>
-            <v-list-item>
-              <v-list-item-title>
-                Codesys Application Files
-              </v-list-item-title>
-            </v-list-item>
+        <v-list-group value="Codesys Application Files">
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title="Codesys Application Files"
+            />
           </template>
           <v-row>
             <v-col>

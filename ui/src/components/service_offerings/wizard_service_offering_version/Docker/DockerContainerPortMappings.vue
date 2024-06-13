@@ -49,7 +49,7 @@
                 v-if="editable"
                 v-bind="field"
                 :error-messages="errors"
-
+                :model-value="item.hostPort"
               />
               <div
                 v-else
@@ -70,7 +70,7 @@
                 v-if="editable"
                 v-bind="field"
                 :error-messages="errors"
-
+                :model-value="item.containerPort"
               />
               <div
                 v-else

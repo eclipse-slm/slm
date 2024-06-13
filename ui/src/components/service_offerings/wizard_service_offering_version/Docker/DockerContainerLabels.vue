@@ -50,7 +50,7 @@
                 v-bind="field"
                 placeholder="Name of label"
                 :error-messages="errors"
-
+                :model-value="item.name"
               />
               <div
                 v-else
@@ -72,7 +72,7 @@
                 v-bind="field"
                 placeholder="Value of label"
                 :error-messages="errors"
-
+                :model-value="item.value"
               />
               <div
                 v-else

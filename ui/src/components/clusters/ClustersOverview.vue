@@ -20,20 +20,17 @@
     </base-material-card>
 
 
-    <v-fab-transition>
-      <v-btn
-        id="resources-button-add-resource"
-        class="mb-10 elevation-15"
-        color="primary"
-        absolute
-        location="bottom, right"
-        @click="showCreateDialog = true"
-      >
-        <v-icon size="large">
-          mdi-plus
-        </v-icon>
-      </v-btn>
-    </v-fab-transition>
+    <v-fab
+      id="resources-button-add-resource"
+      class="mb-10"
+      elevation="15"
+      color="primary"
+      icon="mdi-plus"
+      location="top end"
+      absolute
+      offset
+      @click="showCreateDialog = true"
+    />
 
     <clusters-create-dialog
       :show="showCreateDialog"

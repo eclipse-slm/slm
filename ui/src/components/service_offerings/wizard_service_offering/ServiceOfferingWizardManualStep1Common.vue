@@ -21,6 +21,7 @@
               required
               density="compact"
               :error-messages="errors"
+              :model-value="newServiceOffering.name"
 
             />
           </Field>
@@ -41,6 +42,7 @@
               variant="outlined"
               density="compact"
               :error-messages="errors"
+              :model-value="newServiceOffering.serviceCategoryId"
 
             />
             <span>{{ errors[0] }}</span>
@@ -61,7 +63,7 @@
               variant="outlined"
               density="compact"
               :error-messages="errors"
-
+              :model-value="newServiceOffering.shortDescription"
             />
           </Field>
 
@@ -79,7 +81,7 @@
               variant="outlined"
               density="compact"
               :error-messages="errors"
-
+              :model-value="newServiceOffering.description"
             />
           </Field>
 

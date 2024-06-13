@@ -28,6 +28,7 @@
         :readonly="!(serviceOption.editable || definitionMode)"
         :disabled="!(serviceOption.editable || definitionMode)"
         :error-messages="errors"
+        :model-value="serviceOption.defaultValue"
 
       />
 

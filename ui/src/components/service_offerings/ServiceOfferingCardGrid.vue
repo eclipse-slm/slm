@@ -8,16 +8,23 @@
     @mouseleave="hovered = 0"
     @click="$emit('click', serviceOffering)"
   >
-    <v-container fluid>
-      <v-list-item>
-        <v-list-item><v-img :src="getImageUrl(serviceVendorById(serviceOffering.serviceVendorId).logo)" /></v-list-item>
-        <v-list-item>
-          <v-list-item-title class="text-h5">
-            {{ serviceOffering.name }}
-          </v-list-item-title>
-          <v-list-item-subtitle>{{ serviceVendorById(serviceOffering.serviceVendorId).name }}</v-list-item-subtitle>
-        </v-list-item>
-      </v-list-item>
+    <v-container
+        fluid
+        grid-list-md
+    >
+      <v-row no-gutters>
+        <v-col cols="2">
+          <v-list-item :prepend-avatar="getImageUrl(serviceVendorById(serviceOffering.serviceVendorId).logo)" xs6 />
+        </v-col>
+        <v-col cols="10">
+          <v-list-item >
+            <v-list-item-title class="text-h5">
+              {{ serviceOffering.name }}
+            </v-list-item-title>
+            <v-list-item-subtitle>{{ serviceVendorById(serviceOffering.serviceVendorId).name }}</v-list-item-subtitle>
+          </v-list-item>
+        </v-col>
+      </v-row>
 
       <v-row class="mx-2 my-2">
         <v-col id="serviceCardContent_category">

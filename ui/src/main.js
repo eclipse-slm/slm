@@ -31,7 +31,7 @@ configureCompat({
     GLOBAL_OBSERVABLE: true
 });
 
-export let app = createApp(App);
+export let app = withUUID(createApp(App)) ;
 
 const requireComponent = require.context(
     '@/components/base', true, /\.vue$/,
@@ -55,7 +55,6 @@ requireComponent.keys().forEach(fileName => {
 
 app.component('NoItemAvailableNote', NoItemAvailableNote);
 
-console.log(requireComponent.keys())
 
 app.use(VueKeycloakJs, {
     init: {
@@ -105,6 +104,7 @@ const theme = {
 };
 
 import 'vuetify/styles';
+import withUUID from "vue-uuid";
 
 const v = createVuetify({
     lang: {

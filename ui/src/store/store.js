@@ -10,10 +10,11 @@ import notificationStore from '@/store/notificationStore'
 import overviewStore from '@/store/overviewStore'
 import providerStore from '@/store/providerStore'
 import catalogStore from "@/store/catalogStore";
+import * as localforage from "localforage";
 
 
 const vuexLocal = new VuexPersistence({
-  storage: window.sessionStorage,
+  storage: localforage,
 })
 
 export const store = createStore({

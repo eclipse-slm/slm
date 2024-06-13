@@ -32,46 +32,32 @@
         />
       </v-row>
 
-      <v-stepper
+      <v-stepper 
         v-else
         v-model="createWizardState.currentStep"
-        horizontal
+        hide-actions
+        :items="[$t('ServiceStepper.Common')]"
       >
-        <v-stepper-header>
-          <v-stepper-step
-            step="1"
-            :complete="createWizardState.step1.completed"
-          >
-            {{ $t('ServiceStepper.Common') }}
-          </v-stepper-step>
-        </v-stepper-header>
-
-        <v-stepper-items>
-          <!-- Step 1 - Manual Service Offering Creation -->
-          <v-stepper-content
-            v-if="creationType == 'manual'"
-            step="1"
-          >
-            <service-offering-wizard-manual-step1-common
+        <template #item.1 v-if="creationType === 'manual'">
+          <service-offering-wizard-manual-step1-common
+              v-if="creationType === 'manual'"
               :edit-mode="editMode"
               :new-service-offering="newServiceOffering"
               @step-canceled="onStepCanceled"
               @step-completed="onStepCompleted"
-            />
-          </v-stepper-content>
-          <!-- Step 1 - Git-based Service Offering -->
-          <v-stepper-content
-            v-if="creationType == 'git'"
-            step="1"
-          >
-            <service-offering-wizard-git-step1-common
+          />
+        </template>
+
+        <template #item.1 v-if="creationType === 'git'">
+          <service-offering-wizard-git-step1-common
               :new-service-offering="newServiceOffering"
               :service-vendor-id="serviceVendorId"
               @step-canceled="onStepCanceled"
               @step-completed="onStepCompleted"
-            />
-          </v-stepper-content>
-        </v-stepper-items>
+          />
+        </template>
+
+
       </v-stepper>
     </div>
   </div>

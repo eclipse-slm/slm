@@ -26,21 +26,12 @@
           <v-select
             v-model="selectedServiceVendor"
             :items="serviceVendorsOfDeveloper"
+            item-title="name"
             return-object
             label="Select Service Vendor"
             autofocus
             @update:modelValue="onServiceVendorSelected"
           >
-            <template
-              #selection="data"
-            >
-              {{ data.item.name }}
-            </template>
-            <template
-              #item="data"
-            >
-              {{ data.item.name }}
-            </template>
           </v-select>
         </v-col>
       </v-row>

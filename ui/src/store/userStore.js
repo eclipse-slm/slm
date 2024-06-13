@@ -14,7 +14,7 @@ export default {
         },
 
         userId: (state) => {
-            return state.userInfo.sub
+            return state.userInfo?.sub
         },
 
         userName: (state) => {

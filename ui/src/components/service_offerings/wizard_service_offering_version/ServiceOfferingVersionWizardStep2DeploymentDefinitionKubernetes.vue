@@ -3,15 +3,14 @@
     <v-form
       v-model="validForm"
     >
-      <v-list>
+      <v-list :opened="['Kubernetes Manifest File']">
         <!-- Kubernetes Manifest File !-->
-        <v-list-group :value="true">
-          <template #activator>
-            <v-list-item>
-              <v-list-item-title>
-                Kubernetes Manifest File
-              </v-list-item-title>
-            </v-list-item>
+        <v-list-group value="Kubernetes Manifest File">
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title="Kubernetes Manifest File"
+            />
           </template>
           <v-row>
             <v-col>
@@ -38,14 +37,13 @@
         <!-- Environment Variables (parsed Kubernetes objects)!-->
         <v-list-group
             v-if="envVarsDefined"
-            :value="true"
+            value="Environment (parsed from Kubernetes Objects)"
         >
-          <template #activator>
-            <v-list-item>
-              <v-list-item-title>
-                Environment (parsed from Kubernetes Objects)
-              </v-list-item-title>
-            </v-list-item>
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title="Environment (parsed from Kubernetes Objects)"
+            />
           </template>
           <docker-container-environment-variables
               subheader="Environment Variables"
@@ -57,14 +55,13 @@
         <!-- Environment Variables (string replace) !-->
         <v-list-group
             v-if="stringReplacementsDefined"
-            :value="true"
+            value="String Replacement (parsed from regular expression)"
         >
-          <template #activator>
-            <v-list-item>
-              <v-list-item-title>
-                String Replacement (parsed from regular expression)
-              </v-list-item-title>
-            </v-list-item>
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title="String Replacement (parsed from regular expression)"
+            />
           </template>
           <docker-container-environment-variables
               subheader="String Replacement Variables"

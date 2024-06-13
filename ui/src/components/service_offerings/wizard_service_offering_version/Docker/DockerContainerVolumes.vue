@@ -50,6 +50,7 @@
                 v-bind="field"
                 placeholder="Name of volume"
                 :error-messages="errors"
+                :model-value="item.name"
 
               />
               <div
@@ -72,7 +73,7 @@
                 v-bind="field"
                 placeholder="e.g. /path/in/container"
                 :error-messages="errors"
-
+                :model-value="item.containerPath"
               />
               <div
                 v-else

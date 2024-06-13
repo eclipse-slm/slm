@@ -2,7 +2,7 @@
   <v-card-text
     v-if="resource"
   >
-    <v-list>
+    <v-list :opened="['Common']">
       <v-list-group
         value="Common"
       >
