@@ -204,7 +204,8 @@
             if (serviceOption.optionType === "ENVIRONMENT_VARIABLE") {
               let serviceName = serviceOption.relation.split("|")[0]
               let envVarKey = serviceOption.relation.split("|")[1]
-              let envVar = this.serviceOfferingVersion.deploymentDefinition.environmentVariables.find(envVar => envVar.key === envVarKey && envVar.serviceName == serviceName);
+              let envVar = this.serviceOfferingVersion.deploymentDefinition.environmentVariables
+                  .find(envVar => envVar.key === envVarKey && envVar.serviceName === serviceName);
               envVar.isServiceOption = true
             }
           })

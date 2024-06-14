@@ -44,8 +44,7 @@ export default {
   },
   methods: {
     getParamLogo(param) {
-      const icon = "mdi-alpha-"+param.name[0]+"-box"
-      return icon
+      return "mdi-alpha-" + param.name[0] + "-box"
     }
   }
 }

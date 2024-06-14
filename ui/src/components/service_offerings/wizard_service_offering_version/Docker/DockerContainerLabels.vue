@@ -125,10 +125,10 @@ import * as yup from "yup";
     data () {
       return {
         tableHeaders: [
-          { text: 'Label', value: 'name' },
-          { text: 'Value', value: 'value' },
-          { text: 'Service Option', value: 'isServiceOption' },
-          { text: 'Actions', value: 'actions' },
+          { title: 'Label', value: 'name' },
+          { title: 'Value', value: 'value' },
+          { title: 'Service Option', value: 'isServiceOption' },
+          { title: 'Actions', value: 'actions' },
         ],
       }
     },

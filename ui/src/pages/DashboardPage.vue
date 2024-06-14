@@ -256,29 +256,29 @@
         headers: [
           {
             sortable: false,
-            text: 'ID',
+            title: 'ID',
             value: 'id',
           },
           {
             sortable: false,
-            text: 'Name',
+            title: 'Name',
             value: 'name',
           },
           {
             sortable: false,
-            text: 'Salary',
+            title: 'Salary',
             value: 'salary',
             align: 'right',
           },
           {
             sortable: false,
-            text: 'Country',
+            title: 'Country',
             value: 'country',
             align: 'right',
           },
           {
             sortable: false,
-            text: 'City',
+            title: 'City',
             value: 'city',
             align: 'right',
           },

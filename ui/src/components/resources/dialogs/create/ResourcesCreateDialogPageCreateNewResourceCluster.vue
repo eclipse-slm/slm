@@ -119,9 +119,6 @@
         validInput: false,
       }
     },
-    mounted() {
-      this.$emit('title-changed', 'Create new cluster resource')
-    },
     computed: {
       ...mapGetters(['virtualResourceProviders', 'availableClusterTypes', 'resources']),
       clusterCreateOptions () {
@@ -141,6 +138,9 @@
 
         return options
       },
+    },
+    mounted() {
+      this.$emit('title-changed', 'Create new cluster resource')
     },
     methods: {
       onClusterTypeSelected () {

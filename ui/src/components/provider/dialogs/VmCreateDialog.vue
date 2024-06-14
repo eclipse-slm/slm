@@ -23,11 +23,9 @@
             cols="1"
           >
             <v-btn
-              icon
+              icon="mdi-close"
               @click="closeDialog"
-            >
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
+            />
           </v-col>
         </v-row>
       </v-toolbar>

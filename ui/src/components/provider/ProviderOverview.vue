@@ -27,8 +27,8 @@
         >
           <v-card flat>
             <v-card-text>
-              <virtual-resource-provider-table v-if="item.id=='VirtualResourceProvider'" />
-              <service-hoster-table v-if="item.id=='ServiceHoster'" />
+              <virtual-resource-provider-table v-if="item.id==='VirtualResourceProvider'" />
+              <service-hoster-table v-if="item.id==='ServiceHosted'" />
             </v-card-text>
           </v-card>
         </v-window-item>

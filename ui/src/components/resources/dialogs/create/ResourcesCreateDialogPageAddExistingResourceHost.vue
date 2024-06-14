@@ -75,7 +75,7 @@
         >
           <template #activator="{ props }">
             <div
-              style="width:min-content;border: 1px solid bg-white"
+              style="width:min-content;border: 1px solid white"
               v-bind="props"
             >
               <v-switch
@@ -200,14 +200,13 @@
 <script>
 
 import resourcesRestApi from '@/api/resource-management/resourcesRestApi'
-  import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
-  import NotificationServiceWebsocketClient from "@/api/notification-service/notificationServiceWebsocketClient";
-  import {mapGetters} from "vuex";
-import {Field, Form as ValidationForm } from "vee-validate";
+import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
+import {mapGetters} from "vuex";
+import {Field, Form as ValidationForm} from "vee-validate";
 import * as yup from 'yup';
 
 
-  export default {
+export default {
     name: 'ResourcesCreateDialogPageAddExistingResourceHost',
     components: {Field, ValidationForm },
     enums: {
@@ -235,7 +234,7 @@ import * as yup from 'yup';
     computed: {
       ...mapGetters(['resourceConnectionTypes','locations','availableBaseConfigurationCapabilities']),
       resourceBaseConfigurationId() {
-        if(this.availableBaseConfigurationCapabilities.length == 0 || !this.addBaseConfigurationToResource)
+        if(this.availableBaseConfigurationCapabilities.length === 0 || !this.addBaseConfigurationToResource)
           return ''
         return this.availableBaseConfigurationCapabilities[0].id
       }
@@ -247,7 +246,7 @@ import * as yup from 'yup';
     methods: {
       updateConnectionPort(connectionTypeName) {
         let connectionType = this.resourceConnectionTypes.find(ct => {
-          return ct.name == connectionTypeName
+          return ct.name === connectionTypeName
         });
 
         if(connectionType !== undefined)
@@ -265,8 +264,7 @@ import * as yup from 'yup';
         this.addBaseConfigurationToResource = false
       },
       showBaseConfigurationSwitch() {
-        const show = this.availableBaseConfigurationCapabilities.length>0 && this.resourceAccessAvailable
-        return show
+        return this.availableBaseConfigurationCapabilities.length > 0 && this.resourceAccessAvailable
       },
       onBackButtonClicked () {
         this.clearForm()

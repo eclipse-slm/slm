@@ -36,8 +36,8 @@
 
         <!-- Environment Variables (parsed Kubernetes objects)!-->
         <v-list-group
-            v-if="envVarsDefined"
-            value="Environment (parsed from Kubernetes Objects)"
+          v-if="envVarsDefined"
+          value="Environment (parsed from Kubernetes Objects)"
         >
           <template #activator="{props}">
             <v-list-item
@@ -46,16 +46,16 @@
             />
           </template>
           <docker-container-environment-variables
-              subheader="Environment Variables"
-              :environment-variables="serviceOfferingVersion.deploymentDefinition.environmentVariables"
-              :addable="false"
+            subheader="Environment Variables"
+            :environment-variables="serviceOfferingVersion.deploymentDefinition.environmentVariables"
+            :addable="false"
           />
         </v-list-group>
 
         <!-- Environment Variables (string replace) !-->
         <v-list-group
-            v-if="stringReplacementsDefined"
-            value="String Replacement (parsed from regular expression)"
+          v-if="stringReplacementsDefined"
+          value="String Replacement (parsed from regular expression)"
         >
           <template #activator="{props}">
             <v-list-item
@@ -64,19 +64,18 @@
             />
           </template>
           <docker-container-environment-variables
-              subheader="String Replacement Variables"
-              :environment-variables="serviceOfferingVersion.deploymentDefinition.stringReplacements"
-              :addable="false"
+            subheader="String Replacement Variables"
+            :environment-variables="serviceOfferingVersion.deploymentDefinition.stringReplacements"
+            :addable="false"
           />
         </v-list-group>
-
       </v-list>
 
       <service-repository-select
-          v-model="serviceOfferingVersion.serviceRepositories"
-          label="Private Container Registries Credentials"
-          :service-vendor-id="serviceVendorId"
-          :multiple="true"
+        v-model="serviceOfferingVersion.serviceRepositories"
+        label="Private Container Registries Credentials"
+        :service-vendor-id="serviceVendorId"
+        :multiple="true"
       />
 
     </v-form>
@@ -133,7 +132,8 @@
         this.serviceOfferingVersion.serviceOptionCategories.forEach(serviceOptionCategory => {
           serviceOptionCategory.serviceOptions.forEach(serviceOption => {
             if (serviceOption.optionType === "ENVIRONMENT_VARIABLE") {
-              let envVar = this.serviceOfferingVersion.deploymentDefinition.environmentVariables.find(envVar => envVar.key === serviceOption.key && envVar.serviceName === serviceOption.relation);
+              let envVar = this.serviceOfferingVersion.deploymentDefinition.environmentVariables
+                  .find(envVar => envVar.key === serviceOption.key && envVar.serviceName === serviceOption.relation);
               if (typeof envVar !== "undefined"){
                 envVar.isServiceOption = true
               }
@@ -160,8 +160,10 @@
         let serviceOptions = []
 
         // cache previously saved options, if available
-        let envVarServiceOptions = this.serviceOfferingVersion.serviceOptionCategories.map(soc => soc.serviceOptions).flat().filter((option) => option.optionType === 'ENVIRONMENT_VARIABLE')
-        let stringReplacementServiceOptions = this.serviceOfferingVersion.serviceOptionCategories.map(soc => soc.serviceOptions).flat().filter((option) => option.optionType === 'STRING_REPLACE')
+        let envVarServiceOptions = this.serviceOfferingVersion.serviceOptionCategories
+            .map(soc => soc.serviceOptions).flat().filter((option) => option.optionType === 'ENVIRONMENT_VARIABLE')
+        let stringReplacementServiceOptions = this.serviceOfferingVersion.serviceOptionCategories
+            .map(soc => soc.serviceOptions).flat().filter((option) => option.optionType === 'STRING_REPLACE')
         // console.log(this.serviceOfferingVersion.serviceOptionCategories)
         // console.log({envVarServiceOptions})
         // console.log({stringReplacementServiceOptions})

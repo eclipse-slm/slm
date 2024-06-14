@@ -5,7 +5,7 @@
     @click:outside="closeDialog"
   >
     <template v-slot:default="{}">
-      <v-card v-if="page=='scale-virtual'">
+      <v-card v-if="page==='scale-virtual'">
         <v-toolbar
           color="primary"
           theme="dark"
@@ -31,7 +31,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-      <v-card v-else-if="page=='scale-bare-metal'">
+      <v-card v-else-if="page==='scale-bare-metal'">
         <v-toolbar
           color="primary"
           theme="dark"
@@ -68,7 +68,7 @@
       </v-card>
       <v-card v-else>
         <v-container
-          v-if="action=='up'"
+          v-if="action==='up'"
           class="ma-0 pa-0"
         >
           <v-toolbar
@@ -117,7 +117,7 @@
           </v-container>
         </v-container>
         <v-container
-          v-else-if="action=='down'"
+          v-else-if="action==='down'"
           class="ma-0 pa-0"
         >
           <v-toolbar

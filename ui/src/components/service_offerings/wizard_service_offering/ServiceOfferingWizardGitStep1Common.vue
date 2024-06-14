@@ -39,7 +39,6 @@
               density="compact"
               :error-messages="errors"
               :model-value="serviceOfferingGitRepository.gitTagRegEx"
-
             />
           </Field>
 
@@ -64,7 +63,6 @@
               density="compact"
               :error-messages="errors"
               :model-value="serviceOfferingGitRepository.gitUsername"
-
             />
           </Field>
 
@@ -166,14 +164,14 @@
         loading: false,
       }
     },
-    mounted() {
-      this.serviceOfferingGitRepository.serviceVendorId = this.serviceVendorId
-    },
     computed: {
       ...mapGetters([
         'serviceOfferingCategories',
         'serviceOfferingDeploymentTypes',
       ]),
+    },
+    mounted() {
+      this.serviceOfferingGitRepository.serviceVendorId = this.serviceVendorId
     },
     methods: {
       async onNextButtonClicked () {

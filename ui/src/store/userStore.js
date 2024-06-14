@@ -74,7 +74,6 @@ export default {
 
             // console.log('MyLOG', app.config.globalProperties.$keycloak.ready);
 
-            console.log(app.config.globalProperties.$keycloak);
             if (app.config.globalProperties.$keycloak.keycloak.authenticated){
                 await app.config.globalProperties.$keycloak.keycloak.loadUserInfo().then(userInfo => {
                     context.commit('SET_USERINFO', userInfo)

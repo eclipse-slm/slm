@@ -53,10 +53,10 @@
           >
             <v-btn
               variant="text"
-              icon
+              :icon="isExpanded ? 'mdi-close' : 'mdi-chevron-down'"
               :class="{'v-data-table__expand-icon--active' : isExpanded}"
             >
-              <v-icon>{{ isExpanded ? 'mdi-close' : 'mdi-chevron-down' }}</v-icon>
+              <v-icon></v-icon>
             </v-btn>
           </td>
         </template>

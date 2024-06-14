@@ -61,7 +61,7 @@
               </v-tooltip>
             </v-col>
             <v-col
-              v-if="configParameter.valueType == 'FILE'"
+              v-if="configParameter.valueType === 'FILE'"
               cols="9"
             >
               <v-file-input
@@ -75,7 +75,7 @@
               />
             </v-col>
             <v-col
-              v-if="configParameter.valueType == 'STRING'"
+              v-if="configParameter.valueType === 'STRING'"
               cols="9"
             >
               <v-text-field
@@ -85,7 +85,7 @@
               />
             </v-col>
             <v-col
-              v-if="configParameter.valueType == 'KUBE_CONF'"
+              v-if="configParameter.valueType === 'KUBE_CONF'"
               cols="9"
             >
               <v-file-input
@@ -100,7 +100,7 @@
             </v-col>
           </v-row>
           <Field
-            v-if="configParameter.valueType == 'FILE'"
+            v-if="configParameter.valueType === 'FILE'"
             v-slot="{ field, errors }"
             v-model="configParameterValues[configParameter.name]"
             :name="configParameter.prettyName"
@@ -117,7 +117,7 @@
             </v-row>
           </Field>
           <Field
-            v-if="configParameter.valueType == 'KUBE_CONF'"
+            v-if="configParameter.valueType === 'KUBE_CONF'"
             v-slot="{ field, errors }"
             v-model="configParameterValues[configParameter.name]"
             :name="configParameter.prettyName"
@@ -167,11 +167,8 @@
   import { mapGetters } from 'vuex'
   import clustersRestApi from '@/api/resource-management/clustersRestApi'
   import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
-  import {ref} from "vue";
   import {Field, Form as ValidationForm } from "vee-validate";
   import * as yup from 'yup';
-
-  const textAreaFileContentComponentKey = ref(0);
 
   export default {
     name: 'ResourcesCreateDialogPageAddExistingResourceCluster',
@@ -194,22 +191,22 @@
         textAreaFileContentComponentKey: 0
       }
     },
-    mounted() {
-      this.$emit('title-changed', 'Add existing cluster resource')
-    },
     computed: {
       ...mapGetters(['availableClusterTypes']),
       availableClusterTypesWithSkipInstall () {
         let clusterTypes = []
         this.availableClusterTypes.forEach(clusterType => {
           if ('INSTALL' in clusterType.actions) {
-            if (clusterType.actions['INSTALL'].skipable == true) {
+            if (clusterType.actions['INSTALL'].skipable === true) {
               clusterTypes.push(clusterType)
             }
           }
         })
         return clusterTypes
       }
+    },
+    mounted() {
+      this.$emit('title-changed', 'Add existing cluster resource')
     },
     methods: {
       clearForm () {

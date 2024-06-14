@@ -51,7 +51,6 @@
                 placeholder="Name of volume"
                 :error-messages="errors"
                 :model-value="item.name"
-
               />
               <div
                 v-else
@@ -115,7 +114,8 @@ import * as yup from 'yup';
     components: {Field},
     props: ['volumes', 'editable'],
     setup(){
-      const required_alpha_dash = yup.string().required().matches(new RegExp("/.[a-zA-Z0-9_\/]/"))
+      const required_alpha_dash = yup.string().required().matches(new RegExp(".[a-zA-Z0-9_\/]"))
+          .typeError("Only letters, numbers and slash are allowed (a-zA-Z0-9_\/)");
       const required = yup.string().required()
       return {
         required,required_alpha_dash
@@ -124,10 +124,10 @@ import * as yup from 'yup';
     data () {
       return {
         tableHeaders: [
-          { text: 'Volume Name', value: 'name' },
-          { text: 'Container Path', value: 'containerPath' },
-          { text: 'Service Option', value: 'isServiceOption' },
-          { text: 'Actions', value: 'actions' },
+          { title: 'Volume Name', value: 'name' },
+          { title: 'Container Path', value: 'containerPath' },
+          { title: 'Service Option', value: 'isServiceOption' },
+          { title: 'Actions', value: 'actions' },
         ],
       }
     },

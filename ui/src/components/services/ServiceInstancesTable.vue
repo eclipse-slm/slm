@@ -198,12 +198,12 @@
     data () {
       return {
         headers: [
-          { text: 'Id', value: 'id', sortable: true },
-          { text: 'Service Offering', value: 'offering', sortable: true },
-          { text: 'Ports', value: 'ports', sortable: true, width: '20%' },
-          { text: 'Tags', value: 'tags', sortable: true },
-          { text: 'Resource', value: 'resource', sortable: true },
-          { text: 'Actions', value: 'actions' },
+          { title: 'Id', value: 'id', sortable: true },
+          { title: 'Service Offering', value: 'offering', sortable: true },
+          { title: 'Ports', value: 'ports', sortable: true, width: '20%' },
+          { title: 'Tags', value: 'tags', sortable: true },
+          { title: 'Resource', value: 'resource', sortable: true },
+          { title: 'Actions', value: 'actions' },
         ],
         serviceToDelete: null,
         selectedResource: null,

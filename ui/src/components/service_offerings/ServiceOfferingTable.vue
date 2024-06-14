@@ -97,6 +97,7 @@
                 :items="expandedServiceOfferingVersions"
                 :headers="ServiceOfferingVersionsTableHeaders"
                 hide-default-footer
+                :sort-by="[{key: 'version', order: 'desc'}]"
               >
 
                 <template #item="{ item: version }">
@@ -199,7 +200,7 @@ export default {
       serviceOfferingVersionOfServiceOfferingId: {},
       expandedServiceOffering: undefined,
       expandedServiceOfferingVersions: undefined,
-      expanded: [],
+      expanded: []
     }
   },
   mounted() {

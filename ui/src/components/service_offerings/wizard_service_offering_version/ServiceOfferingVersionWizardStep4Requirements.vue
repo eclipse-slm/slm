@@ -6,28 +6,37 @@
           <template #heading>
             <v-row class="my-1">
               <v-text-field v-model="requirement.name" class="mx-6" density="compact" />
-              <v-btn icon size="small" class="mx-4" @click="onRequirementDeleteClicked(requirement)">
-                <v-icon>
-                  mdi-delete
-                </v-icon>
-              </v-btn>
+              <v-btn
+                icon="mdi-delete"
+                size="small"
+                class="mx-4"
+                @click="onRequirementDeleteClicked(requirement)"
+              />
             </v-row>
           </template>
           <v-tabs
             v-model="requirement.activeLogic"
           >
             <v-tab v-for="logic in requirement.logics" :key="logic.id" :value="logic.id">
-              <v-select v-model="logic.type" :items="logicList" density="compact" />
-              <v-btn icon size="small" class="mx-4" @click="onLogicDeleteClicked(requirement, logic)">
-                <v-icon>
-                  mdi-delete
-                </v-icon>
-              </v-btn>
+              <v-select
+                v-model="logic.type"
+                :items="logicList"
+                density="compact"
+              />
+              <v-btn
+                icon="mdi-delete"
+                size="small"
+                class="mx-4"
+                @click="onLogicDeleteClicked(requirement, logic)"
+              />
             </v-tab>
-            <v-btn color="secondary" @click="onNewLogicClicked(requirement)">
-                  <v-icon>mdi-plus</v-icon>
-                  {{ $t('buttons.AddLogic') }}
-                </v-btn>
+            <v-btn
+              icon="mdi-plus"
+              color="secondary"
+              @click="onNewLogicClicked(requirement)"
+            >
+              {{ $t('buttons.AddLogic') }}
+            </v-btn>
           </v-tabs>
           <v-card-text>
             <v-window v-model="requirement.activeLogic">

@@ -84,7 +84,7 @@
             </base-material-alert>
 
             <base-material-alert
-              color="pink darken-1"
+              color="pink-darken-1"
               theme="dark"
               dismissible
             >
@@ -165,7 +165,7 @@
                   </v-col>
                   <v-col cols="4">
                     <v-btn
-                      color="pink darken-1"
+                      color="pink-darken-1"
                       theme="dark"
                       default
                       rounded
@@ -220,7 +220,7 @@
 
           <v-btn
             color="error"
-            text
+            variant="text"
             @click="dialog = false"
           >
             Close
@@ -313,7 +313,7 @@
           <v-btn
             class="mt-6"
             color="info"
-            depressed
+            variant="flat"
             default
             rounded
             @click="dialog2 = false"
@@ -345,7 +345,7 @@
         <v-card-text class="pb-6 pt-12 text-center">
           <v-btn
             class="mr-3"
-            text
+            variant="text"
             @click="dialog3 = false"
           >
             Nevermind
@@ -353,7 +353,7 @@
 
           <v-btn
             color="success"
-            text
+            variant="text"
             @click="dialog3 = false"
           >
             Yes

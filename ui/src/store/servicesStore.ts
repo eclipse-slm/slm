@@ -241,7 +241,6 @@ export default {
         },
 
         async getServiceOfferings (context) {
-            context.commit('SET_API_STATE_SERVICE_OFFERINGS', ApiState.LOADING)
             await ServiceOfferingsRestApi.getOfferings()
                 .then(
                     serviceOfferings => {

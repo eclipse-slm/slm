@@ -16,7 +16,9 @@
       >
         <tr v-for="(serviceOption, index) in props.items" :key="index">
           <td>
-            <v-icon size="small" class="page__grab-icon"> mdi-arrow-all </v-icon>
+            <v-icon size="small" class="page__grab-icon">
+              mdi-arrow-all
+            </v-icon>
           </td>
           <td>{{ serviceOption.key }}</td>
           <td :id="serviceOption.key + '_DisplayName'">
@@ -63,10 +65,7 @@
                   />
                 </div>
               </template>
-              <span
-                >If service option is required to be set by user no value is
-                needed.</span
-              >
+              <span>If service option is required to be set by user no value is needed.</span>
             </v-tooltip>
           </td>
           <td :id="serviceOption.key + '_ValueType'">
@@ -74,8 +73,8 @@
               v-model="serviceOption.valueType"
               :items="validatorList"
               :disabled="
-                serviceOption.optionType == 'VOLUME' ||
-                serviceOption.optionType == 'PORT_MAPPING'
+                serviceOption.optionType === 'VOLUME' ||
+                serviceOption.optionType === 'PORT_MAPPING'
               "
               @update:modelValue="
                 onValueTypeChanged(serviceOption, serviceOption.valueType)
@@ -93,16 +92,13 @@
                   :ripple="false"
                   :disabled="
                     serviceOption.valueType === 'SYSTEM_VARIABLE' ||
-                    serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
-                    serviceOption.valueType === 'AAS_SM_TEMPLATE'
+                      serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
+                      serviceOption.valueType === 'AAS_SM_TEMPLATE'
                   "
                   @click="onServiceOptionRequiredChanged(serviceOption)"
                 />
               </template>
-              <span
-                >If service option is required to be set by user it needs to be
-                editable.</span
-              >
+              <span>If service option is required to be set by user it needs to be editable.</span>
             </v-tooltip>
           </td>
           <td :id="serviceOption.key + '_EditableCheckbox'">
@@ -113,8 +109,8 @@
               :ripple="false"
               :disabled="
                 serviceOption.valueType === 'SYSTEM_VARIABLE' ||
-                serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
-                serviceOption.valueType === 'AAS_SM_TEMPLATE'
+                  serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
+                  serviceOption.valueType === 'AAS_SM_TEMPLATE'
               "
               @click="onServiceOptionEditableChanged(serviceOption)"
             />

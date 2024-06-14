@@ -38,7 +38,6 @@
               clearable
               :error-messages="errors"
               :model-value="newServiceOffering.deploymentDefinition.imageRepository"
-
             />
           </Field>
         </v-col>
@@ -80,7 +79,6 @@
               clearable
               :error-messages="errors"
               :model-value="newServiceOffering.deploymentDefinition.imageTag"
-
             />
           </Field>
         </v-col>
@@ -95,9 +93,9 @@ import * as yup from 'yup';
 
   export default {
     name: 'DockerContainerImageName',
-    components: {Field},
     comments: {
     },
+    components: {Field},
     props: ['newServiceOffering'],
     setup(){
       const required = yup.string().required()

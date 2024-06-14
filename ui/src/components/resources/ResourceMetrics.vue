@@ -63,9 +63,9 @@
     data () {
       return {
         headers: [
-          { text: 'Category', value: 'category' },
-          { text: 'Metric', value: 'metric' },
-          { text: 'Value', value: 'value' },
+          { title: 'Category', value: 'category' },
+          { title: 'Metric', value: 'metric' },
+          { title: 'Value', value: 'value' },
         ],
         data: [30, 40, 60, 70, 5],
         cpuUsage: 0,

@@ -58,6 +58,11 @@ export default {
     name: 'ResourcesCreateDialogPageStart',
     components: { },
     props: ['show'],
+  computed: {
+    ResourcesCreateDialogPage() {
+      return ResourcesCreateDialogPage
+    }
+  },
     enums: {
       ResourcesCreateDialogPage,
     },

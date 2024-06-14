@@ -99,6 +99,11 @@
 
   export default {
     name: 'ResourcesCreateDialog',
+    computed: {
+      ResourcesCreateDialogPage() {
+        return ResourcesCreateDialogPage
+      }
+    },
     components: {
       ResourcesCreateDialogPageStart,
       ResourcesCreateDialogPageAddExistingResource,

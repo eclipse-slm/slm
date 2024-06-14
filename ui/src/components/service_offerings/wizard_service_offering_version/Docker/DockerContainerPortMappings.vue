@@ -42,7 +42,7 @@
             <Field
               v-slot="{ field, errors }"
               v-model="item.hostPort"
-              name="Container Port"
+              name="Host Port"
               :rules="required"
             >
               <v-text-field
@@ -82,6 +82,7 @@
 
           <template #item.protocol="{ item }">
             <v-btn-toggle
+                mandatory="force"
               class="ml-5"
             >
               <v-btn
@@ -132,7 +133,7 @@ import * as yup from 'yup';
     components: {Field},
     props: ['portMappings', 'editable'],
     setup(){
-      const required = yup.number().required().min(1).max(65536)
+      const required = yup.number().required().min(1).max(65536).typeError("Number needs to be between 1 and 65536");
       return {
         required
       }
@@ -140,11 +141,11 @@ import * as yup from 'yup';
     data () {
       return {
         tableHeaders: [
-          { text: 'Host Port', value: 'hostPort', width: '35%' },
-          { text: 'Container Port', value: 'containerPort', width: '35%' },
-          { text: 'Protocol', value: 'protocol', width: '10%' },
-          { text: 'Service Option', value: 'isServiceOption', width: '10%' },
-          { text: 'Actions', value: 'actions', width: '10%' },
+          { title: 'Host Port', value: 'hostPort', width: '35%' },
+          { title: 'Container Port', value: 'containerPort', width: '35%' },
+          { title: 'Protocol', value: 'protocol', width: '10%' },
+          { title: 'Service Option', value: 'isServiceOption', width: '10%' },
+          { title: 'Actions', value: 'actions', width: '10%' },
         ],
       }
     },

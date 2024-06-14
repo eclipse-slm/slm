@@ -55,7 +55,7 @@
               >
                 <v-icon
                   :start="dir === 'left'"
-                  :right="dir === 'right'"
+                  :end="dir === 'right'"
                   :class="dir === 'right' && 'order-last'"
                   v-text="icons[dir]"
                 />
@@ -92,8 +92,7 @@
               v-for="n in 3"
               :key="n"
               elevation="1"
-              :size="small"="n === 1"
-              :large="n === 3"
+              :size="n === 3 ? 'large' : undefined"
               class="ma-1"
               color="secondary"
             >
@@ -154,7 +153,7 @@
             <v-btn
               class="ma-1"
               color="secondary"
-              text
+              variant="text"
             >
               Simple
             </v-btn>
@@ -173,14 +172,14 @@
             <v-pagination
               :length="5"
               :model-value="1"
-              circle
+              rounded
               class="justify-start"
             />
 
             <v-pagination
               :length="3"
               :model-value="2"
-              circle
+              rounded
               class="justify-start"
               next-icon="mdi-menu-right"
               prev-icon="mdi-menu-left"
@@ -330,7 +329,7 @@
                   <v-btn
                     :color="s.color"
                     theme="dark"
-                    text
+                    variant="text"
                   >
                     <v-icon
                       start

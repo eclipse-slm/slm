@@ -19,7 +19,7 @@
           <v-alert prominent type="error">
             <div>
               There are '{{ serviceInstancesForCluster.length }}' service instances running on this cluster:<br>
-              <v-list-item v-for="item in serviceInstancesForCluster" v-bind:key="item.id">
+              <v-list-item v-for="item in serviceInstancesForCluster" :key="item.id">
                 <v-list-item>
                   <v-icon>mdi-apps</v-icon>
                 </v-list-item>
@@ -40,10 +40,10 @@
           <v-tooltip location="bottom">
             <template v-slot:#activator="{ props }">
               <v-btn
-                  v-bind="props"
-                  color="error"
-                  @click="deleteCluster"
-                  :disabled="serviceInstancesForCluster.length > 0"
+                v-bind="props"
+                color="error"
+                :disabled="serviceInstancesForCluster.length > 0"
+                @click="deleteCluster"
               >
                 Yes
               </v-btn>

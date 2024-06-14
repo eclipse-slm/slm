@@ -68,11 +68,14 @@
     enums: {
       ResourcesCreateDialogPage,
     },
+    computed: {
+      ResourcesCreateDialogPage() {
+        return ResourcesCreateDialogPage
+      },
+      ...mapGetters(['availableClusterTypes']),
+    },
     mounted() {
       this.$emit('title-changed', 'Add existing resource')
-    },
-    computed: {
-      ...mapGetters(['availableClusterTypes']),
     },
   }
 </script>

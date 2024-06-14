@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-table v-slot v-if="submodels.length > 0">
+    <v-table v-if="submodels.length > 0" v-slot>
       <thead>
         <tr>
           <th>{{ 'IdShort' }}</th>
@@ -15,7 +15,8 @@
           <td> {{ submodel.idShort }}</td>
           <td> {{ submodel.identification.idType }}, {{ submodel.identification.id }} </td>
           <td>
-            <a :href="aasGuiUrl+'/?aas='+submodel.endpoints[0].address.replace('aas/submodels', 'aas&path=submodels')" target="_blank"><v-icon>mdi-open-in-new</v-icon></a>
+            <a :href="aasGuiUrl+'/?aas='+submodel.endpoints[0].address.replace('aas/submodels', 'aas&path=submodels')" 
+               target="_blank"><v-icon>mdi-open-in-new</v-icon></a>
           </td>
           <td>
             <div v-if="submodel.semanticId && submodel.semanticId.keys.length > 0">
@@ -23,7 +24,11 @@
             </div>
           </td>
           <td>
-            <v-btn color="error" @click.stop="submodelToDelete = submodel"><v-icon>mdi-delete</v-icon></v-btn>
+            <v-btn 
+              color="error" 
+              icon="mdi-delete"
+              @click.stop="submodelToDelete = submodel"
+            />
           </td>
         </tr>
       </tbody>
@@ -38,15 +43,23 @@
         <v-file-input accept=".aasx" v-model="file" :placeholder="'select .aasx file'"></v-file-input>
       </v-col>
       <v-col>
-        <v-btn color="info" @click="addSubmodels" :disabled="!file">
-          <v-icon>mdi-upload</v-icon> {{ 'Upload submodel AASX package' }}
+        <v-btn 
+          color="info" 
+          icon="mdi-upload" 
+          :disabled="!file" 
+          @click="addSubmodels"
+        >
+          {{ 'Upload submodel AASX package' }}
         </v-btn>
       </v-col>
     </v-row>
-    <confirm-dialog :isActive="submodelToDelete != null"
+    <confirm-dialog
+      :show="submodelToDelete !== null"
       :title="'Delete submodel ' + (submodelToDelete == null ? '' : submodelToDelete.idShort)"
-      text="Do you really want to delete this submodel?" @confirmed="deleteSubmodel(submodelToDelete)"
-      @canceled="submodelToDelete = null" />
+      text="Do you really want to delete this submodel?"
+      @confirmed="deleteSubmodel(submodelToDelete)"
+      @canceled="submodelToDelete = null"
+    />
   </div>
 </template>
 <script>

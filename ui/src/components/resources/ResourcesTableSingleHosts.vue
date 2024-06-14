@@ -18,10 +18,10 @@
             <v-tooltip start close-delay="2000">
               <template #activator="{ props }">
                 <v-btn
-                    v-if="areProfilerAvailable"
-                    color="primary"
-                    @click="runProfiler"
-                    v-bind="props"
+                  v-if="areProfilerAvailable"
+                  color="primary"
+                  v-bind="props"
+                  @click="runProfiler"
                 >
                   <v-icon color="white">
                     mdi-magnify
@@ -52,7 +52,7 @@
               <v-btn
                 size="small"
                 model-value="location.name"
-                :color="groupBy == 'location.name' ? 'secondary' : 'disabled'"
+                :color="groupBy === 'location.name' ? 'secondary' : 'disabled'"
                 style="height:40px"
               >
                 <v-icon>mdi-group</v-icon>
@@ -285,6 +285,7 @@
   export default {
     name: 'ResourcesTableSingleHosts',
     components: {CapabilityParamsDialog, ConfirmDialog },
+    mixins: [capabilityUtilsMixin],
     data () {
       return {
         tableHeaders: [
@@ -327,10 +328,7 @@
         'availableSingleHostCapabilitiesNoDefault',
       ]),
       areProfilerAvailable() {
-        if(this.profiler.length > 0)
-          return true
-        else
-          return false
+        return this.profiler.length > 0;
       },
       showCapabilityParamsDialog() {
         if(this.selectedResourceId !== null && this.selectedCapabilityId !== null && this.selectedSkipInstall !== null)
@@ -352,18 +350,17 @@
     created() {
       this.filteredResources = this.resources
     },
-    mixins: [capabilityUtilsMixin],
     methods: {
       hasBaseConfigurationCapabilityService(capabilityServicesOfResource) {
-        return capabilityServicesOfResource.some(cs => cs.capability.capabilityClass=="BaseConfigurationCapability")
+        return capabilityServicesOfResource.some(cs => cs.capability.capabilityClass==="BaseConfigurationCapability")
       },
       getStatusOfBaseConfigurationCapabilityService(capabilityServicesOfResource) {
-        const bcCapabilityService = capabilityServicesOfResource.find(cs => cs.capability.capabilityClass=="BaseConfigurationCapability")
+        const bcCapabilityService = capabilityServicesOfResource.find(cs => cs.capability.capabilityClass==="BaseConfigurationCapability")
 
         return bcCapabilityService.status
       },
       getDeploymentCapabilityServices(capabilityServices) {
-        return capabilityServices.filter(cs => cs.capability.capabilityClass!="BaseConfigurationCapability")
+        return capabilityServices.filter(cs => cs.capability.capabilityClass!=="BaseConfigurationCapability")
       },
       deleteResource (resource) {
         const resourceId = resource.id
@@ -373,7 +370,7 @@
         this.resourceToDelete = null
       },
       openDefineCapabilityParamsDialog(resourceId, capabilityId, skipInstall) {
-        if(this.isDefineCapabilityDialogRequired(capabilityId, skipInstall) == false) {
+        if(this.isDefineCapabilityDialogRequired(capabilityId, skipInstall) === false) {
           this.addCapability(resourceId,capabilityId,skipInstall,{})
           return;
         }
@@ -402,13 +399,13 @@
 
         return this.getCapability(capabilityId).actions["INSTALL"].configParameters.filter(
           param => param.requiredType === "ALWAYS"
-        ).length != 0
+        ).length !== 0
       },
       isDefineCapabilityDialogRequired(capabilityId, skipInstall) {
         //false
-        if(this.getParamsOfInstallAction(capabilityId).length == 0)
+        if(this.getParamsOfInstallAction(capabilityId).length === 0)
           return false
-        else if (this.hasCapabilityConfigParamsWithRequiredTypeAlways(capabilityId) == false && skipInstall == true)
+        else if (this.hasCapabilityConfigParamsWithRequiredTypeAlways(capabilityId) === false && skipInstall === true)
           return false
         else
           return true
@@ -428,7 +425,7 @@
         }
       },
       isCapabilityInstalledOnResource (resource, capability) {
-        if(resource.capabilityServices != null)
+        if(resource.capabilityServices !== null)
           return resource.capabilityServices.filter(capService => capService.capability.name === capability.name).length > 0
         else
           return false
@@ -507,7 +504,7 @@
         return hasLocations
       },
       filterResources() {
-        if(this.filterResourcesByLocations.length == 0) {
+        if(this.filterResourcesByLocations.length === 0) {
           this.filteredResources = this.resources
           return
         }
@@ -525,17 +522,17 @@
       getFabOSDeviceIcon(capabilityServices) {
         const baseConfigService = capabilityServices.find(cs => cs.capability.capabilityClass === "BaseConfigurationCapability")
 
-        if(baseConfigService.status == "INSTALL" || baseConfigService.status == "UNINSTALL")
+        if(baseConfigService.status === "INSTALL" || baseConfigService.status === "UNINSTALL")
           return {
             "color": "info",
             "logo": "mdi-timer-sand"
           }
-        if(baseConfigService.status == "READY")
+        if(baseConfigService.status === "READY")
           return {
             "color": "info",
             "logo": "mdi-check-circle-outline"
           }
-        if(baseConfigService.status == "FAILED")
+        if(baseConfigService.status === "FAILED")
           return {
             "color": "error",
             "logo": "mdi-message-alert"

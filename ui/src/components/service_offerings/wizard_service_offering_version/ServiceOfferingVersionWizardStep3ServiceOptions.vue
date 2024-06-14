@@ -21,29 +21,25 @@
               <v-icon> arrow_upward </v-icon>
             </v-btn>
             <v-btn
-              icon
+              icon="arrow_downward"
               size="small"
               @click="
                 onMoveServiceOptionCategoryDownClicked(serviceOptionCategory.id)
               "
-            >
-              <v-icon> arrow_downward </v-icon>
-            </v-btn>
+            />
             <v-text-field
               v-model="serviceOptionCategory.name"
               class="mx-6"
               density="compact"
             />
             <v-btn
-              icon
+              icon="mdi-delete"
               size="small"
               class="mx-4"
               @click="
                 onServiceOptionCategoryDeleteClicked(serviceOptionCategory.id)
               "
-            >
-              <v-icon> mdi-delete </v-icon>
-            </v-btn>
+            />
           </v-row>
         </template>
         <v-card-text>

@@ -179,13 +179,13 @@
                 v-for="n in 5"
                 :key="n"
               >
-                <v-expansion-panel-header>
+                <v-expansion-panel-title>
                   Collapsible Group Item #{{ n }}
-                </v-expansion-panel-header>
+                </v-expansion-panel-title>
 
-                <v-expansion-panel-content>
+                <v-expansion-panel-text>
                   Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                </v-expansion-panel-content>
+                </v-expansion-panel-text>
               </v-expansion-panel>
             </v-expansion-panels>
           </v-card-text>
@@ -284,9 +284,9 @@
             <v-icon v-text="tab.icon" />
           </v-tab>
 
-          <v-tabs-items
+          <v-window-item
             v-model="tab"
-            class="pt-12 transparent"
+            class="pt-12 bg-transparent"
           >
             <v-window-item>
               <v-card class="mt-0 px-5">
@@ -367,7 +367,7 @@
                 </v-card-text>
               </v-card>
             </v-window-item>
-          </v-tabs-items>
+          </v-window-item>
         </base-material-tabs>
       </v-col>
     </v-row>
