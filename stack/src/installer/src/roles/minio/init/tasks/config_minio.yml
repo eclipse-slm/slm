@@ -7,18 +7,6 @@
       - (_minio_root_password is defined) and (_minio_root_password|length > 0)
     fail_msg: "Variable must be defined and not empty"
 
-- name: "MINIO | Download the Minio client"
-  get_url:
-    url: "https://dl.minio.io/client/mc/release/linux-amd64/mc"
-    dest: "/usr/local/bin/mc"
-    owner: "root"
-    group: "root"
-    mode: 0755
-  register: _download_client
-  until: _download_client is succeeded
-  retries: 5
-  delay: 2
-
 - name: "MINIO | Set secure mc command"
   set_fact:
     mc_command: "mc"
