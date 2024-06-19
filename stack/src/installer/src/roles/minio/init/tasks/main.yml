@@ -19,10 +19,19 @@
         token: "{{ _consul_token }}"
         key: "config/minio/data"
       register: minio_config_consul
+      no_log: True
 
-    - set_fact:
-        minio_config: "{{ minio_config_consul.data.Value | from_yaml }}"
+    - name: "MINIO | Set Minio config"
+      block:
+        - name: "MINIO | Set minio_config"
+          set_fact:
+            minio_config: "{{ minio_config_consul.data.Value | from_yaml }}"
+        - name: "MINIO | Set admin password"
+          set_fact:
+            MINIO_ADMIN_PASSWORD: minio_config.users.admin.password
+          when: (MINIO_ADMIN_PASSWORD is not defined) or (MINIO_ADMIN_PASSWORD | default([]) | length == 0)
       when: minio_config_consul.data.Value is defined
+      no_log: True
 
     - name: "MINIO | Create Minio config"
       block:
@@ -57,6 +66,7 @@
           with_items:
             - { key: "config/minio/data", value: "{{ minio_config | to_yaml }}"  }
       when: minio_config_consul.data.Value is not defined
+      no_log: True
 
 - name: "MINIO | Start Minio"
   block:
@@ -85,6 +95,7 @@
     src: "minio.yml"
     dest: "{{ _store_compose_file }}"
   when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+  no_log: True
 
 - name: "MINIO | Register Minio instance at Consul (discovery server)"
   include_role:
@@ -97,6 +108,7 @@
     _http: "{{ MINIO_API_URL }}/minio/health/live"
     _additional_tags:
       - "minio"
+  no_log: True
 
 - name: "MINIO | Install Minio Client"
   include_tasks: config_minio.yml

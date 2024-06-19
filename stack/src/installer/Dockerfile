@@ -8,6 +8,12 @@ ENV CONSUL_URL=http://consul:8500 \
 RUN pip install docker docker-compose python-consul
 RUN mkdir /compose
 
+RUN curl https://dl.min.io/client/mc/release/linux-amd64/mc \
+      --create-dirs \
+      -o /usr/local/bin/mc
+
+RUN chmod +x /usr/local/bin/mc
+
 COPY src /src
 COPY env.yml /env/env.yml
 
