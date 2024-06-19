@@ -40,14 +40,10 @@
             <v-btn
               v-if="notifications_unread.length > 0"
               variant="outlined"
+              prepend-icon="mdi-email-open-outline"
               @click="markAsRead"
             >
               Mark all
-              <v-icon
-                location="right"
-              >
-                mdi-email-open-outline
-              </v-icon>
             </v-btn>
           </v-col>
         </v-row>

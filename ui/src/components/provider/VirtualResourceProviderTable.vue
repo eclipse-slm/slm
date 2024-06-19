@@ -16,12 +16,9 @@
           <v-btn
             color="info"
             disabled
+            icon="mdi-plus-thick"
             @click="showDialog(item)"
-          >
-            <v-icon>
-              mdi-plus-thick
-            </v-icon>
-          </v-btn>
+          />
         </div>
       </template>
     </v-data-table>

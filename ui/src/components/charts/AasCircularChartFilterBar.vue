@@ -12,8 +12,12 @@
           <v-select density="compact" :items="filterValues" @update:modelValue="addFilterValueToSelectedValues" v-model="selectedFilterValue" />
         </v-breadcrumbs-item>
       </div>
-      <v-spacer></v-spacer>
-      <v-btn icon @click="clearFilterSelection" v-if="showClearSelectionButton"><v-icon>mdi-close</v-icon></v-btn>
+      <v-spacer />
+      <v-btn
+        v-if="showClearSelectionButton"
+        icon="mdi-close"
+        @click="clearFilterSelection" 
+      />
     </v-breadcrumbs>
   </v-container>
 </template>

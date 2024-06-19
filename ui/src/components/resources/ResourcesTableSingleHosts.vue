@@ -175,11 +175,8 @@
                 v-bind="props"
                 :disabled="item.clusterMember || availableSingleHostCapabilitiesNoDefault.length == 0"
                 class="resource-single-host-add-capability"
-              >
-                <v-icon>
-                  mdi-mushroom-outline
-                </v-icon>
-              </v-btn>
+                icon="mdi-mushroom-outline"
+              />
             </template>
             <v-list
               v-for="capabilityClass in getUniqueCapabilityClasses"
@@ -201,14 +198,9 @@
                     :disabled="!resourceHasRemoteAccessService(item)"
                     color="info"
                     style="height:36px"
+                    :prepend-icon="capability.logo"
                     @click="openDefineCapabilityParamsDialog(item.id, capability.id, false)"
                   >
-                    <v-icon
-                      start
-                      color="white"
-                    >
-                      {{ capability.logo }}
-                    </v-icon>
                     {{ capability.name }}
                   </v-btn>
                   <!-- Capability Skip Install Button -->
@@ -216,25 +208,17 @@
                     v-if="showCapabilitySkipInstallButton(item,capability)"
                     color="info"
                     style="height:36px"
+                    icon="mdi-skip-next"
                     @click="openDefineCapabilityParamsDialog(item.id, capability.id, true)"
-                  >
-                    <v-icon color="white">
-                      mdi-skip-next
-                    </v-icon>
-                  </v-btn>
+                  />
                   <!-- Capability Uninstall Button -->
                   <v-btn
                     v-if="isCapabilityInstalledOnResource(item, capability)"
                     color="error"
                     style="height:36px"
+                    :append-icon="capability.logo"
                     @click="removeCapability(item.id, capability.id)"
                   >
-                    <v-icon
-                      start
-                      color="white"
-                    >
-                      {{ capability.logo }}
-                    </v-icon>
                     {{ capability.name }}
                   </v-btn>
                 </v-btn-toggle>
@@ -245,10 +229,9 @@
             :disabled="item.clusterMember"
             class="ml-4 resource-single-host-delete"
             color="error"
+            icon="mdi-delete"
             @click.stop="resourceToDelete = item"
-          >
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
+          />
         </div>
       </template>
     </v-data-table>
@@ -301,7 +284,7 @@
           { title: 'OS', value: 'os' },
           { title: 'UUID', value: 'id', sortable: false },
           { title: 'Cluster Member', value: 'clusterMember' },
-          { title:'test', value: 'actions', sortable: false },
+          { title:'', value: 'actions', sortable: false },
         ],
         groupBy: [],
         sortBy: [{key: 'ip', order: 'asc'}],

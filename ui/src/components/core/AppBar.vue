@@ -10,18 +10,10 @@
     <v-btn
       class="mr-3"
       elevation="1"
-
       size="small"
+      :icon="value ? 'mdi-view-quilt' : 'mdi-dots-vertical'"
       @click="setDrawer(!drawer)"
-    >
-      <v-icon v-if="value">
-        mdi-view-quilt
-      </v-icon>
-
-      <v-icon v-else>
-        mdi-dots-vertical
-      </v-icon>
-    </v-btn>
+    />
 
     <v-toolbar-title
       class="hidden-sm-and-down font-weight-light"
@@ -48,11 +40,8 @@
           min-width="0"
           variant="text"
           v-bind="props"
-        >
-          <v-icon color="primary" >
-            mdi-cog
-          </v-icon>
-        </v-btn>
+          icon="mdi-cog"
+        />
       </template>
 
       <v-card
@@ -166,11 +155,8 @@
           min-width="0"
           disabled
           variant="text"
-        >
-          <v-icon color="primary">
-            mdi-bell
-          </v-icon>
-        </v-btn>
+          icon="mdi-bell"
+        />
       </template>
 
       <!--      <v-list-->
@@ -206,11 +192,8 @@
           class="ml-2"
           min-width="0"
           variant="text"
-        >
-          <v-icon color="primary">
-            mdi-account
-          </v-icon>
-        </v-btn>
+          icon="mdi-account"
+        />
       </template>
 
       <v-list>
@@ -218,17 +201,10 @@
           v-for="(item, index) in userIconMenuItems"
           :id="item.id"
           :key="index"
+          :title="item.title"
+          :append-icon="item.icon"
           @click="userIconMenuItemClick(index)"
-        >
-          <v-list-item>
-            <v-icon
-              color="primary"
-            >
-              {{ item.icon }}
-            </v-icon>
-          </v-list-item>
-          <v-list-item-title>{{ item.title }}</v-list-item-title>
-        </v-list-item>
+        />
       </v-list>
     </v-menu>
   </v-app-bar>

@@ -29,7 +29,7 @@
               required
               return-object
               :error-messages="errors"
-              :model-value="availableClusterTypesWithSkipInstall"
+              :model-value="selectedClusterType"
 
               @update:modelValue="onSelectedClusterTypeChanged"
             />
@@ -123,7 +123,7 @@
             v-slot="{ field, errors }"
             v-model="configParameterValues[configParameter.name]"
             :name="configParameter.prettyName"
-            :rules="required"
+            :rules="required_string"
           >
             <v-row>
               <v-textarea
@@ -183,9 +183,10 @@
       ClustersCreateDialogPage,
     },
     setup(){
-      const required = yup.string().required();
+      const required = yup.object().required();
+      const required_string = yup.string().required();
       return {
-        required
+        required, required_string
       }
     },
     data () {
@@ -196,9 +197,6 @@
         configParameterValues: {},
         textAreaFileContentComponentKey: 0
       }
-    },
-    mounted() {
-      this.$emit('title-changed', 'Add existing cluster')
     },
     computed: {
       ...mapGetters(['availableClusterTypes']),
@@ -214,14 +212,17 @@
         return clusterTypes
       }
     },
+    mounted() {
+      this.$emit('title-changed', 'Add existing cluster')
+    },
     methods: {
       clearForm () {
         this.selectedClusterType = ''
         this.configParameters = []
         this.uploadedFiles = []
       },
-      onSelectedClusterTypeChanged () {
-        this.configParameters = this.selectedClusterType.actions['INSTALL'].configParameters
+      onSelectedClusterTypeChanged (item) {
+        this.configParameters = item.actions['INSTALL'].configParameters
       },
       onFileChanged (configParameterName) {
         const reader = new FileReader()

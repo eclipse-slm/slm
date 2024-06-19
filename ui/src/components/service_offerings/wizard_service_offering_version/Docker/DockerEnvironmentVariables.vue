@@ -119,7 +119,7 @@ import * as yup from 'yup';
         },
       },
     setup(){
-      const required_alpha_dash = yup.string().required().matches(new RegExp("/.[a-zA-Z0-9_\/]/"))
+      const required_alpha_dash = yup.string().required().matches(new RegExp(".[a-zA-Z0-9_\/]"))
       const required = yup.string().required()
       return {
         required,required_alpha_dash

@@ -53,25 +53,16 @@
               <td class="btn-col">
                 <v-btn
                   color="info"
+                  :icon="showPassword ? 'mdi-glasses' : 'mdi-sunglasses'"
                   @click="togglePasswordShow"
-                >
-                  <v-icon v-if="showPassword">
-                    mdi-glasses
-                  </v-icon>
-                  <v-icon v-else>
-                    mdi-sunglasses
-                  </v-icon>
-                </v-btn>
+                />
               </td>
               <td class="btn-col">
                 <v-btn
                   color="info"
+                  icon="mdi-content-copy"
                   @click="copyOtp"
-                >
-                  <v-icon>
-                    mdi-content-copy
-                  </v-icon>
-                </v-btn>
+                />
               </td>
               <td
                 v-if="resource.passwordType === 'otp'"
@@ -79,10 +70,9 @@
               >
                 <v-btn
                   color="info"
+                  icon="mdi-reload"
                   @click="updateOtp"
-                >
-                  <v-icon>mdi-reload</v-icon>
-                </v-btn>
+                />
               </td>
             </tr>
           </tbody>

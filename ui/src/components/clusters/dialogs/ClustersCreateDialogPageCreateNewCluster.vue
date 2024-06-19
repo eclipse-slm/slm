@@ -127,14 +127,14 @@
       clusterCreateOptions () {
         const options = [
           {
-            text: 'Use existing resources',
+            title: 'Use existing resources',
             value: 'useExistingResources',
           },
         ]
 
         if (this.virtualResourceProviders.length !== 0) {
           options.push({
-            text: 'Create Members',
+            title: 'Create Members',
             value: 'createVirtualResources',
           })
         }
@@ -170,6 +170,7 @@
             }
           })
         }
+
       },
       limiter (e) {
         this.validInput = true
