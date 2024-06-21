@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("/jobs")
 public class JobsRestController {
@@ -21,12 +23,17 @@ public class JobsRestController {
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Iterable<Job> getJobs() {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = keycloakPrincipal.getKeycloakSecurityContext().getToken().getPreferredUsername();
-        String accessToken = keycloakPrincipal.getKeycloakSecurityContext().getTokenString();
+        var keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var username = keycloakPrincipal.getKeycloakSecurityContext().getToken().getPreferredUsername();
+        var accessToken = keycloakPrincipal.getKeycloakSecurityContext().getTokenString();
 
-        Results<Job> results = awxClient.getJobs(accessToken, username);
+        var resultsForUsernameWithoutJWT = awxClient.getJobs(accessToken, username);
+        var resultsForUsernameWithJWT = awxClient.getJobs(accessToken, username + "-JWT");
 
-        return results.getResults();
+        var jobs = new ArrayList<Job>();
+        jobs.addAll(resultsForUsernameWithoutJWT.getResults());
+        jobs.addAll(resultsForUsernameWithJWT.getResults());
+
+        return jobs;
     }
 }

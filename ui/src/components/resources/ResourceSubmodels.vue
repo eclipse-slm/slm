@@ -4,7 +4,7 @@
       <thead>
         <tr>
           <th>{{ 'IdShort' }}</th>
-          <th>{{ 'Identification' }}</th>
+          <th>{{ 'Id' }}</th>
           <th>{{ 'Details' }}</th>
           <th>{{ 'semantic Id' }}</th>
           <th></th>
@@ -13,13 +13,13 @@
       <tbody>
         <tr v-for="submodel in submodels" :key="submodel.idShort">
           <td> {{ submodel.idShort }}</td>
-          <td> {{ submodel.identification.idType }}, {{ submodel.identification.id }} </td>
+          <td> {{ submodel.id }} </td>
           <td>
-            <a :href="aasGuiUrl+'/?aas='+submodel.endpoints[0].address.replace('aas/submodels', 'aas&path=submodels')" target="_blank"><v-icon>mdi-open-in-new</v-icon></a>
+            <a :href="`${aasGuiUrl}/?aas=${aasDescriptor.endpoints[0].protocolInformation.href}&path=${submodel.endpoints[0].protocolInformation.href}`" target="_blank"><v-icon>mdi-open-in-new</v-icon></a>
           </td>
           <td>
-            <div v-if="submodel.semanticId && submodel.semanticId.keys.length > 0">
-              {{ submodel.semanticId.keys[0].idType }}, {{ submodel.semanticId.keys[0].value }}
+            <div v-if="submodel.semanticId">
+              {{ submodel.semanticId.keys[0].value }}
             </div>
           </td>
           <td>
@@ -51,6 +51,7 @@
 </template>
 <script>
 import SubmodelsRestApi from '@/api/resource-management/submodelsRestApi'
+import AasRestApi from '@/api/resource-management/aasRestApi'
 import ConfirmDialog from '@/components/base/ConfirmDialog'
 import getEnv from '@/utils/env'
 
@@ -60,14 +61,16 @@ export default {
   props: ['resourceId'],
   data() {
     return {
+      aasDescriptor: undefined,
       submodels: [],
-      submodelToDelete: null,
-      file: null,
+      submodelToDelete: undefined,
+      file: undefined,
       aasGuiUrl: getEnv("VUE_APP_BASYX_AAS_GUI_URL")
     }
   },
 
   mounted() {
+    this.getAasDescriptor()
     this.getSubmodels()
   },
 
@@ -83,8 +86,17 @@ export default {
         this.submodels = []
       })
     },
+    getAasDescriptor() {
+      AasRestApi.getResourceAasDescriptor(this.resourceId).then(response => {
+        this.aasDescriptor = response
+      }).catch((e) => {
+        console.log(e)
+        this.aasDescriptor = undefined
+      })
+    },
     deleteSubmodel(submodel) {
-      SubmodelsRestApi.deleteSubmodel(this.resourceId, submodel.idShort).then(response => {
+      let submodelIdBase64Encoded = btoa(submodel.id);
+      SubmodelsRestApi.deleteSubmodel(this.resourceId, submodelIdBase64Encoded).then(response => {
         this.getSubmodels()
         this.submodelToDelete = null
       }).catch((e) => {
