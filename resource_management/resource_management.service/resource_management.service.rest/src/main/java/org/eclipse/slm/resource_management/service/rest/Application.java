@@ -27,11 +27,20 @@ import javax.transaction.Transactional;
 import java.util.concurrent.Executor;
 
 @SpringBootApplication(scanBasePackages = {
-        "org.eclipse.slm.resource_management",
+        "org.eclipse.slm.resource_management.model",
+        "org.eclipse.slm.resource_management.persistence",
+        "org.eclipse.slm.resource_management.service.rest",
         "org.eclipse.slm.notification_service.service.client",
-        "org.eclipse.slm.common",
-        "org.eclipse.slm.common.parent.service_rest"
-})
+        "org.eclipse.slm.common.aas",
+        "org.eclipse.slm.common.awx",
+        "org.eclipse.slm.common.consul",
+        "org.eclipse.slm.common.keycloak",
+        "org.eclipse.slm.common.model",
+        "org.eclipse.slm.common.parent",
+        "org.eclipse.slm.common.utils",
+        "org.eclipse.slm.common.vault"
+}
+)
 @EntityScan(basePackages = {
         "org.eclipse.slm.resource_management.model"
 })
