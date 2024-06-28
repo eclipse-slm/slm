@@ -7,11 +7,12 @@
             <v-row class="my-1">
               <v-text-field v-model="requirement.name" class="mx-6" density="compact" />
               <v-btn
-                icon="mdi-delete"
                 size="small"
                 class="mx-4"
                 @click="onRequirementDeleteClicked(requirement)"
-              />
+              >
+                <v-icon icon="mdi-delete" />
+              </v-btn>
             </v-row>
           </template>
           <v-tabs
@@ -24,11 +25,12 @@
                 density="compact"
               />
               <v-btn
-                icon="mdi-delete"
                 size="small"
                 class="mx-4"
                 @click="onLogicDeleteClicked(requirement, logic)"
-              />
+              >
+                <v-icon icon="mdi-delete" />
+              </v-btn>
             </v-tab>
             <v-btn
               icon="mdi-plus"

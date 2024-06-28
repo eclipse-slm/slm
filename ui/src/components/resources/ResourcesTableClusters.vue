@@ -24,22 +24,25 @@
             <v-btn
               color="info"
               :disabled="item.isManaged"
-              icon="mdi-server-plus"
               @click.stop="addNodeToCluster(item)"
-            />
+            >
+              <v-icon icon="mdi-server-plus" />
+            </v-btn>
             <v-btn
               class="ml-4"
               color="warning"
               :disabled="item.isManaged"
-              icon="mdi-server-minus"
               @click.stop="removeNodeFromCluster(item)"
-            />
+            >
+              <v-icon icon="mdi-server-minus" />
+            </v-btn>
             <v-btn
               class="ml-4"
               color="error"
-              icon="mdi-delete"
               @click.stop="deleteCluster(item)"
-            />
+            >
+              <v-icon icon="mdi-delete" />
+            </v-btn>
           </div>
         </template>
 
@@ -50,9 +53,10 @@
           >
             <v-btn
               variant="text"
-              :icon="isExpanded ? 'mdi-close' : 'mdi-chevron-down'"
               :class="{'v-data-table__expand-icon--active' : isExpanded}"
-            />
+            >
+              <v-icon :icon="isExpanded ? 'mdi-close' : 'mdi-chevron-down'" />
+            </v-btn>
           </td>
         </template>
 

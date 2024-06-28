@@ -8,10 +8,12 @@
         <v-row class="warn text-h3 font-weight-light">
           <v-col>
             <v-icon
+                icon="mdi-chart-arc"
                 size="large"
                 class="ml-2 mr-4"
+                style="font-size: 36px;"
             >
-              mdi-chart-arc
+
             </v-icon>
             Device Statistics
           </v-col>

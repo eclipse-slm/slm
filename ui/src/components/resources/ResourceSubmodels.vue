@@ -25,10 +25,11 @@
           </td>
           <td>
             <v-btn 
-              color="error" 
-              icon="mdi-delete"
+              color="error"
               @click.stop="submodelToDelete = submodel"
-            />
+            >
+              <v-icon icon="mdi-delete" />
+            </v-btn>
           </td>
         </tr>
       </tbody>

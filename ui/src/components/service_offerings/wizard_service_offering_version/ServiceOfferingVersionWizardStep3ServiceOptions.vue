@@ -11,7 +11,6 @@
         <template #heading>
           <v-row class="my-1">
             <v-btn
-              icon
               size="small"
               class="mx-2"
               @click="
@@ -21,25 +20,27 @@
               <v-icon> arrow_upward </v-icon>
             </v-btn>
             <v-btn
-              icon="arrow_downward"
               size="small"
               @click="
                 onMoveServiceOptionCategoryDownClicked(serviceOptionCategory.id)
               "
-            />
+            >
+              <v-icon icon="arrow_downward" />
+            </v-btn>
             <v-text-field
               v-model="serviceOptionCategory.name"
               class="mx-6"
               density="compact"
             />
             <v-btn
-              icon="mdi-delete"
               size="small"
               class="mx-4"
               @click="
                 onServiceOptionCategoryDeleteClicked(serviceOptionCategory.id)
               "
-            />
+            >
+              <v-icon icon="mdi-delete" />
+            </v-btn>
           </v-row>
         </template>
         <v-card-text>

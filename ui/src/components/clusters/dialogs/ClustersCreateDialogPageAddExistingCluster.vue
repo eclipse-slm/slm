@@ -202,6 +202,7 @@
       ...mapGetters(['availableClusterTypes']),
       availableClusterTypesWithSkipInstall () {
         let clusterTypes = []
+        console.log('sdfsadfsadf', this.availableClusterTypes);
         this.availableClusterTypes.forEach(clusterType => {
           if ('INSTALL' in clusterType.actions) {
             if (clusterType.actions['INSTALL'].skipable == true) {

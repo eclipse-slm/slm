@@ -1,7 +1,7 @@
 // import Vue from 'vue'
 // import Vuetify from 'vuetify'
 // import i18n from '@/localisation/i18n'
-// import '@/design/overrides.sass'
+// import '@/design/overrides.sass';
 //
 // Vue.use(Vuetify)
 

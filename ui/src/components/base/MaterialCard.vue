@@ -3,6 +3,7 @@
       v-bind="$attrs"
       :class="classes"
       class="v-card--material pa-3"
+      style="margin-top: 30px; margin-bottom: 15px;"
   >
     <div class="d-flex grow flex-wrap">
       <v-avatar
@@ -22,8 +23,9 @@
           :max-height="icon ? 90 : undefined"
           :width="icon ? 'auto' : '100%'"
           elevation="6"
-          class="text-start v-card--material__heading"
+          class="text-start v-card--material__heading mb-n6"
           theme="dark"
+          style="top: -30px"
       >
         <slot
             v-if="$slots.heading"
@@ -139,6 +141,10 @@ export default {
 </script>
 
 <style lang="sass">
+
+.v-card
+  overflow: visible
+
 .v-card--material
   &__avatar
     position: relative
@@ -147,6 +153,12 @@ export default {
 
   &__heading
     position: relative
+    top: -40px
     transition: .3s ease
     z-index: 1
+
+.v-application .text-h3
+  font-size: 3rem!important
+  line-height: 3.125rem
+  letter-spacing: normal!important
 </style>

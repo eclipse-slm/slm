@@ -25,12 +25,12 @@
     </v-col>
 
     <v-icon
+      v-if="subIcon"
+      :icon="subIcon"
       :color="subIconColor"
       size="16"
       class="ml-2 mr-1"
-    >
-      {{ subIcon }}
-    </v-icon>
+    />
 
     <span
       :class="subTextColor"
@@ -92,11 +92,11 @@
 
 <style lang="sass">
 .v-card--material-stats
-  display: flex
+  //display: flex
   flex-wrap: wrap
   position: relative
 
-  > div:first-child
+  > div:nth-child(2)
     justify-content: space-between
 
   .v-card

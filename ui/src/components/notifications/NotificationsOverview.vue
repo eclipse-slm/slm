@@ -27,14 +27,17 @@
             <v-btn
               class="mr-2"
               variant="outlined"
-              icon="mdi-email-open"
               @click="filter(true)"
-            />
+            >
+              <v-icon icon="mdi-email-open" />
+            </v-btn>
             <v-btn
               variant="outlined"
-              icon="mdi-email"
+
               @click="filter(false)"
-            />
+            >
+              <v-icon icon="mdi-email" />
+            </v-btn>
           </v-col>
           <v-col class="text-right">
             <v-btn

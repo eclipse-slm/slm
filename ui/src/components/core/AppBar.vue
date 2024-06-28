@@ -11,9 +11,10 @@
       class="mr-3"
       elevation="1"
       size="small"
-      :icon="value ? 'mdi-view-quilt' : 'mdi-dots-vertical'"
       @click="setDrawer(!drawer)"
-    />
+    >
+      <v-icon :icon="value ? 'mdi-view-quilt' : 'mdi-dots-vertical'" />
+    </v-btn>
 
     <v-toolbar-title
       class="hidden-sm-and-down font-weight-light"
@@ -40,8 +41,9 @@
           min-width="0"
           variant="text"
           v-bind="props"
-          icon="mdi-cog"
-        />
+        >
+          <v-icon icon="mdi-cog" />
+        </v-btn>
       </template>
 
       <v-card
@@ -155,8 +157,9 @@
           min-width="0"
           disabled
           variant="text"
-          icon="mdi-bell"
-        />
+        >
+          <v-icon icon="mdi-bell" />
+        </v-btn>
       </template>
 
       <!--      <v-list-->
@@ -192,8 +195,9 @@
           class="ml-2"
           min-width="0"
           variant="text"
-          icon="mdi-account"
-        />
+        >
+          <v-icon icon="mdi-account" />
+        </v-btn>
       </template>
 
       <v-list>

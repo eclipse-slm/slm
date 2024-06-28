@@ -15,9 +15,10 @@
       <v-spacer />
       <v-btn
         v-if="showClearSelectionButton"
-        icon="mdi-close"
         @click="clearFilterSelection" 
-      />
+      >
+        <v-icon icon="mdi-close" />
+      </v-btn>
     </v-breadcrumbs>
   </v-container>
 </template>

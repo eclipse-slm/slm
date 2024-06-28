@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card class="v-sheet">
     <v-data-table
       id="resource-table-single-host"
       :headers="tableHeaders"
@@ -23,9 +23,10 @@
                   v-bind="props"
                   @click="runProfiler"
                 >
-                  <v-icon color="white">
-                    mdi-magnify
-                  </v-icon>
+                  <v-icon
+                    icon="mdi-magnify"
+                    color="white"
+                  />
                 </v-btn>
               </template>
               <span>Runs all <a href="https://eclipse-slm.github.io/slm/docs/usage/profiler/">profiler</a> on all devices</span>
@@ -175,8 +176,12 @@
                 v-bind="props"
                 :disabled="item.clusterMember || availableSingleHostCapabilitiesNoDefault.length == 0"
                 class="resource-single-host-add-capability"
-                icon="mdi-mushroom-outline"
-              />
+              >
+                <v-icon
+                  color="white"
+                  icon="mdi-mushroom-outline"
+                />
+              </v-btn>
             </template>
             <v-list
               v-for="capabilityClass in getUniqueCapabilityClasses"
@@ -208,9 +213,10 @@
                     v-if="showCapabilitySkipInstallButton(item,capability)"
                     color="info"
                     style="height:36px"
-                    icon="mdi-skip-next"
                     @click="openDefineCapabilityParamsDialog(item.id, capability.id, true)"
-                  />
+                  >
+                    <v-icon icon="mdi-skip-next" />
+                  </v-btn>
                   <!-- Capability Uninstall Button -->
                   <v-btn
                     v-if="isCapabilityInstalledOnResource(item, capability)"
@@ -229,9 +235,10 @@
             :disabled="item.clusterMember"
             class="ml-4 resource-single-host-delete"
             color="error"
-            icon="mdi-delete"
             @click.stop="resourceToDelete = item"
-          />
+          >
+            <v-icon icon="mdi-delete" />
+          </v-btn>
         </div>
       </template>
     </v-data-table>

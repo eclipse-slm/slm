@@ -6,15 +6,17 @@
     class="bg-primary"
     theme="dark"
     :expand-on-hover="expandOnHover"
+    :location="'left'"
 
     mobile-breakpoint="960"
     width="260"
     v-bind="$attrs"
   >
-    <template #img="props">
+    <template #image="props" >
       <v-img
         :gradient="`to bottom, ${barColor}`"
         v-bind="props"
+        style="height: 100%;width: 100%;"
       />
     </template>
 
@@ -36,13 +38,10 @@
 
     <v-divider class="mb-2" />
 
+
     <v-list
       nav
     >
-      <!-- Style cascading bug  -->
-      <!-- https://github.com/vuetifyjs/vuetify/pull/8574 -->
-      <div />
-
       <template v-for="(item, i) in computedItems">
         <div
           v-if="item.visible"
@@ -61,13 +60,10 @@
             :id="item.id"
             :key="`item-${i}`"
             :item="item"
+
           />
         </div>
       </template>
-
-      <!-- Style cascading bug  -->
-      <!-- https://github.com/vuetifyjs/vuetify/pull/8574 -->
-      <div />
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -124,7 +120,7 @@
             id: 'main-menu-button-dashboard',
             icon: 'mdi-view-dashboard',
             title: this.$t('drawer.section.dashboard.title'),
-            to: '/',
+            to: '/dashboard',
             visible: true,
           },
           {
@@ -165,7 +161,7 @@
           {
             id: 'main-menu-button-service-instances',
             title: this.$t('drawer.section.services.title'),
-            icon: 'apps',
+            icon: 'mdi-apps',
             to: '/services/instances',
             visible: true,
           },
@@ -179,7 +175,7 @@
           {
             id: 'main-menu-button-admin',
             title: this.$t('drawer.section.admin.title'),
-            icon: 'admin_panel_settings',
+            icon: 'mdi-shield-account-variant-outline',
             to: '/admin',
             visible: this.userRoles.includes('slm-admin'),
           },
@@ -209,7 +205,7 @@
 </style>
 
 <style lang="sass">
-  @import 'vuetify/settings'
+  @import '~vuetify/lib/styles/tools/_rtl.sass'
 
   #core-navigation-drawer
     .v-list-group__header.v-list-item--active:before
@@ -223,13 +219,13 @@
         width: 20px
 
 
-        //+ltr()
-        //  margin-right: 24px
-        //  margin-left: 12px !important
-        //
-        //+rtl()
-        //  margin-left: 24px
-        //  margin-right: 12px !important
+        +ltr()
+          margin-right: 24px
+          margin-left: 12px !important
+
+        +rtl()
+          margin-left: 24px
+          margin-right: 12px !important
 
     .v-list--dense
       .v-list-item
@@ -239,18 +235,18 @@
 
     .v-list-group--sub-group
       .v-list-item
-        //+ltr()
-        //  padding-left: 8px
-        //
-        //+rtl()
-        //  padding-right: 8px
+        +ltr()
+          padding-left: 8px
+
+        +rtl()
+          padding-right: 8px
 
       .v-list-group__header
-        //+ltr()
-        //  padding-right: 0
-        //
-        //+rtl()
-        //  padding-right: 0
+        +ltr()
+          padding-right: 0
+
+        +rtl()
+          padding-right: 0
 
         .v-list-item__icon--text
           margin-top: 19px
@@ -259,9 +255,9 @@
         .v-list-group__header__prepend-icon
           order: 2
 
-          //+ltr()
-          //  margin-right: 8px
-          //
-          //+rtl()
-          //  margin-left: 8px
+          +ltr()
+            margin-right: 8px
+
+          +rtl()
+            margin-left: 8px
 </style>

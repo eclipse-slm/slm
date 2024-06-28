@@ -11,7 +11,7 @@
         lg="3"
       >
         <base-material-stats-card
-          color="bg-primary"
+          color="primary"
           icon="mdi-desktop-classic"
           title="Resources"
           :value="overviewResources.length.toString()"
@@ -33,19 +33,19 @@
         />
       </v-col>
 
-            <v-col
-              cols="12"
-              sm="6"
-              lg="3"
-            >
-              <base-material-stats-card
-                color="green"
-                icon="mdi-account-hard-hat"
-                title="Jobs"
-                :value="jobs.length.toString()"
-                @click.native="onResourcesCardClicked"
-              />
-            </v-col>
+<!--      <v-col
+        cols="12"
+        sm="6"
+        lg="3"
+      >
+        <base-material-stats-card
+          color="green"
+          icon="mdi-account-hard-hat"
+          title="Jobs"
+          :value="jobs.length.toString()"
+          @click.native="onResourcesCardClicked"
+        />
+      </v-col>-->
 
       <v-col
         cols="12"
@@ -68,7 +68,7 @@
       >
         <base-material-stats-card
           color="warn"
-          icon="apps"
+          icon="mdi-apps"
           title="Services"
           :value="services.length.toString()"
           @click.native="onServicesCardClicked"
@@ -88,10 +88,14 @@
                   <v-icon
                     size="large"
                     class="ml-2 mr-4"
+                    style="font-size: 36px;"
+                    color="white"
                   >
                     mdi-run-fast
                   </v-icon>
-                  Latest {{ jobCount }} Jobs
+                  <span style="color: white">
+                    Latest {{ jobCount }} Jobs
+                  </span>
                 </v-col>
               </v-row>
             </v-container>

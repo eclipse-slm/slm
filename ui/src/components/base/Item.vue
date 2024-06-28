@@ -4,17 +4,16 @@
     :rel="href && href !== '#' ? 'noopener' : undefined"
     :target="href && href !== '#' ? '_blank' : undefined"
     :to="item.to"
-    :active-class="`primary ${!isDark ? 'black' : 'white'}--text`"
+    :active-class="`bg-primary ${!isDark ? 'black' : 'white'}--text`"
   >
     <template #prepend>
       <v-icon v-if="text" class="v-list-item__icon--text">
         {{ computedText }}
       </v-icon>
-      <v-icon v-else-if="item.icon">
-        {{ item.icon }}
-      </v-icon>
+      <v-icon v-else-if="item.icon"
+              :icon="item.icon"
+      />
     </template>
-
     <v-list-item-title v-if="item.title">
       {{ item.title }}
     </v-list-item-title>
@@ -73,3 +72,4 @@ import {useTheme} from 'vuetify'
     },
   }
 </script>
+

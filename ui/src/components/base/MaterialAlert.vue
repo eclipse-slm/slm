@@ -27,9 +27,10 @@
       <v-btn
         :aria-label="$vuetify.lang.t('$vuetify.close')"
         size="smale"
-        icon="mdi-cancel"
         @click="toggle"
-      />
+      >
+        <v-icon icon="mdi-cancel" />
+      </v-btn>
     </template>
   </v-alert>
 </template>

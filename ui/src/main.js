@@ -23,6 +23,9 @@ import axios from "axios";
 import cors from "cors";
 import NotificationServiceWebsocketClient from "@/api/notification-service/notificationServiceWebsocketClient";
 
+import 'vuetify/styles';
+import '@/design/overrides.sass';
+import withUUID from "vue-uuid";
 
 configureCompat({
     MODE:3,
@@ -94,23 +97,26 @@ Chart.register(...registerables)
 app.use(enums)
 
 const theme = {
-    primary: '#004263',
-    secondary: '#00A0E3',
-    accent: '#17A6A6',
-    error: '#FF7A5A',
-    warning: '#F39430',
-    info: '#71BD86',
-    success: '#00A0E3',
+    colors: {
+        primary: '#004263',
+        secondary: '#00A0E3',
+        accent: '#17A6A6',
+        error: '#FF7A5A',
+        warning: '#F39430',
+        info: '#71BD86',
+        success: '#00A0E3',
+    }
 };
 
-import 'vuetify/styles';
-import withUUID from "vue-uuid";
+
+
 
 const v = createVuetify({
     lang: {
         t: (key, ...params) => i18n.t(key, params),
     },
     theme: {
+        defaultTheme: 'light',
         themes: {
             dark: theme,
             light: theme,

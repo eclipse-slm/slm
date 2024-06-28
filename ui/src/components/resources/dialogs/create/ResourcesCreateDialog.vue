@@ -23,7 +23,6 @@
             cols="1"
           >
             <v-btn
-              icon
               @click="closeDialog"
             >
               <v-icon>mdi-close</v-icon>

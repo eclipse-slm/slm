@@ -11,7 +11,7 @@ const routes = [
       // Dashboard
       {
         name: 'Dashboard',
-        path: '',
+        path: '/dashboard',
         component: () => import('@/pages/DashboardPage'),
       },
       // Error Pages

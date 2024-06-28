@@ -26,9 +26,10 @@
                 cols="1"
               >
                 <v-btn
-                  icon="mdi-close"
                   @click="$emit('canceled')"
-                />
+                >
+                  <v-icon icon="mdi-close" />
+                </v-btn>
               </v-col>
             </v-row>
           </slot>
