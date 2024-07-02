@@ -25,41 +25,28 @@
         item-key="id"
         :items="serviceOfferingCategories"
       >
-        <template
-          #body="{ items }"
-        >
-          <tbody
-            v-for="serviceCategory in items"
-            :key="serviceCategory.id"
+        <template v-slot:item.actions="{ item }">
+          <v-btn
+            class="ma-1"
+            size="small"
+            color="info"
+            @click="onEditServiceCategoryClicked(item)"
           >
-            <tr>
-              <td>{{ serviceCategory.name }}</td>
-              <td>{{ serviceCategory.id }}</td>
-              <td>
-                <v-btn
-                  class="ma-1"
-                  size="small"
-                  color="info"
-                  @click="onEditServiceCategoryClicked(serviceCategory)"
-                >
-                  <v-icon>
-                    mdi-pencil
-                  </v-icon>
-                </v-btn>
+            <v-icon>
+              mdi-pencil
+            </v-icon>
+          </v-btn>
 
-                <v-btn
-                  class="ma-1"
-                  size="small"
-                  color="error"
-                  @click="onDeleteServiceCategoryClicked(serviceCategory)"
-                >
-                  <v-icon>
-                    mdi-delete
-                  </v-icon>
-                </v-btn>
-              </td>
-            </tr>
-          </tbody>
+          <v-btn
+            class="ma-1"
+            size="small"
+            color="error"
+            @click="onDeleteServiceCategoryClicked(item)"
+          >
+            <v-icon>
+              mdi-delete
+            </v-icon>
+          </v-btn>
         </template>
       </v-data-table>
       <v-divider />
@@ -105,9 +92,9 @@
       ]),
       ServiceCategoriesTableHeaders () {
         return [
-          { text: 'Name', value: 'serviceCategoryName', sortable: true },
-          { text: 'Id', value: 'serviceCategoryId', sortable: true },
-          { text: 'Actions', value: 'serviceCategoryActions', sortable: false },
+          { title: 'Name', value: 'name', sortable: true },
+          { title: 'Id', value: 'id', sortable: true },
+          { title: 'Actions', key: 'actions', sortable: false },
         ]
       },
     },

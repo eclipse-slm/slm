@@ -86,12 +86,12 @@
       ]),
       DataTableHeaders () {
         return [
-          { text: 'ID', value: 'id', sortable: true },
-          { text: 'Name', value: 'name', sortable: true },
-          { text: 'Started at', value: 'started', sortable: true },
-          { text: 'Finished at', value: 'finished', sortable: true },
-          { text: 'Duration', value: 'elapsed', sortable: true },
-          { text: 'Status', value: 'status', sortable: false },
+          { title: 'ID', value: 'id', sortable: true },
+          { title: 'Name', value: 'name', sortable: true },
+          { title: 'Started at', value: 'started', sortable: true },
+          { title: 'Finished at', value: 'finished', sortable: true },
+          { title: 'Duration', value: 'elapsed', sortable: true },
+          { title: 'Status', value: 'status', sortable: false },
         ]
       },
       awxURL () {

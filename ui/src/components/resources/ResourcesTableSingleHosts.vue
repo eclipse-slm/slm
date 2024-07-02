@@ -183,52 +183,54 @@
                 />
               </v-btn>
             </template>
-            <v-list
-              v-for="capabilityClass in getUniqueCapabilityClasses"
-              :key="capabilityClass"
-              class="resources-capability-menu"
-            >
-              <h6 class="ml-4">
-                {{ insertWhiteSpaceInCamelCase(capabilityClass) }}
-              </h6>
-              <v-list-item
-                v-for="capability in getCapabilitiesByCapabilityClass(capabilityClass)"
-                :key="capability.id"
+            <v-list>
+              <v-list
+                v-for="capabilityClass in getUniqueCapabilityClasses"
+                :key="capabilityClass"
+                class="resources-capability-menu"
               >
-                <v-btn-toggle>
-                  <!-- Capability Install Button -->
-                  <v-btn
-                    v-if="showCapabilityInstallButton(item, capability)"
-                    id="install-button"
-                    :disabled="!resourceHasRemoteAccessService(item)"
-                    color="info"
-                    style="height:36px"
-                    :prepend-icon="capability.logo"
-                    @click="openDefineCapabilityParamsDialog(item.id, capability.id, false)"
-                  >
-                    {{ capability.name }}
-                  </v-btn>
-                  <!-- Capability Skip Install Button -->
-                  <v-btn
-                    v-if="showCapabilitySkipInstallButton(item,capability)"
-                    color="info"
-                    style="height:36px"
-                    @click="openDefineCapabilityParamsDialog(item.id, capability.id, true)"
-                  >
-                    <v-icon icon="mdi-skip-next" />
-                  </v-btn>
-                  <!-- Capability Uninstall Button -->
-                  <v-btn
-                    v-if="isCapabilityInstalledOnResource(item, capability)"
-                    color="error"
-                    style="height:36px"
-                    :append-icon="capability.logo"
-                    @click="removeCapability(item.id, capability.id)"
-                  >
-                    {{ capability.name }}
-                  </v-btn>
-                </v-btn-toggle>
-              </v-list-item>
+                <h6 class="ml-4">
+                  {{ insertWhiteSpaceInCamelCase(capabilityClass) }}
+                </h6>
+                <v-list-item
+                  v-for="capability in getCapabilitiesByCapabilityClass(capabilityClass)"
+                  :key="capability.id"
+                >
+                  <v-btn-toggle>
+                    <!-- Capability Install Button -->
+                    <v-btn
+                      v-if="showCapabilityInstallButton(item, capability)"
+                      id="install-button"
+                      :disabled="!resourceHasRemoteAccessService(item)"
+                      class="bg-info"
+                      style="height:36px"
+                      :prepend-icon="capability.logo"
+                      @click="openDefineCapabilityParamsDialog(item.id, capability.id, false)"
+                    >
+                      {{ capability.name }}
+                    </v-btn>
+                    <!-- Capability Skip Install Button -->
+                    <v-btn
+                      v-if="showCapabilitySkipInstallButton(item,capability)"
+                      color="info"
+                      style="height:36px"
+                      @click="openDefineCapabilityParamsDialog(item.id, capability.id, true)"
+                    >
+                      <v-icon icon="mdi-skip-next" />
+                    </v-btn>
+                    <!-- Capability Uninstall Button -->
+                    <v-btn
+                      v-if="isCapabilityInstalledOnResource(item, capability)"
+                      color="error"
+                      style="height:36px"
+                      :append-icon="capability.logo"
+                      @click="removeCapability(item.id, capability.id)"
+                    >
+                      {{ capability.name }}
+                    </v-btn>
+                  </v-btn-toggle>
+                </v-list-item>
+              </v-list>
             </v-list>
           </v-menu>
           <v-btn
@@ -549,6 +551,7 @@
 </script>
 
 <style scoped>
+
 .row-pointer  {
   cursor: pointer;
 }

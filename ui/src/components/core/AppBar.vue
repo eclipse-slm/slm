@@ -11,9 +11,9 @@
       class="mr-3"
       elevation="1"
       size="small"
+      :icon="value ? 'mdi-view-quilt' : 'mdi-dots-vertical'"
       @click="setDrawer(!drawer)"
     >
-      <v-icon :icon="value ? 'mdi-view-quilt' : 'mdi-dots-vertical'" />
     </v-btn>
 
     <v-toolbar-title

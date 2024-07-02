@@ -114,10 +114,10 @@
               return value === this.filterRead
             },
           },
-          { text: 'ID', value: 'id', sortable: true },
-          { text: 'Category', value: 'category', sortable: true },
-          { text: 'Date', value: 'date', sortable: true },
-          { text: 'Text', value: 'text', sortable: false },
+          { title: 'ID', value: 'id', sortable: true },
+          { title: 'Category', value: 'category', sortable: true },
+          { title: 'Date', value: 'date', sortable: true },
+          { title: 'Text', value: 'text', sortable: false },
         ]
       },
     },

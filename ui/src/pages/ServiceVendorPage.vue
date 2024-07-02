@@ -341,11 +341,11 @@
       },
       RepositoriesTableHeaders () {
         return [
-          { text: 'Id', value: 'id', sortable: false },
-          { text: 'Address', value: 'address', sortable: true },
-          { text: 'Username', value: 'username', sortable: false },
-          { text: 'Password', value: 'password', sortable: false },
-          { text: 'Type', value: 'type', sortable: true },
+          { title: 'Id', value: 'id', sortable: false },
+          { title: 'Address', value: 'address', sortable: true },
+          { title: 'Username', value: 'username', sortable: false },
+          { title: 'Password', value: 'password', sortable: false },
+          { title: 'Type', value: 'type', sortable: true },
         ]
       },
     },

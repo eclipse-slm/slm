@@ -25,43 +25,31 @@
         :headers="ServiceVendorsTableHeaders"
         item-key="id"
         :items="serviceVendors"
+        @click:row="onRowClick"
       >
-        <template
-          #body="{ items }"
-        >
-          <tbody
-            v-for="serviceVendor in items"
-            :key="serviceVendor.id"
-          >
-            <tr @click="$emit('serviceVendorClicked', serviceVendor)">
-              <td>{{ serviceVendor.name }}</td>
-              <td>{{ serviceVendor.description }}</td>
-              <td>{{ serviceVendor.id }}</td>
-              <td>
-                <v-btn
-                  class="ma-1"
-                  size="small"
-                  color="info"
-                  @click="onEditServiceVendorClicked(serviceVendor)"
-                >
-                  <v-icon>
-                    mdi-pencil
-                  </v-icon>
-                </v-btn>
 
-                <v-btn
-                  class="ma-1"
-                  size="small"
-                  color="error"
-                  @click="onDeleteServiceVendorClicked(serviceVendor)"
-                >
-                  <v-icon>
-                    mdi-delete
-                  </v-icon>
-                </v-btn>
-              </td>
-            </tr>
-          </tbody>
+        <template v-slot:item.actions="{ item }">
+          <v-btn
+            class="ma-1"
+            size="small"
+            color="info"
+            @click="onEditServiceVendorClicked(item)"
+          >
+            <v-icon>
+              mdi-pencil
+            </v-icon>
+          </v-btn>
+
+          <v-btn
+            class="ma-1"
+            size="small"
+            color="error"
+            @click="onDeleteServiceVendorClicked(item)"
+          >
+            <v-icon>
+              mdi-delete
+            </v-icon>
+          </v-btn>
         </template>
       </v-data-table>
       <v-divider />
@@ -108,10 +96,10 @@
       ]),
       ServiceVendorsTableHeaders () {
         return [
-          { text: 'Name', value: 'serviceVendorName', sortable: true },
-          { text: 'Description', value: 'serviceVendorDescription', sortable: false },
-          { text: 'Id', value: 'serviceVendorId', sortable: true },
-          { text: 'Actions', value: 'serviceVendorActions', sortable: false },
+          { title: 'Name', key: 'name', sortable: true },
+          { title: 'Description', key: 'description',  sortable: false },
+          { title: 'Id', key: 'id', sortable: true },
+          { title: 'Actions', key: 'actions', sortable: false },
         ]
       },
     },
@@ -157,6 +145,9 @@
         this.editServiceVendor = false
         this.$store.dispatch('getServiceVendors')
       },
+      onRowClick(click, row){
+        this.$emit('serviceVendorClicked', row.item)
+      }
     },
   }
 </script>

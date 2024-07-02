@@ -41,10 +41,10 @@
       ]),
       ServiceVendorsTableHeaders () {
         return [
-          { text: 'Id', value: 'serviceVendorId', sortable: true },
-          { text: 'Name', value: 'serviceVendorName', sortable: true },
-          { text: 'Description', value: 'serviceVendorDescription', sortable: false },
-          { text: 'Actions', value: 'serviceVendorActions', sortable: false },
+          { title: 'Id', value: 'serviceVendorId', sortable: true },
+          { title: 'Name', value: 'serviceVendorName', sortable: true },
+          { title: 'Description', value: 'serviceVendorDescription', sortable: false },
+          { title: 'Actions', value: 'serviceVendorActions', sortable: false },
         ]
       },
     },
