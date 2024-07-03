@@ -18,7 +18,7 @@
             <v-text-field
               v-model="searchResources"
               label="Search Resources"
-              append-icon="mdi-magnify"
+              append-inner-icon="mdi-magnify"
               clearable
             />
           </v-col>

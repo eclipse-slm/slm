@@ -59,7 +59,7 @@
                   multiple
                   variant="outlined"
                   :error-messages="errorMessageByMemberType[clusterMemberType.name]"
-                  @update:modelValue="onSelectedClusterMembersChanged($event)"
+                  @update:modelValue="limiter();onSelectedClusterMembersChanged($event)"
                 >
                   <template slot="no-data">
                     No resources available

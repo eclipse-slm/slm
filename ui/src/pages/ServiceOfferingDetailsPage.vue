@@ -22,6 +22,7 @@
           <v-col>
             <v-btn
               class="mx-3 my-3"
+              style="background-color: #999; color: #fff"
               @click="hideServiceView"
             >
               {{ $t('buttons.Hide_info') }}
@@ -31,7 +32,7 @@
           <v-col>
             <v-btn
               class="mx-3 my-3"
-              :color="$vuetify.theme.themes.light.secondary"
+              :color="$vuetify.theme.themes.light.colors.secondary"
               :disabled="selectedServiceOfferingVersionId == null"
               @click="showOrderView"
             >

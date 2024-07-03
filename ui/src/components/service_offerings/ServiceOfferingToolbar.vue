@@ -1,71 +1,64 @@
 <template>
-  <div>
-    <v-toolbar
+  <v-toolbar
       id="ServiceHeaderFilterRow"
       flat
       height="75px"
-    >
-      <!-- Search field to filter by Service Offering Name -->
-      <div class="mr-10">
-        <v-text-field
-          v-model="filterServiceOfferingName"
-          prepend-inner-icon="search"
-          :placeholder="$t('labels.SearchLabel')"
-          single-line
-          variant="outlined"
-          density="compact"
-          rounded
-          hide-details
-          @update:modelValue="filterServices()"
-        />
-      </div>
+  >
+    <!-- Search field to filter by Service Offering Name -->
+    <v-text-field
+      v-model="filterServiceOfferingName"
+      class="mr-10"
+      prepend-inner-icon="mdi-magnify"
+      :placeholder="$t('labels.SearchLabel')"
+      single-line
+      variant="outlined"
+      density="compact"
+      rounded
+      hide-details
+      @update:modelValue="filterServices()"
+    />
 
-      <!-- Dropdown to filter by Service Offering Category -->
-      <div class="mr-10">
-        <v-select
-          v-model="filterServiceOfferingCategoryIds"
-          :items="serviceOfferingCategories"
-          :label="$t('labels.CategoryFilterLabel')"
-          :menu-props="{ closeOnContentClick: true } "
-          item-title="name"
-          item-value="id"
-          closable-chips
-          density="compact"
-          variant="outlined"
-          hide-details
-          multiple
-          max-width="10px"
-          @update:modelValue="filterServices()"
-        />
-      </div>
+    <!-- Dropdown to filter by Service Offering Category -->
+    <v-select
+      v-model="filterServiceOfferingCategoryIds"
+      class="mr-10"
+      :items="serviceOfferingCategories"
+      :label="$t('labels.CategoryFilterLabel')"
+      :menu-props="{ closeOnContentClick: true } "
+      item-title="name"
+      item-value="id"
+      closable-chips
+      density="compact"
+      variant="outlined"
+      hide-details
+      multiple
+      @update:modelValue="filterServices()"
+    />
+    <!-- Dropdown to filter by Service Vendor -->
+    <v-select
+      v-model="filterVendorId"
+      class="mr-10"
+      :items="serviceVendors"
+      label="Service Vendors"
+      :menu-props="{ closeOnContentClick: true } "
+      item-title="name"
+      item-value="id"
+      clearable
+      density="compact"
+      variant="outlined"
+      hide-details
+      @update:modelValue="filterServices()"
+    />
 
-      <!-- Dropdown to filter by Service Vendor -->
-      <div class="mr-10">
-        <v-select
-          v-model="filterVendorId"
-          :items="serviceVendors"
-          label="Service Vendors"
-          :menu-props="{ closeOnContentClick: true } "
-          item-title="name"
-          item-value="id"
-          clearable
-          density="compact"
-          variant="outlined"
-          hide-details
-          max-width="10px"
-          @update:modelValue="filterServices()"
-        />
-      </div>
 
-      <!--Button to remove all activated filters -->
-      <v-btn
+    <!--Button to remove all activated filters -->
+    <v-btn
         variant="text"
         @click="removeFilter()"
-      >
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-toolbar>
-  </div>
+    >
+      <v-icon>mdi-close</v-icon>
+    </v-btn>
+  </v-toolbar>
 </template>
 
 <script>
@@ -124,4 +117,7 @@
 </script>
 
 <style lang="scss" scoped>
+#ServiceHeaderFilterRow{
+  background-color: white;
+}
 </style>

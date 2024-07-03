@@ -2,6 +2,7 @@
   <v-card
     class="mx-1 my-1"
     variant="outlined"
+    style="border: thin solid rgba(0,0,0,.12) !important;"
     :elevation="hovered"
     height="100%"
     @mouseenter="passive ? hovered = 0 : hovered = 24"
@@ -13,11 +14,8 @@
         grid-list-md
     >
       <v-row no-gutters>
-        <v-col cols="2">
-          <v-list-item :prepend-avatar="getImageUrl(serviceVendorById(serviceOffering.serviceVendorId).logo)" xs6 />
-        </v-col>
-        <v-col cols="10">
-          <v-list-item >
+        <v-col >
+          <v-list-item :prepend-avatar="getImageUrl(serviceVendorById(serviceOffering.serviceVendorId).logo)" >
             <v-list-item-title class="text-h5">
               {{ serviceOffering.name }}
             </v-list-item-title>
@@ -57,7 +55,6 @@
         <v-img
           ref="coverImage"
           :src="createOrEditMode ? getImageUrl(serviceOffering.coverImage) : coverImage"
-          cover
           :aspect-ratio="4/3"
         >
           <template
@@ -170,4 +167,5 @@
        src="@/design/serviceOfferingCard.scss"
        lang="scss" scoped
 >
+
 </style>

@@ -87,7 +87,7 @@ export default {
   computed: {
     tableHeaders () {
       return [
-        { title: 'Name', value: 'name', sortable: true },
+        { title: 'Name', value: 'prettyName', sortable: true },
         { title: 'Version', value: 'version', sortable: true },
         { title: 'Build Time', value: 'buildTime', sortable: true },
         { title: 'Status', value: 'status', sortable: true },
