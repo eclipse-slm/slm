@@ -7,6 +7,7 @@ interface ProviderStoreState{
 }
 
 export const useProviderStore = defineStore('providerStore', {
+  persist: true,
   state:():ProviderStoreState => ({
     virtualResourceProviders_: [],
     serviceHosters_: []

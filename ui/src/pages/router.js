@@ -164,7 +164,7 @@ router.beforeEach((to, from, next) => {
       next('/access_denied')
     }
   } else if (to.meta.adminPermissionRequired) {
-    if (userStore.userRoles().includes('slm-admin')) {
+    if (userStore.userRoles.includes('slm-admin')) {
       next()
     } else {
       next('/access_denied')

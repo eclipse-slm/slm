@@ -6,6 +6,7 @@ interface OverviewStoreState{
 }
 
 export const useOverviewStore = defineStore('overviewStore', {
+  persist: true,
   state:():OverviewStoreState => ({
     resources: []
   }),

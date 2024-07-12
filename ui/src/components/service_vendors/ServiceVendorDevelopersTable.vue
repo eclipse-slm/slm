@@ -86,7 +86,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
   import UsersRestApi from '@/api/service-management/usersRestApi'
   import Vue from 'vue'

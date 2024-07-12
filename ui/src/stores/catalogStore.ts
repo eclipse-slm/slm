@@ -9,6 +9,7 @@ interface CatalogStoreState{
 
 
 export const useCatalogStore = defineStore('catalogStore', {
+    persist: true,
     state: (): CatalogStoreState => ({
         apiStateCatalog_: ApiState.INIT,
         aasSubmodelTemplates_: []

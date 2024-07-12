@@ -72,11 +72,6 @@
 
 <script>
 
-  import {
-    mapGetters,
-    mapState,
-  } from 'vuex'
-  import i18n from '@/localisation/i18n'
   import {right} from "core-js/internals/array-reduce";
   import {useStore} from "@/stores/store";
   import {useUserStore} from "@/stores/userStore";

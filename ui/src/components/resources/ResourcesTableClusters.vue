@@ -137,7 +137,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import ClusterScaleDialog from '@/components/resources/dialogs/ClusterScaleDialog'
   import ClusterDeleteDialog from '@/components/resources/dialogs/ClusterDeleteDialog'
   import {useResourcesStore} from "@/stores/resourcesStore";

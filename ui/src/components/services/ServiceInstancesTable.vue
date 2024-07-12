@@ -178,13 +178,9 @@
 </template>
 
 <script>
-  import {
-    mapGetters,
-  } from 'vuex'
   import ServiceInstanceDeleteDialog from '@/components/services/ServiceInstanceDeleteDialog'
   import ServiceInstancesRestApi from '@/api/service-management/serviceInstancesRestApi'
   import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
-  import Vue from "vue";
   import ConfirmDialog from "@/components/base/ConfirmDialog";
   import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
   import {useServicesStore} from "@/stores/servicesStore";
@@ -240,7 +236,7 @@
       this.services.forEach(service => {
         ServiceInstancesRestApi.getAvailableVersionsForServiceInstance(service.id).then(availableUpdates => {
           if (availableUpdates.length > 0) {
-            Vue.set(this.availableVersionChangesOfServices, service.id, availableUpdates)
+            this.availableVersionChangesOfServices[service.id] = availableUpdates;
           }
         })
       })

@@ -82,7 +82,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import TextWithLabel from '@/components/base/TextWithLabel'
   import getImageUrl from '@/utils/imageUtil'
   import ServiceOffering from "@/model/serviceOffering.ts";

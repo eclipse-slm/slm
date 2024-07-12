@@ -69,7 +69,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import ServiceCategoryCreateOrEditDialog from '@/components/service_offerings/ServiceCategoryCreateOrEditDialog'
   import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
   import OverviewHeading from "@/components/base/OverviewHeading.vue";

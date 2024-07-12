@@ -149,9 +149,10 @@ app.use(cors)
 
 app.use(router);
 
-
-const pina = createPinia();
-app.use(pina);
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
+const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
+app.use(pinia);
 
 
 app.use(v);

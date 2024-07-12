@@ -46,7 +46,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import ServiceInstancesTable from '@/components/services/ServiceInstancesTable'
   import OverviewHeading from "@/components/base/OverviewHeading.vue";
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";

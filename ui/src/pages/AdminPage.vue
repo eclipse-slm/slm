@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import VersionsOverview from '@/components/admin/VersionsOverview'
   import ServiceCategoriesTable from '@/components/service_offerings/ServiceCategoriesTable'
   import ServiceVendorsDevelopersTable from '@/components/service_vendors/ServiceVendorDevelopersTable'

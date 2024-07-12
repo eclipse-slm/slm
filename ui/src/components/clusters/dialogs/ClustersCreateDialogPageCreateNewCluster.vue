@@ -99,7 +99,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import clustersRestApi from '@/api/resource-management/clustersRestApi'
   import ClustersCreateDialogPage from "@/components/clusters/dialogs/ClustersCreateDialogPage";
   import {useProviderStore} from "@/stores/providerStore";

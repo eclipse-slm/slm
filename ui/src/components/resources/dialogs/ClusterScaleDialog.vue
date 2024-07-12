@@ -164,7 +164,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
   import {useResourcesStore} from "@/stores/resourcesStore";
 

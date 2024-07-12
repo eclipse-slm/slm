@@ -11,6 +11,7 @@ interface StoreState{
 }
 
 export const useStore = defineStore('store', {
+  persist: true,
   state:():StoreState => ({
     barColor: 'rgba(70, 70, 70, 0.8), rgba(0, 0, 0, .8)',
     themeColorMain_: '#179C7D',

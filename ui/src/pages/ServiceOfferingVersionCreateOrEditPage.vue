@@ -140,7 +140,7 @@
   import ServiceOfferingVersionWizardStep3ServiceOptions from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep3ServiceOptions'
   import ServiceOfferingVersionWizardStep4Requirements from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep4Requirements'
   import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
-  import { mapGetters } from 'vuex'
+
   import ApiState from '@/api/apiState'
   import {app} from "@/main";
   import {useServicesStore} from "@/stores/servicesStore";

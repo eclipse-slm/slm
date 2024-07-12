@@ -133,7 +133,7 @@
 
 <script>
   // import ServiceOfferingCardGrid from '@/components/service_offerings/ServiceOfferingCardGrid'
-  import { mapGetters } from 'vuex'
+
   import ServiceOfferingsRestApi from "@/api/service-management/serviceOfferingsRestApi.ts";
   import ProgressCircular from "@/components/base/ProgressCircular";
   import {app} from "@/main";

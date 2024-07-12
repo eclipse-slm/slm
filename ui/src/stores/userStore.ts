@@ -9,6 +9,7 @@ interface UserStoreState {
 }
 
 export const useUserStore = defineStore('userStore', {
+    persist: true,
     state:():UserStoreState => ({
        apiStateUser_: ApiState.INIT,
        userInfo_: null

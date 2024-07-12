@@ -37,6 +37,7 @@ interface ServiceStoreState{
 }
 
 export const useServicesStore = defineStore('servicesStore', {
+    persist: true,
     state:():ServiceStoreState => ({
         apiStateServices_: {
             serviceOfferings: ApiState.INIT,

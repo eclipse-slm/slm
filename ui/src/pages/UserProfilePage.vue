@@ -111,7 +111,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import ApiState from '@/api/apiState'
   import {useUserStore} from "@/stores/userStore";
   import {useStore} from "@/stores/store";

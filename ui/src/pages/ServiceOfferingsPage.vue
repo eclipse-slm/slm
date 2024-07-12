@@ -82,7 +82,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import ApiState from '@/api/apiState.js'
   import ServiceOfferingCardGrid from '@/components/service_offerings/ServiceOfferingCardGrid'
   import ServiceOfferingOverviewToolbar from '@/components/service_offerings/ServiceOfferingToolbar'

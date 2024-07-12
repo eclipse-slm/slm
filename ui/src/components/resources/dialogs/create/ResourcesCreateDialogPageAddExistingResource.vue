@@ -60,7 +60,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import ResourcesCreateDialogPage from '@/components/resources/dialogs/create/ResourcesCreateDialogPage'
   import {useResourcesStore} from "@/stores/resourcesStore";
 

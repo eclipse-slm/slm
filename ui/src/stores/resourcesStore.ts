@@ -38,6 +38,7 @@ interface ResourcesStoreState{
 }
 
 export const useResourcesStore = defineStore('resourcesStore', {
+    persist: true,
     state:():ResourcesStoreState => ({
         apiStateResources_: ApiState.INIT,
 

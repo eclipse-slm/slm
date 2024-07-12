@@ -12,7 +12,7 @@
       elevation="1"
       size="small"
       :icon="value ? 'mdi-view-quilt' : 'mdi-dots-vertical'"
-      @click="setDrawer(!drawer)"
+      @click="store.drawer = !drawer"
     />
 
     <v-toolbar-title
@@ -213,7 +213,7 @@
 </template>
 
 <script>
-  import { mapState, mapMutations, mapGetters } from 'vuex'
+
   import {app} from "@/main";
   import {useTheme} from "vuetify";
   import {useNotificationStore} from "@/stores/notificationStore";
@@ -284,15 +284,11 @@
     watch: {
       color (val) {
         this.$vuetify.theme.themes[this.isDark ? 'dark' : 'light'].primary = val
-        this.setThemeColorMain(val)
+
       },
     },
 
     methods: {
-      ...mapMutations({
-        setDrawer: 'SET_DRAWER',
-        setThemeColorMain: 'SET_THEME_COLOR_MAIN',
-      }),
       userIconMenuItemClick (index) {
         this.userIconMenuItems[index].click.call(this)
       },

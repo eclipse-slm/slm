@@ -269,9 +269,6 @@
 
 <script>
 
-  import {
-    mapGetters,
-  } from 'vuex'
   import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
   import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
   import ServiceInstancesRestApi from "@/api/service-management/serviceInstancesRestApi";

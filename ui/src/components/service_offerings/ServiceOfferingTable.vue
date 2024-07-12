@@ -184,7 +184,7 @@
 </template>
 
 <script>
-import {mapGetters} from "vuex";
+
 import ServiceOfferingVersionsRestApi from  "@/api/service-management/serviceOfferingVersionsRestApi";
 import ProgressCircular from "@/components/base/ProgressCircular";
 import {useServicesStore} from "@/stores/servicesStore";

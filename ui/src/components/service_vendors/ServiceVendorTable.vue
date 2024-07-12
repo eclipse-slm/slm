@@ -71,7 +71,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import ServiceVendorCreateOrEditDialog from '@/components/service_vendors/ServiceVendorCreateOrEditDialog'
   import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
   import Vue from 'vue'

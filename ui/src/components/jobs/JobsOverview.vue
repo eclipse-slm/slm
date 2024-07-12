@@ -61,7 +61,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import OverviewHeading from "@/components/base/OverviewHeading.vue";
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
   import getEnv from '@/utils/env'

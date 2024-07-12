@@ -72,7 +72,7 @@
   import ServiceOfferingWizardGitStep1Common
     from "@/components/service_offerings/wizard_service_offering/ServiceOfferingWizardGitStep1Common";
   import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
-  import { mapGetters } from 'vuex'
+
   import ApiState from '@/api/apiState'
   import {app} from "@/main";
   import {useServicesStore} from "@/stores/servicesStore";

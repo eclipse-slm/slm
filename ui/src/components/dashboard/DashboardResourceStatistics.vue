@@ -35,7 +35,7 @@
 
 <script>
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-  import {mapGetters} from "vuex";
+
   import AasCircularChart from "@/components/charts/AasCircularChart.vue";
   import {useResourcesStore} from "@/stores/resourcesStore";
 

@@ -44,7 +44,7 @@
               v-if="notifications_unread.length > 0"
               variant="outlined"
               prepend-icon="mdi-email-open-outline"
-              @click="markAsRead"
+              @click="notificationStore.markAsRead()"
             >
               Mark all
             </v-btn>
@@ -88,7 +88,6 @@
 </template>
 
 <script>
-  import { mapActions, mapGetters } from 'vuex'
   import {useNotificationStore} from "@/stores/notificationStore";
 
   export default {
@@ -129,7 +128,6 @@
       },
     },
     methods: {
-      ...mapActions(['markAsRead']),
       getFormatedDate (time) {
         const options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }
         const location = 'de-DE'

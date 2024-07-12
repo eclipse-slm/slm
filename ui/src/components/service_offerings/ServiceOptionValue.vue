@@ -138,7 +138,7 @@
   import VueIp from 'vue-ip'
   import { serviceOptionMixin } from '@/utils/serviceOptionUtil'
   import AASRestApi from "@/api/resource-management/aasRestApi";
-  import { mapGetters } from "vuex";
+
   import {Field } from "vee-validate";
   import {useServicesStore} from "@/stores/servicesStore";
   import {useResourcesStore} from "@/stores/resourcesStore";

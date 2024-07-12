@@ -55,7 +55,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import {useServicesStore} from "@/stores/servicesStore";
   import {storeToRefs} from "pinia";
 

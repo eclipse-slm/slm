@@ -226,7 +226,7 @@
 </template>
 
 <script>
-  import { mapGetters, mapActions } from 'vuex'
+
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
   import DashboardResourceStatistics from "@/components/dashboard/DashboardResourceStatistics.vue";
   import {useServicesStore} from "@/stores/servicesStore";

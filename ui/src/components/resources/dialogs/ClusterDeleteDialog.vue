@@ -71,7 +71,7 @@
 
 <script>
   import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
-  import { mapGetters } from "vuex";
+
   import {toRef} from "vue";
   import {useServicesStore} from "@/stores/servicesStore";
   import {storeToRefs} from "pinia";

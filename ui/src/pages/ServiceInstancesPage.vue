@@ -22,7 +22,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import ApiState from '@/api/apiState.js'
   import ServiceInstancesOverview from '@/components/services/ServiceInstancesOverview'
   import {useServicesStore} from "@/stores/servicesStore";

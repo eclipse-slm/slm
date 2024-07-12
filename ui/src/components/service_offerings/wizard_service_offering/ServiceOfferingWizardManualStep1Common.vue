@@ -135,7 +135,7 @@
 
 <script>
 import ServiceOfferingCardGrid from "@/components/service_offerings/ServiceOfferingCardGrid";
-import { mapGetters } from "vuex";
+
 import {Field, Form as ValidationForm } from "vee-validate";
 import * as yup from 'yup';
 import {useServicesStore} from "@/stores/servicesStore";

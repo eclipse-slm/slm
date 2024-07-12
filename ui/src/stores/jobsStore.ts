@@ -8,6 +8,7 @@ export interface JobsStoreState{
 }
 
 export const useJobsStore = defineStore('jobsStore', {
+  persist: true,
   state: (): JobsStoreState =>({
     jobs_: [],
     jobs_running_: [],

@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import {mapGetters} from "vuex";
+
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 import {useServicesStore} from "@/stores/servicesStore";
 

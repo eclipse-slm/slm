@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+
 import {useStore} from "@/stores/store";
 
 export default {

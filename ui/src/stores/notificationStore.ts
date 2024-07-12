@@ -11,6 +11,7 @@ export interface NotificationStoreState{
 }
 
 export const useNotificationStore = defineStore('notificationStore', {
+  persist: true,
   state: (): NotificationStoreState => ({
     notifications_: [],
     notifications_unread_: [],

@@ -85,7 +85,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import ServiceCard from '@/components/service_offerings/ServiceOfferingCardGrid'
   import ServiceDetailsOverview from '@/components/service_offerings/ServiceOfferingDetailsOverview'
   import ServiceDetailsRequirements from '@/components/service_offerings/ServiceOfferingDetailsRequirements.vue'

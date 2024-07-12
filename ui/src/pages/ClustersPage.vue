@@ -26,7 +26,7 @@
 </template>
 <script>
 import ClustersOverview from "@/components/clusters/ClustersOverview.vue";
-import { mapGetters } from 'vuex'
+
 import ApiState from "@/api/apiState";
 import {useStore} from "@/stores/store";
 import {useResourcesStore} from "@/stores/resourcesStore";

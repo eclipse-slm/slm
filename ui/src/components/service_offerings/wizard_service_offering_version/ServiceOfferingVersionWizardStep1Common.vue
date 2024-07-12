@@ -84,7 +84,7 @@
 
 <script>
 import 'vue-json-pretty/lib/styles.css'
-import {mapGetters} from "vuex";
+
 import {Field, Form as ValidationForm } from "vee-validate";
 import * as yup from 'yup';
 import {useServicesStore} from "@/stores/servicesStore";

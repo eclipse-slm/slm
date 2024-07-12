@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import {mapGetters} from "vuex";
+
 import VmCreateDialog from "@/components/provider/dialogs/VmCreateDialog.vue";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 import {useResourcesStore} from "@/stores/resourcesStore";

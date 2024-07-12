@@ -171,7 +171,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import ApiState from '@/api/apiState'
   import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
   import ServiceOptionValue from '@/components/service_offerings/ServiceOptionValue'

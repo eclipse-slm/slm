@@ -3,7 +3,7 @@
     :prepend-icon="item.icon"
     :subgroup="subGroup"
     append-icon="mdi-menu-down"
-    :color="barColor !== 'rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.7)' ? 'white' : 'grey darken-1'"
+    :color="store.barColor !== 'rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.7)' ? 'white' : 'grey darken-1'"
   >
     <template #activator>
       <v-list-item v-if="text">
@@ -43,7 +43,8 @@
 <script>
   // Utilities
   import kebabCase from 'lodash/kebabCase'
-  import { mapState } from 'vuex'
+
+  import {useStore} from "@/stores/store";
 
   export default {
     name: 'ItemGroup',
@@ -69,9 +70,11 @@
         default: false,
       },
     },
-
+    setup(){
+      const store = useStore();
+      return {store};
+    },
     computed: {
-      ...mapState(['barColor']),
       children () {
         return this.item.children.map(item => ({
           ...item,

@@ -164,7 +164,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import clustersRestApi from '@/api/resource-management/clustersRestApi'
   import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
   import {Field, Form as ValidationForm } from "vee-validate";

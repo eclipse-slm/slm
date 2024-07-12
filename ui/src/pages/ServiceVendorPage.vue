@@ -245,7 +245,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
   import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
   import UsersRestApi from '@/api/service-management/usersRestApi'

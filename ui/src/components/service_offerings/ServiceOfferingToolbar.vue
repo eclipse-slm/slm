@@ -62,7 +62,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+
   import {useServicesStore} from "@/stores/servicesStore";
 
   export default {

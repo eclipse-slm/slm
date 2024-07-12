@@ -201,7 +201,7 @@
 
 import resourcesRestApi from '@/api/resource-management/resourcesRestApi'
 import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
-import {mapGetters} from "vuex";
+
 import {Field, Form as ValidationForm} from "vee-validate";
 import * as yup from 'yup';
 import {useResourcesStore} from "@/stores/resourcesStore";
