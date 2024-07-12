@@ -136,6 +136,9 @@ class ResourcesApi {
       .catch(logRequestError)
   }
     //endregion
+    getOtp(project, ip, username) {
+        return Promise.resolve('');
+    }
 }
 
 export default new ResourcesApi()

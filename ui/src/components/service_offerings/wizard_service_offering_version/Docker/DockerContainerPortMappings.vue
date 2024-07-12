@@ -82,7 +82,7 @@
 
           <template #item.protocol="{ item }">
             <v-btn-toggle
-                mandatory="force"
+              mandatory="force"
               class="ml-5"
             >
               <v-btn

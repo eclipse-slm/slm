@@ -7,7 +7,7 @@
   >
     <template
       v-if="$attrs.icon"
-      v-slot:prepend
+      #prepend
     >
       <v-icon
         class="v-alert__icon elevation-6 bg-white"
@@ -22,7 +22,7 @@
 
     <template
       v-if="$attrs.dismissible"
-      v-slot:close="{ toggle }"
+      #close="{ toggle }"
     >
       <v-btn
         :aria-label="$vuetify.lang.t('$vuetify.close')"

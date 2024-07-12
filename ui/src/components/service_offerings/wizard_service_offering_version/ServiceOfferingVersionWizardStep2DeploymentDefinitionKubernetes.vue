@@ -77,7 +77,6 @@
         :service-vendor-id="serviceVendorId"
         :multiple="true"
       />
-
     </v-form>
 
     <!-- Navigation Buttons-->

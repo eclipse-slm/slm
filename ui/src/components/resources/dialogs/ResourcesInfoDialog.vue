@@ -3,7 +3,7 @@
     v-model="showDialog"
     @click:outside="onCloseButtonClicked"
   >
-    <template v-slot:default="{}">
+    <template #default="{}">
       <v-card v-if="showDialog">
         <v-toolbar
           color="primary"

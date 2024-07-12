@@ -7,11 +7,15 @@
     :active-class="`bg-primary ${!isDark ? 'black' : 'white'}--text`"
   >
     <template #prepend>
-      <v-icon v-if="text" class="v-list-item__icon--text">
+      <v-icon
+        v-if="text"
+        class="v-list-item__icon--text"
+      >
         {{ computedText }}
       </v-icon>
-      <v-icon v-else-if="item.icon"
-              :icon="item.icon"
+      <v-icon
+        v-else-if="item.icon"
+        :icon="item.icon"
       />
     </template>
     <v-list-item-title v-if="item.title">

@@ -61,7 +61,9 @@
           <v-icon>mdi-plus</v-icon>
           Service Option Category
         </v-btn>
-        <div v-else>No service options defined in previous steps</div>
+        <div v-else>
+          No service options defined in previous steps
+        </div>
       </v-col>
     </v-row>
 

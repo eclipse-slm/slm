@@ -22,7 +22,6 @@
               density="compact"
               :error-messages="errors"
               :model-value="newServiceOffering.name"
-
             />
           </Field>
 
@@ -43,18 +42,17 @@
               density="compact"
               :error-messages="errors"
               :model-value="newServiceOffering.serviceCategoryId"
-
             />
             <span>{{ errors[0] }}</span>
           </Field>
 
           <!-- Short Description !-->
           <Field
+            id="shortDescriptionInput2"
             v-slot="{ field, errors }"
             v-model="newServiceOffering.shortDescription"
             name="Short Description"
             :rules="required"
-            id="shortDescriptionInput2"
           >
             <v-text-field
               id="shortDescriptionInput"
@@ -123,8 +121,12 @@
           "
           @click="!meta.valid ? validate() : handleSubmit(onNextButtonClicked)"
         >
-          <div v-if="editMode">Update</div>
-          <div v-else>Create</div>
+          <div v-if="editMode">
+            Update
+          </div>
+          <div v-else>
+            Create
+          </div>
         </v-btn>
       </v-card-actions>
     </ValidationForm>

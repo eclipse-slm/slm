@@ -22,8 +22,8 @@
         </v-tabs>
 
         <v-window-item
-            v-for="item in provider"
-            :key="item.id"
+          v-for="item in provider"
+          :key="item.id"
         >
           <v-card flat>
             <v-card-text>

@@ -14,17 +14,17 @@
           <td>
             <v-row>
               <v-tooltip
-                  location="bottom"
-                  :disabled="!item.scmBased"
+                location="bottom"
+                :disabled="!item.scmBased"
               >
                 <template #activator="{ props }">
                   <div v-bind="props">
                     <v-btn
-                        :disabled="item.scmBased"
-                        class="ma-1"
-                        color="accent"
-                        size="small"
-                        @click="onAddServiceOfferingVersionClicked(item)"
+                      :disabled="item.scmBased"
+                      class="ma-1"
+                      color="accent"
+                      size="small"
+                      @click="onAddServiceOfferingVersionClicked(item)"
                     >
                       <v-icon>
                         mdi-plus
@@ -35,18 +35,18 @@
                 <span>This action is only available for service offerings that are not based on a Git repository</span>
               </v-tooltip>
               <v-tooltip
-                  location="bottom"
-                  :disabled="!item.scmBased"
+                location="bottom"
+                :disabled="!item.scmBased"
               >
                 <template #activator="{ props }">
                   <div v-bind="props">
                     <v-btn
-                        id="editServiceOfferingButton"
-                        class="ma-1"
-                        size="small"
-                        color="info"
-                        :disabled="item.scmBased"
-                        @click.stop="onEditServiceOfferingClicked(item)"
+                      id="editServiceOfferingButton"
+                      class="ma-1"
+                      size="small"
+                      color="info"
+                      :disabled="item.scmBased"
+                      @click.stop="onEditServiceOfferingClicked(item)"
                     >
                       <v-icon>
                         mdi-pencil
@@ -57,10 +57,10 @@
                 <span>This action is only available for service offerings that are not based on a Git repository</span>
               </v-tooltip>
               <v-btn
-                  class="ma-1"
-                  color="error"
-                  size="small"
-                  @click.stop="onDeleteServiceOfferingClicked(item)"
+                class="ma-1"
+                color="error"
+                size="small"
+                @click.stop="onDeleteServiceOfferingClicked(item)"
               >
                 <v-icon>
                   mdi-delete
@@ -78,7 +78,7 @@
           </td>
           <td>
             <v-icon
-                @click.stop="expandRow(item);toggleExpand(internalItem)"
+              @click.stop="expandRow(item);toggleExpand(internalItem)"
             >
               {{ isExpanded(internalItem) ? 'mdi-close' : 'mdi-chevron-down' }}
             </v-icon>
@@ -86,7 +86,7 @@
         </tr>
       </template>
 
-      <template v-slot:expanded-row="{ columns, item: serviceOffering }">
+      <template #expanded-row="{ columns, item: serviceOffering }">
         <tr>
           <td :colspan="columns.length">
             <v-col
@@ -99,7 +99,6 @@
                 hide-default-footer
                 :sort-by="[{key: 'version', order: 'desc'}]"
               >
-
                 <template #item="{ item: version }">
                   <tr>
                     <td>{{ version.version }}</td>
@@ -108,17 +107,17 @@
                     <td>
                       <v-row>
                         <v-tooltip
-                            location="bottom"
-                            :disabled="!serviceOffering.scmBased"
+                          location="bottom"
+                          :disabled="!serviceOffering.scmBased"
                         >
                           <template #activator="{ props }">
                             <div v-bind="props">
                               <v-btn
-                                  :disabled="serviceOffering.scmBased"
-                                  class="ma-1"
-                                  color="info"
-                                  size="small"
-                                  @click="onEditServiceOfferingVersionClicked(version)"
+                                :disabled="serviceOffering.scmBased"
+                                class="ma-1"
+                                color="info"
+                                size="small"
+                                @click="onEditServiceOfferingVersionClicked(version)"
                               >
                                 <v-icon>
                                   mdi-pencil
@@ -130,17 +129,17 @@
                         </v-tooltip>
 
                         <v-tooltip
-                            location="bottom"
-                            :disabled="!serviceOffering.scmBased"
+                          location="bottom"
+                          :disabled="!serviceOffering.scmBased"
                         >
                           <template #activator="{ props }">
                             <div v-bind="props">
                               <v-btn
-                                  :disabled="serviceOffering.scmBased"
-                                  class="ma-1"
-                                  color="error"
-                                  size="small"
-                                  @click="onDeleteServiceOfferingVersionClicked(version)"
+                                :disabled="serviceOffering.scmBased"
+                                class="ma-1"
+                                color="error"
+                                size="small"
+                                @click="onDeleteServiceOfferingVersionClicked(version)"
                               >
                                 <v-icon>
                                   mdi-delete
@@ -162,13 +161,13 @@
                 </v-col>
                 <v-col cols="9">
                   <v-btn
-                      color="secondary"
-                      @click="onAddServiceOfferingVersionClicked(expandedServiceOffering)"
+                    color="secondary"
+                    @click="onAddServiceOfferingVersionClicked(expandedServiceOffering)"
                   >
                     <v-icon
-                        density="compact"
-                        size="small"
-                        class="mr-2"
+                      density="compact"
+                      size="small"
+                      class="mr-2"
                     >
                       mdi-plus-circle
                     </v-icon>
@@ -181,7 +180,6 @@
         </tr>
       </template>
     </v-data-table>
-
   </div>
 </template>
 

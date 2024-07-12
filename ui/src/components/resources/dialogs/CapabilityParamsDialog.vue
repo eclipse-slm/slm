@@ -4,7 +4,7 @@
     width="600"
     @click:outside="$emit('canceled')"
   >
-    <template v-slot:default="{}">
+    <template #default="{}">
       <v-card>
         <v-toolbar
           color="primary"

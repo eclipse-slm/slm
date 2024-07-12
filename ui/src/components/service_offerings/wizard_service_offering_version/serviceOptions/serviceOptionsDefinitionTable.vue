@@ -14,9 +14,15 @@
         tag="tbody"
         group="a"
       >
-        <tr v-for="(serviceOption, index) in props.items" :key="index">
+        <tr
+          v-for="(serviceOption, index) in props.items"
+          :key="index"
+        >
           <td>
-            <v-icon size="small" class="page__grab-icon">
+            <v-icon
+              size="small"
+              class="page__grab-icon"
+            >
               mdi-arrow-all
             </v-icon>
           </td>
@@ -32,7 +38,6 @@
                 v-bind="field"
                 :error-messages="errors"
                 :model-value="serviceOption.name"
-
               />
             </Field>
           </td>
@@ -51,14 +56,17 @@
             </Field>
           </td>
           <td :id="serviceOption.key + '_Value'">
-            <v-tooltip location="bottom" :disabled="!serviceOption.required">
+            <v-tooltip
+              location="bottom"
+              :disabled="!serviceOption.required"
+            >
               <template #activator="{ props }">
                 <div v-bind="props">
                   <service-option-value
                     :service-option="serviceOption"
                     :disabled="
                       serviceOption.required &&
-                      serviceOption.valueType !== 'AAS_SM_TEMPLATE'
+                        serviceOption.valueType !== 'AAS_SM_TEMPLATE'
                     "
                     :definition-mode="true"
                     v-bind="attrs"
@@ -74,7 +82,7 @@
               :items="validatorList"
               :disabled="
                 serviceOption.optionType === 'VOLUME' ||
-                serviceOption.optionType === 'PORT_MAPPING'
+                  serviceOption.optionType === 'PORT_MAPPING'
               "
               @update:modelValue="
                 onValueTypeChanged(serviceOption, serviceOption.valueType)

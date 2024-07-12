@@ -4,7 +4,7 @@
     width="400"
     @click:outside="$emit('canceled')"
   >
-    <template v-slot:default="{isActive}">
+    <template #default="{isActive}">
       <v-card v-if="isActive">
         <v-toolbar
           color="primary"

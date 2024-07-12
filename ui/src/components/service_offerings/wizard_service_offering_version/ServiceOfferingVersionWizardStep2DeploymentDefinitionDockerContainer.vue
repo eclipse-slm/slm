@@ -64,8 +64,7 @@
           />
         </v-list-group>
         <v-row>
-          <v-col>
-          </v-col>
+          <v-col />
         </v-row>
       </v-list>
       <!-- Navigation Buttons-->

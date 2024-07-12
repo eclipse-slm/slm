@@ -1,46 +1,46 @@
 <template>
   <v-card
-      v-bind="$attrs"
-      :class="classes"
-      class="v-card--material pa-3"
-      style="margin-top: 30px; margin-bottom: 15px;"
+    v-bind="$attrs"
+    :class="classes"
+    class="v-card--material pa-3"
+    style="margin-top: 30px; margin-bottom: 15px;"
   >
     <div class="d-flex grow flex-wrap">
       <v-avatar
-          v-if="avatar"
-          size="128"
-          class="mx-auto v-card--material__avatar elevation-6"
+        v-if="avatar"
+        size="128"
+        class="mx-auto v-card--material__avatar elevation-6"
       >
-        <v-img :src="avatar"/>
+        <v-img :src="avatar" />
       </v-avatar>
 
       <v-sheet
-          v-else
-          :class="{
+        v-else
+        :class="{
           'pa-3': !$slots.image
         }"
-          :color="color ? color : themeColorMain"
-          :max-height="icon ? 90 : undefined"
-          :width="icon ? 'auto' : '100%'"
-          elevation="6"
-          class="text-start v-card--material__heading mb-n6"
-          theme="dark"
-          style="top: -30px"
+        :color="color ? color : store.themeColorMain"
+        :max-height="icon ? 90 : undefined"
+        :width="icon ? 'auto' : '100%'"
+        elevation="6"
+        class="text-start v-card--material__heading mb-n6"
+        theme="dark"
+        style="top: -30px"
       >
         <slot
-            v-if="$slots.heading"
-            name="heading"
+          v-if="$slots.heading"
+          name="heading"
         />
 
         <slot
-            v-else-if="$slots.image"
-            name="image"
+          v-else-if="$slots.image"
+          name="image"
         />
 
         <div
-            v-else-if="title && !icon"
-            class="text-h4 font-weight-light"
-            v-text="title"
+          v-else-if="title && !icon"
+          class="text-h4 font-weight-light"
+          v-text="title"
         />
 
         <v-icon
@@ -61,7 +61,7 @@
         v-if="$slots['after-heading']"
         class="ml-6"
       >
-        <slot name="after-heading"/>
+        <slot name="after-heading" />
       </div>
 
       <div

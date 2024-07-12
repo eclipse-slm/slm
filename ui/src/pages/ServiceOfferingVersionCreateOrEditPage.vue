@@ -32,7 +32,7 @@
         hide-actions
         :items="[$t('ServiceStepper.Common'), 'Deployment Definition', 'Service Options', $t('ServiceStepper.Requirements') ]"
       >
-<!--        <v-stepper-header>
+        <!--        <v-stepper-header>
           <v-stepper-item
             step="1"
             :complete="createWizardState.step1.completed"
@@ -61,69 +61,69 @@
         <!-- Step 1 - Common -->
         <template #item.1>
           <service-offering-version-wizard-step1-common
-              :edit-mode="editMode"
-              :service-offering-version="newServiceOfferingVersion"
-              :service-vendor-id="serviceVendorId"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
+            :edit-mode="editMode"
+            :service-offering-version="newServiceOfferingVersion"
+            :service-vendor-id="serviceVendorId"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
           />
         </template>
         <!-- Step 2 - Deployment Definition -->
-        <template #item.2 >
+        <template #item.2>
           <!-- Docker Container -->
           <service-offering-version-wizard-step2-deployment-definition-docker-container
-              v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'DOCKER_CONTAINER'"
-              :edit-mode="editMode"
-              :service-offering-version="newServiceOfferingVersion"
-              :service-vendor-id="serviceVendorId"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
+            v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'DOCKER_CONTAINER'"
+            :edit-mode="editMode"
+            :service-offering-version="newServiceOfferingVersion"
+            :service-vendor-id="serviceVendorId"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
           />
           <!-- Docker Compose -->
           <service-offering-version-wizard-step2-deployment-definition-docker-compose
-              v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'DOCKER_COMPOSE'"
-              :edit-mode="editMode"
-              :service-offering-version="newServiceOfferingVersion"
-              :service-vendor-id="serviceVendorId"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
+            v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'DOCKER_COMPOSE'"
+            :edit-mode="editMode"
+            :service-offering-version="newServiceOfferingVersion"
+            :service-vendor-id="serviceVendorId"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
           />
           <!-- Kubernetes -->
           <service-offering-version-wizard-step2-deployment-definition-kubernetes
-              v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'KUBERNETES'"
-              :edit-mode="editMode"
-              :service-offering-version="newServiceOfferingVersion"
-              :service-vendor-id="serviceVendorId"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
+            v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'KUBERNETES'"
+            :edit-mode="editMode"
+            :service-offering-version="newServiceOfferingVersion"
+            :service-vendor-id="serviceVendorId"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
           />
           <!-- Codesys -->
           <service-offering-version-wizard-step2-deployment-definition-codesys
-              v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'CODESYS'"
-              :edit-mode="editMode"
-              :service-offering-version="newServiceOfferingVersion"
-              :service-vendor-id="serviceVendorId"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
+            v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'CODESYS'"
+            :edit-mode="editMode"
+            :service-offering-version="newServiceOfferingVersion"
+            :service-vendor-id="serviceVendorId"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
           />
         </template>
         <!-- Step 3 - Service Options -->
         <template #item.3>
           <service-offering-version-wizard-step3-service-options
-              :edit-mode="editMode"
-              :service-offering-version="newServiceOfferingVersion"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
+            :edit-mode="editMode"
+            :service-offering-version="newServiceOfferingVersion"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
           />
         </template>
 
         <!--- Step 4 - Service Requirements -->
         <template #item.4>
           <service-offering-version-wizard-step4-requirements
-              :edit-mode="editMode"
-              :service-offering-version="newServiceOfferingVersion"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
+            :edit-mode="editMode"
+            :service-offering-version="newServiceOfferingVersion"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
           />
         </template>
       </v-stepper>

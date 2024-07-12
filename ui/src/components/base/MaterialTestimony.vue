@@ -2,8 +2,8 @@
   <v-card class="text-center v-card--testimony">
     <div class="pt-6">
       <v-icon
-          color="black"
-          size="x-large"
+        color="black"
+        size="x-large"
       >
         mdi-format-quote-close
       </v-icon>
@@ -17,12 +17,14 @@
 
     <div
       class="text-h3 font-weight-light mb-2"
-    >{{ author }}
+    >
+      {{ author }}
     </div>
 
     <div
       class="text-body-2 text-uppercase text-grey"
-    >{{ handle }}
+    >
+      {{ handle }}
     </div>
 
     <v-avatar

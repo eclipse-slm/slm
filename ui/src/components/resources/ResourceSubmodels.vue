@@ -1,22 +1,30 @@
 <template>
   <div>
-    <v-table v-if="submodels.length > 0" v-slot>
+    <v-table
+      v-if="submodels.length > 0"
+      v-slot
+    >
       <thead>
         <tr>
           <th>{{ 'IdShort' }}</th>
           <th>{{ 'Identification' }}</th>
           <th>{{ 'Details' }}</th>
           <th>{{ 'semantic Id' }}</th>
-          <th></th>
+          <th />
         </tr>
       </thead>
       <tbody>
-        <tr v-for="submodel in submodels" :key="submodel.idShort">
+        <tr
+          v-for="submodel in submodels"
+          :key="submodel.idShort"
+        >
           <td> {{ submodel.idShort }}</td>
           <td> {{ submodel.identification.idType }}, {{ submodel.identification.id }} </td>
           <td>
-            <a :href="aasGuiUrl+'/?aas='+submodel.endpoints[0].address.replace('aas/submodels', 'aas&path=submodels')" 
-               target="_blank"><v-icon>mdi-open-in-new</v-icon></a>
+            <a
+              :href="aasGuiUrl+'/?aas='+submodel.endpoints[0].address.replace('aas/submodels', 'aas&path=submodels')" 
+              target="_blank"
+            ><v-icon>mdi-open-in-new</v-icon></a>
           </td>
           <td>
             <div v-if="submodel.semanticId && submodel.semanticId.keys.length > 0">
@@ -35,13 +43,20 @@
       </tbody>
     </v-table>
     <div v-else>
-      <v-alert variant="outlined" type="info">
+      <v-alert
+        variant="outlined"
+        type="info"
+      >
         {{ 'No submodels found.' }}
       </v-alert>
     </div>
     <v-row class="align-center">
       <v-col>
-        <v-file-input accept=".aasx" v-model="file" :placeholder="'select .aasx file'"></v-file-input>
+        <v-file-input
+          v-model="file"
+          accept=".aasx"
+          :placeholder="'select .aasx file'"
+        />
       </v-col>
       <v-col>
         <v-btn 

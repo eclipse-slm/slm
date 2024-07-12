@@ -29,7 +29,6 @@
         :disabled="!(serviceOption.editable || definitionMode)"
         :error-messages="errors"
         :model-value="serviceOption.defaultValue"
-
       />
 
       <v-select
@@ -37,7 +36,6 @@
         v-model="serviceOption.defaultValue"
         :items="serviceOption.valueOptions"
         :error-messages="errors"
-
       />
 
       <vue-ip
@@ -52,7 +50,6 @@
         v-model="serviceOption.defaultValue"
         :readonly="!serviceOption.editable && !definitionMode"
         :error-messages="errors"
-
       />
 
       <!-- AAS !-->
@@ -64,7 +61,6 @@
         item-title="name"
         :items="aasSubmodelTemplates"
         :error-messages="errors"
-
       />
 
       <v-select
@@ -75,7 +71,6 @@
         item-title="name"
         :items="aasSubmodelTemplateInstances"
         :error-messages="errors"
-
       />
 
       <!-- System Variables !-->
@@ -87,7 +82,6 @@
         item-title="name"
         :items="serviceManagementSystemVariables"
         :error-messages="errors"
-
       />
 
       <v-tooltip
@@ -110,28 +104,27 @@
 
       <!-- Deployment Variables !-->
       <v-select
-          v-if="serviceOption.valueType === 'DEPLOYMENT_VARIABLE' && definitionMode"
-          v-model="serviceOption.defaultValue"
-          placeholder="Select deployment variable"
-          item-value="key"
-          item-title="prettyName"
-          :items="serviceManagementDeploymentVariables"
-          :error-messages="errors"
-
+        v-if="serviceOption.valueType === 'DEPLOYMENT_VARIABLE' && definitionMode"
+        v-model="serviceOption.defaultValue"
+        placeholder="Select deployment variable"
+        item-value="key"
+        item-title="prettyName"
+        :items="serviceManagementDeploymentVariables"
+        :error-messages="errors"
       />
 
       <v-tooltip
-          v-if="serviceOption.valueType === 'DEPLOYMENT_VARIABLE' && !definitionMode"
-          location="bottom"
+        v-if="serviceOption.valueType === 'DEPLOYMENT_VARIABLE' && !definitionMode"
+        location="bottom"
       >
         <template #activator="{ props }">
           <div
-              v-bind="props"
+            v-bind="props"
           >
             <v-text-field
-                :model-value="serviceOption.defaultValue"
-                :readonly="true"
-                :disabled="true"
+              :model-value="serviceOption.defaultValue"
+              :readonly="true"
+              :disabled="true"
             />
           </div>
         </template>

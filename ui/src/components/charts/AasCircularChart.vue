@@ -1,34 +1,34 @@
 <template>
   <v-container>
     <aas-circular-chart-filter-bar
-        v-if="showBreadcrumbs"
-        :filter-values="this.labelsForVSelect"
-        :show-filter-selector="this.showFilterSelector"
-        @selectedFilterValuesChanged="onSelectedFilterValuesChanged"
-    ></aas-circular-chart-filter-bar>
-    <v-card-text v-if="this.chartType=='Pie'">
+      v-if="showBreadcrumbs"
+      :filter-values="labelsForVSelect"
+      :show-filter-selector="showFilterSelector"
+      @selectedFilterValuesChanged="onSelectedFilterValuesChanged"
+    />
+    <v-card-text v-if="chartType=='Pie'">
       <Pie
-          :data="chartData"
-          :options="chartOptions"
+        :data="chartData"
+        :options="chartOptions"
       />
     </v-card-text>
-    <v-card-text v-if="this.chartType=='Doughnut'">
+    <v-card-text v-if="chartType=='Doughnut'">
       <Doughnut
-          :data="chartData"
-          :options="chartOptions"
+        :data="chartData"
+        :options="chartOptions"
       />
     </v-card-text>
     <v-footer class="mt-8 bg-white">
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-tooltip location="top">
         <template #activator="{ props }">
           <v-icon
-              v-bind="props"
+            v-bind="props"
           >
             mdi-information-outline
           </v-icon>
         </template>
-        <span>Chart is based on "{{ this.submodelIdShort }}" submodel</span>
+        <span>Chart is based on "{{ submodelIdShort }}" submodel</span>
       </v-tooltip>
     </v-footer>
   </v-container>

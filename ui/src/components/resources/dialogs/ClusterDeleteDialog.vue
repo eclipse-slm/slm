@@ -4,7 +4,7 @@
     width="600"
     @click:outside="$emit('canceled')"
   >
-    <template v-slot:default="{}">
+    <template #default="{}">
       <v-card v-if="active">
         <v-toolbar
           color="primary"
@@ -16,10 +16,16 @@
           Do your really want to delete '{{ cluster.clusterType }}' cluster '{{ cluster.name }}'?
         </v-card-text>
         <v-card-text v-else>
-          <v-alert prominent type="error">
+          <v-alert
+            prominent
+            type="error"
+          >
             <div>
               There are '{{ serviceInstancesForCluster.length }}' service instances running on this cluster:<br>
-              <v-list-item v-for="item in serviceInstancesForCluster" :key="item.id">
+              <v-list-item
+                v-for="item in serviceInstancesForCluster"
+                :key="item.id"
+              >
                 <v-list-item>
                   <v-icon>mdi-apps</v-icon>
                 </v-list-item>
@@ -38,7 +44,7 @@
           <v-spacer />
 
           <v-tooltip location="bottom">
-            <template v-slot:#activator="{ props }">
+            <template #activator="{ props }">
               <v-btn
                 v-bind="props"
                 color="error"

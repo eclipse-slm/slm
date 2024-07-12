@@ -4,7 +4,7 @@
     max-width="800px"
     @click:outside="closeDialog"
   >
-    <template v-slot:default="{}">
+    <template #default="{}">
       <v-toolbar
         color="primary"
         theme="dark"
@@ -98,11 +98,6 @@
 
   export default {
     name: 'ResourcesCreateDialog',
-    computed: {
-      ResourcesCreateDialogPage() {
-        return ResourcesCreateDialogPage
-      }
-    },
     components: {
       ResourcesCreateDialogPageStart,
       ResourcesCreateDialogPageAddExistingResource,
@@ -112,9 +107,6 @@
       ResourcesCreateDialogPageCreateNewResourceCluster
     },
     props: ['show'],
-    enums: {
-      ResourcesCreateDialogPage,
-    },
     setup(props){
       const active = toRef(props, 'show')
       return{
@@ -127,6 +119,14 @@
         title: '',
         dialog: this.active
       }
+    },
+    computed: {
+      ResourcesCreateDialogPage() {
+        return ResourcesCreateDialogPage
+      }
+    },
+    enums: {
+      ResourcesCreateDialogPage,
     },
     methods: {
       onPageChanged(newPage) {

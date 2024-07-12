@@ -19,22 +19,22 @@
         item-key="id"
         :items="Object.values(components)"
       >
-        <template v-slot:item.status="{item}">
+        <template #item.status="{item}">
           <v-icon
-              v-if="item.status === 'UP'"
-              color="green"
+            v-if="item.status === 'UP'"
+            color="green"
           >
             mdi-check-circle
           </v-icon>
           <v-icon
-              v-else-if="item.status === undefined"
-              color="yellow-darken-2"
+            v-else-if="item.status === undefined"
+            color="yellow-darken-2"
           >
             mdi-help-circle
           </v-icon>
           <v-icon
-              v-else
-              color="red"
+            v-else
+            color="red"
           >
             mdi-alert-circle
           </v-icon>

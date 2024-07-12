@@ -4,7 +4,7 @@
     width="400"
     @click:outside="$emit('canceled')"
   >
-    <template v-slot:default="{}">
+    <template #default="{}">
       <ValidationForm
         ref="observer"
         v-slot="{ meta, handleSubmit, validate }"
@@ -117,8 +117,8 @@
 
   export default {
     name: 'ServiceRepositoryCreateDialog',
-    props: ['show'],
     components: {Field, ValidationForm},
+    props: ['show'],
     setup(props){
       const required = yup.string().required();
       const reg_required = yup.string().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)
