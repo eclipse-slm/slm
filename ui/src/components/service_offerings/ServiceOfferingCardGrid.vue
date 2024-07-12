@@ -10,12 +10,12 @@
     @click="$emit('click', serviceOffering)"
   >
     <v-container
-        fluid
-        grid-list-md
+      fluid
+      grid-list-md
     >
       <v-row no-gutters>
-        <v-col >
-          <v-list-item :prepend-avatar="getImageUrl(serviceVendorById(serviceOffering.serviceVendorId).logo)" >
+        <v-col>
+          <v-list-item :prepend-avatar="getImageUrl(serviceVendorById(serviceOffering.serviceVendorId).logo)">
             <v-list-item-title class="text-h5">
               {{ serviceOffering.name }}
             </v-list-item-title>
@@ -87,11 +87,18 @@
   import getImageUrl from '@/utils/imageUtil'
   import ServiceOffering from "@/model/serviceOffering.ts";
   import ProgressCircular from "@/components/base/ProgressCircular";
+  import {useServicesStore} from "@/stores/servicesStore";
+  import {storeToRefs} from "pinia";
 
   export default {
     name: 'ServiceOfferingCardGrid',
     components: {ProgressCircular, TextWithLabel },
     props: ['serviceOffering', 'imgWidth', 'passive', 'createOrEditMode', "showOnlyLatestVersion"],
+    setup(){
+      const servicesStore = useServicesStore();
+      const {serviceVendorById, serviceOfferingCategoryNameById, serviceOfferingDeploymentTypePrettyName} = storeToRefs(servicesStore);
+      return {servicesStore, serviceVendorById, serviceOfferingCategoryNameById, serviceOfferingDeploymentTypePrettyName};
+    },
     data: function () {
       return {
         hovered: 0,
@@ -101,11 +108,7 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'serviceVendorById',
-        'serviceOfferingCategoryNameById',
-        'serviceOfferingDeploymentTypePrettyName',
-      ]),
+
       latestVersion() {
         let latestVersionFound = {}
         if (this.serviceOffering.versions?.length > 0) {
@@ -125,10 +128,10 @@
       }
     },
     mounted () {
-      if (this.serviceOffering.id != undefined) {
-        this.$store.dispatch('getServiceOfferingImages', this.serviceOffering.id).then(coverImage => {
+      if (this.serviceOffering.id !== undefined) {
+        this.servicesStore.getServiceOfferingImages(this.serviceOffering.id).then(coverImage => {
           this.coverImage = coverImage
-        })
+        });
       }
 
       if (this.serviceOffering.versions?.length > 0) {

@@ -143,6 +143,8 @@
   import { mapGetters } from 'vuex'
   import ApiState from '@/api/apiState'
   import {app} from "@/main";
+  import {useServicesStore} from "@/stores/servicesStore";
+  import {storeToRefs} from "pinia";
 
   export default {
     name: 'ServiceOfferingCreatePage',
@@ -157,7 +159,11 @@
       ServiceOfferingVersionWizardStep4Requirements,
     },
     props: ['editMode', 'serviceOfferingVersionId', 'serviceOfferingId', 'serviceVendorId'],
-
+    setup(){
+      const servicesStore = useServicesStore();
+      const {serviceOfferingDeploymentTypePrettyName} = storeToRefs(servicesStore)
+      return {servicesStore, serviceOfferingDeploymentTypePrettyName}
+    },
     data () {
       return {
         createWizardState: {
@@ -240,17 +246,16 @@
     },
 
     computed: {
-      ...mapGetters([
-        'apiStateServices',
-        'serviceOfferingDeploymentTypePrettyName',
-      ]),
+      apiStateServices () {
+        return this.servicesStore.apiStateServices
+      },
       apiStateLoaded () {
         console.log('asdf', this.apiStateServices.serviceOfferingDeploymentTypes)
         return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADED
       },
       apiStateLoading () {
         if (this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferingDeploymentTypes')
+          this.servicesStore.getServiceOfferingDeploymentTypes();
         }
         return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADING || this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT
       },
@@ -326,7 +331,7 @@
                     }
 
                     app.config.globalProperties.$toast.info('Successfully updated service offering version')
-                    this.$store.dispatch('getServiceOfferings')
+                    this.servicesStore.getServiceOfferings();
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
                   } else {
                     console.log(response)
@@ -353,7 +358,7 @@
                     }
 
                     app.config.globalProperties.$toast.info('Successfully created service offering version')
-                    this.$store.dispatch('getServiceOfferings')
+                    this.servicesStore.getServiceOfferings();
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
                   } else {
                     console.log(response)

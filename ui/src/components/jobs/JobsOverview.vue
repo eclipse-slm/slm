@@ -65,12 +65,17 @@
   import OverviewHeading from "@/components/base/OverviewHeading.vue";
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
   import getEnv from '@/utils/env'
+  import {useJobsStore} from "@/stores/jobsStore";
 
   export default {
     name: 'JobsOverview',
     components: {
       OverviewHeading,
       NoItemAvailableNote
+    },
+    setup(){
+      const jobsStore = useJobsStore();
+      return {jobsStore}
     },
     data: function () {
       return {
@@ -80,10 +85,12 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'jobs',
-        'jobs_running',
-      ]),
+      jobs () {
+        return this.jobsStore.jobs
+      },
+      jobs_running () {
+        return this.jobsStore.jobs_running
+      },
       DataTableHeaders () {
         return [
           { title: 'ID', value: 'id', sortable: true },

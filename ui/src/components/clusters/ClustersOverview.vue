@@ -8,7 +8,7 @@
       </template>
 
       <no-item-available-note
-        v-if="!clusters.length"
+        v-if="!resourcesStore.clusters.length"
         item="Cluster"
       />
 
@@ -45,6 +45,7 @@ import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 import ClustersCreateDialog from "@/components/clusters/dialogs/ClustersCreateDialog.vue";
 import ResourcesTableClusters from "@/components/resources/ResourcesTableClusters.vue";
+import {useResourcesStore} from "@/stores/resourcesStore";
 
 export default {
   name: 'ClustersOverview',
@@ -54,6 +55,10 @@ export default {
     NoItemAvailableNote,
     ClustersCreateDialog
   },
+  setup(){
+    const resourcesStore = useResourcesStore();
+    return {resourcesStore}
+  },
   data () {
     return {
       showCreateDialog: false,
@@ -61,17 +66,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'clusters',
-    ])
   },
   mounted () {
-    this.$store.dispatch('getDeploymentCapabilities')
+    this.resourcesStore.getDeploymentCapabilities();
   },
   methods: {
-    ...mapActions([
-      'getResourcesFromBackend',
-    ])
   },
 }
 </script>

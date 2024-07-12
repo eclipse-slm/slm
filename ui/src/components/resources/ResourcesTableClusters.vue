@@ -46,17 +46,42 @@
           </div>
         </template>
 
-        <template #item.data-table-expand="{ item, isExpanded }">
-          <td
-            v-if="item.nodes.length > 0"
-            class="text-start"
-          >
-            <v-btn
-              variant="text"
-              :class="{'v-data-table__expand-icon--active' : isExpanded}"
+        <template #expanded-row="{ columns, item}">
+          <td :colspan="columns.length">
+            <v-table
+                dense
+                class="my-5"
             >
-              <v-icon :icon="isExpanded ? 'mdi-close' : 'mdi-chevron-down'" />
-            </v-btn>
+              <template #default>
+                <thead>
+                <tr>
+                  <th>Node Name</th>
+                  <th>IP</th>
+                  <th>ID</th>
+                  <th>Member Type</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr
+                    v-for="node in item.nodes"
+                    :key="node.node"
+                >
+                  <td>{{ node.Node }}</td>
+                  <td>{{ node.Address }}</td>
+                  <td>{{ node.ID }}</td>
+                  <td>
+                    <v-chip
+                        class="mx-1"
+                        size="small"
+                        value="test"
+                    >
+                      {{ getClusterMemberTypeByNodeId(item.memberMapping[node.ID], item.clusterMemberTypes) }}
+                    </v-chip>
+                  </td>
+                </tr>
+                </tbody>
+              </template>
+            </v-table>
           </td>
         </template>
 
@@ -115,12 +140,17 @@
   import { mapGetters } from 'vuex'
   import ClusterScaleDialog from '@/components/resources/dialogs/ClusterScaleDialog'
   import ClusterDeleteDialog from '@/components/resources/dialogs/ClusterDeleteDialog'
+  import {useResourcesStore} from "@/stores/resourcesStore";
 
   export default {
     name: 'ResourcesTableClusters',
     components: {
       ClusterScaleDialog,
       ClusterDeleteDialog,
+    },
+    setup(){
+      const resourceStore = useResourcesStore();
+      return {resourceStore};
     },
     data () {
       return {
@@ -146,35 +176,43 @@
       }
     },
     computed: {
-      ...mapGetters(['clusters']),
+      clusters () {
+        return this.resourceStore.clusters
+      },
     },
     methods: {
       addNodeToCluster (cluster) {
         this.scaleAction = 'up'
-        this.$store.commit('SET_SELECTED_ClUSTER_FOR_SCALE', cluster)
+        this.resourceStore.selectedClusterForScale_ = cluster;
       },
       removeNodeFromCluster (cluster) {
         this.scaleAction = 'down'
-        this.$store.commit('SET_SELECTED_ClUSTER_FOR_SCALE', cluster)
+        this.resourceStore.selectedClusterForScale_ = cluster;
       },
       selectClusterForDelete (cluster) {
-        this.$store.commit('SET_SELECTED_ClUSTER_FOR_DELETE', cluster)
+        this.resourceStore.selectedClusterForDelete_ = cluster;
       },
-      expandRow (row) {
+      expandRow (event, row) {
+        const item = row.item;
         const found = this.expanded.find(i => {
-          return i.name === row.name
+          return i.name === item.name
         })
 
         if (this.expanded.length > 0) {
           this.expanded = []
         }
 
-        if (!found && row.nodes.length > 0){
-          this.expanded.push(row)
+        if (!found && item.nodes.length > 0){
+          this.expanded.push(item)
         }
       },
-      rowClass (item) {
-        return item.markedForDelete ? 'text-grey text--lighten-1 row-pointer' : 'row-pointer'
+      rowClass ({item}) {
+        return {
+          class: {
+            'text-grey text--lighten-1 row-pointer': item.markedForDelete,
+            'row-pointer': item.markedForDelete
+          }
+        }
       },
       getClusterMemberTypeByNodeId (clusterMemberTypeName, clusterMemberTypes) {
         return clusterMemberTypes.find((clusterMemberType) => {

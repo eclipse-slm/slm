@@ -90,6 +90,7 @@
 
 <script>
 import {mapGetters} from 'vuex'
+import {useStore} from "@/stores/store";
 
 export default {
   name: 'MaterialCard',
@@ -121,10 +122,11 @@ export default {
     },
   },
 
+  setup(){
+    const store = useStore();
+    return {store};
+  },
   computed: {
-    ...mapGetters([
-      'themeColorMain',
-    ]),
     classes() {
       return {
         'v-card--material--has-heading': this.hasHeading,

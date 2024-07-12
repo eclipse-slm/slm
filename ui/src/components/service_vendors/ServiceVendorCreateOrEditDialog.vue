@@ -4,7 +4,10 @@
     width="400"
     @click:outside="$emit('canceled')"
   >
-    <template v-if="serviceVendorUpdate != null" v-slot:default="{}">
+    <template
+      v-if="serviceVendorUpdate != null"
+      #default="{}"
+    >
       <v-card>
         <v-toolbar
           color="primary"
@@ -83,6 +86,7 @@
   import Vue, {toRef} from 'vue'
   import getImageUrl from '@/utils/imageUtil'
   import {app} from "@/main";
+  import {useServicesStore} from "@/stores/servicesStore";
 
   export default {
     name: 'ServiceVendorCreateOrEditDialog',
@@ -138,7 +142,9 @@
           } else {
             app.config.globalProperties.$toast.info('Service vendor successfully created')
           }
-          this.$store.dispatch('getServiceVendors')
+
+          const serviceStore = useServicesStore();
+          serviceStore.getServiceVendors();
           this.$emit('confirmed', this.serviceVendorUpdate)
         }).catch(exception => {
           app.config.globalProperties.$toast.error('Failed to create service vendor')

@@ -67,21 +67,25 @@
   import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
   import { mapGetters } from "vuex";
   import {toRef} from "vue";
+  import {useServicesStore} from "@/stores/servicesStore";
+  import {storeToRefs} from "pinia";
 
   export default {
     name: 'ClusterDeleteDialog',
     props: ['showDialog', 'cluster'],
     setup(props){
       const active = toRef(props, 'showDialog')
+      const servicesStore = useServicesStore();
+      const {serviceOfferingById} = storeToRefs(servicesStore)
       return{
-        active
+        active, servicesStore, serviceOfferingById
       }
     },
     computed: {
-      ...mapGetters([
-        'services',
-        'serviceOfferingById'
-      ]),
+      services() {
+        return this.servicesStore.services
+      },
+
       serviceInstancesForCluster(){
         console.log(this.services)
         return this.services.filter(svc => svc.resourceId === this.cluster.id)

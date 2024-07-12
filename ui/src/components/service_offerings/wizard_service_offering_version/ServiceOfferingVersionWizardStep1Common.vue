@@ -51,7 +51,6 @@
                       density="compact"
                       :readonly="editMode"
                       :error-messages="errors"
-
                     />
                     <span>{{ errors[0] }}</span>
                   </Field>
@@ -88,6 +87,7 @@ import 'vue-json-pretty/lib/styles.css'
 import {mapGetters} from "vuex";
 import {Field, Form as ValidationForm } from "vee-validate";
 import * as yup from 'yup';
+import {useServicesStore} from "@/stores/servicesStore";
 const { parse } = require('dot-properties')
 
   export default {
@@ -96,8 +96,9 @@ const { parse } = require('dot-properties')
     props: ['editMode', 'serviceOfferingVersion'],
     setup(){
       const required = yup.string().required();
+      const servicesStore = useServicesStore();
       return {
-        required
+        required, servicesStore
       }
     },
     data () {
@@ -106,7 +107,13 @@ const { parse } = require('dot-properties')
       }
     },
     computed: {
-      ...mapGetters(['serviceOfferingDeploymentTypes', 'serviceOfferings']),
+      serviceOfferingDeploymentTypes() {
+        return this.servicesStore.serviceOfferingDeploymentTypes
+      },
+      serviceOfferings () {
+        return this.servicesStore.serviceOfferings
+      },
+
       apiStateLoaded() {
         return true;
       },

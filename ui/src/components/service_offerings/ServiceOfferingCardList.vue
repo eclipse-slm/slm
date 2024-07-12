@@ -56,19 +56,23 @@
 
 <script>
   import { mapGetters } from 'vuex'
+  import {useServicesStore} from "@/stores/servicesStore";
+  import {storeToRefs} from "pinia";
 
   export default {
     name: 'ServiceOfferingCardList',
     props: ['service', 'imgWidth', 'passive'],
+    setup(){
+      const servicesStore = useServicesStore();
+      const {serviceVendorById} = storeToRefs(servicesStore)
+      return {servicesStore, serviceVendorById};
+    },
     data: function () {
       return {
         hovered: 0,
       }
     },
     computed: {
-      ...mapGetters([
-        'serviceVendorById',
-      ]),
     },
     methods: {
       serviceClicked (selectedService) {
@@ -82,7 +86,8 @@
 <style rel="stylesheet"
        type="text/css"
        src="@/design/serviceOfferingCard.scss"
-       lang="scss" scoped>
+       lang="scss" scoped
+>
 </style>
 
 <style lang="scss" scoped>

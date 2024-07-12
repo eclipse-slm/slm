@@ -4,7 +4,7 @@
     width="600"
     @click:outside="closeDialog"
   >
-    <template v-slot:default="{}">
+    <template #default="{}">
       <v-card v-if="page==='scale-virtual'">
         <v-toolbar
           color="primary"
@@ -166,10 +166,15 @@
 <script>
   import { mapGetters } from 'vuex'
   import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
+  import {useResourcesStore} from "@/stores/resourcesStore";
 
   export default {
     name: 'ClusterScaleDialog',
     props: ['action'],
+    setup(){
+      const resourceStore = useResourcesStore();
+      return {resourceStore};
+    },
     data () {
       return {
         page: '',
@@ -178,14 +183,21 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'nonClusterResources',
-        'selectedClusterForScale',
-        'selectedProject',
-        'availableClusterTypes',
-      ]),
+      nonClusterResources() {
+        return this.resourceStore.nonClusterResources
+      },
+      selectedClusterForScale () {
+        return this.resourceStore.selectedClusterForScale
+      },
+      selectedProject () {
+        return this.resourceStore.selectedProject
+      },
+      availableClusterTypes() {
+        return this.resourceStore.availableClusterTypes
+      },
+
       showDialog () {
-        return this.$store.getters.selectedClusterForScale !== null
+        return this.resourceStore.selectedClusterForScale_ !== null;
       },
       downScalableClusterMembers () {
 
@@ -247,7 +259,7 @@
         this.page = ''
         this.selectedClusterMemberTypeName = ''
         this.selectedBareMetalResource = ''
-        this.$store.commit('SET_SELECTED_ClUSTER_FOR_SCALE', null)
+        this.resourceStore.selectedClusterForScale_ = null;
       },
     },
   }

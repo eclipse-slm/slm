@@ -147,6 +147,9 @@
   import AASRestApi from "@/api/resource-management/aasRestApi";
   import { mapGetters } from "vuex";
   import {Field } from "vee-validate";
+  import {useServicesStore} from "@/stores/servicesStore";
+  import {useResourcesStore} from "@/stores/resourcesStore";
+  import {useCatalogStore} from "@/stores/catalogStore";
 
   export default {
     name: 'ServiceOptionValue',
@@ -156,18 +159,30 @@
     },
     mixins: [serviceOptionMixin],
     props: ['serviceOption', 'disabled', 'definitionMode'],
+    setup(){
+      const servicesStore = useServicesStore();
+      const resourceStore = useResourcesStore();
+      const catalogStore = useCatalogStore();
+      return {servicesStore, resourceStore, catalogStore};
+    },
     data () {
       return {
         aasSubmodelTemplateInstances: [],
       }
     },
     computed: {
-      ...mapGetters([
-        'valueOfTemplateVariable',
-        'serviceManagementSystemVariables',
-        'serviceManagementDeploymentVariables',
-        'aasSubmodelTemplates'
-      ]),
+      valueOfTemplateVariable() {
+        return this.resourceStore.valueOfTemplateVariable
+      },
+      serviceManagementSystemVariables() {
+        return this.servicesStore.serviceManagementSystemVariables
+      },
+      serviceManagementDeploymentVariables () {
+        return this.servicesStore.serviceManagementDeploymentVariables
+      },
+      aasSubmodelTemplates () {
+        return this.catalogStore.aasSubmodelTemplates
+      },
     },
     created() {
       if (this.serviceOption.valueType === 'AAS_SM_TEMPLATE' && !this.definitionMode) {

@@ -27,8 +27,7 @@
         :items="serviceVendors"
         @click:row="onRowClick"
       >
-
-        <template v-slot:item.actions="{ item }">
+        <template #item.actions="{ item }">
           <v-btn
             class="ma-1"
             size="small"
@@ -79,10 +78,15 @@
   import OverviewHeading from "@/components/base/OverviewHeading.vue";
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
   import {app} from "@/main";
+  import {useServicesStore} from "@/stores/servicesStore";
 
   export default {
     name: 'ServiceVendorTable',
     components: {NoItemAvailableNote, OverviewHeading, ServiceVendorCreateOrEditDialog },
+    setup(){
+      const servicesStore = useServicesStore();
+      return {servicesStore};
+    },
     data () {
       return {
         selectedServiceVendor: null,
@@ -91,9 +95,9 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'serviceVendors',
-      ]),
+      serviceVendors () {
+        return this.servicesStore.serviceVendors
+      },
       ServiceVendorsTableHeaders () {
         return [
           { title: 'Name', key: 'name', sortable: true },
@@ -104,7 +108,7 @@
       },
     },
     created () {
-      this.$store.dispatch('getServiceVendors')
+      this.servicesStore.getServiceVendors();
     },
     methods: {
       onEditServiceVendorClicked (serviceVendor) {
@@ -118,7 +122,7 @@
         ServiceVendorsRestApi.deleteServiceVendorById(serviceVendor.id).then(
           response => {
             app.config.globalProperties.$toast.info('Service vendor successfully deleted')
-            this.$store.dispatch('getServiceVendors')
+            this.servicesStore.getServiceVendors();
           })
           .catch(exception => {
             app.config.globalProperties.$toast.error('Failed to create service offering')
@@ -143,7 +147,7 @@
         this.showCreateOrEditServiceVendorDialog = false
         this.selectedServiceVendor = null
         this.editServiceVendor = false
-        this.$store.dispatch('getServiceVendors')
+        this.servicesStore.getServiceVendors();
       },
       onRowClick(click, row){
         this.$emit('serviceVendorClicked', row.item)

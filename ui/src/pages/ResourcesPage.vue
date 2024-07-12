@@ -26,13 +26,20 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
   import ResourcesOverview from '@/components/resources/ResourcesOverview'
   import ApiState from '@/api/apiState'
+  import {useStore} from "@/stores/store";
+  import {useResourcesStore} from "@/stores/resourcesStore";
 
   export default {
     components: {
       ResourcesOverview,
+    },
+    setup(){
+      const store = useStore();
+      const resourcesStore = useResourcesStore();
+
+      return {store, resourcesStore}
     },
     data () {
       return {
@@ -41,11 +48,15 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'themeColorMain',
-        'apiStateResources',
-        'resources',
-      ]),
+      themeColorMain() {
+        return this.store.themeColorMain
+      },
+      apiStateResources() {
+        return this.resourcesStore.apiStateResources
+      },
+      resources() {
+        return this.resourcesStore.resources
+      },
       apiStateLoaded () {
         return (this.apiStateResources === ApiState.LOADED || this.apiStateResources === ApiState.UPDATING)
       },
@@ -64,5 +75,4 @@
   }
 </script>
 
-<style scoped
-/>
+<style scoped />

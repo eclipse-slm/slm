@@ -38,26 +38,30 @@
         hide-actions
         :items="[$t('ServiceStepper.Common')]"
       >
-        <template #item.1 v-if="creationType === 'manual'">
+        <template
+          v-if="creationType === 'manual'"
+          #item.1
+        >
           <service-offering-wizard-manual-step1-common
-              v-if="creationType === 'manual'"
-              :edit-mode="editMode"
-              :new-service-offering="newServiceOffering"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
+            v-if="creationType === 'manual'"
+            :edit-mode="editMode"
+            :new-service-offering="newServiceOffering"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
           />
         </template>
 
-        <template #item.1 v-if="creationType === 'git'">
+        <template
+          v-if="creationType === 'git'"
+          #item.1
+        >
           <service-offering-wizard-git-step1-common
-              :new-service-offering="newServiceOffering"
-              :service-vendor-id="serviceVendorId"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
+            :new-service-offering="newServiceOffering"
+            :service-vendor-id="serviceVendorId"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
           />
         </template>
-
-
       </v-stepper>
     </div>
   </div>
@@ -71,6 +75,8 @@
   import { mapGetters } from 'vuex'
   import ApiState from '@/api/apiState'
   import {app} from "@/main";
+  import {useServicesStore} from "@/stores/servicesStore";
+  import {storeToRefs} from "pinia";
 
   export default {
     name: 'ServiceOfferingCreatePage',
@@ -80,7 +86,11 @@
       ServiceOfferingWizardGitStep1Common
     },
     props: ['editMode', 'creationType', 'serviceOfferingId', 'serviceVendorId'],
-
+    setup(){
+      const servicesStore = useServicesStore();
+      const {serviceOfferingById} = storeToRefs(servicesStore);
+      return {servicesStore, serviceOfferingById}
+    },
     data () {
       return {
         createWizardState: {
@@ -110,21 +120,23 @@
     },
 
     computed: {
-      ...mapGetters([
-        'apiStateServices',
-        'serviceOfferingCategories',
-        'serviceOfferingById',
-      ]),
+      apiStateServices () {
+        return this.servicesStore.apiStateServices
+      },
+      serviceOfferingCategories () {
+        return this.servicesStore.serviceOfferingCategories
+      },
+
       apiStateLoaded () {
         return this.apiStateServices.serviceOfferingCategories === ApiState.LOADED &&
           this.apiStateServices.serviceVendors === ApiState.LOADED
       },
       apiStateLoading () {
         if (this.apiStateServices.serviceOfferingCategories === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferingCategories')
+          this.servicesStore.getServiceOfferingCategories();
         }
         if (this.apiStateServices.serviceVendors === ApiState.INIT) {
-          this.$store.dispatch('getServiceVendors')
+          this.servicesStore.getServiceVendors();
         }
         return this.apiStateServices.serviceOfferingCategories === ApiState.LOADING || this.apiStateServices.serviceOfferingCategories === ApiState.INIT ||
           this.apiStateServices.serviceVendors === ApiState.LOADING || this.apiStateServices.serviceVendors === ApiState.INIT
@@ -159,7 +171,7 @@
                 response => {
                   if (response.status === 200) {
                     app.config.globalProperties.$toast.info('Successfully updated service offering')
-                    this.$store.dispatch('getServiceOfferings')
+                    this.servicesStore.getServiceOfferings();
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
                   } else {
                     console.log(response)
@@ -174,7 +186,7 @@
                 response => {
                   if (response.status === 200) {
                     app.config.globalProperties.$toast.info('Successfully created service offering')
-                    this.$store.dispatch('getServiceOfferings')
+                    this.servicesStore.getServiceOfferings();
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
                   } else {
                     console.log(response)

@@ -12,15 +12,18 @@
     width="260"
     v-bind="$attrs"
   >
-    <template #image="props" >
+    <template #image="props">
       <v-img
-        :gradient="`to bottom, ${barColor}`"
+        :gradient="`to bottom, ${mainStore.barColor}`"
         v-bind="props"
         style="height: 100%;width: 100%;"
       />
     </template>
 
-    <v-divider class="mb-1" style="background-color: rgb(33,33,33) !important" />
+    <v-divider
+      class="mb-1"
+      style="background-color: rgb(33,33,33) !important"
+    />
 
     <v-list
       density="compact"
@@ -60,7 +63,6 @@
             :id="item.id"
             :key="`item-${i}`"
             :item="item"
-
           />
         </div>
       </template>
@@ -76,6 +78,8 @@
   } from 'vuex'
   import i18n from '@/localisation/i18n'
   import {right} from "core-js/internals/array-reduce";
+  import {useStore} from "@/stores/store";
+  import {useUserStore} from "@/stores/userStore";
 
   export default {
     name: 'DashboardCoreDrawer',
@@ -85,6 +89,12 @@
         default: false,
       },
     },
+    setup(){
+      const mainStore = useStore();
+      const userStore = useUserStore();
+      const store = useStore();
+      return {mainStore, userStore, store};
+    },
 
     data () {
       return {
@@ -92,17 +102,12 @@
     },
 
     computed: {
-      ...mapState(['barColor']),
-      ...mapGetters([
-        'isUserDeveloper',
-        'userRoles',
-      ]),
       drawer: {
         get () {
-          return this.$store.state.drawer
+          return this.store.drawer;
         },
         set (val) {
-          this.$store.commit('SET_DRAWER', val)
+          return this.store.drawer = val;
         },
       },
       computedItems () {
@@ -170,14 +175,14 @@
             title: this.$t('drawer.section.serviceVendor.title'),
             icon: 'smart_button',
             to: '/services/vendors',
-            visible: this.isUserDeveloper,
+            visible: this.userStore.isUserDeveloper,
           },
           {
             id: 'main-menu-button-admin',
             title: this.$t('drawer.section.admin.title'),
             icon: 'mdi-shield-account-variant-outline',
             to: '/admin',
-            visible: this.userRoles.includes('slm-admin'),
+            visible: this.userStore.userRoles.includes('slm-admin'),
           },
         ]
       },

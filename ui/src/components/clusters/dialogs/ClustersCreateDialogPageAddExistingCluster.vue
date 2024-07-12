@@ -174,6 +174,7 @@
   import {Field, Form as ValidationForm } from "vee-validate";
   import * as yup from 'yup';
   import ProgressCircular from "@/components/base/ProgressCircular.vue";
+  import {useResourcesStore} from "@/stores/resourcesStore";
   const textAreaFileContentComponentKey = ref(0);
 
   export default {
@@ -183,10 +184,12 @@
       ClustersCreateDialogPage,
     },
     setup(){
+      const resourceStore = useResourcesStore();
+
       const required = yup.object().required();
       const required_string = yup.string().required();
       return {
-        required, required_string
+        required, required_string, resourceStore
       }
     },
     data () {
@@ -199,7 +202,9 @@
       }
     },
     computed: {
-      ...mapGetters(['availableClusterTypes']),
+      availableClusterTypes() {
+        return this.resourceStore.availableClusterTypes;
+      },
       availableClusterTypesWithSkipInstall () {
         let clusterTypes = []
         console.log('sdfsadfsadf', this.availableClusterTypes);

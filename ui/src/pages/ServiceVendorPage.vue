@@ -31,8 +31,7 @@
             label="Select Service Vendor"
             autofocus
             @update:modelValue="onServiceVendorSelected"
-          >
-          </v-select>
+          />
         </v-col>
       </v-row>
 
@@ -264,6 +263,10 @@
   import ProgressCircular from "@/components/base/ProgressCircular";
   import OverviewHeading from "@/components/base/OverviewHeading.vue";
   import {app} from "@/main";
+  import {useServicesStore} from "@/stores/servicesStore";
+  import {useStore} from "@/stores/store";
+  import {useUserStore} from "@/stores/userStore";
+  import {storeToRefs} from "pinia";
 
   export default {
     components: {
@@ -277,6 +280,13 @@
       ServiceVendorCreateOrEditDialog,
     },
     props: ['serviceVendorId'],
+    setup(){
+      const store = useStore();
+      const userStore = useUserStore();
+      const servicesStore = useServicesStore();
+      const {serviceVendorById, serviceOfferingCategoryNameById} = storeToRefs(servicesStore)
+      return {store, userStore, servicesStore, serviceVendorById, serviceOfferingCategoryNameById};
+    },
     data () {
       return {
         serviceOfferings: [],
@@ -304,7 +314,7 @@
       }
     },
     created () {
-      this.$store.dispatch('getServiceVendors').then(() => {
+      this.servicesStore.getServiceVendors().then(() => {
         UsersRestApi.getServiceVendorsOfDeveloper(this.userId).then(serviceVendorIdsOfDeveloper => {
           this.serviceVendorsOfDeveloper = []
           serviceVendorIdsOfDeveloper.forEach(serviceVendorId => {
@@ -320,19 +330,22 @@
       })
     },
     computed: {
-      ...mapGetters([
-        'themeColorMain',
-        'apiStateServices',
-        'userId',
-        'serviceOfferingCategoryNameById',
-        'serviceVendorById',
-      ]),
+      themeColorMain() {
+        return this.store.themeColorMain
+      },
+      apiStateServices() {
+        return this.servicesStore.apiStateServices
+      },
+      userId () {
+        return this.userStore.userId
+      },
+
       apiStateLoaded () {
         return this.apiStateServices.serviceOfferingCategories === ApiState.LOADED
       },
       apiStateLoading () {
         if (this.apiStateServices.serviceOfferingCategories === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferingCategories')
+          this.servicesStore.getServiceOfferingCategories();
         }
         return this.apiStateServices.serviceOfferingCategories === ApiState.LOADING || this.apiStateServices.serviceOfferingCategories === ApiState.INIT
       },
@@ -362,7 +375,7 @@
         ServiceOfferingsRestApi.deleteServiceOffering(this.serviceOfferingToDelete.id).then(response => {
           app.config.globalProperties.$toast.info(`Successfully delete service offering '${this.serviceOfferingToDelete.name}'`)
           this.serviceOfferingDeleteDialog = false
-          this.$store.dispatch('getServiceOfferings')
+          this.servicesStore.getServiceOfferings();
           ServiceOfferingsRestApi.getOfferings(false, this.selectedServiceVendor.id).then(
               serviceOfferingsOfVendor => {
                 this.serviceOfferingsOfVendor = serviceOfferingsOfVendor

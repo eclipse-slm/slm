@@ -13,8 +13,7 @@
       size="small"
       :icon="value ? 'mdi-view-quilt' : 'mdi-dots-vertical'"
       @click="setDrawer(!drawer)"
-    >
-    </v-btn>
+    />
 
     <v-toolbar-title
       class="hidden-sm-and-down font-weight-light"
@@ -84,7 +83,6 @@
             <v-spacer />
 
             <v-col cols="auto">
-
               <v-switch
                 :model-value="currentTheme === 'dark'"
                 class="ma-0 pa-0"
@@ -126,7 +124,7 @@
     >
       <template #activator="{ props }">
         <v-btn
-          v-if="notifications.length > 0"
+          v-if="notificationStore.notifications.length > 0"
           class="notification-btn ml-2"
           min-width="0"
           variant="text"
@@ -134,10 +132,10 @@
           to="/notifications"
         >
           <v-badge
-            v-if="notifications_unread.length"
+            v-if="notificationStore.notifications_unread.length"
             color="red"
             bordered
-            :content="notifications_unread.length"
+            :content="notificationStore.notifications_unread.length"
           >
             <v-icon color="primary">
               mdi-bell
@@ -218,6 +216,8 @@
   import { mapState, mapMutations, mapGetters } from 'vuex'
   import {app} from "@/main";
   import {useTheme} from "vuetify";
+  import {useNotificationStore} from "@/stores/notificationStore";
+  import {useStore} from "@/stores/store";
 
   export default {
     name: 'DashboardCoreAppBar',
@@ -237,7 +237,10 @@
       const toggleTheme = () => {
         theme.global.name = theme.global.current.dark ? 'light' : 'dark';
       };
-      return {toggleTheme, currentTheme}
+      const notificationStore = useNotificationStore();
+      const store = useStore();
+
+      return {toggleTheme, currentTheme, notificationStore, store}
     },
 
     data: () => ({
@@ -273,11 +276,9 @@
     }),
 
     computed: {
-      ...mapState(['drawer']),
-      ...mapGetters([
-        'notifications',
-        'notifications_unread',
-      ]),
+      drawer() {
+        return this.store.drawer
+      },
     },
 
     watch: {
@@ -296,7 +297,8 @@
         this.userIconMenuItems[index].click.call(this)
       },
       removeNotification (index) {
-        this.$store.commit('REMOVE_NOTIFICATION', index)
+        const notificationStore = useNotificationStore();
+        // this.$store.commit('REMOVE_NOTIFICATION', index)
       },
     },
   }

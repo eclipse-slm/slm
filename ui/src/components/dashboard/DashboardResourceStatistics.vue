@@ -39,15 +39,22 @@
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
   import {mapGetters} from "vuex";
   import AasCircularChart from "@/components/charts/AasCircularChart.vue";
+  import {useResourcesStore} from "@/stores/resourcesStore";
 
   export default {
     name: 'DashboardResourceStatistics',
     components: {AasCircularChart, NoItemAvailableNote },
+    setup(){
+      const resourceStore = useResourcesStore();
+      return {resourceStore}
+    },
     computed: {
-      ...mapGetters(['resourceAAS'])
+      resourceAAS() {
+        return this.resourceStore.resourceAAS
+      },
     },
     mounted () {
-      this.$store.dispatch('getResourceAASFromBackend')
+      this.resourceStore.getResourceAASFromBackend();
     }
   }
 </script>

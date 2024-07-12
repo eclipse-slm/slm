@@ -62,17 +62,24 @@
 <script>
   import { mapGetters } from 'vuex'
   import ResourcesCreateDialogPage from '@/components/resources/dialogs/create/ResourcesCreateDialogPage'
+  import {useResourcesStore} from "@/stores/resourcesStore";
 
   export default {
     name: 'ResourcesCreateDialogPageAddExistingResource',
     enums: {
       ResourcesCreateDialogPage,
     },
+    setup(){
+      const resourceStore = useResourcesStore();
+      return {resourceStore};
+    },
     computed: {
       ResourcesCreateDialogPage() {
         return ResourcesCreateDialogPage
       },
-      ...mapGetters(['availableClusterTypes']),
+      availableClusterTypes() {
+        return this.resourceStore.availableClusterTypes
+      },
     },
     mounted() {
       this.$emit('title-changed', 'Add existing resource')

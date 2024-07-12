@@ -25,7 +25,7 @@
         item-key="id"
         :items="serviceOfferingCategories"
       >
-        <template v-slot:item.actions="{ item }">
+        <template #item.actions="{ item }">
           <v-btn
             class="ma-1"
             size="small"
@@ -75,10 +75,16 @@
   import OverviewHeading from "@/components/base/OverviewHeading.vue";
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
   import {app} from "@/main";
+  import {useResourcesStore} from "@/stores/resourcesStore";
+  import {useServicesStore} from "@/stores/servicesStore";
 
   export default {
     name: 'ServiceCategoriesTable',
     components: {OverviewHeading, ServiceCategoryCreateOrEditDialog, NoItemAvailableNote },
+    setup(){
+      const servicesStore = useServicesStore();
+      return {servicesStore};
+    },
     data () {
       return {
         selectedServiceCategory: null,
@@ -87,9 +93,10 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'serviceOfferingCategories',
-      ]),
+      serviceOfferingCategories() {
+        return this.servicesStore.serviceOfferingCategories
+      },
+
       ServiceCategoriesTableHeaders () {
         return [
           { title: 'Name', value: 'name', sortable: true },
@@ -99,7 +106,7 @@
       },
     },
     created () {
-      this.$store.dispatch('getServiceOfferingCategories')
+      this.servicesStore.getServiceOfferingCategories();
     },
     methods: {
       onEditServiceCategoryClicked (serviceCategory) {
@@ -113,7 +120,8 @@
         ServiceOfferingsRestApi.deleteServiceCategory(serviceVendor.id).then(
           response => {
             app.config.globalProperties.$toast.info('Service category successfully deleted')
-            this.$store.dispatch('getServiceOfferingCategories')
+
+            this.servicesStore.getServiceOfferingCategories();
           })
           .catch(exception => {
             app.config.globalProperties.$toast.error('Failed to create service category')
@@ -137,7 +145,8 @@
         this.showCreateOrEditServiceCategoryDialog = false
         this.selectedServiceCategory = null
         this.editServiceCategory = false
-        this.$store.dispatch('getServiceOfferingCategories')
+
+        this.servicesStore.getServiceOfferingCategories();
       },
     },
   }

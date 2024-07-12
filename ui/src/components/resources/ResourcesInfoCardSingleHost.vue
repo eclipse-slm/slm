@@ -119,6 +119,7 @@
 <script>
   import ResourceMetrics from '@/components/resources/ResourceMetrics'
   import ResourceSubmodels from '@/components/resources/ResourceSubmodels'
+  import {useResourcesStore} from "@/stores/resourcesStore";
 
   export default {
     name: 'ResourcesInfoCardSingleHost',
@@ -148,7 +149,8 @@
         this.showPassword = !this.showPassword
       },
       updateOtp () {
-        this.$store.dispatch('updateOtp')
+        const resourceStore = useResourcesStore();
+        resourceStore.updateOtp();
       },
       copyOtp () {
         const otpInput = document.querySelector('#otp')

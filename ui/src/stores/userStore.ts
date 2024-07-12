@@ -1,31 +1,35 @@
 import ApiState from '@/api/apiState'
 import {app} from "@/main";
+import {defineStore} from "pinia";
 
-export default {
-    state: {
-        apiStateUser: ApiState.INIT,
+interface UserStoreState {
+    apiStateUser_: number,
 
-        userInfo: null,
-    },
+    userInfo_: null | any,
+}
 
+export const useUserStore = defineStore('userStore', {
+    state:():UserStoreState => ({
+       apiStateUser_: ApiState.INIT,
+       userInfo_: null
+    }),
     getters: {
         apiStateUser: (state) => {
-            return state.apiStateUser
+            return state.apiStateUser_
         },
 
         userId: (state) => {
-            return state.userInfo?.sub
+            return state.userInfo_?.sub
         },
-
         userName: (state) => {
-            return state.userInfo.preferred_username
+            return state.userInfo_.preferred_username
         },
 
         userInfo: (state) => {
-            return state.userInfo
+            return state.userInfo_
         },
 
-        userRoles: () => {
+        userRoles(state) {
 
             const roles = app.config.globalProperties.$keycloak?.realmAccess?.roles
             if(roles === undefined){
@@ -34,19 +38,19 @@ export default {
 
             return roles;
         },
-
-        isUserDeveloper: (state, getters) => {
+        isUserDeveloper(state): boolean{
             let isDeveloper = false
-            getters.userGroups.forEach(userGroup => {
+            this.userGroups.forEach(userGroup => {
                 if (userGroup.startsWith('vendor')) {
                     isDeveloper = true
                 }
             })
+            if(this !== undefined){
+            }
 
             return isDeveloper
         },
-
-        userGroups: () => {
+        userGroups(): any[]{
 
             const groups = app.config.globalProperties.$keycloak?.tokenParsed?.groups
             console.log(groups)
@@ -57,31 +61,19 @@ export default {
             }
         },
     },
-
-    mutations: {
-        SET_API_STATE_USER (state, apiState) {
-            state.apiStateUser = apiState
-        },
-
-        SET_USERINFO (state, userInfo) {
-            state.userInfo = userInfo
-        },
-    },
-
     actions: {
-        async getUserDetails (context) {
-            context.commit('SET_API_STATE_USER', ApiState.LOADING)
+        async getUserDetails () {
+            this.apiStateUser_ = ApiState.LOADING;
 
             // console.log('MyLOG', app.config.globalProperties.$keycloak.ready);
 
             if (app.config.globalProperties.$keycloak.keycloak.authenticated){
                 await app.config.globalProperties.$keycloak.keycloak.loadUserInfo().then(userInfo => {
-                    context.commit('SET_USERINFO', userInfo)
+                    this.userInfo_ = userInfo;
                 })
             }
 
-            context.commit('SET_API_STATE_USER', ApiState.LOADED)
+            this.apiStateUser_ = ApiState.LOADED;
         },
     },
-
-}
+});

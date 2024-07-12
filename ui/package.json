@@ -6,11 +6,11 @@
     "dev": "vue-cli-service serve --open",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "test:unit": "vue-cli-service test:unit",
+    "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",
     "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue)' --locales 'src/localisation/**/*.json'",
-    "now-start": "vue-cli-service serve",
-    "test:e2e": "vue-cli-service test:e2e",
-    "test:unit": "vue-cli-service test:unit"
+    "now-start": "vue-cli-service serve"
   },
   "dependencies": {
     "@dsb-norge/vue-keycloak-js": "2.4.0",
@@ -27,6 +27,7 @@
     "material-design-icons-iconfont": "^6.7.0",
     "moment": "^2.29.4",
     "net": "^1.0.2",
+    "pinia": "^2.1.4",
     "sockjs-client": "^1.5.1",
     "stomp-websocket": "^2.3.4-next",
     "ts-loader": "^9.4.1",
@@ -77,6 +78,7 @@
     "vee-validate": "^4.12.6",
     "vue-chartist": "^3.0.0",
     "vue-cli-plugin-i18n": "^2.3.2",
+    "vue-cli-plugin-pinia": "~0.2.4",
     "vue-cli-plugin-vuetify": "^2.0.3",
     "vue-template-compiler": "^2.7.13",
     "vue-world-map": "^0.1.1",

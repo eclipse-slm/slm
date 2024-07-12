@@ -89,10 +89,15 @@
 
 <script>
   import { mapActions, mapGetters } from 'vuex'
+  import {useNotificationStore} from "@/stores/notificationStore";
 
   export default {
     name: 'NotificationsOverview',
     components: {},
+    setup(){
+      const notificationStore = useNotificationStore();
+      return {notificationStore}
+    },
     data: function () {
       return {
         sortBy: ['id'],
@@ -101,10 +106,12 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'notifications',
-        'notifications_unread',
-      ]),
+      notifications () {
+        return this.notificationStore.notifications
+      },
+      notifications_unread () {
+        return this.notificationStore.notifications_unread
+      },
       DataTableHeaders () {
         return [
           {

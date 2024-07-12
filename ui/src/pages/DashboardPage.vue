@@ -33,7 +33,7 @@
         />
       </v-col>
 
-<!--      <v-col
+      <!--      <v-col
         cols="12"
         sm="6"
         lg="3"
@@ -76,7 +76,10 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="12" lg="8">
+      <v-col
+        cols="12"
+        lg="8"
+      >
         <base-material-card class="px-5 py-3">
           <template #heading>
             <v-container
@@ -212,8 +215,11 @@
           </v-card-text>
         </base-material-card>
       </v-col>
-      <v-col cols="12" lg="4">
-        <dashboard-resource-statistics></dashboard-resource-statistics>
+      <v-col
+        cols="12"
+        lg="4"
+      >
+        <dashboard-resource-statistics />
       </v-col>
     </v-row>
   </v-container>
@@ -223,12 +229,26 @@
   import { mapGetters, mapActions } from 'vuex'
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
   import DashboardResourceStatistics from "@/components/dashboard/DashboardResourceStatistics.vue";
+  import {useServicesStore} from "@/stores/servicesStore";
+  import {useResourcesStore} from "@/stores/resourcesStore";
+  import {useUserStore} from "@/stores/userStore";
+  import {useJobsStore} from "@/stores/jobsStore";
+  import {useOverviewStore} from "@/stores/overviewStore";
 
   export default {
     name: 'DashboardDashboard',
     components: {
       DashboardResourceStatistics,
       NoItemAvailableNote,
+    },
+
+    setup(){
+      const servicesStore = useServicesStore();
+      const resourcesStore = useResourcesStore();
+      const userStore = useUserStore();
+      const jobsStore = useJobsStore();
+      const overviewStore = useOverviewStore();
+      return {servicesStore, resourcesStore, userStore, jobsStore, overviewStore};
     },
 
     data () {
@@ -290,20 +310,26 @@
         tabs: 0,
       }
     },
-
-    setup(){
-
-    },
-
     computed: {
-      ...mapGetters([
-        'userGroups',
-        'overviewResources',
-        'services',
-        'serviceOfferings',
-        'jobs',
-        'clusters'
-      ]),
+      userGroups() {
+        return this.userStore.userGroups
+      },
+      overviewResources() {
+        return this.overviewStore.overviewResources
+      },
+      services() {
+        return this.servicesStore.services
+      },
+      serviceOfferings() {
+        return this.servicesStore.serviceOfferings
+      },
+      jobs() {
+        return this.jobsStore.jobs
+      },
+      clusters() {
+        return this.resourcesStore.clusters;
+      },
+
       DataTableHeaders () {
         return [
           { title: 'ID', value: 'id', sortable: true },
@@ -317,12 +343,11 @@
     },
 
     mounted () {
-      this.getResourcesOverview()
-      this.$store.dispatch('updateServicesStore')
+      this.overviewStore.getResourcesOverview()
+      this.servicesStore.updateServicesStore();
     },
 
     methods: {
-      ...mapActions(['getResourcesOverview']),
       complete (index) {
         this.list[index] = !this.list[index]
       },

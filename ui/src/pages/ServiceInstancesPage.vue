@@ -25,29 +25,37 @@
   import { mapGetters } from 'vuex'
   import ApiState from '@/api/apiState.js'
   import ServiceInstancesOverview from '@/components/services/ServiceInstancesOverview'
+  import {useServicesStore} from "@/stores/servicesStore";
+  import {useStore} from "@/stores/store";
+  import {useResourcesStore} from "@/stores/resourcesStore";
 
   export default {
     components: {
       ServiceInstancesOverview,
+    },
+    setup(){
+      const servicesStore = useServicesStore();
+
+      return {servicesStore}
     },
     data () {
       return {
       }
     },
     created () {
-      this.$store.dispatch('getServices')
-      this.$store.dispatch('getServiceOfferings')
+      this.servicesStore.getServices();
+      this.servicesStore.getServiceOfferings();
     },
     computed: {
-      ...mapGetters([
-        'apiStateServices',
-      ]),
+      apiStateServices() {
+        return this.servicesStore.apiStateServices
+      },
       apiStateLoaded () {
         return this.apiStateServices.services === ApiState.LOADED
       },
       apiStateLoading () {
         if (this.apiStateServices.services === ApiState.INIT) {
-          this.$store.dispatch('getServices')
+          this.servicesStore.getServices();
         }
         return this.apiStateServices.services === ApiState.LOADING || this.apiStateServices.services === ApiState.INIT
       },

@@ -139,6 +139,7 @@
   import {app} from "@/main";
   import {Field, Form as ValidationForm } from "vee-validate";
   import * as yup from 'yup';
+  import {useServicesStore} from "@/stores/servicesStore";
 
   export default {
     name: 'ServiceOfferingWizardStep1Common',
@@ -147,8 +148,10 @@
     props: ['editMode', 'serviceVendorId'],
     setup(){
       const required = yup.string().required();
+      const servicesStore = useServicesStore();
+
       return {
-        required
+        required, servicesStore
       }
     },
     data () {
@@ -167,10 +170,12 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'serviceOfferingCategories',
-        'serviceOfferingDeploymentTypes',
-      ]),
+      serviceOfferingCategories() {
+        return this.servicesStore.serviceOfferingCategories
+      },
+      serviceOfferingDeploymentTypes () {
+        return this.servicesStore.serviceOfferingDeploymentTypes
+      },
     },
     mounted() {
       this.serviceOfferingGitRepository.serviceVendorId = this.serviceVendorId
@@ -183,7 +188,7 @@
               this.loading = false
               if (response.status === 200) {
                 app.config.globalProperties.$toast.info('Successfully created git-based service offering')
-                this.$store.dispatch('getServiceOfferings')
+                this.servicesStore.getServiceOfferings();
                 this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
               } else {
                 console.log(response)

@@ -187,6 +187,9 @@
   import Vue from "vue";
   import ConfirmDialog from "@/components/base/ConfirmDialog";
   import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
+  import {useServicesStore} from "@/stores/servicesStore";
+  import {useResourcesStore} from "@/stores/resourcesStore";
+  import {storeToRefs} from "pinia";
 
   export default {
     name: 'ServiceInstancesTable',
@@ -195,6 +198,13 @@
     },
     components: { ServiceInstanceDeleteDialog, ResourcesInfoDialog, ConfirmDialog },
     mixins: [ serviceInstanceMixin ],
+    setup(){
+      const servicesStore = useServicesStore();
+      const resourceStore = useResourcesStore();
+      const {serviceOfferingById, serviceInstanceGroupById} = storeToRefs(servicesStore)
+      const {resourceById} = storeToRefs(resourceStore)
+      return {servicesStore, resourceStore, serviceOfferingById, serviceInstanceGroupById, resourceById};
+    },
     data () {
       return {
         headers: [
@@ -220,12 +230,10 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'services',
-        'serviceOfferingById',
-        'resourceById',
-        'serviceInstanceGroupById'
-      ]),
+      services () {
+        return this.servicesStore.services
+      },
+
     },
     created() {
       this.groupedServices = this.services
@@ -246,7 +254,7 @@
       },
       onServiceDeleteConfirmed () {
         ServiceInstancesRestApi.deleteServiceInstance(this.serviceToDelete.id)
-        this.$store.commit('SET_SERVICE_MARKED_FOR_DELETE', this.serviceToDelete)
+        this.servicesStore.setServiceMarkedForDelete(this.serviceToDelete);
         this.serviceToDelete = null
         this.$toast.info('Service deletion started')
       },

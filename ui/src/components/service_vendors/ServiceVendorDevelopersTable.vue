@@ -92,11 +92,20 @@
   import Vue from 'vue'
   import OverviewHeading from "@/components/base/OverviewHeading.vue";
   import {app} from "@/main";
+  import {useUserStore} from "@/stores/userStore";
+  import {useServicesStore} from "@/stores/servicesStore";
+  import {storeToRefs} from "pinia";
 
   export default {
     name: 'ServiceVendorDevelopersTable',
     components: {OverviewHeading},
     props: ['serviceVendor'],
+    setup(){
+      const userStore = useUserStore();
+      const servicesStore = useServicesStore();
+      const {serviceOfferingCategoryNameById, serviceVendorById} = storeToRefs(servicesStore)
+      return {userStore, servicesStore, serviceOfferingCategoryNameById, serviceVendorById}
+    },
     data () {
       return {
         availableDevelopers: null,
@@ -104,6 +113,30 @@
         addedDevelopers: [],
         developersOfServiceVendor: [],
       }
+    },
+    computed: {
+      userId() {
+        return this.userStore.userId
+      },
+
+      tableHeaders () {
+        return [
+          { text: 'Username', value: 'username', sortable: true },
+          { text: 'Firstname', value: 'firstName', sortable: true },
+          { text: 'Lastname', value: 'lastName', sortable: true },
+          { text: 'Mail', value: 'email', sortable: true },
+          { text: 'Actions', value: 'developerActions', sortable: false },
+        ]
+      },
+      developersAvailableForSharing () {
+        const usersToRemove = []
+        for (const developer of this.developersOfServiceVendor) {
+          usersToRemove.push(developer.id)
+        }
+        return this.users.filter(function (developer) {
+          return usersToRemove.indexOf(developer.id) === -1
+        })
+      },
     },
     watch: {
       serviceVendor: {
@@ -114,31 +147,6 @@
             this.loadUsers()
           }
         },
-      },
-    },
-    computed: {
-      ...mapGetters([
-        'userId',
-        'serviceOfferingCategoryNameById',
-        'serviceVendorById',
-      ]),
-      tableHeaders () {
-        return [
-          { text: 'Username', value: 'username', sortable: true },
-          { text: 'Firstname', value: 'firstName', sortable: true },
-          { text: 'Lastname', value: 'lastName', sortable: true },
-          { text: 'Mail', value: 'email', sortable: true },
-          { text: 'Actions', value: 'developerActions', sortable: false },
-        ]
-      },
-    developersAvailableForSharing () {
-          const usersToRemove = []
-          for (const developer of this.developersOfServiceVendor) {
-            usersToRemove.push(developer.id)
-          }
-          return this.users.filter(function (developer) {
-            return usersToRemove.indexOf(developer.id) === -1
-          })
       },
     },
     methods: {

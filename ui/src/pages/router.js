@@ -1,6 +1,6 @@
 
 import {createRouter, createWebHashHistory, createWebHistory} from 'vue-router'
-import userStore from '@/store/userStore'
+import {useUserStore} from "@/stores/userStore";
 
 
 const routes = [
@@ -156,14 +156,15 @@ export const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  const userStore = useUserStore();
   if (to.meta.developerPermissionRequired) {
-    if (userStore.getters.isUserDeveloper) {
+    if (userStore.isUserDeveloper) {
       next()
     } else {
       next('/access_denied')
     }
   } else if (to.meta.adminPermissionRequired) {
-    if (userStore.getters.userRoles().includes('slm-admin')) {
+    if (userStore.userRoles().includes('slm-admin')) {
       next()
     } else {
       next('/access_denied')

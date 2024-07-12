@@ -189,11 +189,18 @@
 import {mapGetters} from "vuex";
 import ServiceOfferingVersionsRestApi from  "@/api/service-management/serviceOfferingVersionsRestApi";
 import ProgressCircular from "@/components/base/ProgressCircular";
+import {useServicesStore} from "@/stores/servicesStore";
+import {storeToRefs} from "pinia";
 
 export default {
   name: "ServiceOfferingTable",
   // components: {ProgressCircular},
   props: ['serviceOfferings'],
+  setup(){
+    const servicesStore = useServicesStore();
+    const {serviceVendorById, serviceOfferingCategoryNameById} = storeToRefs(servicesStore);
+    return {servicesStore, serviceVendorById, serviceOfferingCategoryNameById};
+  },
   data () {
     return {
       selectedServiceOffering: {},
@@ -203,14 +210,7 @@ export default {
       expanded: []
     }
   },
-  mounted() {
-    this.emitInterface();
-  },
   computed: {
-    ...mapGetters([
-      'serviceOfferingCategoryNameById',
-      'serviceVendorById',
-    ]),
     ServiceOfferingsTableHeaders () {
       return [
         { title: 'Name', value: 'name', sortable: true, width: '15%' },
@@ -229,6 +229,9 @@ export default {
         { title: 'Actions', value: 'serviceOfferingActions', sortable: false, width: '30%' },
       ]
     },
+  },
+  mounted() {
+    this.emitInterface();
   },
   methods: {
     emitInterface() {

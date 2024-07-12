@@ -16,14 +16,14 @@
 <script>
 import {mapGetters} from "vuex";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {useServicesStore} from "@/stores/servicesStore";
 
 export default {
   name: 'ServiceHosterTable',
   components: {NoItemAvailableNote},
-  computed: {
-    ...mapGetters([
-        'serviceHosters'
-    ])
+  setup(){
+    const servicesStore = useServicesStore();
+    return {servicesStore}
   },
   data() {
     return {
@@ -36,6 +36,11 @@ export default {
       ],
       showCreateDialog: false,
       selectedVirtualResourceProvider: null,
+    }
+  },
+  computed: {
+    serviceHosters () {
+      return this.servicesStore.serviceHosters
     }
   },
 }

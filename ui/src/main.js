@@ -1,7 +1,6 @@
 import {createApp, configureCompat } from 'vue'
 import App from './App.vue'
 import router from './pages/router'
-import {store} from './store/store'
 // import '@/plugins/base'
 // import '@/plugins/chartist'
 import 'chartist/dist/chartist.min.css'
@@ -34,7 +33,7 @@ configureCompat({
     GLOBAL_OBSERVABLE: true
 });
 
-export let app = withUUID(createApp(App)) ;
+export let app = withUUID(createApp(App).use(createPinia())) ;
 
 const requireComponent = require.context(
     '@/components/base', true, /\.vue$/,
@@ -44,6 +43,13 @@ import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
 
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import { createPinia } from 'pinia'
+import {useUserStore} from "@/stores/userStore";
+import {useCatalogStore} from "@/stores/catalogStore";
+import {useServicesStore} from "@/stores/servicesStore";
+import {useProviderStore} from "@/stores/providerStore";
+import {useResourcesStore} from "@/stores/resourcesStore";
+import {useNotificationStore} from "@/stores/notificationStore";
 
 
 requireComponent.keys().forEach(fileName => {
@@ -71,22 +77,33 @@ app.use(VueKeycloakJs, {
     },
     onReady (keycloak) {
         keycloak.updateToken(70).then((r) => console.log(r))
-        setupTokenInterceptor()
+        setupTokenInterceptor();
         NotificationServiceWebsocketClient.connect();
-        app.config.globalProperties.$store.dispatch('getUserDetails')
-        app.config.globalProperties.$store.dispatch('updateCatalogStore')
-        app.config.globalProperties.$store.dispatch('initServiceStore')
-        app.config.globalProperties.$store.dispatch('getVirtualResourceProviders')
-        app.config.globalProperties.$store.dispatch('getServiceHosters')
-        app.config.globalProperties.$store.dispatch('getServiceInstanceGroups')
-        app.config.globalProperties.$store.dispatch('getDeploymentCapabilities')
-        app.config.globalProperties.$store.dispatch('getResourcesFromBackend')
-        app.config.globalProperties.$store.dispatch('getResourceAASFromBackend')
-        app.config.globalProperties.$store.dispatch('getLocations')
-        app.config.globalProperties.$store.dispatch('getProfiler')
-        app.config.globalProperties.$store.dispatch('getCluster')
-        app.config.globalProperties.$store.dispatch('getNotifications')
-        app.config.globalProperties.$store.dispatch('getClusterTypes')
+        const userStore = useUserStore();
+        userStore.getUserDetails().then();
+
+        const catalogStore = useCatalogStore();
+        catalogStore.updateCatalogStore().then();
+
+        const serviceStore = useServicesStore();
+        serviceStore.initServiceStore().then();
+        serviceStore.getServiceInstanceGroups().then();
+
+        const providerStore = useProviderStore();
+        providerStore.getVirtualResourceProviders().then();
+        providerStore.getServiceHosters().then();
+
+        const resourceStore = useResourcesStore();
+        resourceStore.getDeploymentCapabilities().then();
+        resourceStore.getResourcesFromBackend().then();
+        resourceStore.getResourceAASFromBackend().then();
+        resourceStore.getLocations().then();
+        resourceStore.getProfiler().then();
+        resourceStore.getCluster().then();
+        resourceStore.getClusterTypes().then();
+
+        const notificationStore = useNotificationStore();
+        notificationStore.getNotifications();
     },
 })
 
@@ -131,7 +148,12 @@ app.use(VueAxios, axios)
 app.use(cors)
 
 app.use(router);
-app.use(store);
+
+
+const pina = createPinia();
+app.use(pina);
+
+
 app.use(v);
 app.use(i18n);
 

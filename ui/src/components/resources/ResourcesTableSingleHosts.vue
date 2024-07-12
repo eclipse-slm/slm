@@ -13,9 +13,12 @@
     >
       <template #top>
         <v-toolbar flat>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-toolbar-title>
-            <v-tooltip start close-delay="2000">
+            <v-tooltip
+              start
+              close-delay="2000"
+            >
               <template #activator="{ props }">
                 <v-btn
                   v-if="areProfilerAvailable"
@@ -97,7 +100,7 @@
           location="top"
         >
           <template
-              #activator="{ props }"
+            #activator="{ props }"
           >
             <v-chip
               v-bind="props"
@@ -120,7 +123,7 @@
           location="right"
         >
           <template
-              #activator="{ props }"
+            #activator="{ props }"
           >
             <v-icon
               :color="getFabOSDeviceIcon(item.capabilityServices).color"
@@ -273,11 +276,16 @@
   import ProfilerRestApi from "@/api/resource-management/profilerRestApi";
   import Vue from "vue";
   import {app} from "@/main";
+  import {useResourcesStore} from "@/stores/resourcesStore";
 
   export default {
     name: 'ResourcesTableSingleHosts',
     components: {CapabilityParamsDialog, ConfirmDialog },
     mixins: [capabilityUtilsMixin],
+    setup(){
+      const resourceStore = useResourcesStore();
+      return {resourceStore};
+    },
     data () {
       return {
         tableHeaders: [
@@ -311,14 +319,25 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'resources',
-        'locations',
-        'profiler',
-        'searchResources',
-        'selectedResourceForDelete',
-        'availableSingleHostCapabilitiesNoDefault',
-      ]),
+      resources () {
+        return this.resourceStore.resources
+      },
+      locations() {
+        return this.resourceStore.locations
+      },
+      profiler() {
+        return this.resourceStore.profiler
+      },
+      searchResources () {
+        return this.resourceStore.searchResources
+      },
+      selectedResourceForDelete () {
+        return this.resourceStore.selectedResourceForDelete
+      },
+      availableSingleHostCapabilitiesNoDefault() {
+        return this.resourceStore.availableSingleHostCapabilitiesNoDefault
+      },
+
       areProfilerAvailable() {
         return this.profiler.length > 0;
       },
@@ -358,7 +377,7 @@
         const resourceId = resource.id
         ResourcesRestApi.deleteResource(resourceId).then(response => {
         })
-        this.$store.commit('SET_RESOURCE_MARKED_FOR_DELETE', resource)
+        this.resourceStore.setResourceMarkedForDelete(resource);
         this.resourceToDelete = null
       },
       openDefineCapabilityParamsDialog(resourceId, capabilityId, skipInstall) {

@@ -67,13 +67,14 @@
 </template>
 
 <script>
-  import { mapGetters, mapActions } from 'vuex'
   import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
   import ResourcesCreateDialog from '@/components/resources/dialogs/create/ResourcesCreateDialog'
   import ResourcesTableSingleHosts from '@/components/resources/ResourcesTableSingleHosts'
   import ResourcesTableClusters from '@/components/resources/ResourcesTableClusters'
   import OverviewHeading from "@/components/base/OverviewHeading.vue";
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+  import {useResourcesStore} from "@/stores/resourcesStore";
+  import {mapWritableState} from "pinia";
 
   export default {
     name: 'ResourcesOverview',
@@ -85,6 +86,10 @@
       ResourcesTableClusters,
       NoItemAvailableNote,
     },
+    setup(){
+      const resourceStore = useResourcesStore();
+      return {resourceStore};
+    },
     data () {
       return {
         selectedResource: null,
@@ -94,26 +99,28 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'resources',
-        'clusters',
-      ]),
+      resources () {
+        return this.resourceStore.resources
+      },
+      clusters () {
+        return this.resourceStore.clusters
+      },
       searchResources: {
         get () {
-          return this.$store.state.resourcesStore.searchResources
+          return this.resourceStore.searchResources_;
         },
         set (value) {
-          this.$store.commit('SET_SEARCH_RESOURCES', value)
+          this.resourceStore.searchResources_ = value;
         },
       },
     },
     mounted () {
-      this.$store.dispatch('getDeploymentCapabilities')
+      this.resourceStore.getDeploymentCapabilities();
     },
     methods: {
-      ...mapActions([
-        'getResourcesFromBackend',
-      ]),
+      getResourcesFromBackend: () => {
+        return this.resourceStore.getResourcesFromBackend()
+      },
 
       onResourceSelected (resource) {
         this.selectedResource = resource

@@ -102,11 +102,19 @@
   import { mapGetters } from 'vuex'
   import clustersRestApi from '@/api/resource-management/clustersRestApi'
   import ClustersCreateDialogPage from "@/components/clusters/dialogs/ClustersCreateDialogPage";
+  import {useProviderStore} from "@/stores/providerStore";
+  import {useResourcesStore} from "@/stores/resourcesStore";
 
   export default {
     name: 'ClustersCreateDialogPageCreateNewCluster',
     enums: {
       ClustersCreateDialogPage,
+    },
+    setup(){
+      const providerStore = useProviderStore();
+      const resourceStore = useResourcesStore();
+
+      return {providerStore, resourceStore};
     },
     data () {
       return {
@@ -123,7 +131,16 @@
       this.$emit('title-changed', 'Create new cluster')
     },
     computed: {
-      ...mapGetters(['virtualResourceProviders', 'availableClusterTypes', 'resources']),
+      virtualResourceProviders() {
+        return this.providerStore.virtualResourceProviders
+      },
+      availableClusterTypes() {
+        return this.resourceStore.availableClusterTypes;
+      },
+      resources() {
+        return this.resourceStore.resources;
+      },
+
       clusterCreateOptions () {
         const options = [
           {

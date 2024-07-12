@@ -1,6 +1,6 @@
 <template>
   <ValidationForm
-      ref="observer"
+    ref="observer"
     v-slot="{ meta, handleSubmit, validate }"
   >
     <v-card>
@@ -194,7 +194,7 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </ValidationForm >
+  </ValidationForm>
 </template>
 
 <script>
@@ -204,6 +204,7 @@ import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/Res
 import {mapGetters} from "vuex";
 import {Field, Form as ValidationForm} from "vee-validate";
 import * as yup from 'yup';
+import {useResourcesStore} from "@/stores/resourcesStore";
 
 
 export default {
@@ -216,7 +217,10 @@ export default {
       const string_required = yup.string().required();
       const reg = new RegExp('^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
       const ip_required = yup.string().matches(reg)
-      return {string_required, ip_required}
+
+      const resourceStore = useResourcesStore();
+
+      return {string_required, ip_required, resourceStore}
     },
     data () {
       return {
@@ -232,7 +236,16 @@ export default {
       }
     },
     computed: {
-      ...mapGetters(['resourceConnectionTypes','locations','availableBaseConfigurationCapabilities']),
+      resourceConnectionTypes() {
+        return this.resourceStore.resourceConnectionTypes
+      },
+      locations () {
+        return this.resourceStore.locations
+      },
+      availableBaseConfigurationCapabilities() {
+        return this.resourceStore.availableBaseConfigurationCapabilities
+      },
+
       resourceBaseConfigurationId() {
         if(this.availableBaseConfigurationCapabilities.length === 0 || !this.addBaseConfigurationToResource)
           return ''
@@ -241,7 +254,7 @@ export default {
     },
     mounted() {
       this.$emit('title-changed', 'Add existing host resource')
-      this.$store.dispatch('getResourceConnectionTypes')
+      this.resourceStore.getResourceConnectionTypes();
     },
     methods: {
       updateConnectionPort(connectionTypeName) {

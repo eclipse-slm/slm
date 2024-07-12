@@ -113,22 +113,38 @@
 <script>
   import { mapGetters } from 'vuex'
   import ApiState from '@/api/apiState'
+  import {useUserStore} from "@/stores/userStore";
+  import {useStore} from "@/stores/store";
 
   export default {
+    setup(){
+      const userStore = useUserStore();
+
+      return {userStore};
+    },
     computed: {
-      ...mapGetters([
-        'apiStateUser',
-        'userId',
-        'userName',
-        'userInfo',
-        'userRoles',
-      ]),
+      apiStateUser () {
+        return this.userStore.apiStateUser
+      },
+      userId() {
+        return this.userStore.userId
+      },
+      userName () {
+        return this.userStore.userName
+      },
+      userInfo () {
+        return this.userStore.userInfo
+      },
+      userRoles () {
+        return this.userStore.userRoles
+      },
+
       apiStateLoaded () {
         return this.apiStateUser === ApiState.LOADED
       },
       apiStateLoading () {
         if (this.apiStateUser === ApiState.INIT) {
-          this.$store.dispatch('getUserDetails')
+          this.userStore.getUserDetails();
         }
         return this.apiStateUser === ApiState.LOADING || this.apiStateUser === ApiState.INIT
       },

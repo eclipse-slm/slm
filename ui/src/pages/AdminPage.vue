@@ -24,10 +24,16 @@
   import ServiceCategoriesTable from '@/components/service_offerings/ServiceCategoriesTable'
   import ServiceVendorsDevelopersTable from '@/components/service_vendors/ServiceVendorDevelopersTable'
   import ServiceVendorTable from '@/components/service_vendors/ServiceVendorTable'
+  import {useServicesStore} from "@/stores/servicesStore";
+  import {useResourcesStore} from "@/stores/resourcesStore";
 
   export default {
     name: 'AdminPage',
     components: { ServiceCategoriesTable, ServiceVendorTable, ServiceVendorsDevelopersTable, VersionsOverview, },
+    setup(){
+      const servicesStore = useServicesStore();
+      return {servicesStore};
+    },
     data () {
       return {
         selectedServiceVendor: null,
@@ -36,9 +42,9 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'serviceVendors',
-      ]),
+      serviceVendors() {
+        return this.servicesStore.serviceVendors
+      },
       ServiceVendorsTableHeaders () {
         return [
           { title: 'Id', value: 'serviceVendorId', sortable: true },
@@ -49,7 +55,7 @@
       },
     },
     created () {
-      this.$store.dispatch('getServiceVendors')
+      this.servicesStore.getServiceVendors();
     },
     methods: {
       onServiceVendorClicked (serviceVendor) {

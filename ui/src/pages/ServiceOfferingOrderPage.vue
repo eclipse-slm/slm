@@ -179,6 +179,11 @@
   import ProgressCircular from "@/components/base/ProgressCircular";
   import {Form as ValidationForm } from "vee-validate";
   import * as yup from 'yup';
+  import {useServicesStore} from "@/stores/servicesStore";
+  import {useResourcesStore} from "@/stores/resourcesStore";
+  import {useUserStore} from "@/stores/userStore";
+  import {useJobsStore} from "@/stores/jobsStore";
+  import {storeToRefs} from "pinia";
 
   export default {
     name: 'ServiceOrderView',
@@ -188,8 +193,15 @@
     props: ['serviceOfferingId', 'serviceOfferingVersionId'],
     setup(){
       const required = yup.string().required();
+      const servicesStore = useServicesStore();
+      const resourcesStore = useResourcesStore();
+      const userStore = useUserStore();
+      const jobsStore = useJobsStore();
+      const {resourceById, clusterById} = storeToRefs(resourcesStore);
+      const {serviceOfferingById} = storeToRefs(servicesStore);
       return {
-        required
+        required, servicesStore, resourcesStore, userStore, jobsStore,
+        resourceById, clusterById, serviceOfferingById
       }
     },
     data () {
@@ -229,16 +241,18 @@
         }
       })
     },
-    computed: {
-      ...mapGetters([
-          'apiStateServices',
-          'serviceOfferingById',
-          'resourceById',
-          'clusterById',
-          'resources',
-          'clusters'
 
-      ]),
+    computed: {
+      apiStateServices() {
+        return this.servicesStore.apiStateServices
+      },
+      resources() {
+        return this.resourcesStore.resources
+      },
+      clusters () {
+        return this.resourcesStore.clusters
+      },
+
       totalResourcesCount () {
         return this.resources?.length + this.clusters?.length
       },

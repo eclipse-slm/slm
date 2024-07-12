@@ -73,7 +73,8 @@
         <v-col v-show="!SelectedServiceOverview">
           <service-details-requirements
             :service-offering="serviceOffering"
-            :service-offering-version-id="selectedServiceOfferingVersionId" />
+            :service-offering-version-id="selectedServiceOfferingVersionId"
+          />
         </v-col>
       </v-col>
     </v-row>
@@ -89,6 +90,7 @@
   import ServiceDetailsOverview from '@/components/service_offerings/ServiceOfferingDetailsOverview'
   import ServiceDetailsRequirements from '@/components/service_offerings/ServiceOfferingDetailsRequirements.vue'
   import ApiState from '@/api/apiState'
+  import {useServicesStore} from "@/stores/servicesStore";
 
   export default {
     name: 'ServiceOfferingDetailsPage',
@@ -98,6 +100,11 @@
       ServiceDetailsRequirements,
     },
     props: ['serviceOfferingId', 'selectedService'],
+    setup(){
+      const servicesStore = useServicesStore();
+
+      return {servicesStore}
+    },
     data () {
       return {
         SelectedServiceOverview: true,
@@ -106,10 +113,13 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'apiStateServices',
-        'serviceOfferingById',
-      ]),
+      apiStateServices () {
+        return this.servicesStore.apiStateServices
+      },
+      serviceOfferingById (id) {
+        return this.servicesStore.serviceOfferingById(id)
+      },
+
       apiStateLoaded () {
         return this.apiStateServices.serviceOfferingCategories === ApiState.LOADED &&
           this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADED &&
@@ -118,16 +128,16 @@
       },
       apiStateLoading () {
         if (this.apiStateServices.serviceOfferingCategories === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferingCategories')
+          this.servicesStore.getServiceOfferingCategories();
         }
         if (this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferingDeploymentTypes')
+          this.servicesStore.getServiceOfferingDeploymentTypes();
         }
         if (this.apiStateServices.serviceOfferings === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferings')
+          this.servicesStore.getServiceOfferings();
         }
         if (this.apiStateServices.serviceVendors === ApiState.INIT) {
-          this.$store.dispatch('getServiceVendors')
+          this.servicesStore.getServiceVendors();
         }
         return this.apiStateServices.serviceOfferingCategories === ApiState.LOADING || this.apiStateServices.serviceOfferingCategories === ApiState.INIT ||
           this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADING || this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT ||

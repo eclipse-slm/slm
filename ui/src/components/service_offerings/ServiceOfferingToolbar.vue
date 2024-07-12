@@ -1,8 +1,8 @@
 <template>
   <v-toolbar
-      id="ServiceHeaderFilterRow"
-      flat
-      height="75px"
+    id="ServiceHeaderFilterRow"
+    flat
+    height="75px"
   >
     <!-- Search field to filter by Service Offering Name -->
     <v-text-field
@@ -53,8 +53,8 @@
 
     <!--Button to remove all activated filters -->
     <v-btn
-        variant="text"
-        @click="removeFilter()"
+      variant="text"
+      @click="removeFilter()"
     >
       <v-icon>mdi-close</v-icon>
     </v-btn>
@@ -63,11 +63,15 @@
 
 <script>
   import { mapGetters } from 'vuex'
+  import {useServicesStore} from "@/stores/servicesStore";
 
   export default {
     name: 'ServiceOfferingOverviewToolbar',
     props: [],
-
+    setup(){
+      const servicesStore = useServicesStore();
+      return {servicesStore};
+    },
     data () {
       return {
         filterServiceOfferingName: '',
@@ -78,12 +82,18 @@
     },
 
     computed: {
-      ...mapGetters([
-        'apiStateServices',
-        'serviceOfferings',
-        'serviceOfferingCategories',
-        'serviceVendors',
-      ]),
+      apiStateServices() {
+        return this.servicesStore.apiStateServices
+      },
+      serviceOfferings () {
+        return this.servicesStore.serviceOfferings
+      },
+      serviceOfferingCategories() {
+        return this.servicesStore.serviceOfferingCategories
+      },
+      serviceVendors () {
+        return this.servicesStore.serviceVendors
+      },
     },
 
     methods: {

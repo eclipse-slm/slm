@@ -1,8 +1,7 @@
 import SockJS from 'sockjs-client'
 import Stomp from 'stomp-websocket'
-import store from '@/store/store'
-import Vue from 'vue'
 import {app} from "@/main";
+import {useNotificationStore} from "@/stores/notificationStore";
 
 const API_URL = '/notification-service'
 
@@ -28,7 +27,8 @@ class NotificationServiceWebsocketClient {
           () => {
               this.stompClient.subscribe(subscriptionName, response => {
                   const content = JSON.parse(response.body)
-                  app.config.globalProperties.$store.dispatch('processIncomingNotification', content)
+                  const notificationStore = useNotificationStore();
+                  notificationStore.processIncomingNotification(content);
               })
           })
   }

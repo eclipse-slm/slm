@@ -136,6 +136,7 @@ import ServiceOfferingCardGrid from "@/components/service_offerings/ServiceOffer
 import { mapGetters } from "vuex";
 import {Field, Form as ValidationForm } from "vee-validate";
 import * as yup from 'yup';
+import {useServicesStore} from "@/stores/servicesStore";
 
 export default {
   name: "ServiceOfferingWizardManualStep1Common",
@@ -143,8 +144,9 @@ export default {
   props: ["editMode", "newServiceOffering"],
   setup(){
     const required = yup.string().required();
+    const servicesStore = useServicesStore();
     return {
-      required
+      required, servicesStore
     }
   },
   data() {
@@ -154,10 +156,12 @@ export default {
     };
   },
   computed: {
-    ...mapGetters([
-      "serviceOfferingCategories",
-      "serviceOfferingDeploymentTypes",
-    ]),
+    serviceOfferingCategories() {
+      return this.servicesStore.serviceOfferingCategories
+    },
+    serviceOfferingDeploymentTypes () {
+      return this.servicesStore.serviceOfferingDeploymentTypes
+    },
   },
   methods: {
     loadServiceOfferingImage(files) {

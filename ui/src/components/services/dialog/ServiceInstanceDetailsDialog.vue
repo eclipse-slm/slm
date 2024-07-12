@@ -3,7 +3,7 @@
     v-model="showDialog"
     @click:outside="onCloseButtonClicked"
   >
-    <template v-slot:default="{}">
+    <template #default="{}">
       <v-card v-if="showDialog">
         <v-toolbar
           color="primary"
@@ -260,12 +260,11 @@
       </v-card>
 
       <resources-info-dialog
-          :resource="selectedResource"
-          @closed="selectedResource = null"
+        :resource="selectedResource"
+        @closed="selectedResource = null"
       />
     </template>
   </v-dialog>
-
 </template>
 
 <script>
@@ -281,12 +280,22 @@
   import AasRestApi from "@/api/resource-management/aasRestApi";
   import getEnv from "@/utils/env";
   import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+  import {useServicesStore} from "@/stores/servicesStore";
+  import {useResourcesStore} from "@/stores/resourcesStore";
+  import {storeToRefs} from "pinia";
 
   export default {
     name: 'ServiceInstanceDetailsDialog',
     components: {NoItemAvailableNote, ProgressCircular, ResourcesInfoDialog },
     mixins: [ serviceInstanceMixin ],
     props: ['serviceInstance'],
+    setup(){
+      const servicesStore = useServicesStore();
+      const resourceStore = useResourcesStore();
+      const {serviceOfferingById, serviceInstanceGroupById} = storeToRefs(servicesStore)
+      const {resourceById} = storeToRefs(resourceStore)
+      return {servicesStore, resourceStore, serviceOfferingById, serviceInstanceGroupById, resourceById};
+    },
     data () {
       return {
         selectedResource: null,
@@ -294,6 +303,20 @@
         serviceInstanceDetails: null,
         aasGuiUrls: {}
       }
+    },
+    computed: {
+      showDialog () {
+        return this.serviceInstance !== null
+      },
+      apiStateLoaded () {
+        return (this.apiState === ApiState.LOADED || this.apiState === ApiState.UPDATING)
+      },
+      apiStateLoading () {
+        return this.apiState === ApiState.LOADING || this.apiState === ApiState.INIT
+      },
+      apiStateError () {
+        return this.apiState === ApiState.ERROR
+      },
     },
     watch: {
       serviceInstance: {
@@ -322,25 +345,6 @@
           }
         }
       }
-    },
-    computed: {
-      ...mapGetters([
-        'serviceOfferingById',
-        'resourceById',
-        'serviceInstanceGroupById'
-      ]),
-      showDialog () {
-        return this.serviceInstance !== null
-      },
-      apiStateLoaded () {
-        return (this.apiState === ApiState.LOADED || this.apiState === ApiState.UPDATING)
-      },
-      apiStateLoading () {
-        return this.apiState === ApiState.LOADING || this.apiState === ApiState.INIT
-      },
-      apiStateError () {
-        return this.apiState === ApiState.ERROR
-      },
     },
     methods: {
       onCloseButtonClicked () {

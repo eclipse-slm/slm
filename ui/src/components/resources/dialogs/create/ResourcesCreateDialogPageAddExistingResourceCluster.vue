@@ -169,6 +169,7 @@
   import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
   import {Field, Form as ValidationForm } from "vee-validate";
   import * as yup from 'yup';
+  import {useResourcesStore} from "@/stores/resourcesStore";
 
   export default {
     name: 'ResourcesCreateDialogPageAddExistingResourceCluster',
@@ -178,8 +179,9 @@
     },
     setup(){
       const is_required = yup.string().required();
+      const resourceStore = useResourcesStore();
       return {
-        is_required
+        is_required, resourceStore
       }
     },
     data () {
@@ -192,7 +194,10 @@
       }
     },
     computed: {
-      ...mapGetters(['availableClusterTypes']),
+      availableClusterTypes () {
+        return this.resourceStore.availableClusterTypes
+      },
+
       availableClusterTypesWithSkipInstall () {
         let clusterTypes = []
         this.availableClusterTypes.forEach(clusterType => {

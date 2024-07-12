@@ -63,17 +63,27 @@
 <script>
   import { mapGetters } from 'vuex'
   import ResourcesCreateDialogPage from '@/components/resources/dialogs/create/ResourcesCreateDialogPage'
+  import {useResourcesStore} from "@/stores/resourcesStore";
 
   export default {
     name: 'ResourcesCreateDialogPageCreateNewResource',
     enums: {
       ResourcesCreateDialogPage,
     },
+    setup(){
+      const resourceStore = useResourcesStore();
+      return {resourceStore};
+    },
     computed: {
       ResourcesCreateDialogPage() {
         return ResourcesCreateDialogPage
       },
-      ...mapGetters(['virtualResourceProviders', 'availableClusterTypes']),
+      virtualResourceProviders() {
+        return this.resourceStore.virtualResourceProviders
+      },
+      availableClusterTypes() {
+        return this.resourceStore.availableClusterTypes
+      },
     },
     mounted() {
       this.$emit('title-changed', 'Create new resource')
