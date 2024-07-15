@@ -2,48 +2,38 @@
   <custom-dialog
     title="Create new service offering"
     :show="show"
-    width="800"
+    width="850"
     @canceled="$emit('canceled')"
   >
     <template
       #content
     >
-      <v-row>
-        <v-col>
-          <v-btn
-            color="secondary"
-            size="x-large"
-            tile
-            @click="onAddServiceOfferingClicked('manual')"
-          >
-            <v-icon
-              class="mr-5 ml-2"
-              size="large"
-              start
+      <v-container>
+        <v-row>
+          <v-col>
+            <v-btn
+              color="secondary"
+              size="x-large"
+              tile
+              prepend-icon="mdi-account"
+              @click="onAddServiceOfferingClicked('manual')"
             >
-              mdi-account
-            </v-icon>
-            Service Offering Wizard
-          </v-btn>
-        </v-col>
-        <v-col>
-          <v-btn
-            color="secondary"
-            size="x-large"
-            tile
-            @click="onAddServiceOfferingClicked('git')"
-          >
-            <v-icon
-              class="mr-5 ml-2"
-              size="large"
-              start
+              Service Offering Wizard
+            </v-btn>
+          </v-col>
+          <v-col>
+            <v-btn
+              color="secondary"
+              size="x-large"
+              tile
+              prepend-icon="mdi-git"
+              @click="onAddServiceOfferingClicked('git')"
             >
-              mdi-git
-            </v-icon>
-            Git-based Service Offering
-          </v-btn>
-        </v-col>
-      </v-row>
+              Git-based Service Offering
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
     </template>
     <template #actions>
       <div />

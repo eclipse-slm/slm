@@ -65,14 +65,16 @@
       <!-- Navigation Buttons-->
       <v-card-actions>
         <v-btn
-          :color="$vuetify.theme.themes.light.secondary"
+          variant="tonal"
+          :color="$vuetify.theme.themes.light.colors.secondary"
           @click="$emit('step-canceled', stepNumber)"
         >
           {{ $t('buttons.Cancel') }}
         </v-btn>
         <v-spacer />
         <v-btn
-          :color="!meta.valid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
+          variant="tonal"
+          :color="!meta.valid ? $vuetify.theme.themes.light.colors.disable : $vuetify.theme.themes.light.colors.secondary"
           @click="!meta.valid ? validate() : handleSubmit(onNextButtonClicked)"
         >
           {{ $t('buttons.Next') }}

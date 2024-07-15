@@ -17,12 +17,11 @@
                 density="compact"
               />
               <v-btn
+                icon="mdi-delete"
                 size="small"
                 class="mx-4"
                 @click="onRequirementDeleteClicked(requirement)"
-              >
-                <v-icon icon="mdi-delete" />
-              </v-btn>
+              />
             </v-row>
           </template>
           <v-tabs
@@ -33,21 +32,26 @@
               :key="logic.id"
               :value="logic.id"
             >
-              <v-select
-                v-model="logic.type"
-                :items="logicList"
-                density="compact"
-              />
-              <v-btn
-                size="small"
-                class="mx-4"
-                @click="onLogicDeleteClicked(requirement, logic)"
-              >
-                <v-icon icon="mdi-delete" />
-              </v-btn>
+              <v-row>
+                <v-col cols="10">
+                  <v-select
+                    v-model="logic.type"
+                    :items="logicList"
+                    density="compact"
+                  />
+                </v-col>
+                <v-col cols="2">
+                  <v-btn
+                    icon="mdi-delete"
+                    size="small"
+                    class="mx-4"
+                    @click="onLogicDeleteClicked(requirement, logic)"
+                  />
+                </v-col>
+              </v-row>
             </v-tab>
             <v-btn
-              icon="mdi-plus"
+              prepend-icon="mdi-plus"
               color="secondary"
               @click="onNewLogicClicked(requirement)"
             >
@@ -67,20 +71,22 @@
                   class="mt-0"
                 >
                   <v-card-title>
-                    <v-text-field
-                      v-model="property.name"
-                      density="compact"
-                    />
-                    <v-btn
-                      icon
-                      size="small"
-                      class="mx-4"
-                      @click="onPropertyDeleteClicked(logic, property)"
-                    >
-                      <v-icon>
-                        mdi-delete
-                      </v-icon>
-                    </v-btn>
+                    <v-row>
+                      <v-col cols="11">
+                        <v-text-field
+                          v-model="property.name"
+                          density="compact"
+                        />
+                      </v-col>
+                      <v-col cols="1">
+                        <v-btn
+                          icon="mdi-delete"
+                          size="small"
+                          class="mx-4"
+                          @click="onPropertyDeleteClicked(logic, property)"
+                        />
+                      </v-col>
+                    </v-row>
                   </v-card-title>
                   <v-card-text>
                     <v-row>
@@ -136,14 +142,16 @@
       <!-- Navigation Buttons-->
       <v-card-actions>
         <v-btn
-          :color="$vuetify.theme.themes.light.secondary"
+          variant="tonal"
+          :color="$vuetify.theme.themes.light.colors.secondary"
           @click="$emit('step-canceled', stepNumber)"
         >
           {{ $t('buttons.Back') }}
         </v-btn>
         <v-spacer />
         <v-btn
-          :color="!meta.valid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
+          variant="tonal"
+          :color="!meta.valid ? $vuetify.theme.themes.light.colors.disable : $vuetify.theme.themes.light.colors.secondary"
           @click="!meta.valid ? validate() : handleSubmit(emitStepCompleted)"
         >
           <div v-if="editMode">

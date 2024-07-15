@@ -44,7 +44,7 @@
           <v-spacer />
           <v-btn
             variant="text"
-            :color="$vuetify.theme.themes.light.secondary"
+            :color="$vuetify.theme.themes.light.colors.secondary"
           >
             Create
           </v-btn>

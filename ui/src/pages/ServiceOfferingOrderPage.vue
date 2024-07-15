@@ -146,6 +146,7 @@
         <v-row class="mt-12 pt-12 ">
           <v-spacer />
           <v-btn
+            variant="tonal"
             class="mr-3"
             @click="cancel()"
           >
@@ -153,7 +154,8 @@
           </v-btn>
           <v-spacer />
           <v-btn
-            :color="!meta.valid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
+            variant="tonal"
+            :color="!meta.valid ? $vuetify.theme.themes.light.colors.disable : $vuetify.theme.themes.light.colors.secondary"
             @click="!meta.valid ? validate() : handleSubmit(order)"
           >
             {{ $t('buttons.Checkout') }}

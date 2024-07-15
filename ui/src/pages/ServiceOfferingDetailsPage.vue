@@ -116,9 +116,6 @@
       apiStateServices () {
         return this.servicesStore.apiStateServices
       },
-      serviceOfferingById (id) {
-        return this.servicesStore.serviceOfferingById(id)
-      },
 
       apiStateLoaded () {
         return this.apiStateServices.serviceOfferingCategories === ApiState.LOADED &&
@@ -164,7 +161,10 @@
       },
       onServiceOfferingVersionSelected (serviceOfferingVersionId) {
         this.selectedServiceOfferingVersionId = serviceOfferingVersionId
-      }
+      },
+      serviceOfferingById (id) {
+        return this.servicesStore.serviceOfferingById(id)
+      },
     },
 
   }

@@ -6,7 +6,7 @@
         :items="clusters"
         :row-props="rowClass"
         :single-expand="true"
-        :expanded.sync="expanded"
+        :expanded="expanded"
         show-expand
         @click:row="expandRow"
       >
@@ -79,45 +79,6 @@
                     </v-chip>
                   </td>
                 </tr>
-                </tbody>
-              </template>
-            </v-table>
-          </td>
-        </template>
-
-        <template #expanded-item="{headers, item}">
-          <td :colspan="headers.length">
-            <v-table
-              dense
-              class="my-5"
-            >
-              <template #default>
-                <thead>
-                  <tr>
-                    <th>Node Name</th>
-                    <th>IP</th>
-                    <th>ID</th>
-                    <th>Member Type</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="node in item.nodes"
-                    :key="node.node"
-                  >
-                    <td>{{ node.Node }}</td>
-                    <td>{{ node.Address }}</td>
-                    <td>{{ node.ID }}</td>
-                    <td>
-                      <v-chip
-                        class="mx-1"
-                        size="small"
-                        value="test"
-                      >
-                        {{ getClusterMemberTypeByNodeId(item.memberMapping[node.ID], item.clusterMemberTypes) }}
-                      </v-chip>
-                    </td>
-                  </tr>
                 </tbody>
               </template>
             </v-table>

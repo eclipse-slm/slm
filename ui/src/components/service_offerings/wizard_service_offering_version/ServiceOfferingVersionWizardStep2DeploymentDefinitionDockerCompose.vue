@@ -153,14 +153,16 @@
     <!-- Navigation Buttons-->
     <v-card-actions>
       <v-btn
-        :color="$vuetify.theme.themes.light.secondary"
+        variant="tonal"
+        :color="$vuetify.theme.themes.light.colors.secondary"
         @click="onCancelButtonClicked()"
       >
         {{ $t('buttons.Back') }}
       </v-btn>
       <v-spacer />
       <v-btn
-        :color="$vuetify.theme.themes.light.secondary"
+        variant="tonal"
+        :color="$vuetify.theme.themes.light.colors.secondary"
         @click="onNextButtonClicked()"
       >
         {{ $t('buttons.Next') }}

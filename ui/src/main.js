@@ -122,9 +122,10 @@ const theme = {
         warning: '#F39430',
         info: '#71BD86',
         success: '#00A0E3',
+        disable: '#999'
     },
     variables:{
-        'theme-on-info': '#fff'
+        'theme-on-info': '#fff',
     }
 };
 

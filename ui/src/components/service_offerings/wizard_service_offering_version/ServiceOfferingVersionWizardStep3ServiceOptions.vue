@@ -70,17 +70,19 @@
     <!-- Navigation Buttons-->
     <v-card-actions>
       <v-btn
-        :color="$vuetify.theme.themes.light.secondary"
+        variant="tonal"
+        :color="$vuetify.theme.themes.light.colors.secondary"
         @click="$emit('step-canceled', stepNumber)"
       >
         {{ $t("buttons.Back") }}
       </v-btn>
       <v-spacer />
       <v-btn
+        variant="tonal"
         :color="
           !meta.valid
-            ? $vuetify.theme.disable
-            : $vuetify.theme.themes.light.secondary
+            ? $vuetify.theme.themes.light.colors.disable
+            : $vuetify.theme.themes.light.colors.secondary
         "
         @click="!meta.valid ? validate() : handleSubmit(emitStepCompleted)"
       >
