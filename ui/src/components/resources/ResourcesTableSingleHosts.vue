@@ -215,7 +215,7 @@
                     <!-- Capability Skip Install Button -->
                     <v-btn
                       v-if="showCapabilitySkipInstallButton(item,capability)"
-                      color="info"
+                      class="bg-info"
                       style="height:36px"
                       @click="openDefineCapabilityParamsDialog(item.id, capability.id, true)"
                     >
@@ -225,6 +225,7 @@
                     <v-btn
                       v-if="isCapabilityInstalledOnResource(item, capability)"
                       color="error"
+                      class="bg-error"
                       style="height:36px"
                       :append-icon="capability.logo"
                       @click="removeCapability(item.id, capability.id)"
@@ -271,7 +272,7 @@
   import CapabilityParamsDialog from "@/components/resources/dialogs/CapabilityParamsDialog.vue";
   import ResourcesRestApi from '@/api/resource-management/resourcesRestApi'
   import { capabilityUtilsMixin } from '@/utils/capabilityUtils'
-  import ProfilerRestApi from "@/api/resource-management/profilerRestApi";;
+  import ProfilerRestApi from "@/api/resource-management/profilerRestApi";
   import {app} from "@/main";
   import {useResourcesStore} from "@/stores/resourcesStore";
 

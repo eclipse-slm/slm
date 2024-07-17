@@ -19,6 +19,7 @@
           <v-spacer />
 
           <v-btn
+            variant="elevated"
             color="error"
             @click="$emit('confirmed')"
           >
@@ -26,6 +27,7 @@
           </v-btn>
 
           <v-btn
+            variant="elevated"
             color="info"
             @click.native="$emit('canceled')"
           >

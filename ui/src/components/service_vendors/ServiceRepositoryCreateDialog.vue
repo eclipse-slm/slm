@@ -91,7 +91,7 @@
           </v-card-text>
           <v-card-actions class="justify-center">
             <v-btn
-              variant="tonal"
+              variant="elevated"
               color="error"
               @click.native="$emit('canceled')"
             >
@@ -99,7 +99,7 @@
             </v-btn>
             <v-spacer />
             <v-btn
-              variant="tonal"
+              variant="elevated"
               :color="!meta.valid ? $vuetify.theme.themes.light.colors.disable : $vuetify.theme.themes.light.colors.secondary"
               @click="!meta.valid ? validate() : handleSubmit(onConfirmedClicked)"
             >

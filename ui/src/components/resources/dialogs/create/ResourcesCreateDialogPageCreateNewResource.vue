@@ -64,6 +64,7 @@
 
   import ResourcesCreateDialogPage from '@/components/resources/dialogs/create/ResourcesCreateDialogPage'
   import {useResourcesStore} from "@/stores/resourcesStore";
+  import {useProviderStore} from "@/stores/providerStore";
 
   export default {
     name: 'ResourcesCreateDialogPageCreateNewResource',
@@ -71,15 +72,17 @@
       ResourcesCreateDialogPage,
     },
     setup(){
+      const providerStore = useProviderStore();
       const resourceStore = useResourcesStore();
-      return {resourceStore};
+
+      return {providerStore, resourceStore};
     },
     computed: {
       ResourcesCreateDialogPage() {
         return ResourcesCreateDialogPage
       },
       virtualResourceProviders() {
-        return this.resourceStore.virtualResourceProviders
+        return this.providerStore.virtualResourceProviders
       },
       availableClusterTypes() {
         return this.resourceStore.availableClusterTypes

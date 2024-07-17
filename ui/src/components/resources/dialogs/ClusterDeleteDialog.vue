@@ -12,7 +12,10 @@
         >
           Delete Cluster
         </v-toolbar>
-        <v-card-text v-if="serviceInstancesForCluster.length === 0">
+        <v-card-text
+          v-if="serviceInstancesForCluster.length === 0"
+          class="mt-2"
+        >
           Do your really want to delete '{{ cluster.clusterType }}' cluster '{{ cluster.name }}'?
         </v-card-text>
         <v-card-text v-else>
@@ -46,6 +49,7 @@
           <v-tooltip location="bottom">
             <template #activator="{ props }">
               <v-btn
+                variant="elevated"
                 v-bind="props"
                 color="error"
                 :disabled="serviceInstancesForCluster.length > 0"
@@ -58,6 +62,7 @@
           </v-tooltip>
 
           <v-btn
+            variant="elevated"
             color="info"
             @click="$emit('canceled')"
           >

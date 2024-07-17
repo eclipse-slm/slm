@@ -24,6 +24,7 @@
         </v-card-text>
         <v-card-actions class="justify-center">
           <v-btn
+            variant="elevated"
             color="error"
             @click.native="$emit('canceled')"
           >
@@ -31,6 +32,7 @@
           </v-btn>
           <v-spacer />
           <v-btn
+            variant="elevated"
             color="info"
             @click="onConfirmedClicked"
           >

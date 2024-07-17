@@ -34,7 +34,7 @@
               :disabled="item.isManaged"
               @click.stop="removeNodeFromCluster(item)"
             >
-              <v-icon icon="mdi-server-minus" />
+              <v-icon color="white" icon="mdi-server-minus" />
             </v-btn>
             <v-btn
               class="ml-4"

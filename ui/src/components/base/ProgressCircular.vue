@@ -3,13 +3,27 @@
     v-if="showAsOverlay"
     :absolute="true"
     :model-value="overlay"
+    width="100%"
+    height="100%"
   >
-    <v-progress-circular
-      :size="size"
-      :width="width"
-      :color="color"
-      indeterminate
-    />
+    <v-container class="fill-height">
+      <v-row
+        align="center"
+        justify="center"
+      >
+        <v-col cols="auto">
+          <!-- Your content here -->
+          <div class="centered-content">
+            <v-progress-circular
+              :size="size"
+              :width="width"
+              :color="color"
+              indeterminate
+            />
+          </div>
+        </v-col>
+      </v-row>
+    </v-container>
   </v-overlay>
 
   <v-progress-circular

@@ -25,21 +25,22 @@
             Error loading service details
           </div>
 
-          <v-list v-if="apiStateLoaded">
+          <v-list
+            v-if="apiStateLoaded"
+            :opened="['Common']"
+          >
             <v-list-group
               :model-value="true"
+              value="Common"
             >
-              <template #activator>
-                <v-list-item>
-                  <v-icon>mdi-information</v-icon>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>
-                    Common
-                  </v-list-item-title>
-                </v-list-item>
+              <template #activator="{props}">
+                <v-list-item
+                  v-bind="props"
+                  prepend-icon="mdi-information"
+                  title="Common"
+                />
               </template>
-              <v-table v-slot>
+              <v-table>
                 <tbody>
                   <tr>
                     <th>{{ 'Id' }}</th>
@@ -86,13 +87,13 @@
                   <tr>
                     <th>{{ 'Created' }}</th>
                     <td colspan="3">
-                      {{ moment(String(serviceInstanceDetails.initialCreation)).format('DD.MM.YYYY - hh:mm') }}
+                      {{ app.config.globalProperties.moment(String(serviceInstanceDetails.initialCreation)).format('DD.MM.YYYY - hh:mm') }}
                     </td>
                   </tr>
                   <tr>
                     <th>{{ 'Last Update' }}</th>
                     <td colspan="3">
-                      {{ moment(String(serviceInstanceDetails.lastUpdate)).format('DD.MM.YYYY - hh:mm') }}
+                      {{ app.config.globalProperties.moment(String(serviceInstanceDetails.lastUpdate)).format('DD.MM.YYYY - hh:mm') }}
                     </td>
                   </tr>
                   <tr>
@@ -128,16 +129,13 @@
                 </tbody>
               </v-table>
             </v-list-group>
-            <v-list-group>
-              <template #activator>
-                <v-list-item>
-                  <v-icon>mdi-adjust</v-icon>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>
-                    Service Options
-                  </v-list-item-title>
-                </v-list-item>
+            <v-list-group value="Service Options">
+              <template #activator="{props}">
+                <v-list-item
+                  v-bind="props"
+                  prepend-icon="mdi-adjust"
+                  title="Service Options"
+                />
               </template>
               <v-table
                 v-if="serviceInstanceDetails.serviceOptions.length>0"
@@ -208,15 +206,12 @@
               />
             </v-list-group>
             <v-list-group>
-              <template #activator>
-                <v-list-item>
-                  <v-icon>mdi-history</v-icon>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>
-                    Order History
-                  </v-list-item-title>
-                </v-list-item>
+              <template #activator="{ props }">
+                <v-list-item
+                  v-bind="props"
+                  prepend-icon="mdi-history"
+                  title="Order History"
+                />
               </template>
               <v-table fixed-header>
                 <template #default>
@@ -238,7 +233,7 @@
                       v-for="order in serviceInstanceDetails.orderHistory"
                       :key="order.id"
                     >
-                      <td>{{ moment(String(order.created)).format('DD.MM.YYYY - hh:mm') }}</td>
+                      <td>{{ app.config.globalProperties.moment(String(order.created)).format('DD.MM.YYYY - hh:mm') }}</td>
                       <td>{{ order.id }}</td>
                       <td>{{ order.serviceOrderResult }}</td>
                     </tr>
@@ -280,6 +275,7 @@
   import {useServicesStore} from "@/stores/servicesStore";
   import {useResourcesStore} from "@/stores/resourcesStore";
   import {storeToRefs} from "pinia";
+  import {app} from "@/main";
 
   export default {
     name: 'ServiceInstanceDetailsDialog',
@@ -302,6 +298,9 @@
       }
     },
     computed: {
+      app() {
+        return app
+      },
       showDialog () {
         return this.serviceInstance !== null
       },

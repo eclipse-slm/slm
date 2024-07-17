@@ -13,7 +13,7 @@ import getEnv from '@/utils/env'
 import VueToast from 'vue-toast-notification'
 import 'vue-toast-notification/dist/theme-sugar.css'
 import enums from 'vue-enums'
-// import moment from 'moment'
+import moment from 'moment'
 
 import { Chart, registerables } from 'chart.js'
 import {createVuetify, ThemeDefinition} from "vuetify";
@@ -109,7 +109,7 @@ app.use(VueKeycloakJs, {
 
 Chart.register(...registerables)
 
-// app.prototype.moment = moment
+app.config.globalProperties.moment = moment;
 
 app.use(enums)
 

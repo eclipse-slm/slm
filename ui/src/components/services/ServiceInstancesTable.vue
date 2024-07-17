@@ -8,7 +8,7 @@
     >
       <v-btn
         size="small"
-        :color="groupByServiceInstanceGroups == 0 ? 'secondary' : 'disabled'"
+        :color="groupByServiceInstanceGroups === 0 ? 'secondary' : 'disabled'"
       >
         <v-icon color="white">
           mdi-ungroup
@@ -16,7 +16,7 @@
       </v-btn>
       <v-btn
         size="small"
-        :color="groupByServiceInstanceGroups == 1 ? 'secondary' : 'disabled'"
+        :color="groupByServiceInstanceGroups === 1 ? 'secondary' : 'disabled'"
       >
         <v-icon color="white">
           mdi-group
@@ -29,16 +29,21 @@
       :items="groupedServices"
       item-key="rowId"
       :row-props="rowClass"
-      :group-by="groupByServiceInstanceGroups ? 'groupName' : null"
+      :group-by="groupByServiceInstanceGroups ? [{key: 'groupName'}] : []"
       @click:row="onServiceInstanceClicked"
     >
-      <template #group.header="{items, isOpen, toggle}">
-        <th colspan="7">
-          <v-icon @click="toggle">
-            {{ isOpen ? 'mdi-minus' : 'mdi-plus' }}
-          </v-icon>
-          {{ items[0].groupName }}
-        </th>
+      <template #group-header="{ item, columns, toggleGroup, isGroupOpen }">
+        <tr>
+          <td :colspan="columns.length">
+            <v-btn
+              :icon="isGroupOpen(item) ? '$expand' : '$next'"
+              size="small"
+              variant="text"
+              @click="toggleGroup(item)"
+            />
+            {{ item.value }}
+          </td>
+        </tr>
       </template>
 
       <template #item.offering="{ item : serviceInstance }">
@@ -204,12 +209,12 @@
     data () {
       return {
         headers: [
-          { title: 'Id', value: 'id', sortable: true },
-          { title: 'Service Offering', value: 'offering', sortable: true },
-          { title: 'Ports', value: 'ports', sortable: true, width: '20%' },
-          { title: 'Tags', value: 'tags', sortable: true },
-          { title: 'Resource', value: 'resource', sortable: true },
-          { title: 'Actions', value: 'actions' },
+          { title: 'Id', key: 'id', sortable: true },
+          { title: 'Service Offering', key: 'offering', sortable: true },
+          { title: 'Ports', key: 'ports', sortable: true, width: '20%' },
+          { title: 'Tags', key: 'tags', sortable: true },
+          { title: 'Resource', key: 'resource', sortable: true },
+          { title: 'Actions', key: 'actions' },
         ],
         serviceToDelete: null,
         selectedResource: null,
@@ -232,9 +237,12 @@
 
     },
     created() {
+
       this.groupedServices = this.services
+      console.log('SERVICES',this.services);
       this.services.forEach(service => {
         ServiceInstancesRestApi.getAvailableVersionsForServiceInstance(service.id).then(availableUpdates => {
+          console.log('adsf',availableUpdates);
           if (availableUpdates.length > 0) {
             this.availableVersionChangesOfServices[service.id] = availableUpdates;
           }
@@ -275,15 +283,17 @@
             this.serviceVersionChange.targetServiceVersion.serviceOfferingVersionId)
       },
 
-      onServiceInstanceClicked (serviceInstance) {
-        this.$emit('service-instance-clicked', serviceInstance)
+      onServiceInstanceClicked (event, serviceInstance) {
+        console.log(serviceInstance)
+        this.$emit('service-instance-clicked', serviceInstance.item)
       },
 
       onGroupByServiceInstanceGroupsClicked () {
         if (this.groupByServiceInstanceGroups === 1) {
           this.groupedServices = []
           this.services.forEach(service => {
-            if (service.groupIds.length == 0) {
+            console.log('service:', service)
+            if (service.groupIds.length === 0) {
               let serviceWithGroup = JSON.parse(JSON.stringify(service))
               serviceWithGroup.groupName = 'No group'
               serviceWithGroup.rowId = service.id + "_ungrouped"
@@ -304,7 +314,12 @@
       },
 
       rowClass (item) {
-        return item.markedForDelete ? 'text-grey text--lighten-1 row-pointer' : 'row-pointer'
+        return {
+          class: {
+            'text-grey text--lighten-1 row-pointer': item.markedForDelete,
+            'row-pointer': item.markedForDelete
+          }
+        };
       },
 
     },

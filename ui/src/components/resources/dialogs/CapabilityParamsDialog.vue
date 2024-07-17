@@ -27,6 +27,7 @@
         </v-card-text>
         <v-card-actions class="justify-center">
           <v-btn
+            variant="elevated"
             color="error"
             class="mx-0"
             @click.native="$emit('canceled')"
@@ -35,6 +36,7 @@
           </v-btn>
           <v-spacer />
           <v-btn
+            variant="elevated"
             color="info"
             class="mx-0"
             @click="$emit('install', paramMap)"

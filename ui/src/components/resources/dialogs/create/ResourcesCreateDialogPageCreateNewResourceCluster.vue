@@ -103,6 +103,7 @@
   import clustersRestApi from '@/api/resource-management/clustersRestApi'
   import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
   import {useResourcesStore} from "@/stores/resourcesStore";
+  import {useProviderStore} from "@/stores/providerStore";
 
   export default {
     name: 'ResourcesCreateDialogPageCreateNewResourceCluster',
@@ -110,8 +111,9 @@
       ResourcesCreateDialogPage,
     },
     setup(){
+      const providerStore = useProviderStore();
       const resourceStore = useResourcesStore();
-      return {resourceStore};
+      return {providerStore, resourceStore};
     },
     data () {
       return {
@@ -126,7 +128,7 @@
     },
     computed: {
       virtualResourceProviders() {
-        return this.resourceStore.virtualResourceProviders
+        return this.providerStore.virtualResourceProviders
       },
       availableClusterTypes() {
         return this.resourceStore.availableClusterTypes
@@ -137,14 +139,14 @@
       clusterCreateOptions () {
         const options = [
           {
-            text: 'Use existing resources',
+            title: 'Use existing resources',
             value: 'useExistingResources',
           },
         ]
 
         if (this.virtualResourceProviders.length !== 0) {
           options.push({
-            text: 'Create Members',
+            title: 'Create Members',
             value: 'createVirtualResources',
           })
         }

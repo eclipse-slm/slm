@@ -49,39 +49,48 @@
               </v-row>
               <v-row>
                 <v-col>
-                  <v-select
+                  <Field
+                    v-slot="{ field, errors }"
                     v-model="selectedResourceId"
-                    :items="matchingResources"
-                    item-value="resourceId"
-                    hint="Select resource for service deployment"
-                    persistent-hint
-                    required
+                    name="resource id"
+                    :rules="required"
                   >
-                    <template #selection="{ item }">
-                      <v-list-item-title>
-                        <div v-if="item.isCluster">
-                          Cluster <strong>{{ clusterById(item.resourceId).metaData.cluster_user }} @ {{ clusterById(item.resourceId).metaData.cluster_name }}</strong>
-                          {{ ` | ${clusterById(item.resourceId).clusterType} ${clusterById(item.resourceId).isManaged? 'managed': 'with '+clusterById(item.resourceId).nodes.length+' nodes' } | ${item.resourceId}` }}
-                        </div>
-                        <div v-else>
-                          <strong>{{ resourceById(item.resourceId).hostname }}</strong>{{ ` | ${item.resourceId} | ${resourceById(item.resourceId).ip}` }}
-                        </div>
-                      </v-list-item-title>
-                    </template>
-                    <template #item="{ item }">
-                      <v-list-item>
+                    <v-select
+                      v-bind="field"
+                      v-model="selectedResourceId"
+                      :items="matchingResources"
+                      item-value="resourceId"
+                      hint="Select resource for service deployment"
+                      persistent-hint
+                      required
+                    >
+                      <template #selection="{ item }">
                         <v-list-item-title>
-                          <div v-if="item.isCluster">
-                            Cluster <strong>{{ clusterById(item.resourceId).metaData.cluster_user }} @ {{ clusterById(item.resourceId).metaData.cluster_name }}</strong>
-                            {{ ` | ${clusterById(item.resourceId).clusterType} ${clusterById(item.resourceId).isManaged? 'managed': 'with '+clusterById(item.resourceId).nodes.length+' nodes' } | ${item.resourceId}` }}
+                          <div v-if="item.raw.isCluster">
+                            Cluster <strong>{{ clusterById(item.raw.resourceId).metaData.cluster_user }} @ {{ clusterById(item.raw.resourceId).metaData.cluster_name }}</strong>
+                            {{ ` | ${clusterById(item.raw.resourceId).clusterType} ${clusterById(item.raw.resourceId).isManaged? 'managed': 'with '+clusterById(item.raw.resourceId).nodes.length+' nodes' } | ${item.raw.resourceId}` }}
                           </div>
-                          <div v-else>
-                            <strong>{{ resourceById(item.resourceId).hostname }}</strong>{{ ` | ${item.resourceId} | ${resourceById(item.resourceId).ip}` }}
+                          <div>
+                            <strong>{{ resourceById(item.raw.resourceId).hostname }}</strong>{{ ` | ${item.raw.resourceId} | ${resourceById(item.raw.resourceId).ip}` }}
                           </div>
                         </v-list-item-title>
-                      </v-list-item>
-                    </template>
-                  </v-select>
+                      </template>
+                      <template #item="{ item }">
+                        <v-list-item>
+                          <v-list-item-title>
+                            <div v-if="item.raw.isCluster">
+                              Cluster <strong>{{ clusterById(item.raw.resourceId).metaData.cluster_user }} @ {{ clusterById(item.raw.resourceId).metaData.cluster_name }}</strong>
+                              {{ ` | ${clusterById(item.raw.resourceId).clusterType} ${clusterById(item.raw.resourceId).isManaged? 'managed': 'with '+clusterById(item.raw.resourceId).nodes.length+' nodes' } | ${item.raw.resourceId}` }}
+                            </div>
+                            <div v-else>
+                              <strong>{{ resourceById(item.raw.resourceId).hostname }}</strong>{{ ` | ${item.raw.resourceId} | ${resourceById(item.raw.resourceId).ip}` }}
+                            </div>
+                          </v-list-item-title>
+                        </v-list-item>
+                      </template>
+                    </v-select>
+                    <span>{{ errors[0] }}</span>
+                  </Field>
                 </v-col>
               </v-row>
             </v-container>
@@ -94,7 +103,7 @@
         <div
           v-if="selectedResourceId"
         >
-          <base-material-card
+          <!--          <base-material-card
             v-for="serviceOptionCategory in serviceOfferingVersion.serviceOptionCategories"
             :key="serviceOptionCategory.id"
             color="secondary"
@@ -139,7 +148,7 @@
                 </v-row>
               </v-container>
             </v-card-text>
-          </base-material-card>
+          </base-material-card>-->
         </div>
 
         <!-- Cancel & Checkout Buttons-->
@@ -179,7 +188,7 @@
   import ServiceOptionValue from '@/components/service_offerings/ServiceOptionValue'
   import logRequestError from '@/api/restApiHelper'
   import ProgressCircular from "@/components/base/ProgressCircular";
-  import {Form as ValidationForm } from "vee-validate";
+  import {Field, Form as ValidationForm} from "vee-validate";
   import * as yup from 'yup';
   import {useServicesStore} from "@/stores/servicesStore";
   import {useResourcesStore} from "@/stores/resourcesStore";
@@ -190,7 +199,8 @@
   export default {
     name: 'ServiceOrderView',
     components: {
-      ServiceOptionValue, ProgressCircular, ValidationForm
+      Field,
+       ProgressCircular, ValidationForm
     },
     props: ['serviceOfferingId', 'serviceOfferingVersionId'],
     setup(){
@@ -218,30 +228,6 @@
         },
         showProgressCircular: false
       }
-    },
-    created () {
-      ServiceOfferingVersionsRestApi.getServiceOfferingVersionById(this.serviceOfferingId, this.serviceOfferingVersionId).then(response => {
-            this.serviceOfferingVersion = response;
-            this.apiState.serviceOfferingVersion = ApiState.LOADED;
-      })
-
-      ServiceOfferingVersionsRestApi.getServiceOfferingVersionMatchingResources(this.serviceOfferingId, this.serviceOfferingVersionId).then((response) => {
-        this.matchingResources = []
-        this.apiState.matchingResources = ApiState.LOADED;
-
-        if (response.length > 0) {
-          // this.matchingResources.push({ header: "Nodes" });
-          let matchingNodeResources = response.filter(matchingResource => !matchingResource.isCluster)
-          this.matchingResources.push(...matchingNodeResources)
-
-          // this.matchingResources.push({ header: "Clusters" });
-          let matchingClusterResources = response.filter(matchingResource => matchingResource.isCluster)
-          this.matchingResources.push(...matchingClusterResources)
-
-          // preselect resource
-          this.selectedResourceId = this.matchingResources.filter(obj => obj.hasOwnProperty('resourceId'))[0].resourceId;
-        }
-      })
     },
 
     computed: {
@@ -271,6 +257,32 @@
         return this.apiState.serviceOfferingVersion === ApiState.ERROR
             && this.apiState.matchingResources === ApiState.ERROR
       },
+    },
+    created () {
+      ServiceOfferingVersionsRestApi.getServiceOfferingVersionById(this.serviceOfferingId, this.serviceOfferingVersionId).then(response => {
+            this.serviceOfferingVersion = response;
+            this.apiState.serviceOfferingVersion = ApiState.LOADED;
+      })
+
+      ServiceOfferingVersionsRestApi.getServiceOfferingVersionMatchingResources(this.serviceOfferingId, this.serviceOfferingVersionId).then((response) => {
+        this.matchingResources = []
+        this.apiState.matchingResources = ApiState.LOADED;
+
+        if (response.length > 0) {
+          // this.matchingResources.push({ header: "Nodes" });
+          let matchingNodeResources = response.filter(matchingResource => !matchingResource.isCluster)
+          this.matchingResources.push(...matchingNodeResources)
+
+          // this.matchingResources.push({ header: "Clusters" });
+          let matchingClusterResources = response.filter(matchingResource => matchingResource.isCluster)
+          this.matchingResources.push(...matchingClusterResources)
+
+          console.log('asdf', this.matchingResources)
+
+          // preselect resource
+          this.selectedResourceId = this.matchingResources.filter(obj => obj.hasOwnProperty('resourceId'))[0].resourceId;
+        }
+      })
     },
     methods: {
       order () {
