@@ -129,10 +129,10 @@ import * as yup from 'yup';
     data () {
       return {
         tableHeaders: [
-          { text: 'Key', value: 'key' },
-          { text: 'Value', value: 'value' },
-          { text: 'Service Option', value: 'isServiceOption' },
-          { text: 'Actions', value: 'actions' },
+          { title: 'Key', value: 'key' },
+          { title: 'Value', value: 'value' },
+          { title: 'Service Option', value: 'isServiceOption' },
+          { title: 'Actions', value: 'actions' },
         ],
       }
     },

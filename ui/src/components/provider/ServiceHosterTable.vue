@@ -28,10 +28,10 @@ export default {
   data() {
     return {
       tableHeaders: [
-        { text: 'ID',             value: 'capabilityService.ID' },
-        { text: 'Provider Name',  value: 'capabilityService.service'},
-        { text: 'Cluster',        value: 'capabilityService.capability.cluster' },
-        { text: 'Machine ID',     value: 'capabilityService.consulNodeId' },
+        { title: 'ID',             value: 'capabilityService.ID' },
+        { title: 'Provider Name',  value: 'capabilityService.service'},
+        { title: 'Cluster',        value: 'capabilityService.capability.cluster' },
+        { title: 'Machine ID',     value: 'capabilityService.consulNodeId' },
         {                         value: 'actions', sortable: false }
       ],
       showCreateDialog: false,

@@ -121,11 +121,11 @@
 
       tableHeaders () {
         return [
-          { text: 'Username', value: 'username', sortable: true },
-          { text: 'Firstname', value: 'firstName', sortable: true },
-          { text: 'Lastname', value: 'lastName', sortable: true },
-          { text: 'Mail', value: 'email', sortable: true },
-          { text: 'Actions', value: 'developerActions', sortable: false },
+          { title: 'Username', value: 'username', sortable: true },
+          { title: 'Firstname', value: 'firstName', sortable: true },
+          { title: 'Lastname', value: 'lastName', sortable: true },
+          { title: 'Mail', value: 'email', sortable: true },
+          { title: 'Actions', value: 'developerActions', sortable: false },
         ]
       },
       developersAvailableForSharing () {
