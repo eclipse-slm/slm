@@ -82,6 +82,7 @@
     <!-- Navigation Buttons-->
     <v-card-actions>
       <v-btn
+        variant="elevated"
         color="secondary"
         @click="onCancelButtonClicked()"
       >
@@ -89,6 +90,7 @@
       </v-btn>
       <v-spacer />
       <v-btn
+        variant="elevated"
         color="secondary"
         @click="onNextButtonClicked()"
       >

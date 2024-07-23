@@ -7,8 +7,9 @@
     :disable-pagination="true"
     :hide-default-footer="true"
     class="page__table"
+    hide-default-body
   >
-    <template #body="props">
+    <template #tbody="props">
       <draggable
         :list="serviceOptionCategory.serviceOptions"
         tag="tbody"
@@ -27,11 +28,11 @@
             </v-icon>
           </td>
           <td>{{ serviceOption.key }}</td>
-          <td :id="serviceOption.key + '_DisplayName'">
+          <td :id="serviceOption.key + '_DisplayName_'">
             <Field
               v-slot="{ field, errors }"
               v-model="serviceOption.name"
-              name="Display Name"
+              :name="serviceOption.key + '_DisplayName_'"
               :rules="required"
             >
               <v-text-field
@@ -45,7 +46,7 @@
             <Field
               v-slot="{ field, errors }"
               v-model="serviceOption.description"
-              name="Description"
+              :name="serviceOption.key + '_Desc'"
               :rules="required"
             >
               <v-text-field
@@ -64,10 +65,8 @@
                 <div v-bind="props">
                   <service-option-value
                     :service-option="serviceOption"
-                    :disabled="
-                      serviceOption.required &&
-                        serviceOption.valueType !== 'AAS_SM_TEMPLATE'
-                    "
+                    :disabled="serviceOption.required &&
+                      serviceOption.valueType !== 'AAS_SM_TEMPLATE'"
                     :definition-mode="true"
                     v-bind="attrs"
                   />
@@ -99,10 +98,10 @@
                   color="primary"
                   :ripple="false"
                   :disabled="
-                    serviceOption.valueType === 'SYSTEM_VARIABLE' ||
-                      serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
-                      serviceOption.valueType === 'AAS_SM_TEMPLATE'
-                  "
+                serviceOption.valueType === 'SYSTEM_VARIABLE' ||
+                  serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
+                  serviceOption.valueType === 'AAS_SM_TEMPLATE'
+              "
                   @click="onServiceOptionRequiredChanged(serviceOption)"
                 />
               </template>
@@ -116,10 +115,10 @@
               color="primary"
               :ripple="false"
               :disabled="
-                serviceOption.valueType === 'SYSTEM_VARIABLE' ||
-                  serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
-                  serviceOption.valueType === 'AAS_SM_TEMPLATE'
-              "
+            serviceOption.valueType === 'SYSTEM_VARIABLE' ||
+              serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
+              serviceOption.valueType === 'AAS_SM_TEMPLATE'
+          "
               @click="onServiceOptionEditableChanged(serviceOption)"
             />
           </td>
@@ -132,7 +131,7 @@
 <script>
 import { VueDraggableNext } from 'vue-draggable-next'
 import ServiceOptionValue from "@/components/service_offerings/ServiceOptionValue";
-import {Field } from "vee-validate";
+import {Field} from "vee-validate";
 import * as yup from 'yup';
 
 export default {
@@ -169,7 +168,7 @@ export default {
         "DEPLOYMENT_VARIABLE",
       ],
       tableHeaders: [
-        { title: "", value: "", sortable: false },
+        { title: "", value: "", width: "50px", sortable: false },
         { title: "Key", value: "key", sortable: false },
         { title: "Display Name", value: "name", sortable: false },
         { title: "Description", value: "description", sortable: false },

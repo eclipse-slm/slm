@@ -11,36 +11,36 @@
         <template #heading>
           <v-row class="my-1">
             <v-btn
+              icon="mdi-arrow-up"
+              variant="text"
               size="small"
               class="mx-2"
               @click="
                 onMoveServiceOptionCategoryUpClicked(serviceOptionCategory.id)
               "
-            >
-              <v-icon> arrow_upward </v-icon>
-            </v-btn>
+            />
             <v-btn
+              icon="mdi-arrow-down"
+              variant="text"
               size="small"
               @click="
                 onMoveServiceOptionCategoryDownClicked(serviceOptionCategory.id)
               "
-            >
-              <v-icon icon="arrow_downward" />
-            </v-btn>
+            />
             <v-text-field
               v-model="serviceOptionCategory.name"
               class="mx-6"
               density="compact"
             />
             <v-btn
+              icon="mdi-delete"
+              variant="text"
               size="small"
               class="mx-4"
               @click="
                 onServiceOptionCategoryDeleteClicked(serviceOptionCategory.id)
               "
-            >
-              <v-icon icon="mdi-delete" />
-            </v-btn>
+            />
           </v-row>
         </template>
         <v-card-text>
@@ -70,7 +70,7 @@
     <!-- Navigation Buttons-->
     <v-card-actions>
       <v-btn
-        variant="tonal"
+        variant="elevated"
         :color="$vuetify.theme.themes.light.colors.secondary"
         @click="$emit('step-canceled', stepNumber)"
       >
@@ -78,7 +78,7 @@
       </v-btn>
       <v-spacer />
       <v-btn
-        variant="tonal"
+        variant="elevated"
         :color="
           !meta.valid
             ? $vuetify.theme.themes.light.colors.disable
@@ -96,8 +96,7 @@
 import { serviceOptionMixin } from "@/utils/serviceOptionUtil";
 import serviceOptionsDefinitionTable from "@/components/service_offerings/wizard_service_offering_version/serviceOptions/serviceOptionsDefinitionTable";
 import {app} from "@/main";
-import {Field, Form as ValidationForm } from "vee-validate";
-import * as yup from 'yup';
+import {Form as ValidationForm} from "vee-validate";
 
 export default {
   name: "ServiceOfferingVersionWizardStep3ServiceOptions",

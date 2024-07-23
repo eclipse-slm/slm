@@ -142,7 +142,7 @@
       <!-- Navigation Buttons-->
       <v-card-actions>
         <v-btn
-          variant="tonal"
+          variant="elevated"
           :color="$vuetify.theme.themes.light.colors.secondary"
           @click="$emit('step-canceled', stepNumber)"
         >
@@ -150,7 +150,7 @@
         </v-btn>
         <v-spacer />
         <v-btn
-          variant="tonal"
+          variant="elevated"
           :color="!meta.valid ? $vuetify.theme.themes.light.colors.disable : $vuetify.theme.themes.light.colors.secondary"
           @click="!meta.valid ? validate() : handleSubmit(emitStepCompleted)"
         >

@@ -44,6 +44,7 @@
     <!-- Navigation Buttons-->
     <v-card-actions>
       <v-btn
+        variant="elevated"
         :color="$vuetify.theme.themes.light.colors.secondary"
         @click="onCancelButtonClicked()"
       >
@@ -51,6 +52,7 @@
       </v-btn>
       <v-spacer />
       <v-btn
+        variant="elevated"
         :color="$vuetify.theme.themes.light.colors.secondary"
         @click="onNextButtonClicked()"
       >

@@ -30,10 +30,12 @@
         </v-row>
 
         <v-row>
-          <service-instances-table
-            class="mt-0 flex"
-            @service-instance-clicked="onServiceInstanceClicked"
-          />
+          <v-col>
+            <service-instances-table
+              class="mt-0"
+              @service-instance-clicked="onServiceInstanceClicked"
+            />
+          </v-col>
         </v-row>
       </v-card-text>
     </base-material-card>

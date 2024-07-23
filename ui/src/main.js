@@ -151,6 +151,7 @@ app.use(cors)
 app.use(router);
 
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
+import * as yup from "yup";
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 app.use(pinia);
@@ -169,3 +170,16 @@ app.use(VueToast,{
 );
 
 app.mount('#app');
+
+
+function ipv4(message = 'Invalid IP address') {
+    return this.matches(/(^(\d{1,3}\.){3}(\d{1,3})$)/, {
+        message,
+        excludeEmptyString: true
+    }).test('ip', message, value => {
+        return value === undefined || value.trim() === '' ? true
+            : value.split('.').find(i => parseInt(i, 10) > 255) === undefined;
+    });
+}
+
+yup.addMethod(yup.string, 'ipv4', ipv4);

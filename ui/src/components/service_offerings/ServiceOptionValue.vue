@@ -9,7 +9,7 @@
       v-else
       v-slot="{ field, errors }"
       v-model="serviceOption.defaultValue"
-      :name="serviceOption.name"
+      :name="serviceOption.name + '_DEFAULT_VALUE'"
       :rules="getValidationRulesForServiceOption(serviceOption)"
     >
       <v-text-field
@@ -38,12 +38,17 @@
         :error-messages="errors"
       />
 
-      <vue-ip
+      <v-text-field
         v-if="serviceOption.valueType === 'IP'"
-        :ip="serviceOption.defaultValue === undefined ? '127.0.0.1' : serviceOption.value"
-        :on-change="ipValueChanged"
-        theme="material"
+        v-bind="field"
+        type="text"
+        :clearable="serviceOption.editable || definitionMode"
+        :readonly="!(serviceOption.editable || definitionMode)"
+        :disabled="!(serviceOption.editable || definitionMode)"
+        :error-messages="errors"
+        :model-value="serviceOption.defaultValue"
       />
+
 
       <v-checkbox
         v-if="serviceOption.valueType === 'BOOLEAN'"
@@ -147,7 +152,6 @@
   export default {
     name: 'ServiceOptionValue',
     components: {
-      VueIp,
       Field
     },
     mixins: [serviceOptionMixin],

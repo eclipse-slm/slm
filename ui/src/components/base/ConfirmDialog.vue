@@ -20,6 +20,7 @@
 
           <v-btn
             id="confirm-dialog-button-yes"
+            variant="elevated"
             color="error"
             @click="$emit('confirmed')"
           >
@@ -28,6 +29,7 @@
 
           <v-btn
             id="confirm-dialog-button-no"
+            variant="elevated"
             color="info"
             @click.native="$emit('canceled')"
           >
