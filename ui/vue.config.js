@@ -1,22 +1,10 @@
 const path = require('path');
-
+const webpack = require('webpack');
 module.exports = {
   chainWebpack: (config) => {
-    config.resolve.alias.set('vue', '@vue/compat')
-
     config.module
         .rule('vue')
-        .use('vue-loader')
-        .tap((options) => {
-          return {
-            ...options,
-            compilerOptions: {
-              compatConfig: {
-                MODE: 3
-              }
-            }
-          }
-        })
+        .use('vue-loader');
   },
   productionSourceMap: true, // NOTE: this is default
   configureWebpack: {
@@ -28,6 +16,11 @@ module.exports = {
         '@': path.resolve(__dirname, 'src')
       }
     },
+    plugins: [
+      new webpack.DefinePlugin({
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
+      })
+    ],
     module: {
       rules: [
         // {

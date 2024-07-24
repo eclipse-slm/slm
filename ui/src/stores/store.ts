@@ -31,11 +31,8 @@ export const useStore = defineStore('store', {
       const allInstances = await axios.get('http://localhost:9090/devices/service-instances',
           { headers: this.Header })
       for (let i = 0; i < allInstances.data.length; i++) {
-        console.log(allInstances.data[i])
         const id = allInstances.data[i]
         const instanceURL = `${this.applicationUrl}instance/${id}`
-        console.log('instanceURL')
-        console.log(instanceURL)
         await this.getInstance(instanceURL)
       }
     },

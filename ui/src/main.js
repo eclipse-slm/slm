@@ -6,7 +6,6 @@ import router from './pages/router'
 import 'chartist/dist/chartist.min.css'
 import '@/plugins/vee-validate'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
-import {i18n} from './localisation/i18n'
 import setupTokenInterceptor from '@/utils/tokenInterceptor'
 import VueKeycloakJs from '@dsb-norge/vue-keycloak-js'
 import getEnv from '@/utils/env'
@@ -26,14 +25,7 @@ import 'vuetify/styles';
 import '@/design/overrides.sass';
 import withUUID from "vue-uuid";
 
-configureCompat({
-    MODE:3,
-    CONFIG_PRODUCTION_TIP: false,
-    GLOBAL_PROTOTYPE: true,
-    GLOBAL_OBSERVABLE: true
-});
-
-export let app = withUUID(createApp(App).use(createPinia())) ;
+export let app = withUUID(createApp(App)) ;
 
 const requireComponent = require.context(
     '@/components/base', true, /\.vue$/,
@@ -152,12 +144,35 @@ app.use(router);
 
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import * as yup from "yup";
+
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 app.use(pinia);
 
-
 app.use(v);
+
+import {createI18n} from "vue-i18n";
+import {de, en} from "vuetify/locale";
+const messages = {
+    en: {
+        ...require('@/localisation/en.json'),
+        $vuetify: en,
+    },
+    de: {
+        ...require('@/localisation/de.json'),
+        $vuetify: de,
+    },
+};
+
+const i18n = createI18n({
+    globalInjection: true,
+    legacy: false,
+    locale: process.env.VUE_APP_I18N_LOCALE || 'en',
+    fallbackLocale: process.env.VUE_APP_I18N_FALLBACK_LOCALE || 'en',
+    silentTranslationWarn: true,
+    messages
+});
+
 app.use(i18n);
 
 app.use(require('vue-chartist'));

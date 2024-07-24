@@ -43,7 +43,7 @@
               v-slot="{ field, errors }"
               v-model="item.name"
               name="Label"
-              :rules="required"
+              :rules="required_string"
             >
               <v-text-field
                 v-if="editable"

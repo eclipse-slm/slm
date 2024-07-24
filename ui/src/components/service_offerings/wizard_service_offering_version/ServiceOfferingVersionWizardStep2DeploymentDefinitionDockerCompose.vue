@@ -228,7 +228,7 @@
               name: envVar.key,
               description: '',
               optionType: 'ENVIRONMENT_VARIABLE',
-              valueType: 'string',
+              valueType: 'STRING',
               value: envVar.value,
               required: false,
               editable: false,

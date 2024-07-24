@@ -54,7 +54,6 @@ export const useUserStore = defineStore('userStore', {
         userGroups(): any[]{
 
             const groups = app.config.globalProperties.$keycloak?.tokenParsed?.groups
-            console.log(groups)
             if (groups === undefined) {
                 return []
             } else {

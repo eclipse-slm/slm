@@ -276,11 +276,9 @@ export const useResourcesStore = defineStore('resourcesStore', {
                             //     resource.metrics = metrics
                             // })
                         })
-                        console.log('state',resources)
                         this.setResources(resources)
                         this.setAvailableResourceTypes(resources);
                         this.apiStateResources_ = ApiState.LOADED;
-                        console.log('state',this.apiStateResources_)
                     })
                 .catch(e => {
                     console.debug(e)

@@ -215,8 +215,7 @@ export default {
     },
     setup(){
       const string_required = yup.string().required();
-      const reg = new RegExp('^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
-      const ip_required = yup.string().matches(reg)
+      const ip_required = yup.string().ipv4();
 
       const resourceStore = useResourcesStore();
 

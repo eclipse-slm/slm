@@ -173,10 +173,10 @@
                         </v-tooltip>
                       </td>
                       <td>
-                        <div v-if="serviceOption.valueType == 'PASSWORD'">
+                        <div v-if="serviceOption.valueType === 'PASSWORD'">
                           •••••••••••••
                         </div>
-                        <div v-else-if="serviceOption.valueType == 'AAS_SM_TEMPLATE'">
+                        <div v-else-if="serviceOption.valueType === 'AAS_SM_TEMPLATE'">
                           <a
                             :href="aasGuiUrls[serviceOption.relation + '|' + serviceOption.key].url"
                             target="_blank"
@@ -324,7 +324,7 @@
               this.apiState = ApiState.LOADED
 
               serviceInstanceDetails.serviceOptions.forEach(serviceOption => {
-                if (serviceOption.valueType == "AAS_SM_TEMPLATE") {
+                if (serviceOption.valueType === "AAS_SM_TEMPLATE") {
                   AasRestApi.getSubmoduleTemplateInstanceOfAas(serviceOption.defaultValue, serviceOption.currentValue).then(response => {
                     let aasGuiBaseUrl = getEnv("VUE_APP_BASYX_AAS_GUI_URL")
                     let smEndpoint = response[0].smEndpoint

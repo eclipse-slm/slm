@@ -60,7 +60,7 @@ export const useNotificationStore = defineStore('notificationStore', {
             servicesStore.updateServicesStore();
             break
           default:
-            console.log(`Update ${notification.category} store`)
+            console.debug(`Update ${notification.category} store`)
             break
         }
       }
