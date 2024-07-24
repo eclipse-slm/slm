@@ -151,7 +151,16 @@ vuetify-material-dashboard
 │   │   ├── overrides.sass
 │   │   └── vuetify-material
 │   │       └── _sidebar.sass
-│   ├── store.js
+│   ├── stores
+│       └── catalogStore.ts
+│       └── jobsStore.ts
+│       └── notificationStore.ts
+│       └── overviewStore.ts
+│       └── providerStore.ts
+│       └── resourcesStore.ts
+│       └── servicesStore.ts
+│       └── store.ts
+│       └── userStore.ts
 │   └── views
 │       └── dashboard
 │           ├── Charts.vue

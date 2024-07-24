@@ -1,10 +1,7 @@
-import {createApp, configureCompat } from 'vue'
+import {createApp } from 'vue'
 import App from './App.vue'
 import router from './pages/router'
-// import '@/plugins/base'
-// import '@/plugins/chartist'
 import 'chartist/dist/chartist.min.css'
-import '@/plugins/vee-validate'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import setupTokenInterceptor from '@/utils/tokenInterceptor'
 import VueKeycloakJs from '@dsb-norge/vue-keycloak-js'
@@ -15,7 +12,7 @@ import enums from 'vue-enums'
 import moment from 'moment'
 
 import { Chart, registerables } from 'chart.js'
-import {createVuetify, ThemeDefinition} from "vuetify";
+import {createVuetify} from "vuetify";
 import VueAxios from "vue-axios";
 import axios from "axios";
 import cors from "cors";
@@ -99,11 +96,11 @@ app.use(VueKeycloakJs, {
     },
 })
 
-Chart.register(...registerables)
+Chart.register(...registerables);
 
 app.config.globalProperties.moment = moment;
 
-app.use(enums)
+app.use(enums);
 
 const theme = {
     colors: {
