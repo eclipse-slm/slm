@@ -6,6 +6,11 @@ ENV CONSUL_TOKEN=0
 COPY prometheus.yml /etc/prometheus/prometheus.yml
 COPY startup.sh /etc/startup
 
+USER root
+RUN chmod +x /etc/startup
+RUN chown nobody:nobody /etc/startup
+USER nobody
+
 ENTRYPOINT ["/etc/startup"]
 CMD        [ "--config.file=/etc/prometheus/prometheus.yml", \
              "--storage.tsdb.path=/prometheus", \

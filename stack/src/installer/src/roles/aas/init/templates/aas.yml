@@ -63,8 +63,6 @@ services:
       VITE_REGISTRY_PATH: "http://{{ SLM_HOSTNAME }}:4000/registry"
       VITE_AAS_SERVER_PATH: "http://{{ SLM_HOSTNAME }}:4001/aasServer"
       VITE_PRIMARY_COLOR: "00A0E3"
-    volumes:
-      - "./config/aas-gui/logo:/app/src/assets/Logo"
 
   aas-broker:
     image: "ghcr.io/fabos-ai/aas-transformer/aas-broker:{{ AAS_TRANSFORMER_VERSION }}"

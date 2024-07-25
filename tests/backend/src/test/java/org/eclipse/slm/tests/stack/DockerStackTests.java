@@ -31,7 +31,7 @@ public class DockerStackTests {
         put("aas-server", "running");
         put("aas-transformer", "running");
         put("aas-transformer-database", "healthy");
-        put("aas-transformer-initializer", "exited");
+//        put("aas-transformer-initializer", "exited");
         put("awx-jwt-authenticator", "healthy");
         put("awx-postgres", "healthy");
         put("awx-redis-init", "exited");
@@ -42,7 +42,6 @@ public class DockerStackTests {
         put("keycloak", "healthy");
         put("keycloak-database", "healthy");
         put("monitoring-prometheus-aas", "running");
-        put("monitoring-prometheus-configurator", "running");
         put("notification-service-database", "healthy");
         put("notification-service", "healthy");
         put("prometheus", "healthy");

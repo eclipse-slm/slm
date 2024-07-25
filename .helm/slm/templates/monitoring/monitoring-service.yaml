@@ -13,10 +13,6 @@ spec:
       protocol: TCP
       port: {{.Values.monitoring.service_port}}
       targetPort: 8080
-    - name: monitoring-prometheus-configurator
-      protocol: TCP
-      port: {{.Values.monitoring.configurator_port}}
-      targetPort: 5000
     - name: prometheus
       protocol: TCP
       port: {{.Values.prometheus.port}}
