@@ -1,9 +1,13 @@
 
-import {createRouter, createWebHashHistory, createWebHistory} from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router';
 import {useUserStore} from "@/stores/userStore";
 
 
 const routes = [
+  {
+    path: '/',
+    redirect: '/dashboard'
+  },
   {
     path: '/',
     component: () => import('@/pages/IndexPage'),
@@ -147,7 +151,7 @@ const routes = [
         meta: { adminPermissionRequired: true },
       },
     ],
-  },
+  }
 ]
 
 export const router = createRouter({

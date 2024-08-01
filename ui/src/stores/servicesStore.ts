@@ -2,8 +2,6 @@ import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRe
 import ServiceInstancesRestApi from '@/api/service-management/serviceInstancesRestApi'
 import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
 import ApiState from '@/api/apiState.js'
-import Vue from 'vue'
-import ServiceOffering from "@/model/serviceOffering";
 import {UUID} from "vue-uuid";
 import ServiceManagementTemplatesRestApi from "@/api/service-management/serviceManagementVariablesRestApi";
 import ServiceInstancesGroupsRestApi from "@/api/service-management/serviceInstancesGroupsRestApi";
