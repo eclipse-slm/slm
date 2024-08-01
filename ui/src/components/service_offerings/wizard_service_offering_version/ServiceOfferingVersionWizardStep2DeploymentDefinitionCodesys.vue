@@ -66,8 +66,6 @@
 import 'vue-json-pretty/lib/styles.css'
 import ServiceOfferingVersionsRestApi from "@/api/service-management/serviceOfferingVersionsRestApi";
 
-const { parse } = require('dot-properties')
-
   export default {
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys',
     components: {
