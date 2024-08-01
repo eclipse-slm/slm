@@ -168,7 +168,7 @@ export default {
           {
             id: 'main-menu-button-service-vendors',
             title: this.$t('drawer.section.serviceVendor.title'),
-            icon: 'smart_button',
+            icon: 'mdi-toolbox',
             to: '/services/vendors',
             visible: this.userStore.isUserDeveloper,
           },
