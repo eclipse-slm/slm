@@ -183,16 +183,16 @@
 </template>
 
 <script>
-  import ServiceInstanceDeleteDialog from '@/components/services/ServiceInstanceDeleteDialog'
-  import ServiceInstancesRestApi from '@/api/service-management/serviceInstancesRestApi'
-  import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
-  import ConfirmDialog from "@/components/base/ConfirmDialog";
-  import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
-  import {useServicesStore} from "@/stores/servicesStore";
-  import {useResourcesStore} from "@/stores/resourcesStore";
-  import {storeToRefs} from "pinia";
+import ServiceInstanceDeleteDialog from '@/components/services/ServiceInstanceDeleteDialog'
+import ServiceInstancesRestApi from '@/api/service-management/serviceInstancesRestApi'
+import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
+import ConfirmDialog from "@/components/base/ConfirmDialog";
+import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
+import {useServicesStore} from "@/stores/servicesStore";
+import {useResourcesStore} from "@/stores/resourcesStore";
+import {storeToRefs} from "pinia";
 
-  export default {
+export default {
     name: 'ServiceInstancesTable',
     comments: {
       ServiceInstanceDeleteDialog,

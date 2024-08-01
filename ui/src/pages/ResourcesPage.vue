@@ -26,12 +26,12 @@
 </template>
 
 <script>
-  import ResourcesOverview from '@/components/resources/ResourcesOverview'
-  import ApiState from '@/api/apiState'
-  import {useStore} from "@/stores/store";
-  import {useResourcesStore} from "@/stores/resourcesStore";
+import ResourcesOverview from '@/components/resources/ResourcesOverview'
+import ApiState from '@/api/apiState'
+import {useStore} from "@/stores/store";
+import {useResourcesStore} from "@/stores/resourcesStore";
 
-  export default {
+export default {
     components: {
       ResourcesOverview,
     },

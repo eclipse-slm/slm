@@ -34,12 +34,12 @@
 </template>
 
 <script>
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 
-  import AasCircularChart from "@/components/charts/AasCircularChart.vue";
-  import {useResourcesStore} from "@/stores/resourcesStore";
+import AasCircularChart from "@/components/charts/AasCircularChart.vue";
+import {useResourcesStore} from "@/stores/resourcesStore";
 
-  export default {
+export default {
     name: 'DashboardResourceStatistics',
     components: {AasCircularChart, NoItemAvailableNote },
     setup(){

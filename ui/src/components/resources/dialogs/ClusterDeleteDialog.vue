@@ -75,13 +75,13 @@
 </template>
 
 <script>
-  import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
+import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
 
-  import {toRef} from "vue";
-  import {useServicesStore} from "@/stores/servicesStore";
-  import {storeToRefs} from "pinia";
+import {toRef} from "vue";
+import {useServicesStore} from "@/stores/servicesStore";
+import {storeToRefs} from "pinia";
 
-  export default {
+export default {
     name: 'ClusterDeleteDialog',
     props: ['showDialog', 'cluster'],
     setup(props){

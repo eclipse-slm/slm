@@ -3,10 +3,10 @@
 </template>
 
 <script>
-  import JobsOverview from '@/components/jobs/JobsOverview'
-  import {useJobsStore} from "@/stores/jobsStore";
+import JobsOverview from '@/components/jobs/JobsOverview'
+import {useJobsStore} from "@/stores/jobsStore";
 
-  export default {
+export default {
     components: {
       JobsOverview,
     },

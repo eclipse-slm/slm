@@ -61,10 +61,10 @@
 
 <script>
 
-  import ResourcesCreateDialogPage from '@/components/resources/dialogs/create/ResourcesCreateDialogPage'
-  import {useResourcesStore} from "@/stores/resourcesStore";
+import ResourcesCreateDialogPage from '@/components/resources/dialogs/create/ResourcesCreateDialogPage'
+import {useResourcesStore} from "@/stores/resourcesStore";
 
-  export default {
+export default {
     name: 'ResourcesCreateDialogPageAddExistingResource',
     enums: {
       ResourcesCreateDialogPage,

@@ -110,8 +110,7 @@ import {Field} from "vee-validate";
 import * as yup from "yup";
 
 
-
-  export default {
+export default {
     name: 'DockerContainerLabels',
     components: {Field},
     props: ['labels', 'editable'],

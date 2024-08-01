@@ -93,8 +93,9 @@
 </template>
 
 <script>
-import { serviceOptionMixin } from "@/utils/serviceOptionUtil";
-import serviceOptionsDefinitionTable from "@/components/service_offerings/wizard_service_offering_version/serviceOptions/serviceOptionsDefinitionTable";
+import {serviceOptionMixin} from "@/utils/serviceOptionUtil";
+import serviceOptionsDefinitionTable
+  from "@/components/service_offerings/wizard_service_offering_version/serviceOptions/serviceOptionsDefinitionTable";
 import {app} from "@/main";
 import {Form as ValidationForm} from "vee-validate";
 

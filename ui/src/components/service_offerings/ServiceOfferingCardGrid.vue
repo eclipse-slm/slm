@@ -83,14 +83,13 @@
 
 <script>
 
-  import TextWithLabel from '@/components/base/TextWithLabel'
-  import getImageUrl from '@/utils/imageUtil'
-  import ServiceOffering from "@/model/serviceOffering.ts";
-  import ProgressCircular from "@/components/base/ProgressCircular";
-  import {useServicesStore} from "@/stores/servicesStore";
-  import {storeToRefs} from "pinia";
+import TextWithLabel from '@/components/base/TextWithLabel'
+import getImageUrl from '@/utils/imageUtil'
+import ProgressCircular from "@/components/base/ProgressCircular";
+import {useServicesStore} from "@/stores/servicesStore";
+import {storeToRefs} from "pinia";
 
-  export default {
+export default {
     name: 'ServiceOfferingCardGrid',
     components: {ProgressCircular, TextWithLabel },
     props: ['serviceOffering', 'imgWidth', 'passive', 'createOrEditMode', "showOnlyLatestVersion"],

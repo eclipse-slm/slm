@@ -126,9 +126,10 @@
 </template>
 
 <script>
-import {Field } from "vee-validate";
+import {Field} from "vee-validate";
 import * as yup from 'yup';
-  export default {
+
+export default {
     name: 'DockerContainerPortMappings',
     components: {Field},
     props: ['portMappings', 'editable'],

@@ -113,11 +113,11 @@
 </template>
 
 <script>
-  import {toRef} from "vue";
-  import {Field, Form as ValidationForm } from "vee-validate";
-  import * as yup from 'yup';
+import {toRef} from "vue";
+import {Field, Form as ValidationForm} from "vee-validate";
+import * as yup from 'yup';
 
-  export default {
+export default {
     name: 'ServiceRepositoryCreateDialog',
     components: {Field, ValidationForm},
     props: ['show'],

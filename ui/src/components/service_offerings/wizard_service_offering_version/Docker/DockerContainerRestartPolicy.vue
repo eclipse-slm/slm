@@ -31,9 +31,10 @@
 </template>
 
 <script>
-import {Field } from "vee-validate";
+import {Field} from "vee-validate";
 import * as yup from 'yup';
-  export default {
+
+export default {
     name: 'DockerContainerRestartPolicy',
     components: {Field},
     props: ['newServiceOffering'],

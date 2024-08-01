@@ -23,13 +23,11 @@
 
 <script>
 
-  import ApiState from '@/api/apiState.js'
-  import ServiceInstancesOverview from '@/components/services/ServiceInstancesOverview'
-  import {useServicesStore} from "@/stores/servicesStore";
-  import {useStore} from "@/stores/store";
-  import {useResourcesStore} from "@/stores/resourcesStore";
+import ApiState from '@/api/apiState.js'
+import ServiceInstancesOverview from '@/components/services/ServiceInstancesOverview'
+import {useServicesStore} from "@/stores/servicesStore";
 
-  export default {
+export default {
     components: {
       ServiceInstancesOverview,
     },

@@ -183,20 +183,19 @@
 
 <script>
 
-  import ApiState from '@/api/apiState'
-  import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
-  import ServiceOptionValue from '@/components/service_offerings/ServiceOptionValue'
-  import logRequestError from '@/api/restApiHelper'
-  import ProgressCircular from "@/components/base/ProgressCircular";
-  import {Field, Form as ValidationForm} from "vee-validate";
-  import * as yup from 'yup';
-  import {useServicesStore} from "@/stores/servicesStore";
-  import {useResourcesStore} from "@/stores/resourcesStore";
-  import {useUserStore} from "@/stores/userStore";
-  import {useJobsStore} from "@/stores/jobsStore";
-  import {storeToRefs} from "pinia";
+import ApiState from '@/api/apiState'
+import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
+import logRequestError from '@/api/restApiHelper'
+import ProgressCircular from "@/components/base/ProgressCircular";
+import {Field, Form as ValidationForm} from "vee-validate";
+import * as yup from 'yup';
+import {useServicesStore} from "@/stores/servicesStore";
+import {useResourcesStore} from "@/stores/resourcesStore";
+import {useUserStore} from "@/stores/userStore";
+import {useJobsStore} from "@/stores/jobsStore";
+import {storeToRefs} from "pinia";
 
-  export default {
+export default {
     name: 'ServiceOrderView',
     components: {
       Field,

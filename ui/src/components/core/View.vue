@@ -8,9 +8,9 @@
 </template>
 
 <script>
-  import DashboardCoreFooter from "@/components/core/Footer.vue";
+import DashboardCoreFooter from "@/components/core/Footer.vue";
 
-  export default {
+export default {
     name: 'DashboardCoreView',
 
     components: {

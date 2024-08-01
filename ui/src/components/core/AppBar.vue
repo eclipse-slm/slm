@@ -214,12 +214,12 @@
 
 <script>
 
-  import {app} from "@/main";
-  import {useTheme} from "vuetify";
-  import {useNotificationStore} from "@/stores/notificationStore";
-  import {useStore} from "@/stores/store";
+import {app} from "@/main";
+import {useTheme} from "vuetify";
+import {useNotificationStore} from "@/stores/notificationStore";
+import {useStore} from "@/stores/store";
 
-  export default {
+export default {
     name: 'DashboardCoreAppBar',
 
     components: {

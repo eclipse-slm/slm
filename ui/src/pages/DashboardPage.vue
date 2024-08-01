@@ -227,15 +227,15 @@
 
 <script>
 
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-  import DashboardResourceStatistics from "@/components/dashboard/DashboardResourceStatistics.vue";
-  import {useServicesStore} from "@/stores/servicesStore";
-  import {useResourcesStore} from "@/stores/resourcesStore";
-  import {useUserStore} from "@/stores/userStore";
-  import {useJobsStore} from "@/stores/jobsStore";
-  import {useOverviewStore} from "@/stores/overviewStore";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import DashboardResourceStatistics from "@/components/dashboard/DashboardResourceStatistics.vue";
+import {useServicesStore} from "@/stores/servicesStore";
+import {useResourcesStore} from "@/stores/resourcesStore";
+import {useUserStore} from "@/stores/userStore";
+import {useJobsStore} from "@/stores/jobsStore";
+import {useOverviewStore} from "@/stores/overviewStore";
 
-  export default {
+export default {
     name: 'DashboardDashboard',
     components: {
       DashboardResourceStatistics,

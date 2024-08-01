@@ -140,15 +140,15 @@
 </template>
 
 <script>
-  import { serviceOptionMixin } from '@/utils/serviceOptionUtil'
-  import AASRestApi from "@/api/resource-management/aasRestApi";
+import {serviceOptionMixin} from '@/utils/serviceOptionUtil'
+import AASRestApi from "@/api/resource-management/aasRestApi";
 
-  import {Field } from "vee-validate";
-  import {useServicesStore} from "@/stores/servicesStore";
-  import {useResourcesStore} from "@/stores/resourcesStore";
-  import {useCatalogStore} from "@/stores/catalogStore";
+import {Field} from "vee-validate";
+import {useServicesStore} from "@/stores/servicesStore";
+import {useResourcesStore} from "@/stores/resourcesStore";
+import {useCatalogStore} from "@/stores/catalogStore";
 
-  export default {
+export default {
     name: 'ServiceOptionValue',
     components: {
       Field

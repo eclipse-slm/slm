@@ -100,12 +100,12 @@
 
 <script>
 
-  import clustersRestApi from '@/api/resource-management/clustersRestApi'
-  import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
-  import {useResourcesStore} from "@/stores/resourcesStore";
-  import {useProviderStore} from "@/stores/providerStore";
+import clustersRestApi from '@/api/resource-management/clustersRestApi'
+import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
+import {useResourcesStore} from "@/stores/resourcesStore";
+import {useProviderStore} from "@/stores/providerStore";
 
-  export default {
+export default {
     name: 'ResourcesCreateDialogPageCreateNewResourceCluster',
     enums: {
       ResourcesCreateDialogPage,

@@ -88,9 +88,9 @@
 </template>
 
 <script>
-  import {useNotificationStore} from "@/stores/notificationStore";
+import {useNotificationStore} from "@/stores/notificationStore";
 
-  export default {
+export default {
     name: 'NotificationsOverview',
     components: {},
     setup(){

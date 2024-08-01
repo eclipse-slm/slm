@@ -31,7 +31,7 @@ import ApiState from "@/api/apiState";
 import {useStore} from "@/stores/store";
 import {useResourcesStore} from "@/stores/resourcesStore";
 
-  export default {
+export default {
       components: {
           ClustersOverview,
       },

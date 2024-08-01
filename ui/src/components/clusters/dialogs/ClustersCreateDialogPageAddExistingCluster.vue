@@ -166,14 +166,14 @@
 
 <script>
 
-  import clustersRestApi from '@/api/resource-management/clustersRestApi'
-  import ClustersCreateDialogPage from "@/components/clusters/dialogs/ClustersCreateDialogPage";
-  import {ref} from "vue";
-  import {Field, Form as ValidationForm } from "vee-validate";
-  import * as yup from 'yup';
-  import ProgressCircular from "@/components/base/ProgressCircular.vue";
-  import {useResourcesStore} from "@/stores/resourcesStore";
-  const textAreaFileContentComponentKey = ref(0);
+import clustersRestApi from '@/api/resource-management/clustersRestApi'
+import ClustersCreateDialogPage from "@/components/clusters/dialogs/ClustersCreateDialogPage";
+import {ref} from "vue";
+import {Field, Form as ValidationForm} from "vee-validate";
+import * as yup from 'yup';
+import {useResourcesStore} from "@/stores/resourcesStore";
+
+const textAreaFileContentComponentKey = ref(0);
 
   export default {
     name: 'ClustersCreateDialogPageAddExistingCluster',

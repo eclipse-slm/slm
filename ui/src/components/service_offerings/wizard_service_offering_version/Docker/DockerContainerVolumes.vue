@@ -106,10 +106,10 @@
 </template>
 
 <script>
-import {Field } from "vee-validate";
+import {Field} from "vee-validate";
 import * as yup from 'yup';
 
-  export default {
+export default {
     name: 'DockerContainerVolumeMappings',
     components: {Field},
     props: ['volumes', 'editable'],

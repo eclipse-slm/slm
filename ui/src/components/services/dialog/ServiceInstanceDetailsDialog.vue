@@ -264,20 +264,20 @@
 
 <script>
 
-  import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
-  import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
-  import ServiceInstancesRestApi from "@/api/service-management/serviceInstancesRestApi";
-  import ApiState from "@/api/apiState";
-  import ProgressCircular from "@/components/base/ProgressCircular";
-  import AasRestApi from "@/api/resource-management/aasRestApi";
-  import getEnv from "@/utils/env";
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-  import {useServicesStore} from "@/stores/servicesStore";
-  import {useResourcesStore} from "@/stores/resourcesStore";
-  import {storeToRefs} from "pinia";
-  import {app} from "@/main";
+import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
+import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
+import ServiceInstancesRestApi from "@/api/service-management/serviceInstancesRestApi";
+import ApiState from "@/api/apiState";
+import ProgressCircular from "@/components/base/ProgressCircular";
+import AasRestApi from "@/api/resource-management/aasRestApi";
+import getEnv from "@/utils/env";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {useServicesStore} from "@/stores/servicesStore";
+import {useResourcesStore} from "@/stores/resourcesStore";
+import {storeToRefs} from "pinia";
+import {app} from "@/main";
 
-  export default {
+export default {
     name: 'ServiceInstanceDetailsDialog',
     components: {NoItemAvailableNote, ProgressCircular, ResourcesInfoDialog },
     mixins: [ serviceInstanceMixin ],

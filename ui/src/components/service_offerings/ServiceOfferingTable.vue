@@ -185,8 +185,7 @@
 
 <script>
 
-import ServiceOfferingVersionsRestApi from  "@/api/service-management/serviceOfferingVersionsRestApi";
-import ProgressCircular from "@/components/base/ProgressCircular";
+import ServiceOfferingVersionsRestApi from "@/api/service-management/serviceOfferingVersionsRestApi";
 import {useServicesStore} from "@/stores/servicesStore";
 import {storeToRefs} from "pinia";
 

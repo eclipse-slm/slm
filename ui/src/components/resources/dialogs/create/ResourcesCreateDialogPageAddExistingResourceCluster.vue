@@ -165,13 +165,13 @@
 
 <script>
 
-  import clustersRestApi from '@/api/resource-management/clustersRestApi'
-  import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
-  import {Field, Form as ValidationForm } from "vee-validate";
-  import * as yup from 'yup';
-  import {useResourcesStore} from "@/stores/resourcesStore";
+import clustersRestApi from '@/api/resource-management/clustersRestApi'
+import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
+import {Field, Form as ValidationForm} from "vee-validate";
+import * as yup from 'yup';
+import {useResourcesStore} from "@/stores/resourcesStore";
 
-  export default {
+export default {
     name: 'ResourcesCreateDialogPageAddExistingResourceCluster',
     components: {Field, ValidationForm },
     enums: {

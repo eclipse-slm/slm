@@ -9,11 +9,11 @@
 </template>
 
 <script>
-  import DashboardCoreAppBar from "@/components/core/AppBar.vue";
-  import DashboardCoreDrawer from "@/components/core/Drawer.vue";
-  import DashboardCoreView from "@/components/core/View.vue";
+import DashboardCoreAppBar from "@/components/core/AppBar.vue";
+import DashboardCoreDrawer from "@/components/core/Drawer.vue";
+import DashboardCoreView from "@/components/core/View.vue";
 
-  export default {
+export default {
     name: 'IndexPage',
 
     components: {

@@ -72,11 +72,11 @@
 
 <script>
 
-  import {right} from "core-js/internals/array-reduce";
-  import {useStore} from "@/stores/store";
-  import {useUserStore} from "@/stores/userStore";
+import {right} from "core-js/internals/array-reduce";
+import {useStore} from "@/stores/store";
+import {useUserStore} from "@/stores/userStore";
 
-  export default {
+export default {
     name: 'DashboardCoreDrawer',
     props: {
       expandOnHover: {

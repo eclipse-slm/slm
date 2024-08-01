@@ -91,20 +91,23 @@
 </template>
 
 <script>
-  import DockerContainerEnvironmentVariables from './Docker/DockerEnvironmentVariables'
-  import { isServiceOptionExisting, deleteServiceOption, isEnvVarExisting } from '@/utils/serviceOptionUtil'
-  import DockerContainerRestartPolicy
-    from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerRestartPolicy'
-  import DockerContainerLabels from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerLabels'
-  import DockerContainerVolumeMapping from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerVolumes'
-  import DockerContainerPortMapping
-    from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerPortMappings'
-  import DockerContainerImageName from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerImageName'
-  import ServiceRepositorySelect from '@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect'
-  import {Field, Form as ValidationForm } from "vee-validate";
-  import * as yup from 'yup';
+import DockerContainerEnvironmentVariables from './Docker/DockerEnvironmentVariables'
+import {deleteServiceOption, isEnvVarExisting, isServiceOptionExisting} from '@/utils/serviceOptionUtil'
+import DockerContainerRestartPolicy
+  from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerRestartPolicy'
+import DockerContainerLabels
+  from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerLabels'
+import DockerContainerVolumeMapping
+  from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerVolumes'
+import DockerContainerPortMapping
+  from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerPortMappings'
+import DockerContainerImageName
+  from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerImageName'
+import ServiceRepositorySelect
+  from '@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect'
+import {Form as ValidationForm} from "vee-validate";
 
-  export default {
+export default {
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer',
     components: {
       DockerContainerRestartPolicy,

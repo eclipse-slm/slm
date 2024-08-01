@@ -72,15 +72,14 @@
 
 <script>
 
-  import ServiceVendorCreateOrEditDialog from '@/components/service_vendors/ServiceVendorCreateOrEditDialog'
-  import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
-  import Vue from 'vue'
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-  import {app} from "@/main";
-  import {useServicesStore} from "@/stores/servicesStore";
+import ServiceVendorCreateOrEditDialog from '@/components/service_vendors/ServiceVendorCreateOrEditDialog'
+import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {app} from "@/main";
+import {useServicesStore} from "@/stores/servicesStore";
 
-  export default {
+export default {
     name: 'ServiceVendorTable',
     components: {NoItemAvailableNote, OverviewHeading, ServiceVendorCreateOrEditDialog },
     setup(){

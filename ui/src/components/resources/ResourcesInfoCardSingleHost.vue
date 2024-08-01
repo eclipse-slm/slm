@@ -117,11 +117,11 @@
 </template>
 
 <script>
-  import ResourceMetrics from '@/components/resources/ResourceMetrics'
-  import ResourceSubmodels from '@/components/resources/ResourceSubmodels'
-  import {useResourcesStore} from "@/stores/resourcesStore";
+import ResourceMetrics from '@/components/resources/ResourceMetrics'
+import ResourceSubmodels from '@/components/resources/ResourceSubmodels'
+import {useResourcesStore} from "@/stores/resourcesStore";
 
-  export default {
+export default {
     name: 'ResourcesInfoCardSingleHost',
     components: { ResourceMetrics, ResourceSubmodels },
     props: {

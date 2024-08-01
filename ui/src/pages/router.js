@@ -1,4 +1,3 @@
-
 import {createRouter, createWebHistory} from 'vue-router';
 import {useUserStore} from "@/stores/userStore";
 
@@ -152,7 +151,7 @@ const routes = [
       },
     ],
   }
-]
+];
 
 export const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
@@ -163,19 +162,19 @@ router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
   if (to.meta.developerPermissionRequired) {
     if (userStore.isUserDeveloper) {
-      next()
+      next();
     } else {
-      next('/access_denied')
+      next('/access_denied');
     }
   } else if (to.meta.adminPermissionRequired) {
     if (userStore.userRoles.includes('slm-admin')) {
-      next()
+      next();
     } else {
-      next('/access_denied')
+      next('/access_denied');
     }
   } else {
-    next()
+    next();
   }
-})
+});
 
 export default router;

@@ -1,4 +1,4 @@
-import axios, {AxiosResponse} from 'axios'
+import axios from 'axios'
 import logRequestError from '@/api/restApiHelper.js'
 import {UUID} from "vue-uuid";
 import ServiceOffering from "@/model/serviceOffering"

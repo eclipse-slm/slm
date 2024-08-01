@@ -20,14 +20,13 @@
 
 <script>
 
-  import VersionsOverview from '@/components/admin/VersionsOverview'
-  import ServiceCategoriesTable from '@/components/service_offerings/ServiceCategoriesTable'
-  import ServiceVendorsDevelopersTable from '@/components/service_vendors/ServiceVendorDevelopersTable'
-  import ServiceVendorTable from '@/components/service_vendors/ServiceVendorTable'
-  import {useServicesStore} from "@/stores/servicesStore";
-  import {useResourcesStore} from "@/stores/resourcesStore";
+import VersionsOverview from '@/components/admin/VersionsOverview'
+import ServiceCategoriesTable from '@/components/service_offerings/ServiceCategoriesTable'
+import ServiceVendorsDevelopersTable from '@/components/service_vendors/ServiceVendorDevelopersTable'
+import ServiceVendorTable from '@/components/service_vendors/ServiceVendorTable'
+import {useServicesStore} from "@/stores/servicesStore";
 
-  export default {
+export default {
     name: 'AdminPage',
     components: { ServiceCategoriesTable, ServiceVendorTable, ServiceVendorsDevelopersTable, VersionsOverview, },
     setup(){

@@ -7,7 +7,6 @@ import AasRestApi from "@/api/resource-management/aasRestApi";
 import {app} from "@/main";
 import {defineStore} from "pinia";
 import {useProviderStore} from "@/stores/providerStore";
-import {useServicesStore} from "@/stores/servicesStore";
 
 interface ResourcesStoreState{
     apiStateResources_: number,

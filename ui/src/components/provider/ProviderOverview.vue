@@ -41,6 +41,7 @@
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import VirtualResourceProviderTable from "@/components/provider/VirtualResourceProviderTable.vue";
 import ServiceHosterTable from "@/components/provider/ServiceHosterTable.vue";
+
 export default {
   name: 'ProviderOverview',
   components: {ServiceHosterTable, VirtualResourceProviderTable, OverviewHeading},

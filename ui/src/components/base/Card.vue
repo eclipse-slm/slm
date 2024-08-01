@@ -1,7 +1,7 @@
 <script>
-  import { VCard } from 'vuetify/components'
+import {VCard} from 'vuetify/components'
 
-  export default {
+export default {
     // eslint-disable-next-line vue/multi-word-component-names
     name: 'Card',
 

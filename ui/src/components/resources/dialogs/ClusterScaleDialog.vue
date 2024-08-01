@@ -165,10 +165,10 @@
 
 <script>
 
-  import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
-  import {useResourcesStore} from "@/stores/resourcesStore";
+import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
+import {useResourcesStore} from "@/stores/resourcesStore";
 
-  export default {
+export default {
     name: 'ClusterScaleDialog',
     props: ['action'],
     setup(){

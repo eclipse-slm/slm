@@ -63,13 +63,10 @@
 </template>
 
 <script>
-  import DockerContainerEnvironmentVariables
-    from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerEnvironmentVariables'
-  import 'vue-json-pretty/lib/styles.css'
-  import YAML from 'yaml'
-  import ServiceRepositorySelect from '@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect'
-  import ServiceOfferingVersionsRestApi from "@/api/service-management/serviceOfferingVersionsRestApi";
-  const { parse } = require('dot-properties')
+import 'vue-json-pretty/lib/styles.css'
+import ServiceOfferingVersionsRestApi from "@/api/service-management/serviceOfferingVersionsRestApi";
+
+const { parse } = require('dot-properties')
 
   export default {
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys',

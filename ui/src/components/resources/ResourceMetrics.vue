@@ -51,10 +51,10 @@
   </div>
 </template>
 <script>
-  // import { LineChart } from 'vue-chart-3'
-  import MetricsRestApi from '@/api/resource-management/metricsRestApi'
+// import { LineChart } from 'vue-chart-3'
+import MetricsRestApi from '@/api/resource-management/metricsRestApi'
 
-  export default {
+export default {
     name: 'ResourceMetrics',
     components: {
       // LineChart,

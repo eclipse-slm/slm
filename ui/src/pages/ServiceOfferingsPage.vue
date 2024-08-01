@@ -83,14 +83,14 @@
 
 <script>
 
-  import ApiState from '@/api/apiState.js'
-  import ServiceOfferingCardGrid from '@/components/service_offerings/ServiceOfferingCardGrid'
-  import ServiceOfferingOverviewToolbar from '@/components/service_offerings/ServiceOfferingToolbar'
-  import ProgressCircular from "@/components/base/ProgressCircular";
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-  import {useServicesStore} from "@/stores/servicesStore";
+import ApiState from '@/api/apiState.js'
+import ServiceOfferingCardGrid from '@/components/service_offerings/ServiceOfferingCardGrid'
+import ServiceOfferingOverviewToolbar from '@/components/service_offerings/ServiceOfferingToolbar'
+import ProgressCircular from "@/components/base/ProgressCircular";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {useServicesStore} from "@/stores/servicesStore";
 
-  export default {
+export default {
     components: {
       NoItemAvailableNote,
       ProgressCircular,

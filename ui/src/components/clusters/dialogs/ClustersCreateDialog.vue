@@ -57,15 +57,15 @@
   </v-dialog>
 </template>
 <script>
-  import ClustersCreateDialogPage from "@/components/clusters/dialogs/ClustersCreateDialogPage";
-  import ClustersCreateDialogPageStart from "@/components/clusters/dialogs/ClustersCreateDialogPageStart.vue";
-  import ClustersCreateDialogPageCreateNewCluster
-    from "@/components/clusters/dialogs/ClustersCreateDialogPageCreateNewCluster.vue";
-  import ClustersCreateDialogPageAddExistingCluster
-    from "@/components/clusters/dialogs/ClustersCreateDialogPageAddExistingCluster.vue";
-  import {toRef} from "vue";
+import ClustersCreateDialogPage from "@/components/clusters/dialogs/ClustersCreateDialogPage";
+import ClustersCreateDialogPageStart from "@/components/clusters/dialogs/ClustersCreateDialogPageStart.vue";
+import ClustersCreateDialogPageCreateNewCluster
+  from "@/components/clusters/dialogs/ClustersCreateDialogPageCreateNewCluster.vue";
+import ClustersCreateDialogPageAddExistingCluster
+  from "@/components/clusters/dialogs/ClustersCreateDialogPageAddExistingCluster.vue";
+import {toRef} from "vue";
 
-  export default {
+export default {
     name: 'ClusterCreateDialog',
     components: {
       ClustersCreateDialogPageStart,

@@ -101,15 +101,16 @@
 </template>
 
 <script>
-  import 'vue-json-pretty/lib/styles.css'
-  import YAML from 'yaml'
-  const { parse } = require('dot-properties')
-  import DockerContainerEnvironmentVariables
-    from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerEnvironmentVariables'
-  import ServiceRepositorySelect
-    from "@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect.vue";
+import 'vue-json-pretty/lib/styles.css'
+import YAML from 'yaml'
+import DockerContainerEnvironmentVariables
+  from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerEnvironmentVariables'
+import ServiceRepositorySelect
+  from "@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect.vue";
 
-  export default {
+const { parse } = require('dot-properties')
+
+export default {
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes',
     components: {ServiceRepositorySelect, DockerContainerEnvironmentVariables},
     props: ['editMode', 'serviceOfferingVersion', 'serviceVendorId'],

@@ -56,10 +56,10 @@
 
 <script>
 
-  import {useServicesStore} from "@/stores/servicesStore";
-  import {storeToRefs} from "pinia";
+import {useServicesStore} from "@/stores/servicesStore";
+import {storeToRefs} from "pinia";
 
-  export default {
+export default {
     name: 'ServiceOfferingCardList',
     props: ['service', 'imgWidth', 'passive'],
     setup(){

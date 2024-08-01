@@ -84,13 +84,13 @@
 
 <script>
 
-  import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
-  import Vue, {toRef} from 'vue'
-  import getImageUrl from '@/utils/imageUtil'
-  import {app} from "@/main";
-  import {useServicesStore} from "@/stores/servicesStore";
+import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
+import {toRef} from 'vue'
+import getImageUrl from '@/utils/imageUtil'
+import {app} from "@/main";
+import {useServicesStore} from "@/stores/servicesStore";
 
-  export default {
+export default {
     name: 'ServiceVendorCreateOrEditDialog',
     props: ['show', 'editMode', 'serviceVendor'],
     setup(props){

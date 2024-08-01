@@ -82,21 +82,21 @@
 </template>
 
 <script>
-  import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
-  import ResourcesCreateDialogPageStart from "@/components/resources/dialogs/create/ResourcesCreateDialogPageStart";
-  import ResourcesCreateDialogPageAddExistingResourceHost
-    from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResourceHost";
-  import ResourcesCreateDialogPageAddExistingResource
-    from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResource";
-  import ResourcesCreateDialogPageAddExistingResourceCluster
-    from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResourceCluster";
-  import ResourcesCreateDialogPageCreateNewResource
-    from "@/components/resources/dialogs/create/ResourcesCreateDialogPageCreateNewResource";
-  import ResourcesCreateDialogPageCreateNewResourceCluster
-    from "@/components/resources/dialogs/create/ResourcesCreateDialogPageCreateNewResourceCluster";
-  import {toRef} from "vue";
+import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
+import ResourcesCreateDialogPageStart from "@/components/resources/dialogs/create/ResourcesCreateDialogPageStart";
+import ResourcesCreateDialogPageAddExistingResourceHost
+  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResourceHost";
+import ResourcesCreateDialogPageAddExistingResource
+  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResource";
+import ResourcesCreateDialogPageAddExistingResourceCluster
+  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResourceCluster";
+import ResourcesCreateDialogPageCreateNewResource
+  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageCreateNewResource";
+import ResourcesCreateDialogPageCreateNewResourceCluster
+  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageCreateNewResourceCluster";
+import {toRef} from "vue";
 
-  export default {
+export default {
     name: 'ResourcesCreateDialog',
     components: {
       ResourcesCreateDialogPageStart,

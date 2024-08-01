@@ -1,6 +1,6 @@
 import ApiState from '@/api/apiState.js'
 import CatalogRestApi from "@/api/catalog/catalogRestApi";
-import { defineStore } from 'pinia'
+import {defineStore} from 'pinia'
 
 interface CatalogStoreState{
     apiStateCatalog_: number,

@@ -62,11 +62,11 @@
 
 <script>
 
-  import ResourcesCreateDialogPage from '@/components/resources/dialogs/create/ResourcesCreateDialogPage'
-  import {useResourcesStore} from "@/stores/resourcesStore";
-  import {useProviderStore} from "@/stores/providerStore";
+import ResourcesCreateDialogPage from '@/components/resources/dialogs/create/ResourcesCreateDialogPage'
+import {useResourcesStore} from "@/stores/resourcesStore";
+import {useProviderStore} from "@/stores/providerStore";
 
-  export default {
+export default {
     name: 'ResourcesCreateDialogPageCreateNewResource',
     enums: {
       ResourcesCreateDialogPage,

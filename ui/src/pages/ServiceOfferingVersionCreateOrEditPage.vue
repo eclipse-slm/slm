@@ -132,21 +132,28 @@
 </template>
 
 <script>
-  import ServiceOfferingVersionWizardStep1Common from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep1Common'
-  import ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys from "@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys.vue";
-  import ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer'
-  import ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose'
-  import ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes'
-  import ServiceOfferingVersionWizardStep3ServiceOptions from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep3ServiceOptions'
-  import ServiceOfferingVersionWizardStep4Requirements from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep4Requirements'
-  import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
+import ServiceOfferingVersionWizardStep1Common
+  from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep1Common'
+import ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys
+  from "@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys.vue";
+import ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer
+  from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer'
+import ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose
+  from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose'
+import ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes
+  from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes'
+import ServiceOfferingVersionWizardStep3ServiceOptions
+  from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep3ServiceOptions'
+import ServiceOfferingVersionWizardStep4Requirements
+  from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep4Requirements'
+import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
 
-  import ApiState from '@/api/apiState'
-  import {app} from "@/main";
-  import {useServicesStore} from "@/stores/servicesStore";
-  import {storeToRefs} from "pinia";
+import ApiState from '@/api/apiState'
+import {app} from "@/main";
+import {useServicesStore} from "@/stores/servicesStore";
+import {storeToRefs} from "pinia";
 
-  export default {
+export default {
     name: 'ServiceOfferingCreatePage',
 
     components: {

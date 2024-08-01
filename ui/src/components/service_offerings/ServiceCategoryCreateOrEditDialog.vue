@@ -51,12 +51,12 @@
 
 <script>
 
-  import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
-  import Vue, {toRef} from 'vue'
-  import {app} from "@/main";
-  import {useServicesStore} from "@/stores/servicesStore";
+import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
+import {toRef} from 'vue'
+import {app} from "@/main";
+import {useServicesStore} from "@/stores/servicesStore";
 
-  export default {
+export default {
     name: 'ServiceCategoryCreateOrEditDialog',
     props: ['show', 'editMode', 'serviceCategory'],
     setup(props){

@@ -48,9 +48,9 @@
 </template>
 
 <script>
-  import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
+import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
 
-  export default {
+export default {
     name: 'ServiceDetailsRequirements',
     props: {
       serviceOffering: { type: Object },

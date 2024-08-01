@@ -42,9 +42,9 @@
 </template>
 
 <script>
-  import {toRef} from "vue";
+import {toRef} from "vue";
 
-  export default {
+export default {
     name: 'ConfirmDialog',
     props: ['show', 'title', 'text'],
     setup(props){

@@ -40,9 +40,9 @@
 </template>
 
 <script>
-  import {toRef} from "vue";
+import {toRef} from "vue";
 
-  export default {
+export default {
     name: 'ServiceInstanceDeleteDialog',
     props: ['service', 'show'],
     setup(props){

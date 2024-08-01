@@ -112,11 +112,10 @@
 
 <script>
 
-  import ApiState from '@/api/apiState'
-  import {useUserStore} from "@/stores/userStore";
-  import {useStore} from "@/stores/store";
+import ApiState from '@/api/apiState'
+import {useUserStore} from "@/stores/userStore";
 
-  export default {
+export default {
     setup(){
       const userStore = useUserStore();
 

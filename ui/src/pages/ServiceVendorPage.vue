@@ -246,29 +246,28 @@
 
 <script>
 
-  import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
-  import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
-  import UsersRestApi from '@/api/service-management/usersRestApi'
-  import ApiState from '@/api/apiState'
-  import Vue from 'vue'
-  import ServiceRepositoryCreateDialog from '@/components/service_vendors/ServiceRepositoryCreateDialog'
-  import ServiceVendorsDevelopersTable from '@/components/service_vendors/ServiceVendorDevelopersTable'
-  import ServiceVendorCreateOrEditDialog from '@/components/service_vendors/ServiceVendorCreateOrEditDialog'
-  import logRequestError from '@/api/restApiHelper'
-  import getImageUrl from '@/utils/imageUtil'
-  import ServiceOfferingTable from "@/components/service_offerings/ServiceOfferingTable";
-  import ConfirmDialog from "@/components/base/ConfirmDialog";
-  import ServiceOfferingVersionsRestApi from  "@/api/service-management/serviceOfferingVersionsRestApi";
-  import ServiceOfferingCreateDialog from "@/components/service_offerings/dialogs/ServiceOfferingCreateDialog";
-  import ProgressCircular from "@/components/base/ProgressCircular";
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
-  import {app} from "@/main";
-  import {useServicesStore} from "@/stores/servicesStore";
-  import {useStore} from "@/stores/store";
-  import {useUserStore} from "@/stores/userStore";
-  import {storeToRefs} from "pinia";
+import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
+import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
+import UsersRestApi from '@/api/service-management/usersRestApi'
+import ApiState from '@/api/apiState'
+import ServiceRepositoryCreateDialog from '@/components/service_vendors/ServiceRepositoryCreateDialog'
+import ServiceVendorsDevelopersTable from '@/components/service_vendors/ServiceVendorDevelopersTable'
+import ServiceVendorCreateOrEditDialog from '@/components/service_vendors/ServiceVendorCreateOrEditDialog'
+import logRequestError from '@/api/restApiHelper'
+import getImageUrl from '@/utils/imageUtil'
+import ServiceOfferingTable from "@/components/service_offerings/ServiceOfferingTable";
+import ConfirmDialog from "@/components/base/ConfirmDialog";
+import ServiceOfferingVersionsRestApi from "@/api/service-management/serviceOfferingVersionsRestApi";
+import ServiceOfferingCreateDialog from "@/components/service_offerings/dialogs/ServiceOfferingCreateDialog";
+import ProgressCircular from "@/components/base/ProgressCircular";
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import {app} from "@/main";
+import {useServicesStore} from "@/stores/servicesStore";
+import {useStore} from "@/stores/store";
+import {useUserStore} from "@/stores/userStore";
+import {storeToRefs} from "pinia";
 
-  export default {
+export default {
     components: {
       OverviewHeading,
       ProgressCircular,

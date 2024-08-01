@@ -63,9 +63,9 @@
 
 <script>
 
-  import {useServicesStore} from "@/stores/servicesStore";
+import {useServicesStore} from "@/stores/servicesStore";
 
-  export default {
+export default {
     name: 'ServiceOfferingOverviewToolbar',
     props: [],
     setup(){

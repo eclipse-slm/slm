@@ -49,10 +49,11 @@
   </v-dialog>
 </template>
 <script>
-  import { capabilityUtilsMixin } from '@/utils/capabilityUtils'
-  import CapabilityParamsDialogInputField from "@/components/resources/dialogs/CapabilityParamsDialogInputField.vue";
-  import {toRef} from "vue";
- export default {
+import {capabilityUtilsMixin} from '@/utils/capabilityUtils'
+import CapabilityParamsDialogInputField from "@/components/resources/dialogs/CapabilityParamsDialogInputField.vue";
+import {toRef} from "vue";
+
+export default {
    name: "CapabilityParamsDialog",
    components: {CapabilityParamsDialogInputField},
    mixins: [capabilityUtilsMixin],

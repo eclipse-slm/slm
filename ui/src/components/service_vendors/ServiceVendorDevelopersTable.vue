@@ -87,16 +87,15 @@
 
 <script>
 
-  import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
-  import UsersRestApi from '@/api/service-management/usersRestApi'
-  import Vue from 'vue'
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
-  import {app} from "@/main";
-  import {useUserStore} from "@/stores/userStore";
-  import {useServicesStore} from "@/stores/servicesStore";
-  import {storeToRefs} from "pinia";
+import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
+import UsersRestApi from '@/api/service-management/usersRestApi'
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import {app} from "@/main";
+import {useUserStore} from "@/stores/userStore";
+import {useServicesStore} from "@/stores/servicesStore";
+import {storeToRefs} from "pinia";
 
-  export default {
+export default {
     name: 'ServiceVendorDevelopersTable',
     components: {OverviewHeading},
     props: ['serviceVendor'],

@@ -38,9 +38,9 @@
 </template>
 
 <script>
-  import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
+import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
 
-  export default {
+export default {
     name: 'ServiceRepositorySelect',
     props: {
       value: {

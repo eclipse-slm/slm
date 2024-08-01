@@ -36,7 +36,6 @@
 
 import VmCreateDialog from "@/components/provider/dialogs/VmCreateDialog.vue";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-import {useResourcesStore} from "@/stores/resourcesStore";
 import {useProviderStore} from "@/stores/providerStore";
 
 export default {

@@ -168,8 +168,7 @@
 
 <script>
 import 'vue-json-pretty/lib/styles.css'
-import {Field, Form as ValidationForm } from "vee-validate";
-import * as yup from 'yup';
+import {Form as ValidationForm} from "vee-validate";
 
 export default {
   name: 'ServiceOfferingVersionWizardStep4Requirements',

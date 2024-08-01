@@ -99,11 +99,11 @@
 
 <script>
 
-  import ClusterScaleDialog from '@/components/resources/dialogs/ClusterScaleDialog'
-  import ClusterDeleteDialog from '@/components/resources/dialogs/ClusterDeleteDialog'
-  import {useResourcesStore} from "@/stores/resourcesStore";
+import ClusterScaleDialog from '@/components/resources/dialogs/ClusterScaleDialog'
+import ClusterDeleteDialog from '@/components/resources/dialogs/ClusterDeleteDialog'
+import {useResourcesStore} from "@/stores/resourcesStore";
 
-  export default {
+export default {
     name: 'ResourcesTableClusters',
     components: {
       ClusterScaleDialog,

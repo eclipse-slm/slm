@@ -268,15 +268,15 @@
 
 <script>
 
-  import ConfirmDialog from '@/components/base/ConfirmDialog'
-  import CapabilityParamsDialog from "@/components/resources/dialogs/CapabilityParamsDialog.vue";
-  import ResourcesRestApi from '@/api/resource-management/resourcesRestApi'
-  import { capabilityUtilsMixin } from '@/utils/capabilityUtils'
-  import ProfilerRestApi from "@/api/resource-management/profilerRestApi";
-  import {app} from "@/main";
-  import {useResourcesStore} from "@/stores/resourcesStore";
+import ConfirmDialog from '@/components/base/ConfirmDialog'
+import CapabilityParamsDialog from "@/components/resources/dialogs/CapabilityParamsDialog.vue";
+import ResourcesRestApi from '@/api/resource-management/resourcesRestApi'
+import {capabilityUtilsMixin} from '@/utils/capabilityUtils'
+import ProfilerRestApi from "@/api/resource-management/profilerRestApi";
+import {app} from "@/main";
+import {useResourcesStore} from "@/stores/resourcesStore";
 
-  export default {
+export default {
     name: 'ResourcesTableSingleHosts',
     components: {CapabilityParamsDialog, ConfirmDialog },
     mixins: [capabilityUtilsMixin],

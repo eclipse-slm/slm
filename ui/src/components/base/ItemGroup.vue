@@ -41,12 +41,12 @@
 </template>
 
 <script>
-  // Utilities
-  import kebabCase from 'lodash/kebabCase'
+// Utilities
+import kebabCase from 'lodash/kebabCase'
 
-  import {useStore} from "@/stores/store";
+import {useStore} from "@/stores/store";
 
-  export default {
+export default {
     name: 'ItemGroup',
 
     inheritAttrs: false,

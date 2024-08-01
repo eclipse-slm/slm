@@ -67,16 +67,15 @@
 </template>
 
 <script>
-  import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
-  import ResourcesCreateDialog from '@/components/resources/dialogs/create/ResourcesCreateDialog'
-  import ResourcesTableSingleHosts from '@/components/resources/ResourcesTableSingleHosts'
-  import ResourcesTableClusters from '@/components/resources/ResourcesTableClusters'
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-  import {useResourcesStore} from "@/stores/resourcesStore";
-  import {mapWritableState} from "pinia";
+import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
+import ResourcesCreateDialog from '@/components/resources/dialogs/create/ResourcesCreateDialog'
+import ResourcesTableSingleHosts from '@/components/resources/ResourcesTableSingleHosts'
+import ResourcesTableClusters from '@/components/resources/ResourcesTableClusters'
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {useResourcesStore} from "@/stores/resourcesStore";
 
-  export default {
+export default {
     name: 'ResourcesOverview',
     components: {
       OverviewHeading,

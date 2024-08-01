@@ -87,9 +87,10 @@
 <script>
 import 'vue-json-pretty/lib/styles.css'
 
-import {Field, Form as ValidationForm } from "vee-validate";
+import {Field, Form as ValidationForm} from "vee-validate";
 import * as yup from 'yup';
 import {useServicesStore} from "@/stores/servicesStore";
+
 const { parse } = require('dot-properties')
 
   export default {

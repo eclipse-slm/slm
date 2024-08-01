@@ -31,9 +31,9 @@
 </template>
 
 <script>
-  import ResourcesInfoCardSingleHost from '@/components/resources/ResourcesInfoCardSingleHost'
+import ResourcesInfoCardSingleHost from '@/components/resources/ResourcesInfoCardSingleHost'
 
-  export default {
+export default {
     name: 'ResourcesInfoDialog',
     components: { ResourcesInfoCardSingleHost },
     props: ['resource'],

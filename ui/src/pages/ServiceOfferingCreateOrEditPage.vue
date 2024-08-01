@@ -68,17 +68,18 @@
 </template>
 
 <script>
-  import ServiceOfferingWizardManualStep1Common from '@/components/service_offerings/wizard_service_offering/ServiceOfferingWizardManualStep1Common'
-  import ServiceOfferingWizardGitStep1Common
-    from "@/components/service_offerings/wizard_service_offering/ServiceOfferingWizardGitStep1Common";
-  import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
+import ServiceOfferingWizardManualStep1Common
+  from '@/components/service_offerings/wizard_service_offering/ServiceOfferingWizardManualStep1Common'
+import ServiceOfferingWizardGitStep1Common
+  from "@/components/service_offerings/wizard_service_offering/ServiceOfferingWizardGitStep1Common";
+import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
 
-  import ApiState from '@/api/apiState'
-  import {app} from "@/main";
-  import {useServicesStore} from "@/stores/servicesStore";
-  import {storeToRefs} from "pinia";
+import ApiState from '@/api/apiState'
+import {app} from "@/main";
+import {useServicesStore} from "@/stores/servicesStore";
+import {storeToRefs} from "pinia";
 
-  export default {
+export default {
     name: 'ServiceOfferingCreatePage',
 
     components: {

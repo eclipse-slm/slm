@@ -86,13 +86,13 @@
 
 <script>
 
-  import ServiceCard from '@/components/service_offerings/ServiceOfferingCardGrid'
-  import ServiceDetailsOverview from '@/components/service_offerings/ServiceOfferingDetailsOverview'
-  import ServiceDetailsRequirements from '@/components/service_offerings/ServiceOfferingDetailsRequirements.vue'
-  import ApiState from '@/api/apiState'
-  import {useServicesStore} from "@/stores/servicesStore";
+import ServiceCard from '@/components/service_offerings/ServiceOfferingCardGrid'
+import ServiceDetailsOverview from '@/components/service_offerings/ServiceOfferingDetailsOverview'
+import ServiceDetailsRequirements from '@/components/service_offerings/ServiceOfferingDetailsRequirements.vue'
+import ApiState from '@/api/apiState'
+import {useServicesStore} from "@/stores/servicesStore";
 
-  export default {
+export default {
     name: 'ServiceOfferingDetailsPage',
     components: {
       ServiceCard,

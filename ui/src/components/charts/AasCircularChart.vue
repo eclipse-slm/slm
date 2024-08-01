@@ -35,11 +35,11 @@
 </template>
 
 <script>
-  import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-  import { Pie, Doughnut } from "vue-chartjs";
-  import AasCircularChartFilterBar from "@/components/charts/AasCircularChartFilterBar.vue";
+import {ArcElement, Chart as ChartJS, Legend, Tooltip} from "chart.js";
+import {Doughnut, Pie} from "vue-chartjs";
+import AasCircularChartFilterBar from "@/components/charts/AasCircularChartFilterBar.vue";
 
-  ChartJS.register(ArcElement, Tooltip, Legend)
+ChartJS.register(ArcElement, Tooltip, Legend)
 
   export default {
     name: 'AasCircularChart',

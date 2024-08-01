@@ -13,10 +13,10 @@
 </template>
 
 <script>
-  // Mixins
-  import Proxyable from 'vuetify'
+// Mixins
+import Proxyable from 'vuetify'
 
-  export default {
+export default {
     name: 'MaterialTabs',
 
     mixins: [Proxyable],

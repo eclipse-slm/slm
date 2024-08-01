@@ -137,7 +137,7 @@
   import ServiceOfferingsRestApi from "@/api/service-management/serviceOfferingsRestApi.ts";
   import ProgressCircular from "@/components/base/ProgressCircular";
   import {app} from "@/main";
-  import {Field, Form as ValidationForm } from "vee-validate";
+  import {Field, Form as ValidationForm} from "vee-validate";
   import * as yup from 'yup';
   import {useServicesStore} from "@/stores/servicesStore";
 

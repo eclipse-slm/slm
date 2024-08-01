@@ -70,15 +70,14 @@
 
 <script>
 
-  import ServiceCategoryCreateOrEditDialog from '@/components/service_offerings/ServiceCategoryCreateOrEditDialog'
-  import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-  import {app} from "@/main";
-  import {useResourcesStore} from "@/stores/resourcesStore";
-  import {useServicesStore} from "@/stores/servicesStore";
+import ServiceCategoryCreateOrEditDialog from '@/components/service_offerings/ServiceCategoryCreateOrEditDialog'
+import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {app} from "@/main";
+import {useServicesStore} from "@/stores/servicesStore";
 
-  export default {
+export default {
     name: 'ServiceCategoriesTable',
     components: {OverviewHeading, ServiceCategoryCreateOrEditDialog, NoItemAvailableNote },
     setup(){
