@@ -140,7 +140,6 @@
 </template>
 
 <script>
-  import VueIp from 'vue-ip'
   import { serviceOptionMixin } from '@/utils/serviceOptionUtil'
   import AASRestApi from "@/api/resource-management/aasRestApi";
 
