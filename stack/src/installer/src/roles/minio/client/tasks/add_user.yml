@@ -14,12 +14,6 @@
   set_fact:
     mc_command: "mc"
 
-- name: "MINIO | Check whether user is already configured"
-  command: "{{ mc_command }} admin user info {{ _alias }} {{ _user }}"
-  register: get_user
-  changed_when: false
-  ignore_errors: true
-
 - name: "MINIO | Create user"
   command: "{{ mc_command }} admin user add {{ _alias }} {{ _user }} {{ _password }}"
 
