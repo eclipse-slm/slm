@@ -15,7 +15,7 @@
     mc_command: "mc"
 
 - name: "MINIO | Create user"
-  command: "{{ mc_command }} admin user add {{ _alias }} {{ _user }} {{ _password }}"
+  command: "{{ mc_command }} admin user add {{ _alias }} {{ _user }} \"{{ _password }}\""
 
 - name: "MINIO | Add user policy"
   command: "{{ mc_command }} admin policy attach {{ _alias }} readwrite --user {{ _user }}"
