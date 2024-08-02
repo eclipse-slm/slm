@@ -83,7 +83,16 @@ import {storeToRefs} from "pinia";
 
 export default {
     name: 'ClusterDeleteDialog',
-    props: ['showDialog', 'cluster'],
+    props:{
+      showDialog: {
+        type: Boolean,
+        default: false
+      },
+      cluster: {
+        type: Object,
+        default: null
+      }
+    },
     setup(props){
       const active = toRef(props, 'showDialog')
       const servicesStore = useServicesStore();

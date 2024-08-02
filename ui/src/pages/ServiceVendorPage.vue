@@ -278,7 +278,12 @@ export default {
       ServiceVendorsDevelopersTable,
       ServiceVendorCreateOrEditDialog,
     },
-    props: ['serviceVendorId'],
+    props: {
+      serviceVendorId: {
+        type: String,
+        default: null
+      }
+    },
     setup(){
       const store = useStore();
       const userStore = useUserStore();
@@ -312,22 +317,6 @@ export default {
         showEditServiceVendorDialog: false,
       }
     },
-    created () {
-      this.servicesStore.getServiceVendors().then(() => {
-        UsersRestApi.getServiceVendorsOfDeveloper(this.userId).then(serviceVendorIdsOfDeveloper => {
-          this.serviceVendorsOfDeveloper = []
-          serviceVendorIdsOfDeveloper.forEach(serviceVendorId => {
-            if (this.serviceVendorId != undefined) {
-              if (this.serviceVendorId == serviceVendorId) {
-                this.selectedServiceVendor = this.serviceVendorById(serviceVendorId)
-                this.onServiceVendorSelected()
-              }
-            }
-            this.serviceVendorsOfDeveloper.push(this.serviceVendorById(serviceVendorId))
-          })
-        })
-      })
-    },
     computed: {
       themeColorMain() {
         return this.store.themeColorMain
@@ -360,6 +349,22 @@ export default {
           { title: 'Type', value: 'type', sortable: true },
         ]
       },
+    },
+    created () {
+      this.servicesStore.getServiceVendors().then(() => {
+        UsersRestApi.getServiceVendorsOfDeveloper(this.userId).then(serviceVendorIdsOfDeveloper => {
+          this.serviceVendorsOfDeveloper = []
+          serviceVendorIdsOfDeveloper.forEach(serviceVendorId => {
+            if (this.serviceVendorId != undefined) {
+              if (this.serviceVendorId == serviceVendorId) {
+                this.selectedServiceVendor = this.serviceVendorById(serviceVendorId)
+                this.onServiceVendorSelected()
+              }
+            }
+            this.serviceVendorsOfDeveloper.push(this.serviceVendorById(serviceVendorId))
+          })
+        })
+      })
     },
     methods: {
       getServiceOfferingTableInterface (serviceOfferingTableInterface) {

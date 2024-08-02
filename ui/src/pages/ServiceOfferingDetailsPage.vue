@@ -99,7 +99,17 @@ export default {
       ServiceDetailsOverview,
       ServiceDetailsRequirements,
     },
-    props: ['serviceOfferingId', 'selectedService'],
+    props: {
+      serviceOfferingId: {
+        type: String,
+        default: null
+      },
+      selectedService: {
+        type: Object,
+        default: null
+      }
+    },
+        // ['serviceOfferingId', 'selectedService'],
     setup(){
       const servicesStore = useServicesStore();
 

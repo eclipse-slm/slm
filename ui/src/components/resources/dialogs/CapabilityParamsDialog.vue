@@ -57,7 +57,25 @@ export default {
    name: "CapabilityParamsDialog",
    components: {CapabilityParamsDialogInputField},
    mixins: [capabilityUtilsMixin],
-   props: ['showDialog', 'resourceId', 'capabilityId', 'skipInstall'],
+   props: {
+     showDialog: {
+       type: Boolean,
+       default: false
+     },
+     resourceId: {
+       type: String,
+       default: null
+     },
+     capabilityId: {
+       type: String,
+       default: null
+     },
+     skipInstall: {
+       type: Boolean,
+       default: false
+     },
+   },
+       // ['showDialog', 'resourceId', 'capabilityId', 'skipInstall'],
    setup(props){
      const active = toRef(props, 'showDialog')
      return{

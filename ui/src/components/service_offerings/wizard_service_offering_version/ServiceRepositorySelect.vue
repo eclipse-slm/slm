@@ -45,6 +45,7 @@ export default {
     props: {
       value: {
         type: Array,
+        default: () => []
       },
       serviceVendorId: {
         type: String,

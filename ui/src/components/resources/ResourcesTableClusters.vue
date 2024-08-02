@@ -34,7 +34,10 @@
               :disabled="item.isManaged"
               @click.stop="removeNodeFromCluster(item)"
             >
-              <v-icon color="white" icon="mdi-server-minus" />
+              <v-icon
+                color="white"
+                icon="mdi-server-minus"
+              />
             </v-btn>
             <v-btn
               class="ml-4"
@@ -49,36 +52,36 @@
         <template #expanded-row="{ columns, item}">
           <td :colspan="columns.length">
             <v-table
-                dense
-                class="my-5"
+              dense
+              class="my-5"
             >
               <template #default>
                 <thead>
-                <tr>
-                  <th>Node Name</th>
-                  <th>IP</th>
-                  <th>ID</th>
-                  <th>Member Type</th>
-                </tr>
+                  <tr>
+                    <th>Node Name</th>
+                    <th>IP</th>
+                    <th>ID</th>
+                    <th>Member Type</th>
+                  </tr>
                 </thead>
                 <tbody>
-                <tr
+                  <tr
                     v-for="node in item.nodes"
                     :key="node.node"
-                >
-                  <td>{{ node.Node }}</td>
-                  <td>{{ node.Address }}</td>
-                  <td>{{ node.ID }}</td>
-                  <td>
-                    <v-chip
+                  >
+                    <td>{{ node.Node }}</td>
+                    <td>{{ node.Address }}</td>
+                    <td>{{ node.ID }}</td>
+                    <td>
+                      <v-chip
                         class="mx-1"
                         size="small"
                         value="test"
-                    >
-                      {{ getClusterMemberTypeByNodeId(item.memberMapping[node.ID], item.clusterMemberTypes) }}
-                    </v-chip>
-                  </td>
-                </tr>
+                      >
+                        {{ getClusterMemberTypeByNodeId(item.memberMapping[node.ID], item.clusterMemberTypes) }}
+                      </v-chip>
+                    </td>
+                  </tr>
                 </tbody>
               </template>
             </v-table>

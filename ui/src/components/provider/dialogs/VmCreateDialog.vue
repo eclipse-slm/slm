@@ -61,7 +61,16 @@ import {toRef} from "vue";
 export default {
   name: 'VmCreateDialog',
   components: {VmCreateDialogForm},
-  props: ['show','virtualResourceProvider'],
+  props: {
+    show: {
+      type: Boolean,
+      default: false
+    },
+    virtualResourceProvider:{
+      type: Object,
+      default: null
+    }
+  },
   setup(props){
     const active = toRef(props, 'show')
     return{

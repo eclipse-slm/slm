@@ -112,7 +112,16 @@ import * as yup from 'yup';
 export default {
     name: 'DockerContainerVolumeMappings',
     components: {Field},
-    props: ['volumes', 'editable'],
+    props: {
+      volumes: {
+        type: Array,
+        default: () => []
+      },
+      editable: {
+        type: Boolean,
+        default: false
+      },
+    },
     setup(){
       const required_alpha_dash = yup.string().required().matches(new RegExp(".[a-zA-Z0-9_\/]"))
           .typeError("Only letters, numbers and slash are allowed (a-zA-Z0-9_\/)");

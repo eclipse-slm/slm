@@ -127,9 +127,6 @@ export default {
         validInput: false,
       }
     },
-    mounted() {
-      this.$emit('title-changed', 'Create new cluster')
-    },
     computed: {
       virtualResourceProviders() {
         return this.providerStore.virtualResourceProviders
@@ -158,6 +155,9 @@ export default {
 
         return options
       },
+    },
+    mounted() {
+      this.$emit('title-changed', 'Create new cluster')
     },
     methods: {
       onClusterTypeSelected () {

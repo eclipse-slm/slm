@@ -145,7 +145,16 @@
     name: 'ServiceOfferingWizardStep1Common',
     components: {ProgressCircular, Field, ValidationForm},
     // components: { ServiceOfferingCardGrid },
-    props: ['editMode', 'serviceVendorId'],
+    props: {
+      editMode: {
+        type: Boolean,
+        default: false
+      },
+      serviceVendorId: {
+        type: String,
+        default: null
+      }
+    },
     setup(){
       const required = yup.string().required();
       const servicesStore = useServicesStore();

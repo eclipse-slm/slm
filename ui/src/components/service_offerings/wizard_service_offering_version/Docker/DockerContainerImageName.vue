@@ -96,7 +96,12 @@ export default {
     comments: {
     },
     components: {Field},
-    props: ['newServiceOffering'],
+    props: {
+      newServiceOffering: {
+        type: Object,
+        default: null
+      }
+    },
     setup(){
       const required = yup.string().required()
       return {

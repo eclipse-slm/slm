@@ -132,7 +132,16 @@ import * as yup from 'yup';
 export default {
     name: 'DockerContainerPortMappings',
     components: {Field},
-    props: ['portMappings', 'editable'],
+    props: {
+      portMappings: {
+        type: Array,
+        default: () => []
+      },
+      editable: {
+        type: Boolean,
+        default: false
+      },
+    },
     setup(){
       const required = yup.number().required().min(1).max(65536).typeError("Number needs to be between 1 and 65536");
       return {

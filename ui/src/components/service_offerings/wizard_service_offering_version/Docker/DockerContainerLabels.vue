@@ -113,7 +113,16 @@ import * as yup from "yup";
 export default {
     name: 'DockerContainerLabels',
     components: {Field},
-    props: ['labels', 'editable'],
+    props:{
+      labels: {
+        type: Array,
+        default: () => []
+      },
+      editable: {
+        type: Boolean,
+        default: false
+      },
+    },
     setup(){
       const required = yup.number().required()
       const required_string = yup.string().required()

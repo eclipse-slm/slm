@@ -86,7 +86,12 @@ import getEnv from '@/utils/env'
 export default {
   name: 'ResourceSubmodels',
   components: { ConfirmDialog },
-  props: ['resourceId'],
+  props: {
+    resourceId: {
+      type: String,
+      default: ""
+    }
+  },
   data() {
     return {
       submodels: [],

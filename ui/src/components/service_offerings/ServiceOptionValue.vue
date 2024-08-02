@@ -154,7 +154,20 @@ export default {
       Field
     },
     mixins: [serviceOptionMixin],
-    props: ['serviceOption', 'disabled', 'definitionMode'],
+    props: {
+      serviceOption: {
+        type: Object,
+        default: null
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      },
+      definitionMode: {
+        type: Boolean,
+        default: false
+      }
+    },
     setup(){
       const servicesStore = useServicesStore();
       const resourceStore = useResourcesStore();

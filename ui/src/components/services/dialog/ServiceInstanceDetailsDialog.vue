@@ -281,7 +281,12 @@ export default {
     name: 'ServiceInstanceDetailsDialog',
     components: {NoItemAvailableNote, ProgressCircular, ResourcesInfoDialog },
     mixins: [ serviceInstanceMixin ],
-    props: ['serviceInstance'],
+    props: {
+      serviceInstance: {
+        type: Object,
+        default: null
+      }
+    },
     setup(){
       const servicesStore = useServicesStore();
       const resourceStore = useResourcesStore();

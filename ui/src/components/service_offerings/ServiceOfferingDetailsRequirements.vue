@@ -53,8 +53,8 @@ import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOffe
 export default {
     name: 'ServiceDetailsRequirements',
     props: {
-      serviceOffering: { type: Object },
-      serviceOfferingVersionId: { type: String }
+      serviceOffering: { type: Object, default: null },
+      serviceOfferingVersionId: { type: String, default: null }
     },
     data () {
       return {

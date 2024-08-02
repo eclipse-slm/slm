@@ -15,6 +15,11 @@
 <script>
 export default {
   name: 'OverviewHeading',
-  props: ['text']
+  props: {
+    text: {
+      type: String,
+      default: ""
+    }
+  }
 }
 </script>

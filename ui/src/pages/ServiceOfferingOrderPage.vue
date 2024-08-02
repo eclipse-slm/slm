@@ -201,7 +201,16 @@ export default {
       Field,
        ProgressCircular, ValidationForm
     },
-    props: ['serviceOfferingId', 'serviceOfferingVersionId'],
+    props: {
+      serviceOfferingId: {
+        type: String,
+        default: null
+      },
+      serviceOfferingVersionId: {
+        type: String,
+        default: null
+      },
+    },
     setup(){
       const required = yup.string().required();
       const servicesStore = useServicesStore();

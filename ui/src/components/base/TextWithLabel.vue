@@ -12,6 +12,15 @@
 <script>
   export default {
     name: 'TextWithLabel',
-    props: ['label', 'text'],
+    props: {
+      label: {
+        type: String,
+        default: ""
+      },
+      text: {
+        type: String,
+        default: "",
+      }
+    }
   }
 </script>

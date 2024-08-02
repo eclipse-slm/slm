@@ -110,9 +110,18 @@ export default {
     name: 'DockerContainerConfigEnvironment',
     components: {Field},
     props: {
-      environmentVariables: {},
-      editable: {},
-      addable: {},
+      environmentVariables: {
+        type: Array,
+        default: () => []
+      },
+      editable: {
+        type: Boolean,
+        default: false
+      },
+      addable: {
+        type: Boolean,
+        default: false
+      },
       subheader: {
         default: "Environment Variables",
         type: String

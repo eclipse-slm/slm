@@ -57,7 +57,12 @@ import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/Res
 export default {
     name: 'ResourcesCreateDialogPageStart',
     components: { },
-    props: ['show'],
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      }
+    },
   computed: {
     ResourcesCreateDialogPage() {
       return ResourcesCreateDialogPage

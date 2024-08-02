@@ -30,7 +30,12 @@
 <script>
 export default {
   name: "CapabilityParamsDialogInputField",
-  props: ['param'],
+  props: {
+    param: {
+      type: Object,
+      default: null
+    }
+  },
   data() {
     return {
       key: this.param.name,

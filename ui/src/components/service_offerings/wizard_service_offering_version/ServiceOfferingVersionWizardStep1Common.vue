@@ -94,7 +94,16 @@ import {useServicesStore} from "@/stores/servicesStore";
   export default {
     name: 'ServiceOfferingVersionWizardStep1Common',
     components: {Field, ValidationForm},
-    props: ['editMode', 'serviceOfferingVersion'],
+    props: {
+      editMode: {
+        type: Boolean,
+        default: false
+      },
+      serviceOfferingVersion: {
+        type: Object,
+        default: null
+      },
+    },
     setup(){
       const required = yup.string().required();
       const servicesStore = useServicesStore();

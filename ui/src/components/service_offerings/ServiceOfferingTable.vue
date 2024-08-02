@@ -192,7 +192,12 @@ import {storeToRefs} from "pinia";
 export default {
   name: "ServiceOfferingTable",
   // components: {ProgressCircular},
-  props: ['serviceOfferings'],
+  props: {
+    serviceOfferings: {
+      type: Array,
+      default: () => []
+    }
+  },
   setup(){
     const servicesStore = useServicesStore();
     const {serviceVendorById, serviceOfferingCategoryNameById} = storeToRefs(servicesStore);

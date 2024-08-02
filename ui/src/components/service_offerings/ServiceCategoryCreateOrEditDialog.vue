@@ -58,7 +58,20 @@ import {useServicesStore} from "@/stores/servicesStore";
 
 export default {
     name: 'ServiceCategoryCreateOrEditDialog',
-    props: ['show', 'editMode', 'serviceCategory'],
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      },
+      editMode: {
+        type: Boolean,
+        default: false
+      },
+      serviceCategory: {
+        type: Object,
+        default: null
+      }
+    },
     setup(props){
       const active = toRef(props, 'show')
       return{

@@ -165,7 +165,24 @@ export default {
       ServiceOfferingVersionWizardStep3ServiceOptions,
       ServiceOfferingVersionWizardStep4Requirements,
     },
-    props: ['editMode', 'serviceOfferingVersionId', 'serviceOfferingId', 'serviceVendorId'],
+    props: {
+      editMode: {
+        type: Boolean,
+        default: false
+      },
+      serviceOfferingId: {
+        type: String,
+        default: null
+      },
+      serviceOfferingVersionId: {
+        type: String,
+        default: null
+      },
+      serviceVendorId: {
+        type: String,
+        default: null
+      }
+    },
     setup(){
       const servicesStore = useServicesStore();
       const {serviceOfferingDeploymentTypePrettyName} = storeToRefs(servicesStore)
@@ -223,6 +240,25 @@ export default {
       }
     },
 
+    computed: {
+      apiStateServices () {
+        return this.servicesStore.apiStateServices
+      },
+      apiStateLoaded () {
+        console.log('asdf', this.apiStateServices.serviceOfferingDeploymentTypes)
+        return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADED
+      },
+      apiStateLoading () {
+        if (this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT) {
+          this.servicesStore.getServiceOfferingDeploymentTypes();
+        }
+        return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADING || this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT
+      },
+      apiStateError () {
+        return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.ERROR
+      },
+    },
+
     created () {
       if (this.editMode) {
         this.newServiceOfferingVersion = null
@@ -250,25 +286,6 @@ export default {
       else {
         this.newServiceOfferingVersion.serviceOfferingId = this.serviceOfferingId
       }
-    },
-
-    computed: {
-      apiStateServices () {
-        return this.servicesStore.apiStateServices
-      },
-      apiStateLoaded () {
-        console.log('asdf', this.apiStateServices.serviceOfferingDeploymentTypes)
-        return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADED
-      },
-      apiStateLoading () {
-        if (this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT) {
-          this.servicesStore.getServiceOfferingDeploymentTypes();
-        }
-        return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADING || this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT
-      },
-      apiStateError () {
-        return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.ERROR
-      },
     },
 
     methods: {

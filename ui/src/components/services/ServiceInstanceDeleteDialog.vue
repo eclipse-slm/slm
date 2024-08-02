@@ -44,7 +44,16 @@ import {toRef} from "vue";
 
 export default {
     name: 'ServiceInstanceDeleteDialog',
-    props: ['service', 'show'],
+    props: {
+      service: {
+        type: Object,
+        default: null
+      },
+      show: {
+        type: Boolean,
+        default: false
+      },
+    },
     setup(props){
       const active = toRef(props, 'show')
       return{

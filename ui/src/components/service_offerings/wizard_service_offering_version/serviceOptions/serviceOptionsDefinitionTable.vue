@@ -68,7 +68,6 @@
                     :disabled="serviceOption.required &&
                       serviceOption.valueType !== 'AAS_SM_TEMPLATE'"
                     :definition-mode="true"
-                    v-bind="attrs"
                   />
                 </div>
               </template>
@@ -98,10 +97,10 @@
                   color="primary"
                   :ripple="false"
                   :disabled="
-                serviceOption.valueType === 'SYSTEM_VARIABLE' ||
-                  serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
-                  serviceOption.valueType === 'AAS_SM_TEMPLATE'
-              "
+                    serviceOption.valueType === 'SYSTEM_VARIABLE' ||
+                      serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
+                      serviceOption.valueType === 'AAS_SM_TEMPLATE'
+                  "
                   @click="onServiceOptionRequiredChanged(serviceOption)"
                 />
               </template>
@@ -115,10 +114,10 @@
               color="primary"
               :ripple="false"
               :disabled="
-            serviceOption.valueType === 'SYSTEM_VARIABLE' ||
-              serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
-              serviceOption.valueType === 'AAS_SM_TEMPLATE'
-          "
+                serviceOption.valueType === 'SYSTEM_VARIABLE' ||
+                  serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
+                  serviceOption.valueType === 'AAS_SM_TEMPLATE'
+              "
               @click="onServiceOptionEditableChanged(serviceOption)"
             />
           </td>
@@ -141,7 +140,12 @@ export default {
     ServiceOptionValue,
     Field
   },
-  props: ["serviceOptionCategory"],
+  props: {
+    serviceOptionCategory: {
+      type: Object,
+      default: null
+    },
+  },
   setup(){
     const required = yup.string().required()
     return {

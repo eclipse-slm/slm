@@ -170,7 +170,12 @@ import {useResourcesStore} from "@/stores/resourcesStore";
 
 export default {
     name: 'ClusterScaleDialog',
-    props: ['action'],
+    props: {
+      action: {
+        type: String,
+        default: null
+      }
+    },
     setup(){
       const resourceStore = useResourcesStore();
       return {resourceStore};

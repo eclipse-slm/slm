@@ -40,10 +40,6 @@ export default {
       return {
       }
     },
-    created () {
-      this.servicesStore.getServices();
-      this.servicesStore.getServiceOfferings();
-    },
     computed: {
       apiStateServices() {
         return this.servicesStore.apiStateServices
@@ -60,6 +56,10 @@ export default {
       apiStateError () {
         return this.apiStateServices.services === ApiState.ERROR
       },
+    },
+    created () {
+      this.servicesStore.getServices();
+      this.servicesStore.getServiceOfferings();
     },
   }
 

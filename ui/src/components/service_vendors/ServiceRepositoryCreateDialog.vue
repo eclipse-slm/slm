@@ -120,7 +120,12 @@ import * as yup from 'yup';
 export default {
     name: 'ServiceRepositoryCreateDialog',
     components: {Field, ValidationForm},
-    props: ['show'],
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      },
+    },
     setup(props){
       const required = yup.string().required();
       const reg_required = yup.string().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)

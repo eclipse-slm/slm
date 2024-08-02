@@ -70,7 +70,20 @@ import ServiceOfferingVersionsRestApi from "@/api/service-management/serviceOffe
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys',
     components: {
     },
-    props: ['editMode', 'serviceOfferingVersion', 'serviceVendorId'],
+    props: {
+      editMode: {
+        type: Boolean,
+        default: false
+      },
+      serviceOfferingVersion: {
+        type: Object,
+        default: null
+      },
+      serviceVendorId: {
+        type: String,
+        default: null
+      },
+    },
 
     data () {
       return {

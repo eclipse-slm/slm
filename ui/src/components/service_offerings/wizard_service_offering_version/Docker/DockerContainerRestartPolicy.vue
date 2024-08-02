@@ -37,7 +37,12 @@ import * as yup from 'yup';
 export default {
     name: 'DockerContainerRestartPolicy',
     components: {Field},
-    props: ['newServiceOffering'],
+    props: {
+      newServiceOffering: {
+        type: Object,
+        default: null
+      }
+    },
     setup(){
       const required = yup.string().required()
       return {

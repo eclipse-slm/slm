@@ -106,7 +106,12 @@ export default {
       ResourcesCreateDialogPageCreateNewResource,
       ResourcesCreateDialogPageCreateNewResourceCluster
     },
-    props: ['show'],
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      }
+    },
     setup(props){
       const active = toRef(props, 'show')
       return{

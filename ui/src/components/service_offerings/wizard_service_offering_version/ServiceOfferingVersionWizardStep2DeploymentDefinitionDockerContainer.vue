@@ -119,7 +119,20 @@ export default {
       ServiceRepositorySelect,
       ValidationForm
     },
-    props: ['editMode', 'serviceOfferingVersion', 'serviceVendorId'],
+    props: {
+      editMode: {
+        type: Boolean,
+        default: false
+      },
+      serviceOfferingVersion: {
+        type: Object,
+        default: null
+      },
+      serviceVendorId: {
+        type: String,
+        default: null
+      },
+    },
 
     data () {
       return {

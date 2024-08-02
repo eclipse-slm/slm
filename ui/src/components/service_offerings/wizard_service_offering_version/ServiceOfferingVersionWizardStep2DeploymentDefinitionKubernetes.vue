@@ -113,8 +113,20 @@ const { parse } = require('dot-properties')
 export default {
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes',
     components: {ServiceRepositorySelect, DockerContainerEnvironmentVariables},
-    props: ['editMode', 'serviceOfferingVersion', 'serviceVendorId'],
-
+  props: {
+    editMode: {
+      type: Boolean,
+      default: false
+    },
+    serviceOfferingVersion: {
+      type: Object,
+      default: null
+    },
+    serviceVendorId: {
+      type: String,
+      default: null
+    },
+  },
     data () {
       return {
         stepNumber: 2,

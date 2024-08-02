@@ -36,7 +36,13 @@ import ResourcesInfoCardSingleHost from '@/components/resources/ResourcesInfoCar
 export default {
     name: 'ResourcesInfoDialog',
     components: { ResourcesInfoCardSingleHost },
-    props: ['resource'],
+    props: {
+      resource: {
+        type: Object,
+        default: null,
+      }
+    },
+  // ['resource'],
     computed: {
       showDialog () {
         console.log(this.resource)

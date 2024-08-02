@@ -173,8 +173,16 @@ import {Form as ValidationForm} from "vee-validate";
 export default {
   name: 'ServiceOfferingVersionWizardStep4Requirements',
   components: {ValidationForm},
-  props: ['editMode', 'serviceOfferingVersion'],
-
+  props: {
+    editMode: {
+      type: Boolean,
+      default: false
+    },
+    serviceOfferingVersion: {
+      type: Object,
+      default: null
+    },
+  },
   data() {
     return {
       stepNumber: 4,

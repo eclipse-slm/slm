@@ -109,13 +109,6 @@ export default {
         serviceVendorsLoaded: false,
       }
     },
-    created () {
-      const serviceStore = useServicesStore();
-      serviceStore.getServiceOfferingCategories();
-      serviceStore.getServiceOfferingDeploymentTypes();
-      serviceStore.getServiceOfferings();
-      serviceStore.getServiceVendors();
-    },
     computed: {
       apiStateServices() {
         return this.servicesStore.apiStateServices
@@ -159,6 +152,13 @@ export default {
           this.apiStateServices.serviceVendors === ApiState.ERROR
         return apiStateError
       },
+    },
+    created () {
+      const serviceStore = useServicesStore();
+      serviceStore.getServiceOfferingCategories();
+      serviceStore.getServiceOfferingDeploymentTypes();
+      serviceStore.getServiceOfferings();
+      serviceStore.getServiceVendors();
     },
     methods: {
       onServiceOfferingClicked (selectedService) {

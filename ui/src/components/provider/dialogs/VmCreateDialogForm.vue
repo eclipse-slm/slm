@@ -49,6 +49,11 @@
 <script>
 export default {
   name: 'VmCreateDialogForm',
-  props: ['parameter']
+  props: {
+    parameter:{
+      type: Array,
+      default: () => []
+    }
+  }
 }
 </script>

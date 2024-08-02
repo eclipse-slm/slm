@@ -46,7 +46,20 @@ import {toRef} from "vue";
 
 export default {
     name: 'ConfirmDialog',
-    props: ['show', 'title', 'text'],
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      },
+      title: {
+        type: String,
+        default: ""
+      },
+      text: {
+        type: String,
+        default: ""
+      }
+    },
     setup(props){
       const active = toRef(props, 'show')
       return{

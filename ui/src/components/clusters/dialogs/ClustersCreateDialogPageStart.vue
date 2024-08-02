@@ -57,7 +57,12 @@ import ClusterCreateDialogPage from "@/components/clusters/dialogs/ClustersCreat
 export default {
     name: 'ResourcesCreateDialogPageStart',
     components: { },
-    props: ['show'],
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      }
+    },
     enums: {
       ClusterCreateDialogPage,
     },

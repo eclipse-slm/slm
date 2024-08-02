@@ -59,7 +59,12 @@ export default {
     components: {
       // LineChart,
     },
-    props: ['resourceId'],
+    props: {
+      resourceId: {
+        type: String,
+        default: ""
+      }
+    },
     data () {
       return {
         headers: [

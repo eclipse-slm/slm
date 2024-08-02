@@ -98,7 +98,12 @@ import {storeToRefs} from "pinia";
 export default {
     name: 'ServiceVendorDevelopersTable',
     components: {OverviewHeading},
-    props: ['serviceVendor'],
+    props: {
+      serviceVendor: {
+        type: Object,
+        default: null
+      }
+    },
     setup(){
       const userStore = useUserStore();
       const servicesStore = useServicesStore();

@@ -72,7 +72,12 @@ export default {
       ClustersCreateDialogPageCreateNewCluster,
       ClustersCreateDialogPageAddExistingCluster
     },
-    props: ['show'],
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      }
+    },
     setup(props){
       const active = toRef(props, 'show')
       return{

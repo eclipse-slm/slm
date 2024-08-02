@@ -115,6 +115,8 @@ export const useServicesStore = defineStore('servicesStore', {
         },
 
         services: (state) => {
+            if(state?.services_ === undefined)
+                return []
             return state.services_
         },
 

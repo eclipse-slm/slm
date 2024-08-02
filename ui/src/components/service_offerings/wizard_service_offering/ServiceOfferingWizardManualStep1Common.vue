@@ -145,7 +145,16 @@ import {useServicesStore} from "@/stores/servicesStore";
 export default {
   name: "ServiceOfferingWizardManualStep1Common",
   components: { ServiceOfferingCardGrid, Field, ValidationForm },
-  props: ["editMode", "newServiceOffering"],
+  props: {
+    editMode: {
+      type: Boolean,
+      default: false
+    },
+    newServiceOffering: {
+      type: Object,
+      default: null
+    }
+  },
   setup(){
     const required = yup.string().required();
     const servicesStore = useServicesStore();

@@ -92,7 +92,20 @@ import {useServicesStore} from "@/stores/servicesStore";
 
 export default {
     name: 'ServiceVendorCreateOrEditDialog',
-    props: ['show', 'editMode', 'serviceVendor'],
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      },
+      editMode: {
+        type: Boolean,
+        default: false
+      },
+      serviceVendor: {
+        type: Object,
+        default: null
+      },
+    },
     setup(props){
       const active = toRef(props, 'show')
       return{

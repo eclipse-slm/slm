@@ -86,7 +86,25 @@ export default {
       ServiceOfferingWizardManualStep1Common,
       ServiceOfferingWizardGitStep1Common
     },
-    props: ['editMode', 'creationType', 'serviceOfferingId', 'serviceVendorId'],
+    props: {
+      editMode: {
+        type: Boolean,
+        default: false
+      },
+      creationType: {
+        type: String,
+        default: ""
+      },
+      serviceOfferingId: {
+        type: String,
+        default: null
+      },
+      serviceVendorId: {
+        type: String,
+        default: null
+      },
+    },
+        // ['editMode', 'creationType', 'serviceOfferingId', 'serviceVendorId'],
     setup(){
       const servicesStore = useServicesStore();
       const {serviceOfferingById} = storeToRefs(servicesStore);
@@ -108,15 +126,6 @@ export default {
           coverImage: 'none',
           serviceCategoryId: null,
         },
-      }
-    },
-
-    created () {
-      if (this.editMode) {
-        this.newServiceOffering = null
-        ServiceOfferingsRestApi.getServiceOfferingById(this.serviceOfferingId).then(serviceOffering => {
-          this.newServiceOffering = serviceOffering
-        })
       }
     },
 
@@ -146,6 +155,15 @@ export default {
         return this.apiStateServices.serviceOfferingCategories === ApiState.ERROR &&
           this.apiStateServices.serviceVendors === ApiState.ERROR
       },
+    },
+
+    created () {
+      if (this.editMode) {
+        this.newServiceOffering = null
+        ServiceOfferingsRestApi.getServiceOfferingById(this.serviceOfferingId).then(serviceOffering => {
+          this.newServiceOffering = serviceOffering
+        })
+      }
     },
 
     methods: {

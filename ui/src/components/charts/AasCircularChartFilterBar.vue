@@ -39,8 +39,11 @@
   export default {
     name: 'AasCircularChartFilterBar',
     props: {
-      filterValues: Array,
-      showFilterSelector: Boolean
+      filterValues: {
+        type: Array,
+        default: () => [],
+      },
+      showFilterSelector: Boolean,
     },
     data() {
       return {
