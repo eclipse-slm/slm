@@ -33,16 +33,22 @@
   &:not(.v-btn--icon):not(.v-btn--fab)
     padding: 0 30px !important
 
-.theme--light.v-list-item .v-list-item__action-text,
-.theme--light.v-list-item .v-list-item__subtitle
+.v-theme--light.v-list-item .v-list-item__action-text,
+.v-theme--light.v-list-item .v-list-item__subtitle
   color: #999
 
-.theme--light.v-text-field>.v-input__control>.v-input__slot:before
+.v-theme--light.v-text-field>.v-input__control>.v-input__slot:before
   border-color: #d2d2d2
 
 .v-label.v-label,
 .v-alert.v-alert
   font-size: $font-size-root
 
-.theme--light .v-content
+.v-theme--light .v-content
   background-color: #eee
+
+.v-table > .v-table__wrapper > table > tbody > tr > td, .v-table > .v-table__wrapper > table > thead > tr > td, .v-table > .v-table__wrapper > table > tfoot > tr > td
+  height: 32px !important
+
+.v-dialog > .v-overlay__content > .v-card > .v-card-text, .v-dialog > .v-overlay__content > form > .v-card > .v-card-text
+  padding: 0 24px 20px !important

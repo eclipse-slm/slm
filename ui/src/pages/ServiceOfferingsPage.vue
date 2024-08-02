@@ -20,7 +20,7 @@
               fluid
               class="ma-0 pa-0"
             >
-              <v-row class="secondary">
+              <v-row class="bg-secondary">
                 <v-col
                   class="text-h3 font-weight-light"
                 >
@@ -71,7 +71,7 @@
               <service-offering-card-grid
                 :service-offering="serviceOffering"
                 :show-only-latest-version="true"
-                @click="onServiceOfferingClicked"
+                @click="onServiceOfferingClicked(serviceOffering)"
               />
             </v-col>
           </v-row>
@@ -82,19 +82,25 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import ApiState from '@/api/apiState.js'
-  import ServiceOfferingCardGrid from '@/components/service_offerings/ServiceOfferingCardGrid'
-  import ServiceOfferingOverviewToolbar from '@/components/service_offerings/ServiceOfferingToolbar'
-  import ProgressCircular from "@/components/base/ProgressCircular";
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 
-  export default {
+import ApiState from '@/api/apiState.js'
+import ServiceOfferingCardGrid from '@/components/service_offerings/ServiceOfferingCardGrid'
+import ServiceOfferingOverviewToolbar from '@/components/service_offerings/ServiceOfferingToolbar'
+import ProgressCircular from "@/components/base/ProgressCircular";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {useServicesStore} from "@/stores/servicesStore";
+
+export default {
     components: {
       NoItemAvailableNote,
       ProgressCircular,
       ServiceOfferingOverviewToolbar,
       ServiceOfferingCardGrid,
+    },
+    setup(){
+      const servicesStore = useServicesStore();
+
+      return {servicesStore}
     },
     data () {
       return {
@@ -103,17 +109,14 @@
         serviceVendorsLoaded: false,
       }
     },
-    created () {
-      this.$store.dispatch('getServiceOfferingCategories')
-      this.$store.dispatch('getServiceOfferingDeploymentTypes')
-      this.$store.dispatch('getServiceOfferings')
-      this.$store.dispatch('getServiceVendors')
-    },
     computed: {
-      ...mapGetters([
-        'apiStateServices',
-        'serviceOfferings',
-      ]),
+      apiStateServices() {
+        return this.servicesStore.apiStateServices
+      },
+      serviceOfferings () {
+        return this.servicesStore.serviceOfferings
+      },
+
       apiStateLoaded () {
         const apiStateLoaded =
           this.apiStateServices.serviceOfferingCategories === ApiState.LOADED &&
@@ -124,16 +127,16 @@
       },
       apiStateLoading () {
         if (this.apiStateServices.serviceOfferingCategories === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferingCategories')
+          this.servicesStore.getServiceOfferingCategories();
         }
         if (this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferingDeploymentTypes')
+          this.servicesStore.getServiceOfferingDeploymentTypes();
         }
         if (this.apiStateServices.serviceOfferings === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferings')
+          this.servicesStore.getServiceOfferings();
         }
         if (this.apiStateServices.serviceVendors === ApiState.INIT) {
-          this.$store.dispatch('getServiceVendors')
+          this.servicesStore.getServiceVendors();
         }
         const apiStateLoading =
           this.apiStateServices.serviceOfferingCategories === ApiState.LOADING || this.apiStateServices.serviceOfferingCategories === ApiState.INIT ||
@@ -149,6 +152,13 @@
           this.apiStateServices.serviceVendors === ApiState.ERROR
         return apiStateError
       },
+    },
+    created () {
+      const serviceStore = useServicesStore();
+      serviceStore.getServiceOfferingCategories();
+      serviceStore.getServiceOfferingDeploymentTypes();
+      serviceStore.getServiceOfferings();
+      serviceStore.getServiceVendors();
     },
     methods: {
       onServiceOfferingClicked (selectedService) {

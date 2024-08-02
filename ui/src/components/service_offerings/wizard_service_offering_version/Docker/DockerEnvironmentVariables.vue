@@ -2,9 +2,9 @@
   <div>
     <v-row>
       <v-col cols="6">
-        <v-subheader>
+        <v-list-subheader>
           {{ subheader }}
-        </v-subheader>
+        </v-list-subheader>
       </v-col>
 
       <v-col cols="9">
@@ -15,8 +15,8 @@
           @click="addEnvironmentVariable"
         >
           <v-icon
-            dense
-            small
+            density="compact"
+            size="small"
             class="mr-2"
           >
             mdi-plus-circle
@@ -38,45 +38,47 @@
       }"
     >
       <template #item.key="{ item }">
-        <ValidationProvider
-          v-slot="{ errors, valid }"
+        <Field
+          v-slot="{ field, errors }"
+          v-model="item.key"
           name="Key"
-          rules="required|alpha_dash"
+          :rules="required_alpha_dash"
         >
           <v-text-field
             v-if="editable"
-            v-model="item.key"
+            v-bind="field"
             placeholder="Key of environment variable"
             :error-messages="errors"
-            :success="valid"
+            :model-value="item.key"
           />
           <div
             v-else
           >
             {{ item.key }} ({{ item.serviceName }})
           </div>
-        </ValidationProvider>
+        </Field>
       </template>
 
       <template #item.value="{ item }">
-        <ValidationProvider
-          v-slot="{ errors, valid }"
+        <Field
+          v-slot="{ field, errors }"
+          v-model="item.value"
           name="Value"
-          rules="required"
+          :rules="required"
         >
           <v-text-field
             v-if="editable"
-            v-model="item.value"
+            v-bind="field"
             placeholder="Value of environment variable"
             :error-messages="errors"
-            :success="valid"
+            :model-value="item.value"
           />
           <div
             v-else
           >
             {{ item.value }}
           </div>
-        </ValidationProvider>
+        </Field>
       </template>
 
       <template #item.isServiceOption="{ item }">
@@ -101,25 +103,45 @@
 </template>
 
 <script>
-  export default {
+import {Field} from "vee-validate";
+import * as yup from 'yup';
+
+export default {
     name: 'DockerContainerConfigEnvironment',
+    components: {Field},
     props: {
-      environmentVariables: {},
-      editable: {},
-      addable: {},
+      environmentVariables: {
+        type: Array,
+        default: () => []
+      },
+      editable: {
+        type: Boolean,
+        default: false
+      },
+      addable: {
+        type: Boolean,
+        default: false
+      },
       subheader: {
         default: "Environment Variables",
         type: String
         },
       },
+    setup(){
+      const required_alpha_dash = yup.string().required().matches(new RegExp(".[a-zA-Z0-9_\/]"))
+      const required = yup.string().required()
+      return {
+        required,required_alpha_dash
+      }
+    },
 
     data () {
       return {
         tableHeaders: [
-          { text: 'Key', value: 'key' },
-          { text: 'Value', value: 'value' },
-          { text: 'Service Option', value: 'isServiceOption' },
-          { text: 'Actions', value: 'actions' },
+          { title: 'Key', value: 'key' },
+          { title: 'Value', value: 'value' },
+          { title: 'Service Option', value: 'isServiceOption' },
+          { title: 'Actions', value: 'actions' },
         ],
       }
     },

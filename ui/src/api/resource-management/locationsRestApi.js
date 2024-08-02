@@ -1,5 +1,4 @@
 import axios from 'axios'
-import logRequestError from '@/api/restApiHelper'
 
 class LocationsApi {
   API_URL = '/resource-management/resources/locations'

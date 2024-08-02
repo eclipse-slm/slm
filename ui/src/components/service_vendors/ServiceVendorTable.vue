@@ -25,43 +25,30 @@
         :headers="ServiceVendorsTableHeaders"
         item-key="id"
         :items="serviceVendors"
+        @click:row="onRowClick"
       >
-        <template
-          #body="{ items }"
-        >
-          <tbody
-            v-for="serviceVendor in items"
-            :key="serviceVendor.id"
+        <template #item.actions="{ item }">
+          <v-btn
+            class="ma-1"
+            size="small"
+            color="info"
+            @click="onEditServiceVendorClicked(item)"
           >
-            <tr @click="$emit('serviceVendorClicked', serviceVendor)">
-              <td>{{ serviceVendor.name }}</td>
-              <td>{{ serviceVendor.description }}</td>
-              <td>{{ serviceVendor.id }}</td>
-              <td>
-                <v-btn
-                  class="ma-1"
-                  small
-                  color="info"
-                  @click="onEditServiceVendorClicked(serviceVendor)"
-                >
-                  <v-icon>
-                    mdi-pencil
-                  </v-icon>
-                </v-btn>
+            <v-icon>
+              mdi-pencil
+            </v-icon>
+          </v-btn>
 
-                <v-btn
-                  class="ma-1"
-                  small
-                  color="error"
-                  @click="onDeleteServiceVendorClicked(serviceVendor)"
-                >
-                  <v-icon>
-                    mdi-delete
-                  </v-icon>
-                </v-btn>
-              </td>
-            </tr>
-          </tbody>
+          <v-btn
+            class="ma-1"
+            size="small"
+            color="error"
+            @click="onDeleteServiceVendorClicked(item)"
+          >
+            <v-icon>
+              mdi-delete
+            </v-icon>
+          </v-btn>
         </template>
       </v-data-table>
       <v-divider />
@@ -84,16 +71,21 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import ServiceVendorCreateOrEditDialog from '@/components/service_vendors/ServiceVendorCreateOrEditDialog'
-  import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
-  import Vue from 'vue'
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 
-  export default {
+import ServiceVendorCreateOrEditDialog from '@/components/service_vendors/ServiceVendorCreateOrEditDialog'
+import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {app} from "@/main";
+import {useServicesStore} from "@/stores/servicesStore";
+
+export default {
     name: 'ServiceVendorTable',
     components: {NoItemAvailableNote, OverviewHeading, ServiceVendorCreateOrEditDialog },
+    setup(){
+      const servicesStore = useServicesStore();
+      return {servicesStore};
+    },
     data () {
       return {
         selectedServiceVendor: null,
@@ -102,20 +94,20 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'serviceVendors',
-      ]),
+      serviceVendors () {
+        return this.servicesStore.serviceVendors
+      },
       ServiceVendorsTableHeaders () {
         return [
-          { text: 'Name', value: 'serviceVendorName', sortable: true },
-          { text: 'Description', value: 'serviceVendorDescription', sortable: false },
-          { text: 'Id', value: 'serviceVendorId', sortable: true },
-          { text: 'Actions', value: 'serviceVendorActions', sortable: false },
+          { title: 'Name', key: 'name', sortable: true },
+          { title: 'Description', key: 'description',  sortable: false },
+          { title: 'Id', key: 'id', sortable: true },
+          { title: 'Actions', key: 'actions', sortable: false },
         ]
       },
     },
     created () {
-      this.$store.dispatch('getServiceVendors')
+      this.servicesStore.getServiceVendors();
     },
     methods: {
       onEditServiceVendorClicked (serviceVendor) {
@@ -128,11 +120,11 @@
         this.editServiceVendor = false
         ServiceVendorsRestApi.deleteServiceVendorById(serviceVendor.id).then(
           response => {
-            Vue.$toast.info('Service vendor successfully deleted')
-            this.$store.dispatch('getServiceVendors')
+            app.config.globalProperties.$toast.info('Service vendor successfully deleted')
+            this.servicesStore.getServiceVendors();
           })
           .catch(exception => {
-            Vue.$toast.error('Failed to create service offering')
+            app.config.globalProperties.$toast.error('Failed to create service offering')
             console.log('Service vendor deletion failed: ' + exception.response.data.message)
             console.log(exception)
           })
@@ -154,8 +146,11 @@
         this.showCreateOrEditServiceVendorDialog = false
         this.selectedServiceVendor = null
         this.editServiceVendor = false
-        this.$store.dispatch('getServiceVendors')
+        this.servicesStore.getServiceVendors();
       },
+      onRowClick(click, row){
+        this.$emit('serviceVendorClicked', row.item)
+      }
     },
   }
 </script>

@@ -4,7 +4,7 @@
     v-bind="$attrs"
     v-on="$listeners"
   >
-    <template v-slot:heading>
+    <template #heading>
       <chartist
         :data="data"
         :event-handlers="eventHandlers"

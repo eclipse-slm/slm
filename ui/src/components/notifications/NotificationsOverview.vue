@@ -8,7 +8,7 @@
         >
           <v-row>
             <v-col
-              class="secondary text-h3 font-weight-light"
+              class="bg-secondary text-h3 font-weight-light"
             >
               Notifications
             </v-col>
@@ -26,40 +26,27 @@
             </span>
             <v-btn
               class="mr-2"
-              outlined
-              icon
-              :text="filterRead !== true"
+              variant="outlined"
               @click="filter(true)"
             >
-              <v-icon>
-                mdi-email-open
-              </v-icon>
+              <v-icon icon="mdi-email-open" />
             </v-btn>
-
             <v-btn
-              outlined
-              icon
-              :text="filterRead !== false"
+              variant="outlined"
+
               @click="filter(false)"
             >
-              <v-icon>
-                mdi-email
-              </v-icon>
+              <v-icon icon="mdi-email" />
             </v-btn>
           </v-col>
           <v-col class="text-right">
             <v-btn
               v-if="notifications_unread.length > 0"
-              text
-              outlined
-              @click="markAsRead"
+              variant="outlined"
+              prepend-icon="mdi-email-open-outline"
+              @click="notificationStore.markAsRead()"
             >
               Mark all
-              <v-icon
-                right
-              >
-                mdi-email-open-outline
-              </v-icon>
             </v-btn>
           </v-col>
         </v-row>
@@ -70,7 +57,6 @@
       <v-data-table
         id="notificationsTable"
         :sort-by.sync="sortBy"
-        :sort-desc.sync="sortDesc"
         :footer-props="{
           'items-per-page-options': [5, 10, 20, -1],
         }"
@@ -102,23 +88,29 @@
 </template>
 
 <script>
-  import { mapActions, mapGetters } from 'vuex'
+import {useNotificationStore} from "@/stores/notificationStore";
 
-  export default {
+export default {
     name: 'NotificationsOverview',
     components: {},
+    setup(){
+      const notificationStore = useNotificationStore();
+      return {notificationStore}
+    },
     data: function () {
       return {
-        sortBy: 'id',
+        sortBy: ['id'],
         sortDesc: true,
         filterRead: null,
       }
     },
     computed: {
-      ...mapGetters([
-        'notifications',
-        'notifications_unread',
-      ]),
+      notifications () {
+        return this.notificationStore.notifications
+      },
+      notifications_unread () {
+        return this.notificationStore.notifications_unread
+      },
       DataTableHeaders () {
         return [
           {
@@ -128,15 +120,14 @@
               return value === this.filterRead
             },
           },
-          { text: 'ID', value: 'id', sortable: true },
-          { text: 'Category', value: 'category', sortable: true },
-          { text: 'Date', value: 'date', sortable: true },
-          { text: 'Text', value: 'text', sortable: false },
+          { title: 'ID', value: 'id', sortable: true },
+          { title: 'Category', value: 'category', sortable: true },
+          { title: 'Date', value: 'date', sortable: true },
+          { title: 'Text', value: 'text', sortable: false },
         ]
       },
     },
     methods: {
-      ...mapActions(['markAsRead']),
       getFormatedDate (time) {
         const options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }
         const location = 'de-DE'

@@ -1,38 +1,54 @@
 <template>
   <v-row>
     <v-col cols="3">
-      <v-subheader>
+      <v-list-subheader>
         Restart Policy
-      </v-subheader>
+      </v-list-subheader>
     </v-col>
 
     <v-col cols="9">
-      <ValidationProvider
-        v-slot="{ errors, valid }"
-        name="Image Tag"
-        rules="required"
+      <Field
+        v-slot="{ field, errors }"
+        v-model="newServiceOffering.deploymentDefinition.restartPolicy"
+        name="Restart Policy"
+        :rules="required"
       >
         <v-select
-          v-model="newServiceOffering.deploymentDefinition.restartPolicy"
+          v-bind="field"
           class="full-width"
           hide-details
-          dense
+          density="compact"
           flat
           :items="restartPoliciesList"
-          item-text="prettyName"
+          item-title="prettyName"
           item-value="value"
           :error-messages="errors"
-          :success="valid"
+          :model-value="newServiceOffering.deploymentDefinition.restartPolicy"
         />
-      </ValidationProvider>
+      </Field>
     </v-col>
   </v-row>
 </template>
 
 <script>
-  export default {
+import {Field} from "vee-validate";
+import * as yup from 'yup';
+
+export default {
     name: 'DockerContainerRestartPolicy',
-    props: ['newServiceOffering'],
+    components: {Field},
+    props: {
+      newServiceOffering: {
+        type: Object,
+        default: null
+      }
+    },
+    setup(){
+      const required = yup.string().required()
+      return {
+        required
+      }
+    },
     data () {
       return {
         restartPoliciesList: [

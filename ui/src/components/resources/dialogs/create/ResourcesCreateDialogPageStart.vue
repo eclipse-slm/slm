@@ -6,14 +6,14 @@
           <v-btn
             id="resource-create-button-add-existing"
             color="secondary"
-            x-large
+            size="x-large"
             tile
             @click="$emit('page-changed', ResourcesCreateDialogPage.ADD_EXISTING_RESOURCE)"
           >
             <v-icon
               class="mr-5"
-              x-large
-              left
+              size="x-large"
+              start
             >
               mdi-plus
             </v-icon>
@@ -24,14 +24,14 @@
           <v-btn
             id="resource-create-button-create-new"
             color="secondary"
-            x-large
+            size="x-large"
             tile
             @click="$emit('page-changed', ResourcesCreateDialogPage.CREATE_RESOURCE)"
           >
             <v-icon
               class="mr-5"
-              large
-              left
+              size="large"
+              start
             >
               mdi-pencil-outline
             </v-icon>
@@ -42,7 +42,7 @@
     </v-container>
     <v-card-actions class="justify-end">
       <v-btn
-        text
+        variant="text"
         @click="$emit('canceled')"
       >
         Cancel
@@ -57,7 +57,17 @@ import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/Res
 export default {
     name: 'ResourcesCreateDialogPageStart',
     components: { },
-    props: ['show'],
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      }
+    },
+  computed: {
+    ResourcesCreateDialogPage() {
+      return ResourcesCreateDialogPage
+    }
+  },
     enums: {
       ResourcesCreateDialogPage,
     },

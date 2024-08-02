@@ -2,6 +2,9 @@ var serviceInstanceMixin = {
     methods: {
         getServiceOfferingText (serviceInstance) {
             let serviceOffering = this.serviceOfferingById(serviceInstance.serviceOfferingId)
+            if(serviceOffering === undefined){
+                return "";
+            }
             let serviceOfferingVersionText = serviceOffering.versions.find(version => version.id === serviceInstance.serviceOfferingVersionId)?.version
 
             return `${serviceOffering.name} (Version: ${serviceOfferingVersionText})`

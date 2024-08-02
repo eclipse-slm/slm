@@ -40,7 +40,7 @@
     </v-data-table>
     <div v-else>
       <v-alert
-        outlined
+        variant="outlined"
         type="info"
       >
         No hardware information available
@@ -51,21 +51,26 @@
   </div>
 </template>
 <script>
-  // import { LineChart } from 'vue-chart-3'
-  import MetricsRestApi from '@/api/resource-management/metricsRestApi'
+// import { LineChart } from 'vue-chart-3'
+import MetricsRestApi from '@/api/resource-management/metricsRestApi'
 
-  export default {
+export default {
     name: 'ResourceMetrics',
     components: {
       // LineChart,
     },
-    props: ['resourceId'],
+    props: {
+      resourceId: {
+        type: String,
+        default: ""
+      }
+    },
     data () {
       return {
         headers: [
-          { text: 'Category', value: 'category' },
-          { text: 'Metric', value: 'metric' },
-          { text: 'Value', value: 'value' },
+          { title: 'Category', value: 'category' },
+          { title: 'Metric', value: 'metric' },
+          { title: 'Value', value: 'value' },
         ],
         data: [30, 40, 60, 70, 5],
         cpuUsage: 0,

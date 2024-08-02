@@ -1,6 +1,6 @@
 <template>
   <v-icon
-    small
+    size="small"
     :class="connectionState"
   >
     {{ icon }}

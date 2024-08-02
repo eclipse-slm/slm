@@ -4,11 +4,11 @@
     width="600"
     @click:outside="closeDialog"
   >
-    <template>
-      <v-card v-if="page=='scale-virtual'">
+    <template #default="{}">
+      <v-card v-if="page==='scale-virtual'">
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           Scale Resource  <strong>{{ selectedClusterForScale.name }}</strong>
         </v-toolbar>
@@ -17,24 +17,24 @@
         </v-card-text>
         <v-card-actions>
           <v-btn
-            text
+            variant="text"
             @click="page=''"
           >
             Back
           </v-btn>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             @click="closeDialog"
           >
             Submit
           </v-btn>
         </v-card-actions>
       </v-card>
-      <v-card v-else-if="page=='scale-bare-metal'">
+      <v-card v-else-if="page==='scale-bare-metal'">
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           Select Bare Metal Resource
         </v-toolbar>
@@ -46,20 +46,20 @@
             v-model="selectedBareMetalResource"
             label="Select Resource"
             :items="nonClusterResources"
-            item-text="hostname"
+            item-title="hostname"
             item-value="id"
           />
         </v-container>
         <v-card-actions>
           <v-btn
-            text
+            variant="text"
             @click="page=''"
           >
             Back
           </v-btn>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             @click="scaleCluster"
           >
             Submit
@@ -68,12 +68,12 @@
       </v-card>
       <v-card v-else>
         <v-container
-          v-if="action=='up'"
+          v-if="action==='up'"
           class="ma-0 pa-0"
         >
           <v-toolbar
             color="primary"
-            dark
+            theme="dark"
           >
             Add Bare Metal Machine / Create Virtual Machine
           </v-toolbar>
@@ -82,14 +82,14 @@
               <v-col class="text-center">
                 <v-btn
                   color="secondary"
-                  x-large
+                  size="x-large"
                   tile
                   @click="page='scale-bare-metal'"
                 >
                   <v-icon
                     class="mr-5 ml-2"
-                    x-large
-                    left
+                    size="x-large"
+                    start
                   >
                     mdi-plus
                   </v-icon>
@@ -99,14 +99,14 @@
               <v-col class="text-center">
                 <v-btn
                   color="secondary"
-                  x-large
+                  size="x-large"
                   tile
                   @click="page='scale-virtual'"
                 >
                   <v-icon
                     class="mr-5 ml-2"
-                    large
-                    left
+                    size="large"
+                    start
                   >
                     mdi-pencil-outline
                   </v-icon>
@@ -117,12 +117,12 @@
           </v-container>
         </v-container>
         <v-container
-          v-else-if="action=='down'"
+          v-else-if="action==='down'"
           class="ma-0 pa-0"
         >
           <v-toolbar
             color="primary"
-            dark
+            theme="dark"
           >
             Select resource to be removed from cluster
           </v-toolbar>
@@ -131,27 +131,27 @@
             <v-select
               v-model="selectedClusterMemberTypeName"
               :items="availableClusterMemberTypes"
-              item-text="prettyName"
+              item-title="prettyName"
               label="Cluster Member Type"
             />
             <v-select
               v-model="selectedBareMetalResource"
               :items="downScalableClusterMembers"
-              item-text="Node"
+              item-title="Node"
               item-value="ID"
               label="Node to be removed from Cluster"
             />
           </v-container>
           <v-card-actions>
             <v-btn
-              text
+              variant="text"
               @click="closeDialog"
             >
               Close
             </v-btn>
             <v-spacer />
             <v-btn
-              text
+              variant="text"
               @click="scaleCluster"
             >
               Submit
@@ -164,12 +164,22 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
 
-  export default {
+import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
+import {useResourcesStore} from "@/stores/resourcesStore";
+
+export default {
     name: 'ClusterScaleDialog',
-    props: ['action'],
+    props: {
+      action: {
+        type: String,
+        default: null
+      }
+    },
+    setup(){
+      const resourceStore = useResourcesStore();
+      return {resourceStore};
+    },
     data () {
       return {
         page: '',
@@ -178,14 +188,21 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'nonClusterResources',
-        'selectedClusterForScale',
-        'selectedProject',
-        'availableClusterTypes',
-      ]),
+      nonClusterResources() {
+        return this.resourceStore.nonClusterResources
+      },
+      selectedClusterForScale () {
+        return this.resourceStore.selectedClusterForScale
+      },
+      selectedProject () {
+        return this.resourceStore.selectedProject
+      },
+      availableClusterTypes() {
+        return this.resourceStore.availableClusterTypes
+      },
+
       showDialog () {
-        return this.$store.getters.selectedClusterForScale !== null
+        return this.resourceStore.selectedClusterForScale_ !== null;
       },
       downScalableClusterMembers () {
 
@@ -247,7 +264,7 @@
         this.page = ''
         this.selectedClusterMemberTypeName = ''
         this.selectedBareMetalResource = ''
-        this.$store.commit('SET_SELECTED_ClUSTER_FOR_SCALE', null)
+        this.resourceStore.selectedClusterForScale_ = null;
       },
     },
   }

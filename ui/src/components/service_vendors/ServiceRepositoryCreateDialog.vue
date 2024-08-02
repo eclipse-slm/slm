@@ -1,82 +1,86 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="active"
     width="400"
     @click:outside="$emit('canceled')"
   >
-    <template>
-      <validation-observer
+    <template #default="{}">
+      <ValidationForm
         ref="observer"
-        v-slot="{ invalid, handleSubmit, validate }"
+        v-slot="{ meta, handleSubmit, validate }"
       >
         <v-card>
           <v-toolbar
             color="primary"
-            dark
+            theme="dark"
           >
             Create new service repository
           </v-toolbar>
           <v-card-text>
             {{ repository.id }}
             <v-container class="pa-8">
-              <validation-provider
-                v-slot="{ errors, valid }"
-                name="Address"
-                :rules="repository.id != null ? { regex: /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i } : {}"
+              <Field
+                v-slot="{ field, errors }"
+                v-model="repository.id"
+                name="Id"
+                :rules="repository.id != null ? reg_required : {}"
               >
                 <v-text-field
-                  v-model="repository.id"
+                  v-bind="field"
                   label="Id"
                   placeholder="Generated"
                   prepend-icon="mdi-fingerprint"
                   :error-messages="errors"
-                  :success="valid"
+                  :model-value="repository.id"
                 />
-              </validation-provider>
-              <validation-provider
-                v-slot="{ errors, valid }"
+              </Field>
+              <Field
+                v-slot="{ field, errors }"
+                v-model="repository.address"
                 name="Address"
-                rules="required"
+                :rules="required"
               >
                 <v-text-field
-                  v-model="repository.address"
+                  v-bind="field"
                   label="Address"
                   prepend-icon="mdi-earth"
                   :error-messages="errors"
-                  :success="valid"
+                  :model-value="repository.address"
                 />
-              </validation-provider>
-              <validation-provider
-                v-slot="{ errors, valid }"
+              </Field>
+              <Field
+                v-slot="{ field, errors }"
+                v-model="repository.username"
                 name="Username"
-                rules="required"
+                :rules="required"
               >
                 <v-text-field
-                  v-model="repository.username"
+                  v-bind="field"
                   label="Username"
                   required
                   prepend-icon="mdi-account"
                   :error-messages="errors"
-                  :success="valid"
+                  :model-value="repository.username"
                 />
-              </validation-provider>
-              <validation-provider
-                v-slot="{ errors, valid }"
+              </Field>
+              <Field
+                v-slot="{ field, errors }"
+                v-model="repository.password"
                 name="Password"
-                rules="required"
+                :rules="required"
               >
                 <v-text-field
-                  v-model="repository.password"
+                  v-bind="field"
                   :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                   :type="showPassword ? 'text' : 'password'"
                   label="Password"
                   pass
                   prepend-icon="mdi-lock"
                   :error-messages="errors"
-                  :success="valid"
+                  :model-value="repository.password"
                   @click:append="showPassword = !showPassword"
                 />
-              </validation-provider>
+              </Field>
               <v-select
                 v-model="repository.type"
                 :items="repositoryTypes"
@@ -87,6 +91,7 @@
           </v-card-text>
           <v-card-actions class="justify-center">
             <v-btn
+              variant="elevated"
               color="error"
               @click.native="$emit('canceled')"
             >
@@ -94,22 +99,43 @@
             </v-btn>
             <v-spacer />
             <v-btn
-              :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-              @click="invalid ? validate() : handleSubmit(onConfirmedClicked)"
+              variant="elevated"
+              :color="!meta.valid ? $vuetify.theme.themes.light.colors.disable : $vuetify.theme.themes.light.colors.secondary"
+              @click="!meta.valid ? validate() : handleSubmit(onConfirmedClicked)"
             >
               Create
             </v-btn>
           </v-card-actions>
         </v-card>
-      </validation-observer>
+      </ValidationForm>
     </template>
   </v-dialog>
 </template>
 
 <script>
-  export default {
+import {toRef} from "vue";
+import {Field, Form as ValidationForm} from "vee-validate";
+import * as yup from 'yup';
+
+export default {
     name: 'ServiceRepositoryCreateDialog',
-    props: ['show'],
+    components: {Field, ValidationForm},
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      },
+    },
+    setup(props){
+      const required = yup.string().required();
+      const reg_required = yup.string().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)
+      const active = toRef(props, 'show')
+      return {
+        required,
+        active,
+        reg_required
+      }
+    },
     data () {
       return {
         showPassword: false,

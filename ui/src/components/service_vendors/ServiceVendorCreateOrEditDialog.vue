@@ -1,14 +1,17 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="active"
     width="400"
     @click:outside="$emit('canceled')"
   >
-    <template v-if="serviceVendorUpdate != null">
+    <template
+      v-if="serviceVendorUpdate != null"
+      #default="{}"
+    >
       <v-card>
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           Create new service vendor
         </v-toolbar>
@@ -32,9 +35,9 @@
               prepend-icon="mdi-file-image"
               label="Logo"
               auto-grow
-              dense
-              outlined
-              @change="loadServiceVendorLogo"
+              density="compact"
+              variant="outlined"
+              @update:modelValue="loadServiceVendorLogo"
             />
 
             <v-row>
@@ -54,6 +57,7 @@
         </v-card-text>
         <v-card-actions class="justify-center">
           <v-btn
+            variant="elevated"
             color="error"
             @click.native="$emit('canceled')"
           >
@@ -61,6 +65,7 @@
           </v-btn>
           <v-spacer />
           <v-btn
+            variant="elevated"
             color="info"
             @click="onConfirmedClicked"
           >
@@ -79,13 +84,34 @@
 
 <script>
 
-  import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
-  import Vue from 'vue'
-  import getImageUrl from '@/utils/imageUtil'
+import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
+import {toRef} from 'vue'
+import getImageUrl from '@/utils/imageUtil'
+import {app} from "@/main";
+import {useServicesStore} from "@/stores/servicesStore";
 
-  export default {
+export default {
     name: 'ServiceVendorCreateOrEditDialog',
-    props: ['show', 'editMode', 'serviceVendor'],
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      },
+      editMode: {
+        type: Boolean,
+        default: false
+      },
+      serviceVendor: {
+        type: Object,
+        default: null
+      },
+    },
+    setup(props){
+      const active = toRef(props, 'show')
+      return{
+        active
+      }
+    },
     data () {
       return {
         uploadedServiceVendorLogo: null,
@@ -127,18 +153,20 @@
 
         apiCall.then(() => {
           if (this.editMode) {
-            Vue.$toast.info('Service vendor successfully updated')
+            app.config.globalProperties.$toast.info('Service vendor successfully updated')
           } else {
-            Vue.$toast.info('Service vendor successfully created')
+            app.config.globalProperties.$toast.info('Service vendor successfully created')
           }
-          this.$store.dispatch('getServiceVendors')
+
+          const serviceStore = useServicesStore();
+          serviceStore.getServiceVendors();
           this.$emit('confirmed', this.serviceVendorUpdate)
         }).catch(exception => {
-          Vue.$toast.error('Failed to create service vendor')
+          app.config.globalProperties.$toast.error('Failed to create service vendor')
           console.log('Service vendor creation failed: ' + exception.response.data.message)
           console.log(exception)
         })
       },
-    },
+    }
   }
 </script>

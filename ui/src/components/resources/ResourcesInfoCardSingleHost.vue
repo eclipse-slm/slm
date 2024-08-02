@@ -2,22 +2,19 @@
   <v-card-text
     v-if="resource"
   >
-    <v-list>
+    <v-list :opened="['Common']">
       <v-list-group
-        :value="true"
+        value="Common"
       >
-        <template #activator>
-          <v-list-item-icon>
-            <v-icon>mdi-information</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>
-              Common
-            </v-list-item-title>
-          </v-list-item-content>
+        <template #activator="{ props }">
+          <v-list-item
+            v-bind="props"
+            prepend-icon="mdi-information"
+            title="Common"
+          />
         </template>
 
-        <v-simple-table v-slot>
+        <v-table>
           <tbody>
             <tr>
               <th>{{ 'Hostname' }}</th>
@@ -48,7 +45,7 @@
               <td>
                 <v-text-field
                   :type="showPassword ? 'text' : 'password'"
-                  :value="resource.remoteAccessService.credential.password"
+                  :model-value="resource.remoteAccessService.credential.password"
                   disabled
                   hide-details="auto"
                 />
@@ -58,12 +55,7 @@
                   color="info"
                   @click="togglePasswordShow"
                 >
-                  <v-icon v-if="showPassword">
-                    mdi-glasses
-                  </v-icon>
-                  <v-icon v-else>
-                    mdi-sunglasses
-                  </v-icon>
+                  <v-icon icon="showPassword ? 'mdi-glasses' : 'mdi-sunglasses'" />
                 </v-btn>
               </td>
               <td class="btn-col">
@@ -71,9 +63,7 @@
                   color="info"
                   @click="copyOtp"
                 >
-                  <v-icon>
-                    mdi-content-copy
-                  </v-icon>
+                  <v-icon icon="mdi-content-copy" />
                 </v-btn>
               </td>
               <td
@@ -84,44 +74,38 @@
                   color="info"
                   @click="updateOtp"
                 >
-                  <v-icon>mdi-reload</v-icon>
+                  <v-icon icon="mdi-reload" />
                 </v-btn>
               </td>
             </tr>
           </tbody>
-        </v-simple-table>
+        </v-table>
       </v-list-group>
       <input
         id="otp"
         type="hidden"
         :value="resource.password"
       >
-      <v-list-group>
-        <template #activator>
-          <v-list-item-icon>
-            <v-icon>mdi-expansion-card</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>
-              Hardware
-            </v-list-item-title>
-          </v-list-item-content>
+      <v-list-group value="Hardware">
+        <template #activator="{props}">
+          <v-list-item
+            v-bind="props"
+            prepend-icon="mdi-expansion-card"
+            title="Hardware"
+          />
         </template>
         <resource-metrics
           ref="resourceMetrics"
           :resource-id="resource.id"
         />
       </v-list-group>
-      <v-list-group>
-        <template #activator>
-          <v-list-item-icon>
-            <v-icon>mdi-adjust</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>
-              Submodels
-            </v-list-item-title>
-          </v-list-item-content>
+      <v-list-group value="Submodels">
+        <template #activator="{props}">
+          <v-list-item
+            v-bind="props"
+            prepend-icon="mdi-adjust"
+            title="Submodels"
+          />
         </template>
         <resource-submodels
           ref="resourceSubmodels"
@@ -133,10 +117,11 @@
 </template>
 
 <script>
-  import ResourceMetrics from '@/components/resources/ResourceMetrics'
-  import ResourceSubmodels from '@/components/resources/ResourceSubmodels'
+import ResourceMetrics from '@/components/resources/ResourceMetrics'
+import ResourceSubmodels from '@/components/resources/ResourceSubmodels'
+import {useResourcesStore} from "@/stores/resourcesStore";
 
-  export default {
+export default {
     name: 'ResourcesInfoCardSingleHost',
     components: { ResourceMetrics, ResourceSubmodels },
     props: {
@@ -144,6 +129,9 @@
         type: Object,
         default: null,
       },
+    },
+    setup(props){
+      console.log(props.resource);
     },
     data () {
       return {
@@ -161,7 +149,8 @@
         this.showPassword = !this.showPassword
       },
       updateOtp () {
-        this.$store.dispatch('updateOtp')
+        const resourceStore = useResourcesStore();
+        resourceStore.updateOtp();
       },
       copyOtp () {
         const otpInput = document.querySelector('#otp')

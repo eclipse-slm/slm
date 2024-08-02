@@ -1,14 +1,14 @@
 <template>
   <v-dialog
-    v-model="showDialog"
+    v-model="active"
     width="600"
     @click:outside="$emit('canceled')"
   >
-    <template>
+    <template #default="{}">
       <v-card>
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           {{ title }}
         </v-toolbar>
@@ -27,6 +27,7 @@
         </v-card-text>
         <v-card-actions class="justify-center">
           <v-btn
+            variant="elevated"
             color="error"
             class="mx-0"
             @click.native="$emit('canceled')"
@@ -35,6 +36,7 @@
           </v-btn>
           <v-spacer />
           <v-btn
+            variant="elevated"
             color="info"
             class="mx-0"
             @click="$emit('install', paramMap)"
@@ -47,13 +49,39 @@
   </v-dialog>
 </template>
 <script>
-  import { capabilityUtilsMixin } from '@/utils/capabilityUtils'
-  import CapabilityParamsDialogInputField from "@/components/resources/dialogs/CapabilityParamsDialogInputField.vue";
- export default {
+import {capabilityUtilsMixin} from '@/utils/capabilityUtils'
+import CapabilityParamsDialogInputField from "@/components/resources/dialogs/CapabilityParamsDialogInputField.vue";
+import {toRef} from "vue";
+
+export default {
    name: "CapabilityParamsDialog",
    components: {CapabilityParamsDialogInputField},
    mixins: [capabilityUtilsMixin],
-   props: ['showDialog', 'resourceId', 'capabilityId', 'skipInstall'],
+   props: {
+     showDialog: {
+       type: Boolean,
+       default: false
+     },
+     resourceId: {
+       type: String,
+       default: null
+     },
+     capabilityId: {
+       type: String,
+       default: null
+     },
+     skipInstall: {
+       type: Boolean,
+       default: false
+     },
+   },
+       // ['showDialog', 'resourceId', 'capabilityId', 'skipInstall'],
+   setup(props){
+     const active = toRef(props, 'showDialog')
+     return{
+       active
+     }
+   },
    data() {
      return {
        title: "Set Configuration Parameter of Capability",

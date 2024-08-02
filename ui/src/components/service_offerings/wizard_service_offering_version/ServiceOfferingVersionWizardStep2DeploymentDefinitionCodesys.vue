@@ -3,15 +3,14 @@
     <v-form
       v-model="validForm"
     >
-      <v-list expand>
+      <v-list :opened="['Codesys Application Files']">
         <!-- Codesys File !-->
-        <v-list-group :value="true">
-          <template #activator>
-            <v-list-item-content>
-              <v-list-item-title>
-                Codesys Application Files
-              </v-list-item-title>
-            </v-list-item-content>
+        <v-list-group value="Codesys Application Files">
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title="Codesys Application Files"
+            />
           </template>
           <v-row>
             <v-col>
@@ -20,9 +19,9 @@
                 accept=".zip"
                 label="Click here to select Application Zip file"
                 auto-grow
-                dense
-                outlined
-                @change="onLoadCodesysApplicationFileClicked($event)"
+                density="compact"
+                variant="outlined"
+                @update:modelValue="onLoadCodesysApplicationFileClicked($event)"
               />
             </v-col>
             <v-spacer />
@@ -45,14 +44,16 @@
     <!-- Navigation Buttons-->
     <v-card-actions>
       <v-btn
-        :color="$vuetify.theme.themes.light.secondary"
+        variant="elevated"
+        :color="$vuetify.theme.themes.light.colors.secondary"
         @click="onCancelButtonClicked()"
       >
         {{ $t('buttons.Back') }}
       </v-btn>
       <v-spacer />
       <v-btn
-        :color="$vuetify.theme.themes.light.secondary"
+        variant="elevated"
+        :color="$vuetify.theme.themes.light.colors.secondary"
         @click="onNextButtonClicked()"
       >
         {{ $t('buttons.Next') }}
@@ -62,19 +63,27 @@
 </template>
 
 <script>
-  import DockerContainerEnvironmentVariables
-    from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerEnvironmentVariables'
-  import 'vue-json-pretty/lib/styles.css'
-  import YAML from 'yaml'
-  import ServiceRepositorySelect from '@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect'
-  import ServiceOfferingVersionsRestApi from "@/api/service-management/serviceOfferingVersionsRestApi";
-  const { parse } = require('dot-properties')
+import 'vue-json-pretty/lib/styles.css'
+import ServiceOfferingVersionsRestApi from "@/api/service-management/serviceOfferingVersionsRestApi";
 
   export default {
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys',
     components: {
     },
-    props: ['editMode', 'serviceOfferingVersion', 'serviceVendorId'],
+    props: {
+      editMode: {
+        type: Boolean,
+        default: false
+      },
+      serviceOfferingVersion: {
+        type: Object,
+        default: null
+      },
+      serviceVendorId: {
+        type: String,
+        default: null
+      },
+    },
 
     data () {
       return {

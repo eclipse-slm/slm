@@ -5,10 +5,11 @@
       :disabled="disabled"
     />
 
-    <validation-provider
+    <Field
       v-else
-      v-slot="{ errors, valid }"
-      :name="serviceOption.name"
+      v-slot="{ field, errors }"
+      v-model="serviceOption.defaultValue"
+      :name="serviceOption.name + '_DEFAULT_VALUE'"
       :rules="getValidationRulesForServiceOption(serviceOption)"
     >
       <v-text-field
@@ -20,14 +21,14 @@
           serviceOption.valueType === 'DECIMAL' ||
           serviceOption.valueType === 'PORT' ||
           serviceOption.valueType === 'VOLUME'"
-        v-model="serviceOption.defaultValue"
+        v-bind="field"
         :type="(serviceOption.valueType === 'INTEGER' || serviceOption.valueType === 'DECIMAL') ? 'number' : serviceOption.valueType === 'PASSWORD' ? 'password' : 'text'"
         required
         :clearable="serviceOption.editable || definitionMode"
         :readonly="!(serviceOption.editable || definitionMode)"
         :disabled="!(serviceOption.editable || definitionMode)"
         :error-messages="errors"
-        :success="valid"
+        :model-value="serviceOption.defaultValue"
       />
 
       <v-select
@@ -35,22 +36,25 @@
         v-model="serviceOption.defaultValue"
         :items="serviceOption.valueOptions"
         :error-messages="errors"
-        :success="valid"
       />
 
-      <vue-ip
+      <v-text-field
         v-if="serviceOption.valueType === 'IP'"
-        :ip="serviceOption.defaultValue === undefined ? '127.0.0.1' : serviceOption.value"
-        :on-change="ipValueChanged"
-        theme="material"
+        v-bind="field"
+        type="text"
+        :clearable="serviceOption.editable || definitionMode"
+        :readonly="!(serviceOption.editable || definitionMode)"
+        :disabled="!(serviceOption.editable || definitionMode)"
+        :error-messages="errors"
+        :model-value="serviceOption.defaultValue"
       />
+
 
       <v-checkbox
         v-if="serviceOption.valueType === 'BOOLEAN'"
         v-model="serviceOption.defaultValue"
         :readonly="!serviceOption.editable && !definitionMode"
         :error-messages="errors"
-        :success="valid"
       />
 
       <!-- AAS !-->
@@ -59,10 +63,9 @@
         v-model="serviceOption.defaultValue"
         placeholder="Select required submodel template"
         item-value="semanticId"
-        item-text="name"
+        item-title="name"
         :items="aasSubmodelTemplates"
         :error-messages="errors"
-        :success="valid"
       />
 
       <v-select
@@ -70,10 +73,9 @@
         v-model="serviceOption.defaultValue"
         placeholder="Select AAS"
         item-value="id"
-        item-text="name"
+        item-title="name"
         :items="aasSubmodelTemplateInstances"
         :error-messages="errors"
-        :success="valid"
       />
 
       <!-- System Variables !-->
@@ -82,23 +84,21 @@
         v-model="serviceOption.defaultValue"
         placeholder="Select system variable"
         item-value="key"
-        item-text="name"
+        item-title="name"
         :items="serviceManagementSystemVariables"
         :error-messages="errors"
-        :success="valid"
       />
 
       <v-tooltip
         v-if="serviceOption.valueType === 'SYSTEM_VARIABLE' && !definitionMode"
-        bottom
+        location="bottom"
       >
-        <template #activator="{ on, attrs }">
+        <template #activator="{ props }">
           <div
-            v-bind="attrs"
-            v-on="on"
+            v-bind="props"
           >
             <v-text-field
-              :value="valueOfTemplateVariable(serviceOption.defaultValue)"
+              :model-value="valueOfTemplateVariable(serviceOption.defaultValue)"
               :readonly="true"
               :disabled="true"
             />
@@ -109,63 +109,89 @@
 
       <!-- Deployment Variables !-->
       <v-select
-          v-if="serviceOption.valueType === 'DEPLOYMENT_VARIABLE' && definitionMode"
-          v-model="serviceOption.defaultValue"
-          placeholder="Select deployment variable"
-          item-value="key"
-          item-text="prettyName"
-          :items="serviceManagementDeploymentVariables"
-          :error-messages="errors"
-          :success="valid"
+        v-if="serviceOption.valueType === 'DEPLOYMENT_VARIABLE' && definitionMode"
+        v-model="serviceOption.defaultValue"
+        placeholder="Select deployment variable"
+        item-value="key"
+        item-title="prettyName"
+        :items="serviceManagementDeploymentVariables"
+        :error-messages="errors"
       />
 
       <v-tooltip
-          v-if="serviceOption.valueType === 'DEPLOYMENT_VARIABLE' && !definitionMode"
-          bottom
+        v-if="serviceOption.valueType === 'DEPLOYMENT_VARIABLE' && !definitionMode"
+        location="bottom"
       >
-        <template #activator="{ on, attrs }">
+        <template #activator="{ props }">
           <div
-              v-bind="attrs"
-              v-on="on"
+            v-bind="props"
           >
             <v-text-field
-                :value="serviceOption.defaultValue"
-                :readonly="true"
-                :disabled="true"
+              :model-value="serviceOption.defaultValue"
+              :readonly="true"
+              :disabled="true"
             />
           </div>
         </template>
         <span>Deployment variables cannot be edited</span>
       </v-tooltip>
-    </validation-provider>
+    </Field>
   </div>
 </template>
 
 <script>
-  import VueIp from 'vue-ip'
-  import { serviceOptionMixin } from '@/utils/serviceOptionUtil'
-  import AASRestApi from "@/api/resource-management/aasRestApi";
-  import { mapGetters } from "vuex";
+import {serviceOptionMixin} from '@/utils/serviceOptionUtil'
+import AASRestApi from "@/api/resource-management/aasRestApi";
 
-  export default {
+import {Field} from "vee-validate";
+import {useServicesStore} from "@/stores/servicesStore";
+import {useResourcesStore} from "@/stores/resourcesStore";
+import {useCatalogStore} from "@/stores/catalogStore";
+
+export default {
     name: 'ServiceOptionValue',
     components: {
-      VueIp,
+      Field
     },
     mixins: [serviceOptionMixin],
-    props: ['serviceOption', 'disabled', 'definitionMode'],
+    props: {
+      serviceOption: {
+        type: Object,
+        default: null
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      },
+      definitionMode: {
+        type: Boolean,
+        default: false
+      }
+    },
+    setup(){
+      const servicesStore = useServicesStore();
+      const resourceStore = useResourcesStore();
+      const catalogStore = useCatalogStore();
+      return {servicesStore, resourceStore, catalogStore};
+    },
     data () {
       return {
         aasSubmodelTemplateInstances: [],
       }
     },
     computed: {
-      ...mapGetters([
-        'valueOfTemplateVariable',
-        'serviceManagementSystemVariables',
-        'serviceManagementDeploymentVariables',
-        'aasSubmodelTemplates'
-      ]),
+      valueOfTemplateVariable() {
+        return this.resourceStore.valueOfTemplateVariable
+      },
+      serviceManagementSystemVariables() {
+        return this.servicesStore.serviceManagementSystemVariables
+      },
+      serviceManagementDeploymentVariables () {
+        return this.servicesStore.serviceManagementDeploymentVariables
+      },
+      aasSubmodelTemplates () {
+        return this.catalogStore.aasSubmodelTemplates
+      },
     },
     created() {
       if (this.serviceOption.valueType === 'AAS_SM_TEMPLATE' && !this.definitionMode) {

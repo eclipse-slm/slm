@@ -1,81 +1,77 @@
 <template>
-  <div>
-    <v-toolbar
-      id="ServiceHeaderFilterRow"
-      flat
-      height="75px"
+  <v-toolbar
+    id="ServiceHeaderFilterRow"
+    flat
+    height="75px"
+  >
+    <!-- Search field to filter by Service Offering Name -->
+    <v-text-field
+      v-model="filterServiceOfferingName"
+      class="mr-10"
+      prepend-inner-icon="mdi-magnify"
+      :placeholder="$t('labels.SearchLabel')"
+      single-line
+      variant="outlined"
+      density="compact"
+      rounded
+      hide-details
+      @update:modelValue="filterServices()"
+    />
+
+    <!-- Dropdown to filter by Service Offering Category -->
+    <v-select
+      v-model="filterServiceOfferingCategoryIds"
+      class="mr-10"
+      :items="serviceOfferingCategories"
+      :label="$t('labels.CategoryFilterLabel')"
+      :menu-props="{ closeOnContentClick: true } "
+      item-title="name"
+      item-value="id"
+      closable-chips
+      density="compact"
+      variant="outlined"
+      hide-details
+      multiple
+      @update:modelValue="filterServices()"
+    />
+    <!-- Dropdown to filter by Service Vendor -->
+    <v-select
+      v-model="filterVendorId"
+      class="mr-10"
+      :items="serviceVendors"
+      label="Service Vendors"
+      :menu-props="{ closeOnContentClick: true } "
+      item-title="name"
+      item-value="id"
+      clearable
+      density="compact"
+      variant="outlined"
+      hide-details
+      @update:modelValue="filterServices()"
+    />
+
+
+    <!--Button to remove all activated filters -->
+    <v-btn
+      variant="text"
+      @click="removeFilter()"
     >
-      <!-- Search field to filter by Service Offering Name -->
-      <div class="mr-10">
-        <v-text-field
-          v-model="filterServiceOfferingName"
-          prepend-inner-icon="search"
-          :placeholder="$t('labels.SearchLabel')"
-          single-line
-          outlined
-          dense
-          rounded
-          hide-details
-          @input="filterServices()"
-        />
-      </div>
-
-      <!-- Dropdown to filter by Service Offering Category -->
-      <div class="mr-10">
-        <v-select
-          v-model="filterServiceOfferingCategoryIds"
-          :items="serviceOfferingCategories"
-          :label="$t('labels.CategoryFilterLabel')"
-          :menu-props="{ closeOnContentClick: true } "
-          item-text="name"
-          item-value="id"
-          deletable-chips
-          dense
-          outlined
-          hide-details
-          small-chips
-          multiple
-          max-width="10px"
-          @input="filterServices()"
-        />
-      </div>
-
-      <!-- Dropdown to filter by Service Vendor -->
-      <div class="mr-10">
-        <v-select
-          v-model="filterVendorId"
-          :items="serviceVendors"
-          label="Service Vendors"
-          :menu-props="{ closeOnContentClick: true } "
-          item-text="name"
-          item-value="id"
-          clearable
-          dense
-          outlined
-          hide-details
-          max-width="10px"
-          @input="filterServices()"
-        />
-      </div>
-
-      <!--Button to remove all activated filters -->
-      <v-btn
-        text
-        @click="removeFilter()"
-      >
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-toolbar>
-  </div>
+      <v-icon>mdi-close</v-icon>
+    </v-btn>
+  </v-toolbar>
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
 
-  export default {
+import {useServicesStore} from "@/stores/servicesStore";
+
+export default {
     name: 'ServiceOfferingOverviewToolbar',
     props: [],
-
+    setup(){
+      const servicesStore = useServicesStore();
+      return {servicesStore};
+    },
     data () {
       return {
         filterServiceOfferingName: '',
@@ -86,12 +82,18 @@
     },
 
     computed: {
-      ...mapGetters([
-        'apiStateServices',
-        'serviceOfferings',
-        'serviceOfferingCategories',
-        'serviceVendors',
-      ]),
+      apiStateServices() {
+        return this.servicesStore.apiStateServices
+      },
+      serviceOfferings () {
+        return this.servicesStore.serviceOfferings
+      },
+      serviceOfferingCategories() {
+        return this.servicesStore.serviceOfferingCategories
+      },
+      serviceVendors () {
+        return this.servicesStore.serviceVendors
+      },
     },
 
     methods: {
@@ -125,4 +127,7 @@
 </script>
 
 <style lang="scss" scoped>
+#ServiceHeaderFilterRow{
+  background-color: white;
+}
 </style>

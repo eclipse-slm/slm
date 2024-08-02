@@ -2,9 +2,9 @@
   <div>
     <v-row>
       <v-col cols="3">
-        <v-subheader>
+        <v-list-subheader>
           Volumes
-        </v-subheader>
+        </v-list-subheader>
       </v-col>
 
       <v-col cols="9">
@@ -14,8 +14,8 @@
           @click="addVolume"
         >
           <v-icon
-            dense
-            small
+            density="compact"
+            size="small"
             class="mr-2"
           >
             mdi-plus-circle
@@ -39,45 +39,47 @@
           }"
         >
           <template #item.name="{ item }">
-            <ValidationProvider
-              v-slot="{ errors, valid }"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="item.name"
               name="Volume Name"
-              rules="required|alpha_dash"
+              :rules="required_alpha_dash"
             >
               <v-text-field
                 v-if="editable"
-                v-model="item.name"
+                v-bind="field"
                 placeholder="Name of volume"
                 :error-messages="errors"
-                :success="valid"
+                :model-value="item.name"
               />
               <div
                 v-else
               >
                 {{ item.key }}
               </div>
-            </ValidationProvider>
+            </Field>
           </template>
 
           <template #item.containerPath="{ item }">
-            <ValidationProvider
-              v-slot="{ errors, valid }"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="item.containerPath"
               name="Container Path"
-              rules="required"
+              :rules="required"
             >
               <v-text-field
                 v-if="editable"
-                v-model="item.containerPath"
+                v-bind="field"
                 placeholder="e.g. /path/in/container"
                 :error-messages="errors"
-                :success="valid"
+                :model-value="item.containerPath"
               />
               <div
                 v-else
               >
                 {{ item.value }}
               </div>
-            </ValidationProvider>
+            </Field>
           </template>
 
           <template #item.isServiceOption="{ item }">
@@ -104,16 +106,37 @@
 </template>
 
 <script>
-  export default {
+import {Field} from "vee-validate";
+import * as yup from 'yup';
+
+export default {
     name: 'DockerContainerVolumeMappings',
-    props: ['volumes', 'editable'],
+    components: {Field},
+    props: {
+      volumes: {
+        type: Array,
+        default: () => []
+      },
+      editable: {
+        type: Boolean,
+        default: false
+      },
+    },
+    setup(){
+      const required_alpha_dash = yup.string().required().matches(new RegExp(".[a-zA-Z0-9_\/]"))
+          .typeError("Only letters, numbers and slash are allowed (a-zA-Z0-9_\/)");
+      const required = yup.string().required()
+      return {
+        required,required_alpha_dash
+      }
+    },
     data () {
       return {
         tableHeaders: [
-          { text: 'Volume Name', value: 'name' },
-          { text: 'Container Path', value: 'containerPath' },
-          { text: 'Service Option', value: 'isServiceOption' },
-          { text: 'Actions', value: 'actions' },
+          { title: 'Volume Name', value: 'name' },
+          { title: 'Container Path', value: 'containerPath' },
+          { title: 'Service Option', value: 'isServiceOption' },
+          { title: 'Actions', value: 'actions' },
         ],
       }
     },

@@ -1,12 +1,15 @@
+import {useResourcesStore} from "@/stores/resourcesStore";
+
 export var capabilityUtilsMixin = {
   methods: {
     getCapability(capabilityId) {
       try {
-        return this.$store.getters.availableSingleHostCapabilitiesNoDefault.find(
+        const resourceStore = useResourcesStore();
+        return resourceStore.availableSingleHostCapabilitiesNoDefault.find(
           cap => cap.id === capabilityId
-        )
+        );
       } catch(e) {
-        return null
+        return null;
       }
     },
     getParamsOfInstallAction(capabilityId) {

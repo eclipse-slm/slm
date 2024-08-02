@@ -14,10 +14,11 @@
   font-size: 19px
 
 .v-application--is-ltr #core-navigation-drawer div.v-list-item__icon--text,
-.v-application--is-ltr #core-navigation-drawer div.v-list-item__icon:first-child
+.v-application--is-ltr #core-navigation-drawer div.v-list-item__icon:first-child,
+.v-application--is-ltr #core-navigation-drawer div.v-list-item__prepend
   margin-left: 5px !important
-  margin-right: 18px
-  opacity: .8
+  margin-right: 18px !important
+  opacity: .8 !important
 
 .v-application--is-ltr .v-list-item__action:last-of-type:not(:only-child),
 .v-application--is-ltr .v-list-item__avatar:last-of-type:not(:only-child),
@@ -58,8 +59,8 @@
     transition: all 0.3s linear 0s
 
 .v-list--nav
-  padding-left: 15px
-  padding-right: 15px
+  padding-left: 15px !important
+  padding-right: 15px !important
 
 .theme--dark.v-navigation-drawer .v-divider
   background-color: rgba(181, 181, 181, 0.2)

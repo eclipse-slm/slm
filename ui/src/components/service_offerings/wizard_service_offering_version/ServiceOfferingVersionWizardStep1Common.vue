@@ -1,59 +1,59 @@
 <template>
   <div>
-    <validation-observer
+    <ValidationForm
       ref="observer"
-      v-slot="{ invalid, handleSubmit, validate }"
+      v-slot="{ meta, handleSubmit, validate }"
     >
       <v-row>
         <v-col cols="8">
           <v-card
-            class="mx-1 my-1"
-            outlined
+            class="mx-1 my-1 pt-5"
           >
-            <validation-provider
-              v-slot="{ errors, valid }"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="serviceOfferingVersion.version"
               name="Version"
-              rules="required"
+              :rules="required"
             >
               <v-text-field
-                v-model="serviceOfferingVersion.version"
+                v-bind="field"
                 label="Version"
-                outlined
-                dense
+                variant="outlined"
+                density="compact"
                 :error-messages="errors"
-                :success="valid"
+                :model-value="serviceOfferingVersion.version"
               />
-            </validation-provider>
+            </Field>
 
 
             <v-tooltip
-              bottom
+              location="bottom"
               :disabled="!editMode"
             >
-              <template #activator="{ on, attrs }">
+              <template #activator="{ props }">
                 <div
-                  v-bind="attrs"
-                  v-on="on"
+                  v-bind="props"
                 >
-                  <validation-provider
-                    v-slot="{ errors, valid }"
+                  <Field
+                    v-slot="{ field, errors }"
+                    v-model="serviceOfferingVersion.deploymentDefinition.deploymentType"
                     name="Service Deployment"
-                    rules="required"
+                    :rules="required"
                   >
                     <v-select
+                      v-bind="field"
                       v-model="serviceOfferingVersion.deploymentDefinition.deploymentType"
                       :items="serviceOfferingDeploymentTypes"
-                      item-text="prettyName"
+                      item-title="prettyName"
                       item-value="value"
                       label="Deployment Type"
-                      outlined
-                      dense
+                      variant="outlined"
+                      density="compact"
                       :readonly="editMode"
                       :error-messages="errors"
-                      :success="valid"
                     />
                     <span>{{ errors[0] }}</span>
-                  </validation-provider>
+                  </Field>
                 </div>
               </template>
             </v-tooltip>
@@ -65,41 +65,65 @@
       <!-- Navigation Buttons-->
       <v-card-actions>
         <v-btn
-          :color="$vuetify.theme.themes.light.secondary"
+          variant="elevated"
+          :color="$vuetify.theme.themes.light.colors.secondary"
           @click="$emit('step-canceled', stepNumber)"
         >
           {{ $t('buttons.Cancel') }}
         </v-btn>
         <v-spacer />
         <v-btn
-          :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-          @click="invalid ? validate() : handleSubmit(onNextButtonClicked)"
+          variant="elevated"
+          :color="!meta.valid ? $vuetify.theme.themes.light.colors.disable : $vuetify.theme.themes.light.colors.secondary"
+          @click="!meta.valid ? validate() : handleSubmit(onNextButtonClicked)"
         >
           {{ $t('buttons.Next') }}
         </v-btn>
       </v-card-actions>
-    </validation-observer>
+    </ValidationForm>
   </div>
 </template>
 
 <script>
 import 'vue-json-pretty/lib/styles.css'
-import {mapGetters} from "vuex";
 
-const { parse } = require('dot-properties')
+import {Field, Form as ValidationForm} from "vee-validate";
+import * as yup from 'yup';
+import {useServicesStore} from "@/stores/servicesStore";
 
   export default {
     name: 'ServiceOfferingVersionWizardStep1Common',
-    components: {},
-    props: ['editMode', 'serviceOfferingVersion'],
-
+    components: {Field, ValidationForm},
+    props: {
+      editMode: {
+        type: Boolean,
+        default: false
+      },
+      serviceOfferingVersion: {
+        type: Object,
+        default: null
+      },
+    },
+    setup(){
+      const required = yup.string().required();
+      const servicesStore = useServicesStore();
+      return {
+        required, servicesStore
+      }
+    },
     data () {
       return {
         stepNumber: 1,
       }
     },
     computed: {
-      ...mapGetters(['serviceOfferingDeploymentTypes', 'serviceOfferings']),
+      serviceOfferingDeploymentTypes() {
+        return this.servicesStore.serviceOfferingDeploymentTypes
+      },
+      serviceOfferings () {
+        return this.servicesStore.serviceOfferings
+      },
+
       apiStateLoaded() {
         return true;
       },

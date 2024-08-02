@@ -1,13 +1,13 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="active"
     max-width="800px"
     @click:outside="closeDialog"
   >
-    <template>
+    <template #default="{}">
       <v-toolbar
         color="primary"
-        dark
+        theme="dark"
       >
         <v-row
           align="center"
@@ -23,7 +23,6 @@
             cols="1"
           >
             <v-btn
-              icon
               @click="closeDialog"
             >
               <v-icon>mdi-close</v-icon>
@@ -83,20 +82,21 @@
 </template>
 
 <script>
-  import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
-  import ResourcesCreateDialogPageStart from "@/components/resources/dialogs/create/ResourcesCreateDialogPageStart";
-  import ResourcesCreateDialogPageAddExistingResourceHost
-    from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResourceHost";
-  import ResourcesCreateDialogPageAddExistingResource
-    from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResource";
-  import ResourcesCreateDialogPageAddExistingResourceCluster
-    from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResourceCluster";
-  import ResourcesCreateDialogPageCreateNewResource
-    from "@/components/resources/dialogs/create/ResourcesCreateDialogPageCreateNewResource";
-  import ResourcesCreateDialogPageCreateNewResourceCluster
-    from "@/components/resources/dialogs/create/ResourcesCreateDialogPageCreateNewResourceCluster";
+import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
+import ResourcesCreateDialogPageStart from "@/components/resources/dialogs/create/ResourcesCreateDialogPageStart";
+import ResourcesCreateDialogPageAddExistingResourceHost
+  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResourceHost";
+import ResourcesCreateDialogPageAddExistingResource
+  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResource";
+import ResourcesCreateDialogPageAddExistingResourceCluster
+  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResourceCluster";
+import ResourcesCreateDialogPageCreateNewResource
+  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageCreateNewResource";
+import ResourcesCreateDialogPageCreateNewResourceCluster
+  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageCreateNewResourceCluster";
+import {toRef} from "vue";
 
-  export default {
+export default {
     name: 'ResourcesCreateDialog',
     components: {
       ResourcesCreateDialogPageStart,
@@ -106,15 +106,32 @@
       ResourcesCreateDialogPageCreateNewResource,
       ResourcesCreateDialogPageCreateNewResourceCluster
     },
-    props: ['show'],
-    enums: {
-      ResourcesCreateDialogPage,
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      }
+    },
+    setup(props){
+      const active = toRef(props, 'show')
+      return{
+        active
+      }
     },
     data () {
       return {
         page: ResourcesCreateDialogPage.START,
-        title: ''
+        title: '',
+        dialog: this.active
       }
+    },
+    computed: {
+      ResourcesCreateDialogPage() {
+        return ResourcesCreateDialogPage
+      }
+    },
+    enums: {
+      ResourcesCreateDialogPage,
     },
     methods: {
       onPageChanged(newPage) {
@@ -128,6 +145,6 @@
         this.page = ResourcesCreateDialogPage.START
         this.title= ''
       },
-    },
+    }
   }
 </script>

@@ -54,8 +54,8 @@
                 class="ma-1"
               >
                 <v-icon
-                  :left="dir === 'left'"
-                  :right="dir === 'right'"
+                  :start="dir === 'left'"
+                  :end="dir === 'right'"
                   :class="dir === 'right' && 'order-last'"
                   v-text="icons[dir]"
                 />
@@ -70,7 +70,7 @@
                 class="ma-1"
               >
                 <v-icon
-                  left
+                  start
                   v-text="icons[color]"
                 />
                 {{ color }}
@@ -92,8 +92,7 @@
               v-for="n in 3"
               :key="n"
               elevation="1"
-              :small="n === 1"
-              :large="n === 3"
+              :size="n === 3 ? 'large' : undefined"
               class="ma-1"
               color="secondary"
             >
@@ -133,7 +132,7 @@
               elevation="1"
               rounded
             >
-              <v-icon left>
+              <v-icon start>
                 mdi-heart
               </v-icon>
               With Icon
@@ -143,8 +142,8 @@
               class="ma-1"
               color="secondary"
               elevation="1"
-              fab
-              small
+
+              size="small"
             >
               <v-icon>
                 mdi-heart
@@ -154,7 +153,7 @@
             <v-btn
               class="ma-1"
               color="secondary"
-              text
+              variant="text"
             >
               Simple
             </v-btn>
@@ -172,15 +171,15 @@
 
             <v-pagination
               :length="5"
-              :value="1"
-              circle
+              :model-value="1"
+              rounded
               class="justify-start"
             />
 
             <v-pagination
               :length="3"
-              :value="2"
-              circle
+              :model-value="2"
+              rounded
               class="justify-start"
               next-icon="mdi-menu-right"
               prev-icon="mdi-menu-left"
@@ -261,10 +260,10 @@
                   <v-btn
                     elevation="1"
                     :color="s.color"
-                    dark
+                    theme="dark"
                   >
                     <v-icon
-                      left
+                      start
                       v-text="s.icon"
                     />
                     {{ s.text }}
@@ -279,7 +278,7 @@
                   <v-btn
                     elevation="1"
                     :color="s.color"
-                    dark
+                    theme="dark"
                     min-width="0"
                     max-width="41"
                   >
@@ -295,10 +294,10 @@
                   <v-btn
                     elevation="1"
                     :color="s.color"
-                    dark
-                    fab
+                    theme="dark"
+
                     min-width="0"
-                    small
+                    size="small"
                   >
                     <v-icon v-text="s.icon" />
                   </v-btn>
@@ -311,7 +310,7 @@
                 >
                   <v-btn
                     :color="s.color"
-                    dark
+                    theme="dark"
                     icon
                     min-width="0"
                   >
@@ -329,11 +328,11 @@
                 >
                   <v-btn
                     :color="s.color"
-                    dark
-                    text
+                    theme="dark"
+                    variant="text"
                   >
                     <v-icon
-                      left
+                      start
                       :color="s.color"
                       v-text="s.icon"
                     />

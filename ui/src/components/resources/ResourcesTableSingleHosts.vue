@@ -1,33 +1,35 @@
 <template>
-  <v-card>
+  <v-card class="v-sheet">
     <v-data-table
       id="resource-table-single-host"
       :headers="tableHeaders"
       :items="filteredResources"
       :search="searchResources"
       :sort-by.sync="sortBy"
-      :sort-desc.sync="sortDesc"
-      :item-class="rowClass"
+      :row-props="rowClass"
       item-key="id"
-      :group-by="groupBy"
+
       @click:row="setSelectedResource"
     >
       <template #top>
         <v-toolbar flat>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-toolbar-title>
-            <v-tooltip left close-delay="2000">
-              <template #activator="{ on, attrs }">
+            <v-tooltip
+              start
+              close-delay="2000"
+            >
+              <template #activator="{ props }">
                 <v-btn
-                    v-if="areProfilerAvailable"
-                    color="primary"
-                    @click="runProfiler"
-                    v-bind="attrs"
-                    v-on="on"
+                  v-if="areProfilerAvailable"
+                  color="primary"
+                  v-bind="props"
+                  @click="runProfiler"
                 >
-                  <v-icon color="white">
-                    mdi-magnify
-                  </v-icon>
+                  <v-icon
+                    icon="mdi-magnify"
+                    color="white"
+                  />
                 </v-btn>
               </template>
               <span>Runs all <a href="https://eclipse-slm.github.io/slm/docs/usage/profiler/">profiler</a> on all devices</span>
@@ -44,17 +46,17 @@
               mandatory
             >
               <v-btn
-                small
-                :value="null"
+                size="small"
+                :model-value="null"
                 :color="groupBy == null ? 'secondary' : 'disabled'"
                 style="height:40px"
               >
                 <v-icon>mdi-ungroup</v-icon>
               </v-btn>
               <v-btn
-                small
-                value="location.name"
-                :color="groupBy == 'location.name' ? 'secondary' : 'disabled'"
+                size="small"
+                model-value="location.name"
+                :color="groupBy === 'location.name' ? 'secondary' : 'disabled'"
                 style="height:40px"
               >
                 <v-icon>mdi-group</v-icon>
@@ -65,17 +67,16 @@
             <v-select
               v-model="filterResourcesByLocations"
               :items="locations"
-              item-text="name"
+              item-title="name"
               item-value="id"
               label="filter by location"
-              dense
-              outlined
+              density="compact"
+              variant="outlined"
               hide-details
-              small-chips
-              deletable-chips
+              closable-chips
               multiple
               clearable
-              @input="filterResources"
+              @update:modelValue="filterResources"
             />
           </div>
         </v-toolbar-items>
@@ -96,18 +97,17 @@
         <v-tooltip
           v-for="capabilityService in getDeploymentCapabilityServices(item.capabilityServices)"
           :key="capabilityService.capability.name"
-          top
+          location="top"
         >
           <template
-            #activator="{ on, attrs }"
+            #activator="{ props }"
           >
             <v-chip
-              v-bind="attrs"
+              v-bind="props"
               :key="capabilityService.capability.name"
               class="ma-1"
-              v-on="on"
             >
-              <v-icon left>
+              <v-icon start>
                 {{ getChipIconByCapabilityService(capabilityService) }}
               </v-icon>
               {{ capabilityService.capability.name }}
@@ -120,15 +120,14 @@
       <template #item.fabosDevice="{ item }">
         <v-tooltip
           v-if="hasBaseConfigurationCapabilityService(item.capabilityServices)"
-          right
+          location="right"
         >
           <template
-            #activator="{ on, attrs }"
+            #activator="{ props }"
           >
             <v-icon
               :color="getFabOSDeviceIcon(item.capabilityServices).color"
-              v-bind="attrs"
-              v-on="on"
+              v-bind="props"
             >
               {{ getFabOSDeviceIcon(item.capabilityServices).logo }}
             </v-icon>
@@ -173,78 +172,69 @@
           class="text-right btn-col"
         >
           <v-menu>
-            <template #activator="{ on, attrs }">
+            <template #activator="{ props }">
               <v-btn
                 id="mushroom-button"
                 color="info"
-                v-bind="attrs"
+                v-bind="props"
                 :disabled="item.clusterMember || availableSingleHostCapabilitiesNoDefault.length == 0"
                 class="resource-single-host-add-capability"
-                v-on="on"
               >
-                <v-icon>
-                  mdi-mushroom-outline
-                </v-icon>
+                <v-icon
+                  color="white"
+                  icon="mdi-mushroom-outline"
+                />
               </v-btn>
             </template>
-            <v-list
-              v-for="capabilityClass in getUniqueCapabilityClasses"
-              :key="capabilityClass"
-              class="resources-capability-menu"
-            >
-              <h6 class="ml-4">
-                {{ insertWhiteSpaceInCamelCase(capabilityClass) }}
-              </h6>
-              <v-list-item
-                v-for="capability in getCapabilitiesByCapabilityClass(capabilityClass)"
-                :key="capability.id"
+            <v-list>
+              <v-list
+                v-for="capabilityClass in getUniqueCapabilityClasses"
+                :key="capabilityClass"
+                class="resources-capability-menu"
               >
-                <v-btn-toggle>
-                  <!-- Capability Install Button -->
-                  <v-btn
-                    v-if="showCapabilityInstallButton(item, capability)"
-                    id="install-button"
-                    :disabled="!resourceHasRemoteAccessService(item)"
-                    color="info"
-                    style="height:36px"
-                    @click="openDefineCapabilityParamsDialog(item.id, capability.id, false)"
-                  >
-                    <v-icon
-                      left
-                      color="white"
+                <h6 class="ml-4">
+                  {{ insertWhiteSpaceInCamelCase(capabilityClass) }}
+                </h6>
+                <v-list-item
+                  v-for="capability in getCapabilitiesByCapabilityClass(capabilityClass)"
+                  :key="capability.id"
+                >
+                  <v-btn-toggle>
+                    <!-- Capability Install Button -->
+                    <v-btn
+                      v-if="showCapabilityInstallButton(item, capability)"
+                      id="install-button"
+                      :disabled="!resourceHasRemoteAccessService(item)"
+                      class="bg-info"
+                      style="height:36px"
+                      :prepend-icon="capability.logo"
+                      @click="openDefineCapabilityParamsDialog(item.id, capability.id, false)"
                     >
-                      {{ capability.logo }}
-                    </v-icon>
-                    {{ capability.name }}
-                  </v-btn>
-                  <!-- Capability Skip Install Button -->
-                  <v-btn
-                    v-if="showCapabilitySkipInstallButton(item,capability)"
-                    color="info"
-                    style="height:36px"
-                    @click="openDefineCapabilityParamsDialog(item.id, capability.id, true)"
-                  >
-                    <v-icon color="white">
-                      mdi-skip-next
-                    </v-icon>
-                  </v-btn>
-                  <!-- Capability Uninstall Button -->
-                  <v-btn
-                    v-if="isCapabilityInstalledOnResource(item, capability)"
-                    color="error"
-                    style="height:36px"
-                    @click="removeCapability(item.id, capability.id)"
-                  >
-                    <v-icon
-                      left
-                      color="white"
+                      {{ capability.name }}
+                    </v-btn>
+                    <!-- Capability Skip Install Button -->
+                    <v-btn
+                      v-if="showCapabilitySkipInstallButton(item,capability)"
+                      class="bg-info"
+                      style="height:36px"
+                      @click="openDefineCapabilityParamsDialog(item.id, capability.id, true)"
                     >
-                      {{ capability.logo }}
-                    </v-icon>
-                    {{ capability.name }}
-                  </v-btn>
-                </v-btn-toggle>
-              </v-list-item>
+                      <v-icon icon="mdi-skip-next" />
+                    </v-btn>
+                    <!-- Capability Uninstall Button -->
+                    <v-btn
+                      v-if="isCapabilityInstalledOnResource(item, capability)"
+                      color="error"
+                      class="bg-error"
+                      style="height:36px"
+                      :append-icon="capability.logo"
+                      @click="removeCapability(item.id, capability.id)"
+                    >
+                      {{ capability.name }}
+                    </v-btn>
+                  </v-btn-toggle>
+                </v-list-item>
+              </v-list>
             </v-list>
           </v-menu>
           <v-btn
@@ -253,7 +243,7 @@
             color="error"
             @click.stop="resourceToDelete = item"
           >
-            <v-icon>mdi-delete</v-icon>
+            <v-icon icon="mdi-delete" />
           </v-btn>
         </div>
       </template>
@@ -277,38 +267,42 @@
 </template>
 
 <script>
-  import {
-    mapGetters,
-  } from 'vuex'
-  import ConfirmDialog from '@/components/base/ConfirmDialog'
-  import CapabilityParamsDialog from "@/components/resources/dialogs/CapabilityParamsDialog.vue";
-  import ResourcesRestApi from '@/api/resource-management/resourcesRestApi'
-  import { capabilityUtilsMixin } from '@/utils/capabilityUtils'
-  import ProfilerRestApi from "@/api/resource-management/profilerRestApi";
-  import Vue from "vue";
 
-  export default {
+import ConfirmDialog from '@/components/base/ConfirmDialog'
+import CapabilityParamsDialog from "@/components/resources/dialogs/CapabilityParamsDialog.vue";
+import ResourcesRestApi from '@/api/resource-management/resourcesRestApi'
+import {capabilityUtilsMixin} from '@/utils/capabilityUtils'
+import ProfilerRestApi from "@/api/resource-management/profilerRestApi";
+import {app} from "@/main";
+import {useResourcesStore} from "@/stores/resourcesStore";
+
+export default {
     name: 'ResourcesTableSingleHosts',
     components: {CapabilityParamsDialog, ConfirmDialog },
+    mixins: [capabilityUtilsMixin],
+    setup(){
+      const resourceStore = useResourcesStore();
+      return {resourceStore};
+    },
     data () {
       return {
         tableHeaders: [
-          { text: 'Capabilities', value: 'capabilityServices' },
-          { text: 'Hostname', value: 'hostname' },
-          { text: 'IP', value: 'ip' },
-          { text: 'Location', value: 'location.name'},
-          { text: 'FabOS Device', value: "fabosDevice" },
-          { text: 'Connection Type', value:'remoteAccessService.connectionType'},
-          { text: 'Port', value:'remoteAccessService.Port'},
+          { title: 'Capabilities', key: 'capabilityServices', value: 'capabilityServices' },
+          { title: 'Hostname', key: 'hostname', value: 'hostname' },
+          { title: 'IP', key: 'ip', value: 'ip' },
+          { title: 'Location', key: 'location.name', value: 'location.name'},
+          { title: 'FabOS Device', key: 'fabosDevice', value: "fabosDevice" },
+          { title: 'Connection Type', key: 'remoteAccessService.connectionType', value:'remoteAccessService.connectionType'},
+          { title: 'Port', key: 'remoteAccessService.Port', value:'remoteAccessService.Port'},
           // { text: 'CPU Arch', value: 'cpuArch' },
           // { text: 'CPU Cores', value: 'cpuCores' },
-          { text: 'OS', value: 'os' },
-          { text: 'UUID', value: 'id', sortable: false },
-          { text: 'Cluster Member', value: 'clusterMember' },
-          { value: 'actions', sortable: false },
+          { title: 'OS', key: 'os', value: 'os' },
+          { title: 'UUID', key: 'id', value: 'id', sortable: false },
+          { title: 'Cluster Member', key: 'clusterMember', value: 'clusterMember' },
+          { title:'', value: 'actions', sortable: false },
         ],
-        groupBy: null,
-        sortBy: 'ip',
+        groupBy: [],
+        sortBy: [{key: 'ip', order: 'asc'}],
         sortDesc: false,
         showLvlUpMenu: false,
         showResourcesDeleteDialog: false,
@@ -323,19 +317,27 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'resources',
-        'locations',
-        'profiler',
-        'searchResources',
-        'selectedResourceForDelete',
-        'availableSingleHostCapabilitiesNoDefault',
-      ]),
+      resources () {
+        return this.resourceStore.resources
+      },
+      locations() {
+        return this.resourceStore.locations
+      },
+      profiler() {
+        return this.resourceStore.profiler
+      },
+      searchResources () {
+        return this.resourceStore.searchResources
+      },
+      selectedResourceForDelete () {
+        return this.resourceStore.selectedResourceForDelete
+      },
+      availableSingleHostCapabilitiesNoDefault() {
+        return this.resourceStore.availableSingleHostCapabilitiesNoDefault
+      },
+
       areProfilerAvailable() {
-        if(this.profiler.length > 0)
-          return true
-        else
-          return false
+        return this.profiler.length > 0;
       },
       showCapabilityParamsDialog() {
         if(this.selectedResourceId !== null && this.selectedCapabilityId !== null && this.selectedSkipInstall !== null)
@@ -357,28 +359,27 @@
     created() {
       this.filteredResources = this.resources
     },
-    mixins: [capabilityUtilsMixin],
     methods: {
       hasBaseConfigurationCapabilityService(capabilityServicesOfResource) {
-        return capabilityServicesOfResource.some(cs => cs.capability.capabilityClass=="BaseConfigurationCapability")
+        return capabilityServicesOfResource.some(cs => cs.capability.capabilityClass==="BaseConfigurationCapability")
       },
       getStatusOfBaseConfigurationCapabilityService(capabilityServicesOfResource) {
-        const bcCapabilityService = capabilityServicesOfResource.find(cs => cs.capability.capabilityClass=="BaseConfigurationCapability")
+        const bcCapabilityService = capabilityServicesOfResource.find(cs => cs.capability.capabilityClass==="BaseConfigurationCapability")
 
         return bcCapabilityService.status
       },
       getDeploymentCapabilityServices(capabilityServices) {
-        return capabilityServices.filter(cs => cs.capability.capabilityClass!="BaseConfigurationCapability")
+        return capabilityServices.filter(cs => cs.capability.capabilityClass!=="BaseConfigurationCapability")
       },
       deleteResource (resource) {
         const resourceId = resource.id
         ResourcesRestApi.deleteResource(resourceId).then(response => {
         })
-        this.$store.commit('SET_RESOURCE_MARKED_FOR_DELETE', resource)
+        this.resourceStore.setResourceMarkedForDelete(resource);
         this.resourceToDelete = null
       },
       openDefineCapabilityParamsDialog(resourceId, capabilityId, skipInstall) {
-        if(this.isDefineCapabilityDialogRequired(capabilityId, skipInstall) == false) {
+        if(this.isDefineCapabilityDialogRequired(capabilityId, skipInstall) === false) {
           this.addCapability(resourceId,capabilityId,skipInstall,{})
           return;
         }
@@ -407,13 +408,13 @@
 
         return this.getCapability(capabilityId).actions["INSTALL"].configParameters.filter(
           param => param.requiredType === "ALWAYS"
-        ).length != 0
+        ).length !== 0
       },
       isDefineCapabilityDialogRequired(capabilityId, skipInstall) {
         //false
-        if(this.getParamsOfInstallAction(capabilityId).length == 0)
+        if(this.getParamsOfInstallAction(capabilityId).length === 0)
           return false
-        else if (this.hasCapabilityConfigParamsWithRequiredTypeAlways(capabilityId) == false && skipInstall == true)
+        else if (this.hasCapabilityConfigParamsWithRequiredTypeAlways(capabilityId) === false && skipInstall === true)
           return false
         else
           return true
@@ -421,14 +422,19 @@
       removeCapability (resourceId, capabilityId) {
         ResourcesRestApi.removeCapabilityFromSingleHost(resourceId, capabilityId)
       },
-      setSelectedResource (resource) {
-        this.$emit('resource-selected', resource)
+      setSelectedResource (event, { item }) {
+        this.$emit('resource-selected', item)
       },
       rowClass (resource) {
-        return resource.markedForDelete ? 'grey--text text--lighten-1 row-pointer' : 'row-pointer'
+        return {
+          class: {
+            'text-grey text--lighten-1 row-pointer': resource.markedForDelete,
+            'row-pointer': resource.markedForDelete
+          }
+        }
       },
       isCapabilityInstalledOnResource (resource, capability) {
-        if(resource.capabilityServices != null)
+        if(resource.capabilityServices !== null)
           return resource.capabilityServices.filter(capService => capService.capability.name === capability.name).length > 0
         else
           return false
@@ -507,7 +513,7 @@
         return hasLocations
       },
       filterResources() {
-        if(this.filterResourcesByLocations.length == 0) {
+        if(this.filterResourcesByLocations.length === 0) {
           this.filteredResources = this.resources
           return
         }
@@ -525,17 +531,17 @@
       getFabOSDeviceIcon(capabilityServices) {
         const baseConfigService = capabilityServices.find(cs => cs.capability.capabilityClass === "BaseConfigurationCapability")
 
-        if(baseConfigService.status == "INSTALL" || baseConfigService.status == "UNINSTALL")
+        if(baseConfigService.status === "INSTALL" || baseConfigService.status === "UNINSTALL")
           return {
             "color": "info",
             "logo": "mdi-timer-sand"
           }
-        if(baseConfigService.status == "READY")
+        if(baseConfigService.status === "READY")
           return {
             "color": "info",
             "logo": "mdi-check-circle-outline"
           }
-        if(baseConfigService.status == "FAILED")
+        if(baseConfigService.status === "FAILED")
           return {
             "color": "error",
             "logo": "mdi-message-alert"
@@ -554,7 +560,7 @@
       },
       runProfiler() {
         let result = ProfilerRestApi.runProfiler()
-        Vue.$toast.info('Started Profiler for all devices.')
+        app.config.globalProperties.$toast.info('Started Profiler for all devices.')
       }
     }
   }
@@ -562,6 +568,7 @@
 </script>
 
 <style scoped>
+
 .row-pointer  {
   cursor: pointer;
 }

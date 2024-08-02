@@ -17,7 +17,7 @@
         <base-material-card
           color="green"
         >
-          <template v-slot:heading>
+          <template #heading>
             <div class="text-h3 font-weight-light">
               Material Dashboard Heading
             </div>

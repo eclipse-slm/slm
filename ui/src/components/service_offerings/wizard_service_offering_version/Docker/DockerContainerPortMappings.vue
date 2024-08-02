@@ -2,9 +2,9 @@
   <div>
     <v-row>
       <v-col cols="3">
-        <v-subheader>
+        <v-list-subheader>
           Port Mappings
-        </v-subheader>
+        </v-list-subheader>
       </v-col>
 
       <v-col cols="9">
@@ -14,8 +14,8 @@
           @click="addPortMapping"
         >
           <v-icon
-            dense
-            small
+            density="compact"
+            size="small"
             class="mr-2"
           >
             mdi-plus-circle
@@ -39,47 +39,50 @@
           }"
         >
           <template #item.hostPort="{ item }">
-            <ValidationProvider
-              v-slot="{ errors, valid }"
-              name="Container Port"
-              rules="required|numeric|min_value:1|max_value:65536"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="item.hostPort"
+              name="Host Port"
+              :rules="required"
             >
               <v-text-field
                 v-if="editable"
-                v-model="item.hostPort"
+                v-bind="field"
                 :error-messages="errors"
-                :success="valid"
+                :model-value="item.hostPort"
               />
               <div
                 v-else
               >
                 {{ item.key }}
               </div>
-            </ValidationProvider>
+            </Field>
           </template>
 
           <template #item.containerPort="{ item }">
-            <ValidationProvider
-              v-slot="{ errors, valid }"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="item.containerPort"
               name="Container Port"
-              rules="required|numeric|min_value:1|max_value:65536"
+              :rules="required"
             >
               <v-text-field
                 v-if="editable"
-                v-model="item.containerPort"
+                v-bind="field"
                 :error-messages="errors"
-                :success="valid"
+                :model-value="item.containerPort"
               />
               <div
                 v-else
               >
                 {{ item.value }}
               </div>
-            </ValidationProvider>
+            </Field>
           </template>
 
           <template #item.protocol="{ item }">
             <v-btn-toggle
+              mandatory="force"
               class="ml-5"
             >
               <v-btn
@@ -123,17 +126,36 @@
 </template>
 
 <script>
-  export default {
+import {Field} from "vee-validate";
+import * as yup from 'yup';
+
+export default {
     name: 'DockerContainerPortMappings',
-    props: ['portMappings', 'editable'],
+    components: {Field},
+    props: {
+      portMappings: {
+        type: Array,
+        default: () => []
+      },
+      editable: {
+        type: Boolean,
+        default: false
+      },
+    },
+    setup(){
+      const required = yup.number().required().min(1).max(65536).typeError("Number needs to be between 1 and 65536");
+      return {
+        required
+      }
+    },
     data () {
       return {
         tableHeaders: [
-          { text: 'Host Port', value: 'hostPort', width: '35%' },
-          { text: 'Container Port', value: 'containerPort', width: '35%' },
-          { text: 'Protocol', value: 'protocol', width: '10%' },
-          { text: 'Service Option', value: 'isServiceOption', width: '10%' },
-          { text: 'Actions', value: 'actions', width: '10%' },
+          { title: 'Host Port', value: 'hostPort', width: '35%' },
+          { title: 'Container Port', value: 'containerPort', width: '35%' },
+          { title: 'Protocol', value: 'protocol', width: '10%' },
+          { title: 'Service Option', value: 'isServiceOption', width: '10%' },
+          { title: 'Actions', value: 'actions', width: '10%' },
         ],
       }
     },

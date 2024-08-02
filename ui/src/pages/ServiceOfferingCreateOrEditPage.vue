@@ -32,69 +32,84 @@
         />
       </v-row>
 
-      <v-stepper
+      <v-stepper 
         v-else
         v-model="createWizardState.currentStep"
-        horizontal
+        hide-actions
+        :items="[$t('ServiceStepper.Common')]"
       >
-        <v-stepper-header>
-          <v-stepper-step
-            step="1"
-            :complete="createWizardState.step1.completed"
-          >
-            {{ $t('ServiceStepper.Common') }}
-          </v-stepper-step>
-        </v-stepper-header>
+        <template
+          v-if="creationType === 'manual'"
+          #item.1
+        >
+          <service-offering-wizard-manual-step1-common
+            v-if="creationType === 'manual'"
+            :edit-mode="editMode"
+            :new-service-offering="newServiceOffering"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
+          />
+        </template>
 
-        <v-stepper-items>
-          <!-- Step 1 - Manual Service Offering Creation -->
-          <v-stepper-content
-            v-if="creationType == 'manual'"
-            step="1"
-          >
-            <service-offering-wizard-manual-step1-common
-              :edit-mode="editMode"
-              :new-service-offering="newServiceOffering"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
-            />
-          </v-stepper-content>
-          <!-- Step 1 - Git-based Service Offering -->
-          <v-stepper-content
-            v-if="creationType == 'git'"
-            step="1"
-          >
-            <service-offering-wizard-git-step1-common
-              :new-service-offering="newServiceOffering"
-              :service-vendor-id="serviceVendorId"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
-            />
-          </v-stepper-content>
-        </v-stepper-items>
+        <template
+          v-if="creationType === 'git'"
+          #item.1
+        >
+          <service-offering-wizard-git-step1-common
+            :new-service-offering="newServiceOffering"
+            :service-vendor-id="serviceVendorId"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
+          />
+        </template>
       </v-stepper>
     </div>
   </div>
 </template>
 
 <script>
-  import ServiceOfferingWizardManualStep1Common from '@/components/service_offerings/wizard_service_offering/ServiceOfferingWizardManualStep1Common'
-  import ServiceOfferingWizardGitStep1Common
-    from "@/components/service_offerings/wizard_service_offering/ServiceOfferingWizardGitStep1Common";
-  import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
-  import { mapGetters } from 'vuex'
-  import ApiState from '@/api/apiState'
-  import Vue from 'vue'
+import ServiceOfferingWizardManualStep1Common
+  from '@/components/service_offerings/wizard_service_offering/ServiceOfferingWizardManualStep1Common'
+import ServiceOfferingWizardGitStep1Common
+  from "@/components/service_offerings/wizard_service_offering/ServiceOfferingWizardGitStep1Common";
+import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
 
-  export default {
+import ApiState from '@/api/apiState'
+import {app} from "@/main";
+import {useServicesStore} from "@/stores/servicesStore";
+import {storeToRefs} from "pinia";
+
+export default {
     name: 'ServiceOfferingCreatePage',
 
     components: {
       ServiceOfferingWizardManualStep1Common,
       ServiceOfferingWizardGitStep1Common
     },
-    props: ['editMode', 'creationType', 'serviceOfferingId', 'serviceVendorId'],
-
+    props: {
+      editMode: {
+        type: Boolean,
+        default: false
+      },
+      creationType: {
+        type: String,
+        default: ""
+      },
+      serviceOfferingId: {
+        type: String,
+        default: null
+      },
+      serviceVendorId: {
+        type: String,
+        default: null
+      },
+    },
+        // ['editMode', 'creationType', 'serviceOfferingId', 'serviceVendorId'],
+    setup(){
+      const servicesStore = useServicesStore();
+      const {serviceOfferingById} = storeToRefs(servicesStore);
+      return {servicesStore, serviceOfferingById}
+    },
     data () {
       return {
         createWizardState: {
@@ -114,31 +129,24 @@
       }
     },
 
-    created () {
-      if (this.editMode) {
-        this.newServiceOffering = null
-        ServiceOfferingsRestApi.getServiceOfferingById(this.serviceOfferingId).then(serviceOffering => {
-          this.newServiceOffering = serviceOffering
-        })
-      }
-    },
-
     computed: {
-      ...mapGetters([
-        'apiStateServices',
-        'serviceOfferingCategories',
-        'serviceOfferingById',
-      ]),
+      apiStateServices () {
+        return this.servicesStore.apiStateServices
+      },
+      serviceOfferingCategories () {
+        return this.servicesStore.serviceOfferingCategories
+      },
+
       apiStateLoaded () {
         return this.apiStateServices.serviceOfferingCategories === ApiState.LOADED &&
           this.apiStateServices.serviceVendors === ApiState.LOADED
       },
       apiStateLoading () {
         if (this.apiStateServices.serviceOfferingCategories === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferingCategories')
+          this.servicesStore.getServiceOfferingCategories();
         }
         if (this.apiStateServices.serviceVendors === ApiState.INIT) {
-          this.$store.dispatch('getServiceVendors')
+          this.servicesStore.getServiceVendors();
         }
         return this.apiStateServices.serviceOfferingCategories === ApiState.LOADING || this.apiStateServices.serviceOfferingCategories === ApiState.INIT ||
           this.apiStateServices.serviceVendors === ApiState.LOADING || this.apiStateServices.serviceVendors === ApiState.INIT
@@ -147,6 +155,15 @@
         return this.apiStateServices.serviceOfferingCategories === ApiState.ERROR &&
           this.apiStateServices.serviceVendors === ApiState.ERROR
       },
+    },
+
+    created () {
+      if (this.editMode) {
+        this.newServiceOffering = null
+        ServiceOfferingsRestApi.getServiceOfferingById(this.serviceOfferingId).then(serviceOffering => {
+          this.newServiceOffering = serviceOffering
+        })
+      }
     },
 
     methods: {
@@ -172,8 +189,8 @@
               ServiceOfferingsRestApi.updateServiceOffering(this.newServiceOffering).then(
                 response => {
                   if (response.status === 200) {
-                    Vue.$toast.info('Successfully updated service offering')
-                    this.$store.dispatch('getServiceOfferings')
+                    app.config.globalProperties.$toast.info('Successfully updated service offering')
+                    this.servicesStore.getServiceOfferings();
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
                   } else {
                     console.log(response)
@@ -187,15 +204,15 @@
               ServiceOfferingsRestApi.addServiceOffering(this.newServiceOffering).then(
                 response => {
                   if (response.status === 200) {
-                    Vue.$toast.info('Successfully created service offering')
-                    this.$store.dispatch('getServiceOfferings')
+                    app.config.globalProperties.$toast.info('Successfully created service offering')
+                    this.servicesStore.getServiceOfferings();
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
                   } else {
                     console.log(response)
                   }
                 })
                 .catch(exception => {
-                  Vue.$toast.error('Failed to create service offering')
+                  app.config.globalProperties.$toast.error('Failed to create service offering')
                   console.log('Service offering creation failed: ' + exception.response.data.message)
                   console.log(exception)
                 })

@@ -3,6 +3,7 @@
     v-bind="$attrs"
     :class="classes"
     class="v-card--material pa-3"
+    style="margin-top: 30px; margin-bottom: 15px;"
   >
     <div class="d-flex grow flex-wrap">
       <v-avatar
@@ -18,12 +19,13 @@
         :class="{
           'pa-3': !$slots.image
         }"
-        :color="color ? color : themeColorMain"
+        :color="color ? color : store.themeColorMain"
         :max-height="icon ? 90 : undefined"
         :width="icon ? 'auto' : '100%'"
         elevation="6"
         class="text-start v-card--material__heading mb-n6"
-        dark
+        theme="dark"
+        style="top: -30px"
       >
         <slot
           v-if="$slots.heading"
@@ -44,7 +46,9 @@
         <v-icon
           v-else-if="icon"
           size="32"
-        >{{icon}}</v-icon>
+        >
+          {{ icon }}
+        </v-icon>
 
         <div
           v-if="text"
@@ -85,67 +89,78 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
 
-  export default {
-    name: 'MaterialCard',
+import {useStore} from "@/stores/store";
 
-    props: {
-      avatar: {
-        type: String,
-        default: '',
-      },
-      color: {
-        type: String,
-        default: null,
-      },
-      icon: {
-        type: String,
-        default: undefined,
-      },
-      image: {
-        type: Boolean,
-        default: false,
-      },
-      text: {
-        type: String,
-        default: '',
-      },
-      title: {
-        type: String,
-        default: '',
-      },
+export default {
+  name: 'MaterialCard',
+
+  props: {
+    avatar: {
+      type: String,
+      default: '',
     },
-
-    computed: {
-      ...mapGetters([
-        'themeColorMain',
-      ]),
-      classes () {
-        return {
-          'v-card--material--has-heading': this.hasHeading,
-        }
-      },
-      hasHeading () {
-        return Boolean(this.$slots.heading || this.title || this.icon)
-      },
-      hasAltHeading () {
-        return Boolean(this.$slots.heading || (this.title && this.icon))
-      },
+    color: {
+      type: String,
+      default: null,
     },
-  }
+    icon: {
+      type: String,
+      default: undefined,
+    },
+    image: {
+      type: Boolean,
+      default: false,
+    },
+    text: {
+      type: String,
+      default: '',
+    },
+    title: {
+      type: String,
+      default: '',
+    },
+  },
+
+  setup(){
+    const store = useStore();
+    return {store};
+  },
+  computed: {
+    classes() {
+      return {
+        'v-card--material--has-heading': this.hasHeading,
+      }
+    },
+    hasHeading() {
+      return Boolean(this.$slots.heading || this.title || this.icon)
+    },
+    hasAltHeading() {
+      return Boolean(this.$slots.heading || (this.title && this.icon))
+    },
+  },
+}
 </script>
 
 <style lang="sass">
-  .v-card--material
-    &__avatar
-      position: relative
-      top: -64px
-      margin-bottom: -32px
 
-    &__heading
-      position: relative
-      top: -40px
-      transition: .3s ease
-      z-index: 1
+.v-card
+  overflow: visible
+
+.v-card--material
+  &__avatar
+    position: relative
+    top: -64px
+    margin-bottom: -32px
+
+  &__heading
+    position: relative
+    top: -40px
+    transition: .3s ease
+    z-index: 1
+
+.v-application .text-h3
+  font-size: 3rem!important
+  line-height: 3.125rem
+  letter-spacing: normal!important
 </style>

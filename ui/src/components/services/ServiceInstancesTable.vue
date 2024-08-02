@@ -4,19 +4,19 @@
       v-model="groupByServiceInstanceGroups"
       class="px-4 py-4"
       mandatory
-      @change="onGroupByServiceInstanceGroupsClicked"
+      @update:modelValue="onGroupByServiceInstanceGroupsClicked"
     >
       <v-btn
-        small
-        :color="groupByServiceInstanceGroups == 0 ? 'secondary' : 'disabled'"
+        size="small"
+        :color="groupByServiceInstanceGroups === 0 ? 'secondary' : 'disabled'"
       >
         <v-icon color="white">
           mdi-ungroup
         </v-icon>
       </v-btn>
       <v-btn
-        small
-        :color="groupByServiceInstanceGroups == 1 ? 'secondary' : 'disabled'"
+        size="small"
+        :color="groupByServiceInstanceGroups === 1 ? 'secondary' : 'disabled'"
       >
         <v-icon color="white">
           mdi-group
@@ -28,17 +28,22 @@
       :headers="headers"
       :items="groupedServices"
       item-key="rowId"
-      :item-class="rowClass"
-      :group-by="groupByServiceInstanceGroups ? 'groupName' : null"
+      :row-props="rowClass"
+      :group-by="groupByServiceInstanceGroups ? [{key: 'groupName'}] : []"
       @click:row="onServiceInstanceClicked"
     >
-      <template #group.header="{items, isOpen, toggle}">
-        <th colspan="7">
-          <v-icon @click="toggle">
-            {{ isOpen ? 'mdi-minus' : 'mdi-plus' }}
-          </v-icon>
-          {{ items[0].groupName }}
-        </th>
+      <template #group-header="{ item, columns, toggleGroup, isGroupOpen }">
+        <tr>
+          <td :colspan="columns.length">
+            <v-btn
+              :icon="isGroupOpen(item) ? '$expand' : '$next'"
+              size="small"
+              variant="text"
+              @click="toggleGroup(item)"
+            />
+            {{ item.value }}
+          </td>
+        </tr>
       </template>
 
       <template #item.offering="{ item : serviceInstance }">
@@ -106,16 +111,15 @@
           </v-btn>
 
           <v-menu>
-            <template #activator="{ on: onMenu, attrs: attrsMenu }">
-              <v-tooltip top>
-                <template #activator="{ on }">
-                  <div v-on="!availableVersionChangesOfServices[serviceInstance.id] ? on : ''">
+            <template #activator="{ propsM }">
+              <v-tooltip location="top">
+                <template #activator="{ props }">
+                  <div v-bind="!availableVersionChangesOfServices[serviceInstance.id] ? props : ''">
                     <v-btn
                       :disabled="!availableVersionChangesOfServices[serviceInstance.id]"
                       color="blue"
                       class="ml-4"
-                      v-bind="attrsMenu"
-                      v-on="onMenu"
+                      v-bind="propsM"
                     >
                       <v-icon>
                         mdi-upload
@@ -128,7 +132,7 @@
             </template>
 
             <v-list>
-              <v-subheader>Available versions</v-subheader>
+              <v-list-subheader>Available versions</v-list-subheader>
               <v-list-item
                 v-for="(availableVersionChange, i) in availableVersionChangesOfServices[serviceInstance.id]"
                 :key="i"
@@ -179,32 +183,38 @@
 </template>
 
 <script>
-  import {
-    mapGetters,
-  } from 'vuex'
-  import ServiceInstanceDeleteDialog from '@/components/services/ServiceInstanceDeleteDialog'
-  import ServiceInstancesRestApi from '@/api/service-management/serviceInstancesRestApi'
-  import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
-  import Vue from "vue";
-  import ConfirmDialog from "@/components/base/ConfirmDialog";
-  import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
+import ServiceInstanceDeleteDialog from '@/components/services/ServiceInstanceDeleteDialog'
+import ServiceInstancesRestApi from '@/api/service-management/serviceInstancesRestApi'
+import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
+import ConfirmDialog from "@/components/base/ConfirmDialog";
+import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
+import {useServicesStore} from "@/stores/servicesStore";
+import {useResourcesStore} from "@/stores/resourcesStore";
+import {storeToRefs} from "pinia";
 
-  export default {
+export default {
     name: 'ServiceInstancesTable',
     comments: {
       ServiceInstanceDeleteDialog,
     },
     components: { ServiceInstanceDeleteDialog, ResourcesInfoDialog, ConfirmDialog },
     mixins: [ serviceInstanceMixin ],
+    setup(){
+      const servicesStore = useServicesStore();
+      const resourceStore = useResourcesStore();
+      const {serviceOfferingById, serviceInstanceGroupById} = storeToRefs(servicesStore)
+      const {resourceById} = storeToRefs(resourceStore)
+      return {servicesStore, resourceStore, serviceOfferingById, serviceInstanceGroupById, resourceById};
+    },
     data () {
       return {
         headers: [
-          { text: 'Id', value: 'id', sortable: true },
-          { text: 'Service Offering', value: 'offering', sortable: true },
-          { text: 'Ports', value: 'ports', sortable: true, width: '20%' },
-          { text: 'Tags', value: 'tags', sortable: true },
-          { text: 'Resource', value: 'resource', sortable: true },
-          { text: 'Actions', value: 'actions' },
+          { title: 'Id', key: 'id', sortable: true },
+          { title: 'Service Offering', key: 'offering', sortable: true },
+          { title: 'Ports', key: 'ports', sortable: true, width: '20%' },
+          { title: 'Tags', key: 'tags', sortable: true },
+          { title: 'Resource', key: 'resource', sortable: true },
+          { title: 'Actions', key: 'actions' },
         ],
         serviceToDelete: null,
         selectedResource: null,
@@ -221,19 +231,20 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'services',
-        'serviceOfferingById',
-        'resourceById',
-        'serviceInstanceGroupById'
-      ]),
+      services () {
+        return this.servicesStore.services
+      },
+
     },
     created() {
+
       this.groupedServices = this.services
+      console.log('SERVICES',this.services);
       this.services.forEach(service => {
         ServiceInstancesRestApi.getAvailableVersionsForServiceInstance(service.id).then(availableUpdates => {
+          console.log('adsf',availableUpdates);
           if (availableUpdates.length > 0) {
-            Vue.set(this.availableVersionChangesOfServices, service.id, availableUpdates)
+            this.availableVersionChangesOfServices[service.id] = availableUpdates;
           }
         })
       })
@@ -247,7 +258,7 @@
       },
       onServiceDeleteConfirmed () {
         ServiceInstancesRestApi.deleteServiceInstance(this.serviceToDelete.id)
-        this.$store.commit('SET_SERVICE_MARKED_FOR_DELETE', this.serviceToDelete)
+        this.servicesStore.setServiceMarkedForDelete(this.serviceToDelete);
         this.serviceToDelete = null
         this.$toast.info('Service deletion started')
       },
@@ -272,15 +283,17 @@
             this.serviceVersionChange.targetServiceVersion.serviceOfferingVersionId)
       },
 
-      onServiceInstanceClicked (serviceInstance) {
-        this.$emit('service-instance-clicked', serviceInstance)
+      onServiceInstanceClicked (event, serviceInstance) {
+        console.log(serviceInstance)
+        this.$emit('service-instance-clicked', serviceInstance.item)
       },
 
       onGroupByServiceInstanceGroupsClicked () {
         if (this.groupByServiceInstanceGroups === 1) {
           this.groupedServices = []
           this.services.forEach(service => {
-            if (service.groupIds.length == 0) {
+            console.log('service:', service)
+            if (service.groupIds.length === 0) {
               let serviceWithGroup = JSON.parse(JSON.stringify(service))
               serviceWithGroup.groupName = 'No group'
               serviceWithGroup.rowId = service.id + "_ungrouped"
@@ -301,7 +314,12 @@
       },
 
       rowClass (item) {
-        return item.markedForDelete ? 'grey--text text--lighten-1 row-pointer' : 'row-pointer'
+        return {
+          class: {
+            'text-grey text--lighten-1 row-pointer': item.markedForDelete,
+            'row-pointer': item.markedForDelete
+          }
+        };
       },
 
     },

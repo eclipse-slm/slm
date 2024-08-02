@@ -1,39 +1,36 @@
 <template>
   <v-list-group
-    :group="group"
     :prepend-icon="item.icon"
-    :sub-group="subGroup"
+    :subgroup="subGroup"
     append-icon="mdi-menu-down"
-    :color="barColor !== 'rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.7)' ? 'white' : 'grey darken-1'"
+    :color="store.barColor !== 'rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.7)' ? 'white' : 'grey darken-1'"
   >
-    <template v-slot:activator>
-      <v-list-item-icon
-        v-if="text"
-        class="v-list-item__icon--text"
-      >{{computedText}}</v-list-item-icon>
+    <template #activator>
+      <v-list-item v-if="text">
+        {{ computedText }}
+      </v-list-item>
 
-      <v-list-item-avatar
+      <v-list-item 
         v-else-if="item.avatar"
         class="align-self-center"
         color="white"
         contain
       >
         <v-img src="https://demos.creative-tim.com/vuetify-material-dashboard/favicon.ico" />
-      </v-list-item-avatar>
+      </v-list-item>
 
-      <v-list-item-content>
-        <v-list-item-title >{{item.title}}</v-list-item-title>
-      </v-list-item-content>
+
+      <v-list-item-title> {{ item.title }} </v-list-item-title>
     </template>
 
     <template v-for="(child, i) in children">
-      <base-item-sub-group
+      <v-list-group
         v-if="child.children"
         :key="`sub-group-${i}`"
         :item="child"
       />
 
-      <base-item
+      <v-list-item
         v-else
         :key="`item-${i}`"
         :item="child"
@@ -44,11 +41,12 @@
 </template>
 
 <script>
-  // Utilities
-  import kebabCase from 'lodash/kebabCase'
-  import { mapState } from 'vuex'
+// Utilities
+import kebabCase from 'lodash/kebabCase'
 
-  export default {
+import {useStore} from "@/stores/store";
+
+export default {
     name: 'ItemGroup',
 
     inheritAttrs: false,
@@ -72,9 +70,11 @@
         default: false,
       },
     },
-
+    setup(){
+      const store = useStore();
+      return {store};
+    },
     computed: {
-      ...mapState(['barColor']),
       children () {
         return this.item.children.map(item => ({
           ...item,

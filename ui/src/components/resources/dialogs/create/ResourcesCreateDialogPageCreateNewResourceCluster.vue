@@ -4,7 +4,7 @@
       <v-container class="pa-8">
         <v-row>
           <v-icon
-            large
+            size="large"
             class="mr-7 ml-2"
           >
             mdi-arrow-decision
@@ -20,7 +20,7 @@
         <div v-if="selectedClusterCreateOption === 'useExistingResources'">
           <v-row id="resource-create-select-cluster-type">
             <v-icon
-              large
+              size="large"
               class="mr-7 ml-2"
             >
               mdi-selection-multiple
@@ -28,17 +28,17 @@
             <v-select
               v-model="selectedClusterType"
               :items="availableClusterTypes"
-              item-text="name"
+              item-title="name"
               label="Cluster Type"
               required
               return-object
-              @change="onClusterTypeSelected"
+              @update:modelValue="onClusterTypeSelected"
             />
           </v-row>
           <div v-if="selectedClusterType">
-            <v-subheader class="mt-6">
+            <v-list-subheader class="mt-6">
               Cluster Member:
-            </v-subheader>
+            </v-list-subheader>
             <v-row
               v-for="clusterMemberType in selectedClusterType.clusterMemberTypes"
               :key="clusterMemberType.name"
@@ -50,17 +50,16 @@
                   v-model="clusterMembersByMemberType[clusterMemberType.name]"
                   :label="clusterMemberType.prettyName"
                   :items="availableClusterResourcesByMemberType[clusterMemberType.name]"
-                  item-text="hostname"
+                  item-title="hostname"
                   item-value="id"
                   return-object
                   hide-selected
-                  deletable-chips
+                  closable-chips
                   chips
                   multiple
-                  outlined
+                  variant="outlined"
                   :error-messages="errorMessageByMemberType[clusterMemberType.name]"
-                  @change="onSelectedClusterMembersChanged($event)"
-                  @input="limiter"
+                  @update:modelValue="onSelectedClusterMembersChanged($event)"
                 >
                   <template slot="no-data">
                     No resources available
@@ -75,21 +74,21 @@
 
     <v-card-actions>
       <v-btn
-        text
+        variant="text"
         @click="onBackButtonClicked"
       >
         Back
       </v-btn>
       <v-spacer />
       <v-btn
-        text
+        variant="text"
         @click="onCancelButtonClicked"
       >
         Cancel
       </v-btn>
       <v-btn
         id="resource-create-button-create-cluster"
-        text
+        variant="text"
         :disabled="!validInput"
         @click="onCreateButtonClicked"
       >
@@ -100,14 +99,21 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import clustersRestApi from '@/api/resource-management/clustersRestApi'
-  import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
 
-  export default {
+import clustersRestApi from '@/api/resource-management/clustersRestApi'
+import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
+import {useResourcesStore} from "@/stores/resourcesStore";
+import {useProviderStore} from "@/stores/providerStore";
+
+export default {
     name: 'ResourcesCreateDialogPageCreateNewResourceCluster',
     enums: {
       ResourcesCreateDialogPage,
+    },
+    setup(){
+      const providerStore = useProviderStore();
+      const resourceStore = useResourcesStore();
+      return {providerStore, resourceStore};
     },
     data () {
       return {
@@ -120,28 +126,36 @@
         validInput: false,
       }
     },
-    mounted() {
-      this.$emit('title-changed', 'Create new cluster resource')
-    },
     computed: {
-      ...mapGetters(['virtualResourceProviders', 'availableClusterTypes', 'resources']),
+      virtualResourceProviders() {
+        return this.providerStore.virtualResourceProviders
+      },
+      availableClusterTypes() {
+        return this.resourceStore.availableClusterTypes
+      },
+      resources() {
+        return this.resourceStore.resources
+      },
       clusterCreateOptions () {
         const options = [
           {
-            text: 'Use existing resources',
+            title: 'Use existing resources',
             value: 'useExistingResources',
           },
         ]
 
         if (this.virtualResourceProviders.length !== 0) {
           options.push({
-            text: 'Create Members',
+            title: 'Create Members',
             value: 'createVirtualResources',
           })
         }
 
         return options
       },
+    },
+    mounted() {
+      this.$emit('title-changed', 'Create new cluster resource')
     },
     methods: {
       onClusterTypeSelected () {

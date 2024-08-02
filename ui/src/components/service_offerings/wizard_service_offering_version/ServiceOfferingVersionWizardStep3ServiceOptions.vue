@@ -1,7 +1,7 @@
 <template>
-  <validation-observer
+  <ValidationForm
     ref="observer"
-    v-slot="{ invalid, handleSubmit, validate }"
+    v-slot="{ meta, handleSubmit, validate }"
   >
     <div
       v-for="serviceOptionCategory in serviceOfferingVersion.serviceOptionCategories"
@@ -11,39 +11,36 @@
         <template #heading>
           <v-row class="my-1">
             <v-btn
-              icon
-              small
+              icon="mdi-arrow-up"
+              variant="text"
+              size="small"
               class="mx-2"
               @click="
                 onMoveServiceOptionCategoryUpClicked(serviceOptionCategory.id)
               "
-            >
-              <v-icon> arrow_upward </v-icon>
-            </v-btn>
+            />
             <v-btn
-              icon
-              small
+              icon="mdi-arrow-down"
+              variant="text"
+              size="small"
               @click="
                 onMoveServiceOptionCategoryDownClicked(serviceOptionCategory.id)
               "
-            >
-              <v-icon> arrow_downward </v-icon>
-            </v-btn>
+            />
             <v-text-field
               v-model="serviceOptionCategory.name"
               class="mx-6"
-              dense
+              density="compact"
             />
             <v-btn
-              icon
-              small
+              icon="mdi-delete"
+              variant="text"
+              size="small"
               class="mx-4"
               @click="
                 onServiceOptionCategoryDeleteClicked(serviceOptionCategory.id)
               "
-            >
-              <v-icon> mdi-delete </v-icon>
-            </v-btn>
+            />
           </v-row>
         </template>
         <v-card-text>
@@ -64,44 +61,61 @@
           <v-icon>mdi-plus</v-icon>
           Service Option Category
         </v-btn>
-        <div v-else>No service options defined in previous steps</div>
+        <div v-else>
+          No service options defined in previous steps
+        </div>
       </v-col>
     </v-row>
 
     <!-- Navigation Buttons-->
     <v-card-actions>
       <v-btn
-        :color="$vuetify.theme.themes.light.secondary"
+        variant="elevated"
+        :color="$vuetify.theme.themes.light.colors.secondary"
         @click="$emit('step-canceled', stepNumber)"
       >
         {{ $t("buttons.Back") }}
       </v-btn>
       <v-spacer />
       <v-btn
+        variant="elevated"
         :color="
-          invalid
-            ? $vuetify.theme.disable
-            : $vuetify.theme.themes.light.secondary
+          !meta.valid
+            ? $vuetify.theme.themes.light.colors.disable
+            : $vuetify.theme.themes.light.colors.secondary
         "
-        @click="invalid ? validate() : handleSubmit(emitStepCompleted)"
+        @click="!meta.valid ? validate() : handleSubmit(emitStepCompleted)"
       >
         {{ $t("buttons.Next") }}
       </v-btn>
     </v-card-actions>
-  </validation-observer>
+  </ValidationForm>
 </template>
 
 <script>
-import { serviceOptionMixin } from "@/utils/serviceOptionUtil";
-import Vue from "vue";
-import serviceOptionsDefinitionTable from "@/components/service_offerings/wizard_service_offering_version/serviceOptions/serviceOptionsDefinitionTable";
+import {serviceOptionMixin} from "@/utils/serviceOptionUtil";
+import serviceOptionsDefinitionTable
+  from "@/components/service_offerings/wizard_service_offering_version/serviceOptions/serviceOptionsDefinitionTable";
+import {app} from "@/main";
+import {Form as ValidationForm} from "vee-validate";
+
 export default {
   name: "ServiceOfferingVersionWizardStep3ServiceOptions",
   components: {
     serviceOptionsDefinitionTable,
+    ValidationForm
   },
   mixins: [serviceOptionMixin],
-  props: ["editMode", "serviceOfferingVersion"],
+  props: {
+    editMode: {
+      type: Boolean,
+      default: false
+    },
+    serviceOfferingVersion: {
+      type: Object,
+      default: null
+    },
+  },
   data() {
     return {
       stepNumber: 3,
@@ -130,7 +144,7 @@ export default {
           1
         );
       } else {
-        Vue.$toast.warning(
+        app.config.globalProperties.$toast.warning(
           `A category that contains service options cannot be deleted`
         );
       }

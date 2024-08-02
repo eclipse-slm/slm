@@ -1,13 +1,13 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="active"
     max-width="800px"
     @click:outside="closeDialog"
   >
-    <template>
+    <template #default>
       <v-toolbar
         color="primary"
-        dark
+        theme="dark"
       >
         <v-row
           align="center"
@@ -23,10 +23,9 @@
             cols="1"
           >
             <v-btn
-              icon
               @click="closeDialog"
             >
-              <v-icon>mdi-close</v-icon>
+              <v-icon icon="mdi-close" />
             </v-btn>
           </v-col>
         </v-row>
@@ -37,15 +36,15 @@
         </v-container>
         <v-card-actions>
           <v-btn
-            text
+            variant="text"
             @click="closeDialog"
           >
             Cancel
           </v-btn>
           <v-spacer />
           <v-btn
-            text
-            :color="$vuetify.theme.themes.light.secondary"
+            variant="text"
+            :color="$vuetify.theme.themes.light.colors.secondary"
           >
             Create
           </v-btn>
@@ -56,13 +55,28 @@
 </template>
 
 <script>
-import {mapGetters} from "vuex";
 import VmCreateDialogForm from "@/components/provider/dialogs/VmCreateDialogForm.vue";
+import {toRef} from "vue";
 
 export default {
   name: 'VmCreateDialog',
   components: {VmCreateDialogForm},
-  props: ['show','virtualResourceProvider'],
+  props: {
+    show: {
+      type: Boolean,
+      default: false
+    },
+    virtualResourceProvider:{
+      type: Object,
+      default: null
+    }
+  },
+  setup(props){
+    const active = toRef(props, 'show')
+    return{
+      active
+    }
+  },
   data () {
     return {
       title: 'Create VM'
@@ -80,6 +94,6 @@ export default {
     closeDialog () {
       this.$emit('canceled')
     }
-  },
+  }
 }
 </script>

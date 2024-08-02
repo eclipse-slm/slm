@@ -30,7 +30,12 @@
 <script>
 export default {
   name: "CapabilityParamsDialogInputField",
-  props: ['param'],
+  props: {
+    param: {
+      type: Object,
+      default: null
+    }
+  },
   data() {
     return {
       key: this.param.name,
@@ -44,8 +49,7 @@ export default {
   },
   methods: {
     getParamLogo(param) {
-      const icon = "mdi-alpha-"+param.name[0]+"-box"
-      return icon
+      return "mdi-alpha-" + param.name[0] + "-box"
     }
   }
 }

@@ -2,9 +2,9 @@
   <div>
     <v-row>
       <v-col cols="3">
-        <v-subheader>
+        <v-list-subheader>
           Labels
-        </v-subheader>
+        </v-list-subheader>
       </v-col>
 
       <v-col cols="9">
@@ -14,8 +14,8 @@
           @click="addLabel"
         >
           <v-icon
-            dense
-            small
+            density="compact"
+            size="small"
             class="mr-2"
           >
             mdi-plus-circle
@@ -39,45 +39,47 @@
           }"
         >
           <template #item.name="{ item }">
-            <ValidationProvider
-              v-slot="{ errors, valid }"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="item.name"
               name="Label"
-              rules="required|alpha_num"
+              :rules="required_string"
             >
               <v-text-field
                 v-if="editable"
-                v-model="item.name"
+                v-bind="field"
                 placeholder="Name of label"
                 :error-messages="errors"
-                :success="valid"
+                :model-value="item.name"
               />
               <div
                 v-else
               >
                 {{ item.key }}
               </div>
-            </ValidationProvider>
+            </Field>
           </template>
 
           <template #item.value="{ item }">
-            <ValidationProvider
-              v-slot="{ errors, valid }"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="item.value"
               name="Value"
-              rules="required"
+              :rules="required_string"
             >
               <v-text-field
                 v-if="editable"
-                v-model="item.value"
+                v-bind="field"
                 placeholder="Value of label"
                 :error-messages="errors"
-                :success="valid"
+                :model-value="item.value"
               />
               <div
                 v-else
               >
                 {{ item.value }}
               </div>
-            </ValidationProvider>
+            </Field>
           </template>
 
           <template #item.isServiceOption="{ item }">
@@ -104,16 +106,37 @@
 </template>
 
 <script>
-  export default {
+import {Field} from "vee-validate";
+import * as yup from "yup";
+
+
+export default {
     name: 'DockerContainerLabels',
-    props: ['labels', 'editable'],
+    components: {Field},
+    props:{
+      labels: {
+        type: Array,
+        default: () => []
+      },
+      editable: {
+        type: Boolean,
+        default: false
+      },
+    },
+    setup(){
+      const required = yup.number().required()
+      const required_string = yup.string().required()
+      return {
+        required, required_string
+      }
+    },
     data () {
       return {
         tableHeaders: [
-          { text: 'Label', value: 'name' },
-          { text: 'Value', value: 'value' },
-          { text: 'Service Option', value: 'isServiceOption' },
-          { text: 'Actions', value: 'actions' },
+          { title: 'Label', value: 'name' },
+          { title: 'Value', value: 'value' },
+          { title: 'Service Option', value: 'isServiceOption' },
+          { title: 'Actions', value: 'actions' },
         ],
       }
     },

@@ -9,13 +9,17 @@
 </template>
 
 <script>
-  export default {
+import DashboardCoreAppBar from "@/components/core/AppBar.vue";
+import DashboardCoreDrawer from "@/components/core/Drawer.vue";
+import DashboardCoreView from "@/components/core/View.vue";
+
+export default {
     name: 'IndexPage',
 
     components: {
-      DashboardCoreAppBar: () => import('../components/core/AppBar'),
-      DashboardCoreDrawer: () => import('../components/core/Drawer'),
-      DashboardCoreView: () => import('../components/core/View'),
+      DashboardCoreView,
+      DashboardCoreDrawer,
+      DashboardCoreAppBar
     },
 
     data: () => ({

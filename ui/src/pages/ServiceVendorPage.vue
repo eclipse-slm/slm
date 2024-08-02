@@ -26,22 +26,12 @@
           <v-select
             v-model="selectedServiceVendor"
             :items="serviceVendorsOfDeveloper"
+            item-title="name"
             return-object
             label="Select Service Vendor"
             autofocus
-            @change="onServiceVendorSelected"
-          >
-            <template
-              #selection="data"
-            >
-              {{ data.item.name }}
-            </template>
-            <template
-              #item="data"
-            >
-              {{ data.item.name }}
-            </template>
-          </v-select>
+            @update:modelValue="onServiceVendorSelected"
+          />
         </v-col>
       </v-row>
 
@@ -65,7 +55,7 @@
               v-if="serviceOfferingsOfVendor == null && serviceOfferingsOfVendorLoaded"
             >
               <v-alert
-                outlined
+                variant="outlined"
                 type="info"
               >
                 No service offerings available
@@ -84,8 +74,8 @@
               @click="serviceOfferingCreateDialog = true"
             >
               <v-icon
-                dense
-                small
+                density="compact"
+                size="small"
                 class="mr-2"
               >
                 mdi-plus
@@ -152,9 +142,9 @@
                     <td>
                       <v-btn
                         class="ma-1"
-                        small
-                        outlined
-                        fab
+                        size="small"
+                        variant="outlined"
+
                         color="red"
                         @click="onDeleteRepositoryClicked(repository)"
                       >
@@ -173,8 +163,8 @@
               @click="serviceRepositoryCreateDialog = true"
             >
               <v-icon
-                dense
-                small
+                density="compact"
+                size="small"
                 class="mr-2"
               >
                 mdi-plus
@@ -195,7 +185,7 @@
                 :avatar="getImageUrl(selectedServiceVendor.logo)"
               >
                 <v-card-text class="text-center">
-                  <div class="text-h4 font-weight-light mb-3 black--text">
+                  <div class="text-h4 font-weight-light mb-3 text-black">
                     {{ selectedServiceVendor.name }}
                   </div>
 
@@ -213,8 +203,8 @@
                     @click="showEditServiceVendorDialog = true"
                   >
                     <v-icon
-                      dense
-                      small
+                      density="compact"
+                      size="small"
                       class="mr-2"
                     >
                       mdi-pencil
@@ -255,25 +245,29 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
-  import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
-  import UsersRestApi from '@/api/service-management/usersRestApi'
-  import ApiState from '@/api/apiState'
-  import Vue from 'vue'
-  import ServiceRepositoryCreateDialog from '@/components/service_vendors/ServiceRepositoryCreateDialog'
-  import ServiceVendorsDevelopersTable from '@/components/service_vendors/ServiceVendorDevelopersTable'
-  import ServiceVendorCreateOrEditDialog from '@/components/service_vendors/ServiceVendorCreateOrEditDialog'
-  import logRequestError from '@/api/restApiHelper'
-  import getImageUrl from '@/utils/imageUtil'
-  import ServiceOfferingTable from "@/components/service_offerings/ServiceOfferingTable";
-  import ConfirmDialog from "@/components/base/ConfirmDialog";
-  import ServiceOfferingVersionsRestApi from  "@/api/service-management/serviceOfferingVersionsRestApi";
-  import ServiceOfferingCreateDialog from "@/components/service_offerings/dialogs/ServiceOfferingCreateDialog";
-  import ProgressCircular from "@/components/base/ProgressCircular";
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
 
-  export default {
+import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
+import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
+import UsersRestApi from '@/api/service-management/usersRestApi'
+import ApiState from '@/api/apiState'
+import ServiceRepositoryCreateDialog from '@/components/service_vendors/ServiceRepositoryCreateDialog'
+import ServiceVendorsDevelopersTable from '@/components/service_vendors/ServiceVendorDevelopersTable'
+import ServiceVendorCreateOrEditDialog from '@/components/service_vendors/ServiceVendorCreateOrEditDialog'
+import logRequestError from '@/api/restApiHelper'
+import getImageUrl from '@/utils/imageUtil'
+import ServiceOfferingTable from "@/components/service_offerings/ServiceOfferingTable";
+import ConfirmDialog from "@/components/base/ConfirmDialog";
+import ServiceOfferingVersionsRestApi from "@/api/service-management/serviceOfferingVersionsRestApi";
+import ServiceOfferingCreateDialog from "@/components/service_offerings/dialogs/ServiceOfferingCreateDialog";
+import ProgressCircular from "@/components/base/ProgressCircular";
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import {app} from "@/main";
+import {useServicesStore} from "@/stores/servicesStore";
+import {useStore} from "@/stores/store";
+import {useUserStore} from "@/stores/userStore";
+import {storeToRefs} from "pinia";
+
+export default {
     components: {
       OverviewHeading,
       ProgressCircular,
@@ -284,7 +278,19 @@
       ServiceVendorsDevelopersTable,
       ServiceVendorCreateOrEditDialog,
     },
-    props: ['serviceVendorId'],
+    props: {
+      serviceVendorId: {
+        type: String,
+        default: null
+      }
+    },
+    setup(){
+      const store = useStore();
+      const userStore = useUserStore();
+      const servicesStore = useServicesStore();
+      const {serviceVendorById, serviceOfferingCategoryNameById} = storeToRefs(servicesStore)
+      return {store, userStore, servicesStore, serviceVendorById, serviceOfferingCategoryNameById};
+    },
     data () {
       return {
         serviceOfferings: [],
@@ -311,8 +317,41 @@
         showEditServiceVendorDialog: false,
       }
     },
+    computed: {
+      themeColorMain() {
+        return this.store.themeColorMain
+      },
+      apiStateServices() {
+        return this.servicesStore.apiStateServices
+      },
+      userId () {
+        return this.userStore.userId
+      },
+
+      apiStateLoaded () {
+        return this.apiStateServices.serviceOfferingCategories === ApiState.LOADED
+      },
+      apiStateLoading () {
+        if (this.apiStateServices.serviceOfferingCategories === ApiState.INIT) {
+          this.servicesStore.getServiceOfferingCategories();
+        }
+        return this.apiStateServices.serviceOfferingCategories === ApiState.LOADING || this.apiStateServices.serviceOfferingCategories === ApiState.INIT
+      },
+      apiStateError () {
+        return this.apiStateServices.serviceOfferingCategories === ApiState.ERROR
+      },
+      RepositoriesTableHeaders () {
+        return [
+          { title: 'Id', value: 'id', sortable: false },
+          { title: 'Address', value: 'address', sortable: true },
+          { title: 'Username', value: 'username', sortable: false },
+          { title: 'Password', value: 'password', sortable: false },
+          { title: 'Type', value: 'type', sortable: true },
+        ]
+      },
+    },
     created () {
-      this.$store.dispatch('getServiceVendors').then(() => {
+      this.servicesStore.getServiceVendors().then(() => {
         UsersRestApi.getServiceVendorsOfDeveloper(this.userId).then(serviceVendorIdsOfDeveloper => {
           this.serviceVendorsOfDeveloper = []
           serviceVendorIdsOfDeveloper.forEach(serviceVendorId => {
@@ -327,36 +366,6 @@
         })
       })
     },
-    computed: {
-      ...mapGetters([
-        'themeColorMain',
-        'apiStateServices',
-        'userId',
-        'serviceOfferingCategoryNameById',
-        'serviceVendorById',
-      ]),
-      apiStateLoaded () {
-        return this.apiStateServices.serviceOfferingCategories === ApiState.LOADED
-      },
-      apiStateLoading () {
-        if (this.apiStateServices.serviceOfferingCategories === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferingCategories')
-        }
-        return this.apiStateServices.serviceOfferingCategories === ApiState.LOADING || this.apiStateServices.serviceOfferingCategories === ApiState.INIT
-      },
-      apiStateError () {
-        return this.apiStateServices.serviceOfferingCategories === ApiState.ERROR
-      },
-      RepositoriesTableHeaders () {
-        return [
-          { text: 'Id', value: 'id', sortable: false },
-          { text: 'Address', value: 'address', sortable: true },
-          { text: 'Username', value: 'username', sortable: false },
-          { text: 'Password', value: 'password', sortable: false },
-          { text: 'Type', value: 'type', sortable: true },
-        ]
-      },
-    },
     methods: {
       getServiceOfferingTableInterface (serviceOfferingTableInterface) {
         this.$options.serviceOfferingTableInterface = serviceOfferingTableInterface;
@@ -368,9 +377,9 @@
       },
       onDeleteServiceOfferingConfirmed () {
         ServiceOfferingsRestApi.deleteServiceOffering(this.serviceOfferingToDelete.id).then(response => {
-          Vue.$toast.info(`Successfully delete service offering '${this.serviceOfferingToDelete.name}'`)
+          app.config.globalProperties.$toast.info(`Successfully delete service offering '${this.serviceOfferingToDelete.name}'`)
           this.serviceOfferingDeleteDialog = false
-          this.$store.dispatch('getServiceOfferings')
+          this.servicesStore.getServiceOfferings();
           ServiceOfferingsRestApi.getOfferings(false, this.selectedServiceVendor.id).then(
               serviceOfferingsOfVendor => {
                 this.serviceOfferingsOfVendor = serviceOfferingsOfVendor
@@ -389,7 +398,7 @@
         ServiceOfferingVersionsRestApi.deleteServiceOfferingVersion(
             this.serviceOfferingVersionToDelete.serviceOfferingId, this.serviceOfferingVersionToDelete.id)
         .then(response => {
-          Vue.$toast.info(`Successfully delete service offering version '${this.serviceOfferingVersionToDelete.version}'`)
+          app.config.globalProperties.$toast.info(`Successfully delete service offering version '${this.serviceOfferingVersionToDelete.version}'`)
           this.serviceOfferingVersionDeleteDialog = false
           this.serviceOfferingVersionToDelete = undefined
           this.$options.serviceOfferingTableInterface.updateExpanded()
@@ -412,18 +421,18 @@
       onServiceRepositoryCreateDialogConfirmed (repository) {
         ServiceVendorsRestApi.addRepositoryToServiceVendor(this.selectedServiceVendor.id, repository).then(response => {
           this.loadRepositories()
-          Vue.$toast.info(`Successfully created repository '${repository.address}'`)
+          app.config.globalProperties.$toast.info(`Successfully created repository '${repository.address}'`)
           this.serviceRepositoryCreateDialog = false
         })
           .catch((error) => {
-            Vue.$toast.error(`Failed to created repository '${repository.address}'`)
+            app.config.globalProperties.$toast.error(`Failed to created repository '${repository.address}'`)
             logRequestError(error)
           })
       },
       onDeleteRepositoryClicked (repository) {
         ServiceVendorsRestApi.deleteRepositoryOfServiceVendor(this.selectedServiceVendor.id, repository.id).then(() => {
           this.loadRepositories()
-          Vue.$toast.info(`Successfully removed repository '${repository.address}'`)
+          app.config.globalProperties.$toast.info(`Successfully removed repository '${repository.address}'`)
         })
       },
 

@@ -18,7 +18,7 @@
             <v-text-field
               v-model="searchResources"
               label="Search Resources"
-              append-icon="search"
+              append-inner-icon="mdi-magnify"
               clearable
             />
           </v-col>
@@ -47,24 +47,17 @@
       :resource="selectedResource"
       @closed="selectedResource = null"
     />
-
-    <v-fab-transition>
-      <v-btn
-        v-show="!showCreateButton"
-        id="resources-button-add-resource"
-        class="mb-10 elevation-15"
-        color="primary"
-        absolute
-        bottom
-        right
-        fab
-        @click="showCreateDialog = true"
-      >
-        <v-icon large>
-          mdi-plus
-        </v-icon>
-      </v-btn>
-    </v-fab-transition>
+    <v-fab
+      :active="!showCreateButton"
+      class="mb-10"
+      elevation="15"
+      color="primary"
+      icon="mdi-plus"
+      location="top end"
+      absolute
+      offset
+      @click="showCreateDialog = true"
+    />
 
     <resources-create-dialog
       :show="showCreateDialog"
@@ -74,15 +67,15 @@
 </template>
 
 <script>
-  import { mapGetters, mapActions } from 'vuex'
-  import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
-  import ResourcesCreateDialog from '@/components/resources/dialogs/create/ResourcesCreateDialog'
-  import ResourcesTableSingleHosts from '@/components/resources/ResourcesTableSingleHosts'
-  import ResourcesTableClusters from '@/components/resources/ResourcesTableClusters'
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
+import ResourcesCreateDialog from '@/components/resources/dialogs/create/ResourcesCreateDialog'
+import ResourcesTableSingleHosts from '@/components/resources/ResourcesTableSingleHosts'
+import ResourcesTableClusters from '@/components/resources/ResourcesTableClusters'
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {useResourcesStore} from "@/stores/resourcesStore";
 
-  export default {
+export default {
     name: 'ResourcesOverview',
     components: {
       OverviewHeading,
@@ -91,6 +84,10 @@
       ResourcesTableSingleHosts,
       ResourcesTableClusters,
       NoItemAvailableNote,
+    },
+    setup(){
+      const resourceStore = useResourcesStore();
+      return {resourceStore};
     },
     data () {
       return {
@@ -101,26 +98,28 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'resources',
-        'clusters',
-      ]),
+      resources () {
+        return this.resourceStore.resources
+      },
+      clusters () {
+        return this.resourceStore.clusters
+      },
       searchResources: {
         get () {
-          return this.$store.state.resourcesStore.searchResources
+          return this.resourceStore.searchResources_;
         },
         set (value) {
-          this.$store.commit('SET_SEARCH_RESOURCES', value)
+          this.resourceStore.searchResources_ = value;
         },
       },
     },
     mounted () {
-      this.$store.dispatch('getDeploymentCapabilities')
+      this.resourceStore.getDeploymentCapabilities();
     },
     methods: {
-      ...mapActions([
-        'getResourcesFromBackend',
-      ]),
+      getResourcesFromBackend: () => {
+        return this.resourceStore.getResourcesFromBackend()
+      },
 
       onResourceSelected (resource) {
         this.selectedResource = resource

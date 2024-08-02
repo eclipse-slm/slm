@@ -20,14 +20,14 @@
 
             <base-material-alert
               color="info"
-              dark
+              theme="dark"
             >
               This is a plain notification.
             </base-material-alert>
 
             <base-material-alert
               color="info"
-              dark
+              theme="dark"
               dismissible
             >
               This is a notification with close button.
@@ -35,7 +35,7 @@
 
             <base-material-alert
               color="info"
-              dark
+              theme="dark"
               dismissible
               icon="mdi-bell"
             >
@@ -44,7 +44,7 @@
 
             <base-material-alert
               color="primary"
-              dark
+              theme="dark"
               dismissible
               icon="mdi-bell"
             >
@@ -66,7 +66,7 @@
               v-for="color in colors"
               :key="color"
               :color="color"
-              dark
+              theme="dark"
               dismissible
             >
               <span
@@ -77,15 +77,15 @@
 
             <base-material-alert
               color="secondary"
-              dark
+              theme="dark"
               dismissible
             >
               <span>PRIMARY</span> — This is a regular alert made with the color "secondary"
             </base-material-alert>
 
             <base-material-alert
-              color="pink darken-1"
-              dark
+              color="pink-darken-1"
+              theme="dark"
               dismissible
             >
               <span>PINK DARKEN-1</span> — This is a regular alert made with the color "pink darken-1"
@@ -165,8 +165,8 @@
                   </v-col>
                   <v-col cols="4">
                     <v-btn
-                      color="pink darken-1"
-                      dark
+                      color="pink-darken-1"
+                      theme="dark"
                       default
                       rounded
                       @click="dialog3 = true"
@@ -220,7 +220,7 @@
 
           <v-btn
             color="error"
-            text
+            variant="text"
             @click="dialog = false"
           >
             Close
@@ -258,7 +258,7 @@
                   <strong>1. Register</strong>
                 </div>
 
-                <div class="grey--text">
+                <div class="text-grey">
                   The first step is to create an account at Creative Tim. You can choose a social network or go for the classic version, whatever works best for you.
                 </div>
               </div>
@@ -286,7 +286,7 @@
                   <strong>2. Apply</strong>
                 </div>
 
-                <div class="grey--text">
+                <div class="text-grey">
                   The first step is to create an account at <a href="http://www.creative-tim.com/">Creative Tim</a>. You can choose a social network or go for the classic version, whatever works best for you.
                 </div>
               </div>
@@ -313,7 +313,7 @@
           <v-btn
             class="mt-6"
             color="info"
-            depressed
+            variant="flat"
             default
             rounded
             @click="dialog2 = false"
@@ -345,7 +345,7 @@
         <v-card-text class="pb-6 pt-12 text-center">
           <v-btn
             class="mr-3"
-            text
+            variant="text"
             @click="dialog3 = false"
           >
             Nevermind
@@ -353,7 +353,7 @@
 
           <v-btn
             color="success"
-            text
+            variant="text"
             @click="dialog3 = false"
           >
             Yes

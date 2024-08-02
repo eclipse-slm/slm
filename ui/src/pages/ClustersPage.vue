@@ -26,19 +26,32 @@
 </template>
 <script>
 import ClustersOverview from "@/components/clusters/ClustersOverview.vue";
-import { mapGetters } from 'vuex'
-import ApiState from "@/api/apiState";
 
-  export default {
+import ApiState from "@/api/apiState";
+import {useStore} from "@/stores/store";
+import {useResourcesStore} from "@/stores/resourcesStore";
+
+export default {
       components: {
           ClustersOverview,
       },
+    setup(){
+        const store = useStore();
+        const resourcesStore = useResourcesStore();
+
+        return {store, resourcesStore}
+    },
       computed: {
-          ...mapGetters([
-              'themeColorMain',
-              'apiStateResources',
-              'resources',
-          ]),
+        themeColorMain () {
+          return this.store.themeColorMain
+        },
+        apiStateResources() {
+          return this.resourcesStore.apiStateResources
+        },
+        resources () {
+          return this.resourcesStore.resources
+        },
+
           apiStateLoaded () {
               return (this.apiStateResources === ApiState.LOADED || this.apiStateResources === ApiState.UPDATING)
           },

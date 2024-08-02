@@ -1,14 +1,14 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="active"
     width="400"
     @click:outside="$emit('canceled')"
   >
-    <template>
-      <v-card v-if="show">
+    <template #default="{isActive}">
+      <v-card v-if="isActive">
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           {{ title }}
         </v-toolbar>
@@ -20,6 +20,7 @@
 
           <v-btn
             id="confirm-dialog-button-yes"
+            variant="elevated"
             color="error"
             @click="$emit('confirmed')"
           >
@@ -28,6 +29,7 @@
 
           <v-btn
             id="confirm-dialog-button-no"
+            variant="elevated"
             color="info"
             @click.native="$emit('canceled')"
           >
@@ -40,8 +42,29 @@
 </template>
 
 <script>
-  export default {
+import {toRef} from "vue";
+
+export default {
     name: 'ConfirmDialog',
-    props: ['show', 'title', 'text'],
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      },
+      title: {
+        type: String,
+        default: ""
+      },
+      text: {
+        type: String,
+        default: ""
+      }
+    },
+    setup(props){
+      const active = toRef(props, 'show')
+      return{
+        active
+      }
+    }
   }
 </script>

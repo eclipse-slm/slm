@@ -2,16 +2,16 @@
   <v-alert
     v-bind="$attrs"
     class="v-alert--material"
-    dark
+    theme="dark"
     v-on="$listeners"
   >
     <template
       v-if="$attrs.icon"
-      v-slot:prepend
+      #prepend
     >
       <v-icon
-        class="v-alert__icon elevation-6 white"
-        light
+        class="v-alert__icon elevation-6 bg-white"
+        theme="light"
         :color="$attrs.color"
       >
         {{ $attrs.icon }}
@@ -22,18 +22,14 @@
 
     <template
       v-if="$attrs.dismissible"
-      v-slot:close="{ toggle }"
+      #close="{ toggle }"
     >
       <v-btn
         :aria-label="$vuetify.lang.t('$vuetify.close')"
-        color
-        icon
-        small
+        size="smale"
         @click="toggle"
       >
-        <v-icon>
-          $vuetify.icons.cancel
-        </v-icon>
+        <v-icon icon="mdi-cancel" />
       </v-btn>
     </template>
   </v-alert>

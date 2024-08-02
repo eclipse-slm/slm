@@ -5,34 +5,26 @@
 <script>
   import updateToken from '@/utils/updateToken'
   import NotificationServiceWebsocketClient from '@/api/notification-service/notificationServiceWebsocketClient'
+  import {app} from "@/main";
 
   export default {
     name: 'App',
+    computed: {
+      app() {
+        return app
+      }
+    },
     watch: {
       $route () {
         updateToken()
       },
     },
     created () {
-      this.$store.dispatch('getUserDetails')
     },
     mounted () {
-      NotificationServiceWebsocketClient.connect()
-      this.$store.dispatch('updateCatalogStore')
-      this.$store.dispatch('initServiceStore')
-      this.$store.dispatch('getVirtualResourceProviders')
-      this.$store.dispatch('getServiceHosters')
-      this.$store.dispatch('getServiceInstanceGroups')
-      this.$store.dispatch('getDeploymentCapabilities')
-      this.$store.dispatch('getResourcesFromBackend')
-      this.$store.dispatch('getResourceAASFromBackend')
-      this.$store.dispatch('getLocations')
-      this.$store.dispatch('getProfiler')
-      this.$store.dispatch('getCluster')
-      this.$store.dispatch('getNotifications')
-      this.$store.dispatch('getClusterTypes')
+
     },
-    destroyed () {
+    unmounted () {
       NotificationServiceWebsocketClient.disconnect()
     },
   }

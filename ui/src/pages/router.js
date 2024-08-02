@@ -1,10 +1,12 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import userStore from '@/store/userStore'
+import {createRouter, createWebHistory} from 'vue-router';
+import {useUserStore} from "@/stores/userStore";
 
-Vue.use(Router)
 
 const routes = [
+  {
+    path: '/',
+    redirect: '/dashboard'
+  },
   {
     path: '/',
     component: () => import('@/pages/IndexPage'),
@@ -12,7 +14,7 @@ const routes = [
       // Dashboard
       {
         name: 'Dashboard',
-        path: '',
+        path: '/dashboard',
         component: () => import('@/pages/DashboardPage'),
       },
       // Error Pages
@@ -148,32 +150,31 @@ const routes = [
         meta: { adminPermissionRequired: true },
       },
     ],
-  },
-]
+  }
+];
 
-const router = new Router({
-  mode: 'hash',
-  base: process.env.BASE_URL,
+export const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes: routes,
-
-})
+});
 
 router.beforeEach((to, from, next) => {
+  const userStore = useUserStore();
   if (to.meta.developerPermissionRequired) {
-    if (userStore.getters.isUserDeveloper) {
-      next()
+    if (userStore.isUserDeveloper) {
+      next();
     } else {
-      next('/access_denied')
+      next('/access_denied');
     }
   } else if (to.meta.adminPermissionRequired) {
-    if (userStore.getters.userRoles().includes('slm-admin')) {
-      next()
+    if (userStore.userRoles.includes('slm-admin')) {
+      next();
     } else {
-      next('/access_denied')
+      next('/access_denied');
     }
   } else {
-    next()
+    next();
   }
-})
+});
 
-export default router
+export default router;
