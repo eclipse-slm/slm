@@ -2,11 +2,11 @@
     aas_compose: "{{ lookup('template', 'aas.yml') }}"
 
 - name: "Start containers"
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_name: eclipse-slm
     definition: "{{ aas_compose | from_yaml}}"
     state: present
-    pull: true
+    pull: always
 
 - name: "Store resulting compose file"
   template:

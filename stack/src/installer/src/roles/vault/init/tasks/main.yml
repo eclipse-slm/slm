@@ -17,11 +17,11 @@
     set_fact:
       vault_compose: "{{ lookup('template', 'vault.yml') }}"
   - name: "Start Vault containers"
-    community.docker.docker_compose:
+    community.docker.docker_compose_v2:
       project_name: eclipse-slm
       definition: "{{ vault_compose | from_yaml}}"
       state: present
-      pull: true
+      pull: always
     register: vault_compose_start_output
   - name: "Wait for Vault ('{{ VAULT_URL }}') being up"
     uri:
@@ -33,8 +33,10 @@
     delay: 3
   - name: "Get Vault root token"
     community.docker.docker_container_exec:
-      container: "{{ vault_compose_start_output.services.vault | first }}"
+      container: "{{ vault_compose_start_output.images | community.general.json_query(query) | first }}"
       command: "grep 'Token' /vault/config/root/vault_init_msg"
+    vars:
+      query: "[?Repository.contains(@, 'vault')].ContainerName"
     register: vault_root_token_line
     until: "vault_root_token_line is not failed"
     retries: 10
@@ -50,6 +52,8 @@
     import_role:
       name: vault/client
       tasks_from: create_approle_auth_method
+    vars:
+      _vault_token: "{{ vault_root_token }}"
 
   - name: "Wait for Keycloak being up"
     uri:

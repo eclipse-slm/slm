@@ -36,11 +36,11 @@
       set_fact:
         consul_compose: "{{ lookup('template', 'consul.yml') }}"
     - name: "Consul | Start containers"
-      community.docker.docker_compose:
+      community.docker.docker_compose_v2:
         project_name: eclipse-slm
         definition: "{{ consul_compose | from_yaml}}"
         state: present
-        pull: true
+        pull: always
     - name: "Consul | Wait for Consul ('{{ CONSUL_URL }}') being up"
       uri:
         url: "{{ CONSUL_URL }}/v1/status/leader"

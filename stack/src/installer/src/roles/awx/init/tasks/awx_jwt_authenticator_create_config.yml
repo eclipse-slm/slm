@@ -33,6 +33,7 @@
     name: vault/client
     tasks_from: create_kv_secret_engine
   vars:
+    _vault_token: "{{ vault_root_token }}"
     _kv_secret_engine_name: "{{ item }}"
   loop: "{{ awx_jwt_authenticator.vault.kv_secret_engines }}"
 

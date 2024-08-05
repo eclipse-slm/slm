@@ -75,11 +75,11 @@
       set_fact:
         keycloak_compose: "{{ lookup('template', 'keycloak.yml') }}"
     - name: "Start containers"
-      community.docker.docker_compose:
+      community.docker.docker_compose_v2:
         project_name: eclipse-slm
         definition: "{{ keycloak_compose | from_yaml}}"
         state: present
-        pull: true
+        pull: always
     - name: "Wait for Keycloak being up"
       uri:
         url: "{{ KEYCLOAK_AUTH_URL }}"

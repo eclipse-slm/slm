@@ -7,7 +7,7 @@
       - (_keycloak_realm_name is defined) and (_keycloak_realm_name|length > 0)         # Name of the Keycloak realm the client belongs to
       - (client_id is defined) and (client_id|length > 0)                               # Id of the client
 
-- name: "Get OIDC Keycloak JSON of '{{ client_id }}'"
+- name: "Get Keylcoak client details of '{{ client_id }}'"
   uri:
     url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ _keycloak_realm_name }}/clients?clientId={{ client_id }}"
     method: GET
@@ -24,8 +24,10 @@
     method: GET
     headers:
       authorization: "Bearer {{ keycloak_access_token }}"
+    body_format: json
+    return_content: true
   register: keycloak_response
 
 ### Outputs
 - set_fact:
-    keycloak_oidc_json: "{{ keycloak_response.json }}"
+    keycloak_oidc_json: "{{ keycloak_response.content }}"

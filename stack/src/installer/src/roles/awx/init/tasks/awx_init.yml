@@ -16,6 +16,7 @@
     name: vault/client
     tasks_from: create_approle_with_policies.yml
   vars:
+    _vault_token: "{{ vault_root_token }}"
     _approle_name: "{{ approle.name }}"
     _approle_policies: "{{ approle.policies }}"
   loop: "{{ vault_approles }}"

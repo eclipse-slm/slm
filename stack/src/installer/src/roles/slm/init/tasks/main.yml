@@ -66,6 +66,7 @@
     name: vault/client
     tasks_from: create_approle_with_policies
   vars:
+    _vault_token: "{{ vault_root_token }}"
     _approle_name: "{{ item.name }}"
     _approle_policies: "{{ item.policies }}"
   loop: "{{ vault.approles }}"
@@ -75,6 +76,7 @@
     name: vault/client
     tasks_from: create_kv_secret_engine
   vars:
+    _vault_token: "{{ vault_root_token }}"
     _kv_secret_engine_name: "{{ item }}"
   loop: "{{ vault.kv_secret_engines }}"
 
@@ -83,11 +85,11 @@
     - set_fact:
         slm_compose: "{{ lookup('template', 'slm.yml') }}"
     - name: "Start containers"
-      community.docker.docker_compose:
+      community.docker.docker_compose_v2:
         project_name: eclipse-slm
         definition: "{{ slm_compose | from_yaml}}"
         state: present
-        pull: true
+        pull: always
 
 - name: "Store resulting compose file"
   template:
@@ -100,11 +102,11 @@
     - set_fact:
         catalog_compose: "{{ lookup('template', 'catalog.yml') }}"
     - name: "Start containers"
-      community.docker.docker_compose:
+      community.docker.docker_compose_v2:
         project_name: eclipse-slm
         definition: "{{ catalog_compose | from_yaml }}"
         state: present
-        pull: true
+        pull: always
 
 - name: "Store resulting compose file"
   template:
