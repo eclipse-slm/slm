@@ -22,7 +22,7 @@ public class JobsRestController {
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Iterable<Job> getJobs() {
         KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = keycloakPrincipal.getKeycloakSecurityContext().getToken().getPreferredUsername();
+        String username = keycloakPrincipal.getKeycloakSecurityContext().getToken().getPreferredUsername() + "-JWT";
         String accessToken = keycloakPrincipal.getKeycloakSecurityContext().getTokenString();
 
         Results<Job> results = awxClient.getJobs(accessToken, username);
