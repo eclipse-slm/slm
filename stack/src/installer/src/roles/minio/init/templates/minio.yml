@@ -15,8 +15,8 @@ services:
         max-size: "{{ LOGGING_MAX_SIZE }}"
     environment:
       KC_HOSTNAME: {{SLM_HOSTNAME}}
-      MINIO_ROOT_USER: {{ MINIO_ADMIN_USERNAME }}
-      MINIO_ROOT_PASSWORD: {{ MINIO_ADMIN_PASSWORD }}
+      MINIO_ROOT_USER: "{{ MINIO_ADMIN_USERNAME }}"
+      MINIO_ROOT_PASSWORD: "{{ MINIO_ADMIN_PASSWORD }}"
       MINIO_VOLUMES: "/mnt/data"
     volumes:
       - minio_data:/mnt/data

@@ -21,14 +21,16 @@
       register: minio_config_consul
       no_log: True
 
+    - name: "MINIO | Set minio_config"
+      set_fact:
+        minio_config: "{{ minio_config_consul.data.Value | from_yaml }}"
+      when: minio_config_consul.data.Value is defined
+
     - name: "MINIO | Set Minio config"
       block:
-        - name: "MINIO | Set minio_config"
-          set_fact:
-            minio_config: "{{ minio_config_consul.data.Value | from_yaml }}"
         - name: "MINIO | Set admin password"
           set_fact:
-            MINIO_ADMIN_PASSWORD: minio_config.users.admin.password
+            MINIO_ADMIN_PASSWORD: "{{ minio_config.users.admin.password }}"
           when: (MINIO_ADMIN_PASSWORD is not defined) or (MINIO_ADMIN_PASSWORD | default([]) | length == 0)
       when: minio_config_consul.data.Value is defined
       no_log: True
