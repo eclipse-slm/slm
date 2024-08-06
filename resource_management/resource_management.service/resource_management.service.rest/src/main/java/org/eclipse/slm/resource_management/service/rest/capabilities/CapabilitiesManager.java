@@ -247,7 +247,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                 }
             }else{
                 credential = this.awxClient.createCredential(new CredentialDTOApiCreate(
-                        capability.getName() + "-rc",
+                        capability.getName() + "-Credential",
                         Objects.requireNonNullElse(newCredentials.getDescription(), ""),
                         organization.getId(),
                         17,
