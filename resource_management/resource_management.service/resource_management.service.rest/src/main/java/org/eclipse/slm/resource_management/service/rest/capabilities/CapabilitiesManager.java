@@ -26,6 +26,7 @@ import org.eclipse.slm.resource_management.model.consul.capability.SingleHostCap
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceInternalErrorException;
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotCreatedException;
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotFoundException;
+import org.eclipse.slm.resource_management.model.resource.ExecutionEnvironment;
 import org.eclipse.slm.resource_management.persistence.api.CapabilityJpaRepository;
 import org.apache.commons.lang3.NotImplementedException;
 import org.keycloak.KeycloakPrincipal;
@@ -193,22 +194,31 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
         }
     }
 
-    private void createExecutionEnvironment(Capability capability) throws ResourceNotCreatedException, JsonProcessingException, ResourceInternalErrorException {
-        if(capability.getExecutionEnvironment() != null){
+    private void createExecutionEnvironment(Capability capability)
+            throws ResourceNotCreatedException, JsonProcessingException, ResourceInternalErrorException {
+        if (capability.getExecutionEnvironment() != null) {
 
             var executionEnvironment = capability.getExecutionEnvironment();
 
-            var resultOrganisations = this.awxClient.getOrganizationByName("Service Lifecycle Management");
-            Organization organization;
-            if(resultOrganisations.getCount() == 0 && resultOrganisations.getResults().stream().findFirst().isEmpty()){
-                throw new ResourceInternalErrorException("Organization \" Service Lifecycle Management\" not found");
-            }
-            organization = resultOrganisations.getResults().stream().findFirst().get();
+            var organisationName = "Service Lifecycle Management";
+            var resultOrganisations = this.awxClient.getOrganizationByName(organisationName);
+            Organization organization = null;
 
-            Credential credential = createCredential(capability, executionEnvironment, organization);
+            for (Organization org : resultOrganisations.getResults()) {
+                if (org.getName().equals(organisationName)) {
+                    organization = org;
+                    break;
+                }
+            }
+
+            if (organization == null) {
+                throw new ResourceInternalErrorException("Organization \"" + organisationName + "\" not found");
+            }
+
+            Credential credential = createRegistryCredential(capability, executionEnvironment, organization);
 
             var ee = this.awxClient.createOrUpdateExecutionEnvironment(new ExecutionEnvironmentCreate(
-                    capability.getName()+"-EE",
+                    capability.getName() + "-EE",
                     executionEnvironment.getDescription(),
                     organization.getId(),
                     executionEnvironment.getImage(),
@@ -217,18 +227,19 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                     executionEnvironment.getPull().getPrettyName()
             ));
 
-            if (ee.isEmpty()){
+            if (ee.isEmpty()) {
                 throw new ResourceNotCreatedException("Could not create Execution Environment for capability" + capability.getName());
             }
         }
     }
 
-    private Credential createCredential(Capability capability, org.eclipse.slm.resource_management.model.resource.ExecutionEnvironment executionEnvironment, Organization organization) throws ResourceNotCreatedException {
+    private Credential createRegistryCredential(Capability capability, ExecutionEnvironment executionEnvironment, Organization organization)
+            throws ResourceNotCreatedException {
         var newCredentials = executionEnvironment.getRegistryCredential();
         Credential credential = null;
-        if(newCredentials != null) {
+        if (newCredentials != null) {
             credential = this.awxClient.createCredential(new CredentialDTOApiCreate(
-                    capability.getName()+"-registry-credential",
+                    capability.getName() + "-rc",
                     Objects.requireNonNullElse(newCredentials.getDescription(), ""),
                     organization.getId(),
                     17,
@@ -239,7 +250,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                         put("verify_ssl", newCredentials.getVerifySSL());
                     }}
             ));
-            if (credential == null){
+            if (credential == null) {
                 throw new ResourceNotCreatedException("Could not create Credential for Execution-Environment for capability: " + capability.getName());
             }
         }

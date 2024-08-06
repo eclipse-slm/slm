@@ -923,29 +923,25 @@ public class AwxClient {
         return Optional.empty();
     }
 
-    public Optional<ExecutionEnvironment> createOrUpdateExecutionEnvironment(ExecutionEnvironmentCreate executionEnvironmentCreate){
+    public Optional<ExecutionEnvironment> createOrUpdateExecutionEnvironment(ExecutionEnvironmentCreate executionEnvironmentCreate) {
         String url = this.getAwxApiUrl() + "/execution_environments/";
         HttpHeaders headers = getAdminAuthHeader();
 
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<ExecutionEnvironmentCreate> httpEntity = new HttpEntity<>(executionEnvironmentCreate, headers);
 
-        try{
+        var ee = this.getExecutionEnvironmentByName(executionEnvironmentCreate.getName());
+        if (ee.isEmpty()) {
             restTemplate.postForEntity(url, httpEntity, ExecutionEnvironment.class);
 
             return this.getExecutionEnvironmentByName(executionEnvironmentCreate.getName());
-        }catch (HttpClientErrorException e){
-            log.info("ExecutionEnvironment exists already => update ExecutionEnvironment");
-            var ee = this.getExecutionEnvironmentByName(executionEnvironmentCreate.getName());
-            if (ee.isEmpty()){
-                return Optional.empty();
-            }
-
-            url += ee.get().getId();
-            restTemplate.put(url, httpEntity);
-
-            return this.getExecutionEnvironmentByName(executionEnvironmentCreate.getName());
         }
+
+        log.info("ExecutionEnvironment exists already => update ExecutionEnvironment");
+        url += ee.get().getId();
+        restTemplate.put(url, httpEntity);
+
+        return this.getExecutionEnvironmentByName(executionEnvironmentCreate.getName());
 
     }
 
