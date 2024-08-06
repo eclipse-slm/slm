@@ -2,11 +2,7 @@ package org.eclipse.slm.common.awx.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeCreator;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.fasterxml.jackson.module.kotlin.KotlinModule;
 import org.eclipse.slm.common.awx.model.*;
 import org.eclipse.slm.notification_service.model.JobFinalState;
@@ -916,12 +912,41 @@ public class AwxClient {
                 new HttpEntity<>(null, getAdminAuthHeader()),
                 new ParameterizedTypeReference<Results<ExecutionEnvironment>>() {});
         Results<ExecutionEnvironment> executionEnvironmentResults = response.getBody();
-        if(executionEnvironmentResults.getCount() == 1){
-
-            return executionEnvironmentResults.getResults().stream().findFirst();
+        if(executionEnvironmentResults.getCount() > 0){
+            for (ExecutionEnvironment executionEnvironment : executionEnvironmentResults.getResults()) {
+                if (name.equals(executionEnvironment.getName())) {
+                    return Optional.of(executionEnvironment);
+                }
+            }
         }
 
         return Optional.empty();
+    }
+
+    public Optional<ExecutionEnvironment> createOrUpdateExecutionEnvironment(ExecutionEnvironmentCreate executionEnvironmentCreate){
+        String url = this.getAwxApiUrl() + "/execution_environments/";
+        HttpHeaders headers = getAdminAuthHeader();
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<ExecutionEnvironmentCreate> httpEntity = new HttpEntity<>(executionEnvironmentCreate, headers);
+
+        try{
+            restTemplate.postForEntity(url, httpEntity, ExecutionEnvironment.class);
+
+            return this.getExecutionEnvironmentByName(executionEnvironmentCreate.getName());
+        }catch (HttpClientErrorException e){
+            log.info("ExecutionEnvironment exists already => update ExecutionEnvironment");
+            var ee = this.getExecutionEnvironmentByName(executionEnvironmentCreate.getName());
+            if (ee.isEmpty()){
+                return Optional.empty();
+            }
+
+            url += ee.get().getId();
+            restTemplate.put(url, httpEntity);
+
+            return this.getExecutionEnvironmentByName(executionEnvironmentCreate.getName());
+        }
+
     }
 
     public JobTemplate createJobTemplateAndAddExecuteRoleToDefaultTeam(

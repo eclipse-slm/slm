@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.model.capabilities.*;
+import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceInternalErrorException;
+import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotCreatedException;
 import org.eclipse.slm.resource_management.service.rest.resources.ResourcesManager;
 import org.eclipse.slm.resource_management.model.consul.capability.CapabilityService;
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotFoundException;
@@ -82,7 +84,7 @@ public class CapabilitiesRestController {
     @Operation(summary = "Add capability")
     public ResponseEntity<Void> createCapability(
             @RequestBody CapabilityDTOApi capabilityDTOApi
-    ) throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException {
+    ) throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, ResourceNotCreatedException, JsonProcessingException, ResourceInternalErrorException {
         Capability capability = modelMapper.map(capabilityDTOApi, Capability.class);
         capabilitiesManager.addCapability(capability);
         LOG.info("Added capability: " + capabilityDTOApi.toString());

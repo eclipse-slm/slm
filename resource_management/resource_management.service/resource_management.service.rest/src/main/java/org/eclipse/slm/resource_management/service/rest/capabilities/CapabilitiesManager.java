@@ -9,10 +9,7 @@ import org.eclipse.slm.common.awx.client.observer.AwxJobExecutor;
 import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
 import org.eclipse.slm.common.awx.client.observer.AwxJobObserverInitializer;
 import org.eclipse.slm.common.awx.client.observer.IAwxJobObserverListener;
-import org.eclipse.slm.common.awx.model.ExtraVars;
-import org.eclipse.slm.common.awx.model.JobTemplate;
-import org.eclipse.slm.common.awx.model.Survey;
-import org.eclipse.slm.common.awx.model.SurveyItem;
+import org.eclipse.slm.common.awx.model.*;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.keycloak.config.KeycloakUtil;
@@ -26,6 +23,8 @@ import org.eclipse.slm.resource_management.model.consul.capability.CapabilitySer
 import org.eclipse.slm.resource_management.model.consul.capability.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.model.consul.capability.CapabilityServiceStatus;
 import org.eclipse.slm.resource_management.model.consul.capability.SingleHostCapabilityService;
+import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceInternalErrorException;
+import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotCreatedException;
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.persistence.api.CapabilityJpaRepository;
 import org.apache.commons.lang3.NotImplementedException;
@@ -136,7 +135,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
     }
 
     public void addCapability(Capability capability)
-            throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException {
+            throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, ResourceNotCreatedException, JsonProcessingException, ResourceInternalErrorException {
         capability.getActions().forEach((capabilityActionType, capabilityAction) -> {
                     if(capabilityAction.getActionClass().equals(AwxAction.class.getSimpleName())) {
                         AwxAction awxCapabilityAction = (AwxAction) capabilityAction;
@@ -180,6 +179,8 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                     }
                 });
 
+        createExecutionEnvironment(capability);
+
         capabilityJpaRepository.save(capability);
 
         if (capability.getHealthCheck() != null) {
@@ -190,6 +191,59 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                     new HashMap<>()
             );
         }
+    }
+
+    private void createExecutionEnvironment(Capability capability) throws ResourceNotCreatedException, JsonProcessingException, ResourceInternalErrorException {
+        if(capability.getExecutionEnvironment() != null){
+
+            var executionEnvironment = capability.getExecutionEnvironment();
+
+            var resultOrganisations = this.awxClient.getOrganizationByName("Service Lifecycle Management");
+            Organization organization;
+            if(resultOrganisations.getCount() == 0 && resultOrganisations.getResults().stream().findFirst().isEmpty()){
+                throw new ResourceInternalErrorException("Organization \" Service Lifecycle Management\" not found");
+            }
+            organization = resultOrganisations.getResults().stream().findFirst().get();
+
+            Credential credential = createCredential(capability, executionEnvironment, organization);
+
+            var ee = this.awxClient.createOrUpdateExecutionEnvironment(new ExecutionEnvironmentCreate(
+                    capability.getName()+"-EE",
+                    executionEnvironment.getDescription(),
+                    organization.getId(),
+                    executionEnvironment.getImage(),
+                    "false",
+                    credential != null ? credential.getId() : null,
+                    executionEnvironment.getPull().getPrettyName()
+            ));
+
+            if (ee.isEmpty()){
+                throw new ResourceNotCreatedException("Could not create Execution Environment for capability" + capability.getName());
+            }
+        }
+    }
+
+    private Credential createCredential(Capability capability, org.eclipse.slm.resource_management.model.resource.ExecutionEnvironment executionEnvironment, Organization organization) throws ResourceNotCreatedException {
+        var newCredentials = executionEnvironment.getRegistryCredential();
+        Credential credential = null;
+        if(newCredentials != null) {
+            credential = this.awxClient.createCredential(new CredentialDTOApiCreate(
+                    capability.getName()+"-registry-credential",
+                    Objects.requireNonNullElse(newCredentials.getDescription(), ""),
+                    organization.getId(),
+                    17,
+                    new HashMap<String, Object>() {{
+                        put("host", newCredentials.getAuthenticationURL());
+                        put("username", newCredentials.getUsername());
+                        put("password", newCredentials.getPassword());
+                        put("verify_ssl", newCredentials.getVerifySSL());
+                    }}
+            ));
+            if (credential == null){
+                throw new ResourceNotCreatedException("Could not create Credential for Execution-Environment for capability: " + capability.getName());
+            }
+        }
+        return credential;
     }
 
     public boolean deleteCapability(UUID capabilityId) throws ConsulLoginFailedException {
