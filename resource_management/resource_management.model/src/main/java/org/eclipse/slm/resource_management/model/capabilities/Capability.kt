@@ -67,7 +67,7 @@ abstract class Capability(id: UUID? = null) {
     @Column(name = "connection")
     open var connection: ConnectionType? = null
 
-    @Column(name = "execution_environment")
+    @Column(name = "execution_environment", columnDefinition = "LONGTEXT")
     @Type(type = "json")
     open var executionEnvironment: ExecutionEnvironment? = null
 
