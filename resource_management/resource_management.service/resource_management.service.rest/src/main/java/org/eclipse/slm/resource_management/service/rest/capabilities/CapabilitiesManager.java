@@ -238,20 +238,30 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
         var newCredentials = executionEnvironment.getRegistryCredential();
         Credential credential = null;
         if (newCredentials != null) {
-            credential = this.awxClient.createCredential(new CredentialDTOApiCreate(
-                    capability.getName() + "-rc",
-                    Objects.requireNonNullElse(newCredentials.getDescription(), ""),
-                    organization.getId(),
-                    17,
-                    new HashMap<String, Object>() {{
-                        put("host", newCredentials.getAuthenticationURL());
-                        put("username", newCredentials.getUsername());
-                        put("password", newCredentials.getPassword());
-                        put("verify_ssl", newCredentials.getVerifySSL());
-                    }}
-            ));
-            if (credential == null) {
-                throw new ResourceNotCreatedException("Could not create Credential for Execution-Environment for capability: " + capability.getName());
+
+            if (newCredentials.getId() != null){
+                credential = this.awxClient.getCredentialById(newCredentials.getId());
+
+                if (credential == null) {
+                    throw new ResourceNotCreatedException("Could not find Credential with Id "+newCredentials.getId()+" for Execution-Environment for capability: " + capability.getName());
+                }
+            }else{
+                credential = this.awxClient.createCredential(new CredentialDTOApiCreate(
+                        capability.getName() + "-rc",
+                        Objects.requireNonNullElse(newCredentials.getDescription(), ""),
+                        organization.getId(),
+                        17,
+                        new HashMap<String, Object>() {{
+                            put("host", newCredentials.getAuthenticationURL());
+                            put("username", newCredentials.getUsername());
+                            put("password", newCredentials.getPassword());
+                            put("verify_ssl", newCredentials.getVerifySSL());
+                        }}
+                ));
+
+                if (credential == null) {
+                    throw new ResourceNotCreatedException("Could not create Credential for Execution-Environment for capability: " + capability.getName());
+                }
             }
         }
         return credential;
