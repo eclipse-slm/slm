@@ -198,6 +198,9 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
             throws ResourceNotCreatedException, JsonProcessingException, ResourceInternalErrorException {
         if (capability.getExecutionEnvironment() != null) {
 
+            var executionName = capability.getName() + "-EE";
+            LOG.info("Create or Update Execution Environment with name " + executionName);
+
             var executionEnvironment = capability.getExecutionEnvironment();
 
             var organisationName = "Service Lifecycle Management";
@@ -218,7 +221,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
             Credential credential = createRegistryCredential(capability, executionEnvironment, organization);
 
             var ee = this.awxClient.createOrUpdateExecutionEnvironment(new ExecutionEnvironmentCreate(
-                    capability.getName() + "-EE",
+                    executionName,
                     executionEnvironment.getDescription(),
                     organization.getId(),
                     executionEnvironment.getImage(),
@@ -228,7 +231,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
             ));
 
             if (ee.isEmpty()) {
-                throw new ResourceNotCreatedException("Could not create Execution Environment for capability" + capability.getName());
+                throw new ResourceNotCreatedException("Could not create Execution Environment for capability" + executionName);
             }
         }
     }

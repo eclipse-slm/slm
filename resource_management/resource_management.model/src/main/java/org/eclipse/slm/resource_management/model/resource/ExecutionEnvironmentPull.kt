@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue
 
 enum class ExecutionEnvironmentPull(@JsonValue val prettyName: String = "") {
     None(""),
-    Always("allways"),
+    Always("always"),
     Missing("missing"),
     Never("never")
 }

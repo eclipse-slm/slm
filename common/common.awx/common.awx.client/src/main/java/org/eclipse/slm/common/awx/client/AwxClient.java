@@ -938,8 +938,8 @@ public class AwxClient {
         }
 
         log.info("ExecutionEnvironment exists already => update ExecutionEnvironment");
-        url += ee.get().getId();
-        restTemplate.put(url, httpEntity);
+        url += ee.get().getId() + "/";
+        restTemplate.exchange(url, HttpMethod.PUT, httpEntity, Void.class);
 
         return this.getExecutionEnvironmentByName(executionEnvironmentCreate.getName());
 
