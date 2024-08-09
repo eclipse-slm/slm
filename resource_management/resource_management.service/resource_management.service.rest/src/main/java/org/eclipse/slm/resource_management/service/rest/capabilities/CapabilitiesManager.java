@@ -137,10 +137,17 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
 
     public void addCapability(Capability capability)
             throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, ResourceNotCreatedException, JsonProcessingException, ResourceInternalErrorException {
+
+        var ee = createExecutionEnvironment(capability);
+
         capability.getActions().forEach((capabilityActionType, capabilityAction) -> {
                     if(capabilityAction.getActionClass().equals(AwxAction.class.getSimpleName())) {
                         AwxAction awxCapabilityAction = (AwxAction) capabilityAction;
                         try {
+                            var executionEnvironmentName = defaultExecutionEnvironment;
+                            if (ee.isPresent()){
+                                executionEnvironmentName = ee.get().getName();
+                            }
                             var jobTemplateCredentialNames = this.jobTemplateCredentialNames;
                             JobTemplate jobTemplate;
                             if(!awxCapabilityAction.getUsername().equals("") && !awxCapabilityAction.getPassword().equals("")) {
@@ -151,7 +158,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                                         awxCapabilityAction.getUsername(),
                                         awxCapabilityAction.getPassword(),
                                         jobTemplateCredentialNames,
-                                        defaultExecutionEnvironment
+                                        executionEnvironmentName
                                 );
                             } else {
                                 jobTemplate = awxClient.createJobTemplateAndAddExecuteRoleToDefaultTeam(
@@ -159,7 +166,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                                         awxCapabilityAction.getAwxBranch(),
                                         awxCapabilityAction.getPlaybook(),
                                         jobTemplateCredentialNames,
-                                        defaultExecutionEnvironment);
+                                        executionEnvironmentName);
                             }
 
                             List<SurveyItem> params = awxCapabilityAction.getParameter();
@@ -180,7 +187,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                     }
                 });
 
-        createExecutionEnvironment(capability);
+
 
         capabilityJpaRepository.save(capability);
 
@@ -194,7 +201,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
         }
     }
 
-    private void createExecutionEnvironment(Capability capability)
+    private Optional<org.eclipse.slm.common.awx.model.ExecutionEnvironment> createExecutionEnvironment(Capability capability)
             throws ResourceNotCreatedException, JsonProcessingException, ResourceInternalErrorException {
         if (capability.getExecutionEnvironment() != null) {
 
@@ -233,7 +240,9 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
             if (ee.isEmpty()) {
                 throw new ResourceNotCreatedException("Could not create Execution Environment for capability" + executionName);
             }
+            return ee;
         }
+        return Optional.empty();
     }
 
     private Credential createRegistryCredential(Capability capability, ExecutionEnvironment executionEnvironment, Organization organization)
