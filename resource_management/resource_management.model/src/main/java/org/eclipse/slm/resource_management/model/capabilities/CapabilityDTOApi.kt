@@ -8,6 +8,7 @@ import org.eclipse.slm.resource_management.model.actions.Action
 import org.eclipse.slm.resource_management.model.actions.ActionType
 import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType
 import org.eclipse.slm.resource_management.model.resource.ConnectionType
+import org.eclipse.slm.resource_management.model.resource.ExecutionEnvironment
 import java.util.*
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "capabilityClass")
@@ -37,6 +38,8 @@ abstract class CapabilityDTOApi(id: UUID? = null, capabilityClass: String) {
     open var clusterMemberTypes: List<ClusterMemberType> = ArrayList()
 
     open var connection: ConnectionType? = null
+
+    open var executionEnvironment: ExecutionEnvironment? = null
 
     override fun toString(): String {
         return "CapabilityDTOApi(id=$id, name='$name', logo='$logo', type=$type, actions=$actions)"

@@ -23,6 +23,8 @@ import org.eclipse.slm.resource_management.model.capabilities.*;
 import org.eclipse.slm.resource_management.model.actions.AwxAction;
 import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.consul.capability.SingleHostCapabilityService;
+import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceInternalErrorException;
+import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotCreatedException;
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.persistence.api.CapabilityJpaRepository;
 import org.junit.jupiter.api.*;
@@ -143,7 +145,7 @@ public class CapabilitiesManagerTest {
 
         @Test
         @Order(20)
-        public void testAddDeploymentCapability() throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException {
+        public void testAddDeploymentCapability() throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, ResourceNotCreatedException, JsonProcessingException, ResourceInternalErrorException {
             capabilitiesManager.addCapability(dockerDeploymentCapability);
         }
 
@@ -413,7 +415,7 @@ public class CapabilitiesManagerTest {
 
         @Test
         @Order(20)
-        public void testAddVirtualizationCapability() throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException {
+        public void testAddVirtualizationCapability() throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, ResourceNotCreatedException, JsonProcessingException, ResourceInternalErrorException {
             capabilitiesManager.addCapability(virtualizationCapability);
         }
 
@@ -494,7 +496,7 @@ public class CapabilitiesManagerTest {
 
         @Test
         @Order(75)
-        public void testAddCapabilityWithParams() throws ConsulLoginFailedException, ResourceNotFoundException, AwxProjectUpdateFailedException, JsonProcessingException, SSLException, IllegalAccessException {
+        public void testAddCapabilityWithParams() throws ConsulLoginFailedException, ResourceNotFoundException, AwxProjectUpdateFailedException, JsonProcessingException, SSLException, IllegalAccessException, ResourceNotCreatedException, ResourceInternalErrorException {
             AwxAction action = (AwxAction) virtualizationCapability.getActions().get(ActionType.CREATE_VM);
             action.setParameter(surveyItems);
 

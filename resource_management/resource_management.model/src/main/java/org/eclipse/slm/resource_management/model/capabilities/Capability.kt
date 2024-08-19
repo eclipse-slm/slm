@@ -9,6 +9,7 @@ import org.eclipse.slm.resource_management.model.actions.Action
 import org.eclipse.slm.resource_management.model.actions.ActionType
 import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType
 import org.eclipse.slm.resource_management.model.resource.ConnectionType
+import org.eclipse.slm.resource_management.model.resource.ExecutionEnvironment
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
 import org.hibernate.annotations.TypeDefs
@@ -65,6 +66,10 @@ abstract class Capability(id: UUID? = null) {
 
     @Column(name = "connection")
     open var connection: ConnectionType? = null
+
+    @Column(name = "execution_environment", columnDefinition = "LONGTEXT")
+    @Type(type = "json")
+    open var executionEnvironment: ExecutionEnvironment? = null
 
     fun isCluster(): Boolean {
         return clusterMemberTypes.isNotEmpty();
