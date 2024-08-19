@@ -93,7 +93,7 @@ services:
       KEYCLOAK_REALM: "{{ KEYCLOAK_REALM }}"
       KEYCLOAK_USERNAME: "{{ keycloak_config['default_user_username'] }}"
       KEYCLOAK_PASSWORD: "{{ keycloak_config['default_user_password'] }}"
-      CONSUL_ACL_TOKEN: "{{ app_configs['resource_management']['consul']['acl-token'] }}"
+      CONSUL_ACLTOKEN: "{{ app_configs['resource_management']['consul']['acl-token'] }}"
     extra_hosts:
       - "{{ SLM_HOSTNAME }}:172.17.0.1"
 

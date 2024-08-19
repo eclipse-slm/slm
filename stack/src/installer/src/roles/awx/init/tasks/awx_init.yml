@@ -23,12 +23,6 @@
   loop_control:
     loop_var: approle
 
-- debug:
-    var: _awx_admin_username
-
-- debug:
-    var: _awx_admin_password
-
 - name: "Remove organization"
   awx.awx.organization:
     controller_host: "{{ AWX_URL }}"
