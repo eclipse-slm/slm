@@ -2,11 +2,10 @@ package org.eclipse.slm.resource_management.service.rest.jobs;
 
 import org.eclipse.slm.common.awx.client.AwxClient;
 import org.eclipse.slm.common.awx.model.Job;
-import org.eclipse.slm.common.awx.model.Results;
 import org.eclipse.slm.notification_service.service.client.NotificationServiceClient;
-import org.keycloak.KeycloakPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -23,9 +22,9 @@ public class JobsRestController {
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Iterable<Job> getJobs() {
-        var keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var username = keycloakPrincipal.getKeycloakSecurityContext().getToken().getPreferredUsername();
-        var accessToken = keycloakPrincipal.getKeycloakSecurityContext().getTokenString();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        var username = jwtAuthenticationToken.getName();
+        var accessToken = jwtAuthenticationToken.getToken().getTokenValue();
 
         var resultsForUsernameWithoutJWT = awxClient.getJobs(accessToken, username);
         var resultsForUsernameWithJWT = awxClient.getJobs(accessToken, username + "-JWT");

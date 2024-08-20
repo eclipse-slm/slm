@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.eclipse.slm.resource_management.service.rest.resources.ResourcesManagerITDevConfig.jwtAuthenticationToken;
+
 @TestConfiguration
 public class CapabilitiesVaultClientTestConfig {
     //region Vault Properties
@@ -94,7 +96,6 @@ public class CapabilitiesVaultClientTestConfig {
     public void createRemoteAccessService() {
         AccessToken accessToken = new AccessToken();
         accessToken.setSubject(UUID.randomUUID().toString());
-        KeycloakPrincipal keycloakPrincipal = new KeycloakPrincipal<>("testUser", new KeycloakSecurityContext("", accessToken, "", null));
 
         RemoteAccessService remoteAccessService = new RemoteAccessService(
                 ConnectionType.ssh,
@@ -103,7 +104,7 @@ public class CapabilitiesVaultClientTestConfig {
         );
 
         resourcesVaultClient.addSecretsForConnectionService(
-                keycloakPrincipal,
+                jwtAuthenticationToken,
                 remoteAccessService
         );
     }

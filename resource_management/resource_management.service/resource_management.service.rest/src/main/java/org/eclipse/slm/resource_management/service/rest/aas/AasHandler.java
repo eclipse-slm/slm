@@ -2,12 +2,11 @@ package org.eclipse.slm.resource_management.service.rest.aas;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShellDescriptor;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException;
-import org.eclipse.slm.common.aas.AasRegistryClient;
-import org.eclipse.slm.common.aas.AasRepositoryClient;
-import org.eclipse.slm.common.aas.SubmodelRegistryClient;
+import org.eclipse.slm.common.aas.clients.AasRegistryClient;
+import org.eclipse.slm.common.aas.clients.AasRepositoryClient;
+import org.eclipse.slm.common.aas.clients.SubmodelRegistryClient;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
-import org.eclipse.slm.resource_management.service.rest.metrics.MetricsRestController;
 import org.eclipse.slm.resource_management.service.rest.resources.ResourcesConsulClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.rmi.ConnectException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -62,6 +62,8 @@ public class AasHandler {
             throw new RuntimeException(e);
         } catch (ApiException e) {
             throw new RuntimeException(e);
+        } catch (RuntimeException e) {
+            LOG.error(e.getMessage());
         }
     }
 

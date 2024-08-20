@@ -4,7 +4,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.aasx.AASXDeserializer;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor;
-import org.eclipse.slm.common.aas.*;
+import org.eclipse.slm.common.aas.clients.*;
 import org.eclipse.slm.resource_management.model.resource.BasicResource;
 import org.springframework.stereotype.Component;
 

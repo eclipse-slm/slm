@@ -37,7 +37,9 @@ public class ResourcesRestControllerITHelper {
                 .andReturn().getResponse().getContentAsString();
 
         var objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new KotlinModule());
+        KotlinModule kotlinModule = new KotlinModule.Builder()
+                .build();
+        objectMapper.registerModule(kotlinModule);
         var resource = objectMapper.readValue(responseContent, new TypeReference<BasicResource>(){});
 
         return resource;
@@ -53,7 +55,9 @@ public class ResourcesRestControllerITHelper {
                 .andReturn().getResponse().getContentAsString();
 
         var objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new KotlinModule());
+        KotlinModule kotlinModule = new KotlinModule.Builder()
+                .build();
+        objectMapper.registerModule(kotlinModule);
         var resources = objectMapper.readValue(responseContent, new TypeReference<List<BasicResource>>(){});
 
         return resources;

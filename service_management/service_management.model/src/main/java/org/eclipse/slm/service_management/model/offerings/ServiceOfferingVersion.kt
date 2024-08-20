@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType
 import com.vladmihalcea.hibernate.type.json.JsonStringType
+import jakarta.persistence.*
 import org.eclipse.slm.common.model.DeploymentType
 import org.eclipse.slm.service_management.model.AbstractBaseEntityUuid
 import org.eclipse.slm.service_management.model.exceptions.ServiceOptionNotFoundException
@@ -13,13 +14,11 @@ import org.eclipse.slm.service_management.model.offerings.options.ServiceOption
 import org.eclipse.slm.service_management.model.offerings.options.ServiceOptionCategory
 import org.eclipse.slm.service_management.model.offerings.options.ServiceOptionType
 import org.eclipse.slm.service_management.model.offerings.options.ServiceOptionValue
-import org.hibernate.annotations.Type
-import org.hibernate.annotations.TypeDef
-import org.hibernate.annotations.TypeDefs
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
-import javax.persistence.*
 import kotlin.jvm.Transient
 
 @Entity
@@ -28,7 +27,6 @@ import kotlin.jvm.Transient
         name = "UniqueVersionNamePerServiceOffering",
         columnNames = ["version", "service_offering_id"]
     )])
-@TypeDefs(TypeDef(name = "json", typeClass = JsonStringType::class), TypeDef(name = "jsonb", typeClass = JsonBinaryType::class))
 @DiscriminatorColumn(name = "deployment_type", discriminatorType = DiscriminatorType.STRING)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -56,24 +54,24 @@ class ServiceOfferingVersion(
     @Column(name = "created", nullable = false)
     var created: Date = Calendar.getInstance().time
 
-    @Type(type = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "service_option_categories", columnDefinition = "LONGTEXT")
     var serviceOptionCategories: List<ServiceOptionCategory> = mutableListOf()
 
-    @Type(type = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "service_requirements", columnDefinition = "LONGTEXT")
     var serviceRequirements: List<ServiceRequirement> = mutableListOf()
 
-    @Type(type = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
     @JsonProperty("serviceRepositories")
     @Column(name = "service_repositories", columnDefinition = "LONGTEXT")
     var serviceRepositories: List<UUID> = mutableListOf()
 
-    @Type(type = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "deployment_definition", columnDefinition = "LONGTEXT", nullable = false)
     var deploymentDefinition: DeploymentDefinition? = deploymentDefinition
 
-    @Type(type = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
     @JsonProperty("servicePorts")
     @Column(name = "service_ports", columnDefinition = "LONGTEXT")
     var servicePorts: List<Integer> = mutableListOf()

@@ -1,8 +1,8 @@
 package org.eclipse.slm.common.awx.client.observer;
 
+import jakarta.websocket.ClientEndpointConfig;
 import org.springframework.http.HttpHeaders;
 
-import javax.websocket.ClientEndpointConfig;
 import java.util.List;
 import java.util.Map;
 

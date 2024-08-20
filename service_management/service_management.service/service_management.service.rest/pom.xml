@@ -24,7 +24,7 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>1.28</version>
+            <version>2.2</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -107,12 +107,6 @@
             <artifactId>common.awx.client</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
-        </dependency>
-        <!-- BaSyx !-->
-        <dependency>
-            <groupId>org.eclipse.basyx</groupId>
-            <artifactId>basyx.components.lib</artifactId>
-            <version>${basyx.version}</version>
         </dependency>
         <!-- Testing !-->
         <dependency>

@@ -99,7 +99,7 @@ resource-management:
 ### Keycloak
 keycloak:
   config:
-    auth-white-list: /actuator/health
+    auth-white-list:
     tenants:
       config-path: consul:keycloak
       client-registration-enable: false

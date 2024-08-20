@@ -1,6 +1,7 @@
 package org.eclipse.slm.service_management.model.offerings
 
 import com.fasterxml.jackson.annotation.*
+import jakarta.persistence.Column
 import org.eclipse.slm.common.model.DeploymentType
 import org.eclipse.slm.service_management.model.offerings.codesys.CodesysDeploymentDefinition
 import org.eclipse.slm.service_management.model.offerings.docker.compose.DockerComposeDeploymentDefinition
@@ -8,7 +9,6 @@ import org.eclipse.slm.service_management.model.offerings.docker.container.Docke
 import org.eclipse.slm.service_management.model.offerings.kubernetes.KubernetesDeploymentDefinition
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import javax.persistence.Column
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "deploymentType")
 @JsonSubTypes(

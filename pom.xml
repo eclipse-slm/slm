@@ -33,8 +33,8 @@
         <revision>1.4.0-SNAPSHOT</revision>
 
         <java.version>18</java.version>
-        <kotlin.version>1.7.20</kotlin.version>
-        <jackson.version>2.13.2</jackson.version>
+        <kotlin.version>1.9.20</kotlin.version>
+        <jackson.version>2.17.1</jackson.version>
         <resource.delimiter>^</resource.delimiter>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -50,21 +50,20 @@
         <maven.plugin.jacoco.version>0.8.8</maven.plugin.jacoco.version>
         <maven.plugin.openapi-generator.version>6.4.0</maven.plugin.openapi-generator.version>
 
-        <spring.version>5.3.30</spring.version>
-        <spring.boot.version>2.7.17</spring.boot.version>
-        <spring.security.version>5.7.3</spring.security.version>
-        <spring-cloud.version>2021.0.8</spring-cloud.version>
+        <spring.version>6.1.10</spring.version>
+        <spring.boot.version>3.3.1</spring.boot.version>
+        <spring-cloud.version>2023.0.2</spring-cloud.version>
         <spring-cloud-contract-wiremock.version>3.1.4</spring-cloud-contract-wiremock.version>
-        <springdoc.openapi.version>1.8.0</springdoc.openapi.version>
+        <springdoc.openapi.version>2.5.0</springdoc.openapi.version>
         <swagger.version>1.6.7</swagger.version>
-        <keycloak.version>18.0.2</keycloak.version>
+        <keycloak.version>19.0.3</keycloak.version>
         <migbase.version>2.2</migbase.version>
         <joda-time.version>2.10.10</joda-time.version>
         <mariadb.client.version>2.7.4</mariadb.client.version>
         <model.mapper.version>2.4.5</model.mapper.version>
         <github.docker.java.version>3.2.13</github.docker.java.version>
         <apache.commons.version>3.12.0</apache.commons.version>
-        <apache.httpcomponents.version>4.5.12</apache.httpcomponents.version>
+        <apache.httpcomponents.version>4.5.14</apache.httpcomponents.version>
         <netty.version>4.1.73.Final</netty.version>
         <jgit.version>6.2.0.202206071550-r</jgit.version>
         <basyx.version>2.0.0-SNAPSHOT</basyx.version>
@@ -217,6 +216,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
+            <version>5.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

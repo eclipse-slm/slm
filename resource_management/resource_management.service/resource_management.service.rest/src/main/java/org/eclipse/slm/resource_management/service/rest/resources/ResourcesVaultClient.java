@@ -6,10 +6,9 @@ import org.eclipse.slm.common.vault.client.VaultCredential;
 import org.eclipse.slm.common.vault.client.VaultCredentialType;
 import org.eclipse.slm.common.vault.model.KvPath;
 import org.eclipse.slm.resource_management.model.resource.*;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.KeycloakSecurityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -45,16 +44,13 @@ public class ResourcesVaultClient {
     }
 
     public Credential getCredentialOfRemoteAccessService(
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             UUID serviceId,
             CredentialClass credentialClass
     ) {
-        KeycloakSecurityContext keycloakContext = keycloakPrincipal.getKeycloakSecurityContext();
-        String keycloakUserUuid = keycloakContext.getToken().getSubject();
-        String keycloakToken = keycloakContext.getTokenString();
         var kvPath = new KvPath("resources", serviceId+"/"+credentialClass);
         Map<String, String> kvContent = vaultClient.getKvContent(
-                new VaultCredential(VaultCredentialType.KEYCLOAK_TOKEN, keycloakToken),
+                new VaultCredential(VaultCredentialType.KEYCLOAK_TOKEN, jwtAuthenticationToken.getToken().getTokenValue()),
                 kvPath
         );
 
@@ -146,7 +142,7 @@ public class ResourcesVaultClient {
     }
 
     public void addSecretsForConnectionService(
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             RemoteAccessService remoteAccessService
     ) {
         Map<String, String> secretsOfResource = new HashMap<>();

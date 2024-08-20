@@ -5,21 +5,18 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.vladmihalcea.hibernate.type.json.JsonStringType
+import jakarta.persistence.*
 import org.eclipse.slm.resource_management.model.actions.Action
 import org.eclipse.slm.resource_management.model.actions.ActionType
 import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType
 import org.eclipse.slm.resource_management.model.resource.ConnectionType
-import org.hibernate.annotations.Type
-import org.hibernate.annotations.TypeDef
-import org.hibernate.annotations.TypeDefs
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.util.*
-import javax.persistence.*
 import kotlin.collections.HashSet
 
 @Entity
-@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
-@TypeDefs(TypeDef(name = "json", typeClass = JsonStringType::class))
-
+@Inheritance(strategy= InheritanceType.TABLE_PER_CLASS)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "capabilityClass")
 @JsonSubTypes(
     JsonSubTypes.Type(value = DeploymentCapability::class,      name = "DeploymentCapability"),
@@ -34,7 +31,6 @@ abstract class Capability(id: UUID? = null) {
     constructor() : this(UUID.randomUUID()) {}
 
     @Id
-    @Type(type="uuid-char")
     @Column(name = "uuid", length = 36, unique = true, nullable = false)
     open var id: UUID = id ?: UUID.randomUUID()
 
@@ -48,19 +44,19 @@ abstract class Capability(id: UUID? = null) {
     open var logo: String = ""
 
     @Column(name = "type")
-    @Type(type = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
     open var type: List<CapabilityType> = ArrayList()
 
     @Column(name = "actions", columnDefinition = "LONGTEXT")
-    @Type(type = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
     open var actions: Map<ActionType, Action> = HashMap()
 
     @Column(name = "health_check")
-    @Type(type = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
     open var healthCheck: CapabilityHealthCheck? = null
 
     @Column(name = "cluster_member_types", columnDefinition = "LONGTEXT")
-    @Type(type = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
     open var clusterMemberTypes: List<ClusterMemberType> = ArrayList()
 
     @Column(name = "connection")

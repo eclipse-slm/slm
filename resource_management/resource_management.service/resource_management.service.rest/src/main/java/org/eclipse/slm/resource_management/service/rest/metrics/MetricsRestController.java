@@ -1,10 +1,9 @@
 package org.eclipse.slm.resource_management.service.rest.metrics;
 
-import org.eclipse.digitaltwin.basyx.aasregistry.client.ApiException;
-import org.eclipse.slm.common.aas.AasRegistryClient;
-import org.eclipse.slm.common.aas.AasRepositoryClient;
-import org.eclipse.slm.common.aas.SubmodelRegistryClient;
-import org.eclipse.slm.common.aas.SubmodelServiceClient;
+import org.eclipse.slm.common.aas.clients.AasRegistryClient;
+import org.eclipse.slm.common.aas.clients.AasRepositoryClient;
+import org.eclipse.slm.common.aas.clients.SubmodelRegistryClient;
+import org.eclipse.slm.common.aas.clients.SubmodelServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

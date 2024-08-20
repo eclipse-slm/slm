@@ -3,7 +3,6 @@ package org.eclipse.slm.common.keycloak.config;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakGroupNotFoundException;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakUserNotFoundException;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
-import org.keycloak.KeycloakPrincipal;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -12,6 +11,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.ClientErrorException;
@@ -30,14 +30,14 @@ public class KeycloakUtil {
     }
 
     public List<UserRepresentation> getUsersOfRealm(String realm) {
-        var realmResource = this.getKeycloakRealm(realm);
+        var realmResource = this.getKeycloakRealmResource(realm);
 
         return realmResource.users().list();
     }
 
     public RoleRepresentation createRealmRole(String realm, String roleName)
     {
-        var realmResource = this.getKeycloakRealm(realm);
+        var realmResource = this.getKeycloakRealmResource(realm);
         var newRole = new RoleRepresentation();
         newRole.setName(roleName);
         try {
@@ -49,26 +49,28 @@ public class KeycloakUtil {
         return newRole;
     }
 
-    public void createRealmRoleAndAssignToUser(KeycloakPrincipal keycloakPrincipal, String roleName)
+    public void createRealmRoleAndAssignToUser(JwtAuthenticationToken jwtAuthenticationToken, String roleName)
     {
         // Create role
-        var realmResource = this.getKeycloakRealm(keycloakPrincipal);
-        var createdRole = this.createRealmRole(keycloakPrincipal.getKeycloakSecurityContext().getRealm(), roleName);
+        var realmResource = this.getKeycloakRealmResource(jwtAuthenticationToken);
+        var realmName = KeycloakTokenUtil.getRealm(jwtAuthenticationToken);
+        var createdRole = this.createRealmRole(realmName, roleName);
         // Add user to newly created role
-        UserResource userResource = realmResource.users().get(keycloakPrincipal.getName());
+        var userId = jwtAuthenticationToken.getToken().getSubject();
+        var userResource = realmResource.users().get(userId);
         createdRole = realmResource.roles().get(createdRole.getName()).toRepresentation();
         userResource.roles().realmLevel().add(Arrays.asList(createdRole));
     }
 
-    public void deleteRealmRoles(KeycloakPrincipal keycloakPrincipal, List<String> realmRoleNames) {
+    public void deleteRealmRoles(JwtAuthenticationToken jwtAuthenticationToken, List<String> realmRoleNames) {
         realmRoleNames
                 .stream()
-                .forEach(realmRole -> deleteRealmRole(keycloakPrincipal, realmRole));
+                .forEach(realmRole -> deleteRealmRole(jwtAuthenticationToken, realmRole));
     }
 
-    public void deleteRealmRole(KeycloakPrincipal keycloakPrincipal, String roleName)
+    public void deleteRealmRole(JwtAuthenticationToken jwtAuthenticationToken, String roleName)
     {
-        var realmResource = getKeycloakRealm(keycloakPrincipal);
+        var realmResource = getKeycloakRealmResource(jwtAuthenticationToken);
         try {
             realmResource.roles().deleteRole(roleName);
         } catch(ClientErrorException e) {
@@ -76,9 +78,9 @@ public class KeycloakUtil {
         }
     }
 
-    public void deleteRealmRoleAsAdmin(KeycloakPrincipal keycloakPrincipal, String roleName)
+    public void deleteRealmRoleAsAdmin(JwtAuthenticationToken jwtAuthenticationToken, String roleName)
     {
-        var realmResource = getKeycloakRealm(keycloakPrincipal.getKeycloakSecurityContext().getRealm());
+        var realmResource = getKeycloakRealmResource(jwtAuthenticationToken);
         try {
             realmResource.roles().deleteRole(roleName);
         } catch(ClientErrorException e) {
@@ -86,16 +88,16 @@ public class KeycloakUtil {
         }
     }
 
-    private RealmResource getKeycloakRealm(KeycloakPrincipal keycloakPrincipal) {
-        return multiTenantKeycloakRegistration.getRealmResource(KeycloakTokenUtil.getRealm(keycloakPrincipal));
+    private RealmResource getKeycloakRealmResource(JwtAuthenticationToken jwtAuthenticationToken) {
+        return multiTenantKeycloakRegistration.getRealmResource(KeycloakTokenUtil.getRealm(jwtAuthenticationToken));
     }
 
-    private RealmResource getKeycloakRealm(String realm) {
+    private RealmResource getKeycloakRealmResource(String realm) {
         return multiTenantKeycloakRegistration.getRealmResource(realm);
     }
 
     public List<UserRepresentation> getUsersOfGroup(String realm, String keycloakGroupName) throws KeycloakGroupNotFoundException {
-        var realmResource = this.getKeycloakRealm(realm);
+        var realmResource = this.getKeycloakRealmResource(realm);
         var realmGroups = realmResource.groups().groups();
 
         var groupRepresentation = realmGroups.stream().filter(g -> g.getName().equals(keycloakGroupName)).findFirst();
@@ -111,7 +113,7 @@ public class KeycloakUtil {
     }
 
     public void assignUserToGroup(String realm, String keycloakGroupName, UUID userId) throws KeycloakGroupNotFoundException, KeycloakUserNotFoundException {
-        var realmResource = this.getKeycloakRealm(realm);
+        var realmResource = this.getKeycloakRealmResource(realm);
 
         var user = realmResource.users().get(userId.toString());
 
@@ -132,7 +134,7 @@ public class KeycloakUtil {
     }
 
     public void removeUserFromGroup(String realm, String keycloakGroupName, UUID userId) throws KeycloakGroupNotFoundException, KeycloakUserNotFoundException {
-        var realmResource = this.getKeycloakRealm(realm);
+        var realmResource = this.getKeycloakRealmResource(realm);
 
         var user = realmResource.users().get(userId.toString());
         if (user != null) {
@@ -151,7 +153,7 @@ public class KeycloakUtil {
     }
 
     public List<GroupRepresentation> getGroupsOfUser(String realm, UUID userId) throws KeycloakUserNotFoundException {
-        var realmResource = this.getKeycloakRealm(realm);
+        var realmResource = this.getKeycloakRealmResource(realm);
 
         var user = realmResource.users().get(userId.toString());
         if (user != null) {
@@ -163,7 +165,7 @@ public class KeycloakUtil {
     }
 
     public GroupRepresentation createGroup(String realm, String groupName, Map<String, List<String>> attributes) {
-        var realmResource = this.getKeycloakRealm(realm);
+        var realmResource = this.getKeycloakRealmResource(realm);
         var newGroup = new GroupRepresentation();
         newGroup.setName(groupName);
         newGroup.setAttributes(attributes);
@@ -177,7 +179,7 @@ public class KeycloakUtil {
     }
 
     public void deleteGroup(String realm, String keycloakGroupName) throws KeycloakGroupNotFoundException {
-        var realmResource = this.getKeycloakRealm(realm);
+        var realmResource = this.getKeycloakRealmResource(realm);
 
         var realmGroups = realmResource.groups().groups();
         var groupRepresentation = realmGroups.stream().filter(g -> g.getName().equals(keycloakGroupName)).findFirst();

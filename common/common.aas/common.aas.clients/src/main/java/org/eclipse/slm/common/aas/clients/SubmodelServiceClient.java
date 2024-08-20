@@ -1,4 +1,4 @@
-package org.eclipse.slm.common.aas;
+package org.eclipse.slm.common.aas.clients;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.Property;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;

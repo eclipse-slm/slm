@@ -3,14 +3,17 @@ package org.eclipse.slm.common.vault.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;
+import org.apache.hc.client5.http.ssl.TrustAllStrategy;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
+import org.apache.hc.core5.ssl.SSLContexts;
 import org.eclipse.slm.common.vault.model.*;
 import org.eclipse.slm.common.vault.model.exceptions.GroupAliasNotFoundException;
 import org.eclipse.slm.common.vault.model.exceptions.KvValueNotFound;
 import org.apache.commons.lang3.NotImplementedException;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -72,15 +75,20 @@ public class VaultClient {
         this.appRoleId = appRoleId;
         this.appRoleSecretId = appRoleSecretId;
 
-        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-        SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
-                .loadTrustMaterial(null, acceptingTrustStrategy)
+        var httpClient = HttpClients.custom()
+                .setConnectionManager(
+                    PoolingHttpClientConnectionManagerBuilder.create()
+                        .setSSLSocketFactory(
+                            SSLConnectionSocketFactoryBuilder.create()
+                                .setSslContext(
+                                        SSLContexts.custom()
+                                        .loadTrustMaterial(null, TrustAllStrategy.INSTANCE)
+                                        .build())
+                                    .setHostnameVerifier((s, sslSession) -> true)
+                                .build())
+                    .build())
                 .build();
-        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
-        CloseableHttpClient httpClient = HttpClients.custom()
-                .setSSLSocketFactory(csf)
-                .build();
-        HttpComponentsClientHttpRequestFactory requestFactory =
+        var requestFactory =
                 new HttpComponentsClientHttpRequestFactory();
         requestFactory.setHttpClient(httpClient);
         this.restTemplate = new RestTemplate(requestFactory);

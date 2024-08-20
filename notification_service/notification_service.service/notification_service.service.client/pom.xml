@@ -24,6 +24,14 @@
             <artifactId>spring-cloud-commons</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-resource-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>notification_service.model</artifactId>
             <version>${project.version}</version>

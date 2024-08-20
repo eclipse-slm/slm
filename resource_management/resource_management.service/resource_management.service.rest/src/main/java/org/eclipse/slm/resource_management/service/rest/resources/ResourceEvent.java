@@ -1,6 +1,5 @@
 package org.eclipse.slm.resource_management.service.rest.resources;
 
-import org.keycloak.KeycloakPrincipal;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.UUID;

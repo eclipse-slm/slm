@@ -3,6 +3,7 @@ package org.eclipse.slm.service_management.model.offerings
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import jakarta.persistence.*
 import org.eclipse.slm.service_management.model.AbstractBaseEntityUuid
 import org.eclipse.slm.service_management.model.utils.ByteArrayDeserializer
 import org.eclipse.slm.service_management.model.vendors.ServiceVendor
@@ -10,7 +11,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
-import javax.persistence.*
 import kotlin.jvm.Transient
 
 @Entity

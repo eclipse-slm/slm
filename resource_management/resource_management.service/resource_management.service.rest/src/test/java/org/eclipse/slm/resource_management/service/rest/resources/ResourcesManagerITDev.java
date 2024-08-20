@@ -147,7 +147,7 @@ public class ResourcesManagerITDev {
         @Order(10)
         public void getBasicResourcesWithRemoteAccessServiceExpectNoReturn() throws ConsulLoginFailedException, JsonProcessingException, ResourceNotFoundException {
             List<BasicResource> resources = resourcesManager.getResourcesWithCredentialsByRemoteAccessService(
-                    config.keycloakPrincipal
+                    config.jwtAuthenticationToken
             );
 
             //size has to be 1 because consul itself is also registered as node
@@ -158,14 +158,14 @@ public class ResourcesManagerITDev {
         @Order(15)
         public void getBasicResourceWithRemoteAccessServiceByResourceIdExpectNoReturn() throws ConsulLoginFailedException, JsonProcessingException, ResourceNotFoundException {
             BasicResource resourceSsh = resourcesManager.getResourceWithCredentialsByRemoteAccessService(
-                    config.keycloakPrincipal,
+                    config.jwtAuthenticationToken,
                     basicResourceSshId
             );
 
             assertNull(resourceSsh);
 
             BasicResource resourceWinRm = resourcesManager.getResourceWithCredentialsByRemoteAccessService(
-                    config.keycloakPrincipal,
+                    config.jwtAuthenticationToken,
                     basicResourceWinRmId
             );
 
@@ -176,7 +176,7 @@ public class ResourcesManagerITDev {
         @Order(20)
         public void createBasicResourcesWithRemoteAccessService() throws ConsulLoginFailedException, ResourceNotFoundException, JsonProcessingException, IllegalAccessException, CapabilityNotFoundException, SSLException {
             BasicResource basicResourceSsh = resourcesManager.addExistingResource(
-                    config.keycloakPrincipal,
+                    config.jwtAuthenticationToken,
                     basicResourceSshId,
                     "test-host-ssh",
                     "1.2.3.4",
@@ -191,7 +191,7 @@ public class ResourcesManagerITDev {
             assertEquals(basicResourceSshId, basicResourceSsh.getId());
 
             BasicResource basicResourceWinrm = resourcesManager.addExistingResource(
-                    config.keycloakPrincipal,
+                    config.jwtAuthenticationToken,
                     basicResourceWinRmId,
                     "test-host-winrm",
                     "1.2.3.5",
@@ -210,7 +210,7 @@ public class ResourcesManagerITDev {
         @Order(30)
         public void getBasicResourcesWithRemoteAccessService() throws ConsulLoginFailedException, JsonProcessingException, ResourceNotFoundException {
             List<BasicResource> resources = resourcesManager.getResourcesWithCredentialsByRemoteAccessService(
-                    config.keycloakPrincipal
+                    config.jwtAuthenticationToken
             );
 
             //size has to be +1 because consul itself is also registered as node
@@ -222,7 +222,7 @@ public class ResourcesManagerITDev {
         public void getBasicResourceWithRemoteAccessServiceByResourceId() throws ConsulLoginFailedException, ResourceNotFoundException, JsonProcessingException {
             //region SSH
             BasicResource newResourceSsh = resourcesManager.getResourceWithCredentialsByRemoteAccessService(
-                    config.keycloakPrincipal,
+                    config.jwtAuthenticationToken,
                     basicResourceSshId
             );
             RemoteAccessService remAccServSsh = newResourceSsh.getRemoteAccessService();
@@ -236,7 +236,7 @@ public class ResourcesManagerITDev {
 
             //region WinRM
             BasicResource newResourceWinRM = resourcesManager.getResourceWithCredentialsByRemoteAccessService(
-                    config.keycloakPrincipal,
+                    config.jwtAuthenticationToken,
                     basicResourceWinRmId
             );
             RemoteAccessService remoteAccessServiceWinRM = newResourceWinRM.getRemoteAccessService();
@@ -273,12 +273,12 @@ public class ResourcesManagerITDev {
 
             for(UUID id : ids) {
                 resourcesManager.deleteResource(
-                        config.keycloakPrincipal,
+                        config.jwtAuthenticationToken,
                         id
                 );
 
                 BasicResource resource = resourcesManager.getResourceWithCredentialsByRemoteAccessService(
-                        config.keycloakPrincipal,
+                        config.jwtAuthenticationToken,
                         id
                 );
 
@@ -328,7 +328,7 @@ public class ResourcesManagerITDev {
         @Order(10)
         public void getBasicResourcesWithoutRemoteAccessServiceExpectNoReturn() throws ConsulLoginFailedException, JsonProcessingException, ResourceNotFoundException {
             List<BasicResource> resources = resourcesManager.getResourcesWithCredentialsByRemoteAccessService(
-                    config.keycloakPrincipal
+                    config.jwtAuthenticationToken
             );
 
             //size has to be 1 because consul itself is also registered as node
@@ -339,7 +339,7 @@ public class ResourcesManagerITDev {
         @Order(20)
         public void createBasicResourcesWithoutRemoteAccessService() throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, CapabilityNotFoundException, SSLException, JsonProcessingException {
             BasicResource basicResourceWithNoCredentials = resourcesManager.addExistingResource(
-                    config.keycloakPrincipal,
+                    config.jwtAuthenticationToken,
                     uuid,
                     hostname,
                     ip,
@@ -358,7 +358,7 @@ public class ResourcesManagerITDev {
         @Order(30)
         public void getBasicResourcesWithoutRemoteAccessServiceExpectOneResource() throws ConsulLoginFailedException, JsonProcessingException, ResourceNotFoundException {
             List<BasicResource> resources = resourcesManager.getResourcesWithCredentialsByRemoteAccessService(
-                    config.keycloakPrincipal
+                    config.jwtAuthenticationToken
             );
 
             //size has to be +1 because consul itself is also registered as node
@@ -369,7 +369,7 @@ public class ResourcesManagerITDev {
         @Order(40)
         public void getBasicResourceWithoutRemoteAccessServiceByResourceId() throws ConsulLoginFailedException, ResourceNotFoundException, JsonProcessingException {
             BasicResource resource = resourcesManager.getResourceWithCredentialsByRemoteAccessService(
-                    config.keycloakPrincipal,
+                    config.jwtAuthenticationToken,
                     uuid
             );
             RemoteAccessService remAccServSsh = resource.getRemoteAccessService();
@@ -384,10 +384,10 @@ public class ResourcesManagerITDev {
             List<Node> nodesBefore = consulNodesApiClient.getNodes(config.cCred);
             Map<String, List<String>> servicesBefore = consulServicesApiClient.getServices(config.cCred);
 
-            resourcesManager.deleteResource(config.keycloakPrincipal,uuid);
+            resourcesManager.deleteResource(config.jwtAuthenticationToken,uuid);
 
             BasicResource resource = resourcesManager.getResourceWithCredentialsByRemoteAccessService(
-                    config.keycloakPrincipal,
+                    config.jwtAuthenticationToken,
                     uuid
             );
 
@@ -441,7 +441,7 @@ public class ResourcesManagerITDev {
                     .findById(location.getId());
 
             BasicResource basicResourceWithLocation = resourcesManager.addExistingResource(
-                    config.keycloakPrincipal,
+                    config.jwtAuthenticationToken,
                     uuid,
                     hostname,
                     ip,
@@ -460,7 +460,7 @@ public class ResourcesManagerITDev {
         @Order(20)
         public void registerResourceWithoutLocationExpectLocationNull() throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, CapabilityNotFoundException, SSLException, JsonProcessingException {
             BasicResource basicResourceWithoutLocation = resourcesManager.addExistingResource(
-                    config.keycloakPrincipal,
+                    config.jwtAuthenticationToken,
                     uuid,
                     hostname,
                     ip,
@@ -479,7 +479,7 @@ public class ResourcesManagerITDev {
         @Order(30)
         public void registerResourceWithWrongLocationIdExpectLocationNull() throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, CapabilityNotFoundException, SSLException, JsonProcessingException {
             BasicResource basicResourceWithWrongLocationId = resourcesManager.addExistingResource(
-                    config.keycloakPrincipal,
+                    config.jwtAuthenticationToken,
                     uuid,
                     hostname,
                     ip,

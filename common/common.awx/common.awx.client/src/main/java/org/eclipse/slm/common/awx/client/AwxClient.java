@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeCreator;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.fasterxml.jackson.module.kotlin.KotlinModule;
+import jakarta.annotation.PostConstruct;
 import org.eclipse.slm.common.awx.model.*;
 import org.eclipse.slm.notification_service.model.JobFinalState;
 import org.eclipse.slm.notification_service.model.JobState;
@@ -34,7 +35,6 @@ import reactor.netty.http.client.HttpClient;
 import reactor.netty.tcp.TcpClient;
 import reactor.retry.Repeat;
 
-import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -1520,11 +1520,11 @@ public class AwxClient {
 
     private LinkedMultiValueMap<String, String> getAuthHeader(AwxCredential awxCredential) {
         LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap();
-        if(awxCredential.keycloakPrincipal != null) {
+        if(awxCredential.jwtAuthenticationToken != null) {
             linkedMultiValueMap.add(
                     HttpHeaders.AUTHORIZATION,
                     "Bearer " +
-                            getAccessToken(awxCredential.keycloakPrincipal.getKeycloakSecurityContext().getTokenString())
+                            getAccessToken(awxCredential.jwtAuthenticationToken.getToken().getTokenValue())
             );
         } else {
             String str = (awxCredential.username == null ? "" : awxCredential.username) + ":" + (awxCredential.password == null ? "" : awxCredential.password);

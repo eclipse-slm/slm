@@ -1,4 +1,4 @@
-package org.eclipse.slm.common.aas;
+package org.eclipse.slm.common.aas.clients;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException;
