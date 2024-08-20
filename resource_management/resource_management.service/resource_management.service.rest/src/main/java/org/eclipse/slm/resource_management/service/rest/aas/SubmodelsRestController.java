@@ -8,16 +8,14 @@ import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.service.rest.resources.ResourcesManager;
-import org.keycloak.KeycloakPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.util.UUID;
@@ -43,8 +41,8 @@ public class SubmodelsRestController {
     public ResponseEntity getResourceSubmodels(
             @PathVariable(name = "resourceId") UUID resourceId
     ) throws ResourceNotFoundException, ConsulLoginFailedException, JsonProcessingException {
-        var keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var resource = this.resourcesManager.getResourceWithCredentialsByRemoteAccessService(keycloakPrincipal, resourceId);
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        var resource = this.resourcesManager.getResourceWithCredentialsByRemoteAccessService(jwtAuthenticationToken, resourceId);
         return ResponseEntity.ok(submodelManager.getSubmodels(resource));
     }
 
@@ -54,8 +52,8 @@ public class SubmodelsRestController {
             @PathVariable(name = "resourceId") UUID resourceId,
             @RequestParam("aasx") MultipartFile aasxFile
     ) throws ConsulLoginFailedException, ResourceNotFoundException, IOException, InvalidFormatException, DeserializationException {
-        var keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var resource = this.resourcesManager.getResourceWithCredentialsByRemoteAccessService(keycloakPrincipal, resourceId);
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        var resource = this.resourcesManager.getResourceWithCredentialsByRemoteAccessService(jwtAuthenticationToken, resourceId);
         var aasxFileInputStream = new BufferedInputStream(aasxFile.getInputStream());
 
         this.submodelManager.addSubmodelsFromAASX(ResourceAAS.createAasIdFromResourceId(resource.getId()), aasxFileInputStream);
@@ -69,8 +67,8 @@ public class SubmodelsRestController {
             @PathVariable(name = "resourceId") UUID resourceId,
             @PathVariable(name = "submodelIdBase64Encoded") String submodelIdBase64Encoded
     ) throws ConsulLoginFailedException, ResourceNotFoundException, JsonProcessingException {
-        var keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var resource = this.resourcesManager.getResourceWithCredentialsByRemoteAccessService(keycloakPrincipal, resourceId);
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        var resource = this.resourcesManager.getResourceWithCredentialsByRemoteAccessService(jwtAuthenticationToken, resourceId);
         try {
             var submodelId = new String(Base64.decodeBase64(submodelIdBase64Encoded));
             submodelManager.deleteSubmodel(resource.getId(), submodelId);

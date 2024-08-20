@@ -29,11 +29,11 @@ import org.eclipse.slm.resource_management.model.consul.capability.SingleHostCap
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.persistence.api.CapabilityJpaRepository;
 import org.apache.commons.lang3.NotImplementedException;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
@@ -388,11 +388,11 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
             UUID capabilityId,
             Boolean skipInstall,
             Map<String, String> configParameters,
-            KeycloakPrincipal keycloakPrincipal
+            JwtAuthenticationToken jwtAuthenticationToken
     ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException, CapabilityNotFoundException, JsonProcessingException, IllegalAccessException {
         var deploymentCapabilitiesOfResource = getDeploymentCapabilitiesOfResource(
                 resourceId,
-                new ConsulCredential(keycloakPrincipal)
+                new ConsulCredential(jwtAuthenticationToken)
         );
         var optionalExistingDCOnResource = deploymentCapabilitiesOfResource
                 .stream()
@@ -429,10 +429,10 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                 configParameters
         );
 
-        this.notificationServiceClient.postNotification(keycloakPrincipal, Category.Resources, JobTarget.DEPLOYMENT_CAPABILITY, ADD);
+        this.notificationServiceClient.postNotification(jwtAuthenticationToken, Category.Resources, JobTarget.DEPLOYMENT_CAPABILITY, ADD);
 
         this.keycloakUtil.createRealmRoleAndAssignToUser(
-                keycloakPrincipal,
+                jwtAuthenticationToken,
                 singleHostCapabilitiesVaultClient.addSingleHostCapabilityServiceSecrets(
                         new VaultCredential(),
                         newCapabilityService,
@@ -447,17 +447,17 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
             awxJobId = installCapabilityOnResource(
                     resourceId,
                     newCapabilityService,
-                    new AwxCredential(keycloakPrincipal),
-                    new ConsulCredential(keycloakPrincipal),
-                    keycloakPrincipal.getKeycloakSecurityContext().getTokenString(),
+                    new AwxCredential(jwtAuthenticationToken),
+                    new ConsulCredential(jwtAuthenticationToken),
+                    jwtAuthenticationToken.getToken().getTokenValue(),
                     configParameters
             );
-            this.notificationServiceClient.postJobObserver(keycloakPrincipal, awxJobId, JobTarget.DEPLOYMENT_CAPABILITY, ADD);
+            this.notificationServiceClient.postJobObserver(jwtAuthenticationToken, awxJobId, JobTarget.DEPLOYMENT_CAPABILITY, ADD);
         }
     }
 
     public void installBaseConfigurationOnResource(
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             UUID resourceId,
             UUID capabilityId
     ) throws CapabilityNotFoundException, ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, SSLException, JsonProcessingException {
@@ -481,13 +481,13 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
         int awxJobId = installCapabilityOnResource(
                 resourceId,
                 newCapabilityService,
-                new AwxCredential(keycloakPrincipal),
+                new AwxCredential(jwtAuthenticationToken),
                 new ConsulCredential(),
-                keycloakPrincipal.getKeycloakSecurityContext().getTokenString(),
+                jwtAuthenticationToken.getToken().getTokenValue(),
                 new HashMap<>()
 
         );
-        this.notificationServiceClient.postJobObserver(keycloakPrincipal, awxJobId, JobTarget.BASE_CONFIGURATION_CAPABILITY, ADD);
+        this.notificationServiceClient.postJobObserver(jwtAuthenticationToken, awxJobId, JobTarget.BASE_CONFIGURATION_CAPABILITY, ADD);
     }
 
     private void updateCapabilityServiceStatus(
@@ -557,9 +557,9 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
     public void uninstallCapabilityFromResource(
             UUID resourceId,
             UUID capabilityId,
-            KeycloakPrincipal keycloakPrincipal
+            JwtAuthenticationToken jwtAuthenticationToken
     ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException {
-        ConsulCredential consulCredential = new ConsulCredential(keycloakPrincipal);
+        ConsulCredential consulCredential = new ConsulCredential(jwtAuthenticationToken);
         Optional<Capability> capabilityOptional = null;
         try {
             capabilityOptional = this.getSingleHostCapabilityOfResourceById(
@@ -594,14 +594,14 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
             int awxJobId = uninstallCapabilityFromResource(
                     resourceId,
                     capabilityService,
-                    new AwxCredential(keycloakPrincipal),
+                    new AwxCredential(jwtAuthenticationToken),
                     consulCredential,
-                    keycloakPrincipal.getKeycloakSecurityContext().getTokenString()
+                    jwtAuthenticationToken.getToken().getTokenValue()
             );
 
             if (awxJobId != -1)
                 this.notificationServiceClient.postJobObserver(
-                        keycloakPrincipal,
+                        jwtAuthenticationToken,
                         awxJobId,
                         JobTarget.DEPLOYMENT_CAPABILITY,
                         DELETE
@@ -614,14 +614,14 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
             );
             //TODO Does not work? keycloakPrincipal has not proper rights?
             this.keycloakUtil.deleteRealmRoleAsAdmin(
-                    keycloakPrincipal,
+                    jwtAuthenticationToken,
                     singleHostCapabilitiesVaultClient.deleteSingleHostCapabilityServiceSecrets(
                             new VaultCredential(),
                             capabilityService
                     )
             );
             this.notificationServiceClient.postNotification(
-                    keycloakPrincipal,
+                    jwtAuthenticationToken,
                     Category.Resources,
                     JobTarget.DEPLOYMENT_CAPABILITY,
                     DELETE
