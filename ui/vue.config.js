@@ -51,7 +51,7 @@ module.exports = {
         secure: false,
       },
       '/resource-management/*': {
-        target: `${process.env.VUE_APP_RESOURCE_REGISTRY_URL}`,
+        target: `${process.env.VUE_APP_RESOURCE_MANAGEMENT_URL}`,
         pathRewrite: {
           '^/resource-management': '',
         },
@@ -59,7 +59,7 @@ module.exports = {
         secure: false,
       },
       '/service-management/*': {
-        target: `${process.env.VUE_APP_SERVICE_REGISTRY_URL}`,
+        target: `${process.env.VUE_APP_SERVICE_MANAGEMENT_URL}`,
         pathRewrite: {
           '^/service-management': '',
         },
