@@ -121,94 +121,96 @@
               :items="jobs"
               style="border-bottom:1px solid #E0E0E0"
             >
-              <template #header.id="{ header }">
+              <template #header.id="{ column }">
                 <v-icon size="small">
                   mdi-pound
-                </v-icon> {{ header.text }}
+                </v-icon> {{ column.title }}
               </template>
-              <template #header.name="{ header }">
+              <template #header.name="{ column }">
                 <v-icon size="small">
                   mdi-form-textbox
                 </v-icon>
-                {{ header.text }}
+                {{ column.title }}
               </template>
-              <template #header.started="{ header }">
+              <template #header.started="{ column }">
                 <v-icon size="small">
                   mdi-clock-start
-                </v-icon> {{ header.text }}
+                </v-icon> {{ column.title }}
               </template>
-              <template #header.finished="{ header }">
+              <template #header.finished="{ column }">
                 <v-icon size="small">
                   mdi-clock-end
-                </v-icon> {{ header.text }}
+                </v-icon> {{ column.title }}
               </template>
-              <template #header.elapsed="{ header }">
+              <template #header.elapsed="{ column }">
                 <v-icon size="small">
                   mdi-alarm
-                </v-icon> {{ header.text }}
+                </v-icon> {{ column.title }}
               </template>
-              <template #header.status="{ header }">
+              <template #header.status="{ column }">
                 <v-icon size="small">
                   mdi-list-status
-                </v-icon> {{ header.text }}
+                </v-icon> {{ column.title }}
               </template>
-              <template
-                #body="{ items }"
-              >
-                <tbody
-                  v-for="job in items"
-                  :key="job.id"
-                >
-                  <tr>
-                    <td>{{ job.id }}</td>
-                    <td>{{ job.name }}</td>
-                    <td>{{ getFormattedDate(job.started) }}</td>
-                    <td>{{ getFormattedDate(job.finished) }}</td>
-                    <td v-if="job.status === 'running'" />
-                    <td v-else-if="job.elapsed > 60">
-                      {{ Math.floor(job.elapsed/60) }}m {{ Math.round(job.elapsed % 60) }}s
-                    </td>
-                    <td v-else>
-                      {{ Math.round(job.elapsed % 60) }}s
-                    </td>
-                    <td>
-                      <v-tooltip location="right">
-                        <template #activator="{ props }">
-                          <v-icon
-                            v-if="job.status == 'successful'"
-                            v-bind="props"
-                          >
-                            mdi-check-circle-outline
-                          </v-icon>
-                          <v-icon
-                            v-if="job.status == 'running'"
-                            v-bind="attrs"
-                            v-on="on"
-                          >
-                            mdi-run-fast
-                          </v-icon>
-                          <v-icon
-                            v-else-if="job.status == 'pending'"
-                            v-bind="attrs"
-                            v-on="on"
-                          >
-                            mdi-timer-sand-empty
-                          </v-icon>
-                          <v-icon
-                            v-else-if="job.status == 'canceled' || job.status == 'failed'|| job.status == 'error'"
-                            v-bind="attrs"
-                            v-on="on"
-                          >
-                            mdi-alert-circle-outline
-                          </v-icon>
-                        </template>
-                        <span>
-                          {{ job.status }}
-                        </span>
-                      </v-tooltip>
-                    </td>
-                  </tr>
-                </tbody>
+
+              <template #item.id="{item}">
+                {{ item.id }}
+              </template>
+
+              <template #item.name="{item}">
+                {{ item.name }}
+              </template>
+
+              <template #item.started="{item}">
+                {{ getFormattedDate(item.started) }}
+              </template>
+
+              <template #item.finished="{item}">
+                {{ getFormattedDate(item.finished) }}
+              </template>
+
+              <template #item.status="{item}">
+                <span v-if="item.status === 'running'" />
+                <span v-else-if="item.elapsed > 60">
+                  {{ Math.floor(item.elapsed/60) }}m {{ Math.round(item.elapsed % 60) }}s
+                </span>
+                <span v-else>
+                  {{ Math.round(item.elapsed % 60) }}s
+                </span>
+                <v-tooltip location="right">
+                  <template #activator="{ props }">
+                    <v-icon
+                      v-if="item.status == 'successful'"
+                      v-bind="props"
+                    >
+                      mdi-check-circle-outline
+                    </v-icon>
+                    <v-icon
+                      v-if="item.status == 'running'"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      mdi-run-fast
+                    </v-icon>
+                    <v-icon
+                      v-else-if="item.status == 'pending'"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      mdi-timer-sand-empty
+                    </v-icon>
+                    <v-icon
+                      v-else-if="item.status == 'canceled' || item.status == 'failed'|| item.status == 'error'"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      mdi-alert-circle-outline
+                    </v-icon>
+                  </template>
+                  <span>
+                    {{ item.status }}
+                  </span>
+                </v-tooltip>
               </template>
             </v-data-table>
             <v-card-subtitle>Total Job Count: {{ jobs.length }}</v-card-subtitle>
@@ -253,7 +255,7 @@ export default {
 
     data () {
       return {
-        sortBy: 'id',
+        sortBy: [{key: 'id'}],
         sortDesc: true,
         jobCount: 5,
         dataCompletedTasksChart: {
