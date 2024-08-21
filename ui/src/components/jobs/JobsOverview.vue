@@ -24,35 +24,37 @@
           item-key="id"
           :items="jobs"
         >
-          <template
-            #body="{ items }"
-          >
-            <tbody
-              v-for="job in items"
-              :key="job.id"
-            >
-              <tr>
-                <td>
-                  <a
-                    :href="`${awxURL}/#/jobs/playbook/${job.id}`"
-                    target="_blank"
-                  >{{ job.id }}</a>
-                </td>
-                <td>{{ job.name }}</td>
-                <td>{{ getFormattedDate(job.started) }}</td>
-                <td>{{ getFormattedDate(job.finished) }}</td>
-                <td v-if="job.status === 'running'">
-                  {{ getFormattedTime(jobs_running.find(j => j.id === job.id).elapsed) }}
-                </td>
-                <td v-else-if="job.elapsed > 60">
-                  {{ Math.floor(job.elapsed/60) }}m {{ Math.round(job.elapsed % 60) }}s
-                </td>
-                <td v-else>
-                  {{ Math.round(job.elapsed % 60) }}s
-                </td>
-                <td>{{ job.status }}</td>
-              </tr>
-            </tbody>
+
+          <template #item.id="{ item }">
+            <a
+                :href="`${awxURL}/#/jobs/playbook/${item.id}`"
+                target="_blank"
+            >{{ item.id }}</a>
+          </template>
+
+          <template #item.name="{ item }">
+            {{ item.name }}
+          </template>
+
+          <template #item.started="{ item }">
+            {{ getFormattedDate(item.started) }}
+          </template>
+
+          <template #item.finished="{ item }">
+            {{ getFormattedDate(item.finished) }}
+          </template>
+
+          <template #item.status="{ item }">
+            <span v-if="item.status === 'running'">
+              {{ getFormattedTime(jobs_running.find(j => j.id === item.id).elapsed) }}
+            </span>
+            <span v-else-if="item.elapsed > 60">
+              {{ Math.floor(item.elapsed/60) }}m {{ Math.round(item.elapsed % 60) }}s
+            </span>
+            <span v-else>
+              {{ Math.round(item.elapsed % 60) }}s
+            </span>
+            {{ item.status }}
           </template>
         </v-data-table>
       </base-material-card>
@@ -80,7 +82,7 @@ export default {
     data: function () {
       return {
         observer: null,
-        sortBy: 'id',
+        sortBy: [{key: 'id', order: 'asc'}],
         sortDesc: true,
       }
     },
