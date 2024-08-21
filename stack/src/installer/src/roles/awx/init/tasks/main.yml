@@ -134,11 +134,11 @@
       set_fact:
         awx_compose: "{{ lookup('template', 'awx.yml') }}"
     - name: "Start AWX containers"
-      community.docker.docker_compose:
+      community.docker.docker_compose_v2:
         project_name: eclipse-slm
         definition: "{{ awx_compose | from_yaml}}"
         state: present
-        pull: true
+        pull: always
     - name: "Wait for AWX being up"
       uri:
         url: "{{ AWX_URL }}"

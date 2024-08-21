@@ -22,38 +22,44 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import ApiState from '@/api/apiState.js'
-  import ServiceInstancesOverview from '@/components/services/ServiceInstancesOverview'
 
-  export default {
+import ApiState from '@/api/apiState.js'
+import ServiceInstancesOverview from '@/components/services/ServiceInstancesOverview'
+import {useServicesStore} from "@/stores/servicesStore";
+
+export default {
     components: {
       ServiceInstancesOverview,
+    },
+    setup(){
+      const servicesStore = useServicesStore();
+
+      return {servicesStore}
     },
     data () {
       return {
       }
     },
-    created () {
-      this.$store.dispatch('getServices')
-      this.$store.dispatch('getServiceOfferings')
-    },
     computed: {
-      ...mapGetters([
-        'apiStateServices',
-      ]),
+      apiStateServices() {
+        return this.servicesStore.apiStateServices
+      },
       apiStateLoaded () {
         return this.apiStateServices.services === ApiState.LOADED
       },
       apiStateLoading () {
         if (this.apiStateServices.services === ApiState.INIT) {
-          this.$store.dispatch('getServices')
+          this.servicesStore.getServices();
         }
         return this.apiStateServices.services === ApiState.LOADING || this.apiStateServices.services === ApiState.INIT
       },
       apiStateError () {
         return this.apiStateServices.services === ApiState.ERROR
       },
+    },
+    created () {
+      this.servicesStore.getServices();
+      this.servicesStore.getServiceOfferings();
     },
   }
 

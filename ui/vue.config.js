@@ -1,6 +1,11 @@
 const path = require('path');
-
+const webpack = require('webpack');
 module.exports = {
+  chainWebpack: (config) => {
+    config.module
+        .rule('vue')
+        .use('vue-loader');
+  },
   productionSourceMap: true, // NOTE: this is default
   configureWebpack: {
     devtool: 'source-map',
@@ -11,6 +16,11 @@ module.exports = {
         '@': path.resolve(__dirname, 'src')
       }
     },
+    plugins: [
+      new webpack.DefinePlugin({
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
+      })
+    ],
     module: {
       rules: [
         // {
@@ -41,7 +51,7 @@ module.exports = {
         secure: false,
       },
       '/resource-management/*': {
-        target: `${process.env.VUE_APP_RESOURCE_MANAGEMENT_URL}`,
+        target: `${process.env.VUE_APP_RESOURCE_REGISTRY_URL}`,
         pathRewrite: {
           '^/resource-management': '',
         },
@@ -49,7 +59,7 @@ module.exports = {
         secure: false,
       },
       '/service-management/*': {
-        target: `${process.env.VUE_APP_SERVICE_MANAGEMENT_URL}`,
+        target: `${process.env.VUE_APP_SERVICE_REGISTRY_URL}`,
         pathRewrite: {
           '^/service-management': '',
         },

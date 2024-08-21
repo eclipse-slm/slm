@@ -24,7 +24,7 @@ public class DockerStackTests {
     private static final Logger LOG = LoggerFactory.getLogger(DockerStackTests.class);
 
     private HashMap<String, String> stackContainersExpectedStatesMap = new HashMap<>() {{
-        put("aas-broker", "running");
+        put("aas-broker", "healthy");
         put("aas-database", "healthy");
         put("aas-gui", "running");
         put("aas-registry", "running");

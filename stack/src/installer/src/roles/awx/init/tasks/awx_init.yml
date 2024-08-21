@@ -16,17 +16,12 @@
     name: vault/client
     tasks_from: create_approle_with_policies.yml
   vars:
+    _vault_token: "{{ vault_root_token }}"
     _approle_name: "{{ approle.name }}"
     _approle_policies: "{{ approle.policies }}"
   loop: "{{ vault_approles }}"
   loop_control:
     loop_var: approle
-
-- debug:
-    var: _awx_admin_username
-
-- debug:
-    var: _awx_admin_password
 
 - name: "Remove organization"
   awx.awx.organization:

@@ -4,9 +4,9 @@
       <v-data-table
         :headers="clusterHeaders"
         :items="clusters"
-        :item-class="rowClass"
+        :row-props="rowClass"
         :single-expand="true"
-        :expanded.sync="expanded"
+        :expanded="expanded"
         show-expand
         @click:row="expandRow"
       >
@@ -26,7 +26,7 @@
               :disabled="item.isManaged"
               @click.stop="addNodeToCluster(item)"
             >
-              <v-icon>mdi-server-plus</v-icon>
+              <v-icon icon="mdi-server-plus" />
             </v-btn>
             <v-btn
               class="ml-4"
@@ -34,36 +34,24 @@
               :disabled="item.isManaged"
               @click.stop="removeNodeFromCluster(item)"
             >
-              <v-icon>mdi-server-minus</v-icon>
+              <v-icon
+                color="white"
+                icon="mdi-server-minus"
+              />
             </v-btn>
             <v-btn
               class="ml-4"
               color="error"
               @click.stop="deleteCluster(item)"
             >
-              <v-icon>mdi-delete</v-icon>
+              <v-icon icon="mdi-delete" />
             </v-btn>
           </div>
         </template>
 
-        <template #item.data-table-expand="{ item, isExpanded }">
-          <td
-            v-if="item.nodes.length > 0"
-            class="text-start"
-          >
-            <v-btn
-              text
-              icon
-              :class="{'v-data-table__expand-icon--active' : isExpanded}"
-            >
-              <v-icon>{{ isExpanded ? 'mdi-close' : 'mdi-chevron-down' }}</v-icon>
-            </v-btn>
-          </td>
-        </template>
-
-        <template #expanded-item="{headers, item}">
-          <td :colspan="headers.length">
-            <v-simple-table
+        <template #expanded-row="{ columns, item}">
+          <td :colspan="columns.length">
+            <v-table
               dense
               class="my-5"
             >
@@ -87,7 +75,7 @@
                     <td>
                       <v-chip
                         class="mx-1"
-                        small
+                        size="small"
                         value="test"
                       >
                         {{ getClusterMemberTypeByNodeId(item.memberMapping[node.ID], item.clusterMemberTypes) }}
@@ -96,7 +84,7 @@
                   </tr>
                 </tbody>
               </template>
-            </v-simple-table>
+            </v-table>
           </td>
         </template>
       </v-data-table>
@@ -113,33 +101,38 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import ClusterScaleDialog from '@/components/resources/dialogs/ClusterScaleDialog'
-  import ClusterDeleteDialog from '@/components/resources/dialogs/ClusterDeleteDialog'
 
-  export default {
+import ClusterScaleDialog from '@/components/resources/dialogs/ClusterScaleDialog'
+import ClusterDeleteDialog from '@/components/resources/dialogs/ClusterDeleteDialog'
+import {useResourcesStore} from "@/stores/resourcesStore";
+
+export default {
     name: 'ResourcesTableClusters',
     components: {
       ClusterScaleDialog,
       ClusterDeleteDialog,
     },
+    setup(){
+      const resourceStore = useResourcesStore();
+      return {resourceStore};
+    },
     data () {
       return {
         expanded: [],
         clusterHeaders: [
-          { text: '', value: 'data-table-expand' },
-          { text: 'ID', value: 'id' },
-          { text: 'Name', value: 'name' },
+          { title: '', key: 'data-table-expand' },
+          { title: 'ID', key: 'id' },
+          { title: 'Name', key: 'name' },
           // { text: 'Server', value: 'server' },
-          { text: 'User', value: 'username' },
-          { text: 'Namespace', value: 'namespace' },
-          { text: 'Status', value: 'status'},
-          { text: 'Type', value: 'clusterType' },
-          { text: 'Node Count', value: 'nodeCount' },
+          { title: 'User', key: 'username' },
+          { title: 'Namespace', key: 'namespace' },
+          { title: 'Status', key: 'status'},
+          { title: 'Type', key: 'clusterType' },
+          { title: 'Node Count', key: 'nodeCount' },
           { value: 'actions' },
         ],
         nodeHeaders: [
-          { text: 'Node Name', value: 'node' },
+          { title: 'Node Name', value: 'node' },
         ],
         scaleAction: null,
         clusterForDelete: null,
@@ -147,35 +140,43 @@
       }
     },
     computed: {
-      ...mapGetters(['clusters']),
+      clusters () {
+        return this.resourceStore.clusters
+      },
     },
     methods: {
       addNodeToCluster (cluster) {
         this.scaleAction = 'up'
-        this.$store.commit('SET_SELECTED_ClUSTER_FOR_SCALE', cluster)
+        this.resourceStore.selectedClusterForScale_ = cluster;
       },
       removeNodeFromCluster (cluster) {
         this.scaleAction = 'down'
-        this.$store.commit('SET_SELECTED_ClUSTER_FOR_SCALE', cluster)
+        this.resourceStore.selectedClusterForScale_ = cluster;
       },
       selectClusterForDelete (cluster) {
-        this.$store.commit('SET_SELECTED_ClUSTER_FOR_DELETE', cluster)
+        this.resourceStore.selectedClusterForDelete_ = cluster;
       },
-      expandRow (row) {
+      expandRow (event, row) {
+        const item = row.item;
         const found = this.expanded.find(i => {
-          return i.name === row.name
+          return i.name === item.name
         })
 
         if (this.expanded.length > 0) {
           this.expanded = []
         }
 
-        if (!found && row.nodes.length > 0){
-          this.expanded.push(row)
+        if (!found && item.nodes.length > 0){
+          this.expanded.push(item)
         }
       },
-      rowClass (item) {
-        return item.markedForDelete ? 'grey--text text--lighten-1 row-pointer' : 'row-pointer'
+      rowClass ({item}) {
+        return {
+          class: {
+            'text-grey text--lighten-1 row-pointer': item.markedForDelete,
+            'row-pointer': item.markedForDelete
+          }
+        }
       },
       getClusterMemberTypeByNodeId (clusterMemberTypeName, clusterMemberTypes) {
         return clusterMemberTypes.find((clusterMemberType) => {

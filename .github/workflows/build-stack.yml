@@ -8,7 +8,7 @@ on:
       - release/*
 
 env:
-  DOCKER_COMPOSE_COMMAND: docker-compose
+  DOCKER_COMPOSE_COMMAND: docker compose
 
 jobs:
   build-and-push-awx:

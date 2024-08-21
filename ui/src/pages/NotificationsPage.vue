@@ -3,9 +3,9 @@
 </template>
 
 <script>
-  import NotificationsOverview from '@/components/notifications/NotificationsOverview'
+import NotificationsOverview from '@/components/notifications/NotificationsOverview'
 
-  export default {
+export default {
     components: {
       NotificationsOverview,
     },

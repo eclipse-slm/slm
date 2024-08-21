@@ -1,33 +1,43 @@
 <template>
   <v-container>
     <v-row>
-      <base-material-card v-for="requirement in requirements" :key="requirement.id"
+      <base-material-card
+        v-for="requirement in requirements"
+        :key="requirement.id"
         flat
         width="100%"
         color="secondary"
       >
         <template #heading>
-            {{ requirement.name }}
+          {{ requirement.name }}
         </template>
-        <div v-for="logic in requirement.logics" :key="logic.id" class="mt-0">
+        <div
+          v-for="logic in requirement.logics"
+          :key="logic.id"
+          class="mt-0"
+        >
           <v-card-title>
             {{ logic.type }}
           </v-card-title>
           <v-card-text>
-            <v-card v-for="property in logic.properties" :key="property.id" class="mt-0">
+            <v-card
+              v-for="property in logic.properties"
+              :key="property.id"
+              class="mt-0"
+            >
               <v-card-title>
                 {{ property.name }}
               </v-card-title>
               <v-card-text>
                 <v-row>
                   <v-col>
-                    {{ $t('RequirementLabels.PropertySemanticId')  }}: <code>{{ property.semanticId }}</code>
+                    {{ $t('RequirementLabels.PropertySemanticId') }}: <code>{{ property.semanticId }}</code>
                   </v-col>
                   <v-col>
-                    {{ $t('RequirementLabels.PropertyValue')  }}: <code>{{ property.value }}</code>
+                    {{ $t('RequirementLabels.PropertyValue') }}: <code>{{ property.value }}</code>
                   </v-col>
                 </v-row>
-                {{ $t('RequirementLabels.ParentSubmodelsSemanticIds')  }}: <code>{{ property.parentSubmodelsSemanticIds.join(", ") }}</code>
+                {{ $t('RequirementLabels.ParentSubmodelsSemanticIds') }}: <code>{{ property.parentSubmodelsSemanticIds.join(", ") }}</code>
               </v-card-text>
             </v-card>
           </v-card-text>
@@ -38,13 +48,13 @@
 </template>
 
 <script>
-  import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
+import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
 
-  export default {
+export default {
     name: 'ServiceDetailsRequirements',
     props: {
-      serviceOffering: { type: Object },
-      serviceOfferingVersionId: { type: String }
+      serviceOffering: { type: Object, default: null },
+      serviceOfferingVersionId: { type: String, default: null }
     },
     data () {
       return {
@@ -56,6 +66,9 @@
         this.updateRequirements()
       }
     },
+    mounted () {
+      this.updateRequirements()
+    },
     methods: {
       updateRequirements() {
         if (!this.serviceOfferingVersionId) {
@@ -66,9 +79,6 @@
             this.requirements = serviceOfferingVersion.serviceRequirements
           })
       }
-    },
-    mounted () {
-      this.updateRequirements()
     }
   }
 </script>

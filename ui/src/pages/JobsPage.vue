@@ -3,14 +3,16 @@
 </template>
 
 <script>
-  import JobsOverview from '@/components/jobs/JobsOverview'
+import JobsOverview from '@/components/jobs/JobsOverview'
+import {useJobsStore} from "@/stores/jobsStore";
 
-  export default {
+export default {
     components: {
       JobsOverview,
     },
     created () {
-      this.$store.dispatch('updateJobsStore')
+      const jobStore = useJobsStore();
+      jobStore.updateJobsStore();
     },
   }
 </script>

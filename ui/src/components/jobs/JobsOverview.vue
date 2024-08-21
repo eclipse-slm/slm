@@ -17,7 +17,6 @@
           v-else
           id="jobsTable"
           :sort-by.sync="sortBy"
-          :sort-desc.sync="sortDesc"
           :footer-props="{
             'items-per-page-options': [5, 10, 20, -1],
           }"
@@ -62,16 +61,21 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-  import getEnv from '@/utils/env'
 
-  export default {
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import getEnv from '@/utils/env'
+import {useJobsStore} from "@/stores/jobsStore";
+
+export default {
     name: 'JobsOverview',
     components: {
       OverviewHeading,
       NoItemAvailableNote
+    },
+    setup(){
+      const jobsStore = useJobsStore();
+      return {jobsStore}
     },
     data: function () {
       return {
@@ -81,18 +85,20 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'jobs',
-        'jobs_running',
-      ]),
+      jobs () {
+        return this.jobsStore.jobs
+      },
+      jobs_running () {
+        return this.jobsStore.jobs_running
+      },
       DataTableHeaders () {
         return [
-          { text: 'ID', value: 'id', sortable: true },
-          { text: 'Name', value: 'name', sortable: true },
-          { text: 'Started at', value: 'started', sortable: true },
-          { text: 'Finished at', value: 'finished', sortable: true },
-          { text: 'Duration', value: 'elapsed', sortable: true },
-          { text: 'Status', value: 'status', sortable: false },
+          { title: 'ID', value: 'id', sortable: true },
+          { title: 'Name', value: 'name', sortable: true },
+          { title: 'Started at', value: 'started', sortable: true },
+          { title: 'Finished at', value: 'finished', sortable: true },
+          { title: 'Duration', value: 'elapsed', sortable: true },
+          { title: 'Status', value: 'status', sortable: false },
         ]
       },
       awxURL () {

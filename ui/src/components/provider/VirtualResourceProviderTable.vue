@@ -18,9 +18,7 @@
             disabled
             @click="showDialog(item)"
           >
-            <v-icon>
-              mdi-plus-thick
-            </v-icon>
+            <v-icon icon="mdi-plus-thick" />
           </v-btn>
         </div>
       </template>
@@ -35,13 +33,18 @@
 </template>
 
 <script>
-import {mapGetters} from "vuex";
+
 import VmCreateDialog from "@/components/provider/dialogs/VmCreateDialog.vue";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {useProviderStore} from "@/stores/providerStore";
 
 export default {
   name: 'VirtualResourceProviderTable',
   components: {VmCreateDialog, NoItemAvailableNote},
+  setup(){
+    const providerStore = useProviderStore();
+    return {providerStore}
+  },
   data() {
     return {
       tableHeaders: [
@@ -56,9 +59,9 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-        'virtualResourceProviders'
-    ])
+    virtualResourceProviders() {
+      return this.providerStore.virtualResourceProviders
+    },
   },
   methods: {
     showDialog(CapabilityServiceID) {

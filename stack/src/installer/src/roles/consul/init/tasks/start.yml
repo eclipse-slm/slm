@@ -9,7 +9,7 @@
   block:
     - name: "Consul | Check if instance is already running"
       docker_container_info:
-        name: eclipse-slm_consul_1
+        name: "/{{ COMPOSE_PROJECT_NAME }}-consul-1"
       register: consul_container
     - name: "Consul | Get master token of existing instance"
       set_fact:

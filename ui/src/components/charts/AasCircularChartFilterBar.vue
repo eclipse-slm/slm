@@ -1,19 +1,37 @@
 <template>
-  <v-container v-if="this.filterValues.length > 0">
-    <v-breadcrumbs class="grey lighten-5" >
-      <v-breadcrumbs-item class="pr-3"><v-icon>mdi-home</v-icon></v-breadcrumbs-item>
-      <div v-for="v in selectedFilterValues" v-bind:key="v">
+  <v-container v-if="filterValues.length > 0">
+    <v-breadcrumbs class="bg-grey-lighten-5">
+      <v-breadcrumbs-item class="pr-3">
+        <v-icon>mdi-home</v-icon>
+      </v-breadcrumbs-item>
+      <div
+        v-for="v in selectedFilterValues"
+        :key="v"
+      >
         <v-breadcrumbs-divider>/</v-breadcrumbs-divider>
         <v-breadcrumbs-item>{{ v }}</v-breadcrumbs-item>
       </div>
-      <div v-if="this.showFilterSelector" class="mt-3">
+      <div
+        v-if="showFilterSelector"
+        class="mt-3"
+      >
         <v-breadcrumbs-divider>/</v-breadcrumbs-divider>
         <v-breadcrumbs-item>
-          <v-select dense :items="filterValues" @change="addFilterValueToSelectedValues" v-model="selectedFilterValue" />
+          <v-select
+            v-model="selectedFilterValue"
+            density="compact"
+            :items="filterValues"
+            @update:modelValue="addFilterValueToSelectedValues"
+          />
         </v-breadcrumbs-item>
       </div>
-      <v-spacer></v-spacer>
-      <v-btn icon @click="clearFilterSelection" v-if="showClearSelectionButton"><v-icon>mdi-close</v-icon></v-btn>
+      <v-spacer />
+      <v-btn
+        v-if="showClearSelectionButton"
+        @click="clearFilterSelection" 
+      >
+        <v-icon icon="mdi-close" />
+      </v-btn>
     </v-breadcrumbs>
   </v-container>
 </template>
@@ -21,8 +39,11 @@
   export default {
     name: 'AasCircularChartFilterBar',
     props: {
-      filterValues: Array,
-      showFilterSelector: Boolean
+      filterValues: {
+        type: Array,
+        default: () => [],
+      },
+      showFilterSelector: Boolean,
     },
     data() {
       return {

@@ -1,23 +1,28 @@
 <template>
   <v-card
     class="mx-1 my-1"
-    outlined
+    variant="outlined"
+    style="border: thin solid rgba(0,0,0,.12) !important;"
     :elevation="hovered"
     height="100%"
     @mouseenter="passive ? hovered = 0 : hovered = 24"
     @mouseleave="hovered = 0"
     @click="$emit('click', serviceOffering)"
   >
-    <v-container fluid>
-      <v-list-item>
-        <v-list-item-avatar><v-img :src="getImageUrl(serviceVendorById(serviceOffering.serviceVendorId).logo)" /></v-list-item-avatar>
-        <v-list-item-content>
-          <v-list-item-title class="text-h5">
-            {{ serviceOffering.name }}
-          </v-list-item-title>
-          <v-list-item-subtitle>{{ serviceVendorById(serviceOffering.serviceVendorId).name }}</v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
+    <v-container
+      fluid
+      grid-list-md
+    >
+      <v-row no-gutters>
+        <v-col>
+          <v-list-item :prepend-avatar="getImageUrl(serviceVendorById(serviceOffering.serviceVendorId).logo)">
+            <v-list-item-title class="text-h5">
+              {{ serviceOffering.name }}
+            </v-list-item-title>
+            <v-list-item-subtitle>{{ serviceVendorById(serviceOffering.serviceVendorId).name }}</v-list-item-subtitle>
+          </v-list-item>
+        </v-col>
+      </v-row>
 
       <v-row class="mx-2 my-2">
         <v-col id="serviceCardContent_category">
@@ -39,9 +44,9 @@
             v-model="selectedServiceOfferingVersion"
             label="Versions"
             :items="serviceOffering.versions"
-            item-text="version"
+            item-title="version"
             item-value="id"
-            @change="onServiceOfferingVersionSelected"
+            @update:modelValue="onServiceOfferingVersionSelected"
           />
         </v-col>
       </v-row>
@@ -50,7 +55,6 @@
         <v-img
           ref="coverImage"
           :src="createOrEditMode ? getImageUrl(serviceOffering.coverImage) : coverImage"
-          contain
           :aspect-ratio="4/3"
         >
           <template
@@ -78,16 +82,22 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import TextWithLabel from '@/components/base/TextWithLabel'
-  import getImageUrl from '@/utils/imageUtil'
-  import ServiceOffering from "@/model/serviceOffering.ts";
-  import ProgressCircular from "@/components/base/ProgressCircular";
 
-  export default {
+import TextWithLabel from '@/components/base/TextWithLabel'
+import getImageUrl from '@/utils/imageUtil'
+import ProgressCircular from "@/components/base/ProgressCircular";
+import {useServicesStore} from "@/stores/servicesStore";
+import {storeToRefs} from "pinia";
+
+export default {
     name: 'ServiceOfferingCardGrid',
     components: {ProgressCircular, TextWithLabel },
     props: ['serviceOffering', 'imgWidth', 'passive', 'createOrEditMode', "showOnlyLatestVersion"],
+    setup(){
+      const servicesStore = useServicesStore();
+      const {serviceVendorById, serviceOfferingCategoryNameById, serviceOfferingDeploymentTypePrettyName} = storeToRefs(servicesStore);
+      return {servicesStore, serviceVendorById, serviceOfferingCategoryNameById, serviceOfferingDeploymentTypePrettyName};
+    },
     data: function () {
       return {
         hovered: 0,
@@ -97,11 +107,7 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'serviceVendorById',
-        'serviceOfferingCategoryNameById',
-        'serviceOfferingDeploymentTypePrettyName',
-      ]),
+
       latestVersion() {
         let latestVersionFound = {}
         if (this.serviceOffering.versions?.length > 0) {
@@ -121,10 +127,10 @@
       }
     },
     mounted () {
-      if (this.serviceOffering.id != undefined) {
-        this.$store.dispatch('getServiceOfferingImages', this.serviceOffering.id).then(coverImage => {
+      if (this.serviceOffering.id !== undefined) {
+        this.servicesStore.getServiceOfferingImages(this.serviceOffering.id).then(coverImage => {
           this.coverImage = coverImage
-        })
+        });
       }
 
       if (this.serviceOffering.versions?.length > 0) {
@@ -163,4 +169,5 @@
        src="@/design/serviceOfferingCard.scss"
        lang="scss" scoped
 >
+
 </style>

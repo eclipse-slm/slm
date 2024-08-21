@@ -1,7 +1,7 @@
 <template>
   <v-card-text>
     <v-alert
-      outlined
+      variant="outlined"
       type="info"
     >
       No {{ item }} available
@@ -12,6 +12,11 @@
 <script>
 export default {
   name: 'NoItemAvailableNote',
-  props: ['item']
+  props: {
+    item: {
+      type: String,
+      default: () => ''
+    }
+  }
 }
 </script>

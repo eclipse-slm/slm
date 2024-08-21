@@ -9,10 +9,7 @@ import org.eclipse.slm.common.awx.client.observer.AwxJobExecutor;
 import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
 import org.eclipse.slm.common.awx.client.observer.AwxJobObserverInitializer;
 import org.eclipse.slm.common.awx.client.observer.IAwxJobObserverListener;
-import org.eclipse.slm.common.awx.model.ExtraVars;
-import org.eclipse.slm.common.awx.model.JobTemplate;
-import org.eclipse.slm.common.awx.model.Survey;
-import org.eclipse.slm.common.awx.model.SurveyItem;
+import org.eclipse.slm.common.awx.model.*;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.keycloak.config.KeycloakUtil;
@@ -26,7 +23,10 @@ import org.eclipse.slm.resource_management.model.consul.capability.CapabilitySer
 import org.eclipse.slm.resource_management.model.consul.capability.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.model.consul.capability.CapabilityServiceStatus;
 import org.eclipse.slm.resource_management.model.consul.capability.SingleHostCapabilityService;
+import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceInternalErrorException;
+import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotCreatedException;
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotFoundException;
+import org.eclipse.slm.resource_management.model.resource.ExecutionEnvironment;
 import org.eclipse.slm.resource_management.persistence.api.CapabilityJpaRepository;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
@@ -136,11 +136,18 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
     }
 
     public void addCapability(Capability capability)
-            throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException {
+            throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, ResourceNotCreatedException, JsonProcessingException, ResourceInternalErrorException {
+
+        var ee = createExecutionEnvironment(capability);
+
         capability.getActions().forEach((capabilityActionType, capabilityAction) -> {
                     if(capabilityAction.getActionClass().equals(AwxAction.class.getSimpleName())) {
                         AwxAction awxCapabilityAction = (AwxAction) capabilityAction;
                         try {
+                            var executionEnvironmentName = defaultExecutionEnvironment;
+                            if (ee.isPresent()){
+                                executionEnvironmentName = ee.get().getName();
+                            }
                             var jobTemplateCredentialNames = this.jobTemplateCredentialNames;
                             JobTemplate jobTemplate;
                             if(!awxCapabilityAction.getUsername().equals("") && !awxCapabilityAction.getPassword().equals("")) {
@@ -151,7 +158,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                                         awxCapabilityAction.getUsername(),
                                         awxCapabilityAction.getPassword(),
                                         jobTemplateCredentialNames,
-                                        defaultExecutionEnvironment
+                                        executionEnvironmentName
                                 );
                             } else {
                                 jobTemplate = awxClient.createJobTemplateAndAddExecuteRoleToDefaultTeam(
@@ -159,7 +166,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                                         awxCapabilityAction.getAwxBranch(),
                                         awxCapabilityAction.getPlaybook(),
                                         jobTemplateCredentialNames,
-                                        defaultExecutionEnvironment);
+                                        executionEnvironmentName);
                             }
 
                             List<SurveyItem> params = awxCapabilityAction.getParameter();
@@ -180,6 +187,8 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                     }
                 });
 
+
+
         capabilityJpaRepository.save(capability);
 
         if (capability.getHealthCheck() != null) {
@@ -190,6 +199,84 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                     new HashMap<>()
             );
         }
+    }
+
+    private Optional<org.eclipse.slm.common.awx.model.ExecutionEnvironment> createExecutionEnvironment(Capability capability)
+            throws ResourceNotCreatedException, JsonProcessingException, ResourceInternalErrorException {
+        if (capability.getExecutionEnvironment() != null) {
+
+            var executionName = capability.getName() + "-EE";
+            LOG.info("Create or Update Execution Environment with name " + executionName);
+
+            var executionEnvironment = capability.getExecutionEnvironment();
+
+            var organisationName = "Service Lifecycle Management";
+            var resultOrganisations = this.awxClient.getOrganizationByName(organisationName);
+            Organization organization = null;
+
+            for (Organization org : resultOrganisations.getResults()) {
+                if (org.getName().equals(organisationName)) {
+                    organization = org;
+                    break;
+                }
+            }
+
+            if (organization == null) {
+                throw new ResourceInternalErrorException("Organization \"" + organisationName + "\" not found");
+            }
+
+            Credential credential = createRegistryCredential(capability, executionEnvironment, organization);
+
+            var ee = this.awxClient.createOrUpdateExecutionEnvironment(new ExecutionEnvironmentCreate(
+                    executionName,
+                    executionEnvironment.getDescription(),
+                    organization.getId(),
+                    executionEnvironment.getImage(),
+                    "false",
+                    credential != null ? credential.getId() : null,
+                    executionEnvironment.getPull().getPrettyName()
+            ));
+
+            if (ee.isEmpty()) {
+                throw new ResourceNotCreatedException("Could not create Execution Environment for capability" + executionName);
+            }
+            return ee;
+        }
+        return Optional.empty();
+    }
+
+    private Credential createRegistryCredential(Capability capability, ExecutionEnvironment executionEnvironment, Organization organization)
+            throws ResourceNotCreatedException {
+        var newCredentials = executionEnvironment.getRegistryCredential();
+        Credential credential = null;
+        if (newCredentials != null) {
+
+            if (newCredentials.getId() != null){
+                credential = this.awxClient.getCredentialById(newCredentials.getId());
+
+                if (credential == null) {
+                    throw new ResourceNotCreatedException("Could not find Credential with Id "+newCredentials.getId()+" for Execution-Environment for capability: " + capability.getName());
+                }
+            }else{
+                credential = this.awxClient.createCredential(new CredentialDTOApiCreate(
+                        capability.getName() + "-Credential",
+                        Objects.requireNonNullElse(newCredentials.getDescription(), ""),
+                        organization.getId(),
+                        17,
+                        new HashMap<String, Object>() {{
+                            put("host", newCredentials.getAuthenticationURL());
+                            put("username", newCredentials.getUsername());
+                            put("password", newCredentials.getPassword());
+                            put("verify_ssl", newCredentials.getVerifySSL());
+                        }}
+                ));
+
+                if (credential == null) {
+                    throw new ResourceNotCreatedException("Could not create Credential for Execution-Environment for capability: " + capability.getName());
+                }
+            }
+        }
+        return credential;
     }
 
     public boolean deleteCapability(UUID capabilityId) throws ConsulLoginFailedException {

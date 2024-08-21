@@ -3,11 +3,11 @@
     v-model="showDialog"
     @click:outside="onCloseButtonClicked"
   >
-    <template>
+    <template #default="{}">
       <v-card v-if="showDialog">
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           {{ getServiceOfferingText(serviceInstance) }} | Service Instance {{ serviceInstance.id }}
         </v-toolbar>
@@ -25,21 +25,22 @@
             Error loading service details
           </div>
 
-          <v-list v-if="apiStateLoaded">
+          <v-list
+            v-if="apiStateLoaded"
+            :opened="['Common']"
+          >
             <v-list-group
-              :value="true"
+              :model-value="true"
+              value="Common"
             >
-              <template #activator>
-                <v-list-item-icon>
-                  <v-icon>mdi-information</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>
-                    Common
-                  </v-list-item-title>
-                </v-list-item-content>
+              <template #activator="{props}">
+                <v-list-item
+                  v-bind="props"
+                  prepend-icon="mdi-information"
+                  title="Common"
+                />
               </template>
-              <v-simple-table v-slot>
+              <v-table>
                 <tbody>
                   <tr>
                     <th>{{ 'Id' }}</th>
@@ -86,13 +87,13 @@
                   <tr>
                     <th>{{ 'Created' }}</th>
                     <td colspan="3">
-                      {{ moment(String(serviceInstanceDetails.initialCreation)).format('DD.MM.YYYY - hh:mm') }}
+                      {{ app.config.globalProperties.moment(String(serviceInstanceDetails.initialCreation)).format('DD.MM.YYYY - hh:mm') }}
                     </td>
                   </tr>
                   <tr>
                     <th>{{ 'Last Update' }}</th>
                     <td colspan="3">
-                      {{ moment(String(serviceInstanceDetails.lastUpdate)).format('DD.MM.YYYY - hh:mm') }}
+                      {{ app.config.globalProperties.moment(String(serviceInstanceDetails.lastUpdate)).format('DD.MM.YYYY - hh:mm') }}
                     </td>
                   </tr>
                   <tr>
@@ -126,20 +127,17 @@
                     </td>
                   </tr>
                 </tbody>
-              </v-simple-table>
+              </v-table>
             </v-list-group>
-            <v-list-group>
-              <template #activator>
-                <v-list-item-icon>
-                  <v-icon>mdi-adjust</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>
-                    Service Options
-                  </v-list-item-title>
-                </v-list-item-content>
+            <v-list-group value="Service Options">
+              <template #activator="{props}">
+                <v-list-item
+                  v-bind="props"
+                  prepend-icon="mdi-adjust"
+                  title="Service Options"
+                />
               </template>
-              <v-simple-table
+              <v-table
                 v-if="serviceInstanceDetails.serviceOptions.length>0"
                 fixed-header
               >
@@ -162,12 +160,11 @@
                       <td>
                         <v-tooltip
                           v-if="serviceOption.description != null"
-                          bottom
+                          location="bottom"
                         >
-                          <template #activator="{ on, attrs }">
+                          <template #activator="{ props }">
                             <div
-                              v-bind="attrs"
-                              v-on="on"
+                              v-bind="props"
                             >
                               {{ serviceOption.name }}
                             </div>
@@ -176,10 +173,10 @@
                         </v-tooltip>
                       </td>
                       <td>
-                        <div v-if="serviceOption.valueType == 'PASSWORD'">
+                        <div v-if="serviceOption.valueType === 'PASSWORD'">
                           •••••••••••••
                         </div>
-                        <div v-else-if="serviceOption.valueType == 'AAS_SM_TEMPLATE'">
+                        <div v-else-if="serviceOption.valueType === 'AAS_SM_TEMPLATE'">
                           <a
                             :href="aasGuiUrls[serviceOption.relation + '|' + serviceOption.key].url"
                             target="_blank"
@@ -202,24 +199,21 @@
                     </tr>
                   </tbody>
                 </template>
-              </v-simple-table>
+              </v-table>
               <no-item-available-note
                 v-else
                 item="Service Options"
               />
             </v-list-group>
             <v-list-group>
-              <template #activator>
-                <v-list-item-icon>
-                  <v-icon>mdi-history</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>
-                    Order History
-                  </v-list-item-title>
-                </v-list-item-content>
+              <template #activator="{ props }">
+                <v-list-item
+                  v-bind="props"
+                  prepend-icon="mdi-history"
+                  title="Order History"
+                />
               </template>
-              <v-simple-table fixed-header>
+              <v-table fixed-header>
                 <template #default>
                   <thead>
                     <tr>
@@ -239,19 +233,19 @@
                       v-for="order in serviceInstanceDetails.orderHistory"
                       :key="order.id"
                     >
-                      <td>{{ moment(String(order.created)).format('DD.MM.YYYY - hh:mm') }}</td>
+                      <td>{{ app.config.globalProperties.moment(String(order.created)).format('DD.MM.YYYY - hh:mm') }}</td>
                       <td>{{ order.id }}</td>
                       <td>{{ order.serviceOrderResult }}</td>
                     </tr>
                   </tbody>
                 </template>
-              </v-simple-table>
+              </v-table>
             </v-list-group>
           </v-list>
 
           <v-card-actions class="justify-end">
             <v-btn
-              text
+              variant="text"
               @click="onCloseButtonClicked"
             >
               Close
@@ -259,34 +253,47 @@
           </v-card-actions>
         </v-card-text>
       </v-card>
-    </template>
 
-    <resources-info-dialog
-      :resource="selectedResource"
-      @closed="selectedResource = null"
-    />
+      <resources-info-dialog
+        :resource="selectedResource"
+        @closed="selectedResource = null"
+      />
+    </template>
   </v-dialog>
 </template>
 
 <script>
 
-  import {
-    mapGetters,
-  } from 'vuex'
-  import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
-  import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
-  import ServiceInstancesRestApi from "@/api/service-management/serviceInstancesRestApi";
-  import ApiState from "@/api/apiState";
-  import ProgressCircular from "@/components/base/ProgressCircular";
-  import AasRestApi from "@/api/resource-management/aasRestApi";
-  import getEnv from "@/utils/env";
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
+import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
+import ServiceInstancesRestApi from "@/api/service-management/serviceInstancesRestApi";
+import ApiState from "@/api/apiState";
+import ProgressCircular from "@/components/base/ProgressCircular";
+import AasRestApi from "@/api/resource-management/aasRestApi";
+import getEnv from "@/utils/env";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {useServicesStore} from "@/stores/servicesStore";
+import {useResourcesStore} from "@/stores/resourcesStore";
+import {storeToRefs} from "pinia";
+import {app} from "@/main";
 
-  export default {
+export default {
     name: 'ServiceInstanceDetailsDialog',
     components: {NoItemAvailableNote, ProgressCircular, ResourcesInfoDialog },
     mixins: [ serviceInstanceMixin ],
-    props: ['serviceInstance'],
+    props: {
+      serviceInstance: {
+        type: Object,
+        default: null
+      }
+    },
+    setup(){
+      const servicesStore = useServicesStore();
+      const resourceStore = useResourcesStore();
+      const {serviceOfferingById, serviceInstanceGroupById} = storeToRefs(servicesStore)
+      const {resourceById} = storeToRefs(resourceStore)
+      return {servicesStore, resourceStore, serviceOfferingById, serviceInstanceGroupById, resourceById};
+    },
     data () {
       return {
         selectedResource: null,
@@ -294,6 +301,23 @@
         serviceInstanceDetails: null,
         aasGuiUrls: {}
       }
+    },
+    computed: {
+      app() {
+        return app
+      },
+      showDialog () {
+        return this.serviceInstance !== null
+      },
+      apiStateLoaded () {
+        return (this.apiState === ApiState.LOADED || this.apiState === ApiState.UPDATING)
+      },
+      apiStateLoading () {
+        return this.apiState === ApiState.LOADING || this.apiState === ApiState.INIT
+      },
+      apiStateError () {
+        return this.apiState === ApiState.ERROR
+      },
     },
     watch: {
       serviceInstance: {
@@ -305,7 +329,7 @@
               this.apiState = ApiState.LOADED
 
               serviceInstanceDetails.serviceOptions.forEach(serviceOption => {
-                if (serviceOption.valueType == "AAS_SM_TEMPLATE") {
+                if (serviceOption.valueType === "AAS_SM_TEMPLATE") {
                   AasRestApi.getSubmoduleTemplateInstanceOfAas(serviceOption.defaultValue, serviceOption.currentValue).then(response => {
                     let aasGuiBaseUrl = getEnv("VUE_APP_BASYX_AAS_GUI_URL")
                     let smEndpoint = response[0].smEndpoint
@@ -322,25 +346,6 @@
           }
         }
       }
-    },
-    computed: {
-      ...mapGetters([
-        'serviceOfferingById',
-        'resourceById',
-        'serviceInstanceGroupById'
-      ]),
-      showDialog () {
-        return this.serviceInstance !== null
-      },
-      apiStateLoaded () {
-        return (this.apiState === ApiState.LOADED || this.apiState === ApiState.UPDATING)
-      },
-      apiStateLoading () {
-        return this.apiState === ApiState.LOADING || this.apiState === ApiState.INIT
-      },
-      apiStateError () {
-        return this.apiState === ApiState.ERROR
-      },
     },
     methods: {
       onCloseButtonClicked () {

@@ -1,63 +1,121 @@
 <template>
   <div>
-    <validation-observer ref="observer" v-slot="{ invalid, handleSubmit, validate }">
-      <div v-for="requirement in serviceOfferingVersion.serviceRequirements" :key="requirement.id">
+    <ValidationForm
+      ref="observer"
+      v-slot="{ meta, handleSubmit, validate }"
+    >
+      <div
+        v-for="requirement in serviceOfferingVersion.serviceRequirements"
+        :key="requirement.id"
+      >
         <base-material-card color="secondary">
           <template #heading>
             <v-row class="my-1">
-              <v-text-field v-model="requirement.name" class="mx-6" dense />
-              <v-btn icon small class="mx-4" @click="onRequirementDeleteClicked(requirement)">
-                <v-icon>
-                  mdi-delete
-                </v-icon>
-              </v-btn>
+              <v-text-field
+                v-model="requirement.name"
+                class="mx-6"
+                density="compact"
+              />
+              <v-btn
+                icon="mdi-delete"
+                size="small"
+                class="mx-4"
+                @click="onRequirementDeleteClicked(requirement)"
+              />
             </v-row>
           </template>
           <v-tabs
             v-model="requirement.activeLogic"
           >
-            <v-tab v-for="logic in requirement.logics" :key="logic.id" :value="logic.id">
-              <v-select v-model="logic.type" :items="logicList" dense />
-              <v-btn icon small class="mx-4" @click="onLogicDeleteClicked(requirement, logic)">
-                <v-icon>
-                  mdi-delete
-                </v-icon>
-              </v-btn>
+            <v-tab
+              v-for="logic in requirement.logics"
+              :key="logic.id"
+              :value="logic.id"
+            >
+              <v-row>
+                <v-col cols="10">
+                  <v-select
+                    v-model="logic.type"
+                    :items="logicList"
+                    density="compact"
+                  />
+                </v-col>
+                <v-col cols="2">
+                  <v-btn
+                    icon="mdi-delete"
+                    size="small"
+                    class="mx-4"
+                    @click="onLogicDeleteClicked(requirement, logic)"
+                  />
+                </v-col>
+              </v-row>
             </v-tab>
-            <v-btn color="secondary" @click="onNewLogicClicked(requirement)">
-                  <v-icon>mdi-plus</v-icon>
-                  {{ $t('buttons.AddLogic') }}
-                </v-btn>
+            <v-btn
+              prepend-icon="mdi-plus"
+              color="secondary"
+              @click="onNewLogicClicked(requirement)"
+            >
+              {{ $t('buttons.AddLogic') }}
+            </v-btn>
           </v-tabs>
           <v-card-text>
             <v-window v-model="requirement.activeLogic">
-              <v-window-item v-for="logic in requirement.logics" :key="logic.id" :value="logic.id">
-                <v-card v-for="property in logic.properties" :key="property.id" class="mt-0">
+              <v-window-item
+                v-for="logic in requirement.logics"
+                :key="logic.id"
+                :value="logic.id"
+              >
+                <v-card
+                  v-for="property in logic.properties"
+                  :key="property.id"
+                  class="mt-0"
+                >
                   <v-card-title>
-                    <v-text-field v-model="property.name" dense />
-                    <v-btn icon small class="mx-4" @click="onPropertyDeleteClicked(logic, property)">
-                      <v-icon>
-                        mdi-delete
-                      </v-icon>
-                    </v-btn>
+                    <v-row>
+                      <v-col cols="11">
+                        <v-text-field
+                          v-model="property.name"
+                          density="compact"
+                        />
+                      </v-col>
+                      <v-col cols="1">
+                        <v-btn
+                          icon="mdi-delete"
+                          size="small"
+                          class="mx-4"
+                          @click="onPropertyDeleteClicked(logic, property)"
+                        />
+                      </v-col>
+                    </v-row>
                   </v-card-title>
                   <v-card-text>
                     <v-row>
                       <v-col>
-                        <v-text-field v-model="property.semanticId" :label="$t('RequirementLabels.PropertySemanticId')" />
+                        <v-text-field
+                          v-model="property.semanticId"
+                          :label="$t('RequirementLabels.PropertySemanticId')"
+                        />
                       </v-col>
                       <v-col>
-                        <v-text-field v-model="property.value" :label="$t('RequirementLabels.PropertyValue')" />
+                        <v-text-field
+                          v-model="property.value"
+                          :label="$t('RequirementLabels.PropertyValue')"
+                        />
                       </v-col>
                     </v-row>
-                    <v-combobox v-model="property.parentSubmodelsSemanticIds" :label="$t('RequirementLabels.ParentSubmodelsSemanticIds')"
-                      multiple>
-                    </v-combobox>
+                    <v-combobox
+                      v-model="property.parentSubmodelsSemanticIds"
+                      :label="$t('RequirementLabels.ParentSubmodelsSemanticIds')"
+                      multiple
+                    />
                   </v-card-text>
                 </v-card>
                 <v-row>
                   <v-col>
-                    <v-btn color="secondary" @click="onNewPropertyClicked(logic)">
+                    <v-btn
+                      color="secondary"
+                      @click="onNewPropertyClicked(logic)"
+                    >
                       <v-icon>mdi-plus</v-icon>
                       {{ $t('buttons.AddProperty') }}
                     </v-btn>
@@ -71,7 +129,10 @@
 
       <v-row>
         <v-col>
-          <v-btn color="secondary" @click="onNewRequirementClicked">
+          <v-btn
+            color="secondary"
+            @click="onNewRequirementClicked"
+          >
             <v-icon>mdi-plus</v-icon>
             {{ $t('buttons.AddRequirement') }}
           </v-btn>
@@ -80,12 +141,19 @@
 
       <!-- Navigation Buttons-->
       <v-card-actions>
-        <v-btn :color="$vuetify.theme.themes.light.secondary" @click="$emit('step-canceled', stepNumber)">
+        <v-btn
+          variant="elevated"
+          :color="$vuetify.theme.themes.light.colors.secondary"
+          @click="$emit('step-canceled', stepNumber)"
+        >
           {{ $t('buttons.Back') }}
         </v-btn>
         <v-spacer />
-        <v-btn :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-          @click="invalid ? validate() : handleSubmit(emitStepCompleted)">
+        <v-btn
+          variant="elevated"
+          :color="!meta.valid ? $vuetify.theme.themes.light.colors.disable : $vuetify.theme.themes.light.colors.secondary"
+          @click="!meta.valid ? validate() : handleSubmit(emitStepCompleted)"
+        >
           <div v-if="editMode">
             {{ $t('buttons.Update') }}
           </div>
@@ -94,18 +162,27 @@
           </div>
         </v-btn>
       </v-card-actions>
-    </validation-observer>
+    </ValidationForm>
   </div>
 </template>
 
 <script>
 import 'vue-json-pretty/lib/styles.css'
+import {Form as ValidationForm} from "vee-validate";
 
 export default {
   name: 'ServiceOfferingVersionWizardStep4Requirements',
-  components: {},
-  props: ['editMode', 'serviceOfferingVersion'],
-
+  components: {ValidationForm},
+  props: {
+    editMode: {
+      type: Boolean,
+      default: false
+    },
+    serviceOfferingVersion: {
+      type: Object,
+      default: null
+    },
+  },
   data() {
     return {
       stepNumber: 4,

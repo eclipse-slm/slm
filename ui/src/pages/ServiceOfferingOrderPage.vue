@@ -12,9 +12,9 @@
       v-if="apiStateLoaded"
       class="mx-auto"
     >
-      <validation-observer
+      <ValidationForm
         ref="observer"
-        v-slot="{ invalid, handleSubmit, validate }"
+        v-slot="{ meta, handleSubmit, validate }"
       >
         <base-material-card color="secondary">
           <template #heading>
@@ -31,15 +31,14 @@
                   <span>Found '<strong>{{ matchingResources.length }}</strong>' suitable target resources, from '<strong>{{ totalResourcesCount }}</strong>' available resources</span>
 
                   <v-tooltip
-                    bottom
+                    location="bottom"
                   >
-                    <template #activator="{ on, attrs }">
+                    <template #activator="{ props }">
                       <v-icon
                         class="mx-3"
                         color="primary"
-                        dark
-                        v-bind="attrs"
-                        v-on="on"
+                        theme="dark"
+                        v-bind="props"
                       >
                         mdi-information
                       </v-icon>
@@ -50,39 +49,48 @@
               </v-row>
               <v-row>
                 <v-col>
-                  <v-select
+                  <Field
+                    v-slot="{ field, errors }"
                     v-model="selectedResourceId"
-                    :items="matchingResources"
-                    item-value="resourceId"
-                    hint="Select resource for service deployment"
-                    persistent-hint
-                    required
+                    name="resource id"
+                    :rules="required"
                   >
-                    <template #selection="{ item }">
-                      <v-list-item-title>
-                        <div v-if="item.isCluster">
-                          Cluster <strong>{{ clusterById(item.resourceId).metaData.cluster_user }} @ {{ clusterById(item.resourceId).metaData.cluster_name }}</strong>
-                          {{ ` | ${clusterById(item.resourceId).clusterType} ${clusterById(item.resourceId).isManaged? 'managed': 'with '+clusterById(item.resourceId).nodes.length+' nodes' } | ${item.resourceId}` }}
-                        </div>
-                        <div v-else>
-                          <strong>{{ resourceById(item.resourceId).hostname }}</strong>{{ ` | ${item.resourceId} | ${resourceById(item.resourceId).ip}` }}
-                        </div>
-                      </v-list-item-title>
-                    </template>
-                    <template #item="{ item }">
-                      <v-list-item-content>
+                    <v-select
+                      v-bind="field"
+                      v-model="selectedResourceId"
+                      :items="matchingResources"
+                      item-value="resourceId"
+                      hint="Select resource for service deployment"
+                      persistent-hint
+                      required
+                    >
+                      <template #selection="{ item }">
                         <v-list-item-title>
-                          <div v-if="item.isCluster">
-                            Cluster <strong>{{ clusterById(item.resourceId).metaData.cluster_user }} @ {{ clusterById(item.resourceId).metaData.cluster_name }}</strong>
-                            {{ ` | ${clusterById(item.resourceId).clusterType} ${clusterById(item.resourceId).isManaged? 'managed': 'with '+clusterById(item.resourceId).nodes.length+' nodes' } | ${item.resourceId}` }}
+                          <div v-if="item.raw.isCluster">
+                            Cluster <strong>{{ clusterById(item.raw.resourceId).metaData.cluster_user }} @ {{ clusterById(item.raw.resourceId).metaData.cluster_name }}</strong>
+                            {{ ` | ${clusterById(item.raw.resourceId).clusterType} ${clusterById(item.raw.resourceId).isManaged? 'managed': 'with '+clusterById(item.raw.resourceId).nodes.length+' nodes' } | ${item.raw.resourceId}` }}
                           </div>
-                          <div v-else>
-                            <strong>{{ resourceById(item.resourceId).hostname }}</strong>{{ ` | ${item.resourceId} | ${resourceById(item.resourceId).ip}` }}
+                          <div>
+                            <strong>{{ resourceById(item.raw.resourceId).hostname }}</strong>{{ ` | ${item.raw.resourceId} | ${resourceById(item.raw.resourceId).ip}` }}
                           </div>
                         </v-list-item-title>
-                      </v-list-item-content>
-                    </template>
-                  </v-select>
+                      </template>
+                      <template #item="{ item }">
+                        <v-list-item>
+                          <v-list-item-title>
+                            <div v-if="item.raw.isCluster">
+                              Cluster <strong>{{ clusterById(item.raw.resourceId).metaData.cluster_user }} @ {{ clusterById(item.raw.resourceId).metaData.cluster_name }}</strong>
+                              {{ ` | ${clusterById(item.raw.resourceId).clusterType} ${clusterById(item.raw.resourceId).isManaged? 'managed': 'with '+clusterById(item.raw.resourceId).nodes.length+' nodes' } | ${item.raw.resourceId}` }}
+                            </div>
+                            <div v-else>
+                              <strong>{{ resourceById(item.raw.resourceId).hostname }}</strong>{{ ` | ${item.raw.resourceId} | ${resourceById(item.raw.resourceId).ip}` }}
+                            </div>
+                          </v-list-item-title>
+                        </v-list-item>
+                      </template>
+                    </v-select>
+                    <span>{{ errors[0] }}</span>
+                  </Field>
                 </v-col>
               </v-row>
             </v-container>
@@ -95,7 +103,7 @@
         <div
           v-if="selectedResourceId"
         >
-          <base-material-card
+          <!--          <base-material-card
             v-for="serviceOptionCategory in serviceOfferingVersion.serviceOptionCategories"
             :key="serviceOptionCategory.id"
             color="secondary"
@@ -117,15 +125,14 @@
                     {{ serviceOption.name }}
                     <v-tooltip
                       v-if="serviceOption.description != null"
-                      bottom
+                      location="bottom"
                     >
-                      <template #activator="{ on, attrs }">
+                      <template #activator="{ props }">
                         <v-icon
                           class="mx-3"
                           color="primary"
-                          dark
-                          v-bind="attrs"
-                          v-on="on"
+                          theme="dark"
+                          v-bind="props"
                         >
                           mdi-information
                         </v-icon>
@@ -141,13 +148,14 @@
                 </v-row>
               </v-container>
             </v-card-text>
-          </base-material-card>
+          </base-material-card>-->
         </div>
 
         <!-- Cancel & Checkout Buttons-->
         <v-row class="mt-12 pt-12 ">
           <v-spacer />
           <v-btn
+            variant="elevated"
             class="mr-3"
             @click="cancel()"
           >
@@ -155,14 +163,15 @@
           </v-btn>
           <v-spacer />
           <v-btn
-            :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-            @click="invalid ? validate() : handleSubmit(order)"
+            variant="elevated"
+            :color="!meta.valid ? $vuetify.theme.themes.light.colors.disable : $vuetify.theme.themes.light.colors.secondary"
+            @click="!meta.valid ? validate() : handleSubmit(order)"
           >
             {{ $t('buttons.Checkout') }}
           </v-btn>
           <v-spacer />
         </v-row>
-      </validation-observer>
+      </ValidationForm>
     </v-container>
 
     <progress-circular
@@ -173,19 +182,48 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import ApiState from '@/api/apiState'
-  import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
-  import ServiceOptionValue from '@/components/service_offerings/ServiceOptionValue'
-  import logRequestError from '@/api/restApiHelper'
-  import ProgressCircular from "@/components/base/ProgressCircular";
 
-  export default {
+import ApiState from '@/api/apiState'
+import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
+import logRequestError from '@/api/restApiHelper'
+import ProgressCircular from "@/components/base/ProgressCircular";
+import {Field, Form as ValidationForm} from "vee-validate";
+import * as yup from 'yup';
+import {useServicesStore} from "@/stores/servicesStore";
+import {useResourcesStore} from "@/stores/resourcesStore";
+import {useUserStore} from "@/stores/userStore";
+import {useJobsStore} from "@/stores/jobsStore";
+import {storeToRefs} from "pinia";
+
+export default {
     name: 'ServiceOrderView',
     components: {
-      ServiceOptionValue, ProgressCircular
+      Field,
+       ProgressCircular, ValidationForm
     },
-    props: ['serviceOfferingId', 'serviceOfferingVersionId'],
+    props: {
+      serviceOfferingId: {
+        type: String,
+        default: null
+      },
+      serviceOfferingVersionId: {
+        type: String,
+        default: null
+      },
+    },
+    setup(){
+      const required = yup.string().required();
+      const servicesStore = useServicesStore();
+      const resourcesStore = useResourcesStore();
+      const userStore = useUserStore();
+      const jobsStore = useJobsStore();
+      const {resourceById, clusterById} = storeToRefs(resourcesStore);
+      const {serviceOfferingById} = storeToRefs(servicesStore);
+      return {
+        required, servicesStore, resourcesStore, userStore, jobsStore,
+        resourceById, clusterById, serviceOfferingById
+      }
+    },
     data () {
       return {
         selectedResourceId: '',
@@ -198,6 +236,35 @@
         },
         showProgressCircular: false
       }
+    },
+
+    computed: {
+      apiStateServices() {
+        return this.servicesStore.apiStateServices
+      },
+      resources() {
+        return this.resourcesStore.resources
+      },
+      clusters () {
+        return this.resourcesStore.clusters
+      },
+
+      totalResourcesCount () {
+        return this.resources?.length + this.clusters?.length
+      },
+
+      apiStateLoaded () {
+        return this.apiState.serviceOfferingVersion === ApiState.LOADED
+            && this.apiState.matchingResources === ApiState.LOADED
+      },
+      apiStateLoading () {
+        return this.apiState.serviceOfferingVersion === ApiState.LOADING
+            && this.apiState.matchingResources === ApiState.LOADING
+      },
+      apiStateError () {
+        return this.apiState.serviceOfferingVersion === ApiState.ERROR
+            && this.apiState.matchingResources === ApiState.ERROR
+      },
     },
     created () {
       ServiceOfferingVersionsRestApi.getServiceOfferingVersionById(this.serviceOfferingId, this.serviceOfferingVersionId).then(response => {
@@ -218,37 +285,12 @@
           let matchingClusterResources = response.filter(matchingResource => matchingResource.isCluster)
           this.matchingResources.push(...matchingClusterResources)
 
+          console.log('asdf', this.matchingResources)
+
           // preselect resource
           this.selectedResourceId = this.matchingResources.filter(obj => obj.hasOwnProperty('resourceId'))[0].resourceId;
         }
       })
-    },
-    computed: {
-      ...mapGetters([
-          'apiStateServices',
-          'serviceOfferingById',
-          'resourceById',
-          'clusterById',
-          'resources',
-          'clusters'
-
-      ]),
-      totalResourcesCount () {
-        return this.resources?.length + this.clusters?.length
-      },
-
-      apiStateLoaded () {
-        return this.apiState.serviceOfferingVersion === ApiState.LOADED
-            && this.apiState.matchingResources === ApiState.LOADED
-      },
-      apiStateLoading () {
-        return this.apiState.serviceOfferingVersion === ApiState.LOADING
-            && this.apiState.matchingResources === ApiState.LOADING
-      },
-      apiStateError () {
-        return this.apiState.serviceOfferingVersion === ApiState.ERROR
-            && this.apiState.matchingResources === ApiState.ERROR
-      },
     },
     methods: {
       order () {

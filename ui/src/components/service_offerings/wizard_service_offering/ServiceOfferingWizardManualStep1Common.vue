@@ -1,83 +1,87 @@
 <template>
   <v-container fluid>
-    <validation-observer
+    <ValidationForm
       ref="observer"
-      v-slot="{ invalid, handleSubmit, validate }"
+      v-slot="{ meta, handleSubmit, validate }"
     >
       <v-row>
         <v-col cols="8">
           <!-- Name !-->
-          <validation-provider
-            v-slot="{ errors, valid }"
+          <Field
+            v-slot="{ field, errors }"
+            v-model="newServiceOffering.name"
             name="Service Name"
-            rules="required"
+            :rules="required"
           >
             <v-text-field
               id="serviceNameInput"
-              v-model="newServiceOffering.name"
+              v-bind="field"
               label="Name"
-              outlined
+              variant="outlined"
               required
-              dense
+              density="compact"
               :error-messages="errors"
-              :success="valid"
+              :model-value="newServiceOffering.name"
             />
-          </validation-provider>
+          </Field>
 
           <!-- Category !-->
-          <validation-provider
-            v-slot="{ errors, valid }"
+          <Field
+            v-slot="{ field, errors }"
+            v-model="newServiceOffering.serviceCategoryId"
             name="Category"
-            rules="required"
+            :rules="required"
           >
             <v-select
-              v-model="newServiceOffering.serviceCategoryId"
+              v-bind="field"
               :items="serviceOfferingCategories"
-              item-text="name"
+              item-title="name"
               item-value="id"
               label="Service Category"
-              outlined
-              dense
+              variant="outlined"
+              density="compact"
               :error-messages="errors"
-              :success="valid"
+              :model-value="newServiceOffering.serviceCategoryId"
             />
             <span>{{ errors[0] }}</span>
-          </validation-provider>
+          </Field>
 
           <!-- Short Description !-->
-          <validation-provider
-            v-slot="{ errors, valid }"
-            name="Short Description"
-            rules="required"
+          <Field
             id="shortDescriptionInput2"
+            v-slot="{ field, errors }"
+            v-model="newServiceOffering.shortDescription"
+            name="Short Description"
+            :rules="required"
           >
             <v-text-field
               id="shortDescriptionInput"
-              v-model="newServiceOffering.shortDescription"
+              v-bind="field"
               label="Short Description"
-              outlined
-              dense
+              variant="outlined"
+              density="compact"
               :error-messages="errors"
-              :success="valid"
+              :model-value="newServiceOffering.shortDescription"
             />
-          </validation-provider>
+          </Field>
 
           <!-- Description !-->
-          <validation-provider
-            v-slot="{ errors, valid }"
+          <Field
+            v-slot="{ field, errors }"
+            v-model="newServiceOffering.description"
             name="Description"
-            rules="required"
+            :rules="required"
           >
             <v-text-field
               id="descriptionInput"
-              v-model="newServiceOffering.description"
+              v-bind="field"
               label="Description"
-              outlined
-              dense
+              variant="outlined"
+              density="compact"
               :error-messages="errors"
-              :success="valid"
+              :model-value="newServiceOffering.description"
             />
-          </validation-provider>
+          </Field>
 
           <!-- Cover Image !-->
           <v-file-input
@@ -85,9 +89,9 @@
             v-model="uploadedServiceOfferingImage"
             label="Click here to select image"
             auto-grow
-            dense
-            outlined
-            @change="loadServiceOfferingImage"
+            density="compact"
+            variant="outlined"
+            @update:modelValue="loadServiceOfferingImage"
           />
         </v-col>
         <v-col cols="4">
@@ -103,36 +107,61 @@
       <!-- Navigation Buttons-->
       <v-card-actions>
         <v-btn
-          :color="$vuetify.theme.themes.light.secondary"
+          variant="elevated"
+          :color="$vuetify.theme.themes.light.colors.secondary"
           @click="$emit('step-canceled', stepNumber)"
         >
           {{ $t("buttons.Cancel") }}
         </v-btn>
         <v-spacer />
         <v-btn
+          variant="elevated"
           :color="
-            invalid
-              ? $vuetify.theme.disable
-              : $vuetify.theme.themes.light.secondary
+            !meta.valid
+              ? $vuetify.theme.themes.light.colors.disable
+              : $vuetify.theme.themes.light.colors.secondary
           "
-          @click="invalid ? validate() : handleSubmit(onNextButtonClicked)"
+          @click="!meta.valid ? validate() : handleSubmit(onNextButtonClicked)"
         >
-          <div v-if="editMode">Update</div>
-          <div v-else>Create</div>
+          <div v-if="editMode">
+            Update
+          </div>
+          <div v-else>
+            Create
+          </div>
         </v-btn>
       </v-card-actions>
-    </validation-observer>
+    </ValidationForm>
   </v-container>
 </template>
 
 <script>
 import ServiceOfferingCardGrid from "@/components/service_offerings/ServiceOfferingCardGrid";
-import { mapGetters } from "vuex";
+
+import {Field, Form as ValidationForm} from "vee-validate";
+import * as yup from 'yup';
+import {useServicesStore} from "@/stores/servicesStore";
 
 export default {
   name: "ServiceOfferingWizardManualStep1Common",
-  components: { ServiceOfferingCardGrid },
-  props: ["editMode", "newServiceOffering"],
+  components: { ServiceOfferingCardGrid, Field, ValidationForm },
+  props: {
+    editMode: {
+      type: Boolean,
+      default: false
+    },
+    newServiceOffering: {
+      type: Object,
+      default: null
+    }
+  },
+  setup(){
+    const required = yup.string().required();
+    const servicesStore = useServicesStore();
+    return {
+      required, servicesStore
+    }
+  },
   data() {
     return {
       stepNumber: 1,
@@ -140,10 +169,12 @@ export default {
     };
   },
   computed: {
-    ...mapGetters([
-      "serviceOfferingCategories",
-      "serviceOfferingDeploymentTypes",
-    ]),
+    serviceOfferingCategories() {
+      return this.servicesStore.serviceOfferingCategories
+    },
+    serviceOfferingDeploymentTypes () {
+      return this.servicesStore.serviceOfferingDeploymentTypes
+    },
   },
   methods: {
     loadServiceOfferingImage(files) {

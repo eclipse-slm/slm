@@ -1,14 +1,14 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="isActive"
     :width="width"
     @click:outside="$emit('canceled')"
   >
-    <template>
-      <v-card v-if="show">
+    <template #default="{}">
+      <v-card v-if="isActive">
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           <slot name="header">
             <v-row
@@ -26,10 +26,9 @@
                 cols="1"
               >
                 <v-btn
-                  icon
                   @click="$emit('canceled')"
                 >
-                  <v-icon>mdi-close</v-icon>
+                  <v-icon icon="mdi-close" />
                 </v-btn>
               </v-col>
             </v-row>
@@ -67,7 +66,9 @@
 </template>
 
 <script>
-  export default {
+import {toRef} from "vue";
+
+export default {
     name: 'CustomDialog',
     props: {
       show: {
@@ -89,6 +90,12 @@
       width: {
         default: '400',
         type: String
+      }
+    },
+    setup(props){
+      const isActive = toRef(props, 'show')
+      return{
+        isActive
       }
     }
   }

@@ -1,21 +1,20 @@
 <template>
-  <validation-observer
+  <ValidationForm
     ref="observer"
-    v-slot="{ invalid, handleSubmit, validate }"
+    v-slot="{ meta, handleSubmit, validate }"
   >
     <v-card>
       <v-container class="pa-8">
         <v-row>
           <v-tooltip
-            bottom
+            location="bottom"
           >
-            <template #activator="{ on, attrs }">
+            <template #activator="{ props }">
               <v-icon
                 class="mx-3"
                 color="primary"
-                dark
-                v-bind="attrs"
-                v-on="on"
+                theme="dark"
+                v-bind="props"
               >
                 mdi-information
               </v-icon>
@@ -28,55 +27,56 @@
             label="Remote access to resource available?"
           />
         </v-row>
-        <validation-provider
-          v-slot="{ errors, valid }"
+        <Field 
+          v-slot="{ field, errors }"
+          v-model="resourceHostname"
           name="Hostname"
-          rules="required"
+          :rules="string_required"
         >
           <v-text-field
             id="resource-create-text-field-hostname"
-            v-model="resourceHostname"
+            v-bind="field"
             label="Hostname"
             required
             prepend-icon="mdi-dns"
             :error-messages="errors"
-            :success="valid"
+            :model-value="resourceHostname"
           />
-        </validation-provider>
-        <validation-provider
-          v-slot="{ errors, valid }"
+        </Field>
+        <Field
+          v-slot="{ field, errors }"
+          v-model="resourceIp"
           name="IP"
-          :rules="{ required: true, regex: '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$' }"
+          :rules="ip_required"
         >
           <v-text-field
             id="resource-create-text-field-ip"
-            v-model="resourceIp"
+            v-bind="field"
             label="IP"
             required
             prepend-icon="mdi-ip"
             :error-messages="errors"
-            :success="valid"
+            :model-value="resourceIp"
           />
-        </validation-provider>
+        </Field>
         <v-select
           v-if="locations.length>0"
           v-model="resourceLocation"
           label="Resource Location"
           prepend-icon="mdi-map-marker"
           :items="locations"
-          item-text="name"
+          item-title="name"
           item-value="id"
           clearable
         />
         <v-tooltip
           v-if="showBaseConfigurationSwitch()"
-          right
+          location="right"
         >
-          <template #activator="{ on, attrs }">
+          <template #activator="{ props }">
             <div
               style="width:min-content;border: 1px solid white"
-              v-bind="attrs"
-              v-on="on"
+              v-bind="props"
             >
               <v-switch
                 id="resource-base-configuration-switch"
@@ -91,121 +91,135 @@
 
         <v-row>
           <v-col cols="9">
-            <validation-provider
+            <Field
               v-if="resourceAccessAvailable"
-              v-slot="{ errors, valid }"
+              v-slot="{ errors, field }"
+              v-model="resourceConnectionType"
               name="Resource Connection"
-              rules="required"
+              :rules="string_required"
             >
               <v-select
                 id="resource-select-connection-type"
-                v-model="resourceConnectionType"
+                v-bind="field"
                 required
                 label="Connection Type"
                 prepend-icon="mdi-connection"
                 :items="resourceConnectionTypes"
-                item-text="prettyName"
+                item-title="prettyName"
                 item-value="name"
                 :error-messages="errors"
-                :success="valid"
-                @change="updateConnectionPort"
+
+                @update:modelValue="updateConnectionPort"
               />
-            </validation-provider>
+            </Field>
           </v-col>
           <v-col cols="3">
-            <validation-provider
+            <Field
               v-if="resourceAccessAvailable"
-              v-slot="{ errors, valid }"
+              v-slot="{ errors, field }"
+              v-model="resourceConnectionPort"
               name="Connection Port"
-              rules="required"
+              :rules="string_required"
             >
               <v-text-field
-                v-model="resourceConnectionPort"
+                v-bind="field"
                 type="number"
                 required
                 label="Connection Port"
                 prepend-icon="mdi-counter"
                 :error-messages="errors"
-                :success="valid"
               />
-            </validation-provider>
+            </Field>
           </v-col>
         </v-row>
-        <validation-provider
+        <Field
           v-if="resourceAccessAvailable"
-          v-slot="{ errors, valid }"
+          v-slot="{ errors, field }"
+          v-model="resourceUsername"
           name="Username"
-          rules="required"
+          :rules="string_required"
         >
           <v-text-field
             id="resource-create-text-field-username"
-            v-model="resourceUsername"
+            v-bind="field"
             autocomplete="username"
             label="Username"
             required
             prepend-icon="mdi-account"
             :error-messages="errors"
-            :success="valid"
+            :model-value="resourceUsername"
           />
-        </validation-provider>
-        <validation-provider
+        </Field>
+        <Field
           v-if="resourceAccessAvailable"
-          v-slot="{ errors, valid }"
+          v-slot="{ errors, field }"
+          v-model="resourcePassword"
           name="Password"
-          rules="required"
+          :rules="string_required"
         >
           <v-text-field
             id="resource-create-text-field-password"
-            v-model="resourcePassword"
+            v-bind="field"
             autocomplete="current-password"
             label="Password"
             type="password"
             required
             prepend-icon="mdi-lock"
             :error-messages="errors"
-            :success="valid"
           />
-        </validation-provider>
+        </Field>
       </v-container>
 
       <v-card-actions>
         <v-btn
-          text
+          variant="text"
           @click="onBackButtonClicked"
         >
           Back
         </v-btn>
         <v-spacer />
         <v-btn
-          text
+          variant="text"
           @click="onCancelButtonClicked"
         >
           Cancel
         </v-btn>
         <v-btn
           id="resource-create-button-add"
-          text
-          :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-          @click="invalid ? validate() : handleSubmit(onAddButtonClicked)"
+          variant="text"
+          :color="!meta.valid ? $vuetify.theme.themes.light.colors.disable : $vuetify.theme.themes.light.colors.secondary"
+          @click="!meta.valid ? validate() : handleSubmit(onAddButtonClicked)"
         >
           Add
         </v-btn>
       </v-card-actions>
     </v-card>
-  </validation-observer>
+  </ValidationForm>
 </template>
 
 <script>
 
 import resourcesRestApi from '@/api/resource-management/resourcesRestApi'
-  import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
-  import NotificationServiceWebsocketClient from "@/api/notification-service/notificationServiceWebsocketClient";
-  import {mapGetters} from "vuex";
+import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
 
-  export default {
+import {Field, Form as ValidationForm} from "vee-validate";
+import * as yup from 'yup';
+import {useResourcesStore} from "@/stores/resourcesStore";
+
+
+export default {
     name: 'ResourcesCreateDialogPageAddExistingResourceHost',
+    components: {Field, ValidationForm },
     enums: {
       ResourcesCreateDialogPage,
+    },
+    setup(){
+      const string_required = yup.string().required();
+      const ip_required = yup.string().ipv4();
+
+      const resourceStore = useResourcesStore();
+
+      return {string_required, ip_required, resourceStore}
     },
     data () {
       return {
@@ -221,21 +235,30 @@ import resourcesRestApi from '@/api/resource-management/resourcesRestApi'
       }
     },
     computed: {
-      ...mapGetters(['resourceConnectionTypes','locations','availableBaseConfigurationCapabilities']),
+      resourceConnectionTypes() {
+        return this.resourceStore.resourceConnectionTypes
+      },
+      locations () {
+        return this.resourceStore.locations
+      },
+      availableBaseConfigurationCapabilities() {
+        return this.resourceStore.availableBaseConfigurationCapabilities
+      },
+
       resourceBaseConfigurationId() {
-        if(this.availableBaseConfigurationCapabilities.length == 0 || !this.addBaseConfigurationToResource)
+        if(this.availableBaseConfigurationCapabilities.length === 0 || !this.addBaseConfigurationToResource)
           return ''
         return this.availableBaseConfigurationCapabilities[0].id
       }
     },
     mounted() {
       this.$emit('title-changed', 'Add existing host resource')
-      this.$store.dispatch('getResourceConnectionTypes')
+      this.resourceStore.getResourceConnectionTypes();
     },
     methods: {
       updateConnectionPort(connectionTypeName) {
         let connectionType = this.resourceConnectionTypes.find(ct => {
-          return ct.name == connectionTypeName
+          return ct.name === connectionTypeName
         });
 
         if(connectionType !== undefined)
@@ -253,8 +276,7 @@ import resourcesRestApi from '@/api/resource-management/resourcesRestApi'
         this.addBaseConfigurationToResource = false
       },
       showBaseConfigurationSwitch() {
-        const show = this.availableBaseConfigurationCapabilities.length>0 && this.resourceAccessAvailable
-        return show
+        return this.availableBaseConfigurationCapabilities.length > 0 && this.resourceAccessAvailable
       },
       onBackButtonClicked () {
         this.clearForm()

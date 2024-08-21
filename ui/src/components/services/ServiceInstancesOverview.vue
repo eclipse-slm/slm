@@ -18,7 +18,7 @@
           <!--              :items="availableServiceTypes"-->
           <!--              label="Resource Type"-->
           <!--              clearable-->
-          <!--              @change="updateSelectedResourceType"-->
+          <!--              @update:modelValue="updateSelectedResourceType"-->
           <!--            />-->
           <v-spacer />
           <!--            <v-text-field-->
@@ -30,10 +30,12 @@
         </v-row>
 
         <v-row>
-          <service-instances-table
-            class="mt-0 flex"
-            @service-instance-clicked="onServiceInstanceClicked"
-          />
+          <v-col>
+            <service-instances-table
+              class="mt-0"
+              @service-instance-clicked="onServiceInstanceClicked"
+            />
+          </v-col>
         </v-row>
       </v-card-text>
     </base-material-card>
@@ -46,13 +48,14 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import ServiceInstancesTable from '@/components/services/ServiceInstancesTable'
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-  import ServiceInstanceDetailsDialog from "@/components/services/dialog/ServiceInstanceDetailsDialog";
 
-  export default {
+import ServiceInstancesTable from '@/components/services/ServiceInstancesTable'
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import ServiceInstanceDetailsDialog from "@/components/services/dialog/ServiceInstanceDetailsDialog";
+import {useServicesStore} from "@/stores/servicesStore";
+
+export default {
     name: 'ServiceInstancesOverview',
     components: {
       ServiceInstanceDetailsDialog,
@@ -60,15 +63,19 @@
       ServiceInstancesTable,
       NoItemAvailableNote
     },
+    setup(){
+      const servicesStore = useServicesStore();
+      return {servicesStore};
+    },
     data () {
       return {
         selectedServiceInstance: null
       }
     },
     computed: {
-      ...mapGetters([
-        'services',
-      ]),
+      services () {
+        return this.servicesStore.services
+      },
     },
     methods: {
       onServiceInstanceClicked (serviceInstance) {

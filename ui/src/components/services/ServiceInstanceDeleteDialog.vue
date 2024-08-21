@@ -1,14 +1,14 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="active"
     width="400"
     @click:outside="$emit('canceled')"
   >
-    <template>
+    <template #default>
       <v-card v-if="service">
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           Delete Service Instance '{{ service.id }}'
         </v-toolbar>
@@ -19,6 +19,7 @@
           <v-spacer />
 
           <v-btn
+            variant="elevated"
             color="error"
             @click="$emit('confirmed')"
           >
@@ -26,6 +27,7 @@
           </v-btn>
 
           <v-btn
+            variant="elevated"
             color="info"
             @click.native="$emit('canceled')"
           >
@@ -38,8 +40,25 @@
 </template>
 
 <script>
-  export default {
+import {toRef} from "vue";
+
+export default {
     name: 'ServiceInstanceDeleteDialog',
-    props: ['service', 'show'],
+    props: {
+      service: {
+        type: Object,
+        default: null
+      },
+      show: {
+        type: Boolean,
+        default: false
+      },
+    },
+    setup(props){
+      const active = toRef(props, 'show')
+      return{
+        active
+      }
+    }
   }
 </script>

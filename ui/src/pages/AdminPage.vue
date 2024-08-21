@@ -19,15 +19,20 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import VersionsOverview from '@/components/admin/VersionsOverview'
-  import ServiceCategoriesTable from '@/components/service_offerings/ServiceCategoriesTable'
-  import ServiceVendorsDevelopersTable from '@/components/service_vendors/ServiceVendorDevelopersTable'
-  import ServiceVendorTable from '@/components/service_vendors/ServiceVendorTable'
 
-  export default {
+import VersionsOverview from '@/components/admin/VersionsOverview'
+import ServiceCategoriesTable from '@/components/service_offerings/ServiceCategoriesTable'
+import ServiceVendorsDevelopersTable from '@/components/service_vendors/ServiceVendorDevelopersTable'
+import ServiceVendorTable from '@/components/service_vendors/ServiceVendorTable'
+import {useServicesStore} from "@/stores/servicesStore";
+
+export default {
     name: 'AdminPage',
     components: { ServiceCategoriesTable, ServiceVendorTable, ServiceVendorsDevelopersTable, VersionsOverview, },
+    setup(){
+      const servicesStore = useServicesStore();
+      return {servicesStore};
+    },
     data () {
       return {
         selectedServiceVendor: null,
@@ -36,20 +41,20 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'serviceVendors',
-      ]),
+      serviceVendors() {
+        return this.servicesStore.serviceVendors
+      },
       ServiceVendorsTableHeaders () {
         return [
-          { text: 'Id', value: 'serviceVendorId', sortable: true },
-          { text: 'Name', value: 'serviceVendorName', sortable: true },
-          { text: 'Description', value: 'serviceVendorDescription', sortable: false },
-          { text: 'Actions', value: 'serviceVendorActions', sortable: false },
+          { title: 'Id', value: 'serviceVendorId', sortable: true },
+          { title: 'Name', value: 'serviceVendorName', sortable: true },
+          { title: 'Description', value: 'serviceVendorDescription', sortable: false },
+          { title: 'Actions', value: 'serviceVendorActions', sortable: false },
         ]
       },
     },
     created () {
-      this.$store.dispatch('getServiceVendors')
+      this.servicesStore.getServiceVendors();
     },
     methods: {
       onServiceVendorClicked (serviceVendor) {

@@ -44,7 +44,7 @@
                     <v-text-field
                       label="Id"
                       :readonly="true"
-                      :value="userId"
+                      :model-value="userId"
                     />
                   </v-col>
 
@@ -55,7 +55,7 @@
                     <v-text-field
                       class="purple-input"
                       label="User Name"
-                      :value="userName"
+                      :model-value="userName"
                       :readonly="true"
                     />
                   </v-col>
@@ -67,7 +67,7 @@
                     <v-text-field
                       label="Email Address"
                       class="purple-input"
-                      :value="userInfo.email"
+                      :model-value="userInfo.email"
                       :readonly="true"
                     />
                   </v-col>
@@ -79,7 +79,7 @@
                     <v-text-field
                       label="First Name"
                       class="purple-input"
-                      :value="userInfo.given_name"
+                      :model-value="userInfo.given_name"
                       :readonly="true"
                     />
                   </v-col>
@@ -91,7 +91,7 @@
                     <v-text-field
                       label="Last Name"
                       class="purple-input"
-                      :value="userInfo.family_name"
+                      :model-value="userInfo.family_name"
                       :readonly="true"
                     />
                   </v-col>
@@ -111,24 +111,39 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import ApiState from '@/api/apiState'
 
-  export default {
+import ApiState from '@/api/apiState'
+import {useUserStore} from "@/stores/userStore";
+
+export default {
+    setup(){
+      const userStore = useUserStore();
+
+      return {userStore};
+    },
     computed: {
-      ...mapGetters([
-        'apiStateUser',
-        'userId',
-        'userName',
-        'userInfo',
-        'userRoles',
-      ]),
+      apiStateUser () {
+        return this.userStore.apiStateUser
+      },
+      userId() {
+        return this.userStore.userId
+      },
+      userName () {
+        return this.userStore.userName
+      },
+      userInfo () {
+        return this.userStore.userInfo
+      },
+      userRoles () {
+        return this.userStore.userRoles
+      },
+
       apiStateLoaded () {
         return this.apiStateUser === ApiState.LOADED
       },
       apiStateLoading () {
         if (this.apiStateUser === ApiState.INIT) {
-          this.$store.dispatch('getUserDetails')
+          this.userStore.getUserDetails();
         }
         return this.apiStateUser === ApiState.LOADING || this.apiStateUser === ApiState.INIT
       },

@@ -3,11 +3,11 @@
     v-model="showDialog"
     @click:outside="onCloseButtonClicked"
   >
-    <template>
+    <template #default="{}">
       <v-card v-if="showDialog">
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           {{ resource.hostname }}
         </v-toolbar>
@@ -19,7 +19,7 @@
         </v-card-text>
         <v-card-actions class="justify-end">
           <v-btn
-            text
+            variant="text"
             @click="onCloseButtonClicked"
           >
             Close
@@ -31,14 +31,21 @@
 </template>
 
 <script>
-  import ResourcesInfoCardSingleHost from '@/components/resources/ResourcesInfoCardSingleHost'
+import ResourcesInfoCardSingleHost from '@/components/resources/ResourcesInfoCardSingleHost'
 
-  export default {
+export default {
     name: 'ResourcesInfoDialog',
     components: { ResourcesInfoCardSingleHost },
-    props: ['resource'],
+    props: {
+      resource: {
+        type: Object,
+        default: null,
+      }
+    },
+  // ['resource'],
     computed: {
       showDialog () {
+        console.log(this.resource)
         return this.resource !== null
       },
     },

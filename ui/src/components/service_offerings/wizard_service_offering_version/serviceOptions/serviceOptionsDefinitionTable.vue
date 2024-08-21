@@ -7,63 +7,71 @@
     :disable-pagination="true"
     :hide-default-footer="true"
     class="page__table"
+    hide-default-body
   >
-    <template #body="props">
+    <template #tbody="props">
       <draggable
         :list="serviceOptionCategory.serviceOptions"
         tag="tbody"
         group="a"
       >
-        <tr v-for="(serviceOption, index) in props.items" :key="index">
+        <tr
+          v-for="(serviceOption, index) in props.items"
+          :key="index"
+        >
           <td>
-            <v-icon small class="page__grab-icon"> mdi-arrow-all </v-icon>
+            <v-icon
+              size="small"
+              class="page__grab-icon"
+            >
+              mdi-arrow-all
+            </v-icon>
           </td>
           <td>{{ serviceOption.key }}</td>
-          <td :id="serviceOption.key + '_DisplayName'">
-            <ValidationProvider
-              v-slot="{ errors, valid }"
-              name="Display Name"
-              rules="required"
+          <td :id="serviceOption.key + '_DisplayName_'">
+            <Field
+              v-slot="{ field, errors }"
+              v-model="serviceOption.name"
+              :name="serviceOption.key + '_DisplayName_'"
+              :rules="required"
             >
               <v-text-field
-                v-model="serviceOption.name"
+                v-bind="field"
                 :error-messages="errors"
-                :success="valid"
+                :model-value="serviceOption.name"
               />
-            </ValidationProvider>
+            </Field>
           </td>
           <td :id="serviceOption.key + '_Desc'">
-            <ValidationProvider
-              v-slot="{ errors, valid }"
-              name="Description"
-              rules="required"
+            <Field
+              v-slot="{ field, errors }"
+              v-model="serviceOption.description"
+              :name="serviceOption.key + '_Desc'"
+              :rules="required"
             >
               <v-text-field
-                v-model="serviceOption.description"
+                v-bind="field"
                 :error-messages="errors"
-                :success="valid"
+                :model-value="serviceOption.description"
               />
-            </ValidationProvider>
+            </Field>
           </td>
           <td :id="serviceOption.key + '_Value'">
-            <v-tooltip bottom :disabled="!serviceOption.required">
-              <template #activator="{ on, attrs }">
-                <div v-on="on">
+            <v-tooltip
+              location="bottom"
+              :disabled="!serviceOption.required"
+            >
+              <template #activator="{ props }">
+                <div v-bind="props">
                   <service-option-value
                     :service-option="serviceOption"
-                    :disabled="
-                      serviceOption.required &&
-                      serviceOption.valueType !== 'AAS_SM_TEMPLATE'
-                    "
+                    :disabled="serviceOption.required &&
+                      serviceOption.valueType !== 'AAS_SM_TEMPLATE'"
                     :definition-mode="true"
-                    v-bind="attrs"
                   />
                 </div>
               </template>
-              <span
-                >If service option is required to be set by user no value is
-                needed.</span
-              >
+              <span>If service option is required to be set by user no value is needed.</span>
             </v-tooltip>
           </td>
           <td :id="serviceOption.key + '_ValueType'">
@@ -71,48 +79,44 @@
               v-model="serviceOption.valueType"
               :items="validatorList"
               :disabled="
-                serviceOption.optionType == 'VOLUME' ||
-                serviceOption.optionType == 'PORT_MAPPING'
+                serviceOption.optionType === 'VOLUME' ||
+                  serviceOption.optionType === 'PORT_MAPPING'
               "
-              @change="
+              @update:modelValue="
                 onValueTypeChanged(serviceOption, serviceOption.valueType)
               "
             />
           </td>
           <td :id="serviceOption.key + '_RequiredCheckbox'">
-            <v-tooltip bottom>
-              <template #activator="{ on, attrs }">
-                <v-simple-checkbox
+            <v-tooltip location="bottom">
+              <template #activator="{ props }">
+                <v-checkbox-btn
                   id="requiredCheckbox"
                   v-model="serviceOption.required"
-                  v-bind="attrs"
+                  v-bind="props"
                   color="primary"
                   :ripple="false"
                   :disabled="
                     serviceOption.valueType === 'SYSTEM_VARIABLE' ||
-                    serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
-                    serviceOption.valueType === 'AAS_SM_TEMPLATE'
+                      serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
+                      serviceOption.valueType === 'AAS_SM_TEMPLATE'
                   "
-                  v-on="on"
                   @click="onServiceOptionRequiredChanged(serviceOption)"
                 />
               </template>
-              <span
-                >If service option is required to be set by user it needs to be
-                editable.</span
-              >
+              <span>If service option is required to be set by user it needs to be editable.</span>
             </v-tooltip>
           </td>
           <td :id="serviceOption.key + '_EditableCheckbox'">
-            <v-simple-checkbox
+            <v-checkbox-btn
               id="editableCheckbox"
               v-model="serviceOption.editable"
               color="primary"
               :ripple="false"
               :disabled="
                 serviceOption.valueType === 'SYSTEM_VARIABLE' ||
-                serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
-                serviceOption.valueType === 'AAS_SM_TEMPLATE'
+                  serviceOption.valueType === 'DEPLOYMENT_VARIABLE' ||
+                  serviceOption.valueType === 'AAS_SM_TEMPLATE'
               "
               @click="onServiceOptionEditableChanged(serviceOption)"
             />
@@ -124,16 +128,30 @@
 </template>
 
 <script>
-import draggable from "vuedraggable";
+import {VueDraggableNext} from 'vue-draggable-next'
 import ServiceOptionValue from "@/components/service_offerings/ServiceOptionValue";
+import {Field} from "vee-validate";
+import * as yup from 'yup';
 
 export default {
   name: "ServiceOptionsDefinitionTable",
   components: {
-    draggable,
+    draggable: VueDraggableNext,
     ServiceOptionValue,
+    Field
   },
-  props: ["serviceOptionCategory"],
+  props: {
+    serviceOptionCategory: {
+      type: Object,
+      default: null
+    },
+  },
+  setup(){
+    const required = yup.string().required()
+    return {
+      required
+    }
+  },
   data() {
     return {
       validatorList: [
@@ -154,14 +172,14 @@ export default {
         "DEPLOYMENT_VARIABLE",
       ],
       tableHeaders: [
-        { text: "", value: "", sortable: false },
-        { text: "Key", value: "key", sortable: false },
-        { text: "Display Name", value: "name", sortable: false },
-        { text: "Description", value: "description", sortable: false },
-        { text: "Value", value: "value", sortable: false },
-        { text: "Value Type", value: "valueType", sortable: false },
-        { text: "Required", value: "required", sortable: false },
-        { text: "Editable", value: "editable", sortable: false },
+        { title: "", value: "", width: "50px", sortable: false },
+        { title: "Key", value: "key", sortable: false },
+        { title: "Display Name", value: "name", sortable: false },
+        { title: "Description", value: "description", sortable: false },
+        { title: "Value", value: "value", sortable: false },
+        { title: "Value Type", value: "valueType", sortable: false },
+        { title: "Required", value: "required", sortable: false },
+        { title: "Editable", value: "editable", sortable: false },
       ],
     };
   },

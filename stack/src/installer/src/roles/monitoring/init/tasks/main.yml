@@ -2,11 +2,11 @@
     monitoring_compose: "{{ lookup('template', 'monitoring.yml') }}"
 
 - name: "Start containers"
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_name: eclipse-slm
     definition: "{{ monitoring_compose | from_yaml}}"
     state: present
-    pull: true
+    pull: always
 
 - name: "Store config in Consul"
   include_role:

@@ -25,41 +25,28 @@
         item-key="id"
         :items="serviceOfferingCategories"
       >
-        <template
-          #body="{ items }"
-        >
-          <tbody
-            v-for="serviceCategory in items"
-            :key="serviceCategory.id"
+        <template #item.actions="{ item }">
+          <v-btn
+            class="ma-1"
+            size="small"
+            color="info"
+            @click="onEditServiceCategoryClicked(item)"
           >
-            <tr>
-              <td>{{ serviceCategory.name }}</td>
-              <td>{{ serviceCategory.id }}</td>
-              <td>
-                <v-btn
-                  class="ma-1"
-                  small
-                  color="info"
-                  @click="onEditServiceCategoryClicked(serviceCategory)"
-                >
-                  <v-icon>
-                    mdi-pencil
-                  </v-icon>
-                </v-btn>
+            <v-icon>
+              mdi-pencil
+            </v-icon>
+          </v-btn>
 
-                <v-btn
-                  class="ma-1"
-                  small
-                  color="error"
-                  @click="onDeleteServiceCategoryClicked(serviceCategory)"
-                >
-                  <v-icon>
-                    mdi-delete
-                  </v-icon>
-                </v-btn>
-              </td>
-            </tr>
-          </tbody>
+          <v-btn
+            class="ma-1"
+            size="small"
+            color="error"
+            @click="onDeleteServiceCategoryClicked(item)"
+          >
+            <v-icon>
+              mdi-delete
+            </v-icon>
+          </v-btn>
         </template>
       </v-data-table>
       <v-divider />
@@ -82,16 +69,21 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import ServiceCategoryCreateOrEditDialog from '@/components/service_offerings/ServiceCategoryCreateOrEditDialog'
-  import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
-  import Vue from 'vue'
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 
-  export default {
+import ServiceCategoryCreateOrEditDialog from '@/components/service_offerings/ServiceCategoryCreateOrEditDialog'
+import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {app} from "@/main";
+import {useServicesStore} from "@/stores/servicesStore";
+
+export default {
     name: 'ServiceCategoriesTable',
     components: {OverviewHeading, ServiceCategoryCreateOrEditDialog, NoItemAvailableNote },
+    setup(){
+      const servicesStore = useServicesStore();
+      return {servicesStore};
+    },
     data () {
       return {
         selectedServiceCategory: null,
@@ -100,19 +92,20 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'serviceOfferingCategories',
-      ]),
+      serviceOfferingCategories() {
+        return this.servicesStore.serviceOfferingCategories
+      },
+
       ServiceCategoriesTableHeaders () {
         return [
-          { text: 'Name', value: 'serviceCategoryName', sortable: true },
-          { text: 'Id', value: 'serviceCategoryId', sortable: true },
-          { text: 'Actions', value: 'serviceCategoryActions', sortable: false },
+          { title: 'Name', value: 'name', sortable: true },
+          { title: 'Id', value: 'id', sortable: true },
+          { title: 'Actions', key: 'actions', sortable: false },
         ]
       },
     },
     created () {
-      this.$store.dispatch('getServiceOfferingCategories')
+      this.servicesStore.getServiceOfferingCategories();
     },
     methods: {
       onEditServiceCategoryClicked (serviceCategory) {
@@ -125,11 +118,12 @@
         this.editServiceCategory = false
         ServiceOfferingsRestApi.deleteServiceCategory(serviceVendor.id).then(
           response => {
-            Vue.$toast.info('Service category successfully deleted')
-            this.$store.dispatch('getServiceOfferingCategories')
+            app.config.globalProperties.$toast.info('Service category successfully deleted')
+
+            this.servicesStore.getServiceOfferingCategories();
           })
           .catch(exception => {
-            Vue.$toast.error('Failed to create service category')
+            app.config.globalProperties.$toast.error('Failed to create service category')
             console.log('Service category deletion failed: ' + exception.response.data.message)
             console.log(exception)
           })
@@ -150,7 +144,8 @@
         this.showCreateOrEditServiceCategoryDialog = false
         this.selectedServiceCategory = null
         this.editServiceCategory = false
-        this.$store.dispatch('getServiceOfferingCategories')
+
+        this.servicesStore.getServiceOfferingCategories();
       },
     },
   }

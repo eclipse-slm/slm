@@ -6,6 +6,7 @@
 
 <script>
 import ProviderOverview from "@/components/provider/ProviderOverview.vue";
+
 export default{
   components: {
     ProviderOverview

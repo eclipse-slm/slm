@@ -3,12 +3,11 @@
     :icon="icon"
     class="v-card--material-stats"
     v-bind="$attrs"
-    v-on="$listeners"
   >
-    <template v-slot:after-heading>
+    <template #after-heading>
       <div class="ml-auto text-right">
         <div
-          class="body-3 grey--text font-weight-light"
+          class="body-3 text-grey font-weight-light"
           v-text="title"
         />
 
@@ -26,25 +25,25 @@
     </v-col>
 
     <v-icon
+      v-if="subIcon"
+      :icon="subIcon"
       :color="subIconColor"
       size="16"
       class="ml-2 mr-1"
-    >
-      {{ subIcon }}
-    </v-icon>
+    />
 
     <span
       :class="subTextColor"
-      class="text-caption grey--text font-weight-light"
+      class="text-caption text-grey font-weight-light"
       v-text="subText"
     />
   </base-material-card>
 </template>
 
 <script>
-  import Card from './Card'
+import Card from './Card'
 
-  export default {
+export default {
     name: 'MaterialStatsCard',
 
     inheritAttrs: false,
@@ -84,16 +83,20 @@
         default: undefined,
       },
     },
+
+    setup(props){
+      console.log(props)
+    },
   }
 </script>
 
 <style lang="sass">
 .v-card--material-stats
-  display: flex
+  //display: flex
   flex-wrap: wrap
   position: relative
 
-  > div:first-child
+  > div:nth-child(2)
     justify-content: space-between
 
   .v-card

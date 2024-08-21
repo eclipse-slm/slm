@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="grey--text mb-0 text-caption">
+    <div class="text-grey mb-0 text-caption">
       {{ label }}
     </div>
     <div>
@@ -12,6 +12,15 @@
 <script>
   export default {
     name: 'TextWithLabel',
-    props: ['label', 'text'],
+    props: {
+      label: {
+        type: String,
+        default: ""
+      },
+      text: {
+        type: String,
+        default: "",
+      }
+    }
   }
 </script>

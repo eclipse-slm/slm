@@ -8,7 +8,7 @@
       </template>
 
       <no-item-available-note
-        v-if="!clusters.length"
+        v-if="!resourcesStore.clusters.length"
         item="Cluster"
       />
 
@@ -20,22 +20,17 @@
     </base-material-card>
 
 
-    <v-fab-transition>
-      <v-btn
-        id="resources-button-add-resource"
-        class="mb-10 elevation-15"
-        color="primary"
-        absolute
-        bottom
-        right
-        fab
-        @click="showCreateDialog = true"
-      >
-        <v-icon large>
-          mdi-plus
-        </v-icon>
-      </v-btn>
-    </v-fab-transition>
+    <v-fab
+      id="resources-button-add-resource"
+      class="mb-10"
+      elevation="15"
+      color="primary"
+      icon="mdi-plus"
+      location="top end"
+      absolute
+      offset
+      @click="showCreateDialog = true"
+    />
 
     <clusters-create-dialog
       :show="showCreateDialog"
@@ -45,11 +40,12 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 import ClustersCreateDialog from "@/components/clusters/dialogs/ClustersCreateDialog.vue";
 import ResourcesTableClusters from "@/components/resources/ResourcesTableClusters.vue";
+import {useResourcesStore} from "@/stores/resourcesStore";
 
 export default {
   name: 'ClustersOverview',
@@ -59,6 +55,10 @@ export default {
     NoItemAvailableNote,
     ClustersCreateDialog
   },
+  setup(){
+    const resourcesStore = useResourcesStore();
+    return {resourcesStore}
+  },
   data () {
     return {
       showCreateDialog: false,
@@ -66,17 +66,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'clusters',
-    ])
   },
   mounted () {
-    this.$store.dispatch('getDeploymentCapabilities')
+    this.resourcesStore.getDeploymentCapabilities();
   },
   methods: {
-    ...mapActions([
-      'getResourcesFromBackend',
-    ])
   },
 }
 </script>

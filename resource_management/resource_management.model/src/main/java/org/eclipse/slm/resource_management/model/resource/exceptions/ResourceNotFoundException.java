@@ -13,4 +13,8 @@ public class ResourceNotFoundException extends Exception {
         super("Resource with id '"  + resourceId + "' not found");
     }
 
+    public ResourceNotFoundException(String name){
+        super("Resource with name '" + name + "' not found");
+    }
+
 }

@@ -6,14 +6,14 @@
           <v-btn
             id="resource-create-button-add-existing"
             color="secondary"
-            x-large
+            size="x-large"
             tile
             @click="$emit('page-changed', ClusterCreateDialogPage.ADD_EXISTING_CLUSTER)"
           >
             <v-icon
               class="mr-5"
-              x-large
-              left
+              size="x-large"
+              start
             >
               mdi-plus
             </v-icon>
@@ -24,14 +24,14 @@
           <v-btn
             id="resource-create-button-create-new"
             color="secondary"
-            x-large
+            size="x-large"
             tile
             @click="$emit('page-changed', ClusterCreateDialogPage.CREATE_CLUSTER)"
           >
             <v-icon
               class="mr-5"
-              large
-              left
+              size="large"
+              start
             >
               mdi-pencil-outline
             </v-icon>
@@ -42,7 +42,7 @@
     </v-container>
     <v-card-actions class="justify-end">
       <v-btn
-        text
+        variant="text"
         @click="$emit('canceled')"
       >
         Cancel
@@ -57,7 +57,12 @@ import ClusterCreateDialogPage from "@/components/clusters/dialogs/ClustersCreat
 export default {
     name: 'ResourcesCreateDialogPageStart',
     components: { },
-    props: ['show'],
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      }
+    },
     enums: {
       ClusterCreateDialogPage,
     },

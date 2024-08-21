@@ -29,7 +29,7 @@
                 {{ tab }}
               </v-tab>
 
-              <v-tab-item>
+              <v-window-item>
                 <v-card
                   flat
                   class="my-0"
@@ -46,9 +46,9 @@
                     <div>This is very nice.</div>
                   </v-card-text>
                 </v-card>
-              </v-tab-item>
+              </v-window-item>
 
-              <v-tab-item>
+              <v-window-item>
                 <v-card
                   flat
                   class="my-0"
@@ -63,9 +63,9 @@
                     </div>
                   </v-card-text>
                 </v-card>
-              </v-tab-item>
+              </v-window-item>
 
-              <v-tab-item>
+              <v-window-item>
                 <v-card
                   flat
                   class="my-0"
@@ -80,7 +80,7 @@
                     </div>
                   </v-card-text>
                 </v-card>
-              </v-tab-item>
+              </v-window-item>
             </base-material-tabs>
           </v-card-text>
         </v-card>
@@ -109,7 +109,7 @@
                 {{ tab }}
               </v-tab>
 
-              <v-tab-item>
+              <v-window-item>
                 <v-card
                   flat
                   class="my-0"
@@ -126,9 +126,9 @@
                     <div>This is very nice.</div>
                   </v-card-text>
                 </v-card>
-              </v-tab-item>
+              </v-window-item>
 
-              <v-tab-item>
+              <v-window-item>
                 <v-card
                   flat
                   class="my-0"
@@ -143,9 +143,9 @@
                     </div>
                   </v-card-text>
                 </v-card>
-              </v-tab-item>
+              </v-window-item>
 
-              <v-tab-item>
+              <v-window-item>
                 <v-card
                   flat
                   class="my-0"
@@ -160,7 +160,7 @@
                     </div>
                   </v-card-text>
                 </v-card>
-              </v-tab-item>
+              </v-window-item>
             </base-material-tabs>
           </v-card-text>
         </v-card>
@@ -179,13 +179,13 @@
                 v-for="n in 5"
                 :key="n"
               >
-                <v-expansion-panel-header>
+                <v-expansion-panel-title>
                   Collapsible Group Item #{{ n }}
-                </v-expansion-panel-header>
+                </v-expansion-panel-title>
 
-                <v-expansion-panel-content>
+                <v-expansion-panel-text>
                   Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                </v-expansion-panel-content>
+                </v-expansion-panel-text>
               </v-expansion-panel>
             </v-expansion-panels>
           </v-card-text>
@@ -218,7 +218,7 @@
                 <v-icon v-text="tab.icon" />
               </v-tab>
 
-              <v-tab-item>
+              <v-window-item>
                 <v-card
                   flat
                   class="my-0"
@@ -237,9 +237,9 @@
                     </div>
                   </v-card-text>
                 </v-card>
-              </v-tab-item>
+              </v-window-item>
 
-              <v-tab-item>
+              <v-window-item>
                 <v-card
                   flat
                   class="my-0"
@@ -254,7 +254,7 @@
                     </div>
                   </v-card-text>
                 </v-card>
-              </v-tab-item>
+              </v-window-item>
             </base-material-tabs>
           </v-card-text>
         </v-card>
@@ -271,7 +271,7 @@
 
         <base-material-tabs
           v-model="tab"
-          background-color="transparent"
+          bg-color="transparent"
           centered
           color="warning"
           icons-and-text
@@ -284,15 +284,15 @@
             <v-icon v-text="tab.icon" />
           </v-tab>
 
-          <v-tabs-items
+          <v-window-item
             v-model="tab"
-            class="pt-12 transparent"
+            class="pt-12 bg-transparent"
           >
-            <v-tab-item>
+            <v-window-item>
               <v-card class="mt-0 px-5">
                 <v-card-text>
                   <base-subheading subheading="Description about product">
-                    <p class="grey--text text-body-2 font-weight-light">
+                    <p class="text-grey text-body-2 font-weight-light">
                       More Information here
                     </p>
                   </base-subheading>
@@ -306,13 +306,13 @@
                   </div>
                 </v-card-text>
               </v-card>
-            </v-tab-item>
+            </v-window-item>
 
-            <v-tab-item>
+            <v-window-item>
               <v-card class="mt-0 px-5">
                 <v-card-text>
                   <base-subheading subheading="Location of the product product">
-                    <p class="grey--text text-body-2 font-weight-light">
+                    <p class="text-grey text-body-2 font-weight-light">
                       More Information here
                     </p>
                   </base-subheading>
@@ -326,13 +326,13 @@
                   </div>
                 </v-card-text>
               </v-card>
-            </v-tab-item>
+            </v-window-item>
 
-            <v-tab-item>
+            <v-window-item>
               <v-card class="mt-0 px-5">
                 <v-card-text>
                   <base-subheading subheading="Legal info of the product product">
-                    <p class="grey--text text-body-2 font-weight-light">
+                    <p class="text-grey text-body-2 font-weight-light">
                       More Information here
                     </p>
                   </base-subheading>
@@ -346,13 +346,13 @@
                   </div>
                 </v-card-text>
               </v-card>
-            </v-tab-item>
+            </v-window-item>
 
-            <v-tab-item>
+            <v-window-item>
               <v-card class="mt-0 px-5">
                 <v-card-text>
                   <base-subheading heading="Help center">
-                    <p class="grey--text text-body-2 font-weight-light">
+                    <p class="text-grey text-body-2 font-weight-light">
                       More Information here
                     </p>
                   </base-subheading>
@@ -366,8 +366,8 @@
                   </div>
                 </v-card-text>
               </v-card>
-            </v-tab-item>
-          </v-tabs-items>
+            </v-window-item>
+          </v-window-item>
         </base-material-tabs>
       </v-col>
     </v-row>

@@ -19,11 +19,11 @@
           v-model="addedDevelopers"
           :items="developersAvailableForSharing"
           label="Add developer"
-          item-text="username"
+          item-title="username"
           return-object
           multiple
           chips
-          deletable-chips
+          closable-chips
         />
 
         <v-divider />
@@ -50,7 +50,7 @@
                   <v-btn
                     class="ma-1"
                     color="error"
-                    small
+                    size="small"
                     @click="onDeleteDeveloperClicked(developer)"
                   >
                     <v-icon>
@@ -72,8 +72,8 @@
           @click="onSaveDevelopersClicked()"
         >
           <v-icon
-            dense
-            small
+            density="compact"
+            size="small"
             class="mr-2"
           >
             mdi-check
@@ -86,16 +86,30 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
-  import UsersRestApi from '@/api/service-management/usersRestApi'
-  import Vue from 'vue'
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
 
-  export default {
+import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
+import UsersRestApi from '@/api/service-management/usersRestApi'
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import {app} from "@/main";
+import {useUserStore} from "@/stores/userStore";
+import {useServicesStore} from "@/stores/servicesStore";
+import {storeToRefs} from "pinia";
+
+export default {
     name: 'ServiceVendorDevelopersTable',
     components: {OverviewHeading},
-    props: ['serviceVendor'],
+    props: {
+      serviceVendor: {
+        type: Object,
+        default: null
+      }
+    },
+    setup(){
+      const userStore = useUserStore();
+      const servicesStore = useServicesStore();
+      const {serviceOfferingCategoryNameById, serviceVendorById} = storeToRefs(servicesStore)
+      return {userStore, servicesStore, serviceOfferingCategoryNameById, serviceVendorById}
+    },
     data () {
       return {
         availableDevelopers: null,
@@ -103,6 +117,30 @@
         addedDevelopers: [],
         developersOfServiceVendor: [],
       }
+    },
+    computed: {
+      userId() {
+        return this.userStore.userId
+      },
+
+      tableHeaders () {
+        return [
+          { title: 'Username', value: 'username', sortable: true },
+          { title: 'Firstname', value: 'firstName', sortable: true },
+          { title: 'Lastname', value: 'lastName', sortable: true },
+          { title: 'Mail', value: 'email', sortable: true },
+          { title: 'Actions', value: 'developerActions', sortable: false },
+        ]
+      },
+      developersAvailableForSharing () {
+        const usersToRemove = []
+        for (const developer of this.developersOfServiceVendor) {
+          usersToRemove.push(developer.id)
+        }
+        return this.users.filter(function (developer) {
+          return usersToRemove.indexOf(developer.id) === -1
+        })
+      },
     },
     watch: {
       serviceVendor: {
@@ -115,42 +153,17 @@
         },
       },
     },
-    computed: {
-      ...mapGetters([
-        'userId',
-        'serviceOfferingCategoryNameById',
-        'serviceVendorById',
-      ]),
-      tableHeaders () {
-        return [
-          { text: 'Username', value: 'username', sortable: true },
-          { text: 'Firstname', value: 'firstName', sortable: true },
-          { text: 'Lastname', value: 'lastName', sortable: true },
-          { text: 'Mail', value: 'email', sortable: true },
-          { text: 'Actions', value: 'developerActions', sortable: false },
-        ]
-      },
-    developersAvailableForSharing () {
-          const usersToRemove = []
-          for (const developer of this.developersOfServiceVendor) {
-            usersToRemove.push(developer.id)
-          }
-          return this.users.filter(function (developer) {
-            return usersToRemove.indexOf(developer.id) === -1
-          })
-      },
-    },
     methods: {
       onDeleteDeveloperClicked (deletedDeveloper) {
         if (this.developersOfServiceVendor.length === 1) {
-          Vue.$toast.warning('Last developer of service vendor cannot be deleted')
+          app.config.globalProperties.$toast.warning('Last developer of service vendor cannot be deleted')
         } else {
           ServiceVendorsRestApi.removeDeveloperFromServiceVendor(this.serviceVendor.id, deletedDeveloper.id).then(() => {
-            Vue.$toast.info(`Successfully removed developer '${deletedDeveloper.username}'`)
+            app.config.globalProperties.$toast.info(`Successfully removed developer '${deletedDeveloper.username}'`)
             this.loadDevelopersOfServiceVendor()
           })
             .catch(() => {
-              Vue.$toast.error(`Failed to remove developer '${deletedDeveloper.username}'`)
+              app.config.globalProperties.$toast.error(`Failed to remove developer '${deletedDeveloper.username}'`)
             })
         }
       },
@@ -159,8 +172,8 @@
         this.addedDevelopers.forEach(developer => {
           ServiceVendorsRestApi.addDeveloperToServiceVendor(this.serviceVendor.id, developer.id).then(() => {
             this.developersOfServiceVendor.push(developer)
-            Vue.$toast.info(`Successfully added developer '${developer.username}'`)
-            Vue.prototype.$keycloak.keycloak.updateToken(100000) // Force refresh of token
+            app.config.globalProperties.$toast.info(`Successfully added developer '${developer.username}'`)
+            app.config.globalProperties.$keycloak.keycloak.updateToken(100000) // Force refresh of token
           })
         })
         this.addedDevelopers = []

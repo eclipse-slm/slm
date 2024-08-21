@@ -1,38 +1,40 @@
 <template>
-  <validation-observer
+  <ValidationForm
     ref="observer"
-    v-slot="{ invalid, handleSubmit, validate }"
+    v-slot="{ meta, handleSubmit, validate }"
   >
     <v-card>
       <v-container
         fluid
         class="pa-8"
       >
-        <validation-provider
-          v-slot="{ errors, valid }"
+        <Field
+          v-slot="{ field, errors }"
+          v-model="selectedClusterType"
           name="Cluster Type"
-          rules="required"
+          :rules="required"
         >
           <v-row id="resource-create-select-cluster-type">
             <v-icon
-              large
+              size="large"
               class="mr-7 ml-2"
             >
               mdi-selection-multiple
             </v-icon>
             <v-select
-              v-model="selectedClusterType"
+              v-bind="field"
               :items="availableClusterTypesWithSkipInstall"
-              item-text="name"
+              item-title="name"
               label="Cluster Type"
               required
               return-object
               :error-messages="errors"
-              :success="valid"
-              @change="onSelectedClusterTypeChanged"
+              :model-value="selectedClusterType"
+
+              @update:modelValue="onSelectedClusterTypeChanged"
             />
           </v-row>
-        </validation-provider>
+        </Field>
         <div
           v-for="configParameter in configParameters"
           :key="configParameter.name"
@@ -44,15 +46,14 @@
             <v-col cols="3">
               {{ configParameter.prettyName }}
               <v-tooltip
-                bottom
+                location="bottom"
               >
-                <template #activator="{ on, attrs }">
+                <template #activator="{ props }">
                   <v-icon
                     class="mx-3"
                     color="primary"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
+                    theme="dark"
+                    v-bind="props"
                   >
                     mdi-information
                   </v-icon>
@@ -69,9 +70,9 @@
                 accept=".yml,.yaml"
                 label="Click here to select file"
                 auto-grow
-                dense
-                outlined
-                @change="onFileChanged(configParameter.name)"
+                density="compact"
+                variant="outlined"
+                @update:modelValue="onFileChanged(configParameter.name)"
               />
             </v-col>
             <v-col
@@ -93,88 +94,101 @@
                 accept=".yml,.yaml"
                 label="Click here to select kube config file"
                 auto-grow
-                dense
-                outlined
-                @change="onFileChanged(configParameter.name)"
+                density="compact"
+                variant="outlined"
+                @update:modelValue="onFileChanged(configParameter.name)"
               />
             </v-col>
           </v-row>
-          <validation-provider
+          <Field
             v-if="configParameter.valueType == 'FILE'"
-            v-slot="{ errors, valid }"
+            v-slot="{ field, errors }"
+            v-model="configParameterValues[configParameter.name]"
             :name="configParameter.prettyName"
-            rules="required"
+            :rules="required"
           >
             <v-row>
               <v-textarea
                 :key="textAreaFileContentComponentKey"
-                v-model="configParameterValues[configParameter.name]"
-                outlined
-                dense
+                v-bind="field"
+                variant="outlined"
+                density="compact"
                 :error-messages="errors"
-                :success="valid"
               />
             </v-row>
-          </validation-provider>
-          <validation-provider
+          </Field>
+          <Field
             v-if="configParameter.valueType == 'KUBE_CONF'"
-            v-slot="{ errors, valid }"
+            v-slot="{ field, errors }"
+            v-model="configParameterValues[configParameter.name]"
             :name="configParameter.prettyName"
-            rules="required"
+            :rules="required_string"
           >
             <v-row>
               <v-textarea
                 :key="textAreaFileContentComponentKey"
-                v-model="configParameterValues[configParameter.name]"
-                outlined
-                dense
+                v-bind="field"
+                variant="outlined"
+                density="compact"
                 :error-messages="errors"
-                :success="valid"
               />
             </v-row>
-          </validation-provider>
+          </Field>
         </div>
       </v-container>
 
       <v-card-actions>
         <v-btn
-          text
+          variant="text"
           @click="onBackButtonClicked"
         >
           Back
         </v-btn>
         <v-spacer />
         <v-btn
-          text
+          variant="text"
           @click="onCancelButtonClicked"
         >
           Cancel
         </v-btn>
         <v-btn
           id="resource-create-button-create-cluster"
-          text
-          :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-          @click="invalid ? validate() : handleSubmit(onAddButtonClicked)"
+          variant="text"
+          :color="!meta.valid ? $vuetify.theme.themes.light.colors.disable : $vuetify.theme.themes.light.colors.secondary"
+          @click="!meta.valid ? validate() : handleSubmit(onAddButtonClicked)"
         >
           Add
         </v-btn>
       </v-card-actions>
     </v-card>
-  </validation-observer>
+  </ValidationForm>
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import clustersRestApi from '@/api/resource-management/clustersRestApi'
-  import ClustersCreateDialogPage from "@/components/clusters/dialogs/ClustersCreateDialogPage";
-  import {ref} from "vue";
 
-  const textAreaFileContentComponentKey = ref(0);
+import clustersRestApi from '@/api/resource-management/clustersRestApi'
+import ClustersCreateDialogPage from "@/components/clusters/dialogs/ClustersCreateDialogPage";
+import {ref} from "vue";
+import {Field, Form as ValidationForm} from "vee-validate";
+import * as yup from 'yup';
+import {useResourcesStore} from "@/stores/resourcesStore";
+
+const textAreaFileContentComponentKey = ref(0);
 
   export default {
     name: 'ClustersCreateDialogPageAddExistingCluster',
+    components: {Field, ValidationForm},
     enums: {
       ClustersCreateDialogPage,
+    },
+    setup(){
+      const resourceStore = useResourcesStore();
+
+      const required = yup.object().required();
+      const required_string = yup.string().required();
+      return {
+        required, required_string, resourceStore
+      }
     },
     data () {
       return {
@@ -185,13 +199,13 @@
         textAreaFileContentComponentKey: 0
       }
     },
-    mounted() {
-      this.$emit('title-changed', 'Add existing cluster')
-    },
     computed: {
-      ...mapGetters(['availableClusterTypes']),
+      availableClusterTypes() {
+        return this.resourceStore.availableClusterTypes;
+      },
       availableClusterTypesWithSkipInstall () {
         let clusterTypes = []
+        console.log('sdfsadfsadf', this.availableClusterTypes);
         this.availableClusterTypes.forEach(clusterType => {
           if ('INSTALL' in clusterType.actions) {
             if (clusterType.actions['INSTALL'].skipable == true) {
@@ -202,14 +216,17 @@
         return clusterTypes
       }
     },
+    mounted() {
+      this.$emit('title-changed', 'Add existing cluster')
+    },
     methods: {
       clearForm () {
         this.selectedClusterType = ''
         this.configParameters = []
         this.uploadedFiles = []
       },
-      onSelectedClusterTypeChanged () {
-        this.configParameters = this.selectedClusterType.actions['INSTALL'].configParameters
+      onSelectedClusterTypeChanged (item) {
+        this.configParameters = item.actions['INSTALL'].configParameters
       },
       onFileChanged (configParameterName) {
         const reader = new FileReader()

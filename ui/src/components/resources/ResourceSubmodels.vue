@@ -1,17 +1,23 @@
 <template>
   <div>
-    <v-simple-table v-slot v-if="submodels.length > 0">
+    <v-table
+      v-if="submodels.length > 0"
+      v-slot
+    >
       <thead>
         <tr>
           <th>{{ 'IdShort' }}</th>
           <th>{{ 'Id' }}</th>
           <th>{{ 'Details' }}</th>
           <th>{{ 'semantic Id' }}</th>
-          <th></th>
+          <th />
         </tr>
       </thead>
       <tbody>
-        <tr v-for="submodel in submodels" :key="submodel.idShort">
+        <tr
+          v-for="submodel in submodels"
+          :key="submodel.idShort"
+        >
           <td> {{ submodel.idShort }}</td>
           <td> {{ submodel.id }} </td>
           <td>
@@ -23,30 +29,50 @@
             </div>
           </td>
           <td>
-            <v-btn color="error" @click.stop="submodelToDelete = submodel"><v-icon>mdi-delete</v-icon></v-btn>
+            <v-btn
+              color="error"
+              @click.stop="submodelToDelete = submodel"
+            >
+              <v-icon icon="mdi-delete" />
+            </v-btn>
           </td>
         </tr>
       </tbody>
-    </v-simple-table>
+    </v-table>
     <div v-else>
-      <v-alert outlined type="info">
+      <v-alert
+        variant="outlined"
+        type="info"
+      >
         {{ 'No submodels found.' }}
       </v-alert>
     </div>
     <v-row class="align-center">
       <v-col>
-        <v-file-input accept=".aasx" v-model="file" :placeholder="'select .aasx file'"></v-file-input>
+        <v-file-input
+          v-model="file"
+          accept=".aasx"
+          :placeholder="'select .aasx file'"
+        />
       </v-col>
       <v-col>
-        <v-btn color="info" @click="addSubmodels" :disabled="!file">
-          <v-icon>mdi-upload</v-icon> {{ 'Upload submodel AASX package' }}
+        <v-btn
+          color="info"
+          icon="mdi-upload"
+          :disabled="!file"
+          @click="addSubmodels"
+        >
+          {{ 'Upload submodel AASX package' }}
         </v-btn>
       </v-col>
     </v-row>
-    <confirm-dialog :show="submodelToDelete != null"
+    <confirm-dialog
+      :show="submodelToDelete !== null"
       :title="'Delete submodel ' + (submodelToDelete == null ? '' : submodelToDelete.idShort)"
-      text="Do you really want to delete this submodel?" @confirmed="deleteSubmodel(submodelToDelete)"
-      @canceled="submodelToDelete = null" />
+      text="Do you really want to delete this submodel?"
+      @confirmed="deleteSubmodel(submodelToDelete)"
+      @canceled="submodelToDelete = null"
+    />
   </div>
 </template>
 <script>
@@ -58,7 +84,12 @@ import getEnv from '@/utils/env'
 export default {
   name: 'ResourceSubmodels',
   components: { ConfirmDialog },
-  props: ['resourceId'],
+  props: {
+    resourceId: {
+      type: String,
+      default: ""
+    }
+  },
   data() {
     return {
       aasDescriptor: undefined,

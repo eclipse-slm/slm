@@ -49,7 +49,18 @@
       "DOCKER_CONTAINER",
       "DOCKER_COMPOSE"
     ],
-    "clusterMemberTypes": []
+    "clusterMemberTypes": [],
+    "executionEnvironment": {
+      "image": "ghcr.io/eclipse-slm/awx-ee-slm:1.4.0-snapshot",
+      "pull": "",
+      "description": "TEST TEST TEST",
+      "registryCredential": {
+        "description": "TEST TEST TEST",
+        "authenticationURL": "quary.io",
+        "username": "username-test",
+        "password": "password-test"
+      }
+    }
   },
   {
     "id": "b5cc76b3-c3cf-4df2-94ec-622245de34d1",

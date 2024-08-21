@@ -2,7 +2,7 @@
   <v-app-bar
     id="app-bar"
     absolute
-    app
+    order="1"
     color="transparent"
     flat
     height="75"
@@ -10,18 +10,10 @@
     <v-btn
       class="mr-3"
       elevation="1"
-      fab
-      small
-      @click="setDrawer(!drawer)"
-    >
-      <v-icon v-if="value">
-        mdi-view-quilt
-      </v-icon>
-
-      <v-icon v-else>
-        mdi-dots-vertical
-      </v-icon>
-    </v-btn>
+      size="small"
+      :icon="value ? 'mdi-view-quilt' : 'mdi-dots-vertical'"
+      @click="store.drawer = !drawer"
+    />
 
     <v-toolbar-title
       class="hidden-sm-and-down font-weight-light"
@@ -34,25 +26,22 @@
     <v-menu
       v-model="menu"
       :close-on-content-click="false"
-      bottom
-      left
-      offset-y
+      location="bottom"
+      start
+      target="[y]"
       origin="top right"
       transition="scale-transition"
       content-class="v-settings"
-      nudge-left="8"
+      offset="8"
     >
-      <template #activator="{ attrs, on }">
+      <template #activator="{ props }">
         <v-btn
           class="ml-2"
           min-width="0"
-          text
-          v-bind="attrs"
-          v-on="on"
+          variant="text"
+          v-bind="props"
         >
-          <v-icon color="primary">
-            settings
-          </v-icon>
+          <v-icon icon="mdi-cog" />
         </v-btn>
       </template>
 
@@ -95,10 +84,11 @@
 
             <v-col cols="auto">
               <v-switch
-                v-model="$vuetify.theme.dark"
+                :model-value="currentTheme === 'dark'"
                 class="ma-0 pa-0"
                 color="secondary"
                 hide-details
+                @click="toggleTheme"
               />
             </v-col>
           </v-row>
@@ -127,26 +117,25 @@
 
     <v-menu
       :close-on-content-click="false"
-      bottom
-      left
-      offset-y
+      location="bottom"
+      start
+      target="[y]"
       origin="top right"
     >
-      <template #activator="{ attrs }">
+      <template #activator="{ props }">
         <v-btn
-          v-if="notifications.length > 0"
+          v-if="notificationStore.notifications.length > 0"
           class="notification-btn ml-2"
           min-width="0"
-          text
-          v-bind="attrs"
+          variant="text"
+          v-bind="props"
           to="/notifications"
         >
           <v-badge
-            v-if="notifications_unread.length"
+            v-if="notificationStore.notifications_unread.length"
             color="red"
-            overlap
             bordered
-            :content="notifications_unread.length"
+            :content="notificationStore.notifications_unread.length"
           >
             <v-icon color="primary">
               mdi-bell
@@ -165,11 +154,9 @@
           class="ml-2"
           min-width="0"
           disabled
-          text
+          variant="text"
         >
-          <v-icon color="primary">
-            mdi-bell
-          </v-icon>
+          <v-icon icon="mdi-bell" />
         </v-btn>
       </template>
 
@@ -193,24 +180,21 @@
     </v-menu>
 
     <v-menu
-      bottom
-      left
-      offset-y
+      location="bottom"
+      start
+
       origin="top right"
       transition="scale-transition"
     >
-      <template #activator="{ attrs, on }">
+      <template #activator="{ props }">
         <v-btn
-          v-bind="attrs"
+          v-bind="props"
           id="user-menu-button"
           class="ml-2"
           min-width="0"
-          text
-          v-on="on"
+          variant="text"
         >
-          <v-icon color="primary">
-            mdi-account
-          </v-icon>
+          <v-icon icon="mdi-account" />
         </v-btn>
       </template>
 
@@ -219,27 +203,23 @@
           v-for="(item, index) in userIconMenuItems"
           :id="item.id"
           :key="index"
+          :title="item.title"
+          :append-icon="item.icon"
           @click="userIconMenuItemClick(index)"
-        >
-          <v-list-item-icon>
-            <v-icon
-              color="primary"
-            >
-              {{ item.icon }}
-            </v-icon>
-          </v-list-item-icon>
-          <v-list-item-title>{{ item.title }}</v-list-item-title>
-        </v-list-item>
+        />
       </v-list>
     </v-menu>
   </v-app-bar>
 </template>
 
 <script>
-  import { mapState, mapMutations, mapGetters } from 'vuex'
-  import Vue from 'vue'
 
-  export default {
+import {app} from "@/main";
+import {useTheme} from "vuetify";
+import {useNotificationStore} from "@/stores/notificationStore";
+import {useStore} from "@/stores/store";
+
+export default {
     name: 'DashboardCoreAppBar',
 
     components: {
@@ -250,6 +230,17 @@
         type: Boolean,
         default: false,
       },
+    },
+    setup(){
+      const theme = useTheme();
+      const currentTheme = theme.global.name;
+      const toggleTheme = () => {
+        theme.global.name = theme.global.current.dark ? 'light' : 'dark';
+      };
+      const notificationStore = useNotificationStore();
+      const store = useStore();
+
+      return {toggleTheme, currentTheme, notificationStore, store}
     },
 
     data: () => ({
@@ -278,37 +269,32 @@
           id: 'logout-button',
           icon: 'mdi-logout',
           click () {
-            Vue.prototype.$keycloak.logoutFn()
+            app.config.globalProperties.$keycloak.logoutFn()
           },
         },
       ],
     }),
 
     computed: {
-      ...mapState(['drawer']),
-      ...mapGetters([
-        'notifications',
-        'notifications_unread',
-      ]),
+      drawer() {
+        return this.store.drawer
+      },
     },
 
     watch: {
       color (val) {
         this.$vuetify.theme.themes[this.isDark ? 'dark' : 'light'].primary = val
-        this.setThemeColorMain(val)
+
       },
     },
 
     methods: {
-      ...mapMutations({
-        setDrawer: 'SET_DRAWER',
-        setThemeColorMain: 'SET_THEME_COLOR_MAIN',
-      }),
       userIconMenuItemClick (index) {
         this.userIconMenuItems[index].click.call(this)
       },
       removeNotification (index) {
-        this.$store.commit('REMOVE_NOTIFICATION', index)
+        const notificationStore = useNotificationStore();
+        // this.$store.commit('REMOVE_NOTIFICATION', index)
       },
     },
   }

@@ -23,7 +23,7 @@
         class="pt-0"
       >
         <v-card class="mt-0">
-          <v-card-text class="red--text text--darken-4">
+          <v-card-text class="text-red-darken-4">
             col-4
           </v-card-text>
         </v-card>
@@ -43,7 +43,7 @@
         class="pt-0"
       >
         <v-card class="mt-0">
-          <v-card-text class="red--text text--darken-4">
+          <v-card-text class="text-red-darken-4">
             col-sm-4
           </v-card-text>
         </v-card>
@@ -63,7 +63,7 @@
         class="pt-0"
       >
         <v-card class="mt-0">
-          <v-card-text class="red--text text--darken-4">
+          <v-card-text class="text-red-darken-4">
             col-md-4
           </v-card-text>
         </v-card>
@@ -83,7 +83,7 @@
         class="pt-0"
       >
         <v-card class="mt-0">
-          <v-card-text class="red--text text--darken-4">
+          <v-card-text class="text-red-darken-4">
             col-lg-4
           </v-card-text>
         </v-card>
@@ -103,7 +103,7 @@
         class="pt-0"
       >
         <v-card class="mt-0">
-          <v-card-text class="red--text text--darken-4">
+          <v-card-text class="text-red-darken-4">
             col-xl-4
           </v-card-text>
         </v-card>
@@ -123,7 +123,7 @@
         class="pt-0"
       >
         <v-card class="mt-0">
-          <v-card-text class="red--text text--darken-4">
+          <v-card-text class="text-red-darken-4">
             col-xl-4
           </v-card-text>
         </v-card>
@@ -142,7 +142,7 @@
         class="pt-0"
       >
         <v-card class="mt-0">
-          <v-card-text class="red--text text--darken-4">
+          <v-card-text class="text-red-darken-4">
             col-md-3
           </v-card-text>
         </v-card>
@@ -153,7 +153,7 @@
         class="ml-auto"
       >
         <v-card class="mt-0">
-          <v-card-text class="red--text text--darken-4">
+          <v-card-text class="text-red-darken-4">
             col-md-4 ml-auto mr-auto
           </v-card-text>
         </v-card>
@@ -168,7 +168,7 @@
         md="4"
       >
         <v-card class="mt-0">
-          <v-card-text class="red--text text--darken-4">
+          <v-card-text class="text-red-darken-4">
             col-md-4 ml-auto mr-auto
           </v-card-text>
         </v-card>
@@ -181,7 +181,7 @@
         md="6"
       >
         <v-card class="mt-0">
-          <v-card-text class="red--text text--darken-4">
+          <v-card-text class="text-red-darken-4">
             col-md-6 ml-auto mr-auto
           </v-card-text>
         </v-card>
