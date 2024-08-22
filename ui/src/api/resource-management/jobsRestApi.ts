@@ -1,6 +1,5 @@
-import axios from 'axios'
 import logRequestError from '@/api/restApiHelper'
-import {ClustersRestControllerApi, JobsRestControllerApi} from "@/api/resource-management/client";
+import {JobsRestControllerApi} from "@/api/resource-management/client";
 
 class JobsApi {
     API_URL = '/resource-management/jobs';
@@ -8,7 +7,7 @@ class JobsApi {
     api = new JobsRestControllerApi(undefined, "/resource-management");
     realm = 'fabos';
 
-    async getJobs () {
+    async getJobs() {
         return this.api.getJobs(this.realm)
             .then(response => {
                 let data = response.data;

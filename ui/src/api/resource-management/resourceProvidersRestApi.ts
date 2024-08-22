@@ -1,10 +1,5 @@
-import axios from 'axios'
 import logRequestError from '@/api/restApiHelper'
-import {
-    CapabilityProvidersRestControllerApi,
-    ProfilerRestControllerApi,
-    ResourcesRestControllerApi
-} from "@/api/resource-management/client";
+import {CapabilityProvidersRestControllerApi} from "@/api/resource-management/client";
 
 class ResourceProvidersApi {
     API_URL = '/resource-management/resources'
@@ -12,7 +7,7 @@ class ResourceProvidersApi {
     api = new CapabilityProvidersRestControllerApi(undefined, "/resource-management")
     realm = 'fabos'
 
-    async getVirtualResourceProviders () {
+    async getVirtualResourceProviders() {
         return this.api.getVirtualResourceProviders(this.realm)
             .then(response => {
                 return response.data
@@ -20,12 +15,12 @@ class ResourceProvidersApi {
             .catch(logRequestError)
     }
 
-    async getServiceHosters () {
+    async getServiceHosters() {
         return this.api.getServiceHosters(this.realm)
-          .then(response => {
-              return response.data
-          })
-          .catch(logRequestError)
+            .then(response => {
+                return response.data
+            })
+            .catch(logRequestError)
     }
 }
 

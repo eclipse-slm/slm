@@ -1,8 +1,7 @@
-import axios from 'axios'
 import logRequestError from '@/api/restApiHelper'
 import {
     CapabilitiesRestControllerApi,
-    CapabilityProvidersRestControllerApi, ClustersRestControllerApi,
+    ClustersRestControllerApi,
     ResourcesRestControllerApi
 } from "@/api/resource-management/client";
 
@@ -17,19 +16,20 @@ class ResourcesApi {
 //region Resources
     async getResourceConnectionTypes() {
 
-      return this.api.getResourceConnectionTypes('fabos')
-          .then(response => {
-              if (typeof response.data !== 'undefined') {
-                  return response.data
-              }
-          })
-        .catch((error) => {
-          console.debug(error)
-          return []
-        })
-        .catch(logRequestError)
+        return this.api.getResourceConnectionTypes('fabos')
+            .then(response => {
+                if (typeof response.data !== 'undefined') {
+                    return response.data
+                }
+            })
+            .catch((error) => {
+                console.debug(error)
+                return []
+            })
+            .catch(logRequestError)
     }
-    async getResources () {
+
+    async getResources() {
         return this.api.getResources('fabos')
             .then(response => {
                 if (typeof response.data !== 'undefined') {
@@ -39,20 +39,21 @@ class ResourcesApi {
             .catch((error) => {
                 console.debug(error)
                 return []
-              })
+            })
             .catch(logRequestError)
     }
-    async addExistingResource (
-      resourceHostname,
-      resourceIp,
-      resourceLocation,
-      resourceUsername,
-      resourcePassword,
-      resourceType,
-      resourceAccessAvailable,
-      resourceConnectionType,
-      resourceConnectionPort,
-      resourceBaseConfigurationId
+
+    async addExistingResource(
+        resourceHostname,
+        resourceIp,
+        resourceLocation,
+        resourceUsername,
+        resourcePassword,
+        resourceType,
+        resourceAccessAvailable,
+        resourceConnectionType,
+        resourceConnectionPort,
+        resourceBaseConfigurationId
     ) {
 
         return this.api.addExistingResource(
@@ -64,35 +65,38 @@ class ResourcesApi {
             })
             .catch(logRequestError)
     }
+
     /**
      * DELETE /{resourceId}
      * @param resourceId    Id of the resource which should be deleted.
      */
-    async deleteResource (resourceId) {
+    async deleteResource(resourceId) {
         return this.api.deleteResource(resourceId, this.realm)
             .then(response => {
                 return response.data
             })
             .catch(logRequestError)
     }
+
     //endregion
 
 
     //region Capabilities
-    async getDeploymentCapabilities () {
-    return this.capabilityApi.getCapabilities(this.realm)
-      .then(response => {
-        return response.data
-      })
-      .catch(logRequestError)
-  }
-    async createClusterResource (selectedNetwork, selectedClusterType, selectedClusterMembers) {
+    async getDeploymentCapabilities() {
+        return this.capabilityApi.getCapabilities(this.realm)
+            .then(response => {
+                return response.data
+            })
+            .catch(logRequestError)
+    }
+
+    async createClusterResource(selectedNetwork, selectedClusterType, selectedClusterMembers) {
         return this.clusterApi.createClusterResource(this.realm, selectedClusterMembers)
-      .then(response => {
-        return response.data
-      })
-      .catch(logRequestError)
-  }
+            .then(response => {
+                return response.data
+            })
+            .catch(logRequestError)
+    }
 
     async addCapabilityToSingleHost(resourceId, capabilityId, skipInstall, configParameters) {
 
@@ -108,7 +112,8 @@ class ResourcesApi {
             })
             .catch(logRequestError)
     }
-    async removeCapabilityFromSingleHost (resourceId, capabilityId) {
+
+    async removeCapabilityFromSingleHost(resourceId, capabilityId) {
 
         return this.capabilityApi.removeCapabilityFromSingleHost(resourceId, capabilityId, this.realm, {
             params: {
@@ -116,11 +121,12 @@ class ResourcesApi {
                 capabilityId,
             },
         })
-      .then(response => {
-        return response.data
-      })
-      .catch(logRequestError)
-  }
+            .then(response => {
+                return response.data
+            })
+            .catch(logRequestError)
+    }
+
     //endregion
     getOtp(project, ip, username) {
         return Promise.resolve('');
