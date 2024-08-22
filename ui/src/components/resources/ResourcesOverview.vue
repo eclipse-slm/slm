@@ -12,17 +12,6 @@
 
       <v-card-text v-else>
         <v-row>
-          <v-col cols="4">
-            <v-text-field
-              v-model="searchResources"
-              label="Search Resources"
-              append-inner-icon="mdi-magnify"
-              clearable
-            />
-          </v-col>
-        </v-row>
-
-        <v-row>
           <resources-table-single-hosts
             v-if="resources.length > 0"
             class="mt-0 flex"
@@ -101,14 +90,6 @@ export default {
       },
       clusters () {
         return this.resourceStore.clusters
-      },
-      searchResources: {
-        get () {
-          return this.resourceStore.searchResources_;
-        },
-        set (value) {
-          this.resourceStore.searchResources_ = value;
-        },
       },
     },
     mounted () {

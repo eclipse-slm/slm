@@ -21,7 +21,6 @@ interface ResourcesStoreState{
     allDevices_: {},
 
     selectedProject_: string,
-    searchResources_: string,
     selectedResource_: any,
     selectedResourceType_: any,
     selectedResourceForDelete_: any,
@@ -51,7 +50,6 @@ export const useResourcesStore = defineStore('resourcesStore', {
         allDevices_: {},
 
         selectedProject_: 'fabos',
-        searchResources_: '',
         selectedResource_: null,
         selectedResourceType_: null,
         selectedResourceForDelete_: null,
@@ -192,10 +190,6 @@ export const useResourcesStore = defineStore('resourcesStore', {
 
         search: (state) => {
             return state.search_
-        },
-
-        searchResources: (state) => {
-            return state.searchResources_
         },
     },
 
