@@ -4,19 +4,18 @@
       v-model="groupByServiceInstanceGroups"
       class="px-2 py-2"
       mandatory
+      base-color="disable"
       @update:modelValue="onGroupByServiceInstanceGroupsClicked"
     >
       <v-btn
-        size="small"
-        :color="groupByServiceInstanceGroups === 0 ? 'secondary' : 'disabled'"
+        :color="groupByServiceInstanceGroups === 0 ? 'secondary' : 'disable'"
       >
         <v-icon color="white">
           mdi-ungroup
         </v-icon>
       </v-btn>
       <v-btn
-        size="small"
-        :color="groupByServiceInstanceGroups === 1 ? 'secondary' : 'disabled'"
+        :color="groupByServiceInstanceGroups === 1 ? 'secondary' : 'disable'"
       >
         <v-icon color="white">
           mdi-group
