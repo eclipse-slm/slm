@@ -1,62 +1,73 @@
 <template>
   <v-container fluid>
-    <div>
-      <base-material-card>
-        <template #heading>
-          <overview-heading text="Jobs" />
-        </template>
-
-        <no-item-available-note
-          v-if="!jobs.length"
-          item="jobs"
+    <v-container fluid>
+      <div
+        v-if="apiStateLoading"
+        class="text-center"
+      >
+        <v-progress-circular
+          :size="70"
+          :width="7"
+          color="primary"
+          indeterminate
         />
+      </div>
+      <div v-if="apiStateError">
+        Error
+      </div>
 
-        <v-data-table
-          v-else
-          id="jobsTable"
-          :sort-by.sync="sortBy"
-          :footer-props="{
-            'items-per-page-options': [5, 10, 20, -1],
-          }"
-          :headers="DataTableHeaders"
-          item-key="id"
-          :items="jobs"
-        >
+      <div v-if="apiStateLoaded">
+        <base-material-card>
+          <template #heading>
+            <overview-heading text="Jobs" />
+          </template>
 
-          <template #item.id="{ item }">
-            <a
+          <no-item-available-note
+            v-if="jobs && !jobs.length > 0"
+            item="jobs"
+          />
+
+          <v-data-table
+            v-else
+            id="jobsTable"
+            :sort-by.sync="sortBy"
+            :footer-props="{
+              'items-per-page-options': [5, 10, 20, -1],
+            }"
+            :headers="DataTableHeaders"
+            item-key="id"
+            :items="jobs"
+          >
+            <template #item.id="{ item }">
+              <a
                 :href="`${awxURL}/#/jobs/playbook/${item.id}`"
                 target="_blank"
-            >{{ item.id }}</a>
-          </template>
+              >{{ item.id }}</a>
+            </template>
 
-          <template #item.name="{ item }">
-            {{ item.name }}
-          </template>
+            <template #item.name="{ item }">
+              {{ item.name }}
+            </template>
 
-          <template #item.started="{ item }">
-            {{ getFormattedDate(item.started) }}
-          </template>
+            <template #item.started="{ item }">
+              {{ getFormattedDate(item.started) }}
+            </template>
 
-          <template #item.finished="{ item }">
-            {{ getFormattedDate(item.finished) }}
-          </template>
+            <template #item.finished="{ item }">
+              {{ getFormattedDate(item.finished) }}
+            </template>
 
-          <template #item.status="{ item }">
-            <span v-if="item.status === 'running'">
-              {{ getFormattedTime(jobs_running.find(j => j.id === item.id).elapsed) }}
-            </span>
-            <span v-else-if="item.elapsed > 60">
-              {{ Math.floor(item.elapsed/60) }}m {{ Math.round(item.elapsed % 60) }}s
-            </span>
-            <span v-else>
-              {{ Math.round(item.elapsed % 60) }}s
-            </span>
-            {{ item.status }}
-          </template>
-        </v-data-table>
-      </base-material-card>
-    </div>
+            <template #item.elapsed="{ item }">
+              {{ getFormattedTime(item.elapsed) }}
+            </template>
+
+            <template #item.status="{ item }">
+              {{ item.status }}
+            </template>
+          </v-data-table>
+        </base-material-card>
+      </div>
+    </v-container>
   </v-container>
 </template>
 
@@ -66,6 +77,8 @@ import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 import getEnv from '@/utils/env'
 import {useJobsStore} from "@/stores/jobsStore";
+import ServiceInstancesOverview from "@/components/services/ServiceInstancesOverview.vue";
+import ApiState from "@/api/apiState";
 
 export default {
     name: 'JobsOverview',
@@ -80,11 +93,26 @@ export default {
     data: function () {
       return {
         observer: null,
-        sortBy: [{key: 'id', order: 'asc'}],
+        sortBy: [{key: 'id', order: 'desc'}],
         sortDesc: true,
       }
     },
     computed: {
+      apiStateJobs() {
+        return this.jobsStore.apiStateJobs
+      },
+      apiStateLoaded () {
+        return this.apiStateJobs === ApiState.LOADED
+      },
+      apiStateLoading () {
+        if (this.apiStateJobs === ApiState.INIT) {
+          this.jobsStore.updateJobsStore();
+        }
+        return this.apiStateJobs === ApiState.LOADING || this.apiStateJobs === ApiState.INIT
+      },
+      apiStateError () {
+        return this.apiStateJobs === ApiState.ERROR
+      },
       jobs () {
         return this.jobsStore.jobs
       },
@@ -116,13 +144,30 @@ export default {
           return ''
         }
       },
-      getFormattedTime (time) {
-        // const milliseconds = parseInt((time % 1000))
-        const seconds = parseInt((time / 1000) % 60)
-        const minutes = parseInt((time / (1000 * 60)) % 60)
-        // const hours = parseInt((time / (1000 * 60 * 60)) % 24)
+      getFormattedTime (duration) {
+        // Hours, minutes and seconds
+        const hrs = ~~(duration / 3600);
+        const mins = ~~((duration % 3600) / 60);
+        const secs = ~~duration % 60;
 
-        return (minutes > 0) ? `${minutes}m ${seconds}s` : `${seconds}s`
+        // Output like "1:01" or "4:03:59" or "123:03:59"
+        let ret = "";
+
+        if (hrs > 0) {
+          ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+        }
+
+        ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+        ret += "" + secs;
+
+        return ret;
+
+        // // const milliseconds = parseInt((time % 1000))
+        // const seconds = parseInt((time / 1000) % 60)
+        // const minutes = parseInt((time / (1000 * 60)) % 60)
+        // // const hours = parseInt((time / (1000 * 60 * 60)) % 24)
+        //
+        // return (minutes > 0) ? `${minutes}m ${seconds}s` : `${seconds}s`
       },
     },
   }
