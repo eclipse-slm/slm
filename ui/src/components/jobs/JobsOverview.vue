@@ -1,9 +1,7 @@
 <template>
   <v-container fluid>
     <div>
-      <base-material-card
-        class="px-5 py-3"
-      >
+      <base-material-card>
         <template #heading>
           <overview-heading text="Jobs" />
         </template>

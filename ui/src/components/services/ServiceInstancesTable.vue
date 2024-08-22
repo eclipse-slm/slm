@@ -2,7 +2,7 @@
   <v-card>
     <v-btn-toggle
       v-model="groupByServiceInstanceGroups"
-      class="px-4 py-4"
+      class="px-2 py-2"
       mandatory
       @update:modelValue="onGroupByServiceInstanceGroupsClicked"
     >

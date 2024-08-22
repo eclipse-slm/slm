@@ -12,9 +12,7 @@
 
     <div v-if="apiStateLoaded">
       <div v-if="serviceOfferings.length === 0">
-        <base-material-card
-          class="px-5 py-3"
-        >
+        <base-material-card>
           <template #heading>
             <v-container
               fluid

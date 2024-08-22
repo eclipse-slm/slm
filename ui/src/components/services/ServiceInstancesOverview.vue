@@ -1,8 +1,6 @@
 <template>
   <div>
-    <base-material-card
-      class="px-5 py-3"
-    >
+    <base-material-card>
       <template #heading>
         <overview-heading text="Service Instances" />
       </template>
