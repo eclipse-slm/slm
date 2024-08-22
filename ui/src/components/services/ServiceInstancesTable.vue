@@ -49,7 +49,7 @@
           <td :colspan="columns.length">
             <v-btn
               :icon="isGroupOpen(item) ? '$expand' : '$next'"
-              size="small"
+              class="ma-2"
               variant="text"
               @click="toggleGroup(item)"
             />

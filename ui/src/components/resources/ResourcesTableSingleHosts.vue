@@ -246,7 +246,7 @@
           </v-menu>
           <v-btn
             :disabled="item.clusterMember"
-            class="ml-4 resource-single-host-delete"
+            class="ma-2 resource-single-host-delete"
             color="error"
             @click.stop="resourceToDelete = item"
           >
