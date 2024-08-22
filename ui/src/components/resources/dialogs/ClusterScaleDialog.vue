@@ -165,7 +165,7 @@
 
 <script>
 
-import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
+import ClustersRestApi from '@/api/resource-management/clustersRestApi'
 import {useResourcesStore} from "@/stores/resourcesStore";
 
 export default {

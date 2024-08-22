@@ -1,12 +1,19 @@
 import axios from 'axios'
 import logRequestError from '@/api/restApiHelper'
+import {
+    CapabilityProvidersRestControllerApi,
+    ProfilerRestControllerApi,
+    ResourcesRestControllerApi
+} from "@/api/resource-management/client";
 
 class ResourceProvidersApi {
     API_URL = '/resource-management/resources'
 
+    api = new CapabilityProvidersRestControllerApi(undefined, "/resource-management")
+    realm = 'fabos'
+
     async getVirtualResourceProviders () {
-        return axios
-            .get(this.API_URL + '/providers/virtual-resource-provider')
+        return this.api.getVirtualResourceProviders(this.realm)
             .then(response => {
                 return response.data
             })
@@ -14,8 +21,7 @@ class ResourceProvidersApi {
     }
 
     async getServiceHosters () {
-        return axios
-          .get(this.API_URL + '/providers/service-hoster')
+        return this.api.getServiceHosters(this.realm)
           .then(response => {
               return response.data
           })

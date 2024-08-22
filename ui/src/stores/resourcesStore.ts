@@ -1,12 +1,13 @@
-import ResourcesRestApi from '@/api/resource-management/resourcesRestApi.js'
-import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
-import LocationsRestApi from '@/api/resource-management/locationsRestApi.js'
-import ProfilerRestApi from '@/api/resource-management/profilerRestApi.js'
+import ResourcesRestApi from '@/api/resource-management/resourcesRestApi'
+import ClustersRestApi from '@/api/resource-management/clustersRestApi'
+import LocationsRestApi from '@/api/resource-management/locationsRestApi'
+import ProfilerRestApi from '@/api/resource-management/profilerRestApi'
 import ApiState from '@/api/apiState'
 import AasRestApi from "@/api/resource-management/aasRestApi";
 import {app} from "@/main";
 import {defineStore} from "pinia";
 import {useProviderStore} from "@/stores/providerStore";
+import {ResourcesRestControllerApi} from "@/api/resource-management/client";
 
 interface ResourcesStoreState{
     apiStateResources_: number,
@@ -36,7 +37,11 @@ interface ResourcesStoreState{
     search_: string
 }
 
+
+const resourcesApi = new ResourcesRestControllerApi(undefined, '/resource-management');
+
 export const useResourcesStore = defineStore('resourcesStore', {
+
     persist: true,
     state:():ResourcesStoreState => ({
         apiStateResources_: ApiState.INIT,
@@ -270,14 +275,17 @@ export const useResourcesStore = defineStore('resourcesStore', {
             return await ResourcesRestApi.getResources()
                 .then(
                     resources => {
-                        resources.forEach(resource => {
-                            // MetricsRestApi.getMetricsOfResource(resource.id).then(metrics => {
-                            //     resource.metrics = metrics
-                            // })
-                        })
-                        this.setResources(resources)
-                        this.setAvailableResourceTypes(resources);
-                        this.apiStateResources_ = ApiState.LOADED;
+                        if (resources){
+                            resources.forEach(resource => {
+                                // MetricsRestApi.getMetricsOfResource(resource.id).then(metrics => {
+                                //     resource.metrics = metrics
+                                // })
+                            })
+                            this.setResources(resources)
+                            this.setAvailableResourceTypes(resources);
+                            this.apiStateResources_ = ApiState.LOADED;
+                        }
+
                     })
                 .catch(e => {
                     console.debug(e)
@@ -319,7 +327,9 @@ export const useResourcesStore = defineStore('resourcesStore', {
             return await  ProfilerRestApi.getProfiler()
                 .then(
                     profiler => {
-                        this.profiler_ = profiler;
+                        if (profiler){
+                            this.profiler_ = profiler;
+                        }
                     }
                 )
                 .catch(e => {
@@ -332,7 +342,9 @@ export const useResourcesStore = defineStore('resourcesStore', {
             return await ResourcesRestApi.getResourceConnectionTypes()
                 .then(
                     resourceConnectionTypes => {
-                        this.resourceConnectionTypes_ = resourceConnectionTypes;
+                        if(resourceConnectionTypes){
+                            this.resourceConnectionTypes_ = resourceConnectionTypes;
+                        }
                     }
                 )
                 .catch(e => {
@@ -369,14 +381,18 @@ export const useResourcesStore = defineStore('resourcesStore', {
         async getClusterTypes () {
             return await ClustersRestApi.getClusterTypes()
                 .then(response => {
-                    this.setAvailableClusterTypes(response)
+                    if(response){
+                        this.setAvailableClusterTypes(response)
+                    }
                 })
         },
 
         async getDeploymentCapabilities () {
             return await ResourcesRestApi.getDeploymentCapabilities()
                 .then(response => {
-                    this.setAvailableDeploymentCapabilities(response);
+                    if(response){
+                        this.setAvailableDeploymentCapabilities(response);
+                    }
                 })
         },
 

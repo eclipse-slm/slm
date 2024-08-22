@@ -1,13 +1,19 @@
 import axios from 'axios'
 import logRequestError from '@/api/restApiHelper'
+import {
+  CapabilitiesRestControllerApi,
+  ClustersRestControllerApi,
+  ResourcesRestControllerApi, SubmodelsRestControllerApi
+} from "@/api/resource-management/client";
 
 class SubmodelsApi {
   API_URL = '/resource-management/resources'
 
+  api = new SubmodelsRestControllerApi(undefined, "/resource-management")
+  realm = 'fabos'
+
   async getResourceSubmodels(resourceId) {
-    return axios.get(
-      this.API_URL + `/${resourceId}/submodels`,
-    )
+    return this.api.getResourceSubmodels(resourceId, this.realm)
       .then(response => {
         return response.data
       })
@@ -15,8 +21,7 @@ class SubmodelsApi {
   }
 
   async deleteSubmodel(resourceId, submodelIdShort) {
-    return axios
-      .delete(this.API_URL + `/${resourceId}/submodels/${submodelIdShort}`, {})
+    return this.api.deleteSubmodel(resourceId, submodelIdShort, this.realm)
       .then(response => {
         return response.data
       })
@@ -24,9 +29,9 @@ class SubmodelsApi {
   }
 
   async addSubmodels(resourceId, file) {
-    const formData = new FormData()
-    formData.append('aasx', file, file.name)
-    return axios.post(this.API_URL + `/${resourceId}/submodels`, formData).then(response => {
+
+    return this.api.addSubmodels(resourceId, this.realm, {aasx: file})
+        .then(response => {
       return response.data
     }).catch(logRequestError)
   }

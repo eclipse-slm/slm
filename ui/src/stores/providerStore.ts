@@ -25,13 +25,17 @@ export const useProviderStore = defineStore('providerStore', {
     async getVirtualResourceProviders () {
       return await ResourceProvidersRestApi.getVirtualResourceProviders()
           .then(response => {
-            this.virtualResourceProviders_ = response;
+            if(response){
+              this.virtualResourceProviders_ = response;
+            }
           })
     },
     async getServiceHosters () {
       return await ResourceProvidersRestApi.getServiceHosters()
           .then(response => {
-            this.serviceHosters_ = response;
+            if(response){
+              this.serviceHosters_ = response;
+            }
           })
     }
   },

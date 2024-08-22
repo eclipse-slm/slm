@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
+import ClustersRestApi from '@/api/resource-management/clustersRestApi'
 
 import {toRef} from "vue";
 import {useServicesStore} from "@/stores/servicesStore";

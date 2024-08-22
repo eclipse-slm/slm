@@ -1,12 +1,19 @@
 import axios from 'axios'
 import logRequestError from '@/api/restApiHelper'
+import {
+    ClusterCreateRequest,
+    ClustersRestControllerApi,
+    SubmodelTemplatesRestControllerApi
+} from "@/api/resource-management/client";
 
 class ClustersRestApi {
     API_URL = '/resource-management/resources/clusters'
 
+    api = new ClustersRestControllerApi(undefined, "/resource-management")
+    realm = 'fabos'
+
     async getClusterTypes () {
-      return axios
-          .get(this.API_URL + '/types')
+      return this.api.getClusterTypes(this.realm)
           .then(response => {
               return response.data
           })
@@ -14,8 +21,7 @@ class ClustersRestApi {
     }
 
     async getCluster () {
-        return axios
-          .get(this.API_URL)
+        return this.api.getClusterResources(this.realm)
           .then(response => {
               if (typeof response.data !== 'undefined') {
                 return response.data
@@ -25,15 +31,16 @@ class ClustersRestApi {
     }
 
     async createClusterResource (clusterTypeId, skipInstall, clusterMembers, configParameterValues) {
-        let clusterCreateRequest = {
-            clusterTypeId,
-            skipInstall,
-            clusterMembers,
-            configParameterValues
-        }
 
-        return axios
-            .post(this.API_URL, clusterCreateRequest)
+        let clusterCreateRequest = {
+            clusterTypeId: clusterTypeId,
+            skipInstall: skipInstall,
+            clusterMembers: clusterMembers,
+            configParameterValues: configParameterValues
+        };
+
+
+        return this.api.createClusterResource(this.realm, clusterCreateRequest)
             .then(response => {
                 return response.data
             })
@@ -41,8 +48,7 @@ class ClustersRestApi {
     }
 
     async deleteClusterResource (clusterId) {
-        return axios
-            .delete(`${this.API_URL}/${clusterId}`)
+        return this.api.deleteClusterResource(clusterId, this.realm)
             .then(response => {
                 return response.data
             })
@@ -50,27 +56,14 @@ class ClustersRestApi {
     }
 
     async addMemberToCluster (clusterUuid, resourceId) {
-        return await axios.post(
-            `${this.API_URL}/${clusterUuid}/members`,
-            {},
-            {
-                params: {
-                    resourceId,
-                },
-            })
+        return this.api.addClusterMember(clusterUuid, resourceId, this.realm)
             .then(response => {
                 return response.data
             })
     }
 
     async removeMemberFromCluster (clusterUuid, resourceId) {
-        return await axios.delete(
-            `${this.API_URL}/${clusterUuid}/members`,
-            {
-                params: {
-                    resourceId,
-                },
-            })
+        return await this.api.removeClusterMember(clusterUuid, resourceId, this.realm)
             .then(response => {
                 return response.data
             })

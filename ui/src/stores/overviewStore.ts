@@ -17,7 +17,10 @@ export const useOverviewStore = defineStore('overviewStore', {
   },
   actions: {
     async getResourcesOverview () {
-      this.resources = await ResourcesRestApi.getResources();
+      const resources = await ResourcesRestApi.getResources();
+      if (resources){
+        this.resources = resources;
+      }
     },
   },
 });
