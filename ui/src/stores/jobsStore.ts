@@ -44,8 +44,8 @@ export const useJobsStore = defineStore('jobsStore', {
                   clearInterval(this.timeoutObject)
                 }
               }
-              this.apiStateJobs_ = ApiState.LOADED
             }
+            this.apiStateJobs_ = ApiState.LOADED
           },
       )
     },
