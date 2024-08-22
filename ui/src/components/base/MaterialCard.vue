@@ -2,7 +2,7 @@
   <v-card
     v-bind="$attrs"
     :class="classes"
-    class="v-card--material pa-3"
+    class="v-card--material pa-3 px-5 py-3"
     style="margin-top: 30px; margin-bottom: 15px;"
   >
     <div class="d-flex grow flex-wrap">

@@ -122,9 +122,10 @@ vault:
   host: localhost
   port: 8200
   authentication: APPROLE
+  #  token: your-secret-token
   app-role:
     role-id: resource-management
-    secret-id: 48a319fa-f100-9b27-afa7-676809ba29fd
+    secret-id: your-secret-id
     app-role-path: approle
 
 ### Consul

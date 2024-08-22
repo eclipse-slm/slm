@@ -31,6 +31,7 @@
           <td>
             <v-btn
               color="error"
+              class="ma-2"
               @click.stop="submodelToDelete = submodel"
             >
               <v-icon icon="mdi-delete" />
@@ -47,22 +48,25 @@
         {{ 'No submodels found.' }}
       </v-alert>
     </div>
-    <v-row class="align-center">
+    <v-row align="center">
       <v-col>
         <v-file-input
           v-model="file"
           accept=".aasx"
-          :placeholder="'select .aasx file'"
+          :placeholder="'Select .aasx file'"
+          variant="underlined"
         />
       </v-col>
       <v-col>
         <v-btn
           color="info"
-          icon="mdi-upload"
           :disabled="!file"
           @click="addSubmodels"
         >
-          {{ 'Upload submodel AASX package' }}
+          <v-icon
+            icon="mdi-upload"
+            color="white"
+          />
         </v-btn>
       </v-col>
     </v-row>

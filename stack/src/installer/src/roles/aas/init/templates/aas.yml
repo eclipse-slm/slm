@@ -156,6 +156,8 @@ services:
         aliases:
           - aas-transformer
     environment:
+      AAS_BROKER_HOST: aas-broker
+      AAS_BROKER_PORT: 1883
       DATABASE_HOST: aas-transformer-database
       DATABASE_SCHEMA: "{{ AAS_TRANSFORMER_DATABASE_NAME }}"
       DATABASE_USERNAME: "{{ AAS_TRANSFORMER_DATABASE_USER }}"

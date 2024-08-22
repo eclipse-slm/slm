@@ -1,5 +1,80 @@
 <template>
-  <v-card class="v-sheet">
+  <v-container fluid>
+    <v-row
+      dense
+      class="ml-8 mb-8"
+      align="center"
+    >
+      <v-text-field
+        v-model="searchResources"
+        label="Search resources"
+        append-inner-icon="mdi-magnify"
+        clearable
+        variant="underlined"
+      />
+      <v-spacer />
+      <v-spacer />
+      <v-tooltip
+        start
+        close-delay="2000"
+      >
+        <template #activator="{ props }">
+          <v-btn
+            v-if="profiler.length > 0"
+            color="secondary"
+            v-bind="props"
+            @click="runProfiler"
+          >
+            <v-icon
+              icon="mdi-tab-search"
+              color="white"
+            />
+          </v-btn>
+        </template>
+        <span>Run all available <a href="https://eclipse-slm.github.io/slm/docs/usage/profiler/">profilers</a> on all devices</span>
+      </v-tooltip>
+      <div v-if="resourcesHaveLocations()">
+        <div class="mr-10">
+          <v-btn-toggle
+            v-model="groupBy"
+            mandatory
+          >
+            <v-btn
+              size="small"
+              :model-value="null"
+              :color="groupBy == null ? 'secondary' : 'disabled'"
+              style="height:40px"
+            >
+              <v-icon>mdi-ungroup</v-icon>
+            </v-btn>
+            <v-btn
+              size="small"
+              model-value="location.name"
+              :color="groupBy === 'location.name' ? 'secondary' : 'disabled'"
+              style="height:40px"
+            >
+              <v-icon>mdi-group</v-icon>
+            </v-btn>
+          </v-btn-toggle>
+        </div>
+        <div class="mr-10">
+          <v-select
+            v-model="filterResourcesByLocations"
+            :items="locations"
+            item-title="name"
+            item-value="id"
+            label="filter by location"
+            density="compact"
+            variant="outlined"
+            hide-details
+            closable-chips
+            multiple
+            clearable
+            @update:modelValue="filterResources"
+          />
+        </div>
+      </div>
+    </v-row>
     <v-data-table
       id="resource-table-single-host"
       :headers="tableHeaders"
@@ -11,76 +86,7 @@
 
       @click:row="setSelectedResource"
     >
-      <template #top>
-        <v-toolbar flat>
-          <v-spacer />
-          <v-toolbar-title>
-            <v-tooltip
-              start
-              close-delay="2000"
-            >
-              <template #activator="{ props }">
-                <v-btn
-                  v-if="areProfilerAvailable"
-                  color="primary"
-                  v-bind="props"
-                  @click="runProfiler"
-                >
-                  <v-icon
-                    icon="mdi-magnify"
-                    color="white"
-                  />
-                </v-btn>
-              </template>
-              <span>Runs all <a href="https://eclipse-slm.github.io/slm/docs/usage/profiler/">profiler</a> on all devices</span>
-            </v-tooltip>
-          </v-toolbar-title>
-        </v-toolbar>
-        <v-toolbar-items
-          v-if="resourcesHaveLocations()"
-          class="ml-8 mb-8"
-        >
-          <div class="mr-10">
-            <v-btn-toggle
-              v-model="groupBy"
-              mandatory
-            >
-              <v-btn
-                size="small"
-                :model-value="null"
-                :color="groupBy == null ? 'secondary' : 'disabled'"
-                style="height:40px"
-              >
-                <v-icon>mdi-ungroup</v-icon>
-              </v-btn>
-              <v-btn
-                size="small"
-                model-value="location.name"
-                :color="groupBy === 'location.name' ? 'secondary' : 'disabled'"
-                style="height:40px"
-              >
-                <v-icon>mdi-group</v-icon>
-              </v-btn>
-            </v-btn-toggle>
-          </div>
-          <div class="mr-10">
-            <v-select
-              v-model="filterResourcesByLocations"
-              :items="locations"
-              item-title="name"
-              item-value="id"
-              label="filter by location"
-              density="compact"
-              variant="outlined"
-              hide-details
-              closable-chips
-              multiple
-              clearable
-              @update:modelValue="filterResources"
-            />
-          </div>
-        </v-toolbar-items>
-      </template>
+      <template #top />
 
       <template #group.header="{items, isOpen, toggle}">
         <th
@@ -164,6 +170,7 @@
         <v-icon>{{ getOsIcon(item.remoteAccessService) }}</v-icon>
       </template>
 
+      <!-- Column: Actions -->
       <template
         #item.actions="{ item }"
       >
@@ -239,7 +246,7 @@
           </v-menu>
           <v-btn
             :disabled="item.clusterMember"
-            class="ml-4 resource-single-host-delete"
+            class="ma-2 resource-single-host-delete"
             color="error"
             @click.stop="resourceToDelete = item"
           >
@@ -263,7 +270,7 @@
       @install="runAddCapability"
       @canceled="unsetSelected()"
     />
-  </v-card>
+  </v-container>
 </template>
 
 <script>
@@ -313,7 +320,8 @@ export default {
         selectedSkipInstall: null,
         selectedParamMap: null,
         filterResourcesByLocations: [],
-        filteredResources: []
+        filteredResources: [],
+        searchResources: undefined
       }
     },
     computed: {
@@ -326,18 +334,11 @@ export default {
       profiler() {
         return this.resourceStore.profiler
       },
-      searchResources () {
-        return this.resourceStore.searchResources
-      },
       selectedResourceForDelete () {
         return this.resourceStore.selectedResourceForDelete
       },
       availableSingleHostCapabilitiesNoDefault() {
         return this.resourceStore.availableSingleHostCapabilitiesNoDefault
-      },
-
-      areProfilerAvailable() {
-        return this.profiler.length > 0;
       },
       showCapabilityParamsDialog() {
         if(this.selectedResourceId !== null && this.selectedCapabilityId !== null && this.selectedSkipInstall !== null)
@@ -575,5 +576,11 @@ export default {
 
 .v-tooltip__content {
   pointer-events: initial;
+}
+
+.v-overlay__content {
+  --v-theme-surface-variant: 255, 255, 255;
+  --v-theme-on-surface-variant: 0, 0, 0;
+  border: 1px solid black;
 }
 </style>

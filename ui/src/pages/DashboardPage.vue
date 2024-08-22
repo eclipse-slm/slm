@@ -80,7 +80,7 @@
         cols="12"
         lg="8"
       >
-        <base-material-card class="px-5 py-3">
+        <base-material-card>
           <template #heading>
             <v-container
               fluid

@@ -14,8 +14,8 @@ FROM nginx:stable as production-stage
 EXPOSE 80
 
 ENV NOTIFICATION_SERVICE_URL="http://notification-service:9001/" \
-    RESOURCE_REGISTRY_URL="http://resource-management:9010/" \
-    SERVICE_REGISTRY_URL="http://service-management:9020/" \
+    RESOURCE_MANAGEMENT_URL="http://resource-management:9010/" \
+    SERVICE_MANAGEMENT_URL="http://service-management:9020/" \
     KEYCLOAK_URL="http://keycloak:8080/auth" \
     KEYCLOAK_REALM="fabos" \
     KEYCLOAK_CLIENT_ID="ui" \

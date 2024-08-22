@@ -1,7 +1,7 @@
 #!/bin/sh
 JSON_STRING='window.configs = { \
-  "VUE_APP_RESOURCE_REGISTRY_URL":"'"${RESOURCE_REGISTRY_URL}"'", \
-  "VUE_APP_SERVICE_REGISTRY_URL":"'"${SERVICE_REGISTRY_URL}"'", \
+  "VUE_APP_RESOURCE_MANAGEMENT_URL":"'"${RESOURCE_MANAGEMENT_URL}"'", \
+  "VUE_APP_SERVICE_MANAGEMENT_URL":"'"${SERVICE_MANAGEMENT_URL}"'", \
   "VUE_APP_NOTIFICATION_SERVICE_URL":"'"${NOTIFICATION_SERVICE_URL}"'", \
   "VUE_APP_KEYCLOAK_URL":"'"${KEYCLOAK_URL}"'", \
   "VUE_APP_KEYCLOAK_REALM":"'"${KEYCLOAK_REALM}"'", \
@@ -12,7 +12,7 @@ JSON_STRING='window.configs = { \
 }'
 sed -i "s@// CONFIGURATIONS_PLACEHOLDER@${JSON_STRING}@" /usr/share/nginx/html/index.html
 
-#envsubst '$RESOURCE_REGISTRY_URL,$SERVICE_REGISTRY_URL,$NOTIFICATION_SERVICE_URL,$CATALOG_SERVICE_URL' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
+#envsubst '$RESOURCE_MANAGEMENT_URL,$SERVICE_MANAGEMENT_URL,$NOTIFICATION_SERVICE_URL,$CATALOG_SERVICE_URL' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
 
 # Wait until Keycloak is running
 echo "Keycloak availability test URL: $KEYCLOAK_URL/realms/$KEYCLOAK_REALM/.well-known/openid-configuration"
@@ -28,13 +28,13 @@ until curl -m 5 -s --location --request GET "$NOTIFICATION_SERVICE_URL/v3/api-do
 done
 
 # Wait until Resource Management is running
-until curl -m 5 -s --location --request GET "$RESOURCE_REGISTRY_URL/v3/api-docs" > /dev/null; do
+until curl -m 5 -s --location --request GET "$RESOURCE_MANAGEMENT_URL/v3/api-docs" > /dev/null; do
   echo "Resource Management is unavailable -> sleeping"
   sleep 1
 done
 
 # Wait until Service Management is running
-until curl -m 5 -s --location --request GET "$SERVICE_REGISTRY_URL/v3/api-docs" > /dev/null; do
+until curl -m 5 -s --location --request GET "$SERVICE_MANAGEMENT_URL/v3/api-docs" > /dev/null; do
   echo "Service Management is unavailable -> sleeping"
   sleep 1
 done

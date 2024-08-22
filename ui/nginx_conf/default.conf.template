@@ -8,12 +8,12 @@ server {
     # https://www.nginx.com/blog/websocket-nginx/
 
     location /resource-management/ {
-        proxy_pass ${RESOURCE_REGISTRY_URL};
+        proxy_pass ${RESOURCE_MANAGEMENT_URL};
         proxy_set_header Origin "";
     }
 
     location /service-management/ {
-        proxy_pass ${SERVICE_REGISTRY_URL};
+        proxy_pass ${SERVICE_MANAGEMENT_URL};
         proxy_set_header Origin "";
     }
 
