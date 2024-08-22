@@ -1,30 +1,33 @@
 <template>
   <v-container fluid>
-    <v-row dense
-           class="ml-8 mb-8"
-           align="center">
+    <v-row
+      dense
+      class="ml-8 mb-8"
+      align="center"
+    >
       <v-text-field
-          v-model="searchResources"
-          label="Search Resources"
-          append-inner-icon="mdi-magnify"
-          clearable
-          small
+        v-model="searchResources"
+        label="Search resources"
+        append-inner-icon="mdi-magnify"
+        clearable
+        variant="underlined"
       />
-      <v-spacer></v-spacer>
+      <v-spacer />
+      <v-spacer />
       <v-tooltip
-          start
-          close-delay="2000"
+        start
+        close-delay="2000"
       >
         <template #activator="{ props }">
           <v-btn
-              v-if="profiler.length > 0"
-              color="secondary"
-              v-bind="props"
-              @click="runProfiler"
+            v-if="profiler.length > 0"
+            color="secondary"
+            v-bind="props"
+            @click="runProfiler"
           >
             <v-icon
-                icon="mdi-tab-search"
-                color="white"
+              icon="mdi-tab-search"
+              color="white"
             />
           </v-btn>
         </template>
@@ -33,22 +36,22 @@
       <div v-if="resourcesHaveLocations()">
         <div class="mr-10">
           <v-btn-toggle
-              v-model="groupBy"
-              mandatory
+            v-model="groupBy"
+            mandatory
           >
             <v-btn
-                size="small"
-                :model-value="null"
-                :color="groupBy == null ? 'secondary' : 'disabled'"
-                style="height:40px"
+              size="small"
+              :model-value="null"
+              :color="groupBy == null ? 'secondary' : 'disabled'"
+              style="height:40px"
             >
               <v-icon>mdi-ungroup</v-icon>
             </v-btn>
             <v-btn
-                size="small"
-                model-value="location.name"
-                :color="groupBy === 'location.name' ? 'secondary' : 'disabled'"
-                style="height:40px"
+              size="small"
+              model-value="location.name"
+              :color="groupBy === 'location.name' ? 'secondary' : 'disabled'"
+              style="height:40px"
             >
               <v-icon>mdi-group</v-icon>
             </v-btn>
@@ -56,18 +59,18 @@
         </div>
         <div class="mr-10">
           <v-select
-              v-model="filterResourcesByLocations"
-              :items="locations"
-              item-title="name"
-              item-value="id"
-              label="filter by location"
-              density="compact"
-              variant="outlined"
-              hide-details
-              closable-chips
-              multiple
-              clearable
-              @update:modelValue="filterResources"
+            v-model="filterResourcesByLocations"
+            :items="locations"
+            item-title="name"
+            item-value="id"
+            label="filter by location"
+            density="compact"
+            variant="outlined"
+            hide-details
+            closable-chips
+            multiple
+            clearable
+            @update:modelValue="filterResources"
           />
         </div>
       </div>
@@ -83,9 +86,7 @@
 
       @click:row="setSelectedResource"
     >
-      <template #top>
-
-      </template>
+      <template #top />
 
       <template #group.header="{items, isOpen, toggle}">
         <th
@@ -169,6 +170,7 @@
         <v-icon>{{ getOsIcon(item.remoteAccessService) }}</v-icon>
       </template>
 
+      <!-- Column: Actions -->
       <template
         #item.actions="{ item }"
       >

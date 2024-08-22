@@ -10,31 +10,10 @@
         item="services"
       />
       <v-card-text v-else>
-        <v-row>
-          <!--            <v-select-->
-          <!--              :value="selectedServiceType"-->
-          <!--              :items="availableServiceTypes"-->
-          <!--              label="Resource Type"-->
-          <!--              clearable-->
-          <!--              @update:modelValue="updateSelectedResourceType"-->
-          <!--            />-->
-          <v-spacer />
-          <!--            <v-text-field-->
-          <!--              v-model="searchServices"-->
-          <!--              label="Search services"-->
-          <!--              append-icon="search"-->
-          <!--              clearable-->
-          <!--            />-->
-        </v-row>
-
-        <v-row>
-          <v-col>
-            <service-instances-table
-              class="mt-0"
-              @service-instance-clicked="onServiceInstanceClicked"
-            />
-          </v-col>
-        </v-row>
+        <service-instances-table
+          class="mt-0 flex"
+          @service-instance-clicked="onServiceInstanceClicked"
+        />
       </v-card-text>
     </base-material-card>
 

@@ -1,32 +1,45 @@
 <template>
-  <v-card>
-    <v-btn-toggle
-      v-model="groupByServiceInstanceGroups"
-      class="px-2 py-2"
-      mandatory
-      base-color="disable"
-      @update:modelValue="onGroupByServiceInstanceGroupsClicked"
-    >
-      <v-btn
-        :color="groupByServiceInstanceGroups === 0 ? 'secondary' : 'disable'"
+  <v-container fluid>
+    <v-row>
+      <v-text-field
+        v-model="searchServices"
+        label="Search services"
+        append-inner-icon="mdi-magnify"
+        clearable
+        variant="underlined"
+      />
+      <v-spacer />
+      <v-spacer />
+      <v-btn-toggle
+        v-model="groupByServiceInstanceGroups"
+        class="px-2 py-2"
+        mandatory
+        base-color="disable"
+        @update:modelValue="onGroupByServiceInstanceGroupsClicked"
       >
-        <v-icon color="white">
-          mdi-ungroup
-        </v-icon>
-      </v-btn>
-      <v-btn
-        :color="groupByServiceInstanceGroups === 1 ? 'secondary' : 'disable'"
-      >
-        <v-icon color="white">
-          mdi-group
-        </v-icon>
-      </v-btn>
-    </v-btn-toggle>
+        <v-btn
+          :color="groupByServiceInstanceGroups === 0 ? 'secondary' : 'disable'"
+        >
+          <v-icon color="white">
+            mdi-ungroup
+          </v-icon>
+        </v-btn>
+        <v-btn
+          :color="groupByServiceInstanceGroups === 1 ? 'secondary' : 'disable'"
+        >
+          <v-icon color="white">
+            mdi-group
+          </v-icon>
+        </v-btn>
+      </v-btn-toggle>
+    </v-row>
 
     <v-data-table
+      id="table-service-instances"
       :headers="headers"
       :items="groupedServices"
       item-key="rowId"
+      :search="searchServices"
       :row-props="rowClass"
       :group-by="groupByServiceInstanceGroups ? [{key: 'groupName'}] : []"
       @click:row="onServiceInstanceClicked"
@@ -99,11 +112,12 @@
       <template
         #item.actions="{ item : serviceInstance }"
       >
-        <v-row>
+        <v-row align="center">
           <v-btn
             :disabled="serviceInstance.markedForDelete"
             class="ml-4"
             color="error"
+            size="small"
             @click.stop="onDeleteClicked(serviceInstance)"
           >
             <v-icon>mdi-delete</v-icon>
@@ -118,6 +132,7 @@
                       :disabled="!availableVersionChangesOfServices[serviceInstance.id]"
                       color="blue"
                       class="ml-4"
+                      size="small"
                       v-bind="propsM"
                     >
                       <v-icon>
@@ -178,7 +193,7 @@
       @canceled="serviceVersionChange.dialog = false"
       @confirmed="onServiceInstanceVersionChangedConfirmed"
     />
-  </v-card>
+  </v-container>
 </template>
 
 <script>
@@ -226,7 +241,8 @@ export default {
           targetServiceVersion: null
         },
         groupedServices: [],
-        groupByServiceInstanceGroups: 0
+        groupByServiceInstanceGroups: 0,
+        searchServices: undefined
       }
     },
     computed: {
