@@ -121,43 +121,28 @@
               item-key="id"
               :items="repositoriesOfVendor"
             >
-              <template
-                #body="{ items }"
-              >
-                <tbody
-                  v-for="repository in items"
-                  :key="repository.id"
+              <template #item.password="{ }">
+                <v-text-field
+                  label="Encrypted"
+                  size="small"
+                  disabled
+                />
+              </template>
+              <template #item.actions="{ item : serviceRepository }">
+                <v-btn
+                  class="ma-2"
+                  color="error"
+                  @click="onDeleteRepositoryClicked(serviceRepository)"
                 >
-                  <tr>
-                    <td>{{ repository.id }}</td>
-                    <td>{{ repository.address }}</td>
-                    <td>{{ repository.username }}</td>
-                    <td>
-                      <v-text-field
-                        label="Encrypted"
-                        disabled
-                      />
-                    </td>
-                    <td>{{ repository.type }}</td>
-                    <td>
-                      <v-btn
-                        class="ma-1"
-                        size="small"
-                        variant="outlined"
-
-                        color="red"
-                        @click="onDeleteRepositoryClicked(repository)"
-                      >
-                        <v-icon>
-                          mdi-delete
-                        </v-icon>
-                      </v-btn>
-                    </td>
-                  </tr>
-                </tbody>
+                  <v-icon>
+                    mdi-delete
+                  </v-icon>
+                </v-btn>
               </template>
             </v-data-table>
+
             <v-divider />
+
             <v-btn
               color="secondary"
               @click="serviceRepositoryCreateDialog = true"
@@ -347,6 +332,7 @@ export default {
           { title: 'Username', value: 'username', sortable: false },
           { title: 'Password', value: 'password', sortable: false },
           { title: 'Type', value: 'type', sortable: true },
+          { title: 'Actions', value: 'actions', sortable: false },
         ]
       },
     },
