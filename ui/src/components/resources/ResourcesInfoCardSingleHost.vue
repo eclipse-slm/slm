@@ -55,7 +55,10 @@
                   color="info"
                   @click="togglePasswordShow"
                 >
-                  <v-icon icon="showPassword ? 'mdi-glasses' : 'mdi-sunglasses'" />
+                  <v-icon
+                      :icon="showPassword ? 'mdi-glasses' : 'mdi-sunglasses'"
+                      color="white"
+                  />
                 </v-btn>
               </td>
               <td class="btn-col">
