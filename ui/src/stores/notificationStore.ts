@@ -1,9 +1,10 @@
-import notificationServiceRestApi from '@/api/notification-service/notificationServiceRestApi'
 import {app} from "@/main";
 import {defineStore} from "pinia";
 import {useJobsStore} from "@/stores/jobsStore";
 import {useResourcesStore} from "@/stores/resourcesStore";
 import {useServicesStore} from "@/stores/servicesStore";
+import NotificationServiceClient from "@/api/notification-service/notification-service-client";
+import logRequestError from "@/api/restApiHelper";
 
 export interface NotificationStoreState{
   notifications_: any[],
@@ -32,9 +33,9 @@ export const useNotificationStore = defineStore('notificationStore', {
     },
 
     getNotifications () {
-      notificationServiceRestApi.getNotifications().then(notifications => {
-        this.setNotifications(notifications);
-      })
+      NotificationServiceClient.api.getNotifications().then(response => {
+        this.setNotifications(response.data);
+      }).catch(logRequestError);
     },
 
     processIncomingNotification (notification: any) {
@@ -68,9 +69,9 @@ export const useNotificationStore = defineStore('notificationStore', {
     markAsRead () {
       const unreadNotifications = this.notifications_unread_
 
-      notificationServiceRestApi.markNotificationsAsRead(unreadNotifications).then(response => {
+      NotificationServiceClient.api.setReadOfNotifications(true, unreadNotifications).then(response => {
         this.getNotifications()
-      })
+      }).catch(logRequestError)
     },
   },
 });

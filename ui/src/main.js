@@ -1,4 +1,4 @@
-import {createApp } from 'vue'
+import {createApp} from 'vue'
 import App from './App.vue'
 import router from './pages/router'
 import 'chartist/dist/chartist.min.css'
@@ -11,7 +11,7 @@ import 'vue-toast-notification/dist/theme-sugar.css'
 import enums from 'vue-enums'
 import moment from 'moment'
 
-import { Chart, registerables } from 'chart.js'
+import {Chart, registerables} from 'chart.js'
 import {createVuetify} from "vuetify";
 import VueAxios from "vue-axios";
 import axios from "axios";
@@ -21,24 +21,27 @@ import NotificationServiceWebsocketClient from "@/api/notification-service/notif
 import 'vuetify/styles';
 import '@/design/overrides.sass';
 import withUUID from "vue-uuid";
-
-export let app = withUUID(createApp(App)) ;
-
-const requireComponent = require.context(
-    '@/components/base', true, /\.vue$/,
-)
-
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
 
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-import { createPinia } from 'pinia'
+import {createPinia} from 'pinia'
 import {useUserStore} from "@/stores/userStore";
 import {useCatalogStore} from "@/stores/catalogStore";
 import {useServicesStore} from "@/stores/servicesStore";
 import {useProviderStore} from "@/stores/providerStore";
 import {useResourcesStore} from "@/stores/resourcesStore";
 import {useNotificationStore} from "@/stores/notificationStore";
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
+import * as yup from "yup";
+import {createI18n} from "vue-i18n";
+import {de, en} from "vuetify/locale";
+
+export let app = withUUID(createApp(App)) ;
+
+const requireComponent = require.context(
+    '@/components/base', true, /\.vue$/,
+)
 
 
 requireComponent.keys().forEach(fileName => {
@@ -139,17 +142,12 @@ app.use(cors)
 
 app.use(router);
 
-import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
-import * as yup from "yup";
-
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 app.use(pinia);
 
 app.use(v);
 
-import {createI18n} from "vue-i18n";
-import {de, en} from "vuetify/locale";
 const messages = {
     en: {
         ...require('@/localisation/en.json'),

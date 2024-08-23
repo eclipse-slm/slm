@@ -184,7 +184,6 @@
 <script>
 
 import ApiState from '@/api/apiState'
-import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
 import logRequestError from '@/api/restApiHelper'
 import ProgressCircular from "@/components/base/ProgressCircular";
 import {Field, Form as ValidationForm} from "vee-validate";
@@ -194,6 +193,7 @@ import {useResourcesStore} from "@/stores/resourcesStore";
 import {useUserStore} from "@/stores/userStore";
 import {useJobsStore} from "@/stores/jobsStore";
 import {storeToRefs} from "pinia";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
 
 export default {
     name: 'ServiceOrderView',
@@ -267,30 +267,30 @@ export default {
       },
     },
     created () {
-      ServiceOfferingVersionsRestApi.getServiceOfferingVersionById(this.serviceOfferingId, this.serviceOfferingVersionId).then(response => {
-            this.serviceOfferingVersion = response;
+      ServiceManagementClient.serviceOfferingVersionsApi.getServiceOfferingVersionById(this.serviceOfferingId, this.serviceOfferingVersionId).then(response => {
+            this.serviceOfferingVersion = response.data;
             this.apiState.serviceOfferingVersion = ApiState.LOADED;
-      })
+      }).catch(logRequestError)
 
-      ServiceOfferingVersionsRestApi.getServiceOfferingVersionMatchingResources(this.serviceOfferingId, this.serviceOfferingVersionId).then((response) => {
+      ServiceManagementClient.serviceOfferingVersionsApi.getResourcesMatchingServiceRequirements(this.serviceOfferingId, this.serviceOfferingVersionId)
+          .then((response) => {
         this.matchingResources = []
         this.apiState.matchingResources = ApiState.LOADED;
 
-        if (response.length > 0) {
+        if (response.data.length > 0) {
           // this.matchingResources.push({ header: "Nodes" });
-          let matchingNodeResources = response.filter(matchingResource => !matchingResource.isCluster)
+          let matchingNodeResources = response.data.filter(matchingResource => !matchingResource.isCluster)
           this.matchingResources.push(...matchingNodeResources)
 
           // this.matchingResources.push({ header: "Clusters" });
-          let matchingClusterResources = response.filter(matchingResource => matchingResource.isCluster)
+          let matchingClusterResources = response.data.filter(matchingResource => matchingResource.isCluster)
           this.matchingResources.push(...matchingClusterResources)
 
-          console.log('asdf', this.matchingResources)
 
           // preselect resource
           this.selectedResourceId = this.matchingResources.filter(obj => obj.hasOwnProperty('resourceId'))[0].resourceId;
         }
-      })
+      }).catch(logRequestError)
     },
     methods: {
       order () {
@@ -315,11 +315,11 @@ export default {
         }
 
         this.showProgressCircular = true
-        ServiceOfferingVersionsRestApi.orderServiceOfferingVersion(
+        ServiceManagementClient.serviceOfferingVersionsApi.orderServiceOfferingVersionById(
             this.serviceOfferingId,
             this.serviceOfferingVersionId,
-            serviceOfferingVersionOrder,
-            this.matchingResources.find(obj => obj.resourceId === this.selectedResourceId).capabilityServiceId
+            this.matchingResources.find(obj => obj.resourceId === this.selectedResourceId).capabilityServiceId,
+            serviceOfferingVersionOrder
         ).then(response => {
           console.log(response)
           this.$toast.info('Service deployment started')

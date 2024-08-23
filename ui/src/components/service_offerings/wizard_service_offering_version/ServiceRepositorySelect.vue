@@ -38,7 +38,8 @@
 </template>
 
 <script>
-import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
+import ServiceManagementClient from "@/api/service-management/service-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 export default {
     name: 'ServiceRepositorySelect',
@@ -76,11 +77,13 @@ export default {
         this.$emit('input', selectedRepositories)
       },
       loadRepositories () {
-        ServiceVendorsRestApi.getRepositoriesOfServiceVendor(this.serviceVendorId).then(
-          repositories => {
-            this.availableRepositories = repositories
+
+
+        ServiceManagementClient.serviceRepositoriesApi.getRepositories(this.serviceVendorId).then(
+          response => {
+            this.availableRepositories = response.data
           },
-        )
+        ).catch(logRequestError)
       },
     },
   }

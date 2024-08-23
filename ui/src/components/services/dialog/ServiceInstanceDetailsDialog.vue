@@ -266,7 +266,6 @@
 
 import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
 import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
-import ServiceInstancesRestApi from "@/api/service-management/serviceInstancesRestApi";
 import ApiState from "@/api/apiState";
 import ProgressCircular from "@/components/base/ProgressCircular";
 import getEnv from "@/utils/env";
@@ -277,6 +276,7 @@ import {storeToRefs} from "pinia";
 import {app} from "@/main";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import logRequestError from "@/api/restApiHelper";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
 
 export default {
     name: 'ServiceInstanceDetailsDialog',
@@ -325,11 +325,11 @@ export default {
         immediate: true,
         handler (val, oldVal) {
           if (val != null) {
-            ServiceInstancesRestApi.getServiceInstanceDetails(this.serviceInstance.id).then(serviceInstanceDetails => {
-              this.serviceInstanceDetails = serviceInstanceDetails
+            ServiceManagementClient.serviceInstancesApi.getServiceInstanceDetails(this.serviceInstance.id).then(response => {
+              this.serviceInstanceDetails = response.data
               this.apiState = ApiState.LOADED
 
-              serviceInstanceDetails.serviceOptions.forEach(serviceOption => {
+              response.data.serviceOptions.forEach(serviceOption => {
                 if (serviceOption.valueType === "AAS_SM_TEMPLATE") {
                   ResourceManagementClient.aasApi.getSubmodelTemplateInstancesBySemanticId(serviceOption.defaultValue, serviceOption.currentValue)
                       .then(res => {
@@ -345,7 +345,7 @@ export default {
                   }).catch(logRequestError)
                 }
               })
-            } )
+            } ).catch(logRequestError)
           }
         }
       }

@@ -64,9 +64,10 @@
 
 <script>
 import 'vue-json-pretty/lib/styles.css'
-import ServiceOfferingVersionsRestApi from "@/api/service-management/serviceOfferingVersionsRestApi";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
+import logRequestError from "@/api/restApiHelper";
 
-  export default {
+export default {
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys',
     components: {
     },
@@ -119,14 +120,17 @@ import ServiceOfferingVersionsRestApi from "@/api/service-management/serviceOffe
         }
       },
       onDownloadCodesysApplicationClick(){
-        ServiceOfferingVersionsRestApi.downloadFileForServiceOfferingVersion(this.serviceOfferingVersion.serviceOfferingId, this.serviceOfferingVersion.id, 'application.zip').then(response => {
+        ServiceManagementClient.serviceOfferingVersionsApi.getServiceOfferingFileWithId(
+            this.serviceOfferingVersion.serviceOfferingId, this.serviceOfferingVersion.id, 'application.zip'
+        )
+            .then(response => {
           const url = window.URL.createObjectURL(new Blob([response.data]));
           const link = document.createElement('a');
           link.href = url;
           link.setAttribute('download', 'application.zip');
           document.body.appendChild(link);
           link.click();
-        });
+        }).catch(logRequestError);
       }
     },
 
