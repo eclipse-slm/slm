@@ -1,13 +1,12 @@
 import ResourcesRestApi from '@/api/resource-management/resourcesRestApi'
-import ClustersRestApi from '@/api/resource-management/clustersRestApi'
-import LocationsRestApi from '@/api/resource-management/locationsRestApi'
-import ProfilerRestApi from '@/api/resource-management/profilerRestApi'
 import ApiState from '@/api/apiState'
-import AasRestApi from "@/api/resource-management/aasRestApi";
 import {app} from "@/main";
 import {defineStore} from "pinia";
 import {useProviderStore} from "@/stores/providerStore";
-import {ResourcesRestControllerApi} from "@/api/resource-management/client";
+import ResourceManagementClient, {
+    ResourcesRestControllerApi
+} from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 interface ResourcesStoreState{
     apiStateResources_: number,
@@ -272,17 +271,17 @@ export const useResourcesStore = defineStore('resourcesStore', {
                 this.apiStateResources_ = ApiState.UPDATING;
             }
 
-            return await ResourcesRestApi.getResources()
+            return await ResourceManagementClient.resourcesApi.getResources()
                 .then(
-                    resources => {
-                        if (resources){
-                            resources.forEach(resource => {
+                    response => {
+                        if (response.data){
+                            response.data.forEach(resource => {
                                 // MetricsRestApi.getMetricsOfResource(resource.id).then(metrics => {
                                 //     resource.metrics = metrics
                                 // })
                             })
-                            this.setResources(resources)
-                            this.setAvailableResourceTypes(resources);
+                            this.setResources(response.data)
+                            this.setAvailableResourceTypes(response.data);
                             this.apiStateResources_ = ApiState.LOADED;
                         }
 
@@ -302,19 +301,21 @@ export const useResourcesStore = defineStore('resourcesStore', {
                 this.apiStateResources_ = ApiState.UPDATING;
             }
 
-            return await AasRestApi.getResourceAAS().then(
-                aas => {
-                    this.aas = aas;
+
+            return await ResourceManagementClient.aasApi.getResourceAASDescriptors().then(
+                response => {
+                    this.aas = response.data;
                     this.apiStateResources_ = ApiState.LOADED;
                 }
-            )
+            ).catch(logRequestError)
         },
 
         async getLocations() {
-            return await  LocationsRestApi.getLocations()
+            return await  ResourceManagementClient.locationApi.getLocations()
                 .then(
-                    locations => {
-                        this.locations_ = locations;
+                    result => {
+                        if (result.data)
+                            this.locations_ = result.data;
                     }
                 )
                 .catch(e => {
@@ -324,11 +325,12 @@ export const useResourcesStore = defineStore('resourcesStore', {
         },
 
         async getProfiler() {
-            return await  ProfilerRestApi.getProfiler()
+            return await  ResourceManagementClient.profilerApi.getProfiler()
                 .then(
-                    profiler => {
-                        if (profiler){
-                            this.profiler_ = profiler;
+                    response => {
+
+                        if (response.data){
+                            this.profiler_ = response.data;
                         }
                     }
                 )
@@ -339,11 +341,11 @@ export const useResourcesStore = defineStore('resourcesStore', {
         },
 
         async getResourceConnectionTypes() {
-            return await ResourcesRestApi.getResourceConnectionTypes()
+            return await ResourceManagementClient.resourcesApi.getResourceConnectionTypes()
                 .then(
-                    resourceConnectionTypes => {
-                        if(resourceConnectionTypes){
-                            this.resourceConnectionTypes_ = resourceConnectionTypes;
+                    response => {
+                        if(response.data){
+                            this.resourceConnectionTypes_ = response.data;
                         }
                     }
                 )
@@ -354,10 +356,12 @@ export const useResourcesStore = defineStore('resourcesStore', {
         },
 
         async getCluster () {
-            return await ClustersRestApi.getCluster()
-                .then(response => {
-                    const clusters: any[] = []
-                    for (var i in response) {
+
+            try{
+                const response = await ResourceManagementClient.clusterApi.getClusterResources();
+                const clusters: any[] = []
+                if (response.data && response.data.length > 0) {
+                    for (const i in response.data) {
                         clusters.push({
                             id: response[i].id,
                             name: response[i].metaData['cluster_name'] ? response[i].metaData['cluster_name'] : response[i].name,
@@ -374,17 +378,24 @@ export const useResourcesStore = defineStore('resourcesStore', {
                             status: response[i].capabilityService.status
                         })
                     }
+
                     this.setClusters(clusters)
-                })
+                }
+                return clusters;
+            }catch (e) {
+                logRequestError(e)
+                return [];
+            }
+
         },
 
         async getClusterTypes () {
-            return await ClustersRestApi.getClusterTypes()
+            return await ResourceManagementClient.clusterApi.getClusterTypes()
                 .then(response => {
-                    if(response){
-                        this.setAvailableClusterTypes(response)
+                    if(response.data && response.data.length > 0) {
+                        this.setAvailableClusterTypes(response.data)
                     }
-                })
+                }).catch(logRequestError)
         },
 
         async getDeploymentCapabilities () {

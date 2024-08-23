@@ -272,9 +272,10 @@ import ConfirmDialog from '@/components/base/ConfirmDialog'
 import CapabilityParamsDialog from "@/components/resources/dialogs/CapabilityParamsDialog.vue";
 import ResourcesRestApi from '@/api/resource-management/resourcesRestApi'
 import {capabilityUtilsMixin} from '@/utils/capabilityUtils'
-import ProfilerRestApi from "@/api/resource-management/profilerRestApi";
 import {app} from "@/main";
 import {useResourcesStore} from "@/stores/resourcesStore";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 export default {
     name: 'ResourcesTableSingleHosts',
@@ -559,7 +560,7 @@ export default {
         return string.replace(/([A-Z])/g, ' $1').trim()
       },
       runProfiler() {
-        let result = ProfilerRestApi.runProfiler()
+        ResourceManagementClient.profilerApi.runProfiler1().then().catch(logRequestError);
         app.config.globalProperties.$toast.info('Started Profiler for all devices.')
       }
     }

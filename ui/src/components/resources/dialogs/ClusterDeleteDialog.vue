@@ -75,11 +75,11 @@
 </template>
 
 <script>
-import ClustersRestApi from '@/api/resource-management/clustersRestApi'
-
 import {toRef} from "vue";
 import {useServicesStore} from "@/stores/servicesStore";
 import {storeToRefs} from "pinia";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 export default {
     name: 'ClusterDeleteDialog',
@@ -113,7 +113,9 @@ export default {
     },
     methods: {
       deleteCluster () {
-        ClustersRestApi.deleteClusterResource(this.cluster.id)
+        ResourceManagementClient.clusterApi
+            .deleteClusterResource(this.cluster.id)
+            .then().catch(logRequestError);
         this.$emit('confirmed')
       },
     }

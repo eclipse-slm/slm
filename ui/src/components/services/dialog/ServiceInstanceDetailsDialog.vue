@@ -269,13 +269,14 @@ import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDia
 import ServiceInstancesRestApi from "@/api/service-management/serviceInstancesRestApi";
 import ApiState from "@/api/apiState";
 import ProgressCircular from "@/components/base/ProgressCircular";
-import AasRestApi from "@/api/resource-management/aasRestApi";
 import getEnv from "@/utils/env";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 import {useServicesStore} from "@/stores/servicesStore";
 import {useResourcesStore} from "@/stores/resourcesStore";
 import {storeToRefs} from "pinia";
 import {app} from "@/main";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 export default {
     name: 'ServiceInstanceDetailsDialog',
@@ -330,7 +331,9 @@ export default {
 
               serviceInstanceDetails.serviceOptions.forEach(serviceOption => {
                 if (serviceOption.valueType === "AAS_SM_TEMPLATE") {
-                  AasRestApi.getSubmoduleTemplateInstanceOfAas(serviceOption.defaultValue, serviceOption.currentValue).then(response => {
+                  ResourceManagementClient.aasApi.getSubmodelTemplateInstancesBySemanticId(serviceOption.defaultValue, serviceOption.currentValue)
+                      .then(res => {
+                        let response = res.data;
                     let aasGuiBaseUrl = getEnv("VUE_APP_BASYX_AAS_GUI_URL")
                     let smEndpoint = response[0].smEndpoint
                     let aasGuiUrl = `${aasGuiBaseUrl}/?aas=${smEndpoint.replace('aas/submodels', 'aas&path=submodels')}`
@@ -339,7 +342,7 @@ export default {
                       name: response[0].name,
                       url: aasGuiUrl,
                     }
-                  })
+                  }).catch(logRequestError)
                 }
               })
             } )

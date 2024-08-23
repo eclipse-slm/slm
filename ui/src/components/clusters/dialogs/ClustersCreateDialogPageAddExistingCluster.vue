@@ -166,12 +166,13 @@
 
 <script>
 
-import clustersRestApi from '@/api/resource-management/clustersRestApi'
 import ClustersCreateDialogPage from "@/components/clusters/dialogs/ClustersCreateDialogPage";
 import {ref} from "vue";
 import {Field, Form as ValidationForm} from "vee-validate";
 import * as yup from 'yup';
 import {useResourcesStore} from "@/stores/resourcesStore";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 const textAreaFileContentComponentKey = ref(0);
 
@@ -246,8 +247,14 @@ const textAreaFileContentComponentKey = ref(0);
         this.$emit('canceled')
       },
       onAddButtonClicked () {
-        console.log(this.configParameterValues)
-        clustersRestApi.createClusterResource(this.selectedClusterType.id, true, {}, this.configParameterValues)
+        console.log(this.configParameterValues);
+
+        ResourceManagementClient.clusterApi.createClusterResource({
+          clusterTypeId: this.selectedClusterType.id,
+          skipInstall: true,
+          clusterMembers: {},
+          configParameterValues: this.configParameterValues
+        }).then().catch(logRequestError);
         this.clearForm()
         this.$emit('confirmed')
       },

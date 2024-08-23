@@ -199,12 +199,13 @@
 
 <script>
 
-import resourcesRestApi from '@/api/resource-management/resourcesRestApi'
 import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
 
 import {Field, Form as ValidationForm} from "vee-validate";
 import * as yup from 'yup';
 import {useResourcesStore} from "@/stores/resourcesStore";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 
 export default {
@@ -287,7 +288,7 @@ export default {
         this.$emit('canceled')
       },
       onAddButtonClicked () {
-        resourcesRestApi.addExistingResource(
+        ResourceManagementClient.resourcesApi.addExistingResource(
           this.resourceHostname,
           this.resourceIp,
           this.resourceLocation,
@@ -298,7 +299,7 @@ export default {
           this.resourceConnectionType,
           this.resourceConnectionPort,
           this.resourceBaseConfigurationId
-        )
+        ).then().catch(logRequestError);
 
         this.clearForm()
         this.$emit('confirmed')

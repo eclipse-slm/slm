@@ -52,7 +52,7 @@
 </template>
 <script>
 // import { LineChart } from 'vue-chart-3'
-import MetricsRestApi from '@/api/resource-management/metricsRestApi'
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 
 export default {
     name: 'ResourceMetrics',
@@ -108,8 +108,10 @@ export default {
       },
 
       getMetric () {
-        MetricsRestApi.getMetricsOfResource(this.resourceId).then(response => {
-          if (Object.keys(response).length === 0) {
+
+        ResourceManagementClient.metricsApi.getMetric(this.resourceId).then(response => {
+          const metric = response.data;
+          if (Object.keys(metric).length === 0) {
             return
           }
 
@@ -117,16 +119,16 @@ export default {
             setTimeout(this.getMetric.bind(this), 3000)
           }
           this.metrics = []
-          // this.metrics.push({ category: 'System', name: 'Uptime', value: response.systemUptime, unit: 'seconds' })
-          this.metrics.push({ category: 'System', name: 'OS', value: response.OS })
-          // this.metrics.push({ category: 'CPU', name: 'Cores', value: response.cpuCores })
-          this.metrics.push({ category: 'CPU', name: 'Architecture', value: response.ProArc })
-          this.metrics.push({ category: 'CPU', name: 'Usage', value: response.CPULoad, unit: '%' })
-          this.metrics.push({ category: 'RAM', name: 'Installed', value: response.SizOfTheRam, unit: 'kilobytes' })
-          this.metrics.push({ category: 'RAM', name: 'Usage', value: response.AllocatedMemory, unit: '%' })
-          // this.metrics.push({ category: 'Filesystem', name: 'Root - Type', value: response.rootFsType })
-          // this.metrics.push({ category: 'Filesystem', name: 'Root - Usage', value: response.rootFsUsage, unit: '%' })
-          // this.metrics.push({ category: 'Docker', name: 'Running Containers', value: response.dockerRunningContainers })
+          // this.metrics.push({ category: 'System', name: 'Uptime', value: metric.systemUptime, unit: 'seconds' })
+          this.metrics.push({ category: 'System', name: 'OS', value: metric.OS })
+          // this.metrics.push({ category: 'CPU', name: 'Cores', value: metric.cpuCores })
+          this.metrics.push({ category: 'CPU', name: 'Architecture', value: metric.ProArc })
+          this.metrics.push({ category: 'CPU', name: 'Usage', value: metric.CPULoad, unit: '%' })
+          this.metrics.push({ category: 'RAM', name: 'Installed', value: metric.SizOfTheRam, unit: 'kilobytes' })
+          this.metrics.push({ category: 'RAM', name: 'Usage', value: metric.AllocatedMemory, unit: '%' })
+          // this.metrics.push({ category: 'Filesystem', name: 'Root - Type', value: metric.rootFsType })
+          // this.metrics.push({ category: 'Filesystem', name: 'Root - Usage', value: metric.rootFsUsage, unit: '%' })
+          // this.metrics.push({ category: 'Docker', name: 'Running Containers', value: metric.dockerRunningContainers })
         }).catch((e) => {
           console.log(e)
           this.metrics = []

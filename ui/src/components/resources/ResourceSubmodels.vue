@@ -79,9 +79,9 @@
   </div>
 </template>
 <script>
-import SubmodelsRestApi from '@/api/resource-management/submodelsRestApi'
 import ConfirmDialog from '@/components/base/ConfirmDialog'
 import getEnv from '@/utils/env'
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 
 export default {
   name: 'ResourceSubmodels',
@@ -107,18 +107,18 @@ export default {
 
   methods: {
     getSubmodels() {
-      SubmodelsRestApi.getResourceSubmodels(this.resourceId).then(response => {
-        if (response.length === 1 && Object.keys(response).length === 0) {
+      ResourceManagementClient.submodelsApi.getResourceSubmodels(this.resourceId).then(response => {
+        if (response.data && response.data.length === 1 && Object.keys(response.data).length === 0) {
           return
         }
-        this.submodels = response
+        this.submodels = response.data
       }).catch((e) => {
         console.log(e)
         this.submodels = []
       })
     },
     deleteSubmodel(submodel) {
-      SubmodelsRestApi.deleteSubmodel(this.resourceId, submodel.idShort).then(response => {
+      ResourceManagementClient.submodelsApi.deleteSubmodel(this.resourceId, submodel.idShort).then(response => {
         this.getSubmodels()
         this.submodelToDelete = null
       }).catch((e) => {
@@ -129,7 +129,7 @@ export default {
       if (this.file == null) {
         return
       }
-      SubmodelsRestApi.addSubmodels(this.resourceId, this.file).then(response => {
+      ResourceManagementClient.submodelsApi.addSubmodels(this.resourceId, this.file).then(response => {
         this.file = null
         this.getSubmodels()
       }).catch((e) => {

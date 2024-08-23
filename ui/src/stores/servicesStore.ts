@@ -7,6 +7,7 @@ import ServiceManagementTemplatesRestApi from "@/api/service-management/serviceM
 import ServiceInstancesGroupsRestApi from "@/api/service-management/serviceInstancesGroupsRestApi";
 import {app} from "@/main";
 import {defineStore} from "pinia";
+import logRequestError from "@/api/restApiHelper";
 
 
 interface ServiceStoreState{
@@ -291,9 +292,11 @@ export const useServicesStore = defineStore('servicesStore', {
             await ServiceInstancesGroupsRestApi.getServiceInstanceGroups()
                 .then(
                     response => {
-                        this.serviceInstanceGroups_ = response
-                        this.apiStateServices_.serviceInstanceGroups = ApiState.LOADED
-                    })
+                        if(response){
+                            this.serviceInstanceGroups_ = response
+                            this.apiStateServices_.serviceInstanceGroups = ApiState.LOADED
+                        }
+                    }).catch(logRequestError)
         },
     },
     

@@ -1,5 +1,6 @@
-import JobsRestApi from '@/api/resource-management/jobsRestApi'
 import {defineStore} from "pinia";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 export interface JobsStoreState{
   jobs_: any[],
@@ -24,7 +25,10 @@ export const useJobsStore = defineStore('jobsStore', {
   },
   actions:{
     async updateJobsStore () {
-      JobsRestApi.getJobs().then(jobs => {
+
+      ResourceManagementClient.jobApi.getJobs().then(result => {
+          if (result.data) {
+            const jobs = <any[]>result.data;
             this.jobs_ = jobs;
 
             if (jobs.filter(job => job.status === 'running').length > 0) {
@@ -36,8 +40,10 @@ export const useJobsStore = defineStore('jobsStore', {
                 clearInterval(this.timeoutObject)
               }
             }
+          }
+
           },
-      )
+      ).catch(logRequestError)
     },
     calculateElapsed () {
       this.jobs_running_.forEach(job => {
