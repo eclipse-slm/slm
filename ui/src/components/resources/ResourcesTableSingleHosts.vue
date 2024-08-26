@@ -177,7 +177,7 @@
                 id="mushroom-button"
                 color="info"
                 v-bind="props"
-                :disabled="item.clusterMember || availableSingleHostCapabilitiesNoDefault.length == 0"
+                :disabled="item.clusterMember || availableSingleHostCapabilitiesNoDefault.length === 0"
                 class="resource-single-host-add-capability"
               >
                 <v-icon
@@ -270,7 +270,6 @@
 
 import ConfirmDialog from '@/components/base/ConfirmDialog'
 import CapabilityParamsDialog from "@/components/resources/dialogs/CapabilityParamsDialog.vue";
-import ResourcesRestApi from '@/api/resource-management/resourcesRestApi'
 import {capabilityUtilsMixin} from '@/utils/capabilityUtils'
 import {app} from "@/main";
 import {useResourcesStore} from "@/stores/resourcesStore";
@@ -421,7 +420,9 @@ export default {
           return true
       },
       removeCapability (resourceId, capabilityId) {
-        ResourcesRestApi.removeCapabilityFromSingleHost(resourceId, capabilityId)
+        ResourceManagementClient.capabilityApi.removeCapabilityFromSingleHost(resourceId, capabilityId)
+            .then().catch(logRequestError);
+
       },
       setSelectedResource (event, { item }) {
         this.$emit('resource-selected', item)

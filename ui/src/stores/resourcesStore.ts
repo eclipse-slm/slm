@@ -1,11 +1,8 @@
-import ResourcesRestApi from '@/api/resource-management/resourcesRestApi'
 import ApiState from '@/api/apiState'
 import {app} from "@/main";
 import {defineStore} from "pinia";
 import {useProviderStore} from "@/stores/providerStore";
-import ResourceManagementClient, {
-    ResourcesRestControllerApi
-} from "@/api/resource-management/resource-management-client";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import logRequestError from "@/api/restApiHelper";
 
 interface ResourcesStoreState{
@@ -35,9 +32,6 @@ interface ResourcesStoreState{
 
     search_: string
 }
-
-
-const resourcesApi = new ResourcesRestControllerApi(undefined, '/resource-management');
 
 export const useResourcesStore = defineStore('resourcesStore', {
 
@@ -275,11 +269,11 @@ export const useResourcesStore = defineStore('resourcesStore', {
                 .then(
                     response => {
                         if (response.data){
-                            response.data.forEach(resource => {
+                            /*response.data.forEach(resource => {
                                 // MetricsRestApi.getMetricsOfResource(resource.id).then(metrics => {
                                 //     resource.metrics = metrics
                                 // })
-                            })
+                            })*/
                             this.setResources(response.data)
                             this.setAvailableResourceTypes(response.data);
                             this.apiStateResources_ = ApiState.LOADED;
@@ -399,10 +393,10 @@ export const useResourcesStore = defineStore('resourcesStore', {
         },
 
         async getDeploymentCapabilities () {
-            return await ResourcesRestApi.getDeploymentCapabilities()
+            return await ResourceManagementClient.capabilityApi.getCapabilities()
                 .then(response => {
                     if(response){
-                        this.setAvailableDeploymentCapabilities(response);
+                        this.setAvailableDeploymentCapabilities(response.data);
                     }
                 })
         },
@@ -436,7 +430,7 @@ export const useResourcesStore = defineStore('resourcesStore', {
             const ip = resource.ip
             const username = 'vfk'
 
-            return ResourcesRestApi.getOtp(project, ip, username)
+            return '';
         },
 
         async updateOtp () {

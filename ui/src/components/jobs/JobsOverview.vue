@@ -24,11 +24,10 @@
           item-key="id"
           :items="jobs"
         >
-
           <template #item.id="{ item }">
             <a
-                :href="`${awxURL}/#/jobs/playbook/${item.id}`"
-                target="_blank"
+              :href="`${awxURL}/#/jobs/playbook/${item.id}`"
+              target="_blank"
             >{{ item.id }}</a>
           </template>
 
@@ -46,15 +45,45 @@
 
           <template #item.status="{ item }">
             <span v-if="item.status === 'running'">
-              {{ getFormattedTime(jobs_running.find(j => j.id === item.id).elapsed) }}
-            </span>
-            <span v-else-if="item.elapsed > 60">
-              {{ Math.floor(item.elapsed/60) }}m {{ Math.round(item.elapsed % 60) }}s
+              {{ getFormattedTime(new Date().getTime() - new Date(item.started).getTime()) }}
             </span>
             <span v-else>
-              {{ Math.round(item.elapsed % 60) }}s
+              {{ getFormattedTime(new Date(item.finished).getTime() - new Date(item.started).getTime()) }}
             </span>
-            {{ item.status }}
+            <v-tooltip location="right">
+              <template #activator="{ props }">
+                <v-icon
+                  v-if="item.status === 'successful'"
+                  v-bind="props"
+                >
+                  mdi-check-circle-outline
+                </v-icon>
+                <v-icon
+                  v-if="item.status === 'running'"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  mdi-run-fast
+                </v-icon>
+                <v-icon
+                  v-else-if="item.status === 'pending'"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  mdi-timer-sand-empty
+                </v-icon>
+                <v-icon
+                  v-else-if="item.status === 'canceled' || item.status === 'failed'|| item.status === 'error'"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  mdi-alert-circle-outline
+                </v-icon>
+              </template>
+              <span>
+                {{ item.status }}
+              </span>
+            </v-tooltip>
           </template>
         </v-data-table>
       </base-material-card>
@@ -89,9 +118,6 @@ export default {
     computed: {
       jobs () {
         return this.jobsStore.jobs
-      },
-      jobs_running () {
-        return this.jobsStore.jobs_running
       },
       DataTableHeaders () {
         return [
