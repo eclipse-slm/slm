@@ -291,13 +291,11 @@ export default {
         ResourceManagementClient.resourcesApi.addExistingResource(
           this.resourceHostname,
           this.resourceIp,
-          this.resourceLocation,
           this.resourceUsername,
           this.resourcePassword,
-          'BareMetal',
-          this.resourceAccessAvailable,
           this.resourceConnectionType,
           this.resourceConnectionPort,
+          this.resourceLocation,
           this.resourceBaseConfigurationId
         ).then().catch(logRequestError);
 

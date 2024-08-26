@@ -373,8 +373,7 @@ export default {
       },
       deleteResource (resource) {
         const resourceId = resource.id
-        ResourcesRestApi.deleteResource(resourceId).then(response => {
-        })
+        ResourceManagementClient.resourcesApi.deleteResource(resourceId).then();
         this.resourceStore.setResourceMarkedForDelete(resource);
         this.resourceToDelete = null
       },
@@ -393,7 +392,7 @@ export default {
 
       },
       addCapability (resourceId, capabilityId, skipInstall, configParameterMap) {
-        ResourcesRestApi.addCapabilityToSingleHost(resourceId, capabilityId, skipInstall, configParameterMap)
+        ResourceManagementClient.capabilityApi.installCapabilityOnSingleHost(resourceId, capabilityId, configParameterMap, skipInstall).then();
         this.unsetSelected()
       },
       unsetSelected() {
