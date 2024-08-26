@@ -12,7 +12,6 @@
     <base-material-card
       icon="mdi-clipboard-text"
       title="Simple Table"
-      class="px-5 py-3"
     >
       <v-table>
         <thead>
@@ -106,7 +105,6 @@
       theme="dark"
       icon="mdi-clipboard-plus"
       title="Table on Dark Background"
-      class="px-5 py-3"
     >
       <v-table>
         <thead>

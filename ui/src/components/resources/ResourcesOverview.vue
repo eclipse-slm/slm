@@ -1,8 +1,6 @@
 <template>
   <div>
-    <base-material-card
-      class="px-5 py-3"
-    >
+    <base-material-card>
       <template #heading>
         <overview-heading text="Devices" />
       </template>
@@ -13,17 +11,6 @@
       />
 
       <v-card-text v-else>
-        <v-row>
-          <v-col cols="4">
-            <v-text-field
-              v-model="searchResources"
-              label="Search Resources"
-              append-inner-icon="mdi-magnify"
-              clearable
-            />
-          </v-col>
-        </v-row>
-
         <v-row>
           <resources-table-single-hosts
             v-if="resources.length > 0"
@@ -103,14 +90,6 @@ export default {
       },
       clusters () {
         return this.resourceStore.clusters
-      },
-      searchResources: {
-        get () {
-          return this.resourceStore.searchResources_;
-        },
-        set (value) {
-          this.resourceStore.searchResources_ = value;
-        },
       },
     },
     mounted () {

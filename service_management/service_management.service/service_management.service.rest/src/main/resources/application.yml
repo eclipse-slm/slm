@@ -137,12 +137,12 @@ vault:
   scheme: http
   host: localhost
   port: 8200
-  authentication: TOKEN
-  token: secret
-  #app-role:
-  #  role-id: service-lifecycle-management
-  #  secret-id: 75604ba4-902b-21d4-a3d3-9782af56ad1f
-  #  app-role-path: approle
+  authentication: APPROLE
+#  token: your-secret-token
+  app-role:
+    role-id: service-lifecycle-management
+    secret-id: your-secret-id
+    app-role-path: approle
 
 ### Minio
 minio:

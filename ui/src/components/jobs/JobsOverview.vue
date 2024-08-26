@@ -1,20 +1,28 @@
 <template>
   <v-container fluid>
-    <div>
-      <base-material-card
-        class="px-5 py-3"
-      >
+    <div
+      v-if="apiStateLoading"
+      class="text-center"
+    >
+      <v-progress-circular
+        :size="70"
+        :width="7"
+        color="primary"
+        indeterminate
+      />
+    </div>
+    <div v-if="apiStateError">
+      Error
+    </div>
+
+    <div v-if="apiStateLoaded">
+      <base-material-card>
         <template #heading>
           <overview-heading text="Jobs" />
         </template>
 
-        <no-item-available-note
-          v-if="!jobs.length"
-          item="jobs"
-        />
-
         <v-data-table
-          v-else
+          v-if="jobs && jobs.length > 0"
           id="jobsTable"
           :sort-by.sync="sortBy"
           :footer-props="{
@@ -43,49 +51,19 @@
             {{ getFormattedDate(item.finished) }}
           </template>
 
+          <template #item.elapsed="{ item }">
+            {{ getFormattedTime(item.elapsed) }}
+          </template>
+
           <template #item.status="{ item }">
-            <span v-if="item.status === 'running'">
-              {{ getFormattedTime(new Date().getTime() - new Date(item.started).getTime()) }}
-            </span>
-            <span v-else>
-              {{ getFormattedTime(new Date(item.finished).getTime() - new Date(item.started).getTime()) }}
-            </span>
-            <v-tooltip location="right">
-              <template #activator="{ props }">
-                <v-icon
-                  v-if="item.status === 'successful'"
-                  v-bind="props"
-                >
-                  mdi-check-circle-outline
-                </v-icon>
-                <v-icon
-                  v-if="item.status === 'running'"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  mdi-run-fast
-                </v-icon>
-                <v-icon
-                  v-else-if="item.status === 'pending'"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  mdi-timer-sand-empty
-                </v-icon>
-                <v-icon
-                  v-else-if="item.status === 'canceled' || item.status === 'failed'|| item.status === 'error'"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  mdi-alert-circle-outline
-                </v-icon>
-              </template>
-              <span>
-                {{ item.status }}
-              </span>
-            </v-tooltip>
+            {{ item.status }}
           </template>
         </v-data-table>
+
+        <no-item-available-note
+          v-else
+          item="jobs"
+        />
       </base-material-card>
     </div>
   </v-container>
@@ -97,6 +75,8 @@ import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 import getEnv from '@/utils/env'
 import {useJobsStore} from "@/stores/jobsStore";
+import ServiceInstancesOverview from "@/components/services/ServiceInstancesOverview.vue";
+import ApiState from "@/api/apiState";
 
 export default {
     name: 'JobsOverview',
@@ -111,13 +91,31 @@ export default {
     data: function () {
       return {
         observer: null,
-        sortBy: [{key: 'id', order: 'asc'}],
+        sortBy: [{key: 'id', order: 'desc'}],
         sortDesc: true,
       }
     },
     computed: {
+      apiStateJobs() {
+        return this.jobsStore.apiStateJobs
+      },
+      apiStateLoaded () {
+        return this.apiStateJobs === ApiState.LOADED
+      },
+      apiStateLoading () {
+        if (this.apiStateJobs === ApiState.INIT) {
+          this.jobsStore.updateJobsStore();
+        }
+        return this.apiStateJobs === ApiState.LOADING || this.apiStateJobs === ApiState.INIT
+      },
+      apiStateError () {
+        return this.apiStateJobs === ApiState.ERROR
+      },
       jobs () {
         return this.jobsStore.jobs
+      },
+      jobs_running () {
+        return this.jobsStore.jobs_running
       },
       DataTableHeaders () {
         return [
@@ -144,13 +142,30 @@ export default {
           return ''
         }
       },
-      getFormattedTime (time) {
-        // const milliseconds = parseInt((time % 1000))
-        const seconds = parseInt((time / 1000) % 60)
-        const minutes = parseInt((time / (1000 * 60)) % 60)
-        // const hours = parseInt((time / (1000 * 60 * 60)) % 24)
+      getFormattedTime (duration) {
+        // Hours, minutes and seconds
+        const hrs = ~~(duration / 3600);
+        const mins = ~~((duration % 3600) / 60);
+        const secs = ~~duration % 60;
 
-        return (minutes > 0) ? `${minutes}m ${seconds}s` : `${seconds}s`
+        // Output like "1:01" or "4:03:59" or "123:03:59"
+        let ret = "";
+
+        if (hrs > 0) {
+          ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+        }
+
+        ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+        ret += "" + secs;
+
+        return ret;
+
+        // // const milliseconds = parseInt((time % 1000))
+        // const seconds = parseInt((time / 1000) % 60)
+        // const minutes = parseInt((time / (1000 * 60)) % 60)
+        // // const hours = parseInt((time / (1000 * 60 * 60)) % 24)
+        //
+        // return (minutes > 0) ? `${minutes}m ${seconds}s` : `${seconds}s`
       },
     },
   }
