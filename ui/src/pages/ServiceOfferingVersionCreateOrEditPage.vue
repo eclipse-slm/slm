@@ -264,7 +264,8 @@ export default {
       if (this.editMode) {
         this.newServiceOfferingVersion = null
         ServiceManagementClient.serviceOfferingVersionsApi.getServiceOfferingVersionById(this.serviceOfferingId, this.serviceOfferingVersionId)
-            .then(serviceOfferingVersion => {
+            .then(result => {
+              const serviceOfferingVersion = result.data;
               var requirements = serviceOfferingVersion.serviceRequirements
               for(let requirementId = 0; requirementId < requirements.length; requirementId++) {
                 var requirement = requirements[requirementId]

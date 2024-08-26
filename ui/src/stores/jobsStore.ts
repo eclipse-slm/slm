@@ -33,16 +33,16 @@ export const useJobsStore = defineStore('jobsStore', {
       async updateJobsStore() {
           this.apiStateJobs_ = ApiState.LOADING
                   ResourceManagementClient.jobApi.getJobs().then(result => {
-                  if (result.data) {
-                      const jobs = <any[]>result.data;
-                      this.jobs_ = jobs;
+                      if (result.data) {
+                          const jobs = <any[]>result.data;
+                          this.jobs_ = jobs;
 
-                      if (this.jobs_ && this.jobs_.length > 0) {
-                          if (jobs.filter(job => job.status === 'running').length > 0) {
-                              this.timeoutObject = setInterval(() => {
-                                  this.calculateElapsed();
-                              }, 1000)
-                          } else {
+                          if (this.jobs_ && this.jobs_.length > 0) {
+                              if (jobs.filter(job => job.status === 'running').length > 0) {
+                                  this.timeoutObject = setInterval(() => {
+                                      this.calculateElapsed();
+                                  }, 1000)
+                              } else {
                               if (this.timeoutObject) {
                                   clearInterval(this.timeoutObject)
                               }

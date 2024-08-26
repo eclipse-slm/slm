@@ -186,22 +186,19 @@
                     </v-icon>
                     <v-icon
                       v-if="item.status === 'running'"
-                      v-bind="attrs"
-                      v-on="on"
+                      v-bind="props"
                     >
                       mdi-run-fast
                     </v-icon>
                     <v-icon
                       v-else-if="item.status === 'pending'"
-                      v-bind="attrs"
-                      v-on="on"
+                      v-bind="props"
                     >
                       mdi-timer-sand-empty
                     </v-icon>
                     <v-icon
                       v-else-if="item.status === 'canceled' || item.status === 'failed'|| item.status === 'error'"
-                      v-bind="attrs"
-                      v-on="on"
+                      v-bind="props"
                     >
                       mdi-alert-circle-outline
                     </v-icon>
