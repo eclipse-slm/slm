@@ -101,7 +101,7 @@ public class OpenApiConfig {
             var parameterSchema = new StringSchema();
             parameterSchema.setDefault("fabos");
             Parameter realmHeaderParameter = new Parameter().in(ParameterIn.HEADER.toString()).schema(parameterSchema)
-                    .name("Realm").description("Keycloak Realm").required(true);
+                    .name("Realm").description("Keycloak Realm").required(false);
 
             operation.addParametersItem(realmHeaderParameter);
 

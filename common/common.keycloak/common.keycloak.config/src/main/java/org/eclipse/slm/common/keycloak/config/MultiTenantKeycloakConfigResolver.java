@@ -84,6 +84,9 @@ public class MultiTenantKeycloakConfigResolver implements KeycloakConfigResolver
     private KeycloakDeployment resolveHeader(HttpFacade.Request request) {
         if (multiTenantKeycloakApplicationProperties.isResolveByHeader()) {
             String realm = request.getHeader(multiTenantKeycloakApplicationProperties.getResolverHeader());
+            if (realm == null || realm.isEmpty()) {
+                return multiTenantKeycloakRegistration.getRealm("fabos");
+            }
             if (realm != null && !realm.isEmpty() && multiTenantKeycloakRegistration.containsRealm(realm)) {
                 LOG.trace("found realm in header: {}", realm);
                 return multiTenantKeycloakRegistration.getRealm(realm);
