@@ -99,6 +99,7 @@ public class OpenApiConfig {
         return (Operation operation, HandlerMethod handlerMethod) -> {
 
             var parameterSchema = new StringSchema();
+            // TODO: Remove when it is not any more necessary to set Realm in the Header
             parameterSchema.setDefault("fabos");
             Parameter realmHeaderParameter = new Parameter().in(ParameterIn.HEADER.toString()).schema(parameterSchema)
                     .name("Realm").description("Keycloak Realm").required(false);
