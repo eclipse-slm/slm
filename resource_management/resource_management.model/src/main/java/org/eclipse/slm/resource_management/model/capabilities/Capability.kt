@@ -4,20 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.vladmihalcea.hibernate.type.json.JsonStringType
 import jakarta.persistence.*
 import org.eclipse.slm.resource_management.model.actions.Action
 import org.eclipse.slm.resource_management.model.actions.ActionType
 import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType
 import org.eclipse.slm.resource_management.model.resource.ConnectionType
 import org.eclipse.slm.resource_management.model.resource.ExecutionEnvironment
-import org.hibernate.annotations.Type
-import org.hibernate.annotations.TypeDef
-import org.hibernate.annotations.TypeDefs
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
 import java.util.*
-import kotlin.collections.HashSet
 
 @Entity
 @Inheritance(strategy= InheritanceType.TABLE_PER_CLASS)

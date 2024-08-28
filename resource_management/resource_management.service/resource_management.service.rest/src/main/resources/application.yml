@@ -7,6 +7,8 @@ application:
 ### Deployment
 deployment:
   hostname: localhost
+  scheme: "http"
+  port: ${server.port}
 
 ### Server / API
 server:
@@ -55,6 +57,7 @@ spring:
       discovery:
         enabled: true
         hostname: ${deployment.hostname}
+        port: ${deployment.port}
         acl-token: ${consul.acl-token}
         register-health-check: true
         tags: slm, backend, ${spring.application.name}
@@ -98,7 +101,7 @@ notification-service:
 
 ### Security
 security:
-    auth-white-list:
+    auth-white-list: "/resources/*/aas/**"
     origins: "*"
 
 ### Keycloak

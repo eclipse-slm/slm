@@ -59,4 +59,8 @@ public class AasRepositoryClient {
     public void removeSubmodelReferenceFromAas(String aasId, String smId) {
         this.connectedAasRepository.removeSubmodelReference(aasId, smId);
     }
+
+    public void deleteAAS(String aasId) {
+        this.connectedAasRepository.deleteAas(aasId);
+    }
 }

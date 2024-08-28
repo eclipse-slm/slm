@@ -5,21 +5,21 @@ import org.springframework.context.ApplicationEvent;
 import java.util.UUID;
 
 public class ResourceEvent extends ApplicationEvent{
-    private final UUID id;
+    private final UUID resourceId;
     private final Operation operation;
 
     public enum Operation {
         CREATE, DELETE
     }
 
-    ResourceEvent(Object object, UUID id, Operation operation) {
+    ResourceEvent(Object object, UUID resourceId, Operation operation) {
         super(object);
-        this.id = id;
+        this.resourceId = resourceId;
         this.operation = operation;
     }
 
-    public UUID getId() {
-        return id;
+    public UUID getResourceId() {
+        return resourceId;
     }
 
     public Operation getOperation() { return operation; }

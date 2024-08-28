@@ -1,12 +1,12 @@
-import axios from 'axios'
-import logRequestError from '@/api/restApiHelper.js'
+import axios from 'axios';
+import logRequestError from '@/api/restApiHelper.js';
 
 class ServiceInstancesGroupsRestApi {
     API_URL = '/service-management/services/instances/groups'
 
     async getServiceInstanceGroups () {
         return axios
-            .get(this.API_URL + '/')
+            .get(this.API_URL + '')
             .then(response => {
                 return response.data
             })

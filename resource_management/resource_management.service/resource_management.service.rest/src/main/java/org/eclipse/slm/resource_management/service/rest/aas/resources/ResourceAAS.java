@@ -1,4 +1,4 @@
-package org.eclipse.slm.resource_management.service.rest.aas;
+package org.eclipse.slm.resource_management.service.rest.aas.resources;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultAssetAdministrationShell;
 import org.eclipse.slm.resource_management.model.resource.BasicResource;

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class SubmodelNotFoundException extends RuntimeException {
 
-	public SubmodelNotFoundException(String resourceId) {
-		super("Submodel for resource with id='" + resourceId + "' not found");
+	public SubmodelNotFoundException(String aasId, String submodelId) {
+		super("Submodel [id='" + submodelId + "'for AAS [id='" + aasId + "'] not found");
 	}
 }

@@ -85,4 +85,7 @@ public class SubmodelRepositoryClient {
         }
     }
 
+    public String getSubmodelRepositoryUrl() {
+        return submodelRepositoryUrl;
+    }
 }

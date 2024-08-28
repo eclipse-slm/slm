@@ -85,6 +85,10 @@ public class SubmodelRegistryClient {
         this.registerSubmodel(submodelRepositoryUrl, submodel.getId(), submodel.getIdShort());
     }
 
+    public void unregisterSubmodel(String submodelId) throws ApiException {
+        this.submodelRegistryApi.deleteSubmodelDescriptorById(submodelId);
+    }
+
     public static org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor convertSubmodelDescriptor(SubmodelDescriptor submodelDescriptor) {
         try {
             var aasJsonSerializer = new JsonSerializer();

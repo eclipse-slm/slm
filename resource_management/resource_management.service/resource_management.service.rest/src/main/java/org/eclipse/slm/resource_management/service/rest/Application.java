@@ -2,6 +2,7 @@ package org.eclipse.slm.resource_management.service.rest;
 
 import jakarta.transaction.Transactional;
 import org.eclipse.digitaltwin.basyx.submodelrepository.http.SubmodelRepositoryApiHTTPController;
+import org.eclipse.slm.common.aas.repositories.api.MultiSubmodelServiceHTTPApiController;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
 import org.eclipse.slm.resource_management.model.capabilities.DeploymentCapability;
 import org.eclipse.slm.resource_management.model.capabilities.DeploymentCapabilityDTOApi;

@@ -6,6 +6,7 @@ import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor;
 import org.eclipse.slm.common.aas.clients.*;
 import org.eclipse.slm.resource_management.model.resource.BasicResource;
+import org.eclipse.slm.resource_management.service.rest.aas.resources.ResourceAAS;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -71,26 +72,6 @@ public class SubmodelManager {
         }
     }
 
-//
-//    // TODO: find a way to update concept descriptions without overwriting the whole aas
-//    private void updateAASConceptDescriptions(AssetAdministrationShell aas, AasEnv aasEnv) {
-//        Collection<IConceptDictionary> dictionaries = aas.getConceptDictionary();
-//        if (dictionaries.isEmpty()) {
-//            for (IConceptDescription conceptDescription: aasEnv.getConceptDescriptions()) {
-//                aas.addConceptDescription(conceptDescription);
-//            }
-//        } else {
-//            ConceptDictionary dictionary = (ConceptDictionary)dictionaries.iterator().next();
-//            Collection<IConceptDescription> conceptDescriptions = dictionary.getConceptDescriptions();
-//            for (IConceptDescription conceptDescription: aasEnv.getConceptDescriptions()) {
-//                if (!conceptDescriptions.contains(conceptDescription)) {
-//                    aas.addConceptDescription(conceptDescription);
-//                }
-//            }
-//        }
-//        aasManager.createAAS(aas, aasServerUrl);
-//    }
-//
     public void deleteSubmodel(UUID resourceId, String submodelId) {
         var aasId = ResourceAAS.createAasIdFromResourceId(resourceId);
 
