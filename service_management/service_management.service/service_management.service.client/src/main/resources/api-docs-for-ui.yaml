@@ -1,0 +1,2501 @@
+openapi: 3.0.1
+info:
+  title: Service Management
+  description: REST API of Service Management
+  contact:
+    name: Fraunhofer IPA
+    url: https://www.ipa.fraunhofer.de
+    email: matthias.schneider@ipa.fraunhofer.de
+  version: 1.4.0-SNAPSHOT
+servers:
+- url: http://localhost:9020
+  description: Generated server url
+security:
+- bearer_auth: []
+- spring_oauth: []
+paths:
+  /services/vendors/{serviceVendorId}:
+    get:
+      tags:
+      - service-vendors-rest-controller
+      summary: Get service vendor by id
+      operationId: getServiceVendorById
+      parameters:
+      - name: serviceVendorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: withImage
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceVendor'
+    put:
+      tags:
+      - service-vendors-rest-controller
+      operationId: createOrUpdateServiceVendorWithId
+      parameters:
+      - name: serviceVendorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceVendorDTOApi'
+        required: true
+      responses:
+        "200":
+          description: OK
+    delete:
+      tags:
+      - service-vendors-rest-controller
+      operationId: deleteServiceVendor
+      parameters:
+      - name: serviceVendorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+  /services/vendors/{serviceVendorId}/repositories/{serviceRepositoryId}:
+    put:
+      tags:
+      - service-repositories-rest-controller
+      summary: Create or update a repository containing files for service offerings
+      operationId: createOrUpdateRepository
+      parameters:
+      - name: serviceVendorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: serviceRepositoryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceRepository'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ServiceRepositoryCreateResponse'
+  /services/vendors/{serviceVendorId}/developers/{userId}:
+    put:
+      tags:
+      - service-vendors-rest-controller
+      operationId: addDeveloperToServiceVendor
+      parameters:
+      - name: serviceVendorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+    delete:
+      tags:
+      - service-vendors-rest-controller
+      operationId: removeDeveloperFromServiceVendor
+      parameters:
+      - name: serviceVendorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+  /services/offerings/{serviceOfferingId}:
+    get:
+      tags:
+      - service-offering-rest-controller
+      summary: Get service offering by id
+      operationId: getServiceOfferingById
+      parameters:
+      - name: serviceOfferingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: withImage
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceOfferingDTOApi'
+    put:
+      tags:
+      - service-offering-rest-controller
+      summary: Create new service offering with specified id or update existing one
+      operationId: createOrUpdateServiceOfferingWithId
+      parameters:
+      - name: serviceOfferingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceOfferingCreateOrUpdateRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ServiceOfferingCreateResponse'
+    delete:
+      tags:
+      - service-offering-rest-controller
+      summary: Delete service offering
+      operationId: deleteServiceOffering
+      parameters:
+      - name: serviceOfferingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+  /services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}:
+    get:
+      tags:
+      - service-offering-versions-rest-controller
+      summary: Get service offering version by id
+      operationId: getServiceOfferingVersionById
+      parameters:
+      - name: serviceOfferingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: serviceOfferingVersionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceOfferingVersionDTOApi'
+    put:
+      tags:
+      - service-offering-versions-rest-controller
+      summary: Create new service offering version with specified id or update existing
+        one
+      operationId: createOrUpdateServiceOfferingVersionWithId
+      parameters:
+      - name: serviceOfferingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: serviceOfferingVersionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceOfferingVersionDTOApi'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ServiceOfferingVersionCreateResponse'
+    delete:
+      tags:
+      - service-offering-versions-rest-controller
+      summary: Delete service offering version
+      operationId: deleteServiceOfferingVersion
+      parameters:
+      - name: serviceOfferingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: serviceOfferingVersionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+  /services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/requirements:
+    get:
+      tags:
+      - service-offering-versions-rest-controller
+      summary: Get service offering version requirements by id
+      operationId: getServiceOfferingVersionRequirementsById
+      parameters:
+      - name: serviceOfferingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: serviceOfferingVersionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceRequirement'
+    put:
+      tags:
+      - service-offering-versions-rest-controller
+      summary: Create or update requirements for service offering version
+      operationId: createOrUpdateServiceOfferingVersionRequirementsWithId
+      parameters:
+      - name: serviceOfferingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: serviceOfferingVersionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ServiceRequirement'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /services/offerings/categories:
+    get:
+      tags:
+      - service-categories-rest-controller
+      summary: Get service categories
+      operationId: getServiceCategories
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceCategory'
+    put:
+      tags:
+      - service-categories-rest-controller
+      summary: Create or update a service category
+      operationId: createOrUpdateServiceCategory
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceCategory'
+        required: true
+      responses:
+        "200":
+          description: OK
+    post:
+      tags:
+      - service-categories-rest-controller
+      summary: Create a service category
+      operationId: createServiceCategory
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceCategory'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceCategoryCreateResponse'
+  /services/instances/{serviceInstanceId}/groups:
+    put:
+      tags:
+      - service-instances-rest-controller
+      summary: Set groups for service instance
+      operationId: setGroupsOfServiceInstance
+      parameters:
+      - name: serviceInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /services/instances/groups/{serviceInstanceGroupId}:
+    put:
+      tags:
+      - service-instances-groups-rest-controller
+      summary: Create or update service instance group
+      operationId: createOrUpdateServiceInstanceGroup
+      parameters:
+      - name: serviceInstanceGroupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceInstanceGroup'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ServiceInstanceGroup'
+  /services/vendors:
+    get:
+      tags:
+      - service-vendors-rest-controller
+      summary: Get service vendors
+      operationId: getServiceVendors
+      parameters:
+      - name: withImage
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceVendor'
+    post:
+      tags:
+      - service-vendors-rest-controller
+      operationId: createServiceVendor
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceVendorDTOApi'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceVendorCreateResponse'
+  /services/vendors/{serviceVendorId}/repositories:
+    get:
+      tags:
+      - service-repositories-rest-controller
+      summary: Get repositories containing files for service offerings
+      operationId: getRepositories
+      parameters:
+      - name: serviceVendorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceRepositoryDTOApiRead'
+    post:
+      tags:
+      - service-repositories-rest-controller
+      summary: Create repository containing files for service offerings
+      operationId: createRepository
+      parameters:
+      - name: serviceVendorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceRepository'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ServiceRepositoryCreateResponse'
+  /services/offerings:
+    get:
+      tags:
+      - service-offering-rest-controller
+      summary: Get service offerings
+      operationId: getServiceOfferings
+      parameters:
+      - name: withImage
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: filterByServiceVendorId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceOfferingDTOApi'
+    post:
+      tags:
+      - service-offering-rest-controller
+      summary: Create new service offering
+      operationId: createServiceOfferingWithAutoGeneratedId
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceOfferingCreateOrUpdateRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ServiceOfferingCreateResponse'
+  /services/offerings/{serviceOfferingId}/versions:
+    get:
+      tags:
+      - service-offering-versions-rest-controller
+      summary: Get service offering versions of service offering
+      operationId: getServiceOfferingVersionsOfServiceOffering
+      parameters:
+      - name: serviceOfferingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceOfferingVersionDTOApi'
+    post:
+      tags:
+      - service-offering-versions-rest-controller
+      summary: Create new service offering version
+      operationId: createServiceOfferingVersionWithAutoGeneratedId
+      parameters:
+      - name: serviceOfferingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceOfferingVersionDTOApi'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ServiceOfferingVersionCreateResponse'
+  /services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/order:
+    post:
+      tags:
+      - service-offering-versions-rest-controller
+      summary: Order service offering version
+      operationId: orderServiceOfferingVersionById
+      parameters:
+      - name: serviceOfferingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: serviceOfferingVersionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: deploymentCapabilityServiceId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceOrder'
+        required: true
+      responses:
+        "200":
+          description: OK
+  /services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/file:
+    post:
+      tags:
+      - service-offering-versions-rest-controller
+      summary: 'Upload new service offering file for deployment '
+      operationId: createOrUpdateServiceOfferingFileWithId
+      parameters:
+      - name: serviceOfferingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: serviceOfferingVersionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+              - file
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+  /services/offerings/git:
+    post:
+      tags:
+      - service-offering-rest-controller
+      summary: Create new service offering from a git repository
+      operationId: addServiceOfferingWithAutoGeneratedIdFromGitRepo
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceOfferingGitRepository'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+                  format: uuid
+  /services/instances/{serviceInstanceId}/versions:
+    get:
+      tags:
+      - service-instances-rest-controller
+      summary: Get available version changes for service instance
+      operationId: getAvailableVersionChangesForServiceInstance
+      parameters:
+      - name: serviceInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AvailableServiceInstanceVersionChange'
+    post:
+      tags:
+      - service-instances-rest-controller
+      summary: Change service instance to version
+      operationId: updateServiceInstanceToVersion
+      parameters:
+      - name: serviceInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: targetServiceOfferingVersionId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /services/instances/groups:
+    get:
+      tags:
+      - service-instances-groups-rest-controller
+      summary: Get service instance groups
+      operationId: getServiceInstanceGroups
+      parameters:
+      - name: filterById
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceInstanceGroup'
+    post:
+      tags:
+      - service-instances-groups-rest-controller
+      summary: Create service instance group
+      operationId: createServiceInstanceGroup
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceInstanceGroup'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ServiceInstanceGroup'
+    delete:
+      tags:
+      - service-instances-groups-rest-controller
+      summary: Delete service instance group
+      operationId: deleteServiceInstanceGroup
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /variables/system:
+    get:
+      tags:
+      - service-management-variables-rest-controller
+      summary: Get system variables
+      operationId: getSystemVariables
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SystemVariable'
+  /variables/deployment:
+    get:
+      tags:
+      - service-management-variables-rest-controller
+      summary: Get deployment variables
+      operationId: getDeploymentVariables
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeploymentVariableType'
+  /services/vendors/{serviceVendorId}/logo:
+    get:
+      tags:
+      - service-vendors-rest-controller
+      operationId: getLogoOfServiceVendor
+      parameters:
+      - name: serviceVendorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            image/png:
+              schema:
+                type: string
+                format: byte
+  /services/vendors/{serviceVendorId}/developers:
+    get:
+      tags:
+      - service-vendors-rest-controller
+      operationId: getDevelopersOfServiceVendor
+      parameters:
+      - name: serviceVendorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceVendorDeveloper'
+  /services/users:
+    get:
+      tags:
+      - users-rest-controller
+      summary: Get users
+      operationId: getUsers
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+  /services/users/vendors:
+    get:
+      tags:
+      - users-rest-controller
+      summary: Get service vendors of authenticated user
+      operationId: getServiceVendorsOfUser
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+  /services/users/organisation/id:
+    get:
+      tags:
+      - users-rest-controller
+      summary: Get organisation id of authenticated user
+      operationId: getOrganisationIdOfAuthenticatedUser
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: uuid
+  /services/users/id:
+    get:
+      tags:
+      - users-rest-controller
+      summary: Get user id of authenticated user
+      operationId: getUserIdOfAuthenticatedUser
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: uuid
+  /services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/matching-resources:
+    get:
+      tags:
+      - service-offering-versions-rest-controller
+      summary: Get possible resources matching service requirements
+      operationId: getResourcesMatchingServiceRequirements
+      parameters:
+      - name: serviceOfferingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: serviceOfferingVersionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MatchingResourceDTO'
+  /services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/file/{fileName}:
+    get:
+      tags:
+      - service-offering-versions-rest-controller
+      summary: 'Download service offering file '
+      operationId: getServiceOfferingFileWithId
+      parameters:
+      - name: serviceOfferingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: serviceOfferingVersionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: fileName
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+  /services/offerings/{serviceOfferingId}/cover:
+    get:
+      tags:
+      - service-offering-rest-controller
+      operationId: getServiceOfferingCover
+      parameters:
+      - name: serviceOfferingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            image/png:
+              schema:
+                type: string
+  /services/offerings/deploymenttypes:
+    get:
+      tags:
+      - service-offering-rest-controller
+      summary: Get possible deployment types
+      operationId: getDeploymentTypes
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeploymentType'
+  /services/offerings/categories/{serviceCategoryId}:
+    get:
+      tags:
+      - service-categories-rest-controller
+      summary: Get service categories
+      operationId: getServiceCategoryById
+      parameters:
+      - name: serviceCategoryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceCategory'
+    delete:
+      tags:
+      - service-categories-rest-controller
+      summary: Delete a service category
+      operationId: deleteServiceCategories
+      parameters:
+      - name: serviceCategoryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ServiceCategoryCreateResponse'
+  /services/instances:
+    get:
+      tags:
+      - service-instances-rest-controller
+      summary: Get all services of user
+      operationId: getServicesOfUser
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceInstance'
+  /services/instances/{serviceInstanceId}/orders:
+    get:
+      tags:
+      - service-instances-rest-controller
+      summary: Get orders of service instance
+      operationId: getOrdersOfServiceInstance
+      parameters:
+      - name: serviceInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceOrder'
+  /services/instances/{serviceInstanceId}/details:
+    get:
+      tags:
+      - service-instances-rest-controller
+      summary: Get details of service instance
+      operationId: getServiceInstanceDetails
+      parameters:
+      - name: serviceInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ServiceInstanceDetails'
+  /services/vendors/{serviceVendorId}/repositories/{repositoryId}:
+    delete:
+      tags:
+      - service-repositories-rest-controller
+      summary: Delete repository containing files for service offerings
+      operationId: deleteRepository
+      parameters:
+      - name: serviceVendorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: repositoryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /services/instances/{serviceInstanceId}:
+    delete:
+      tags:
+      - service-instances-rest-controller
+      summary: Delete a service instance
+      operationId: deleteServiceInstance
+      parameters:
+      - name: serviceInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+components:
+  schemas:
+    ServiceVendorDTOApi:
+      required:
+      - description
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        logo:
+          type: string
+          format: byte
+    ServiceRepository:
+      required:
+      - address
+      - id
+      - password
+      - username
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        serviceVendorId:
+          type: string
+          format: uuid
+        address:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        type:
+          $ref: '#/components/schemas/ServiceRepositoryType'
+    ServiceRepositoryType:
+      type: string
+      enum:
+      - DOCKER_REGISTRY
+    ServiceRepositoryCreateResponse:
+      required:
+      - serviceRepositoryId
+      type: object
+      properties:
+        serviceRepositoryId:
+          type: string
+          format: uuid
+    ServiceOfferingCreateOrUpdateRequest:
+      required:
+      - description
+      - name
+      - serviceCategoryId
+      - serviceVendorId
+      - shortDescription
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        shortDescription:
+          type: string
+        serviceCategoryId:
+          type: integer
+          format: int64
+        serviceVendorId:
+          type: string
+          format: uuid
+        id:
+          type: string
+          format: uuid
+        coverImage:
+          type: string
+          format: byte
+    ServiceOfferingCreateResponse:
+      type: object
+      properties:
+        serviceOfferingId:
+          type: string
+          format: uuid
+    CodesysDeploymentDefinition:
+      required:
+      - applicationPath
+      - deploymentType
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/DeploymentDefinition'
+      - type: object
+        properties:
+          applicationPath:
+            type: string
+    DeploymentDefinition:
+      required:
+      - deploymentType
+      type: object
+      properties:
+        deploymentType:
+          $ref: '#/components/schemas/DeploymentType'
+      discriminator:
+        propertyName: deploymentType
+    DeploymentType:
+      type: string
+      enum:
+      - DOCKER_CONTAINER
+      - DOCKER_COMPOSE
+      - KUBERNETES
+      - CODESYS
+    DockerComposeDeploymentDefinition:
+      required:
+      - composeFile
+      - deploymentType
+      - dotEnvFile
+      - envFiles
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/DeploymentDefinition'
+      - type: object
+        properties:
+          composeFile:
+            type: string
+          dotEnvFile:
+            type: string
+          envFiles:
+            type: object
+            additionalProperties:
+              type: string
+    DockerContainerDeploymentDefinition:
+      required:
+      - deploymentType
+      - environmentVariables
+      - imageRepository
+      - imageTag
+      - labels
+      - portMappings
+      - restartPolicy
+      - volumes
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/DeploymentDefinition'
+      - type: object
+        properties:
+          imageRepository:
+            type: string
+          imageTag:
+            type: string
+          restartPolicy:
+            $ref: '#/components/schemas/DockerRestartPolicy'
+          environmentVariables:
+            type: array
+            items:
+              $ref: '#/components/schemas/ServiceOfferingEnvironmentVariable'
+          labels:
+            type: array
+            items:
+              $ref: '#/components/schemas/DockerContainerLabel'
+          portMappings:
+            type: array
+            items:
+              $ref: '#/components/schemas/DockerContainerPortMapping'
+          volumes:
+            type: array
+            items:
+              $ref: '#/components/schemas/DockerContainerVolume'
+    DockerContainerLabel:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: object
+    DockerContainerPortMapping:
+      required:
+      - containerPort
+      - hostPort
+      - protocol
+      type: object
+      properties:
+        hostPort:
+          type: integer
+          format: int32
+        containerPort:
+          type: integer
+          format: int32
+        protocol:
+          type: string
+    DockerContainerVolume:
+      required:
+      - containerPath
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+        containerPath:
+          type: string
+    DockerRestartPolicy:
+      type: string
+      enum:
+      - "NO"
+      - ALWAYS
+      - ON_FAILURE
+      - UNLESS_STOPPED
+    KubernetesDeploymentDefinition:
+      required:
+      - deploymentType
+      - manifestFile
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/DeploymentDefinition'
+      - type: object
+        properties:
+          manifestFile:
+            type: string
+    RequirementLogicType:
+      type: string
+      enum:
+      - ANY
+      - ALL
+    RequirementProperty:
+      required:
+      - parentSubmodelsSemanticIds
+      type: object
+      properties:
+        name:
+          type: string
+        semanticId:
+          type: string
+        value:
+          type: string
+        parentSubmodelsSemanticIds:
+          type: array
+          items:
+            type: string
+    ServiceOfferingEnvironmentVariable:
+      required:
+      - key
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: object
+    ServiceOfferingVersionDTOApi:
+      required:
+      - serviceOptionCategories
+      - servicePorts
+      - serviceRepositories
+      - serviceRequirements
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        serviceOfferingId:
+          type: string
+          format: uuid
+        version:
+          type: string
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        serviceOptionCategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceOptionCategory'
+        serviceRequirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceRequirement'
+        serviceRepositories:
+          type: array
+          items:
+            type: string
+            format: uuid
+        deploymentDefinition:
+          oneOf:
+          - $ref: '#/components/schemas/CodesysDeploymentDefinition'
+          - $ref: '#/components/schemas/DockerComposeDeploymentDefinition'
+          - $ref: '#/components/schemas/DockerContainerDeploymentDefinition'
+          - $ref: '#/components/schemas/KubernetesDeploymentDefinition'
+        servicePorts:
+          type: array
+          items:
+            type: integer
+            format: int32
+    ServiceOption:
+      required:
+      - description
+      - editable
+      - key
+      - name
+      - optionType
+      - relation
+      - required
+      - valueType
+      type: object
+      properties:
+        relation:
+          type: string
+        key:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        optionType:
+          $ref: '#/components/schemas/ServiceOptionType'
+        defaultValue:
+          type: object
+        valueType:
+          $ref: '#/components/schemas/ServiceOptionValueType'
+        valueOptions:
+          type: array
+          items:
+            type: string
+        required:
+          type: boolean
+        editable:
+          type: boolean
+    ServiceOptionCategory:
+      required:
+      - id
+      - name
+      - serviceOptions
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        serviceOptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceOption'
+    ServiceOptionType:
+      type: string
+      enum:
+      - ENVIRONMENT_VARIABLE
+      - PORT_MAPPING
+      - VOLUME
+      - LABEL
+      - STRING_REPLACE
+    ServiceOptionValueType:
+      type: string
+      enum:
+      - STRING
+      - PASSWORD
+      - BOOLEAN
+      - NUMBER
+      - INTEGER
+      - DECIMAL
+      - EMAIL
+      - IP
+      - ENUM
+      - AUTO_GENERATED_UUID
+      - PORT
+      - VOLUME
+      - AAS_SM_TEMPLATE
+      - SYSTEM_VARIABLE
+      - DEPLOYMENT_VARIABLE
+    ServiceRequirement:
+      required:
+      - logics
+      type: object
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        logics:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceRequirementLogic'
+    ServiceRequirementLogic:
+      required:
+      - properties
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/RequirementLogicType'
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/RequirementProperty'
+    ServiceOfferingVersionCreateResponse:
+      type: object
+      properties:
+        serviceOfferingId:
+          type: string
+          format: uuid
+        serviceOfferingVersionId:
+          type: string
+          format: uuid
+    ServiceCategory:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+        id:
+          type: integer
+          format: int64
+    ServiceInstanceGroup:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    ServiceVendorCreateResponse:
+      required:
+      - serviceVendorId
+      type: object
+      properties:
+        serviceVendorId:
+          type: string
+          format: uuid
+    ServiceOptionValue:
+      required:
+      - serviceOptionId
+      - value
+      type: object
+      properties:
+        serviceOptionId:
+          type: string
+        value:
+          type: object
+    ServiceOrder:
+      required:
+      - created
+      - id
+      - serviceOptionValues
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        created:
+          type: string
+          format: date-time
+        serviceInstanceId:
+          type: string
+          format: uuid
+        serviceOptionValues:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceOptionValue'
+        deploymentCapabilityServiceId:
+          type: string
+          format: uuid
+        serviceOrderResult:
+          $ref: '#/components/schemas/ServiceOrderResult'
+    ServiceOrderResult:
+      type: string
+      enum:
+      - FAILED
+      - SUCCESSFULL
+    ServiceOffering:
+      required:
+      - description
+      - id
+      - name
+      - shortDescription
+      - versions
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        shortDescription:
+          type: string
+        coverImage:
+          type: string
+          format: byte
+        serviceCategory:
+          $ref: '#/components/schemas/ServiceCategory'
+        serviceVendor:
+          $ref: '#/components/schemas/ServiceVendor'
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceOfferingVersion'
+        gitRepository:
+          $ref: '#/components/schemas/ServiceOfferingGitRepository'
+    ServiceOfferingGitRepository:
+      required:
+      - gitPassword
+      - gitTagRegEx
+      - gitUsername
+      - id
+      - repositoryUrl
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        repositoryUrl:
+          type: string
+        gitUsername:
+          type: string
+        gitPassword:
+          type: string
+        gitTagRegEx:
+          type: string
+        serviceVendorId:
+          type: string
+          format: uuid
+        serviceOffering:
+          $ref: '#/components/schemas/ServiceOffering'
+    ServiceOfferingVersion:
+      required:
+      - created
+      - id
+      - serviceOptionCategories
+      - servicePorts
+      - serviceRepositories
+      - serviceRequirements
+      - version
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        serviceOffering:
+          $ref: '#/components/schemas/ServiceOffering'
+        version:
+          type: string
+        deploymentDefinition:
+          oneOf:
+          - $ref: '#/components/schemas/CodesysDeploymentDefinition'
+          - $ref: '#/components/schemas/DockerComposeDeploymentDefinition'
+          - $ref: '#/components/schemas/DockerContainerDeploymentDefinition'
+          - $ref: '#/components/schemas/KubernetesDeploymentDefinition'
+        created:
+          type: string
+          format: date-time
+        serviceOptionCategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceOptionCategory'
+        serviceRequirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceRequirement'
+        serviceRepositories:
+          type: array
+          items:
+            type: string
+            format: uuid
+        servicePorts:
+          type: array
+          items:
+            type: integer
+            format: int32
+    ServiceVendor:
+      required:
+      - description
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        logo:
+          type: string
+          format: byte
+    ServiceCategoryCreateResponse:
+      required:
+      - serviceCategoryId
+      type: object
+      properties:
+        serviceCategoryId:
+          type: integer
+          format: int64
+    SystemVariable:
+      required:
+      - key
+      - name
+      - valuePath
+      - valueSource
+      type: object
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        valueSource:
+          $ref: '#/components/schemas/SystemVariableValueSource'
+        valuePath:
+          type: string
+        value:
+          type: object
+    SystemVariableValueSource:
+      type: string
+      enum:
+      - APPLICATION_PROPERTIES
+    DeploymentVariableType:
+      type: string
+      enum:
+      - TARGET_RESOURCE_ID
+      - TARGET_RESOURCE_IP
+    ServiceRepositoryDTOApiRead:
+      required:
+      - address
+      - id
+      - username
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        serviceVendorId:
+          type: string
+          format: uuid
+        address:
+          type: string
+        username:
+          type: string
+        type:
+          $ref: '#/components/schemas/ServiceRepositoryType'
+    ServiceVendorDeveloper:
+      required:
+      - username
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+    User:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+    ServiceOfferingDTOApi:
+      required:
+      - description
+      - name
+      - scmBased
+      - serviceCategoryId
+      - serviceVendorId
+      - shortDescription
+      - versions
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        shortDescription:
+          type: string
+        serviceCategoryId:
+          type: integer
+          format: int64
+        serviceVendorId:
+          type: string
+          format: uuid
+        id:
+          type: string
+          format: uuid
+        coverImage:
+          type: string
+          format: byte
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceOfferingVersionDTOShort'
+        scmBased:
+          type: boolean
+    ServiceOfferingVersionDTOShort:
+      required:
+      - created
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        version:
+          type: string
+        created:
+          type: string
+          format: date-time
+    MatchingResourceDTO:
+      required:
+      - capabilityServiceId
+      - isCluster
+      - resourceId
+      type: object
+      properties:
+        resourceId:
+          type: string
+          format: uuid
+        capabilityServiceId:
+          type: string
+          format: uuid
+        isCluster:
+          type: boolean
+    ServiceInstance:
+      required:
+      - capabilityServiceId
+      - groupIds
+      - id
+      - metaData
+      - ports
+      - resourceId
+      - serviceOfferingId
+      - serviceOfferingVersionId
+      - tags
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tags:
+          type: array
+          items:
+            type: string
+        metaData:
+          type: object
+          additionalProperties:
+            type: string
+        resourceId:
+          type: string
+          format: uuid
+        capabilityServiceId:
+          type: string
+          format: uuid
+        serviceOfferingId:
+          type: string
+          format: uuid
+        serviceOfferingVersionId:
+          type: string
+          format: uuid
+        ports:
+          type: array
+          items:
+            type: integer
+            format: int32
+        groupIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+    AvailableServiceInstanceVersionChange:
+      required:
+      - changeType
+      - serviceOfferingVersionId
+      - version
+      - versionDate
+      type: object
+      properties:
+        serviceOfferingVersionId:
+          type: string
+          format: uuid
+        version:
+          type: string
+        versionDate:
+          type: string
+          format: date-time
+        changeType:
+          $ref: '#/components/schemas/AvailableServiceInstanceVersionChangeType'
+    AvailableServiceInstanceVersionChangeType:
+      type: string
+      enum:
+      - UP
+      - DOWN
+    ServiceInstanceDetails:
+      required:
+      - deploymentCapabilityServiceId
+      - groupIds
+      - id
+      - initialCreation
+      - lastUpdate
+      - metaData
+      - orderHistory
+      - serviceOfferingId
+      - serviceOfferingVersionId
+      - serviceOptions
+      - tags
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        serviceOfferingId:
+          type: string
+          format: uuid
+        serviceOfferingVersionId:
+          type: string
+          format: uuid
+        initialCreation:
+          type: string
+          format: date-time
+        lastUpdate:
+          type: string
+          format: date-time
+        tags:
+          type: array
+          items:
+            type: string
+        groupIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        metaData:
+          type: object
+          additionalProperties:
+            type: string
+        serviceOptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceOptionWithCurrentValue'
+        deploymentCapabilityServiceId:
+          type: string
+          format: uuid
+        orderHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceOrder'
+    ServiceOptionWithCurrentValue:
+      required:
+      - description
+      - editable
+      - key
+      - name
+      - optionType
+      - relation
+      - required
+      - valueType
+      type: object
+      properties:
+        currentValue:
+          type: object
+        relation:
+          type: string
+        key:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        optionType:
+          $ref: '#/components/schemas/ServiceOptionType'
+        defaultValue:
+          type: object
+        valueType:
+          $ref: '#/components/schemas/ServiceOptionValueType'
+        valueOptions:
+          type: array
+          items:
+            type: string
+        required:
+          type: boolean
+        editable:
+          type: boolean
+  securitySchemes:
+    spring_oauth:
+      type: oauth2
+      description: Oauth2 flow
+      flows:
+        authorizationCode:
+          authorizationUrl: http://fabos.local:7080/auth/realms/fabos/protocol/openid-connect/auth
+          tokenUrl: http://fabos.local:7080/auth/realms/fabos/protocol/openid-connect/token
+          refreshUrl: http://fabos.local:7080/auth/realms/fabos/protocol/openid-connect/token
+          scopes: {}
+    bearer_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,2897 @@
+openapi: 3.0.1
+info:
+  title: Resource Management
+  description: REST API of Resource Management
+  contact:
+    name: Fraunhofer IPA
+    url: https://www.ipa.fraunhofer.de
+    email: matthias.schneider@ipa.fraunhofer.de
+  version: 1.4.0-SNAPSHOT
+servers:
+- url: http://localhost:9010
+  description: Generated server url
+security:
+- bearer_auth: []
+- spring_oauth: []
+paths:
+  /resources:
+    get:
+      tags:
+      - resources-rest-controller
+      summary: Get all resources
+      operationId: getResources
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BasicResource'
+    put:
+      tags:
+      - resources-rest-controller
+      summary: Add existing resource
+      operationId: addExistingResource
+      parameters:
+      - name: resourceUsername
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: resourcePassword
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: resourceHostname
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: resourceIp
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: resourceConnectionType
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ConnectionType'
+      - name: resourceConnectionPort
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: resourceLocation
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: resourceBaseConfiguration
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: uuid
+  /resources/{resourceId}:
+    get:
+      tags:
+      - resources-rest-controller
+      summary: Get resource
+      operationId: getResource
+      parameters:
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BasicResource'
+    put:
+      tags:
+      - resources-rest-controller
+      summary: Add existing resource with id
+      operationId: addExistingResourceWithId
+      parameters:
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceUsername
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: resourcePassword
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: resourceHostname
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: resourceIp
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: resourceConnectionType
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ConnectionType'
+      - name: resourceConnectionPort
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: resourceLocation
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: resourceBaseConfiguration
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+    delete:
+      tags:
+      - resources-rest-controller
+      summary: Delete resource
+      operationId: deleteResource
+      parameters:
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /resources/{resourceId}/capabilities:
+    put:
+      tags:
+      - capabilities-rest-controller
+      summary: Install capability on resource
+      operationId: installCapabilityOnSingleHost
+      parameters:
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: capabilityId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: skipInstall
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+    delete:
+      tags:
+      - capabilities-rest-controller
+      summary: Uninstall capability from resource
+      operationId: removeCapabilityFromSingleHost
+      parameters:
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: capabilityId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /resources/{resourceId}/submodels:
+    get:
+      tags:
+      - submodels-rest-controller
+      summary: Get resource submodels
+      operationId: getResourceSubmodels
+      parameters:
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+    post:
+      tags:
+      - submodels-rest-controller
+      summary: Add submodels to existing resource
+      operationId: addSubmodels
+      parameters:
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - aasx
+              type: object
+              properties:
+                aasx:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /resources/providers/virtual-resource-provider/{virtualResourceProviderId}/vm:
+    post:
+      tags:
+      - capability-providers-rest-controller
+      summary: Create Virtual Machine
+      operationId: createVm
+      parameters:
+      - name: virtualResourceProviderId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+  /resources/profiler:
+    get:
+      tags:
+      - profiler-rest-controller
+      summary: Get all Profiler
+      operationId: getProfiler
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Profiler'
+    post:
+      tags:
+      - profiler-rest-controller
+      summary: Create Profiler
+      operationId: createProfiler
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfilerDTOApi'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Profiler'
+  /resources/profiler/{profilerId}/execute:
+    post:
+      tags:
+      - profiler-rest-controller
+      summary: Run one Profiler
+      operationId: runProfiler
+      parameters:
+      - name: profilerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+  /resources/profiler/execute:
+    post:
+      tags:
+      - profiler-rest-controller
+      summary: Run all Profiler
+      operationId: runProfiler_1
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+  /resources/locations:
+    get:
+      tags:
+      - location-rest-controller
+      summary: Get locations
+      operationId: getLocations
+      parameters:
+      - name: id
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'
+    post:
+      tags:
+      - location-rest-controller
+      summary: Create new Location
+      operationId: addLocation
+      parameters:
+      - name: id
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: name
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+    delete:
+      tags:
+      - location-rest-controller
+      summary: Delete Location
+      operationId: deleteLocation
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /resources/clusters:
+    get:
+      tags:
+      - clusters-rest-controller
+      summary: Get all cluster resources of user
+      operationId: getClusterResources
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cluster'
+    post:
+      tags:
+      - clusters-rest-controller
+      summary: Create a cluster
+      operationId: createClusterResource
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClusterCreateRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+  /resources/clusters/{clusterUuid}/members:
+    post:
+      tags:
+      - clusters-rest-controller
+      summary: Add new Member to cluster
+      operationId: addClusterMember
+      parameters:
+      - name: clusterUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+    delete:
+      tags:
+      - clusters-rest-controller
+      summary: Remove member of cluster
+      operationId: removeClusterMember
+      parameters:
+      - name: clusterUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+  /resources/capabilities:
+    get:
+      tags:
+      - capabilities-rest-controller
+      summary: Get capabilities
+      operationId: getCapabilities
+      parameters:
+      - name: filter
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/CapabilityFilter'
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                  - $ref: '#/components/schemas/BaseConfigurationCapabilityDTOApi'
+                  - $ref: '#/components/schemas/DeploymentCapabilityDTOApi'
+                  - $ref: '#/components/schemas/VirtualizationCapabilityDTOApi'
+    post:
+      tags:
+      - capabilities-rest-controller
+      summary: Add capability
+      operationId: createCapability
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - $ref: '#/components/schemas/BaseConfigurationCapabilityDTOApi'
+              - $ref: '#/components/schemas/DeploymentCapabilityDTOApi'
+              - $ref: '#/components/schemas/VirtualizationCapabilityDTOApi'
+        required: true
+      responses:
+        "200":
+          description: OK
+  /resources/{resourceId}/deployment-capabilities:
+    get:
+      tags:
+      - capabilities-rest-controller
+      summary: Get deployment capabilities of resource
+      operationId: getDeploymentCapabilitiesOfResource
+      parameters:
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeploymentCapability'
+  /resources/{resourceId}/capability-services:
+    get:
+      tags:
+      - capabilities-rest-controller
+      summary: Get capability services of resource
+      operationId: getCapabilityServicesOfResource
+      parameters:
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                  - $ref: '#/components/schemas/CapabilityService'
+                  - $ref: '#/components/schemas/MultiHostCapabilityService'
+                  - $ref: '#/components/schemas/SingleHostCapabilityService'
+  /resources/providers/virtual-resource-provider:
+    get:
+      tags:
+      - capability-providers-rest-controller
+      summary: Get all virtual resource provider
+      operationId: getVirtualResourceProviders
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VirtualResourceProvider'
+  /resources/providers/service-hoster:
+    get:
+      tags:
+      - capability-providers-rest-controller
+      summary: Get all service hoster
+      operationId: getServiceHosters
+      parameters:
+      - name: filter
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ServiceHosterFilter'
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceHoster'
+  /resources/profiler/{profilerId}:
+    get:
+      tags:
+      - profiler-rest-controller
+      summary: Get Profiler
+      operationId: getProfiler_1
+      parameters:
+      - name: profilerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Profiler'
+    delete:
+      tags:
+      - profiler-rest-controller
+      summary: Delete Profiler
+      operationId: deleteProfiler
+      parameters:
+      - name: profilerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+  /resources/connection-types:
+    get:
+      tags:
+      - resources-rest-controller
+      summary: Get available remote connection types
+      operationId: getResourceConnectionTypes
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConnectionTypeDTO'
+  /resources/clusters/{clusterName}/members:
+    get:
+      tags:
+      - clusters-rest-controller
+      summary: Get members of cluster
+      operationId: getClusterMembers
+      parameters:
+      - name: clusterName
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CatalogService'
+  /resources/clusters/types:
+    get:
+      tags:
+      - clusters-rest-controller
+      summary: Get all available cluster types
+      operationId: getClusterTypes
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  oneOf:
+                  - $ref: '#/components/schemas/BaseConfigurationCapabilityDTOApi'
+                  - $ref: '#/components/schemas/DeploymentCapabilityDTOApi'
+                  - $ref: '#/components/schemas/VirtualizationCapabilityDTOApi'
+  /metrics/{resourceId}:
+    get:
+      tags:
+      - metrics-rest-controller
+      operationId: getMetric
+      parameters:
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+  /jobs:
+    get:
+      tags:
+      - jobs-rest-controller
+      operationId: getJobs
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /aas/submodels/templates/{smTemplateSemanticId}/instances:
+    get:
+      tags:
+      - submodel-templates-rest-controller
+      summary: Get instances of submodel templates using semantic id
+      operationId: getSubmodelTemplateInstancesBySemanticId
+      parameters:
+      - name: smTemplateSemanticId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: filterByAasId
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /aas/:
+    get:
+      tags:
+      - submodel-templates-rest-controller
+      summary: Get all AAS containing PlatformResources Submodel
+      operationId: getResourceAASDescriptors
+      parameters:
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssetAdministrationShell'
+  /resources/{resourceId}/submodels/{submodelIdShort}:
+    delete:
+      tags:
+      - submodels-rest-controller
+      summary: Delete resource submodel
+      operationId: deleteSubmodel
+      parameters:
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: submodelIdShort
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /resources/clusters/{clusterUuid}:
+    delete:
+      tags:
+      - clusters-rest-controller
+      summary: Delete cluster resource
+      operationId: deleteClusterResource
+      parameters:
+      - name: clusterUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+  /resources/capabilities/{capabilityId}:
+    delete:
+      tags:
+      - capabilities-rest-controller
+      summary: Delete capability
+      operationId: deleteCapability
+      parameters:
+      - name: capabilityId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+components:
+  schemas:
+    ConnectionType:
+      type: string
+      enum:
+      - ssh
+      - WinSsh
+      - WinRM
+      - http
+      - tcp
+    Action:
+      required:
+      - actionClass
+      - configParameters
+      - connectionTypes
+      - skipable
+      type: object
+      properties:
+        actionClass:
+          type: string
+        actionType:
+          $ref: '#/components/schemas/ActionType'
+        skipable:
+          type: boolean
+        configParameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActionConfigParameter'
+        connectionTypes:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ConnectionType'
+      discriminator:
+        propertyName: actionClass
+    ActionConfigParameter:
+      required:
+      - description
+      - name
+      - prettyName
+      - requiredType
+      - secret
+      - valueType
+      type: object
+      properties:
+        name:
+          type: string
+        prettyName:
+          type: string
+        description:
+          type: string
+        valueType:
+          $ref: '#/components/schemas/ActionConfigParameterValueType'
+        defaultValue:
+          type: string
+        requiredType:
+          $ref: '#/components/schemas/ActionConfigParameterRequiredType'
+        secret:
+          type: boolean
+    ActionConfigParameterRequiredType:
+      type: string
+      enum:
+      - ALWAYS
+      - SKIP
+    ActionConfigParameterValueType:
+      type: string
+      enum:
+      - SERVICE_PORT
+      - STRING
+      - FILE
+      - KUBE_CONF
+    ActionType:
+      type: string
+      enum:
+      - INSTALL
+      - UNINSTALL
+      - SCALE_UP
+      - SCALE_DOWN
+      - CREATE_VM
+      - DELETE_VM
+      - DEPLOY
+      - UNDEPLOY
+      - UPDATE
+      - RUN
+    AwxAction:
+      required:
+      - actionClass
+      - awxBranch
+      - awxRepo
+      - configParameters
+      - connectionTypes
+      - playbook
+      - skipable
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Action'
+      - type: object
+        properties:
+          awxRepo:
+            type: string
+          awxBranch:
+            type: string
+          playbook:
+            type: string
+          parameter:
+            type: array
+            items:
+              $ref: '#/components/schemas/SurveyItem'
+    ProfilerDTOApi:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        action:
+          oneOf:
+          - $ref: '#/components/schemas/AwxAction'
+    SurveyItem:
+      required:
+      - choices
+      - default
+      - question_description
+      - question_name
+      - required
+      - type
+      - variable
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/SurveyItemType'
+        question_name:
+          type: string
+        question_description:
+          type: string
+        variable:
+          type: string
+        choices:
+          type: array
+          items:
+            type: string
+        min:
+          type: integer
+          format: int32
+        max:
+          type: integer
+          format: int32
+        required:
+          type: boolean
+        default:
+          type: string
+    SurveyItemType:
+      type: string
+      enum:
+      - text
+      - password
+      - integer
+      - float
+      - multiplechoice
+      - multiselect
+    Profiler:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        action:
+          oneOf:
+          - $ref: '#/components/schemas/AwxAction'
+    ClusterCreateRequest:
+      required:
+      - clusterMembers
+      - clusterTypeId
+      - configParameterValues
+      - skipInstall
+      type: object
+      properties:
+        clusterTypeId:
+          type: string
+          format: uuid
+        skipInstall:
+          type: boolean
+        clusterMembers:
+          type: object
+          additionalProperties:
+            type: string
+        configParameterValues:
+          type: object
+          additionalProperties:
+            type: string
+    BaseConfigurationCapabilityDTOApi:
+      required:
+      - actions
+      - capabilityClass
+      - clusterMemberTypes
+      - id
+      - logo
+      - name
+      - type
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/CapabilityDTOApi'
+    CapabilityDTOApi:
+      required:
+      - actions
+      - capabilityClass
+      - clusterMemberTypes
+      - id
+      - logo
+      - name
+      - type
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        capabilityClass:
+          type: string
+        name:
+          type: string
+        logo:
+          type: string
+        type:
+          type: array
+          items:
+            $ref: '#/components/schemas/CapabilityType'
+        actions:
+          type: object
+          additionalProperties:
+            oneOf:
+            - $ref: '#/components/schemas/AwxAction'
+        healthCheck:
+          $ref: '#/components/schemas/CapabilityHealthCheck'
+        clusterMemberTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClusterMemberType'
+        connection:
+          $ref: '#/components/schemas/ConnectionType'
+        executionEnvironment:
+          $ref: '#/components/schemas/ExecutionEnvironment'
+      discriminator:
+        propertyName: capabilityClass
+    CapabilityHealthCheck:
+      required:
+      - interval
+      - path
+      - port
+      - type
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/CapabilityHealthCheckType'
+        port:
+          type: integer
+          format: int32
+        path:
+          type: string
+        interval:
+          type: integer
+          format: int32
+    CapabilityHealthCheckType:
+      type: string
+      enum:
+      - HTTP
+    CapabilityType:
+      type: string
+      enum:
+      - SETUP
+      - DEPLOY
+      - SCALE
+      - VM
+    ClusterMemberType:
+      required:
+      - minNumber
+      - name
+      - prettyName
+      - scalable
+      type: object
+      properties:
+        name:
+          type: string
+        prettyName:
+          type: string
+        minNumber:
+          type: integer
+          format: int32
+        scalable:
+          type: boolean
+    DeploymentCapabilityDTOApi:
+      required:
+      - actions
+      - capabilityClass
+      - clusterMemberTypes
+      - id
+      - logo
+      - name
+      - supportedDeploymentTypes
+      - type
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/CapabilityDTOApi'
+      - type: object
+        properties:
+          supportedDeploymentTypes:
+            type: array
+            items:
+              $ref: '#/components/schemas/DeploymentType'
+    DeploymentType:
+      type: string
+      enum:
+      - DOCKER_CONTAINER
+      - DOCKER_COMPOSE
+      - KUBERNETES
+      - CODESYS
+    ExecutionEnvironment:
+      required:
+      - description
+      - image
+      - pull
+      type: object
+      properties:
+        image:
+          type: string
+        pull:
+          $ref: '#/components/schemas/ExecutionEnvironmentPull'
+        description:
+          type: string
+        registryCredential:
+          $ref: '#/components/schemas/RegistryCredentials'
+    ExecutionEnvironmentPull:
+      type: string
+      enum:
+      - None
+      - Always
+      - Missing
+      - Never
+    RegistryCredentials:
+      required:
+      - authenticationURL
+      - password
+      - username
+      - verifySSL
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        description:
+          type: string
+        authenticationURL:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        verifySSL:
+          type: boolean
+    VirtualizationCapabilityDTOApi:
+      required:
+      - actions
+      - capabilityClass
+      - clusterMemberTypes
+      - id
+      - logo
+      - name
+      - type
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/CapabilityDTOApi'
+    BaseConfigurationCapability:
+      required:
+      - actions
+      - capabilityClass
+      - cluster
+      - clusterMemberTypes
+      - connectionTypes
+      - id
+      - logo
+      - name
+      - type
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Capability'
+    BasicResource:
+      required:
+      - clusterMember
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        location:
+          $ref: '#/components/schemas/Location'
+        ip:
+          type: string
+        hostname:
+          type: string
+        project:
+          type: string
+        clusterMember:
+          type: boolean
+        capabilityServices:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/CapabilityService'
+            - $ref: '#/components/schemas/MultiHostCapabilityService'
+            - $ref: '#/components/schemas/SingleHostCapabilityService'
+        remoteAccessService:
+          $ref: '#/components/schemas/RemoteAccessService'
+    Capability:
+      required:
+      - actions
+      - capabilityClass
+      - cluster
+      - clusterMemberTypes
+      - connectionTypes
+      - id
+      - logo
+      - name
+      - type
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        capabilityClass:
+          type: string
+        name:
+          type: string
+        logo:
+          type: string
+        type:
+          type: array
+          items:
+            $ref: '#/components/schemas/CapabilityType'
+        actions:
+          type: object
+          additionalProperties:
+            oneOf:
+            - $ref: '#/components/schemas/AwxAction'
+        healthCheck:
+          $ref: '#/components/schemas/CapabilityHealthCheck'
+        clusterMemberTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClusterMemberType'
+        connection:
+          $ref: '#/components/schemas/ConnectionType'
+        executionEnvironment:
+          $ref: '#/components/schemas/ExecutionEnvironment'
+        cluster:
+          type: boolean
+        connectionTypes:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ConnectionType'
+      discriminator:
+        propertyName: capabilityClass
+    CapabilityService:
+      required:
+      - ID
+      - capabilityServiceClass
+      - customMeta
+      - managed
+      - serviceClass
+      - serviceMeta
+      - status
+      - tags
+      type: object
+      properties:
+        service:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        serviceMeta:
+          type: object
+          additionalProperties:
+            type: string
+        capability:
+          oneOf:
+          - $ref: '#/components/schemas/BaseConfigurationCapability'
+          - $ref: '#/components/schemas/DeploymentCapability'
+          - $ref: '#/components/schemas/VirtualizationCapability'
+        status:
+          $ref: '#/components/schemas/CapabilityServiceStatus'
+        serviceClass:
+          type: string
+        customMeta:
+          type: object
+          additionalProperties:
+            type: string
+        managed:
+          type: boolean
+        ID:
+          type: string
+          format: uuid
+        Address:
+          type: string
+        Port:
+          type: integer
+          format: int32
+        capabilityServiceClass:
+          type: string
+      discriminator:
+        propertyName: capabilityServiceClass
+    CapabilityServiceStatus:
+      type: string
+      enum:
+      - INSTALL
+      - READY
+      - UNINSTALL
+      - FAILED
+      - UNKNOWN
+    Credential:
+      required:
+      - credentialClass
+      type: object
+      properties:
+        credentialClass:
+          type: string
+      discriminator:
+        propertyName: credentialClass
+    CredentialUsernamePassword:
+      required:
+      - password
+      - username
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Credential'
+      - type: object
+        properties:
+          password:
+            type: string
+          username:
+            type: string
+    DeploymentCapability:
+      required:
+      - actions
+      - capabilityClass
+      - cluster
+      - clusterMemberTypes
+      - connectionTypes
+      - id
+      - logo
+      - name
+      - supportedDeploymentTypes
+      - type
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Capability'
+      - type: object
+        properties:
+          supportedDeploymentTypes:
+            type: array
+            items:
+              $ref: '#/components/schemas/DeploymentType'
+    Location:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    MultiHostCapabilityService:
+      required:
+      - ID
+      - customMeta
+      - managed
+      - mapOfNodeIdsAndCatalogServices
+      - serviceClass
+      - serviceMeta
+      - status
+      - tags
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/CapabilityService'
+      - type: object
+        properties:
+          memberMapping:
+            type: object
+            additionalProperties:
+              type: string
+          mapOfNodeIdsAndCatalogServices:
+            type: object
+            additionalProperties:
+              $ref: '#/components/schemas/Service'
+    RemoteAccessService:
+      required:
+      - ID
+      - serviceMeta
+      - tags
+      type: object
+      properties:
+        service:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        serviceMeta:
+          type: object
+          additionalProperties:
+            type: string
+        credential:
+          oneOf:
+          - $ref: '#/components/schemas/CredentialUsernamePassword'
+        connectionType:
+          $ref: '#/components/schemas/ConnectionType'
+        ID:
+          type: string
+          format: uuid
+        Address:
+          type: string
+        Port:
+          type: integer
+          format: int32
+    Service:
+      required:
+      - ID
+      - Meta
+      - Tags
+      type: object
+      properties:
+        ID:
+          type: string
+          format: uuid
+        Address:
+          type: string
+        Service:
+          type: string
+        Tags:
+          type: array
+          items:
+            type: string
+        Port:
+          type: integer
+          format: int32
+        Meta:
+          type: object
+          additionalProperties:
+            type: string
+    SingleHostCapabilityService:
+      required:
+      - ID
+      - customMeta
+      - managed
+      - serviceClass
+      - serviceMeta
+      - status
+      - tags
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/CapabilityService'
+      - type: object
+        properties:
+          consulNodeId:
+            type: string
+            format: uuid
+    VirtualizationCapability:
+      required:
+      - actions
+      - capabilityClass
+      - cluster
+      - clusterMemberTypes
+      - connectionTypes
+      - id
+      - logo
+      - name
+      - type
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Capability'
+    VirtualResourceProvider:
+      required:
+      - capabilityClass
+      type: object
+      properties:
+        capabilityService:
+          oneOf:
+          - $ref: '#/components/schemas/CapabilityService'
+          - $ref: '#/components/schemas/MultiHostCapabilityService'
+          - $ref: '#/components/schemas/SingleHostCapabilityService'
+        capabilityClass:
+          type: string
+    CapabilityHostType:
+      type: string
+      enum:
+      - SINGLE_HOST
+      - MULTI_HOST
+    ServiceHosterFilter:
+      type: object
+      properties:
+        capabilityServiceId:
+          type: string
+          format: uuid
+        supportedDeploymentType:
+          $ref: '#/components/schemas/DeploymentType'
+        capabilityHostType:
+          $ref: '#/components/schemas/CapabilityHostType'
+    ServiceHoster:
+      required:
+      - capabilityClass
+      type: object
+      properties:
+        capabilityService:
+          oneOf:
+          - $ref: '#/components/schemas/CapabilityService'
+          - $ref: '#/components/schemas/MultiHostCapabilityService'
+          - $ref: '#/components/schemas/SingleHostCapabilityService'
+        capabilityClass:
+          type: string
+    ConnectionTypeDTO:
+      required:
+      - isRemote
+      - name
+      - prettyName
+      type: object
+      properties:
+        connectionType:
+          $ref: '#/components/schemas/ConnectionType'
+        name:
+          type: string
+        prettyName:
+          type: string
+        defaultPort:
+          type: integer
+          format: int32
+        isRemote:
+          type: boolean
+    Cluster:
+      required:
+      - clusterMemberTypes
+      - clusterType
+      - id
+      - managed
+      - memberMapping
+      - nodes
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        clusterType:
+          type: string
+        clusterMemberTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClusterMemberType'
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Node'
+        memberMapping:
+          type: object
+          additionalProperties:
+            type: string
+        metaData:
+          type: object
+          additionalProperties:
+            type: string
+        capabilityService:
+          $ref: '#/components/schemas/MultiHostCapabilityService'
+        managed:
+          type: boolean
+    Node:
+      type: object
+      properties:
+        ID:
+          type: string
+          format: uuid
+        Node:
+          type: string
+        Address:
+          type: string
+        Datacenter:
+          type: string
+        TaggedAddresses:
+          $ref: '#/components/schemas/TaggedAddresses'
+        Meta:
+          type: object
+          additionalProperties:
+            type: string
+        CreateIndex:
+          type: integer
+          format: int64
+        ModifyIndex:
+          type: integer
+          format: int64
+    TaggedAddresses:
+      type: object
+      properties:
+        Lan:
+          type: string
+        Wan:
+          type: string
+    CatalogService:
+      type: object
+      properties:
+        ID:
+          type: string
+          format: uuid
+        Node:
+          type: string
+        Address:
+          type: string
+        Datacenter:
+          type: string
+        TaggedAddresses:
+          $ref: '#/components/schemas/TaggedAddresses'
+        NodeMeta:
+          type: object
+          additionalProperties:
+            type: string
+        ServiceID:
+          type: string
+        ServiceName:
+          type: string
+        ServiceTags:
+          type: array
+          items:
+            type: string
+        ServiceAddress:
+          type: string
+        ServiceMeta:
+          type: object
+          additionalProperties:
+            type: string
+        ServicePort:
+          type: integer
+          format: int32
+        ServiceEnableTagOverride:
+          type: boolean
+        CreateIndex:
+          type: integer
+          format: int64
+        ModifyIndex:
+          type: integer
+          format: int64
+    CapabilityFilter:
+      type: object
+      properties:
+        capabilityId:
+          type: string
+          format: uuid
+        capabilityHostType:
+          $ref: '#/components/schemas/CapabilityHostType'
+    AssetAdministrationShell:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: object
+          writeOnly: true
+        reference:
+          $ref: '#/components/schemas/IReference'
+        parent:
+          $ref: '#/components/schemas/IReference'
+        description:
+          type: array
+          properties:
+            languages:
+              uniqueItems: true
+              type: array
+              items:
+                type: string
+            empty:
+              type: boolean
+          items:
+            $ref: '#/components/schemas/LangString'
+        views:
+          type: array
+          items:
+            $ref: '#/components/schemas/IView'
+        submodels:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ISubmodel'
+        asset:
+          $ref: '#/components/schemas/IAsset'
+        idShort:
+          type: string
+        conceptDictionary:
+          type: array
+          items:
+            $ref: '#/components/schemas/IConceptDictionary'
+        security:
+          $ref: '#/components/schemas/ISecurity'
+        administration:
+          $ref: '#/components/schemas/IAdministrativeInformation'
+        derivedFrom:
+          $ref: '#/components/schemas/IReference'
+        identification:
+          $ref: '#/components/schemas/IIdentifier'
+        assetReference:
+          $ref: '#/components/schemas/IReference'
+        submodelParent:
+          type: array
+          writeOnly: true
+          items:
+            $ref: '#/components/schemas/Submodel'
+        category:
+          type: string
+        dataSpecificationReferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/IReference'
+        embeddedDataSpecifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/IEmbeddedDataSpecification'
+        submodelReferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/IReference'
+        empty:
+          type: boolean
+      additionalProperties:
+        type: object
+    AssetKind:
+      type: string
+      enum:
+      - Type
+      - Instance
+    IAccessControlPolicyPoints:
+      type: object
+      properties:
+        policyDecisionPoint:
+          type: object
+        policyInformationPoints:
+          type: object
+        policyEnforcementPoint:
+          type: object
+        policyAdministrationPoint:
+          type: object
+    IAdministrativeInformation:
+      type: object
+      properties:
+        version:
+          type: string
+        revision:
+          type: string
+        embeddedDataSpecifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/IEmbeddedDataSpecification'
+        dataSpecificationReferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/IReference'
+    IAsset:
+      type: object
+      properties:
+        assetIdentificationModel:
+          $ref: '#/components/schemas/IReference'
+        assetKind:
+          $ref: '#/components/schemas/AssetKind'
+        billOfMaterial:
+          $ref: '#/components/schemas/IReference'
+        embeddedDataSpecifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/IEmbeddedDataSpecification'
+        dataSpecificationReferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/IReference'
+        administration:
+          $ref: '#/components/schemas/IAdministrativeInformation'
+        identification:
+          $ref: '#/components/schemas/IIdentifier'
+        reference:
+          $ref: '#/components/schemas/IReference'
+        parent:
+          $ref: '#/components/schemas/IReference'
+        description:
+          type: array
+          properties:
+            languages:
+              uniqueItems: true
+              type: array
+              items:
+                type: string
+            empty:
+              type: boolean
+          items:
+            $ref: '#/components/schemas/LangString'
+        idShort:
+          type: string
+        category:
+          type: string
+    ICertificate:
+      type: object
+    IConceptDescription:
+      type: object
+      properties:
+        isCaseOf:
+          type: array
+          items:
+            $ref: '#/components/schemas/IReference'
+        embeddedDataSpecifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/IEmbeddedDataSpecification'
+        dataSpecificationReferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/IReference'
+        administration:
+          $ref: '#/components/schemas/IAdministrativeInformation'
+        identification:
+          $ref: '#/components/schemas/IIdentifier'
+        reference:
+          $ref: '#/components/schemas/IReference'
+        parent:
+          $ref: '#/components/schemas/IReference'
+        description:
+          type: array
+          properties:
+            languages:
+              uniqueItems: true
+              type: array
+              items:
+                type: string
+            empty:
+              type: boolean
+          items:
+            $ref: '#/components/schemas/LangString'
+        idShort:
+          type: string
+        category:
+          type: string
+    IConceptDictionary:
+      type: object
+      properties:
+        conceptDescriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/IConceptDescription'
+        conceptDescriptionReferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/IReference'
+        reference:
+          $ref: '#/components/schemas/IReference'
+        parent:
+          $ref: '#/components/schemas/IReference'
+        description:
+          type: array
+          properties:
+            languages:
+              uniqueItems: true
+              type: array
+              items:
+                type: string
+            empty:
+              type: boolean
+          items:
+            $ref: '#/components/schemas/LangString'
+        idShort:
+          type: string
+        category:
+          type: string
+    IConstraint:
+      type: object
+    IDataSpecificationContent:
+      type: object
+    IEmbeddedDataSpecification:
+      type: object
+      properties:
+        content:
+          $ref: '#/components/schemas/IDataSpecificationContent'
+        dataSpecificationTemplate:
+          $ref: '#/components/schemas/IReference'
+    IIdentifier:
+      type: object
+      properties:
+        id:
+          type: string
+        idType:
+          $ref: '#/components/schemas/IdentifierType'
+    IKey:
+      type: object
+      properties:
+        value:
+          type: string
+        type:
+          $ref: '#/components/schemas/KeyElements'
+        local:
+          type: boolean
+        idType:
+          $ref: '#/components/schemas/KeyType'
+    IOperation:
+      type: object
+      properties:
+        inputVariables:
+          type: array
+          items:
+            $ref: '#/components/schemas/IOperationVariable'
+        outputVariables:
+          type: array
+          items:
+            $ref: '#/components/schemas/IOperationVariable'
+        inOutputVariables:
+          type: array
+          items:
+            $ref: '#/components/schemas/IOperationVariable'
+        idShort:
+          type: string
+        value:
+          type: object
+        localCopy:
+          type: object
+          properties:
+            map:
+              type: object
+              additionalProperties:
+                type: object
+              writeOnly: true
+            reference:
+              $ref: '#/components/schemas/IReference'
+            value:
+              type: object
+            parent:
+              $ref: '#/components/schemas/IReference'
+            description:
+              type: array
+              properties:
+                languages:
+                  uniqueItems: true
+                  type: array
+                  items:
+                    type: string
+                empty:
+                  type: boolean
+              items:
+                $ref: '#/components/schemas/LangString'
+            kind:
+              $ref: '#/components/schemas/ModelingKind'
+            qualifiers:
+              type: array
+              items:
+                $ref: '#/components/schemas/IConstraint'
+            idShort:
+              type: string
+            semanticId:
+              $ref: '#/components/schemas/IReference'
+            category:
+              type: string
+            modelingKind:
+              $ref: '#/components/schemas/ModelingKind'
+            dataSpecificationReferences:
+              type: array
+              items:
+                $ref: '#/components/schemas/IReference'
+            embeddedDataSpecifications:
+              type: array
+              items:
+                $ref: '#/components/schemas/IEmbeddedDataSpecification'
+            modelType:
+              type: string
+            empty:
+              type: boolean
+          additionalProperties:
+            type: object
+        modelType:
+          type: string
+        embeddedDataSpecifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/IEmbeddedDataSpecification'
+        dataSpecificationReferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/IReference'
+        reference:
+          $ref: '#/components/schemas/IReference'
+        parent:
+          $ref: '#/components/schemas/IReference'
+        description:
+          type: array
+          properties:
+            languages:
+              uniqueItems: true
+              type: array
+              items:
+                type: string
+            empty:
+              type: boolean
+          items:
+            $ref: '#/components/schemas/LangString'
+        category:
+          type: string
+        qualifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/IConstraint'
+        semanticId:
+          $ref: '#/components/schemas/IReference'
+        kind:
+          $ref: '#/components/schemas/ModelingKind'
+        modelingKind:
+          $ref: '#/components/schemas/ModelingKind'
+    IOperationVariable:
+      type: object
+      properties:
+        value:
+          $ref: '#/components/schemas/ISubmodelElement'
+    IProperty:
+      type: object
+      properties:
+        valueType:
+          $ref: '#/components/schemas/ValueType'
+        valueId:
+          $ref: '#/components/schemas/IReference'
+        idShort:
+          type: string
+        value:
+          type: object
+        localCopy:
+          type: object
+          properties:
+            map:
+              type: object
+              additionalProperties:
+                type: object
+              writeOnly: true
+            reference:
+              $ref: '#/components/schemas/IReference'
+            value:
+              type: object
+            parent:
+              $ref: '#/components/schemas/IReference'
+            description:
+              type: array
+              properties:
+                languages:
+                  uniqueItems: true
+                  type: array
+                  items:
+                    type: string
+                empty:
+                  type: boolean
+              items:
+                $ref: '#/components/schemas/LangString'
+            kind:
+              $ref: '#/components/schemas/ModelingKind'
+            qualifiers:
+              type: array
+              items:
+                $ref: '#/components/schemas/IConstraint'
+            idShort:
+              type: string
+            semanticId:
+              $ref: '#/components/schemas/IReference'
+            category:
+              type: string
+            modelingKind:
+              $ref: '#/components/schemas/ModelingKind'
+            dataSpecificationReferences:
+              type: array
+              items:
+                $ref: '#/components/schemas/IReference'
+            embeddedDataSpecifications:
+              type: array
+              items:
+                $ref: '#/components/schemas/IEmbeddedDataSpecification'
+            modelType:
+              type: string
+            empty:
+              type: boolean
+          additionalProperties:
+            type: object
+        modelType:
+          type: string
+        embeddedDataSpecifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/IEmbeddedDataSpecification'
+        dataSpecificationReferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/IReference'
+        reference:
+          $ref: '#/components/schemas/IReference'
+        parent:
+          $ref: '#/components/schemas/IReference'
+        description:
+          type: array
+          properties:
+            languages:
+              uniqueItems: true
+              type: array
+              items:
+                type: string
+            empty:
+              type: boolean
+          items:
+            $ref: '#/components/schemas/LangString'
+        category:
+          type: string
+        qualifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/IConstraint'
+        semanticId:
+          $ref: '#/components/schemas/IReference'
+        kind:
+          $ref: '#/components/schemas/ModelingKind'
+        modelingKind:
+          $ref: '#/components/schemas/ModelingKind'
+    IReference:
+      type: object
+      properties:
+        keys:
+          type: array
+          items:
+            $ref: '#/components/schemas/IKey'
+    ISecurity:
+      type: object
+      properties:
+        certificate:
+          $ref: '#/components/schemas/ICertificate'
+        accessControlPolicyPoints:
+          $ref: '#/components/schemas/IAccessControlPolicyPoints'
+        requiredCertificateExtension:
+          type: object
+          properties:
+            map:
+              type: object
+              additionalProperties:
+                type: object
+              writeOnly: true
+            keys:
+              type: array
+              items:
+                $ref: '#/components/schemas/IKey'
+            empty:
+              type: boolean
+          additionalProperties:
+            type: object
+    ISubmodel:
+      type: object
+      properties:
+        values:
+          type: object
+          additionalProperties:
+            type: object
+        idShort:
+          type: string
+        semanticId:
+          $ref: '#/components/schemas/IReference'
+        administration:
+          $ref: '#/components/schemas/IAdministrativeInformation'
+        identification:
+          $ref: '#/components/schemas/IIdentifier'
+        reference:
+          $ref: '#/components/schemas/IReference'
+        parent:
+          $ref: '#/components/schemas/IReference'
+        description:
+          type: array
+          properties:
+            languages:
+              uniqueItems: true
+              type: array
+              items:
+                type: string
+            empty:
+              type: boolean
+          items:
+            $ref: '#/components/schemas/LangString'
+        category:
+          type: string
+        qualifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/IConstraint'
+        embeddedDataSpecifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/IEmbeddedDataSpecification'
+        dataSpecificationReferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/IReference'
+        kind:
+          $ref: '#/components/schemas/ModelingKind'
+        modelingKind:
+          $ref: '#/components/schemas/ModelingKind'
+        properties:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/IProperty'
+        operations:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/IOperation'
+        submodelElements:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ISubmodelElement'
+    ISubmodelElement:
+      type: object
+      properties:
+        value:
+          type: object
+        localCopy:
+          type: object
+          properties:
+            map:
+              type: object
+              additionalProperties:
+                type: object
+              writeOnly: true
+            reference:
+              $ref: '#/components/schemas/IReference'
+            value:
+              type: object
+            parent:
+              $ref: '#/components/schemas/IReference'
+            description:
+              type: array
+              properties:
+                languages:
+                  uniqueItems: true
+                  type: array
+                  items:
+                    type: string
+                empty:
+                  type: boolean
+              items:
+                $ref: '#/components/schemas/LangString'
+            kind:
+              $ref: '#/components/schemas/ModelingKind'
+            qualifiers:
+              type: array
+              items:
+                $ref: '#/components/schemas/IConstraint'
+            idShort:
+              type: string
+            semanticId:
+              $ref: '#/components/schemas/IReference'
+            category:
+              type: string
+            modelingKind:
+              $ref: '#/components/schemas/ModelingKind'
+            dataSpecificationReferences:
+              type: array
+              items:
+                $ref: '#/components/schemas/IReference'
+            embeddedDataSpecifications:
+              type: array
+              items:
+                $ref: '#/components/schemas/IEmbeddedDataSpecification'
+            modelType:
+              type: string
+            empty:
+              type: boolean
+          additionalProperties:
+            type: object
+        modelType:
+          type: string
+        idShort:
+          type: string
+        embeddedDataSpecifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/IEmbeddedDataSpecification'
+        dataSpecificationReferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/IReference'
+        reference:
+          $ref: '#/components/schemas/IReference'
+        parent:
+          $ref: '#/components/schemas/IReference'
+        description:
+          type: array
+          properties:
+            languages:
+              uniqueItems: true
+              type: array
+              items:
+                type: string
+            empty:
+              type: boolean
+          items:
+            $ref: '#/components/schemas/LangString'
+        category:
+          type: string
+        qualifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/IConstraint'
+        semanticId:
+          $ref: '#/components/schemas/IReference'
+        kind:
+          $ref: '#/components/schemas/ModelingKind'
+        modelingKind:
+          $ref: '#/components/schemas/ModelingKind'
+    IView:
+      type: object
+      properties:
+        containedElement:
+          type: array
+          items:
+            $ref: '#/components/schemas/IReference'
+        semanticId:
+          $ref: '#/components/schemas/IReference'
+        embeddedDataSpecifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/IEmbeddedDataSpecification'
+        dataSpecificationReferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/IReference'
+        reference:
+          $ref: '#/components/schemas/IReference'
+        parent:
+          $ref: '#/components/schemas/IReference'
+        description:
+          type: array
+          properties:
+            languages:
+              uniqueItems: true
+              type: array
+              items:
+                type: string
+            empty:
+              type: boolean
+          items:
+            $ref: '#/components/schemas/LangString'
+        idShort:
+          type: string
+        category:
+          type: string
+    IdentifierType:
+      type: string
+      enum:
+      - IRDI
+      - IRI
+      - Custom
+    KeyElements:
+      type: string
+      enum:
+      - GlobalReference
+      - FragmentReference
+      - AccessPermissionRule
+      - AnnotatedRelationshipElement
+      - BasicEvent
+      - Blob
+      - Capability
+      - ConceptDictionary
+      - DataElement
+      - File
+      - Entity
+      - Event
+      - MultiLanguageProperty
+      - Operation
+      - Property
+      - Range
+      - ReferenceElement
+      - RelationshipElement
+      - SubmodelElement
+      - SubmodelElementCollection
+      - View
+      - Asset
+      - AssetAdministrationShell
+      - ConceptDescription
+      - Submodel
+    KeyType:
+      type: string
+      enum:
+      - Custom
+      - IRDI
+      - IRI
+      - IdShort
+      - FragmentId
+    LangString:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: object
+          writeOnly: true
+        language:
+          type: string
+        description:
+          type: string
+        empty:
+          type: boolean
+      additionalProperties:
+        type: object
+    ModelingKind:
+      type: string
+      enum:
+      - Instance
+      - Template
+    Submodel:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: object
+          writeOnly: true
+        reference:
+          $ref: '#/components/schemas/IReference'
+        parent:
+          $ref: '#/components/schemas/IReference'
+        properties:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/IProperty'
+        description:
+          type: array
+          properties:
+            languages:
+              uniqueItems: true
+              type: array
+              items:
+                type: string
+            empty:
+              type: boolean
+          items:
+            $ref: '#/components/schemas/LangString'
+        operations:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/IOperation'
+        kind:
+          $ref: '#/components/schemas/ModelingKind'
+        values:
+          type: object
+          additionalProperties:
+            type: object
+        qualifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/IConstraint'
+        idShort:
+          type: string
+        semanticId:
+          $ref: '#/components/schemas/IReference'
+        administration:
+          $ref: '#/components/schemas/IAdministrativeInformation'
+        identification:
+          $ref: '#/components/schemas/IIdentifier'
+        category:
+          type: string
+        modelingKind:
+          $ref: '#/components/schemas/ModelingKind'
+        dataSpecificationReferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/IReference'
+        embeddedDataSpecifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/IEmbeddedDataSpecification'
+        submodelElements:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ISubmodelElement'
+        empty:
+          type: boolean
+      additionalProperties:
+        type: object
+    ValueType:
+      type: string
+      enum:
+      - byte
+      - short
+      - int
+      - long
+      - unsignedByte
+      - unsignedShort
+      - unsignedInt
+      - unsignedLong
+      - string
+      - langString
+      - anyURI
+      - base64Binary
+      - hexBinary
+      - notation
+      - entity
+      - id
+      - idref
+      - integer
+      - nonPositiveInteger
+      - nonNegativeInteger
+      - positiveInteger
+      - negativeInteger
+      - double
+      - float
+      - boolean
+      - duration
+      - dayTimeDuration
+      - yearMonthDuration
+      - date
+      - dateTime
+      - dateTimeStamp
+      - gDay
+      - gMonth
+      - gMonthDay
+      - gYear
+      - gYearMonth
+      - qName
+      - none
+      - anyType
+      - anySimpleType
+  securitySchemes:
+    spring_oauth:
+      type: oauth2
+      description: Oauth2 flow
+      flows:
+        authorizationCode:
+          authorizationUrl: http://fabos.local:7080/auth/realms/fabos/protocol/openid-connect/auth
+          tokenUrl: http://fabos.local:7080/auth/realms/fabos/protocol/openid-connect/token
+          refreshUrl: http://fabos.local:7080/auth/realms/fabos/protocol/openid-connect/token
+          scopes: {}
+    bearer_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

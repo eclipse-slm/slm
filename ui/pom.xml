@@ -19,12 +19,82 @@
         <docker.image.name>slm/ui</docker.image.name>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>openapi-generator-maven-plugin</artifactId>
+            <version>5.4.0</version> <!-- Check for the latest version -->
+        </dependency>
+    </dependencies>
+
+
     <build>
         <plugins>
             <!-- Docker Image !-->
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.7.0</version>
+                <executions>
+                    <execution>
+                        <id>resource-management-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+
+                            <generatorName>typescript-axios</generatorName>
+                            <inputSpec>${project.basedir}/../resource_management/resource_management.service/resource_management.service.client/src/main/resources/api-docs-for-ui.yaml</inputSpec>
+                            <output>${project.basedir}/src/api/resource-management/client</output>
+                            <generateModels>true</generateModels>
+                            <generateSupportingFiles>true</generateSupportingFiles>
+                            <additionalProperties>
+                                <supportsES6>true</supportsES6>
+                                <interfacePrefix>ResourceManagement</interfacePrefix>
+                                
+                            </additionalProperties>
+                            <serverVariableOverrides>basePath=/resource-management/</serverVariableOverrides>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>service-management-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <generatorName>typescript-axios</generatorName>
+                            <inputSpec>${project.basedir}/../service_management/service_management.service/service_management.service.client/src/main/resources/api-docs-for-ui.yaml</inputSpec>
+                            <output>${project.basedir}/src/api/service-management/client</output>
+                            <generateModels>true</generateModels>
+                            <additionalProperties>
+                                <supportsES6>true</supportsES6>
+                                <interfacePrefix>ServiceManagement</interfacePrefix>
+                            </additionalProperties>
+                            <serverVariableOverrides>basePath=/service-management/</serverVariableOverrides>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>notification-service-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <generatorName>typescript-axios</generatorName>
+                            <inputSpec>${project.basedir}/../notification_service/notification_service.service/notification_service.service.client/src/main/resources/api-docs-for-ui.yaml</inputSpec>
+                            <output>${project.basedir}/src/api/notification-service/client</output>
+                            <generateModels>true</generateModels>
+                            <additionalProperties>
+                                <supportsES6>true</supportsES6>
+                                <interfacePrefix>NotificationService</interfacePrefix>
+                            </additionalProperties>
+                            <serverVariableOverrides>basePath=/notification-service/</serverVariableOverrides>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
