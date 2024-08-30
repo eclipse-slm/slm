@@ -64,8 +64,7 @@
 
 <script>
 import 'vue-json-pretty/lib/styles.css'
-import ServiceManagementClient from "@/api/service-management/service-management-client";
-import logRequestError from "@/api/restApiHelper";
+import axios from 'axios'
 
 export default {
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys',
@@ -120,17 +119,19 @@ export default {
         }
       },
       onDownloadCodesysApplicationClick(){
-        ServiceManagementClient.serviceOfferingVersionsApi.getServiceOfferingFileWithId(
-            this.serviceOfferingVersion.serviceOfferingId, this.serviceOfferingVersion.id, 'application.zip'
-        )
-            .then(response => {
+
+        const serviceOfferingId = this.serviceOfferingVersion.serviceOfferingId;
+        const serviceOfferingVersionId = this.serviceOfferingVersion.id;
+        const fileName = 'application.zip';
+        axios.get(`/service-management/services/offerings/${serviceOfferingId}/versions/${serviceOfferingVersionId}/file/${fileName}`,
+            {responseType: 'blob'}).then(response => {
           const url = window.URL.createObjectURL(new Blob([response.data]));
           const link = document.createElement('a');
           link.href = url;
           link.setAttribute('download', 'application.zip');
           document.body.appendChild(link);
           link.click();
-        }).catch(logRequestError);
+        });
       }
     },
 
