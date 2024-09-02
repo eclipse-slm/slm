@@ -94,7 +94,7 @@ notification-service:
 
 ### Security
 security:
-  auth-white-list:
+  auth-white-list: "/ws/**"
   origins: "*"
 
 ### Keycloak

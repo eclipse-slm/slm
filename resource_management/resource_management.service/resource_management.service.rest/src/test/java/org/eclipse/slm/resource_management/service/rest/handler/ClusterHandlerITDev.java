@@ -255,24 +255,6 @@ public class ClusterHandlerITDev {
                     .block();
 
             return accessTokenResponse;
-
-//            AccessToken accessToken = new AccessToken();
-//            accessToken.setAccessTokenHash(accessTokenResponse.getToken());
-//            accessToken.issuer("fabos");
-//
-//            KeycloakSecurityContext context = new KeycloakSecurityContext(
-//                    accessTokenResponse.getToken(),
-//                    accessToken,
-//                    "",
-//                    null
-//            );
-//
-//            KeycloakPrincipal keycloakPrincipal = new KeycloakPrincipal(
-//                    "fabos",
-//                    context
-//            );
-//
-//            return keycloakPrincipal;
         }
 
         @Test

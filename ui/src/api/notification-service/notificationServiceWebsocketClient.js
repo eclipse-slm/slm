@@ -9,7 +9,7 @@ class NotificationServiceWebsocketClient {
   socket = null
 
   connect () {
-      this.socket = new SockJS(API_URL + `/ws/notifications/?access_token=${app.config.globalProperties.$keycloak.token}`)
+      this.socket = new SockJS(API_URL + `/ws/notifications`)
       this.stompClient = Stomp.over(this.socket)
 
       this.stompClient.reconnect_delay = 5000
@@ -22,7 +22,7 @@ class NotificationServiceWebsocketClient {
       this.stompClient.connect(
           {
               Authorization: 'Bearer ' + app.config.globalProperties.$keycloak.token,
-              Realm: 'fabos',
+              Issuer: `${app.config.globalProperties.$keycloak.keycloak.authServerUrl}/realms/${app.config.globalProperties.$keycloak.keycloak.realm}`
           },
           () => {
               this.stompClient.subscribe(subscriptionName, response => {

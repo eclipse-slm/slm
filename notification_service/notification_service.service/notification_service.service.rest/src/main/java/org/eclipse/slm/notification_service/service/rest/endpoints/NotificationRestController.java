@@ -7,13 +7,12 @@ import org.eclipse.slm.notification_service.model.JobTarget;
 import org.eclipse.slm.notification_service.model.Notification;
 import org.eclipse.slm.notification_service.persistence.api.NotificationRepository;
 import io.swagger.v3.oas.annotations.Operation;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,9 +24,9 @@ public class NotificationRestController {
 
     public final static Logger LOG = LoggerFactory.getLogger(NotificationRestController.class);
 
-    private NotificationRepository notificationRepository;
+    private final NotificationRepository notificationRepository;
 
-    private NotificationWsService notificationWsService;
+    private final NotificationWsService notificationWsService;
 
     @Autowired
     public NotificationRestController(NotificationRepository notificationRepository, NotificationWsService notificationWsService) {
@@ -38,19 +37,17 @@ public class NotificationRestController {
     @RequestMapping(value = "/notification", method = RequestMethod.POST)
     @Operation(summary = "Create new notifications")
     public void createNotification(
-//            @RequestParam(name = "userUuid", required = true) String userUuid,
             @RequestParam(name = "category", required = true) Category category,
             @RequestParam(name="jobTarget", required = true) JobTarget jobTarget,
             @RequestParam(name="jobGoal", required = true) JobGoal jobGoal
-//            @RequestParam(name = "text", required = true) String text
     ) {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         String text = jobTarget.name().toLowerCase() + " has been " + jobGoal.toString().toLowerCase();
-        Notification notification = new Notification(category, text, keycloakPrincipal.getName());
+        Notification notification = new Notification(category, text, jwtAuthenticationToken.getToken().getSubject());
 
         notificationRepository.save(notification);
         notificationWsService.notifyFrontend(notification);
-        LOG.info("Create new notification: " + notification.toString());
+        LOG.info("Create new notification: " + notification);
     }
 
     @RequestMapping(value = "/notifications", method = RequestMethod.GET)
@@ -58,10 +55,8 @@ public class NotificationRestController {
     public List<Notification> getNotifications(
             @RequestParam(name = "isRead", required = false) Boolean isRead
     ) {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        AccessToken accessToken = keycloakPrincipal.getKeycloakSecurityContext().getToken();
-
-        String userUuid = accessToken.getSubject();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        String userUuid = jwtAuthenticationToken.getToken().getSubject();
         if(isRead == null) {
             return notificationRepository.findByOwner(userUuid);
         } else {
@@ -75,11 +70,6 @@ public class NotificationRestController {
             @RequestParam(name = "read") boolean read,
             @RequestBody List<Notification> notifications
     ) {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        AccessToken accessToken = keycloakPrincipal.getKeycloakSecurityContext().getToken();
-
-        String userUuid = accessToken.getSubject();
-
         notifications.forEach(n -> n.setRead(read));
 
         notificationRepository.saveAll(notifications);

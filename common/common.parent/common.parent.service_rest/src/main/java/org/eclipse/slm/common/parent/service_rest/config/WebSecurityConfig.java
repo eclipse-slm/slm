@@ -15,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManagerResolver
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
@@ -71,6 +72,9 @@ public class WebSecurityConfig {
 
         // Disable CSRF because of state-less session-management
         http.csrf(csrf -> csrf.disable());
+
+        // Disable 'X-Frame-Options' response header
+        http.headers((headers) -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
 
         // Return 401 (unauthorized) instead of 302 (redirect to login) when
         // authorization is missing or invalid
