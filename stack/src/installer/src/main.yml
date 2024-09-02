@@ -21,6 +21,7 @@
             AWX_URL: "{{ AWX_SCHEME }}://{{ AWX_HOST }}:{{ AWX_PORT }}"
             MINIO_API_URL: "{{ MINIO_SCHEME }}://{{ MINIO_HOST }}:{{ MINIO_API_PORT }}"
             MINIO_CONSOLE_URL: "{{ MINIO_SCHEME }}://{{ MINIO_HOST }}:{{ MINIO_CONSOLE_PORT }}"
+            TRAEFIK_URL: "{{ TRAEFIK_SCHEME }}://{{ TRAEFIK_HOST }}:{{ TRAEFIK_API_PORT }}"
 
 #    - name: Display all variables/facts known for a host
 #      debug:
@@ -89,6 +90,10 @@
       vars:
         _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
         _store_compose_file: /compose/slm.yml
+
+    - name: "Start Traefik"
+      include_role:
+        name: traefik/init
 
     - debug:
         msg: "Eclipse Service Lifecycle Management version '{{ SLM_VERSION }}' successfully installed. Your Consul master token: {{ CONSUL_MASTER_TOKEN }}"
