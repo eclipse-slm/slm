@@ -45,7 +45,6 @@ export default {
   // ['resource'],
     computed: {
       showDialog () {
-        console.log(this.resource)
         return this.resource !== null
       },
     },

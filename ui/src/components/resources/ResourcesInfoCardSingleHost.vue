@@ -36,7 +36,10 @@
             </tr>
             <tr v-if="resource.remoteAccessService !== null">
               <th>{{ 'Username' }}</th>
-              <td colspan="3">
+              <td
+                v-if="resource.remoteAccessService"
+                colspan="3"
+              >
                 {{ resource.remoteAccessService.credential.username }}
               </td>
             </tr>
@@ -44,6 +47,7 @@
               <th>{{ 'Password' }}</th>
               <td>
                 <v-text-field
+                  v-if="resource.remoteAccessService"
                   :type="showPassword ? 'text' : 'password'"
                   :model-value="resource.remoteAccessService.credential.password"
                   disabled
@@ -134,7 +138,6 @@ export default {
       },
     },
     setup(props){
-      console.log(props.resource);
     },
     data () {
       return {

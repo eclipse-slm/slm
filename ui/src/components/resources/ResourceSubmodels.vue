@@ -21,7 +21,10 @@
           <td> {{ submodel.idShort }}</td>
           <td> {{ submodel.id }} </td>
           <td>
-            <a :href="`${aasGuiUrl}/?aas=${aasDescriptor.endpoints[0].protocolInformation.href}&path=${submodel.endpoints[0].protocolInformation.href}`" target="_blank"><v-icon>mdi-open-in-new</v-icon></a>
+            <a
+              :href="`${aasGuiUrl}/?aas=${aasDescriptor.endpoints[0].protocolInformation.href}&path=${submodel.endpoints[0].protocolInformation.href}`"
+              target="_blank"
+            ><v-icon>mdi-open-in-new</v-icon></a>
           </td>
           <td>
             <div v-if="submodel.semanticId">
@@ -71,7 +74,7 @@
       </v-col>
     </v-row>
     <confirm-dialog
-      :show="submodelToDelete !== null"
+      :show="submodelToDelete !== undefined"
       :title="'Delete submodel ' + (submodelToDelete == null ? '' : submodelToDelete.idShort)"
       text="Do you really want to delete this submodel?"
       @confirmed="deleteSubmodel(submodelToDelete)"
