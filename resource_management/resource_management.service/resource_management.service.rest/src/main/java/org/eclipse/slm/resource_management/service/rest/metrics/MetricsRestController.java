@@ -54,6 +54,14 @@ public class MetricsRestController {
             }
         } catch (NullPointerException e) {
             LOG.info("Monitoring for resource with id '" + resourceId + "' not available (submodel not found)");
+        } catch (org.eclipse.digitaltwin.basyx.client.internal.ApiException e) {
+            if (e.getMessage().equals("java.net.ConnectException")) {
+                LOG.warn("Monitoring for resource with id '" + resourceId + "' not available (submodel not accessible)");
+                return ResponseEntity.ok(monitoringValues);
+            }
+            else {
+                LOG.error(e.getMessage());
+            }
         }
 
         return ResponseEntity.ok(monitoringValues);
