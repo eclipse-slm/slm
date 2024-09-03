@@ -12,7 +12,7 @@ interface ResourcesStoreState{
     apiStateResources_: number,
 
     resources_: any[],
-    aas: any[],
+    resourceAASs_: any[],
     locations_: any[],
     profiler_: any[],
     resourceConnectionTypes_: any[],
@@ -41,7 +41,7 @@ export const useResourcesStore = defineStore('resourcesStore', {
         apiStateResources_: ApiState.INIT,
 
         resources_: [],
-        aas: [],
+        resourceAASs_: [],
         locations_: [],
         profiler_: [],
         resourceConnectionTypes_: [],
@@ -78,11 +78,11 @@ export const useResourcesStore = defineStore('resourcesStore', {
             }
         },
 
-        resourceAAS: (state) => {
-            if (state.aas === undefined) {
+        resourceAASs: (state) => {
+            if (state.resourceAASs_ === undefined) {
                 return []
             }   else {
-                return state.aas
+                return state.resourceAASs_
             }
         },
 
@@ -290,7 +290,7 @@ export const useResourcesStore = defineStore('resourcesStore', {
 
             return await AasRestApi.getResourceAAS().then(
                 aas => {
-                    this.aas = aas;
+                    this.resourceAASs_ = aas;
                     this.apiStateResources_ = ApiState.LOADED;
                 }
             )

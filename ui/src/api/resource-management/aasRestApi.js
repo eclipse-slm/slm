@@ -4,7 +4,7 @@ class AASRestApi {
     API_URL = '/resource-management'
 
     async getResourceAAS() {
-        return axios.get(`${this.API_URL}/aas`)
+        return axios.get(`${this.API_URL}/resources/aas`)
           .then(response => {
               return response.data;
           });

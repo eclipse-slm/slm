@@ -18,7 +18,9 @@ import org.springframework.stereotype.Component;
 
 import java.net.http.HttpClient;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class AasRegistryClient {
@@ -42,10 +44,27 @@ public class AasRegistryClient {
         this.aasRegistryApi = new RegistryAndDiscoveryInterfaceApi(aasRegistryClient);
     }
 
+    public List<AssetAdministrationShellDescriptor> getAllShellDescriptors() {
+        List<AssetAdministrationShellDescriptor> aasDescriptors = new ArrayList<>();
+        try {
+            var result = this.aasRegistryApi.getAllAssetAdministrationShellDescriptors(Integer.MAX_VALUE, null, null, null);
+            aasDescriptors = result.getResult().stream()
+                    .map(AasRegistryClient::convertAasDescriptor)
+                    .collect(Collectors.toList());
+
+            return aasDescriptors;
+        } catch (ApiException e) {
+            if (e.getCode() != 404) {
+                LOG.error(e.getMessage());
+            }
+            return aasDescriptors;
+        }
+    }
+
     public Optional<AssetAdministrationShellDescriptor> getAasDescriptor(String aasId) throws ApiException {
         try {
             var result = this.aasRegistryApi.getAssetAdministrationShellDescriptorByIdWithHttpInfo(aasId);
-            var convertedAasDescriptor = this.convertAasDescriptor(result.getData());
+            var convertedAasDescriptor = AasRegistryClient.convertAasDescriptor(result.getData());
             return Optional.of(convertedAasDescriptor);
         } catch (ApiException e) {
             if (e.getCode() == 404) {
@@ -87,7 +106,7 @@ public class AasRegistryClient {
         }
     }
 
-    public org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShellDescriptor convertAasDescriptor(
+    public static org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShellDescriptor convertAasDescriptor(
             org.eclipse.digitaltwin.basyx.aasregistry.client.model.AssetAdministrationShellDescriptor aasDescriptor) {
         try {
             var aasJsonSerializer = new JsonSerializer();

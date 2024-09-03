@@ -5,11 +5,16 @@ import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.SerializationException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonDeserializer;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonSerializer;
+import org.eclipse.digitaltwin.aas4j.v3.model.KeyTypes;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultKey;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultReference;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodelDescriptor;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.api.SubmodelRegistryApi;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.model.Endpoint;
+import org.eclipse.digitaltwin.basyx.submodelregistry.client.model.Key;
+import org.eclipse.digitaltwin.basyx.submodelregistry.client.model.Reference;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.model.SubmodelDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +23,9 @@ import org.springframework.stereotype.Component;
 
 import java.net.http.HttpClient;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class SubmodelRegistryClient {
@@ -40,6 +47,23 @@ public class SubmodelRegistryClient {
         this.submodelRegistryApi = new SubmodelRegistryApi(submodelRegistryClient);
     }
 
+    public List<org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor> getAllSubmodelDescriptors() {
+        List<org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor> submodelDescriptors = new ArrayList<>();
+        try {
+            var result = this.submodelRegistryApi.getAllSubmodelDescriptors(Integer.MAX_VALUE, null);
+            submodelDescriptors = result.getResult().stream()
+                    .map(SubmodelRegistryClient::convertSubmodelDescriptor)
+                    .collect(Collectors.toList());
+
+            return submodelDescriptors;
+        } catch (ApiException e) {
+            if (e.getCode() != 404) {
+                LOG.error(e.getMessage());
+            }
+            return submodelDescriptors;
+        }
+    }
+
     public Optional<org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor> findSubmodelDescriptor(String submodelId) {
         SubmodelDescriptor submodelDescriptor = null;
         try {
@@ -54,7 +78,7 @@ public class SubmodelRegistryClient {
         }
     }
 
-    public void registerSubmodel(String submodelUrl, String smId, String smIdShort) throws ApiException {
+    public void registerSubmodel(String submodelUrl, String smId, String smIdShort, String semanticId) throws ApiException {
         var endpoints = new ArrayList<Endpoint>();
         var endpoint = new Endpoint();
         endpoint.setInterface("SUBMODEL-3.0");
@@ -68,6 +92,15 @@ public class SubmodelRegistryClient {
         submodelDescriptor.setId(smId);
         submodelDescriptor.setIdShort(smIdShort);
         submodelDescriptor.setEndpoints(endpoints);
+        if (semanticId != null) {
+// Correct KeyType cannot be set with current version of Submodel Registry Client
+//            var semanticIdRef = new Reference();
+//            var semanticIdKey = new Key();
+//            semanticIdKey.setType(org.eclipse.digitaltwin.basyx.submodelregistry.client.model.KeyTypes.CONCEPTDESCRIPTION);
+//            semanticIdKey.setValue(semanticId);
+//            semanticIdRef.addKeysItem(semanticIdKey);
+//            submodelDescriptor.setSemanticId(semanticIdRef);
+        }
 
         try {
             this.submodelRegistryApi.postSubmodelDescriptor(submodelDescriptor);
@@ -82,7 +115,7 @@ public class SubmodelRegistryClient {
     }
 
     public void registerSubmodel(String submodelRepositoryUrl, Submodel submodel) throws ApiException {
-        this.registerSubmodel(submodelRepositoryUrl, submodel.getId(), submodel.getIdShort());
+        this.registerSubmodel(submodelRepositoryUrl, submodel.getId(), submodel.getIdShort(), submodel.getSemanticId().getKeys().get(0).getValue());
     }
 
     public void unregisterSubmodel(String submodelId) throws ApiException {

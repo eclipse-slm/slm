@@ -14,6 +14,7 @@ import org.eclipse.slm.resource_management.model.resource.BasicResource;
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.service.rest.aas.resources.ResourceAAS;
 import org.eclipse.slm.resource_management.service.rest.aas.resources.ResourcesSubmodelRepositoryApiHTTPController;
+import org.eclipse.slm.resource_management.service.rest.aas.resources.consul.ConsulSubmodel;
 import org.eclipse.slm.resource_management.service.rest.resources.ResourceEvent;
 import org.eclipse.slm.resource_management.service.rest.resources.ResourcesConsulClient;
 import org.slf4j.Logger;
@@ -111,16 +112,22 @@ public class AasHandler implements ApplicationListener<ResourceEvent> {
             var platformResourcesSubmodelId = "PlatformResources-" + resource.getId();
             var platformResourcesSubmodelUrl = this.monitoringServiceUrl + "/" + resource.getId() + "/submodel";
             this.aasRepositoryClient.addSubmodelReferenceToAas(resourceAAS.getId(), platformResourcesSubmodelId);
-            this.submodelRegistryClient.registerSubmodel(platformResourcesSubmodelUrl,
+            this.submodelRegistryClient.registerSubmodel(
+                    platformResourcesSubmodelUrl,
                     platformResourcesSubmodelId,
-                    platformResourcesSubmodelId);
+                    platformResourcesSubmodelId,
+                    null);
 
             var consulSubmodelId = "Consul-" + resource.getId();
             var consulSubmodelIdEncoded = new Base64UrlEncodedIdentifier(consulSubmodelId);
             var consulSubmodelUrl = this.getResourcesSubmodelRepositoryUrl(resourceAASIdEncoded)
                     + "/submodels/" + consulSubmodelIdEncoded.getEncodedIdentifier();
             this.aasRepositoryClient.addSubmodelReferenceToAas(resourceAAS.getId(), consulSubmodelId);
-            this.submodelRegistryClient.registerSubmodel(consulSubmodelUrl, consulSubmodelId, consulSubmodelId);
+            this.submodelRegistryClient.registerSubmodel(
+                    consulSubmodelUrl,
+                    consulSubmodelId,
+                    consulSubmodelId,
+                    ConsulSubmodel.SEMANTIC_ID.getKeys().get(0).getValue());
         }
         catch (ApiException e) {
             LOG.error("Unable to create AAS and submodels for resource [id='" + resource.getId() + "']: " + e.getMessage());
