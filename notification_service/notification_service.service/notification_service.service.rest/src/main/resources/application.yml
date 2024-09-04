@@ -72,6 +72,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        type:
+          preferred_uuid_jdbc_type: CHAR
   datasource:
     platform: mysql
     initialization-mode: always

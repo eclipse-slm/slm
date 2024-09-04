@@ -77,6 +77,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        type:
+          preferred_uuid_jdbc_type: CHAR
   datasource:
     driver-class-name=org: 'mariadb.jdbc.Driver'
     url: jdbc:mariadb://${database.host}:${database.port}/${database.schema}?createDatabaseIfNotExist=true&serverTimezone=UTC
