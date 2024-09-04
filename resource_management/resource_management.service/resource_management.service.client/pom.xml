@@ -140,6 +140,7 @@
                             <inputSpec>${project.basedir}/src/main/resources/api-docs.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <configOptions>
+                                <useJakartaEe>true</useJakartaEe>
                                 <sourceFolder>src/gen/java/main</sourceFolder>
                                 <dateLibrary>joda</dateLibrary>
                                 <hideGenerationTimestamp>true</hideGenerationTimestamp>
