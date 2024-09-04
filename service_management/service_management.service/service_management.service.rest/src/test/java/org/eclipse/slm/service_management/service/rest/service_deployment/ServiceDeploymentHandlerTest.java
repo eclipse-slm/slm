@@ -36,13 +36,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.net.ssl.SSLException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -86,7 +85,7 @@ public class ServiceDeploymentHandlerTest {
 
     private ApiClient apiClient;
 
-    private KeycloakPrincipal keycloakPrincipal;
+    private JwtAuthenticationToken jwtAuthenticationToken;
 
     @BeforeEach
     public void initEach() throws SSLException {
@@ -94,13 +93,14 @@ public class ServiceDeploymentHandlerTest {
 
         var accessToken = new AccessToken();
         accessToken.setSubject(UUID.randomUUID().toString());
-        this.keycloakPrincipal = new KeycloakPrincipal<>("testUser", new KeycloakSecurityContext("", accessToken, "", null));
+        var jwt = new Jwt(accessToken.toString(), null, null, new HashMap<>(), new HashMap<>());
+        this.jwtAuthenticationToken = new JwtAuthenticationToken(jwt, new ArrayList<>(), "testUser");
 
         awxJobObserverInitializer = new AwxJobObserverInitializer("http", "localhost", String.valueOf(this.wireMockServer.port()), "", "", 4);
 
         this.apiClient = new ApiClient();
         this.apiClient.setBasePath("http://localhost:" + this.wireMockServer.port());
-        when(this.resourceManagementApiClientInitializer.init(any(KeycloakPrincipal.class))).thenReturn(this.apiClient);
+        when(this.resourceManagementApiClientInitializer.init(any(JwtAuthenticationToken.class))).thenReturn(this.apiClient);
 
         // Mock Resource Management REST API
         this.wireMockServer.stubFor(
@@ -182,12 +182,12 @@ public class ServiceDeploymentHandlerTest {
         var serviceOfferingOrder = new ServiceOrder();
 
         var deploymentJobRun = this.serviceDeploymentHandler
-                .deployServiceOfferingToResource(keycloakPrincipal, resourceId, serviceOfferingVersion, serviceOfferingOrder);
+                .deployServiceOfferingToResource(jwtAuthenticationToken, resourceId, serviceOfferingVersion, serviceOfferingOrder);
         var serviceId = deploymentJobRun.getServiceInstance().getId();
 
         this.serviceDeploymentHandler.onJobStateFinished(deploymentJobRun.getAwxJobObserver(), JobFinalState.SUCCESSFUL);
         verify(this.keycloakUtil).createRealmRoleAndAssignToUser(
-                argThat(keycloakPrincipal -> keycloakPrincipal.equals(this.keycloakPrincipal)),
+                argThat(keycloakPrincipal -> keycloakPrincipal.equals(this.jwtAuthenticationToken)),
                 argThat(roleName -> roleName.startsWith("service_")));
 
         ArgumentCaptor<ConsulCredential> consulCredentialArg = ArgumentCaptor.forClass(ConsulCredential.class);

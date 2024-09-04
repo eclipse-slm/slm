@@ -57,7 +57,7 @@ public class ServiceOfferingRestController {
     @RequestMapping(value = "/{serviceOfferingId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get service offering by id")
     public ResponseEntity<ServiceOfferingDTOApi> getServiceOfferingById(
-            @PathVariable("serviceOfferingId") UUID serviceOfferingId,
+            @PathVariable(name = "serviceOfferingId") UUID serviceOfferingId,
             @RequestParam(name = "withImage", defaultValue = "false") boolean withImage)
             throws ServiceOfferingNotFoundException {
         var serviceOffering = this.serviceOfferingHandler.getServiceOfferingById(serviceOfferingId);
@@ -82,7 +82,7 @@ public class ServiceOfferingRestController {
     @RequestMapping(value = "/{serviceOfferingId}", method = RequestMethod.PUT)
     @Operation(summary = "Create new service offering with specified id or update existing one")
     public ResponseEntity<ServiceOfferingCreateResponse> createOrUpdateServiceOfferingWithId(
-            @PathVariable("serviceOfferingId") UUID serviceOfferingId,
+            @PathVariable(name = "serviceOfferingId") UUID serviceOfferingId,
             @RequestBody ServiceOfferingCreateOrUpdateRequest serviceOfferingCreateOrUpdateRequest)
             throws ServiceVendorNotFoundException, ServiceCategoryNotFoundException {
         serviceOfferingCreateOrUpdateRequest.setId(serviceOfferingId);
@@ -93,7 +93,7 @@ public class ServiceOfferingRestController {
 
     @RequestMapping(value = "/{serviceOfferingId}", method = RequestMethod.DELETE)
     @Operation(summary = "Delete service offering")
-    public @ResponseBody ResponseEntity<Void> deleteServiceOffering(@PathVariable("serviceOfferingId") UUID serviceOfferingId)
+    public @ResponseBody ResponseEntity<Void> deleteServiceOffering(@PathVariable(name = "serviceOfferingId") UUID serviceOfferingId)
             throws ServiceOfferingNotFoundException {
         this.serviceOfferingHandler.deleteServiceOfferingById(serviceOfferingId);
         return ResponseEntity.ok().build();
@@ -106,7 +106,7 @@ public class ServiceOfferingRestController {
     }
 
     @RequestMapping(value = "/{serviceOfferingId}/cover", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
-    public ResponseEntity<String> getServiceOfferingCover(@PathVariable UUID serviceOfferingId) {
+    public ResponseEntity<String> getServiceOfferingCover(@PathVariable(name = "serviceOfferingId") UUID serviceOfferingId) {
         var coverImage = this.serviceOfferingHandler.getServiceOfferingCoverImageAsBase64(serviceOfferingId);
         return ResponseEntity.ok().body(coverImage);
     }

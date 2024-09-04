@@ -10,7 +10,7 @@ class ServiceOfferingsRestApi {
 
     async getOfferings (withImage = false, serviceVendorIdFilter = null){
         return axios
-            .get(this.API_URL + '/', {
+            .get(this.API_URL, {
                 params: {
                     withImage: withImage,
                     filterByServiceVendorId: serviceVendorIdFilter,

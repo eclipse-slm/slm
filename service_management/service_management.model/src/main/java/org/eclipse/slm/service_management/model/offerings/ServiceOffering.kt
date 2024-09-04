@@ -32,8 +32,7 @@ open class ServiceOffering(id: UUID? = null) : AbstractBaseEntityUuid(id) {
     @Column(name = "short_description", columnDefinition = "LONGTEXT")
     open var shortDescription = ""
 
-    @Lob
-    @Column(name = "cover_image")
+    @Column(name = "cover_image", columnDefinition="MEDIUMBLOB")
     @JsonDeserialize(using = ByteArrayDeserializer::class)
     open var coverImage: ByteArray? = null
 

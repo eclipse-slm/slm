@@ -56,13 +56,13 @@ public class ProfilerRestController {
 
     @RequestMapping(value = "/{profilerId}", method = RequestMethod.GET)
     @Operation(summary = "Get Profiler")
-    public Optional<Profiler> getProfiler(@PathVariable UUID profilerId) {
+    public Optional<Profiler> getProfiler(@PathVariable(name = "profilerId") UUID profilerId) {
         return profilerManager.getProfiler(profilerId);
     }
 
     @RequestMapping(value = "/{profilerId}/execute", method = RequestMethod.POST)
     @Operation(summary = "Run one Profiler")
-    public void runProfiler(@PathVariable UUID profilerId) {
+    public void runProfiler(@PathVariable(name = "profilerId") UUID profilerId) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         profilerManager.runProfilerAction(
@@ -73,7 +73,7 @@ public class ProfilerRestController {
 
     @RequestMapping(value = "/{profilerId}", method = RequestMethod.DELETE)
     @Operation(summary = "Delete Profiler")
-    public void deleteProfiler(@PathVariable UUID profilerId) {
+    public void deleteProfiler(@PathVariable(name = "profilerId") UUID profilerId) {
         profilerManager.deleteProfiler(profilerId);
     }
 }

@@ -11,6 +11,7 @@ import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,9 +42,9 @@ public class UsersRestController {
     @Operation(summary = "Get users")
     public @ResponseBody ResponseEntity<List<User>> getUsers()
     {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-        var keycloakUserRepresentations = this.keycloakUtil.getUsersOfRealm(KeycloakTokenUtil.getRealm(keycloakPrincipal));
+        var keycloakUserRepresentations = this.keycloakUtil.getUsersOfRealm(KeycloakTokenUtil.getRealm(jwtAuthenticationToken));
         var users = new ArrayList<User>();
         for (var keycloakUserRepresentation : keycloakUserRepresentations) {
             var user = new User();

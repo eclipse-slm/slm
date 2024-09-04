@@ -23,8 +23,7 @@ class ServiceVendor(id: UUID? = null) : AbstractBaseEntityUuid(id) {
     @Column(name = "description")
     var description = ""
 
-    @Lob
-    @Column(name = "logo")
+    @Column(name = "logo", columnDefinition="MEDIUMBLOB")
     var logo: ByteArray? = null
 
     @JsonIgnore

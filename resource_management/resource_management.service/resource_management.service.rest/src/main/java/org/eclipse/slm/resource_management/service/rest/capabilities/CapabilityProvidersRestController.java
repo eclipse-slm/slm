@@ -53,7 +53,7 @@ public class CapabilityProvidersRestController {
 
     @RequestMapping(value = "/virtual-resource-provider/{virtualResourceProviderId}/vm", method = RequestMethod.POST)
     @Operation(summary = "Create Virtual Machine")
-    public @ResponseBody void createVm(@PathVariable UUID virtualResourceProviderId) throws ConsulLoginFailedException {
+    public @ResponseBody void createVm(@PathVariable(name = "virtualResourceProviderId") UUID virtualResourceProviderId) throws ConsulLoginFailedException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         virtualResourceProviderHandler.createVm(
                 new AwxCredential(jwtAuthenticationToken),
