@@ -20,7 +20,7 @@ public class ServiceManagementVariablesRestController extends VariablesRestContr
         super(systemVariableHandler);
 
         systemVariableHandler.addSystemVariable(new SystemVariable("AAS_REGISTRY", "AAS Registry URL",
-                SystemVariableValueSource.APPLICATION_PROPERTIES, "basyx.aas-registry.url"));
+                SystemVariableValueSource.APPLICATION_PROPERTIES, "aas.aas-registry.url"));
         systemVariableHandler.addSystemVariable(new SystemVariable("AAS_SERVER", "AAS Server URL",
                 SystemVariableValueSource.APPLICATION_PROPERTIES, "basyx.aas-server.url"));
     }

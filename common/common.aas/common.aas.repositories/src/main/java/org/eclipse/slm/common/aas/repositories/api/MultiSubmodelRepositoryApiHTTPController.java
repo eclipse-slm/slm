@@ -37,7 +37,7 @@ public abstract class MultiSubmodelRepositoryApiHTTPController implements MultiS
     }
 
     @Override
-    public ResponseEntity<PagedResult> getAllSubmodels(String aasId, Base64UrlEncodedIdentifier semanticId, String idShort, Integer limit, Base64UrlEncodedCursor cursor, String level, String extent) {
+    public ResponseEntity<PagedResult> getAllSubmodels(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier semanticId, String idShort, Integer limit, Base64UrlEncodedCursor cursor, String level, String extent) {
         if (limit == null) {
             limit = 100;
         }
@@ -49,7 +49,7 @@ public abstract class MultiSubmodelRepositoryApiHTTPController implements MultiS
 
         PaginationInfo pInfo = new PaginationInfo(limit, decodedCursor);
 
-        CursorResult<List<Submodel>> cursorResult = submodelRepositoryFactory.getSubmodelRepository(aasId).getAllSubmodels(pInfo);
+        CursorResult<List<Submodel>> cursorResult = submodelRepositoryFactory.getSubmodelRepository(aasId.getIdentifier()).getAllSubmodels(pInfo);
 
         GetSubmodelsResult paginatedSubmodel = new GetSubmodelsResult();
 
@@ -62,37 +62,37 @@ public abstract class MultiSubmodelRepositoryApiHTTPController implements MultiS
     }
 
     @Override
-    public ResponseEntity<Submodel> getSubmodelById(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, String level, String extent) {
-        return new ResponseEntity<Submodel>(submodelRepositoryFactory.getSubmodelRepository(aasId).getSubmodel(submodelIdentifier.getIdentifier()), HttpStatus.OK);
+    public ResponseEntity<Submodel> getSubmodelById(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, String level, String extent) {
+        return new ResponseEntity<Submodel>(submodelRepositoryFactory.getSubmodelRepository(aasId.getIdentifier()).getSubmodel(submodelIdentifier.getIdentifier()), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<SubmodelValueOnly> getSubmodelByIdValueOnly(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, String level, String extent) {
-        return new ResponseEntity<SubmodelValueOnly>(submodelRepositoryFactory.getSubmodelRepository(aasId).getSubmodelByIdValueOnly(submodelIdentifier.getIdentifier()), HttpStatus.OK);
+    public ResponseEntity<SubmodelValueOnly> getSubmodelByIdValueOnly(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, String level, String extent) {
+        return new ResponseEntity<SubmodelValueOnly>(submodelRepositoryFactory.getSubmodelRepository(aasId.getIdentifier()).getSubmodelByIdValueOnly(submodelIdentifier.getIdentifier()), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Submodel> getSubmodelByIdMetadata(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, String level) {
-        return new ResponseEntity<Submodel>(submodelRepositoryFactory.getSubmodelRepository(aasId).getSubmodelByIdMetadata(submodelIdentifier.getIdentifier()), HttpStatus.OK);
+    public ResponseEntity<Submodel> getSubmodelByIdMetadata(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, String level) {
+        return new ResponseEntity<Submodel>(submodelRepositoryFactory.getSubmodelRepository(aasId.getIdentifier()).getSubmodelByIdMetadata(submodelIdentifier.getIdentifier()), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Submodel> postSubmodel(String aasId, Submodel body) {
+    public ResponseEntity<Submodel> postSubmodel(Base64UrlEncodedIdentifier aasId, Submodel body) {
         throw new MethodNotImplementedException();
     }
 
     @Override
-    public ResponseEntity<Void> putSubmodelById(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, Submodel body, String level) {
+    public ResponseEntity<Void> putSubmodelById(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, Submodel body, String level) {
         throw new MethodNotImplementedException();
     }
 
     @Override
-    public ResponseEntity<Void> deleteSubmodelById(String aasId, Base64UrlEncodedIdentifier submodelIdentifier) {
+    public ResponseEntity<Void> deleteSubmodelById(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier) {
         throw new MethodNotImplementedException();
     }
 
     @Override
-    public ResponseEntity<PagedResult> getAllSubmodelElements(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, Integer limit, Base64UrlEncodedCursor cursor, String level, String extent) {
+    public ResponseEntity<PagedResult> getAllSubmodelElements(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, Integer limit, Base64UrlEncodedCursor cursor, String level, String extent) {
         if (limit == null) {
             limit = 100;
         }
@@ -103,7 +103,7 @@ public abstract class MultiSubmodelRepositoryApiHTTPController implements MultiS
         }
 
         PaginationInfo pInfo = new PaginationInfo(limit, decodedCursor);
-        CursorResult<List<SubmodelElement>> cursorResult = submodelRepositoryFactory.getSubmodelRepository(aasId).getSubmodelElements(submodelIdentifier.getIdentifier(), pInfo);
+        CursorResult<List<SubmodelElement>> cursorResult = submodelRepositoryFactory.getSubmodelRepository(aasId.getIdentifier()).getSubmodelElements(submodelIdentifier.getIdentifier(), pInfo);
 
         GetSubmodelElementsResult paginatedSubmodelElement = new GetSubmodelElementsResult();
         String encodedCursor = getEncodedCursorFromCursorResult(cursorResult);
@@ -115,62 +115,62 @@ public abstract class MultiSubmodelRepositoryApiHTTPController implements MultiS
     }
 
     @Override
-    public ResponseEntity<SubmodelElement> getSubmodelElementByPathSubmodelRepo(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath, String level, String extent) {
+    public ResponseEntity<SubmodelElement> getSubmodelElementByPathSubmodelRepo(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath, String level, String extent) {
         return handleSubmodelElementValueNormalGetRequest(aasId, submodelIdentifier.getIdentifier(), idShortPath);
     }
 
     @Override
-    public ResponseEntity<SubmodelElementValue> getSubmodelElementByPathValueOnlySubmodelRepo(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath, String level, String extent) {
+    public ResponseEntity<SubmodelElementValue> getSubmodelElementByPathValueOnlySubmodelRepo(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath, String level, String extent) {
         return handleSubmodelElementValueGetRequest(aasId, submodelIdentifier.getIdentifier(), idShortPath);
     }
 
     @Override
-    public ResponseEntity<Void> patchSubmodelElementByPathValueOnlySubmodelRepo(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath, SubmodelElementValue body, String level) {
+    public ResponseEntity<Void> patchSubmodelElementByPathValueOnlySubmodelRepo(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath, SubmodelElementValue body, String level) {
         throw new MethodNotImplementedException();
     }
 
     @Override
-    public ResponseEntity<SubmodelElement> postSubmodelElementByPathSubmodelRepo(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath, SubmodelElement body, String level, String extent) {
+    public ResponseEntity<SubmodelElement> postSubmodelElementByPathSubmodelRepo(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath, SubmodelElement body, String level, String extent) {
         throw new MethodNotImplementedException();
     }
 
     @Override
-    public ResponseEntity<SubmodelElement> postSubmodelElementSubmodelRepo(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, SubmodelElement body) {
+    public ResponseEntity<SubmodelElement> postSubmodelElementSubmodelRepo(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, SubmodelElement body) {
         throw new MethodNotImplementedException();
     }
 
     @Override
-    public ResponseEntity<Void> deleteSubmodelElementByPathSubmodelRepo(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath) {
+    public ResponseEntity<Void> deleteSubmodelElementByPathSubmodelRepo(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath) {
         throw new MethodNotImplementedException();
     }
 
     @Override
-    public ResponseEntity<Resource> getFileByPath(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath) {
+    public ResponseEntity<Resource> getFileByPath(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath) {
         throw new MethodNotImplementedException();
     }
 
     @Override
-    public ResponseEntity<Void> putFileByPath(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath, String fileName, MultipartFile file) {
+    public ResponseEntity<Void> putFileByPath(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath, String fileName, MultipartFile file) {
         throw new MethodNotImplementedException();
     }
 
     @Override
-    public ResponseEntity<Void> deleteFileByPath(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath) {
+    public ResponseEntity<Void> deleteFileByPath(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath) {
         throw new MethodNotImplementedException();
     }
 
     @Override
-    public ResponseEntity<OperationResult> invokeOperationSubmodelRepo(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath, OperationRequest body, Boolean async) {
+    public ResponseEntity<OperationResult> invokeOperationSubmodelRepo(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath, OperationRequest body, Boolean async) {
         throw new MethodNotImplementedException();
     }
 
     @Override
-    public ResponseEntity<Void> putSubmodelElementByPathSubmodelRepo(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath, SubmodelElement body, String level) {
+    public ResponseEntity<Void> putSubmodelElementByPathSubmodelRepo(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, String idShortPath, SubmodelElement body, String level) {
         throw new MethodNotImplementedException();
     }
 
     @Override
-    public ResponseEntity<Void> patchSubmodelByIdValueOnly(String aasId, Base64UrlEncodedIdentifier submodelIdentifier, List<SubmodelElement> body, String level) {
+    public ResponseEntity<Void> patchSubmodelByIdValueOnly(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier submodelIdentifier, List<SubmodelElement> body, String level) {
         throw new MethodNotImplementedException();
     }
 
@@ -182,13 +182,13 @@ public abstract class MultiSubmodelRepositoryApiHTTPController implements MultiS
         return Base64UrlEncodedCursor.encodeCursor(cursorResult.getCursor());
     }
 
-    private ResponseEntity<SubmodelElement> handleSubmodelElementValueNormalGetRequest(String aasId, String submodelIdentifier, String idShortPath) {
-        SubmodelElement submodelElement = submodelRepositoryFactory.getSubmodelRepository(aasId).getSubmodelElement(submodelIdentifier, idShortPath);
+    private ResponseEntity<SubmodelElement> handleSubmodelElementValueNormalGetRequest(Base64UrlEncodedIdentifier aasId, String submodelIdentifier, String idShortPath) {
+        SubmodelElement submodelElement = submodelRepositoryFactory.getSubmodelRepository(aasId.getIdentifier()).getSubmodelElement(submodelIdentifier, idShortPath);
         return new ResponseEntity<SubmodelElement>(submodelElement, HttpStatus.OK);
     }
 
-    private ResponseEntity<SubmodelElementValue> handleSubmodelElementValueGetRequest(String aasId, String submodelIdentifier, String idShortPath) {
-        SubmodelElementValue value = submodelRepositoryFactory.getSubmodelRepository(aasId).getSubmodelElementValue(submodelIdentifier, idShortPath);
+    private ResponseEntity<SubmodelElementValue> handleSubmodelElementValueGetRequest(Base64UrlEncodedIdentifier aasId, String submodelIdentifier, String idShortPath) {
+        SubmodelElementValue value = submodelRepositoryFactory.getSubmodelRepository(aasId.getIdentifier()).getSubmodelElementValue(submodelIdentifier, idShortPath);
         return new ResponseEntity<SubmodelElementValue>(value, HttpStatus.OK);
     }
 }

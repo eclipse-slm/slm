@@ -108,6 +108,18 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.aas.repositories</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.aas.clients</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- Testing !-->
         <dependency>
             <groupId>org.testcontainers</groupId>

@@ -1,6 +1,7 @@
 package org.eclipse.slm.service_management.service.rest.service_offerings;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.minio.model.exceptions.*;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
@@ -39,6 +40,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/services/offerings/{serviceOfferingId}/versions")
+@Tag(name = "Service Offering Version API")
 public class ServiceOfferingVersionsRestController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServiceOfferingVersionsRestController.class);

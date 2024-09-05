@@ -10,8 +10,6 @@ import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodel;
 
 public class ConsulSubmodel extends DefaultSubmodel {
     public static final String SUBMODELID = "ConsulInfo";
-    public static final String IPID = "IP";
-    public static final String HOSTNAMEID = "HostName";
     public static final Reference SEMANTIC_ID = new DefaultReference.Builder().keys(
             new DefaultKey.Builder()
                     .type(KeyTypes.CONCEPT_DESCRIPTION)
@@ -36,7 +34,7 @@ public class ConsulSubmodel extends DefaultSubmodel {
 
     public void addIpProperty(String ip) {
         var ipProp = new DefaultProperty.Builder()
-                .idShort(IPID)
+                .idShort("IP")
                 .valueType(DataTypeDefXsd.STRING)
                 .value(ip).build();
         this.submodelElements.add(ipProp);
@@ -44,7 +42,7 @@ public class ConsulSubmodel extends DefaultSubmodel {
 
     public void addHostnameProperty(String hostName) {
         var hostnameProp = new DefaultProperty.Builder()
-                .idShort(HOSTNAMEID)
+                .idShort("Hostname")
                 .valueType(DataTypeDefXsd.STRING)
                 .value(hostName).build();
         this.submodelElements.add(hostnameProp);
