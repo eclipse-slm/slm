@@ -72,8 +72,7 @@ public class UsersRestController {
     @RequestMapping(value = "/organisation/id", method = RequestMethod.GET)
     @Operation(summary = "Get organisation id of authenticated user")
     public @ResponseBody
-    UUID getOrganisationIdOfAuthenticatedUser(
-            KeycloakAuthenticationToken authentication)
+    UUID getOrganisationIdOfAuthenticatedUser(KeycloakAuthenticationToken authentication)
     {
         var organisationId = MultiTenancyUtil.generateOrganisationIdFromKeycloakAuthenticationToken(authentication);
         return organisationId;
@@ -82,8 +81,9 @@ public class UsersRestController {
     @RequestMapping(value = "/vendors", method = RequestMethod.GET)
     @Operation(summary = "Get service vendors of authenticated user")
     public @ResponseBody ResponseEntity<List<UUID>> getServiceVendorsOfUser() {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var serviceVendorIds = this.serviceVendorRepository.getServiceVendorsOfDeveloper(keycloakPrincipal);
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+
+        var serviceVendorIds = this.serviceVendorRepository.getServiceVendorsOfDeveloper(jwtAuthenticationToken);
 
         return ResponseEntity.ok(serviceVendorIds);
     }

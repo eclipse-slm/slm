@@ -56,7 +56,7 @@ class ServiceOfferingsRestApi {
 
     async addServiceOffering (serviceOffering: ServiceOffering) {
         return axios
-            .post(this.API_URL + '/', serviceOffering)
+            .post(this.API_URL, serviceOffering)
             .then(response => {
                 return response
             })

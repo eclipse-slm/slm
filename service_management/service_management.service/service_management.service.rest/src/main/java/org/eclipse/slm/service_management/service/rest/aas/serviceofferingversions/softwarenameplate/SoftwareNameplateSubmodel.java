@@ -22,10 +22,8 @@ public class SoftwareNameplateSubmodel extends DefaultSubmodel {
     public SoftwareNameplateSubmodel(ServiceOfferingVersion serviceOfferingVersion)  {
         super();
         this.id = SoftwareNameplateSubmodel.getSubmodelIdForServiceOfferingVersionId(serviceOfferingVersion.getId());
-        this.idShort = SoftwareNameplateSubmodel.SUBMODEL_ID_PREFIX
-                + "-" + serviceOfferingVersion.getServiceOffering().getName()
-                + "-" + serviceOfferingVersion.getVersion();
-        this.setSemanticId(SEMANTIC_ID);
+        this.idShort = SoftwareNameplateSubmodel.getSubmodelIdShortForServiceOfferingVersion(serviceOfferingVersion);
+        this.setSemanticId(SoftwareNameplateSubmodel.SEMANTIC_ID);
 
         var smesSoftwareNameplateType = new ArrayList<SubmodelElement>();
         // Property | URIOfTheProduct
@@ -43,6 +41,10 @@ public class SoftwareNameplateSubmodel extends DefaultSubmodel {
                 .category(SubmodelUtils.CATEGORY_PARAMETER)
                 .qualifiers(SubmodelUtils.QUALIFIER_ONE)
                 .semanticId(SubmodelUtils.generateSemanticId("0173-1#02-AAO677#002"))
+                .value(new DefaultLangStringTextType.Builder()
+                            .language("en")
+                            .text(serviceOfferingVersion.getServiceOffering().getServiceVendor().getName())
+                            .build())
                 .build();
         smesSoftwareNameplateType.add(mlpManufacturerName);
         // MLP | ManufacturerProductDesignation
@@ -60,6 +62,7 @@ public class SoftwareNameplateSubmodel extends DefaultSubmodel {
                 .valueType(DataTypeDefXsd.STRING)
                 .qualifiers(SubmodelUtils.QUALIFIER_ONE)
                 .semanticId(SubmodelUtils.generateSemanticId("https://admin-shell.io/idta/SoftwareNameplate/1/0/SoftwareNameplate/SoftwareNameplateType/Version"))
+                .value(serviceOfferingVersion.getVersion())
                 .build();
         smesSoftwareNameplateType.add(propVersion);
         // Property | BuildDate
@@ -119,5 +122,11 @@ public class SoftwareNameplateSubmodel extends DefaultSubmodel {
 
     public static String getSubmodelIdForServiceOfferingVersionId(UUID serviceOfferingVersionId) {
         return SoftwareNameplateSubmodel.SUBMODEL_ID_PREFIX + "-" + serviceOfferingVersionId;
+    }
+
+    public static String getSubmodelIdShortForServiceOfferingVersion(ServiceOfferingVersion serviceOfferingVersion) {
+        return SoftwareNameplateSubmodel.SUBMODEL_ID_PREFIX
+                + "-" + serviceOfferingVersion.getServiceOffering().getName()
+                + "-" + serviceOfferingVersion.getVersion();
     }
 }

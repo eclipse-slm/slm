@@ -6,17 +6,18 @@ import org.eclipse.slm.service_management.model.service_repositories.ServiceRepo
 import org.eclipse.slm.service_management.model.service_repositories.ServiceRepositoryCreateResponse;
 import org.eclipse.slm.service_management.model.vendors.exceptions.ServiceVendorAccessDenied;
 import io.swagger.v3.oas.annotations.Operation;
-import org.keycloak.KeycloakPrincipal;
 import org.modelmapper.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -34,9 +35,9 @@ public class ServiceRepositoriesRestController {
     public ResponseEntity<List<ServiceRepositoryDTOApiRead>> getRepositories(
             @PathVariable(name = "serviceVendorId") UUID serviceVendorId
     ) throws ServiceVendorAccessDenied, ServiceRepositoryNotFound {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-        if (this.checkUserPermissions(keycloakPrincipal, serviceVendorId)) {
+        if (this.checkUserPermissions(jwtAuthenticationToken, serviceVendorId)) {
             var serviceRepositories = this.serviceRepositoryHandler.getRepositoriesOfServiceVendor(serviceVendorId);
 
             List<ServiceRepositoryDTOApiRead> serviceRepositoriesDTO =
@@ -45,7 +46,7 @@ public class ServiceRepositoriesRestController {
             return ResponseEntity.ok(serviceRepositoriesDTO);
         }
         else {
-            throw this.getNoPermissionException(keycloakPrincipal, serviceVendorId);
+            throw this.getNoPermissionException(jwtAuthenticationToken, serviceVendorId);
         }
     }
 
@@ -56,9 +57,9 @@ public class ServiceRepositoriesRestController {
             @PathVariable(name = "serviceVendorId") UUID serviceVendorId,
             @RequestBody ServiceRepository serviceRepository
     ) throws ServiceVendorAccessDenied {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-        if (this.checkUserPermissions(keycloakPrincipal, serviceVendorId)) {
+        if (this.checkUserPermissions(jwtAuthenticationToken, serviceVendorId)) {
             serviceRepository.setId(UUID.randomUUID());
             serviceRepository.setServiceVendorId(serviceVendorId);
             serviceRepository = this.serviceRepositoryHandler.createOrUpdateServiceRepository(serviceRepository);
@@ -68,7 +69,7 @@ public class ServiceRepositoriesRestController {
             return ResponseEntity.ok(response);
         }
         else {
-            throw this.getNoPermissionException(keycloakPrincipal, serviceVendorId);
+            throw this.getNoPermissionException(jwtAuthenticationToken, serviceVendorId);
         }
     }
 
@@ -80,9 +81,9 @@ public class ServiceRepositoriesRestController {
             @PathVariable(name = "serviceRepositoryId") UUID serviceRepositoryId,
             @RequestBody ServiceRepository serviceRepository
     ) throws ServiceVendorAccessDenied {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-        if (this.checkUserPermissions(keycloakPrincipal, serviceVendorId)) {
+        if (this.checkUserPermissions(jwtAuthenticationToken, serviceVendorId)) {
             serviceRepository.setId(serviceRepositoryId);
             serviceRepository.setServiceVendorId(serviceVendorId);
             serviceRepository = this.serviceRepositoryHandler.createOrUpdateServiceRepository(serviceRepository);
@@ -92,7 +93,7 @@ public class ServiceRepositoriesRestController {
             return ResponseEntity.ok(response);
         }
         else {
-            throw this.getNoPermissionException(keycloakPrincipal, serviceVendorId);
+            throw this.getNoPermissionException(jwtAuthenticationToken, serviceVendorId);
         }
     }
 
@@ -103,31 +104,30 @@ public class ServiceRepositoriesRestController {
             @PathVariable(name = "serviceVendorId") UUID serviceVendorId,
             @PathVariable(name = "repositoryId") UUID repositoryId
     ) throws ServiceVendorAccessDenied {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-        if (this.checkUserPermissions(keycloakPrincipal, serviceVendorId)) {
+        if (this.checkUserPermissions(jwtAuthenticationToken, serviceVendorId)) {
             this.serviceRepositoryHandler.deleteServiceRepository(serviceVendorId, repositoryId);
 
             return ResponseEntity.ok().build();
         }
         else {
-            throw this.getNoPermissionException(keycloakPrincipal, serviceVendorId);
+            throw this.getNoPermissionException(jwtAuthenticationToken, serviceVendorId);
         }
     }
 
-    private boolean checkUserPermissions(KeycloakPrincipal keycloakPrincipal, UUID serviceVendorId)
-            throws ServiceVendorAccessDenied {
-        var token = keycloakPrincipal.getKeycloakSecurityContext().getToken();
-        var otherClaims = token.getOtherClaims();
+    private boolean checkUserPermissions(JwtAuthenticationToken jwtAuthenticationToken, UUID serviceVendorId) {
+        var token = jwtAuthenticationToken.getToken();
+        var claims = token.getClaims();
 
-        var userRealmAccessRoles = token.getRealmAccess().getRoles();
+        var userRealmAccessRoles = (List<String>)((Map<String,Object>)claims.get("realm_access")).get("roles");
         if (userRealmAccessRoles.contains("slm-admin"))
         {
             return true;
         }
 
-        if (otherClaims.containsKey("groups")) {
-            var userGroups = (ArrayList) otherClaims.get("groups");
+        if (claims.containsKey("groups")) {
+            var userGroups = (ArrayList<String>) claims.get("groups");
             if (userGroups.contains("vendor_" + serviceVendorId)) {
                 return true;
             }
@@ -136,8 +136,8 @@ public class ServiceRepositoriesRestController {
         return false;
     }
 
-    private ServiceVendorAccessDenied getNoPermissionException(KeycloakPrincipal keycloakPrincipal, UUID serviceVendorId) {
-        var token = keycloakPrincipal.getKeycloakSecurityContext().getToken();
+    private ServiceVendorAccessDenied getNoPermissionException(JwtAuthenticationToken jwtAuthenticationToken, UUID serviceVendorId) {
+        var token = jwtAuthenticationToken.getToken();
         return new ServiceVendorAccessDenied("User '" + token.getId() + "' has no permissions for service vendor '" + serviceVendorId + "'");
     }
 }

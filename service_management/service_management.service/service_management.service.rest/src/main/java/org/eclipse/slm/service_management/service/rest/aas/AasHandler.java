@@ -11,6 +11,7 @@ import org.eclipse.slm.service_management.model.offerings.ServiceOfferingVersion
 import org.eclipse.slm.service_management.persistence.api.ServiceOfferingVersionJpaRepository;
 import org.eclipse.slm.service_management.service.rest.aas.serviceofferingversions.ServiceOfferingVersionAas;
 import org.eclipse.slm.service_management.service.rest.aas.serviceofferingversions.ServiceOfferingVersionsSubmodelRepositoryApiHTTPController;
+import org.eclipse.slm.service_management.service.rest.aas.serviceofferingversions.requirements.RequirementsSubmodel;
 import org.eclipse.slm.service_management.service.rest.aas.serviceofferingversions.softwarenameplate.SoftwareNameplateSubmodel;
 import org.eclipse.slm.service_management.service.rest.service_offerings.ServiceOfferingVersionEvent;
 import org.slf4j.Logger;
@@ -95,8 +96,19 @@ public class AasHandler implements ApplicationListener<ServiceOfferingVersionEve
             this.submodelRegistryClient.registerSubmodel(
                     softwareNameplateSubmodelUrl,
                     softwareNameplateSubmodelId,
-                    softwareNameplateSubmodelId,
+                    SoftwareNameplateSubmodel.getSubmodelIdShortForServiceOfferingVersion(serviceOfferingVersion),
                     SoftwareNameplateSubmodel.SEMANTIC_ID_VALUE);
+
+            var requirementsSubmodelId = RequirementsSubmodel.getSubmodelIdForServiceOfferingVersionId(serviceOfferingVersion.getId());
+            var requirementsSubmodelIdEncoded = new Base64UrlEncodedIdentifier(requirementsSubmodelId);
+            var requirementsSubmodelUrl = this.getServiceOfferingVersionsSubmodelRepositoryUrl(serviceOfferingVersionAasSIdEncoded)
+                    + "/submodels/" + requirementsSubmodelIdEncoded.getEncodedIdentifier();
+            this.aasRepositoryClient.addSubmodelReferenceToAas(serviceOfferingVersionAas.getId(), requirementsSubmodelId);
+            this.submodelRegistryClient.registerSubmodel(
+                    requirementsSubmodelUrl,
+                    requirementsSubmodelId,
+                    RequirementsSubmodel.getSubmodelIdShortForServiceOfferingVersion(serviceOfferingVersion),
+                    RequirementsSubmodel.SEMANTIC_ID_VALUE);
         }
         catch (ApiException e) {
             LOG.error("Unable to create AAS and submodels for ServiceOfferingVersion [id='" + serviceOfferingVersion.getId() + "']: " + e.getMessage());

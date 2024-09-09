@@ -1,7 +1,7 @@
 package org.eclipse.slm.service_management.persistence.keycloak;
 
+import com.c4_soft.springaddons.security.oauth2.test.annotations.*;
 import org.eclipse.slm.common.keycloak.config.KeycloakUtil;
-import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakGroupNotFoundException;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakUserNotFoundException;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendor;
@@ -12,23 +12,20 @@ import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguratio
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.KeycloakSecurityContext;
-import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.test.context.TestSecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,13 +54,7 @@ public class ServiceVendorRepositoryTest {
     private ServiceVendorRepository serviceVendorRepository;
 
     @MockBean
-    private MultiTenantKeycloakRegistration multiTenantKeycloakRegistration;
-
-    @MockBean
     private KeycloakUtil keycloakUtil;
-
-    @Mock
-    private KeycloakPrincipal keycloakPrincipal;
 
     private RecursiveComparisonConfiguration defaultRecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
             .withIgnoredFields("id", "persisted")
@@ -319,27 +310,24 @@ public class ServiceVendorRepositoryTest {
 
         @Test
         @DisplayName("No vendors associated")
+        @WithMockJwtAuth()
         public void noVendorsAssociated() {
-            var accessToken = new AccessToken();
-            var keycloakSecurityContext = new KeycloakSecurityContext("", accessToken,"", null);
-            when(keycloakPrincipal.getKeycloakSecurityContext()).thenReturn(keycloakSecurityContext);
+            var jwtAuthenticationToken = (JwtAuthenticationToken) TestSecurityContextHolder.getContext().getAuthentication();
 
-            var developers = serviceVendorRepository.getServiceVendorsOfDeveloper(keycloakPrincipal);
+            var developers = serviceVendorRepository.getServiceVendorsOfDeveloper(jwtAuthenticationToken);
             assertThat(developers).hasSize(0);
         }
 
         @Test
         @DisplayName("One vendor associated")
+        @WithMockJwtAuth(claims = @OpenIdClaims(
+                otherClaims = @Claims(stringArrayClaims = @StringArrayClaim(name = "groups", value = { "vendor_c12c5a32-c57d-4afd-89f4-9bcd4ae7bee3" })
+        )))
         public void oneVendorAssociated() {
-            var serviceVendor = generateTestServiceVendor();
-            var accessToken = new AccessToken();
-            var groups = new ArrayList<String>();
-            groups.add(serviceVendor.getKeycloakGroupName());
-            accessToken.setOtherClaims("groups", groups);
-            var keycloakSecurityContext = new KeycloakSecurityContext("", accessToken,"", null);
-            when(keycloakPrincipal.getKeycloakSecurityContext()).thenReturn(keycloakSecurityContext);
+            var jwtAuthenticationToken = (JwtAuthenticationToken) TestSecurityContextHolder.getContext().getAuthentication();
+            var serviceVendor = generateTestServiceVendorWithId(UUID.fromString("c12c5a32-c57d-4afd-89f4-9bcd4ae7bee3"));
 
-            var serviceVendors = serviceVendorRepository.getServiceVendorsOfDeveloper(keycloakPrincipal);
+            var serviceVendors = serviceVendorRepository.getServiceVendorsOfDeveloper(jwtAuthenticationToken);
             assertThat(serviceVendors).hasSize(1);
             assertThat(serviceVendors).contains(serviceVendor.getId());
         }
@@ -355,6 +343,10 @@ public class ServiceVendorRepositoryTest {
 
     private ServiceVendor generateTestServiceVendor() {
         return this.generateTestServiceVendor(UUID.randomUUID(), null);
+    }
+
+    private ServiceVendor generateTestServiceVendorWithId(UUID serviceVendorId) {
+        return this.generateTestServiceVendor(serviceVendorId, null);
     }
 
     private ServiceVendor generateTestServiceVendorWithLogo() {

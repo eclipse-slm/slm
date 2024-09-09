@@ -10,10 +10,11 @@ import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodel;
 
 public class ConsulSubmodel extends DefaultSubmodel {
     public static final String SUBMODELID = "ConsulInfo";
+    public static final String SEMANTIC_ID_VALUE = "http://eclipse.dev/slm/aas/sm/ConsulInfo";
     public static final Reference SEMANTIC_ID = new DefaultReference.Builder().keys(
             new DefaultKey.Builder()
                     .type(KeyTypes.CONCEPT_DESCRIPTION)
-                    .value("https://fab-os.org/ConsulInfo").build()).build();
+                    .value(SEMANTIC_ID_VALUE).build()).build();
 
     public ConsulSubmodel(String resourceId) {
         this(resourceId, null, null);

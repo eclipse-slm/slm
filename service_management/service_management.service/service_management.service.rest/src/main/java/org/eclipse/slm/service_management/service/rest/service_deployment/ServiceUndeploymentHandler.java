@@ -1,18 +1,5 @@
 package org.eclipse.slm.service_management.service.rest.service_deployment;
 
-import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
-import org.eclipse.basyx.aas.metamodel.connected.ConnectedAssetAdministrationShell;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
-import org.eclipse.basyx.aas.registration.api.IAASRegistry;
-import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
-import org.eclipse.basyx.aas.registration.restapi.AASRegistryModelProvider;
-import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
-import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
-import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
-import org.eclipse.basyx.submodel.metamodel.connected.ConnectedSubmodel;
-import org.eclipse.basyx.submodel.metamodel.map.Submodel;
-import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
 import org.eclipse.slm.common.awx.client.AwxCredential;
 import org.eclipse.slm.common.awx.client.observer.AwxJobExecutor;
 import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
@@ -36,10 +23,10 @@ import org.eclipse.slm.service_management.model.services.ServiceInstance;
 import org.eclipse.slm.service_management.model.services.exceptions.ServiceInstanceNotFoundException;
 import org.eclipse.slm.service_management.service.rest.service_instances.ServiceInstancesConsulClient;
 import org.eclipse.slm.service_management.service.rest.service_offerings.ServiceOfferingVersionHandler;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
@@ -58,10 +45,6 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
 
     private final ServiceOfferingVersionHandler serviceOfferingVersionHandler;
 
-    private final ConnectedAssetAdministrationShellManager aasManager;
-
-    private final AASRegistryProxy aasRegistryProxy;
-
     private Map<AwxJobObserver, UndeploymentJobRun> observedAwxJobsToUndeploymentJobDetails = new HashMap<>();
 
     public ServiceUndeploymentHandler(
@@ -72,19 +55,16 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
             KeycloakUtil keycloakUtil,
             ResourceManagementApiClientInitializer resourceManagementApiClientInitializer,
             ServiceOfferingVersionHandler serviceOfferingVersionHandler,
-            ServiceInstancesConsulClient serviceInstancesConsulClient,
-            @Value("${basyx.aas-registry.url}") String aasRegistryUrl
+            ServiceInstancesConsulClient serviceInstancesConsulClient
     ) {
         super(resourceManagementApiClientInitializer, serviceInstancesConsulClient, awxJobObserverInitializer, awxJobExecutor);
         this.notificationServiceClient = notificationServiceClient;
         this.consulServicesApiClient = consulServicesApiClient;
         this.keycloakUtil = keycloakUtil;
         this.serviceOfferingVersionHandler = serviceOfferingVersionHandler;
-        this.aasRegistryProxy = new AASRegistryProxy(aasRegistryUrl);
-        this.aasManager = new ConnectedAssetAdministrationShellManager(this.aasRegistryProxy);
     }
 
-    public void deleteService(KeycloakPrincipal keycloakPrincipal, List<CatalogService> consulService)
+    public void deleteService(JwtAuthenticationToken jwtAuthenticationToken, List<CatalogService> consulService)
             throws SSLException, ApiException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, CapabilityServiceNotFoundException {
         if (consulService.isEmpty())
         {
@@ -98,7 +78,7 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
         var serviceOfferingVersion = serviceOfferingVersionHandler
                 .getServiceOfferingVersionById(serviceInstance.getServiceOfferingId(), serviceInstance.getServiceOfferingVersionId());
 
-        var serviceHoster = this.getServiceHoster(keycloakPrincipal, serviceInstance.getCapabilityServiceId());
+        var serviceHoster = this.getServiceHoster(jwtAuthenticationToken, serviceInstance.getCapabilityServiceId());
 
         var awxCapabilityAction = this.getAwxDeployCapabilityAction(ActionType.UNDEPLOY, serviceHoster.getCapabilityService().getCapability());
         var awxGitRepoOfProject = awxCapabilityAction.getAwxRepo();
@@ -108,7 +88,7 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
         Map<String, Object> extraVarsMap = new HashMap<>() {{
             put("service_id", serviceInstance.getId().toString());
             put("resource_id", serviceInstance.getCapabilityServiceId());
-            put("keycloak_token", keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+            put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
             put("service_name", serviceHoster.getCapabilityService().getService());
             put("supported_connection_types", awxCapabilityAction.getConnectionTypes());
         }};
@@ -124,43 +104,11 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
 
         var jobTarget = JobTarget.SERVICE;
         var jobGoal = JobGoal.DELETE;
-        var awxJobId = awxJobExecutor.executeJob(new AwxCredential(keycloakPrincipal), awxGitRepoOfProject, awxGitBranchOfProject, awxPlaybook, extraVars);
+        var awxJobId = awxJobExecutor.executeJob(new AwxCredential(jwtAuthenticationToken), awxGitRepoOfProject, awxGitBranchOfProject, awxPlaybook, extraVars);
         var awxJobObserver = awxJobObserverInitializer.init(awxJobId, jobTarget, jobGoal, this);
-        this.observedAwxJobsToUndeploymentJobDetails.put(awxJobObserver, new UndeploymentJobRun(keycloakPrincipal, serviceInstance.getId(), serviceInstance.getResourceId()));
-        this.notificationServiceClient.postJobObserver(keycloakPrincipal, awxJobId, jobTarget, jobGoal);
+        this.observedAwxJobsToUndeploymentJobDetails.put(awxJobObserver, new UndeploymentJobRun(jwtAuthenticationToken, serviceInstance.getId(), serviceInstance.getResourceId()));
+        this.notificationServiceClient.postJobObserver(jwtAuthenticationToken, awxJobId, jobTarget, jobGoal);
     }
-
-    private void runSubmodelGarbageCollection(UUID resourceId) {
-        IIdentifier iIdentifier = new CustomId(resourceId.toString());
-        Map<String, ISubmodel> submodelMap;
-        ConnectedAssetAdministrationShell aas = aasManager.retrieveAAS(iIdentifier);
-
-        try {
-            submodelMap = aasManager.retrieveSubmodels(iIdentifier);
-        } catch (org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException e) {
-            LOG.info("Garbage collection stopped because no submodels were available in AAS with ID " + resourceId);
-            return;
-        }
-
-        for (Map.Entry<String, ISubmodel> entry: submodelMap.entrySet()) {
-            try {
-                LOG.info("Get information from submodel with ID = " + entry.getKey());
-                Submodel submodel = ((ConnectedSubmodel) entry.getValue()).getLocalCopy();
-            } catch(ResourceNotFoundException e) {
-                LOG.info("Delete submodel with idShort = " + entry.getKey() + " from AAS with ID = " + resourceId);
-                Optional<SubmodelDescriptor> optionalSubmodelDescriptor = this.aasRegistryProxy.lookupSubmodels(iIdentifier)
-                        .stream()
-                        .filter(sd -> sd.getIdShort().equals(entry.getKey()))
-                        .findFirst();
-                if(optionalSubmodelDescriptor.isPresent())
-                    aasRegistryProxy.delete(
-                            iIdentifier,
-                            optionalSubmodelDescriptor.get().getIdentifier()
-                    );
-            }
-        }
-    }
-
     @Override
     public void onJobStateChanged(AwxJobObserver sender, JobState newState) {
     }
@@ -169,7 +117,7 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
     public void onJobStateFinished(AwxJobObserver sender, JobFinalState finalState) {
         if (this.observedAwxJobsToUndeploymentJobDetails.containsKey(sender)) {
             var jobDetails = this.observedAwxJobsToUndeploymentJobDetails.get(sender);
-            var keycloakPrincipal = jobDetails.getKeycloakPrincipal();
+            var keycloakPrincipal = jobDetails.getJwtAuthenticationToken();
             var userUuid = KeycloakTokenUtil.getUserUuid(keycloakPrincipal);
             var serviceInstanceId = jobDetails.getServiceInstanceId();
             var resourceId = jobDetails.getResourceId();
@@ -189,7 +137,6 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
                     } catch (ConsulLoginFailedException | ServiceInstanceNotFoundException e) {
                         LOG.error(e.getMessage());
                     }
-                    runSubmodelGarbageCollection(resourceId);
                 }
 
                 default -> {

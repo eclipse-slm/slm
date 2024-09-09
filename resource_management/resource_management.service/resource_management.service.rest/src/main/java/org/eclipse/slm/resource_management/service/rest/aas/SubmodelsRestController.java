@@ -7,7 +7,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotFoundException;
-import org.eclipse.slm.resource_management.service.rest.aas.resources.ResourceAAS;
+import org.eclipse.slm.resource_management.model.resource.ResourceAas;
 import org.eclipse.slm.resource_management.service.rest.resources.ResourcesManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -57,7 +57,7 @@ public class SubmodelsRestController {
         var resource = this.resourcesManager.getResourceWithCredentialsByRemoteAccessService(jwtAuthenticationToken, resourceId);
         var aasxFileInputStream = new BufferedInputStream(aasxFile.getInputStream());
 
-        this.submodelManager.addSubmodelsFromAASX(ResourceAAS.createAasIdFromResourceId(resource.getId()), aasxFileInputStream);
+        this.submodelManager.addSubmodelsFromAASX(ResourceAas.createAasIdFromResourceId(resource.getId()), aasxFileInputStream);
 
         return ResponseEntity.ok().build();
     }

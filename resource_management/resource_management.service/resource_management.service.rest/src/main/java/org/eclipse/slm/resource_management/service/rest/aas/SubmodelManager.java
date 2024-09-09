@@ -6,7 +6,7 @@ import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor;
 import org.eclipse.slm.common.aas.clients.*;
 import org.eclipse.slm.resource_management.model.resource.BasicResource;
-import org.eclipse.slm.resource_management.service.rest.aas.resources.ResourceAAS;
+import org.eclipse.slm.resource_management.model.resource.ResourceAas;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -39,7 +39,7 @@ public class SubmodelManager {
     public List<SubmodelDescriptor> getSubmodels(BasicResource resource) {
         var submodelDescriptors = new ArrayList<SubmodelDescriptor>();
 
-        var aasId = ResourceAAS.createAasIdFromResourceId(resource.getId());
+        var aasId = ResourceAas.createAasIdFromResourceId(resource.getId());
         var aas = this.aasRepositoryClient.getAas(aasId);
         var submodelRefs = aas.getSubmodels();
         for (var submodelRef : submodelRefs) {
@@ -73,7 +73,7 @@ public class SubmodelManager {
     }
 
     public void deleteSubmodel(UUID resourceId, String submodelId) {
-        var aasId = ResourceAAS.createAasIdFromResourceId(resourceId);
+        var aasId = ResourceAas.createAasIdFromResourceId(resourceId);
 
         this.submodelRepositoryClient.deleteSubmodel(submodelId);
         this.aasRepositoryClient.removeSubmodelReferenceFromAas(aasId, submodelId);

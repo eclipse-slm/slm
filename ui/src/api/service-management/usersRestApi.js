@@ -16,7 +16,7 @@ class ServiceVendorsRestApi {
 
     async getServiceVendorsOfDeveloper (developerUserId) {
         return axios
-            .get(this.API_URL + '/vendors/', {
+            .get(this.API_URL + '/vendors', {
                 params: {
                     withImage: true,
                     developerUserId: developerUserId,
