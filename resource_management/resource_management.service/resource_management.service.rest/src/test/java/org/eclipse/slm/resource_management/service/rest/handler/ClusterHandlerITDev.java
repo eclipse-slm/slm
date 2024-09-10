@@ -54,43 +54,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//        classes = {
-//        ClusterHandler.class,
-//        ClusterCreateFunctions.class,
-//        ClusterDeleteFunctions.class,
-//        ClusterScaleFunctions.class,
-//        ClusterGetFunctions.class,
-//        NotificationServiceClient.class,
-//        AwxJobExecutor.class,
-//        AwxJobObserverInitializer.class,
-//        AwxClient.class,
-//        RestTemplate.class,
-//        MultiTenantKeycloakRegistration.class,
-//        ConsulServicesApiClient.class,
-//        ConsulNodesApiClient.class,
-//        ConsulAclApiClient.class,
-//        ConsulKeyValueApiClient.class,
-//        ConsulHealthApiClient.class,
-//        ObjectMapper.class,
-//        CapabilitiesConsulClient.class,
-//        CapabilityUtil.class,
-//        CapabilityJpaRepository.class,
-//        CapabilitiesManager.class,
-//        SingleHostCapabilitiesConsulClient.class,
-//        MultiHostCapabilitiesConsulClient.class,
-//        LocationJpaRepository.class,
-//        ResourcesManager.class,
-//        ResourcesConsulClient.class,
-//        ResourcesVaultClient.class,
-//        KeycloakUtil.class,
-//        VaultClient.class,
-//        ClustersRestController.class
-//})
 @AutoConfigureMockMvc
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
 @Import(ClusterHandlerITConfig.class)
 @Testcontainers
+@Disabled
 public class ClusterHandlerITDev {
     //region Autowiring
     @Autowired

@@ -32,16 +32,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/resources")
 public class CapabilitiesRestController {
     private final static Logger LOG = LoggerFactory.getLogger(CapabilitiesRestController.class);
-    private final ResourcesManager resourcesManager;
+
     private final CapabilitiesManager capabilitiesManager;
+
     private ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
-    public CapabilitiesRestController(
-            ResourcesManager resourcesManager,
-            CapabilitiesManager capabilitiesManager
-    ) {
-        this.resourcesManager = resourcesManager;
+    public CapabilitiesRestController(CapabilitiesManager capabilitiesManager) {
         this.capabilitiesManager = capabilitiesManager;
 
         // DTO >>> Entity

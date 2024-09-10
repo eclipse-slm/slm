@@ -295,7 +295,6 @@ public class ResourcesManager {
 
 
             this.resourcesVaultClient.addSecretsForConnectionService(
-                    jwtAuthenticationToken,
                     remoteAccessService
             );
         }

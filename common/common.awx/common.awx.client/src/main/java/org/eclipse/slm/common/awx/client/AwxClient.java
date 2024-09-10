@@ -70,7 +70,7 @@ public class AwxClient {
     private ObjectMapper objectMapper;
 
     @Autowired
-    RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
 
 //    private WebClient webClient;
@@ -98,7 +98,8 @@ public class AwxClient {
     @PostConstruct
     public void init() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, SSLException {
         this.objectMapper = new ObjectMapper();
-        KotlinModule kotlinModule = new KotlinModule.Builder()
+
+        var kotlinModule = new KotlinModule.Builder()
                 .nullIsSameAsDefault(true)
                 .build();
         this.objectMapper.registerModule(kotlinModule);

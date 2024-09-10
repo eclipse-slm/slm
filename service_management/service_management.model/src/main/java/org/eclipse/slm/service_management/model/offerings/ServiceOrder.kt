@@ -1,6 +1,5 @@
 package org.eclipse.slm.service_management.model.offerings
 
-import com.vladmihalcea.hibernate.type.json.JsonStringType
 import jakarta.persistence.*
 import org.eclipse.slm.service_management.model.AbstractBaseEntityUuid
 import org.eclipse.slm.service_management.model.offerings.options.ServiceOptionValue

@@ -45,12 +45,16 @@ public class OpenApiConfig {
             @Value("${open-api.contact.email}") String contactMail
             ) {
         var firstKeycloakOidcConfig = multiTenantKeycloakRegistration.getFirstOidcConfig();
-        var tokenServerUrl = firstKeycloakOidcConfig.getTokenServerUrl();
         var authServerUrl = "";
-        try {
-            authServerUrl = tokenServerUrl.replace("token", "auth");
-        } catch (Exception e) {
-            LOG.error(e.getMessage());
+        var tokenServerUrl = "";
+        if (firstKeycloakOidcConfig != null) {
+            tokenServerUrl = firstKeycloakOidcConfig.getTokenServerUrl();
+            authServerUrl = "";
+            try {
+                authServerUrl = tokenServerUrl.replace("token", "auth");
+            } catch (Exception e) {
+                LOG.error(e.getMessage());
+            }
         }
 
         return new OpenAPI()

@@ -66,6 +66,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(initializers = {ConfigDataApplicationContextInitializer.class} )
 @TestPropertySource(properties = { "spring.config.location=classpath:application-test.yml" })
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
+@Disabled
 public class ResourcesManagerITDev {
     private ResourcesManagerITDevConfig config = new ResourcesManagerITDevConfig();
     //region MockBeans

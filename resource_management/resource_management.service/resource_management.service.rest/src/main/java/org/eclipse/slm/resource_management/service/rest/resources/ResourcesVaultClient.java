@@ -142,7 +142,6 @@ public class ResourcesVaultClient {
     }
 
     public void addSecretsForConnectionService(
-            JwtAuthenticationToken jwtAuthenticationToken,
             RemoteAccessService remoteAccessService
     ) {
         Map<String, String> secretsOfResource = new HashMap<>();

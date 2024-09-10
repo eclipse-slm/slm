@@ -13,18 +13,11 @@ import org.eclipse.slm.resource_management.model.resource.ConnectionType;
 import org.eclipse.slm.resource_management.model.resource.CredentialUsernamePassword;
 import org.eclipse.slm.resource_management.model.resource.RemoteAccessService;
 import org.eclipse.slm.resource_management.service.rest.resources.ResourcesVaultClient;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import static org.eclipse.slm.resource_management.service.rest.resources.ResourcesManagerITDevConfig.jwtAuthenticationToken;
+import java.util.*;
 
 @TestConfiguration
 public class CapabilitiesVaultClientTestConfig {
@@ -35,7 +28,6 @@ public class CapabilitiesVaultClientTestConfig {
     public static int VAULT_PORT = 8200;
     public static String VAULT_TOKEN = "myroot";
     //endregion
-
 
     @Autowired
     public ResourcesVaultClient resourcesVaultClient;
@@ -103,10 +95,7 @@ public class CapabilitiesVaultClientTestConfig {
                 new CredentialUsernamePassword("username","password")
         );
 
-        resourcesVaultClient.addSecretsForConnectionService(
-                jwtAuthenticationToken,
-                remoteAccessService
-        );
+        resourcesVaultClient.addSecretsForConnectionService(remoteAccessService);
     }
     public void createResourcesSecretEngine() {
         vaultClient.createKvSecretEngine(

@@ -6,7 +6,9 @@ application:
 
 ### Deployment
 deployment:
-  hostname: localhost
+  scheme: "http"
+  hostname: "localhost"
+  port: ${server.port}
 
 ### Server / API
 server:
@@ -88,18 +90,8 @@ notification-service:
 
 ### Keycloak
 keycloak:
-  config:
-    auth-white-list:
-    tenants:
-      config-path: consul:keycloak
-      client-registration-enable: false
-      client-update-enable: false
-      resolve-by-path: true
-      resolve-by-header: true
-      resolver-base-path: /
-      resolver-header: Realm
-      redirect-uris:
-      web-origins:
+  tenants:
+    config-path: keycloak/
 
 ### AWX
 awx:
@@ -130,12 +122,41 @@ consul:
   datacenter: fabos
   acl-token: your-consul-acl-token
 
-### BaSyx
-basyx:
+### AAS
+aas:
+  broker:
+    host: localhost
+    port: 1884
   aas-registry:
-    url: http://localhost:4000/registry
-  aas-server:
-    url: http://localhost:4001/aasServer
+    scheme: http
+    host: localhost
+    port: 8082
+    path:
+    url: ${aas.aas-registry.scheme}://${aas.aas-registry.host}:${aas.aas-registry.port}${aas.aas-registry.path}
+  aas-repository:
+    scheme: http
+    host: localhost
+    port: 8081
+    path:
+    url: ${aas.aas-repository.scheme}://${aas.aas-repository.host}:${aas.aas-repository.port}${aas.aas-repository.path}
+  submodel-registry:
+    scheme: http
+    host: localhost
+    port: 8083
+    path:
+    url: ${aas.submodel-registry.scheme}://${aas.submodel-registry.host}:${aas.submodel-registry.port}${aas.submodel-registry.path}
+  submodel-repository:
+    scheme: http
+    host: localhost
+    port: 8081
+    path:
+    url: ${aas.submodel-repository.scheme}://${aas.submodel-repository.host}:${aas.submodel-repository.port}${aas.submodel-repository.path}
+  concept-descriptions-repository:
+    scheme: http
+    host: localhost
+    port: 8081
+    path:
+    url: ${aas.concept-descriptions-repository.scheme}://${aas.concept-descriptions-repository.host}:${aas.concept-descriptions-repository.port}${aas.concept-descriptions-repository.path}
 
 ### Monitoring
 monitoring:

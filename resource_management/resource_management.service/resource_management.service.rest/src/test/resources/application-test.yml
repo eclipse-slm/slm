@@ -56,19 +56,10 @@ logging:
       apache:
         http: INFO
 
+### Keycloak
 keycloak:
-  enabled: false
-  config:
-    tenants:
-      config-path: ../../src/test/resources/keycloak/
-      client-registration-enable: false
-      client-update-enable: false
-      resolve-by-path: true
-      resolve-by-header: true
-      resolver-base-path: /
-      resolver-header: Realm
-      redirect-uris:
-      web-origins:
+  tenants:
+    config-path: keycloak/
 
 awx:
   username: admin

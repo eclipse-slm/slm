@@ -52,7 +52,7 @@ public class MultiTenantKeycloakRegistration {
 
     private Map<String, RealmResource> realmResourceMap = new HashMap<>();
 
-    private final Optional<ConsulClient> consulClient;
+    private Optional<ConsulClient> consulClient;
 
     @Value("${consul.acl-token}")
     private String consulAclToken;
@@ -73,7 +73,7 @@ public class MultiTenantKeycloakRegistration {
     @Autowired
     public MultiTenantKeycloakRegistration(@Nullable ConsulClient consulClient) {
         if (consulClient == null) {
-            this.consulClient = null;
+            this.consulClient = Optional.empty();
         }
         else {
             this.consulClient = Optional.of(consulClient);

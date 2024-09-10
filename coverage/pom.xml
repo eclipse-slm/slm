@@ -15,7 +15,6 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
     </properties>
 
 
@@ -78,7 +77,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco-maven-plugin.version}</version>
+                <version>${maven.plugin.jacoco.version}</version>
                 <executions>
                     <!-- aggregated unit test coverage report -->
                     <execution>

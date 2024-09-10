@@ -27,9 +27,9 @@
         </dependency>
         <!-- Hibernate !-->
         <dependency>
-            <groupId>com.vladmihalcea</groupId>
-            <artifactId>hibernate-types-52</artifactId>
-            <version>2.10.0</version>
+            <groupId>io.hypersistence</groupId>
+            <artifactId>hypersistence-utils-hibernate-63</artifactId>
+            <version>3.8.2</version>
         </dependency>
         <!-- AAS !-->
         <dependency>
