@@ -52,6 +52,13 @@
             <version>${mariadb.client.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- Testing !-->
+        <dependency>
+            <groupId>com.c4-soft.springaddons</groupId>
+            <artifactId>spring-security-oauth2-test-addons</artifactId>
+            <version>4.5.1</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Shared Modules !-->
         <dependency>
             <groupId>org.eclipse.slm</groupId>

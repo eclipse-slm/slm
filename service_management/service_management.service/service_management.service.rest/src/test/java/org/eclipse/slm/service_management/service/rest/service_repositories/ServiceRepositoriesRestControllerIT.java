@@ -1,11 +1,6 @@
 package org.eclipse.slm.service_management.service.rest.service_repositories;
 
-import com.c4_soft.springaddons.security.oauth2.test.annotations.Claims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.JsonArrayClaim;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.keycloak.KeycloakAccess;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.keycloak.KeycloakAccessToken;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.keycloak.WithMockKeycloakAuth;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.eclipse.slm.common.vault.client.VaultClient;
 import org.eclipse.slm.common.vault.client.VaultCredential;
@@ -56,15 +51,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @ComponentScan(basePackages = { "org.eclipse.slm.common.vault.client" })
 @Testcontainers
-@WithMockKeycloakAuth(
+@WithMockJwtAuth(
     claims = @OpenIdClaims(
             iss = "https://localhost/auth/realms/fabos",
-            preferredUsername = "testUser123"
-    ),
-    accessToken = @KeycloakAccessToken(
-            realmAccess = @KeycloakAccess(roles = { "slm-admin" })
+            preferredUsername = "testUser123",
+            otherClaims = @Claims(
+                    jsonObjectClaims = @JsonObjectClaim(name = "realm_access", value = "{ \"roles\": [\"slm-admin\"] }"))
     )
 )
+
 @DisplayName("Service Repositories (/services/vendors/{serviceVendorId}/repositories)")
 public class ServiceRepositoriesRestControllerIT extends AbstractRestControllerIT {
 
@@ -106,7 +101,7 @@ public class ServiceRepositoriesRestControllerIT extends AbstractRestControllerI
 
         @Test
         @DisplayName("No permission for service vendor")
-        @WithMockKeycloakAuth
+        @WithMockJwtAuth
         public void noPermissionForServiceVendor() throws Exception {
             var path = getBasePath(UUID.randomUUID());
 
@@ -154,12 +149,12 @@ public class ServiceRepositoriesRestControllerIT extends AbstractRestControllerI
 
         @Test
         @DisplayName("Get using group permissions")
-        @WithMockKeycloakAuth(
+        @WithMockJwtAuth(
                 claims = @OpenIdClaims(
                         iss = "https://localhost/auth/realms/fabos",
                         preferredUsername = "testUser123",
-                        otherClaims = @Claims(jsonArrayClaims =
-                            @JsonArrayClaim(name = "groups", value = "[\"vendor_c12c5a32-c57d-4afd-89f4-9bcd4ae7bee3\"]")
+                        otherClaims = @Claims(jsonObjectArrayClaims =
+                            @JsonObjectArrayClaim(name = "groups", value = "[\"vendor_c12c5a32-c57d-4afd-89f4-9bcd4ae7bee3\"]")
                         )
                 )
         )
@@ -181,7 +176,7 @@ public class ServiceRepositoriesRestControllerIT extends AbstractRestControllerI
 
         @Test
         @DisplayName("No permission for service vendor")
-        @WithMockKeycloakAuth
+        @WithMockJwtAuth
         public void noPermissionForServiceVendor() throws Exception {
             var serviceVendorId = UUID.randomUUID();
             var serviceRepositoryId = UUID.randomUUID();
@@ -225,7 +220,7 @@ public class ServiceRepositoriesRestControllerIT extends AbstractRestControllerI
 
         @Test
         @DisplayName("No permission for service vendor")
-        @WithMockKeycloakAuth
+        @WithMockJwtAuth
         public void noPermissionForServiceVendor() throws Exception {
             var serviceVendorId = UUID.randomUUID();
             var serviceRepositoryId = UUID.randomUUID();
@@ -293,7 +288,7 @@ public class ServiceRepositoriesRestControllerIT extends AbstractRestControllerI
 
         @Test
         @DisplayName("No permission for service vendor")
-        @WithMockKeycloakAuth
+        @WithMockJwtAuth()
         public void noPermissionForServiceVendor() throws Exception {
             var path = getBasePath(UUID.randomUUID()) + "/" + UUID.randomUUID();
             mockMvc.perform(delete(path)

@@ -1,7 +1,7 @@
 package org.eclipse.slm.resource_management.service.rest.capabilities;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.keycloak.WithMockKeycloakAuth;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.slm.common.model.DeploymentType;
@@ -204,7 +204,7 @@ public class CapabilityRestControllerTest {
     @Order(10)
     @DisplayName("Pretests")
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-    @WithMockKeycloakAuth(
+    @WithMockJwtAuth(
         claims = @OpenIdClaims(
                 iss = "https://localhost/auth/realms/vfk",
                 preferredUsername = "testUser123"
@@ -231,7 +231,7 @@ public class CapabilityRestControllerTest {
     @Nested
     @Order(20)
     @DisplayName("Deployment Capabilities")
-    @WithMockKeycloakAuth (
+    @WithMockJwtAuth (
         claims = @OpenIdClaims(
             iss = "https://localhost/auth/realms/vfk",
             preferredUsername = "testUser123"
@@ -372,7 +372,7 @@ public class CapabilityRestControllerTest {
     @Nested
     @Order(30)
     @DisplayName("Virtualization Capabilities")
-    @WithMockKeycloakAuth (
+    @WithMockJwtAuth (
         claims = @OpenIdClaims(
             iss = "https://localhost/auth/realms/vfk",
             preferredUsername = "testUser123"

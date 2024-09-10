@@ -1,5 +1,6 @@
 package org.eclipse.slm.catalog.service.app;
 
+import jakarta.annotation.PostConstruct;
 import org.eclipse.slm.catalog.model.AASSubmodelTemplate;
 import org.eclipse.slm.catalog.persistence.api.AASSubmodelTemplateRepository;
 import org.eclipse.slm.catalog.service.app.aas.AASSubmodelTemplatesRestController;
@@ -9,8 +10,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-
-import javax.annotation.PostConstruct;
 
 @SpringBootApplication(scanBasePackages = {
         "org.eclipse.slm.catalog"

@@ -1,7 +1,7 @@
 package org.eclipse.slm.service_management.service.rest.service_offerings;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.keycloak.WithMockKeycloakAuth;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
@@ -178,7 +178,7 @@ public class ServiceOfferingRestControllerIT extends AbstractRestControllerIT {
 
     @Nested
     @DisplayName("Order Service Offering (" + BASE_PATH + "/{serviceOfferingId}/order)")
-    @WithMockKeycloakAuth(
+    @WithMockJwtAuth(
             claims = @OpenIdClaims(
                     iss = "https://localhost/auth/realms/vfk",
                     preferredUsername = "testUser123"

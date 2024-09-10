@@ -120,7 +120,9 @@ public class ServiceRepositoriesRestController {
         var token = jwtAuthenticationToken.getToken();
         var claims = token.getClaims();
 
-        var userRealmAccessRoles = (List<String>)((Map<String,Object>)claims.get("realm_access")).get("roles");
+        var userRealmAccessRoles = (List<String>)((Map<String,Object>)claims
+                .getOrDefault("realm_access", Map.of()))
+                .getOrDefault("roles", List.of());
         if (userRealmAccessRoles.contains("slm-admin"))
         {
             return true;

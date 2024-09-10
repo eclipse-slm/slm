@@ -119,21 +119,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.c4-soft.springaddons</groupId>
-            <artifactId>spring-security-oauth2-addons</artifactId>
-            <version>3.0.4</version>
-        </dependency>
-        <dependency>
             <groupId>com.github.dasniko</groupId>
             <artifactId>testcontainers-keycloak</artifactId>
             <version>2.5.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <!-- just enough for @WithMockKeycloackAuth -->
-            <groupId>com.c4-soft.springaddons</groupId>
-            <artifactId>spring-security-oauth2-test-addons</artifactId>
-            <version>3.0.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -153,6 +141,13 @@
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
             <version>1.7</version>
+        </dependency>
+        <!-- Testing !-->
+        <dependency>
+            <groupId>com.c4-soft.springaddons</groupId>
+            <artifactId>spring-security-oauth2-test-addons</artifactId>
+            <version>4.5.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
