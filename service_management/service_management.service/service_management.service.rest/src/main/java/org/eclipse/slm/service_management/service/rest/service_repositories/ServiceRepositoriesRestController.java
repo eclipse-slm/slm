@@ -129,8 +129,14 @@ public class ServiceRepositoriesRestController {
         }
 
         if (claims.containsKey("groups")) {
-            var userGroups = (ArrayList<String>) claims.get("groups");
-            if (userGroups.contains("vendor_" + serviceVendorId)) {
+            var userGroups = claims.get("groups");
+            List<String> userGroupsCasted;
+            if (userGroups instanceof String[]) {
+                userGroupsCasted = List.of((String[])userGroups);
+            } else {
+                userGroupsCasted = (ArrayList<String>)userGroups;
+            }
+            if (userGroupsCasted.contains("vendor_" + serviceVendorId)) {
                 return true;
             }
         }

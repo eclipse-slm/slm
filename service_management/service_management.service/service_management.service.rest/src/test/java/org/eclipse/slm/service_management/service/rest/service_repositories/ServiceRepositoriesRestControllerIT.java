@@ -150,13 +150,13 @@ public class ServiceRepositoriesRestControllerIT extends AbstractRestControllerI
         @Test
         @DisplayName("Get using group permissions")
         @WithMockJwtAuth(
-                claims = @OpenIdClaims(
-                        iss = "https://localhost/auth/realms/fabos",
-                        preferredUsername = "testUser123",
-                        otherClaims = @Claims(jsonObjectArrayClaims =
-                            @JsonObjectArrayClaim(name = "groups", value = "[\"vendor_c12c5a32-c57d-4afd-89f4-9bcd4ae7bee3\"]")
-                        )
+            claims = @OpenIdClaims(
+                iss = "https://localhost/auth/realms/fabos",
+                preferredUsername = "testUser123",
+                otherClaims = @Claims(
+                    stringArrayClaims = @StringArrayClaim(name = "groups", value = { "vendor_c12c5a32-c57d-4afd-89f4-9bcd4ae7bee3" })
                 )
+            )
         )
         public void getUsingGroupPermissions() throws Exception {
             var path = getBasePath(UUID.fromString("c12c5a32-c57d-4afd-89f4-9bcd4ae7bee3"));
