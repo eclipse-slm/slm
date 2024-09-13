@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse.slm</groupId>
     <artifactId>notification_service.service.rest</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
@@ -29,7 +28,6 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>${mariadb.client.version}</version>
         </dependency>
         <!-- Testing !-->
         <dependency>

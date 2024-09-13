@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse.slm</groupId>
     <artifactId>service_management.service.client</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
@@ -68,7 +67,6 @@
         <dependency>
             <groupId>com.brsanthu</groupId>
             <artifactId>migbase64</artifactId>
-            <version>${migbase.version}</version>
         </dependency>
         <!-- Others !-->
         <dependency>

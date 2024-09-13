@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse.slm</groupId>
     <artifactId>service_management.model</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
@@ -29,7 +28,7 @@
         <dependency>
             <groupId>io.hypersistence</groupId>
             <artifactId>hypersistence-utils-hibernate-63</artifactId>
-            <version>3.8.2</version>
+            <version>${hypersistence-utils-version}</version>
         </dependency>
         <!-- Shared Modules !-->
         <dependency>

@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse.slm</groupId>
     <artifactId>common.aas.clients</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
@@ -20,19 +19,17 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webflux</artifactId>
-            <version>6.1.9</version>
         </dependency>
         <!-- AAS !-->
         <dependency>
             <groupId>org.eclipse.digitaltwin.aas4j</groupId>
             <artifactId>aas4j-dataformat-aasx</artifactId>
-            <version>1.0.2</version>
         </dependency>
         <!-- BaSyx !-->
         <dependency>
             <groupId>org.eclipse.digitaltwin.basyx</groupId>
             <artifactId>basyx.aasrepository-client</artifactId>
-            <version>2.0.0-milestone-02</version>
+            <version>${basyx.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springdoc</groupId>
@@ -51,22 +48,22 @@
         <dependency>
             <groupId>org.eclipse.digitaltwin.basyx</groupId>
             <artifactId>basyx.submodelrepository-client</artifactId>
-            <version>2.0.0-milestone-02</version>
+            <version>${basyx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.digitaltwin.basyx</groupId>
             <artifactId>basyx.aasregistry-client-native</artifactId>
-            <version>2.0.0-milestone-02</version>
+            <version>${basyx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.digitaltwin.basyx</groupId>
             <artifactId>basyx.submodelregistry-client-native</artifactId>
-            <version>2.0.0-milestone-02</version>
+            <version>${basyx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.digitaltwin.basyx</groupId>
             <artifactId>basyx.submodelservice-client</artifactId>
-            <version>2.0.0-milestone-02</version>
+            <version>${basyx.version}</version>
         </dependency>
     </dependencies>
 

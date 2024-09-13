@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse.slm</groupId>
     <artifactId>common.awx.client</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
@@ -20,11 +19,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-kotlin</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
         <!-- Spring !-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -62,7 +56,14 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor.netty</groupId>
+            <artifactId>reactor-netty-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor.netty</groupId>
+            <artifactId>reactor-netty-http</artifactId>
         </dependency>
         <!-- Keycloak !-->
         <dependency>
@@ -79,14 +80,6 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>${apache.httpcomponents.version}</version>
-        </dependency>
-        <!-- Testing !-->
-        <dependency>
-            <groupId>org.junit</groupId>
-            <artifactId>junit-bom</artifactId>
-            <version>${junit.jupiter.version}</version>
-            <type>pom</type>
         </dependency>
         <!-- Shared Modules !-->
         <dependency>
@@ -98,12 +91,6 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <version>${testcontainers.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.projectreactor.netty</groupId>
-            <artifactId>reactor-netty-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
@@ -111,15 +98,11 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>io.projectreactor.netty</groupId>
-            <artifactId>reactor-netty-http</artifactId>
-        </dependency>
+
         <!-- To write basic websockets against -->
         <dependency>
             <groupId>jakarta.websocket</groupId>
             <artifactId>jakarta.websocket-api</artifactId>
-            <version>2.0.0</version>
         </dependency>
 
         <dependency>

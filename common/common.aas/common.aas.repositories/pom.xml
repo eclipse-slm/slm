@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse.slm</groupId>
     <artifactId>common.aas.repositories</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
@@ -26,13 +25,11 @@
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations</artifactId>
-            <version>${swagger.version}</version>
         </dependency>
         <!-- Jakarta !-->
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
-            <version>3.1.0</version>
         </dependency>
         <!-- BaSyx !-->
         <dependency>

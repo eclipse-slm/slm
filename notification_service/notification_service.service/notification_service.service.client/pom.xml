@@ -2,14 +2,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>notification_service.service.client</artifactId>
+    <version>${revision}</version>
+    <packaging>jar</packaging>
+
     <parent>
         <artifactId>notification_service.service</artifactId>
         <groupId>org.eclipse.slm</groupId>
         <version>${revision}</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>notification_service.service.client</artifactId>
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -31,17 +35,13 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-oauth2-jose</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.slm</groupId>
-            <artifactId>notification_service.model</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
+        <!-- Testing !-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Keycloak !-->
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-core</artifactId>
@@ -50,6 +50,13 @@
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-spring-security-adapter</artifactId>
         </dependency>
+        <!-- Shared Modules !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>notification_service.model</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>common.awx.client</artifactId>
@@ -57,10 +64,5 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
-
-    <properties>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-    </properties>
 
 </project>
