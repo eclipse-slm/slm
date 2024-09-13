@@ -91,9 +91,16 @@
         </dependency>
         <!-- Testing !-->
         <dependency>
+            <groupId>com.c4-soft.springaddons</groupId>
+            <artifactId>spring-addons-oauth2-test</artifactId>
+            <version>${springaddons-c4-soft.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.epages</groupId>
             <artifactId>restdocs-api-spec-restassured</artifactId>
             <version>0.16.2</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
@@ -147,13 +154,6 @@
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
             <version>1.7</version>
-        </dependency>
-        <!-- Testing !-->
-        <dependency>
-            <groupId>com.c4-soft.springaddons</groupId>
-            <artifactId>spring-security-oauth2-test-addons</artifactId>
-            <version>4.5.1</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>

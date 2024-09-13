@@ -55,7 +55,9 @@
         <spring.boot.version>3.3.1</spring.boot.version>
         <spring-cloud.version>2023.0.2</spring-cloud.version>
         <spring-cloud-contract-wiremock.version>4.1.4</spring-cloud-contract-wiremock.version>
+        <springaddons-c4-soft.version>7.8.10</springaddons-c4-soft.version>
         <springdoc.openapi.version>2.5.0</springdoc.openapi.version>
+        <swagger.version>2.2.22</swagger.version>
         <keycloak.version>19.0.3</keycloak.version>
         <migbase.version>2.2</migbase.version>
         <joda-time.version>2.12.7</joda-time.version>
@@ -157,6 +159,7 @@
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
                 <version>${junit.jupiter.version}</version>
+                <scope>test</scope>
                 <type>pom</type>
             </dependency>
             <dependency>
@@ -194,11 +197,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
@@ -211,10 +209,12 @@
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-suite-engine</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-commons</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>

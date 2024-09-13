@@ -1,12 +1,12 @@
 package org.eclipse.slm.notification_service.service.rest.endpoints;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.eclipse.slm.notification_service.communication.websocket.NotificationWsService;
 import org.eclipse.slm.notification_service.model.Category;
 import org.eclipse.slm.notification_service.model.JobGoal;
 import org.eclipse.slm.notification_service.model.JobTarget;
 import org.eclipse.slm.notification_service.model.Notification;
 import org.eclipse.slm.notification_service.persistence.api.NotificationRepository;
-import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
