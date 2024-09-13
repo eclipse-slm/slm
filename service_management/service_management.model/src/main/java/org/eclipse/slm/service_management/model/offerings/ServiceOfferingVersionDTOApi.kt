@@ -39,5 +39,5 @@ open class ServiceOfferingVersionDTOApi {
     open var deploymentDefinition: DeploymentDefinition? = null
 
     @JsonProperty("servicePorts", required = false)
-    var servicePorts: List<Integer> = mutableListOf()
+    var servicePorts: List<Int> = mutableListOf()
 }

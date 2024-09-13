@@ -103,4 +103,9 @@ public abstract class AbstractSubmodelService implements SubmodelService {
     public void deleteFileValue(String idShortPath) throws ElementDoesNotExistException, ElementNotAFileException, FileDoesNotExistException {
         throw new MethodNotImplementedException();
     }
+
+    @Override
+    public InputStream getFileByFilePath(String filePath) {
+        throw new MethodNotImplementedException();
+    }
 }

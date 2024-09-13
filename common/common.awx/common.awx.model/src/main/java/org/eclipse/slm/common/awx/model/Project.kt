@@ -24,13 +24,13 @@ data class Project (
     var scm_revision: String?,
     var last_job_run: Date?,
     var last_job_failed: Boolean?,
-    var next_job_run: String??,
+    var next_job_run: String?,
     var status: String?,
     var organization: Int?,
     var scm_update_on_launch: Boolean? = false,
     var scm_update_cache_timeout: Int?,
     var allow_override: Boolean?,
-    var custom_virtualenv: String??,
+    var custom_virtualenv: String?,
     var last_update_failed: Boolean?,
     var last_updated: Date?
 )

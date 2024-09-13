@@ -159,6 +159,11 @@ public abstract class AbstractSubmodelRepository implements SubmodelRepository {
         throw new MethodNotImplementedException();
     }
 
+    @Override
+    public InputStream getFileByFilePath(String submodelId, String filePath) {
+        throw new MethodNotImplementedException();
+    }
+
     private SubmodelServiceFactory getSubmodelFactoryBySubmodelId(String submodelId) {
         var prefixSplit = submodelId.split("-");
         if (prefixSplit.length > 1) {

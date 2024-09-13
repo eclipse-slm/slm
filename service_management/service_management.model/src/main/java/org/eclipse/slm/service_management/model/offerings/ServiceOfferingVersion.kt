@@ -72,7 +72,7 @@ class ServiceOfferingVersion(
     @JdbcTypeCode(SqlTypes.JSON)
     @JsonProperty("servicePorts")
     @Column(name = "service_ports", columnDefinition = "LONGTEXT")
-    var servicePorts: List<Integer> = mutableListOf()
+    var servicePorts: List<Int> = mutableListOf()
 
     @Throws(ServiceOptionNotFoundException::class)
     fun getServiceOptionOfValue(serviceOptionValue: ServiceOptionValue): ServiceOption
