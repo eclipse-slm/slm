@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -69,11 +71,9 @@ public class AwxClient {
 
     private ObjectMapper objectMapper;
 
-    @Autowired
     private RestTemplate restTemplate;
 
 
-//    private WebClient webClient;
     private List<String> finalStates = Stream.of(JobFinalState.values())
             .map(JobFinalState::name)
             .map(String::toLowerCase)
@@ -104,6 +104,7 @@ public class AwxClient {
                 .build();
         this.objectMapper.registerModule(kotlinModule);
 
+        this.restTemplate = new RestTemplateBuilder().build();
         this.restTemplate.setRequestFactory(
                 new HttpComponentsClientHttpRequestFactory()
         );
