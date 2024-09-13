@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   aas-discovery:
     image: "eclipsebasyx/aas-discovery:{{ AAS_BASYX_VERSION }}"

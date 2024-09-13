@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   monitoring-prometheus-aas:
     image: "ghcr.io/eclipse-slm/slm-monitoring-prometheus-aas:{{ MONITORING_PROMETHEUS_AAS_VERSION }}"

@@ -80,7 +80,7 @@
         project_name: eclipse-slm
         definition: "{{ minio_compose | from_yaml}}"
         state: present
-        pull: always
+        pull: "{{ PULL_DOCKER_IMAGES }}"
       register: minio_compose_start_output
     - name: "MINIO | Wait for Minio being up"
       uri:

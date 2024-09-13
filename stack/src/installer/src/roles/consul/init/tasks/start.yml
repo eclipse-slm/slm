@@ -40,7 +40,7 @@
         project_name: eclipse-slm
         definition: "{{ consul_compose | from_yaml}}"
         state: present
-        pull: always
+        pull: "{{ PULL_DOCKER_IMAGES }}"
     - name: "Consul | Wait for Consul ('{{ CONSUL_URL }}') being up"
       uri:
         url: "{{ CONSUL_URL }}/v1/status/leader"

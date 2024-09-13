@@ -6,7 +6,7 @@
     project_name: eclipse-slm
     definition: "{{ monitoring_compose | from_yaml}}"
     state: present
-    pull: always
+    pull: "{{ PULL_DOCKER_IMAGES }}"
 
 - name: "Store config in Consul"
   include_role:
