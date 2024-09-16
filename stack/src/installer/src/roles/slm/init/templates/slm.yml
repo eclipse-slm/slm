@@ -24,8 +24,9 @@ services:
       BASYX_AAS_GUI_URL: "http://{{ SLM_HOSTNAME }}:3000"
       CONSUL_TOKEN: "{{ app_configs['resource_management']['consul']['acl-token'] }}"
     labels:
-      - traefik.http.routers.slm-app.rule=Host(`{{ SLM_HOSTNAME }}`)
-      - traefik.http.routers.slm-app.tls.certresolver=le
+      - traefik.http.routers.slm-ui.rule=Host(`{{ SLM_HOSTNAME }}`)
+#      - traefik.http.routers.slm-ui.tls.certresolver=le
+#      - traefik.http.routers.slm-ui.tls=true
 
   resource-management:
     image: "ghcr.io/eclipse-slm/slm/resource-management:{{ SLM_VERSION }}"
@@ -56,6 +57,10 @@ services:
       - "{{ SLM_HOSTNAME }}:172.17.0.1"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:9010/swagger-ui/index.html" ]
+    labels:
+      - traefik.http.routers.slm-resource-management.rule=Host(`{{ SLM_HOSTNAME }}`) && PathPrefix(`/resource-management`)
+      - traefik.http.middlewares.slm-resource-management-stripprefix.stripprefix.prefixes=/resource-management
+      - traefik.http.routers.slm-resource-management.middlewares=slm-resource-management-stripprefix
 
   resource-management-database:
     image: "mariadb:{{ RESOURCE_MANAGEMENT_DATABASE_VERSION }}"
