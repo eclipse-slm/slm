@@ -137,6 +137,10 @@ services:
       - "{{ SLM_HOSTNAME }}:172.17.0.1"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:9020/swagger-ui/index.html" ]
+    labels:
+      - traefik.http.routers.slm-service-management.rule=Host(`{{ SLM_HOSTNAME }}`) && PathPrefix(`/service-management`)
+      - traefik.http.middlewares.slm-service-management-stripprefix.stripprefix.prefixes=/service-management
+      - traefik.http.routers.slm-service-management.middlewares=slm-service-management-stripprefix
 
   service-management-init:
     image: "ghcr.io/eclipse-slm/slm/service-management-init:{{ SLM_VERSION }}"
@@ -209,6 +213,10 @@ services:
       - "{{ SLM_HOSTNAME }}:172.17.0.1"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:9001/swagger-ui/index.html" ]
+    labels:
+      - traefik.http.routers.slm-notification-service.rule=Host(`{{ SLM_HOSTNAME }}`) && PathPrefix(`/notification-service`)
+      - traefik.http.middlewares.slm-notification-service-stripprefix.stripprefix.prefixes=/notification-service
+      - traefik.http.routers.slm-notification-service.middlewares=slm-notification-service-stripprefix
 
   notification-service-database:
     image: "mariadb:{{ NOTIFICATION_SERVICE_DATABASE_VERSION }}"

@@ -28,6 +28,10 @@ services:
       - "{{ SLM_HOSTNAME }}:172.17.0.1"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:10000/swagger-ui/index.html" ]
+    labels:
+      - traefik.http.routers.slm-catalog.rule=Host(`{{ SLM_HOSTNAME }}`) && PathPrefix(`/slm-catalog`)
+      - traefik.http.middlewares.slm-catalog-stripprefix.stripprefix.prefixes=/slm-catalog
+      - traefik.http.routers.slm-catalog.middlewares=slm-catalog-stripprefix
 
   catalog-database:
     image: "ghcr.io/eclipse-slm/mariadb:{{ SLM_CATALOG_SERVICE_DATABASE_VERSION }}"
