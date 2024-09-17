@@ -152,14 +152,6 @@ minio:
   access-key: admin
   secret-key: password
 
-### Consul
-consul:
-  scheme: http
-  host: localhost
-  port: 8500
-  datacenter: fabos
-  acl-token: your-consul-acl-token
-
 ### AAS
 aas:
   broker:
@@ -196,5 +188,14 @@ aas:
     path:
     url: ${aas.concept-descriptions-repository.scheme}://${aas.concept-descriptions-repository.host}:${aas.concept-descriptions-repository.port}${aas.concept-descriptions-repository.path}
 
+### Consul
+consul:
+  scheme: http
+  host: localhost
+  port: 8500
+  datacenter: fabos
+  acl-token: your-consul-acl-token
+
 service-management:
   url: http://localhost:9020
+
