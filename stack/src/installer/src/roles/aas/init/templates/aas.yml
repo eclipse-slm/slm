@@ -85,7 +85,7 @@ services:
         aliases:
           - aas-environment
 
-  aas-web-ui_v2:
+  aas-gui:
     image: "eclipsebasyx/aas-gui:{{ AAS_GUI_VERSION }}"
     restart: unless-stopped
     ports:
