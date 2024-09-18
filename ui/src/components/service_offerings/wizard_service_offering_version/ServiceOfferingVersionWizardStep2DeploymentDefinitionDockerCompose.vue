@@ -1,17 +1,19 @@
 <template>
-  <div>
-    <v-form
-      v-model="validForm"
+  <v-container
+    fluid
+  >
+    <v-list
+      :opened="['Compose File', '.env File (Optional)', 'Environment']"
     >
-      <v-list :opened="['Compose File', '.env File (Optional)', 'Environment']">
-        <!-- Docker Compose File !-->
-        <v-list-group value="Compose File">
-          <template #activator="{props}">
-            <v-list-item
-              v-bind="props"
-              title="Compose File"
-            />
-          </template>
+      <!-- Docker Compose File !-->
+      <v-list-group value="Compose File">
+        <template #activator="{props}">
+          <v-list-item
+            v-bind="props"
+            title="Compose File"
+          />
+        </template>
+        <div class="ma-4">
           <v-row>
             <v-col>
               <v-file-input
@@ -31,17 +33,23 @@
             class="full-width"
             variant="outlined"
             density="compact"
+            :readonly="true"
           />
-        </v-list-group>
+        </div>
+      </v-list-group>
 
-        <!-- .env File !-->
-        <v-list-group value=".env File (Optional)">
-          <template #activator="{props}">
-            <v-list-item
-              v-bind="props"
-              title=".env File (Optional)"
-            />
-          </template>
+      <!-- .env File !-->
+      <v-list-group
+        v-if="uploadedComposeFile"
+        value=".env File (Optional)"
+      >
+        <template #activator="{props}">
+          <v-list-item
+            v-bind="props"
+            title=".env File (Optional)"
+          />
+        </template>
+        <div class="ma-4">
           <v-row>
             <v-col>
               <v-file-input
@@ -60,95 +68,91 @@
             class="full-width"
             variant="outlined"
             density="compact"
+            :readonly="true"
           />
           <docker-container-environment-variables
+            v-if="serviceOfferingVersion.deploymentDefinition.dotEnvFile.environmentVariables.length > 0"
             :environment-variables="serviceOfferingVersion.deploymentDefinition.dotEnvFile.environmentVariables"
           />
-        </v-list-group>
-        <!-- Environment Variable Files !-->
-        <v-list-group
-          v-if="envFilesDefined"
-          value="Environment Variable Files"
-        >
-          <template #activator="{props}">
-            <v-list-item
-              v-bind="props"
-              title="Environment Variable Files"
-            />
-          </template>
-          <v-list>
-            <v-list-group
-              v-for="environmentVariableFile in serviceOfferingVersion.deploymentDefinition.envFiles"
-              :key="environmentVariableFile.fileName"
-              :value="environmentVariableFile.fileName"
-            >
-              <template #activator="{props}">
-                <v-list-item
-                  class="mx-8"
-                  v-bind="props"
-                  :title="environmentVariableFile.fileName"
-                />
-              </template>
-              <div>
-                <v-row>
-                  <v-col>
-                    <v-file-input
-                      v-model="uploadedEnvFiles[environmentVariableFile.fileName]"
-                      :accept="environmentVariableFile.fileName"
-                      :label="'Click here to select ' + environmentVariableFile.fileName"
-                      density="compact"
-                      variant="outlined"
-                      @update:modelValue="onLoadEnvFileClicked(environmentVariableFile.fileName)"
-                    />
-                  </v-col>
-                  <v-col>
-                    <v-btn
-                      class="noTextTransform"
-                      @click="onLoadEnvFileClicked(environmentVariableFile.fileName)"
-                    >
-                      Load {{ environmentVariableFile.fileName }}
-                    </v-btn>
-                  </v-col>
-                </v-row>
-                <v-textarea
-                  v-model="environmentVariableFile.content"
-                  class="full-width mx-4"
-                  variant="outlined"
-                  auto-grow
-                />
-                <docker-container-environment-variables
-                  :environment-variables="environmentVariableFile.environmentVariables"
-                />
-              </div>
-            </v-list-group>
-          </v-list>
-        </v-list-group>
-
-        <!-- Environment Variables !-->
-        <v-list-group
-          v-if="envVarsDefined"
-          value="Environment"
-        >
-          <template #activator="{props}">
-            <v-list-item
-              v-bind="props"
-              title="Environment"
-            />
-          </template>
-          <docker-container-environment-variables
-            :environment-variables="serviceOfferingVersion.deploymentDefinition.environmentVariables"
-            :addable="false"
+        </div>
+      </v-list-group>
+      <!-- Environment Variable Files !-->
+      <v-list-group
+        v-if="envFilesDefined"
+        value="Environment Variable Files"
+      >
+        <template #activator="{props}">
+          <v-list-item
+            v-bind="props"
+            title="Environment Variable Files"
           />
-        </v-list-group>
-      </v-list>
+        </template>
+        <v-list>
+          <v-list-group
+            v-for="environmentVariableFile in serviceOfferingVersion.deploymentDefinition.envFiles"
+            :key="environmentVariableFile.fileName"
+            :value="environmentVariableFile.fileName"
+          >
+            <template #activator="{props}">
+              <v-list-item
+                class="mx-8"
+                v-bind="props"
+                :title="environmentVariableFile.fileName"
+              />
+            </template>
+            <div class="ma-4">
+              <v-row>
+                <v-col>
+                  <v-file-input
+                    v-model="uploadedEnvFiles[environmentVariableFile.fileName]"
+                    :accept="environmentVariableFile.fileName"
+                    :label="'Click here to select ' + environmentVariableFile.fileName"
+                    density="compact"
+                    variant="outlined"
+                    @update:modelValue="onLoadEnvFileClicked(environmentVariableFile.fileName)"
+                  />
+                </v-col>
+              </v-row>
+              <v-textarea
+                v-model="environmentVariableFile.content"
+                class="full-width mx-4"
+                variant="outlined"
+                auto-grow
+                :readonly="true"
+              />
+              <docker-container-environment-variables
+                :environment-variables="environmentVariableFile.environmentVariables"
+              />
+            </div>
+          </v-list-group>
+        </v-list>
+      </v-list-group>
 
-      <service-repository-select
-        v-model="serviceOfferingVersion.serviceRepositories"
-        label="Docker Registries Credentials"
-        :service-vendor-id="serviceVendorId"
-        :multiple="true"
-      />
-    </v-form>
+      <!-- Environment Variables !-->
+      <v-list-group
+        v-if="envVarsDefined"
+        value="Environment"
+      >
+        <template #activator="{props}">
+          <v-list-item
+            v-bind="props"
+            title="Environment"
+          />
+        </template>
+        <docker-container-environment-variables
+          :environment-variables="serviceOfferingVersion.deploymentDefinition.environmentVariables"
+          :addable="false"
+        />
+      </v-list-group>
+    </v-list>
+
+    <service-repository-select
+      v-model="serviceOfferingVersion.serviceRepositories"
+      label="Docker Registries Credentials"
+      :service-vendor-id="serviceVendorId"
+      :multiple="true"
+      class="ma-2"
+    />
 
     <!-- Navigation Buttons-->
     <v-card-actions>
@@ -168,7 +172,7 @@
         {{ $t('buttons.Next') }}
       </v-btn>
     </v-card-actions>
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -297,7 +301,7 @@ const { parse } = require('dot-properties')
                 name: envVarOfEnvFile.key,
                 description: '',
                 optionType: 'ENVIRONMENT_VARIABLE',
-                valueType: 'string',
+                valueType: 'STRING',
                 value: envVarOfEnvFile.value,
                 required: false,
                 editable: false,
@@ -324,11 +328,12 @@ const { parse } = require('dot-properties')
           // Check if environment files are defined
           if ('env_file' in service) {
             service.env_file.forEach((envFileName) => {
-              this.$set(this.serviceOfferingVersion.deploymentDefinition.envFiles, envFileName, {
+
+              this.serviceOfferingVersion.deploymentDefinition.envFiles[envFileName] = {
                 fileName: envFileName,
                 content: '',
                 environmentVariables: [],
-              })
+              }
 
               envFilesDefined = true
             })
@@ -371,8 +376,8 @@ const { parse } = require('dot-properties')
         }
       },
       onLoadDotEnvFileClicked () {
-        if (!this.uploadedComposeFile) {
-          this.serviceOfferingVersion.deploymentDefinition.dotEnvFile = 'No File Chosen'
+        if (!this.uploadedDotEnvFile) {
+          this.serviceOfferingVersion.deploymentDefinition.dotEnvFile.content = 'No File Chosen'
         } else {
           const reader = new FileReader()
           reader.readAsText(this.uploadedDotEnvFile)
@@ -392,6 +397,7 @@ const { parse } = require('dot-properties')
         if (!this.uploadedEnvFiles[envFileName]) {
           this.serviceOfferingVersion.deploymentDefinition.envFiles[envFileName].content = 'No file chosen'
         } else {
+          console.log("env.list")
           const reader = new FileReader()
           reader.readAsText(this.uploadedEnvFiles[envFileName])
           reader.onload = () => {
@@ -407,6 +413,7 @@ const { parse } = require('dot-properties')
               }
             }
           }
+          console.log(this.serviceOfferingVersion.deploymentDefinition.envFiles[envFileName])
         }
       },
     },
