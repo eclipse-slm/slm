@@ -3,12 +3,12 @@ package org.eclipse.slm.resource_management.service.rest.profiler;
 import io.swagger.v3.oas.annotations.Operation;
 import org.eclipse.slm.resource_management.model.profiler.Profiler;
 import org.eclipse.slm.resource_management.model.profiler.ProfilerDTOApi;
-import org.keycloak.KeycloakPrincipal;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,33 +47,33 @@ public class ProfilerRestController {
     @RequestMapping(value = "/execute", method = RequestMethod.POST)
     @Operation(summary = "Run all Profiler")
     public void runProfiler() {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         profilerManager.runAllProfilerAction(
-                keycloakPrincipal
+                jwtAuthenticationToken
         );
     }
 
     @RequestMapping(value = "/{profilerId}", method = RequestMethod.GET)
     @Operation(summary = "Get Profiler")
-    public Optional<Profiler> getProfiler(@PathVariable UUID profilerId) {
+    public Optional<Profiler> getProfiler(@PathVariable(name = "profilerId") UUID profilerId) {
         return profilerManager.getProfiler(profilerId);
     }
 
     @RequestMapping(value = "/{profilerId}/execute", method = RequestMethod.POST)
     @Operation(summary = "Run one Profiler")
-    public void runProfiler(@PathVariable UUID profilerId) {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public void runProfiler(@PathVariable(name = "profilerId") UUID profilerId) {
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         profilerManager.runProfilerAction(
                 profilerId,
-                keycloakPrincipal
+                jwtAuthenticationToken
         );
     }
 
     @RequestMapping(value = "/{profilerId}", method = RequestMethod.DELETE)
     @Operation(summary = "Delete Profiler")
-    public void deleteProfiler(@PathVariable UUID profilerId) {
+    public void deleteProfiler(@PathVariable(name = "profilerId") UUID profilerId) {
         profilerManager.deleteProfiler(profilerId);
     }
 }

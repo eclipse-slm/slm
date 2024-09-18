@@ -8,32 +8,24 @@
         fluid
         class="pa-8"
       >
-        <Field
-          v-slot="{ field, errors }"
-          v-model="selectedClusterType"
-          name="Cluster Type"
-          :rules="is_required"
-        >
-          <v-row id="resource-create-select-cluster-type">
-            <v-icon
-              size="large"
-              class="mr-7 ml-2"
-            >
-              mdi-selection-multiple
-            </v-icon>
-            <v-select
-              v-bind="field"
-              :items="availableClusterTypesWithSkipInstall"
-              item-title="name"
-              label="Cluster Type"
-              required
-              return-object
-              :error-messages="errors"
-              :model-value="availableClusterTypesWithSkipInstall"
-              @update:modelValue="onSelectedClusterTypeChanged"
-            />
-          </v-row>
-        </Field>
+        <v-row id="resource-create-select-cluster-type">
+          <v-icon
+            size="large"
+            class="mr-7 ml-2"
+          >
+            mdi-selection-multiple
+          </v-icon>
+          <v-select
+            v-model="selectedClusterType"
+            :items="availableClusterTypesWithSkipInstall"
+            item-title="name"
+            label="Cluster Type"
+            required
+            return-object
+            :error-messages="errors"
+            @update:modelValue="onSelectedClusterTypeChanged"
+          />
+        </v-row>
         <div
           v-for="configParameter in configParameters"
           :key="configParameter.name"
@@ -153,8 +145,8 @@
         <v-btn
           id="resource-create-button-create-cluster"
           variant="text"
-          :color="!meta.valid ? $vuetify.theme.themes.light.colors.disable : $vuetify.theme.themes.light.colors.secondary"
-          @click="!meta.valid ? validate() : handleSubmit(onAddButtonClicked)"
+          :color="(!meta.valid || !selectedClusterType) ? $vuetify.theme.themes.light.colors.disable : $vuetify.theme.themes.light.colors.secondary"
+          @click="(!meta.valid || !selectedClusterType) ? validate() : handleSubmit(onAddButtonClicked)"
         >
           Add
         </v-btn>
@@ -186,7 +178,7 @@ export default {
     },
     data () {
       return {
-        selectedClusterType: '',
+        selectedClusterType: undefined,
         configParameters: [],
         uploadedFiles: [],
         configParameterValues: {},
@@ -219,8 +211,8 @@ export default {
         this.configParameters = []
         this.uploadedFiles = []
       },
-      onSelectedClusterTypeChanged () {
-        this.configParameters = this.selectedClusterType.actions['INSTALL'].configParameters
+      onSelectedClusterTypeChanged (clusterType) {
+        this.configParameters = clusterType.actions['INSTALL'].configParameters
       },
       onFileChanged (configParameterName) {
         const reader = new FileReader()

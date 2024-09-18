@@ -1,17 +1,16 @@
 package org.eclipse.slm.service_management.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import jakarta.persistence.*
 import org.eclipse.slm.service_management.model.offerings.ServiceOffering
-import org.hibernate.annotations.Type
 import org.springframework.data.domain.Persistable
 import java.util.*
-import javax.persistence.*
+import kotlin.jvm.Transient
 
 @MappedSuperclass
 abstract class AbstractBaseEntityUuid(id: UUID? = null) : Persistable<UUID> {
 
     @Id
-    @Type(type="uuid-char")
     @Column(name = "id", length = 36, unique = true, nullable = false)
     private var id: UUID = id ?: UUID.randomUUID()
 

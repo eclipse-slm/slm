@@ -7,7 +7,7 @@ data class JobUpdate(
     var type: String,
     var url: String,
     var related: Map<String, String>,
-    var summary_fields: Map<String, Object>,
+    var summary_fields: Map<String, Any>,
     var created: Date?,
     var modified: Date?,
     var name: String,

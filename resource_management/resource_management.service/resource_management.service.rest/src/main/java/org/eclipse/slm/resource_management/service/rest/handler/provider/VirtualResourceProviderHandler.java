@@ -17,7 +17,7 @@ import java.util.UUID;
 @Component
 public class VirtualResourceProviderHandler extends ProviderHandler {
 
-    ConsulServicesApiClient consulServicesApiClient;
+    private ConsulServicesApiClient consulServicesApiClient;
 
     public VirtualResourceProviderHandler(
             CapabilitiesConsulClient capabilitiesConsulClient,

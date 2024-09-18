@@ -1,14 +1,16 @@
 package org.eclipse.slm.resource_management.service.rest.aas;
 
 import io.swagger.v3.oas.annotations.Operation;
-import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
-import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
-import org.eclipse.basyx.aas.registration.api.IAASRegistry;
-import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
-import org.eclipse.basyx.submodel.metamodel.connected.ConnectedSubmodel;
-import org.eclipse.basyx.submodel.metamodel.map.Submodel;
-import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
+import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShellDescriptor;
+import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
+import org.eclipse.digitaltwin.basyx.http.Base64UrlEncodedIdentifier;
+import org.eclipse.slm.common.aas.clients.AasRegistryClient;
+import org.eclipse.slm.common.aas.clients.AasRepositoryClient;
+import org.eclipse.slm.common.aas.clients.SubmodelRegistryClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,89 +20,61 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.eclipse.slm.resource_management.service.rest.aas.ResourceAASController.ID_SHORT_PLATFORM_RESOURCES;
-
 @RestController
 @RequestMapping("/aas")
 public class SubmodelTemplatesRestController {
 
     public final static Logger LOG = LoggerFactory.getLogger(SubmodelTemplatesRestController.class);
 
-    private final IAASRegistry aasRegistry;
-    private ConnectedAssetAdministrationShellManager aasManager;
+    private final AasRegistryClient aasRegistryClient;
 
-    public SubmodelTemplatesRestController(@Value("${basyx.aas-registry.url}") String aasRegistryUrl) {
-        this.aasRegistry = new AASRegistryProxy(aasRegistryUrl);
-        this.aasManager = new ConnectedAssetAdministrationShellManager(aasRegistry);
-    }
+    private final AasRepositoryClient aasRepositoryClient;
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    @Operation(summary = "Get all AAS containing PlatformResources Submodel")
-    public List<AssetAdministrationShell> getResourceAASDescriptors() {
-        var allAASDescriptors = aasRegistry.lookupAll();
-        List<AASDescriptor> resourceAASDescriptors = allAASDescriptors.stream().filter(aasDescriptor ->
-                aasDescriptor
-                        .getSubmodelDescriptorFromIdShort(ID_SHORT_PLATFORM_RESOURCES) != null
-        ).collect(Collectors.toList());
+    private final SubmodelRegistryClient submodelRegistryClient;
 
-        List<AssetAdministrationShell> aasList = new ArrayList<>();
-
-        for(AASDescriptor aasd : resourceAASDescriptors) {
-            Collection<Submodel> submodels = new ArrayList<>();
-
-            aasManager.retrieveSubmodels(aasd.getIdentifier())
-                    .values()
-                    .stream()
-                    .forEach(e -> {
-                        try {
-                            submodels.add( ((ConnectedSubmodel) e).getLocalCopy() );
-                        } catch(ResourceNotFoundException exception) {
-                            LOG.error("Unable to lookup Submodel.");
-                            LOG.error(exception.getMessage());
-                        }
-                    });
-
-            aasList.add(new ResourceAASInclSubmodels(
-                    aasManager.retrieveAAS(aasd.getIdentifier()).getLocalCopy(),
-                    submodels
-            ));
-        }
-        return aasList;
+    public SubmodelTemplatesRestController(AasRegistryClient aasRegistryClient, AasRepositoryClient aasRepositoryClient, SubmodelRegistryClient submodelRegistryClient) {
+        this.aasRegistryClient = aasRegistryClient;
+        this.aasRepositoryClient = aasRepositoryClient;
+        this.submodelRegistryClient = submodelRegistryClient;
     }
 
     @RequestMapping(value = "/submodels/templates/{smTemplateSemanticId}/instances", method = RequestMethod.GET)
     @Operation(summary = "Get instances of submodel templates using semantic id")
     public ResponseEntity getSubmodelTemplateInstancesBySemanticId(
-            @PathVariable(name = "smTemplateSemanticId") String smTemplateSemanticId,
-            @RequestParam(required = false) String filterByAasId
+            @Parameter(in = ParameterIn.PATH, description = "The semantic id to search for submodel instances (UTF8-BASE64-URL-encoded)", required = true, schema = @Schema(implementation = String.class))
+            @PathVariable(name = "smTemplateSemanticId") Base64UrlEncodedIdentifier smTemplateSemanticIdBase64Encoded,
+            @RequestParam(name = "filterByAasId", required = false) String filterByAasId
     ) {
+        var semanticId = smTemplateSemanticIdBase64Encoded.getIdentifier();
         List<Map<String, String>> submodelTemplateInstances = new ArrayList<>();
 
-        var allAASDescriptors = aasRegistry.lookupAll();
+        var allAASDescriptors = this.aasRegistryClient.getAllShellDescriptors();
+        var submodelIdToAasDescriptor = new HashMap<String, AssetAdministrationShellDescriptor>();
+        for (var aasDescriptor : allAASDescriptors) {
+            var aas = this.aasRepositoryClient.getAas(aasDescriptor.getId());
+            for (var submodelRef : aas.getSubmodels()) {
+                var submodelId = submodelRef.getKeys().get(0).getValue();
+                submodelIdToAasDescriptor.put(submodelId, aasDescriptor);
+            }
+        }
 
-        try {
-            for (var aasDescriptor : allAASDescriptors) {
-                for (var submodelDescriptor : aasDescriptor.getSubmodelDescriptors()) {
-                    if (submodelDescriptor != null) {
-                        if (submodelDescriptor.getSemanticId() != null) {
-                            for (var semanticIdKey : submodelDescriptor.getSemanticId().getKeys()) {
-                                if (semanticIdKey.getValue().equals(smTemplateSemanticId)) {
-                                    var submodelTemplateInstance = new HashMap<String, String>();
-                                    submodelTemplateInstance.put("id", aasDescriptor.getIdentifier().getId());
-                                    submodelTemplateInstance.put("name", aasDescriptor.getAsset().getIdShort());
-                                    submodelTemplateInstance.put("aasEndpoint", aasDescriptor.getFirstEndpoint());
-                                    submodelTemplateInstance.put("smEndpoint", submodelDescriptor.getFirstEndpoint());
-                                    submodelTemplateInstance.put("smPath", submodelDescriptor.getFirstEndpoint().replace(aasDescriptor.getFirstEndpoint(), ""));
-                                    submodelTemplateInstances.add(submodelTemplateInstance);
-                                }
-                            }
+        var allSubmodelDescriptors = this.submodelRegistryClient.getAllSubmodelDescriptors();
+        for(var submodelDescriptor : allSubmodelDescriptors) {
+            if (submodelDescriptor.getSemanticId() != null) {
+                for (var semanticIdKey : submodelDescriptor.getSemanticId().getKeys()) {
+                    if (semanticIdKey.getValue().equals(semanticId)) {
+                        var aasDescriptor = submodelIdToAasDescriptor.get(submodelDescriptor.getId());
+                        if (aasDescriptor != null) {
+                            var submodelTemplateInstance = new HashMap<String, String>();
+                            submodelTemplateInstance.put("id", aasDescriptor.getId());
+                            submodelTemplateInstance.put("name", aasDescriptor.getIdShort());
+                            submodelTemplateInstance.put("aasEndpoint", aasDescriptor.getEndpoints().get(0).getProtocolInformation().getHref());
+                            submodelTemplateInstance.put("smEndpoint", submodelDescriptor.getEndpoints().get(0).getProtocolInformation().getHref());
+                            submodelTemplateInstances.add(submodelTemplateInstance);
                         }
                     }
                 }
             }
-        }
-        catch (NullPointerException e) {
-            LOG.error(e.getMessage());
         }
 
         if (filterByAasId != null) {

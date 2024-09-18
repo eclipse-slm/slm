@@ -8,10 +8,10 @@ import org.eclipse.slm.service_management.model.vendors.ServiceVendor;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendorDeveloper;
 import org.eclipse.slm.service_management.model.vendors.exceptions.ServiceVendorNotFoundException;
 import org.eclipse.slm.service_management.persistence.api.ServiceVendorJpaRepository;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -151,15 +151,21 @@ public class ServiceVendorRepository {
         }
     }
 
-    public List<UUID> getServiceVendorsOfDeveloper(KeycloakPrincipal keycloakPrincipal) {
-        var token = keycloakPrincipal.getKeycloakSecurityContext().getToken();
-        var otherClaims = token.getOtherClaims();
+    public List<UUID> getServiceVendorsOfDeveloper(JwtAuthenticationToken jwtAuthenticationToken) {
+        var token = jwtAuthenticationToken.getToken();
+        var otherClaims = token.getClaims();
 
         var serviceVendorIds = new ArrayList<UUID>();
         if (otherClaims.containsKey("groups")) {
-            var userGroups = (ArrayList) otherClaims.get("groups");
-            for (var userGroup : userGroups) {
-                if (userGroup.toString().startsWith("vendor_")) {
+            var userGroups = otherClaims.get("groups");
+            List<String> userGroupsCasted;
+            if (userGroups instanceof String[]) {
+                userGroupsCasted = List.of((String[])userGroups);
+            } else {
+                userGroupsCasted = (ArrayList<String>)userGroups;
+            }
+            for (var userGroup : userGroupsCasted) {
+                if (userGroup.startsWith("vendor_")) {
                     var serviceVendorId = UUID.fromString(userGroup.toString().replace("vendor_", ""));
                     serviceVendorIds.add(serviceVendorId);
                 }

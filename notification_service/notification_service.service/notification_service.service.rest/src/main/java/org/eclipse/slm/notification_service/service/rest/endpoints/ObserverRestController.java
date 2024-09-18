@@ -29,7 +29,6 @@ public class ObserverRestController implements IAwxJobObserverListener {
 
     public final static Logger LOG = LoggerFactory.getLogger(ObserverRestController.class);
 
-//    @Value("${awx.url}")
     private String awxUrl;
 
     @Value("${awx.username}")
@@ -96,14 +95,6 @@ public class ObserverRestController implements IAwxJobObserverListener {
             for (var userUuid : this.jobIdToNotifyUsers.get(sender.jobId))
             {
                 sendJobChangedNotification(sender.jobId, newState.name(), userUuid);
-//                Category category = Category.Jobs;
-//                String text = "Job " + job.getId() + " turned into state '" + job.getStatus() + "'";
-//                Notification notification = new Notification(category, text, userUuid);
-//
-//                notificationRepository.save(notification);
-//                notificationWsService.notifyFrontend(notification);
-//
-//                LOG.info("Created notification for user '" + userUuid + "': " + text);
             }
         }
         else {
@@ -116,15 +107,6 @@ public class ObserverRestController implements IAwxJobObserverListener {
         if(this.jobIdToNotifyUsers.containsKey(sender.jobId)) {
             for (var userUuid : this.jobIdToNotifyUsers.get(sender.jobId)) {
                 sendJobChangedNotification(sender.jobId, finalState.name(), userUuid);
-
-//                Category category = Category.Resources;
-//                String text = jobTarget.name().toLowerCase() + " has been " + jobGoal.toString().toLowerCase();
-//                Notification notification = new Notification(category, text, userUuid);
-//
-//                notificationRepository.save(notification);
-//                notificationWsService.notifyFrontend(notification);
-//
-//                LOG.info("Created notification for user '" + userUuid + "': " + notification);
             }
 
             this.jobIdToNotifyUsers.remove(sender.jobId);
@@ -134,7 +116,6 @@ public class ObserverRestController implements IAwxJobObserverListener {
         }
     }
 
-//    private void sendJobChangedNotification(Job job, String userUuid) {
     private void sendJobChangedNotification(int jobId, String jobState, String userUuid) {
         Category category = Category.Jobs;
         String text = "Job " + jobId + " turned into state '" + jobState + "'";

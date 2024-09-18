@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,9 +12,6 @@ public class NotificationWsService {
     private final Logger logger = LoggerFactory.getLogger(NotificationWsService.class);
 
     private final SimpMessagingTemplate simpleMessageTemplate;
-
-    @Autowired
-    SimpUserRegistry simpUserRegistry;
 
     @Autowired
     public NotificationWsService(SimpMessagingTemplate simpleMessageTemplate) {

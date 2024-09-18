@@ -6,7 +6,7 @@ class ServiceInstancesRestApi {
 
     async getServiceInstances () {
         return axios
-            .get(this.API_URL + '/')
+            .get(this.API_URL + '')
             .then(response => {
                 return response.data
             })

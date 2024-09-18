@@ -22,10 +22,10 @@ import org.eclipse.slm.service_management.model.offerings.exceptions.InvalidServ
 import org.eclipse.slm.service_management.model.offerings.exceptions.ServiceOfferingNotFoundException;
 import org.eclipse.slm.service_management.model.offerings.exceptions.ServiceOfferingVersionNotFoundException;
 import org.eclipse.slm.service_management.model.offerings.options.ServiceOptionValueType;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -73,7 +73,7 @@ public class ServiceOfferingOrderHandler {
 
     public void orderServiceOfferingById(UUID serviceOfferingId, UUID serviceOfferingVersionId,
                                          ServiceOrder serviceOrder,
-                                         UUID deploymentCapabilityServiceId, KeycloakPrincipal keycloakPrincipal)
+                                         UUID deploymentCapabilityServiceId, JwtAuthenticationToken jwtAuthenticationToken)
             throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, ApiException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException, ConsulLoginFailedException {
         var serviceOffering = this.serviceOfferingHandler.getServiceOfferingById(serviceOfferingId);
         var serviceOfferingVersion = this.serviceOfferingVersionHandler
@@ -112,7 +112,7 @@ public class ServiceOfferingOrderHandler {
                                 var deploymentVariable = DeploymentVariableType.valueOf(deploymentVariableTypeString);
                                 switch (deploymentVariable) {
                                     case TARGET_RESOURCE_ID -> {
-                                        var resourceManagementApiClient = resourceManagementApiClientInitializer.init(keycloakPrincipal);
+                                        var resourceManagementApiClient = resourceManagementApiClientInitializer.init(jwtAuthenticationToken);
                                         var capabilityProvidersRestControllerApi = new CapabilityProvidersRestControllerApi(resourceManagementApiClient);
 
                                         var serviceHosterFilter = new ServiceHosterFilter.Builder()
@@ -124,7 +124,7 @@ public class ServiceOfferingOrderHandler {
                                     }
 
                                     case TARGET_RESOURCE_IP -> {
-                                        var resourceManagementApiClient = resourceManagementApiClientInitializer.init(keycloakPrincipal);
+                                        var resourceManagementApiClient = resourceManagementApiClientInitializer.init(jwtAuthenticationToken);
                                         var capabilityProvidersRestControllerApi = new CapabilityProvidersRestControllerApi(resourceManagementApiClient);
 
                                         var serviceHosterFilter = new ServiceHosterFilter.Builder()
@@ -143,19 +143,19 @@ public class ServiceOfferingOrderHandler {
             }
         }
 
-        this.serviceDeploymentHandler.deployServiceOfferingToResource(keycloakPrincipal, deploymentCapabilityServiceId, serviceOfferingVersion, serviceOrder);
+        this.serviceDeploymentHandler.deployServiceOfferingToResource(jwtAuthenticationToken, deploymentCapabilityServiceId, serviceOfferingVersion, serviceOrder);
     }
 
     public List<MatchingResourceDTO> getCapabilityServicesMatchingServiceRequirements(UUID serviceOfferingId,
                                                                                       UUID serviceOfferingVersionId,
-                                                                                      KeycloakPrincipal keycloakPrincipal)
+                                                                                      JwtAuthenticationToken jwtAuthenticationToken)
             throws ApiException, SSLException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException {
         var serviceOffering = this.serviceOfferingHandler.getServiceOfferingById(serviceOfferingId);
         var serviceOfferingVersion = this.serviceOfferingVersionHandler
                 .getServiceOfferingVersionById(serviceOfferingId, serviceOfferingVersionId);
 
         var serviceOfferingDeploymentType = serviceOfferingVersion.getDeploymentDefinition().getDeploymentType();
-        var resourceManagementApiClient = resourceManagementApiClientInitializer.init(keycloakPrincipal);
+        var resourceManagementApiClient = resourceManagementApiClientInitializer.init(jwtAuthenticationToken);
 
         var capabilityProvidersRestControllerApi = new CapabilityProvidersRestControllerApi(resourceManagementApiClient);
 

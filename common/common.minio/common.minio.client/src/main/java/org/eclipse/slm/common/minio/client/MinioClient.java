@@ -2,6 +2,7 @@ package org.eclipse.slm.common.minio.client;
 
 import io.minio.*;
 import io.minio.errors.MinioException;
+import jakarta.annotation.PostConstruct;
 import org.eclipse.slm.common.minio.model.BucketName;
 import org.eclipse.slm.common.minio.model.ObjectName;
 import org.eclipse.slm.common.minio.model.exceptions.*;
@@ -10,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

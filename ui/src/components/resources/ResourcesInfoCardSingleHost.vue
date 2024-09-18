@@ -2,8 +2,11 @@
   <v-card-text
     v-if="resource"
   >
-    <v-list :opened="['Common']">
+    <v-list
+      :opened="['Common']"
+    >
       <v-list-group
+        class="ma-4"
         value="Common"
       >
         <template #activator="{ props }">
@@ -36,7 +39,10 @@
             </tr>
             <tr v-if="resource.remoteAccessService !== null">
               <th>{{ 'Username' }}</th>
-              <td colspan="3">
+              <td
+                v-if="resource.remoteAccessService"
+                colspan="3"
+              >
                 {{ resource.remoteAccessService.credential.username }}
               </td>
             </tr>
@@ -44,6 +50,7 @@
               <th>{{ 'Password' }}</th>
               <td>
                 <v-text-field
+                  v-if="resource.remoteAccessService"
                   :type="showPassword ? 'text' : 'password'"
                   :model-value="resource.remoteAccessService.credential.password"
                   disabled
@@ -89,7 +96,10 @@
         type="hidden"
         :value="resource.password"
       >
-      <v-list-group value="Hardware">
+      <v-list-group
+        value="Hardware"
+        class="ma-4"
+      >
         <template #activator="{props}">
           <v-list-item
             v-bind="props"
@@ -102,7 +112,10 @@
           :resource-id="resource.id"
         />
       </v-list-group>
-      <v-list-group value="Submodels">
+      <v-list-group
+        value="Submodels"
+        class="ma-4"
+      >
         <template #activator="{props}">
           <v-list-item
             v-bind="props"
@@ -134,7 +147,6 @@ export default {
       },
     },
     setup(props){
-      console.log(props.resource);
     },
     data () {
       return {

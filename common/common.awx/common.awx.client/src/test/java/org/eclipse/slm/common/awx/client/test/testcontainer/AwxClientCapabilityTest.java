@@ -27,7 +27,6 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
         RestTemplate.class,
         AwxClient.class

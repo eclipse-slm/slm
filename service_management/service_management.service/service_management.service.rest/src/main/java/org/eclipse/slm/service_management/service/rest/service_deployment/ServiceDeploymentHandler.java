@@ -32,9 +32,9 @@ import org.eclipse.slm.service_management.service.rest.service_instances.Service
 import org.eclipse.slm.service_management.service.rest.kubernetes.KubernetesManifestFile;
 import org.eclipse.slm.service_management.service.rest.kubernetes.KubernetesManifestFileParser;
 import org.apache.commons.lang3.NotImplementedException;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
@@ -72,7 +72,7 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
     }
 
     public DeploymentJobRun deployServiceOfferingToResource(
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             UUID deploymentCapabilityServiceId,
             ServiceOfferingVersion serviceOfferingVersion, ServiceOrder serviceOrder)
             throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, ApiException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException {
@@ -80,7 +80,7 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
         var serviceId = UUID.randomUUID();
         serviceOrder.setServiceInstanceId(serviceId);
         var serviceOfferingDeploymentType = serviceOfferingVersion.getDeploymentType();
-        var serviceHoster = this.getServiceHoster(keycloakPrincipal, deploymentCapabilityServiceId);
+        var serviceHoster = this.getServiceHoster(jwtAuthenticationToken, deploymentCapabilityServiceId);
         serviceOrder.setDeploymentCapabilityServiceId(deploymentCapabilityServiceId);
         var awxCapabilityAction = this.getAwxDeployCapabilityAction(ActionType.DEPLOY, serviceHoster.getCapabilityService().getCapability());
 
@@ -96,7 +96,7 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
 
                 HashMap<String, Object> extraVarsMap = new HashMap<>() {{
                     put("service_id", serviceId);
-                    put("keycloak_token", keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+                    put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
                     put("service_name", serviceHoster.getCapabilityService().getService());
                     put("supported_connection_types", awxCapabilityAction.getConnectionTypes());
                     put("docker_compose_file", deployableComposeFile);
@@ -113,8 +113,8 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                 }
                 var extraVars = new ExtraVars(extraVarsMap);
 
-                awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, keycloakPrincipal, extraVars, JobGoal.CREATE, this);
-                this.notificationServiceClient.postJobObserver(keycloakPrincipal, awxJobObserver);
+                awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, jwtAuthenticationToken, extraVars, JobGoal.CREATE, this);
+                this.notificationServiceClient.postJobObserver(jwtAuthenticationToken, awxJobObserver);
                 break;
             }
             case KUBERNETES: {
@@ -123,7 +123,7 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                 HashMap<String, Object> extraVarsMap = new HashMap<>() {{
                     put("resource_id", deploymentCapabilityServiceId);
                     put("service_id", serviceId);
-                    put("keycloak_token", keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+                    put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
                     put("service_name", serviceHoster.getCapabilityService().getService());
                     put("supported_connection_types", awxCapabilityAction.getConnectionTypes());
                     put("manifest_file", KubernetesManifestFileParser.manifestFinalizer(deployableManifestFile));
@@ -131,8 +131,8 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
 
                 extraVarsMap = this.addExtraVarsForServiceRepositories(extraVarsMap, serviceOfferingVersion);
 
-                awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, keycloakPrincipal, new ExtraVars(extraVarsMap), JobGoal.CREATE, this);
-                this.notificationServiceClient.postJobObserver(keycloakPrincipal, awxJobObserver);
+                awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, jwtAuthenticationToken, new ExtraVars(extraVarsMap), JobGoal.CREATE, this);
+                this.notificationServiceClient.postJobObserver(jwtAuthenticationToken, awxJobObserver);
                 break;
             }
 
@@ -140,7 +140,7 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                 var codesysDeploymentDefinition = (CodesysDeploymentDefinition)serviceOfferingVersion.getDeploymentDefinition();
                 HashMap<String, Object> extraVarsMap = new HashMap<>() {{
                     put("service_id", serviceId);
-                    put("keycloak_token", keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+                    put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
                     put("service_name", serviceHoster.getCapabilityService().getService());
                     put("supported_connection_types", awxCapabilityAction.getConnectionTypes());
                     put("application_path", codesysDeploymentDefinition.getApplicationPath());
@@ -148,8 +148,8 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
 
                 extraVarsMap = this.addExtraVarsForServiceRepositories(extraVarsMap, serviceOfferingVersion);
 
-                awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, keycloakPrincipal, new ExtraVars(extraVarsMap), JobGoal.CREATE, this);
-                this.notificationServiceClient.postJobObserver(keycloakPrincipal, awxJobObserver);
+                awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, jwtAuthenticationToken, new ExtraVars(extraVarsMap), JobGoal.CREATE, this);
+                this.notificationServiceClient.postJobObserver(jwtAuthenticationToken, awxJobObserver);
             }
             break;
             default:
@@ -175,7 +175,7 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                 new ArrayList<>()
         );
 
-        var deploymentJobRun = new DeploymentJobRun(awxJobObserver, keycloakPrincipal, serviceInstance, serviceOrder);
+        var deploymentJobRun = new DeploymentJobRun(awxJobObserver, jwtAuthenticationToken, serviceInstance, serviceOrder);
         this.observedAwxJobsToDeploymentJobDetails.put(awxJobObserver, deploymentJobRun);
 
         return deploymentJobRun;
@@ -296,8 +296,8 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
         if (this.observedAwxJobsToDeploymentJobDetails.containsKey(sender))
         {
             var jobDetails = this.observedAwxJobsToDeploymentJobDetails.get(sender);
-            var keycloakPrincipal = jobDetails.getKeycloakPrincipal();
-            var userUuid = KeycloakTokenUtil.getUserUuid(keycloakPrincipal);
+            var jwtAuthenticationToken = jobDetails.getJwtAuthenticationToken();
+            var userUuid = KeycloakTokenUtil.getUserUuid(jwtAuthenticationToken);
             var serviceInstance = jobDetails.getServiceInstance();
             var serviceOrder = jobDetails.getServiceOrder();
 
@@ -307,13 +307,13 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
 
                     // Add role for new service instance in Keycloak
                     var serviceKeycloakRoleName = "service_" + serviceInstance.getId();
-                    this.keycloakUtil.createRealmRoleAndAssignToUser(keycloakPrincipal, serviceKeycloakRoleName);
+                    this.keycloakUtil.createRealmRoleAndAssignToUser(jwtAuthenticationToken, serviceKeycloakRoleName);
 
                     // Add consul service for new service instance
                     this.serviceInstancesConsulClient.registerConsulServiceForServiceInstance(serviceInstance);
 
                     serviceOrder.setServiceOrderResult(ServiceOrderResult.SUCCESSFULL);
-                    this.notificationServiceClient.postNotification(keycloakPrincipal, Category.Services, JobTarget.SERVICE, JobGoal.CREATE);
+                    this.notificationServiceClient.postNotification(jwtAuthenticationToken, Category.Services, JobTarget.SERVICE, JobGoal.CREATE);
                 }
 
                 default -> {

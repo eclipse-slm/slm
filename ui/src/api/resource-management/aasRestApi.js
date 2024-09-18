@@ -1,13 +1,20 @@
 import axios from 'axios'
 
 class AASRestApi {
-    API_URL = '/resource-management/aas'
+    API_URL = '/resource-management'
 
     async getResourceAAS() {
-        return axios.get(`${this.API_URL}/`)
+        return axios.get(`${this.API_URL}/resources/aas`)
           .then(response => {
               return response.data;
           });
+    }
+
+    async getResourceAasDescriptor(resourceId) {
+        return axios.get(`${this.API_URL}/resources/${resourceId}/aas-descriptor`)
+            .then(response => {
+                return response.data;
+            });
     }
 
     async getSubmodelTemplateInstancesBySemanticId (submodelTemplateSemanticId) {

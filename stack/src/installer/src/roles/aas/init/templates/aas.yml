@@ -1,71 +1,126 @@
-version: '3'
-
 services:
-  aas-registry:
-    image: "eclipsebasyx/aas-registry:{{ AAS_BASYX_VERSION }}"
+  aas-discovery:
+    image: "eclipsebasyx/aas-discovery:{{ AAS_BASYX_VERSION }}"
     restart: unless-stopped
-    depends_on:
-      - aas-database
-      - aas-server
-      - aas-gui
+    ports:
+      - "{{ AAS_AAS_DISCOVERY_PORT }}:8081"
+    networks:
+      default:
+        aliases:
+          - aas-discovery
+    environment:
+      SERVER_PORT: 8081
+      SPRING_APPLICATION_NAME: AAS Discovery Service
+      BASYX_AASDISCOVERYSERVICE_NAME: aas-discovery-service
+      BASYX_BACKEND: MongoDB
+      SPRING_DATA_MONGODB_HOST: aas-database
+      SPRING_DATA_MONGODB_DATABASE: aas-discovery
+      SPRING_DATA_MONGODB_AUTHENTICATIONDATABASE: admin
+      SPRING_DATA_MONGODB_USERNAME: "{{ AAS_DATABASE_USERNAME }}"
+      SPRING_DATA_MONGODB_PASSWORD: "{{ AAS_DATABASE_PASSWORD }}"
+      BASYX_CORS_ALLOWEDORIGINS: "*"
+      BASYX_CORS_ALLOWEDMETHODS: GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+      MANAGEMENT_INFO_GIT_ENABLED: "false"
+
+  aas-registry:
+    image: "eclipsebasyx/aas-registry-log-mongodb:{{ AAS_BASYX_VERSION }}"
+    restart: unless-stopped
+    ports:
+      - "{{ AAS_AAS_REGISTRY_PORT }}:8080"
     networks:
       default:
         aliases:
           - aas-registry
-    ports:
-      - "4000:4000"
     environment:
-      basyxregistry_registry_backend: MongoDB
-      basyxmongodb_dbconnectionstring: mongodb://aas-database:27017/
-      basyxcontext_accesscontrolalloworigin: "*"
+      BASYX_CORS_ALLOWEDORIGINS: "*"
+      BASYX_CORS_ALLOWEDMETHODS: GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
+      SPRING_DATA_MONGODB_URI: "mongodb://{{ AAS_DATABASE_USERNAME }}:{{ AAS_DATABASE_PASSWORD }}@aas-database:27017"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+      MANAGEMENT_INFO_GIT_ENABLED: "false"
 
-  aas-server:
-    image: "eclipsebasyx/aas-server:{{ AAS_BASYX_VERSION }}"
+  submodel-registry:
+    image: "eclipsebasyx/submodel-registry-log-mongodb:{{ AAS_BASYX_VERSION }}"
     restart: unless-stopped
-    depends_on:
-      - aas-database
+    ports:
+      - "{{ AAS_SUBMODEL_REGISTRY_PORT }}:8080"
     networks:
       default:
         aliases:
-          - aas-server
-    ports:
-      - "4001:4001"
+          - submodel-registry
     environment:
-      basyxaas_registry_path: http://aas-registry:4000/registry/api/v1/registry
-      basyxaas_aas_backend: MongoDB
-      basyxaas_aas_aasxupload: Enabled
-      basyxaas_registry_host: http://{{ SLM_HOSTNAME }}:4001/aasServer
-      basyxmongodb_dbconnectionstring: mongodb://aas-database:27017/
-      basyxcontext_accesscontrolalloworigin: "*"
-      waiting_for: '[{"host":"aas-registry","port":"4000"}]'
+      BASYX_CORS_ALLOWEDORIGINS: "*"
+      BASYX_CORS_ALLOWEDMETHODS: GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
+      SPRING_DATA_MONGODB_URI: "mongodb://{{ AAS_DATABASE_USERNAME }}:{{ AAS_DATABASE_PASSWORD }}@aas-database:27017"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+      MANAGEMENT_INFO_GIT_ENABLED: "false"
+
+  aas-environment:
+    image: "eclipsebasyx/aas-environment:{{ AAS_BASYX_VERSION }}"
+    restart: unless-stopped
+    environment:
+      SERVER_PORT: 8081
+      BASYX_BACKEND: MongoDB
+      SPRING_DATA_MONGODB_HOST: aas-database
+      SPRING_DATA_MONGODB_DATABASE: aas-environment
+      SPRING_DATA_MONGODB_AUTHENTICATIONDATABASE: admin
+      SPRING_DATA_MONGODB_USERNAME: "{{ AAS_DATABASE_USERNAME }}"
+      SPRING_DATA_MONGODB_PASSWORD: "{{ AAS_DATABASE_PASSWORD }}"
+      MQTT_CLIENTID: AAS-Environment
+      MQTT_HOSTNAME: aas-broker
+      MQTT_PORT: 1884
+      BASYX_AASREPOSITORY_FEATURE_MQTT_ENABLED: "true"
+      BASYX_SUBMODELREPOSITORY_FEATURE_MQTT_ENABLED: "true"
+      BASYX_CORS_ALLOWEDORIGINS: "*"
+      BASYX_CORS_ALLOWEDMETHODS: GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
+      BASYX_AASREPOSITORY_FEATURE_REGISTRYINTEGRATION: http://aas-registry:8080
+      BASYX_SUBMODELREPOSITORY_FEATURE_REGISTRYINTEGRATION: http://submodel-registry:8080
+      BASYX_EXTERNALURL: http://{{ SLM_HOSTNAME }}:8081
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+      MANAGEMENT_INFO_GIT_ENABLED: "false"
+    ports:
+      - "{{ AAS_AAS_REPOSITORY_PORT }}:8081"
+    networks:
+      default:
+        aliases:
+          - aas-environment
+
+  aas-web-ui_v2:
+    image: "eclipsebasyx/aas-gui:{{ AAS_GUI_VERSION }}"
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      AAS_DISCOVERY_PATH: "{{ AAS_AAS_DISCOVERY_URL }}"
+      AAS_REGISTRY_PATH: "{{ AAS_AAS_REGISTRY_URL }}"
+      SUBMODEL_REGISTRY_PATH: "{{ AAS_SUBMODEL_REGISTRY_URL }}"
+      AAS_REPO_PATH: "{{ AAS_AAS_REPOSITORY_URL }}/shells"
+      SUBMODEL_REPO_PATH: "{{ AAS_SUBMODEL_REPOSITORY_URL }}/submodels"
+      CD_REPO_PATH: "{{ AAS_CONCEPTDESCRIPTION_REPOSITORY_URL }}/concept-descriptions"
+      KEYCLOAK_URL: "{{ KEYCLOAK_AUTH_URL }}"
+      KEYCLOAK_REALM: "{{ KEYCLOAK_REALM }}"
+      KEYCLOAK_CLIENT_ID: "ui"
 
   aas-database:
-    image: mongo:7.0.4
+    image: mongo:5.0.10
     restart: unless-stopped
     networks:
       default:
         aliases:
           - aas-database
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "{{ AAS_DATABASE_USERNAME }}"
+      MONGO_INITDB_ROOT_PASSWORD: "{{ AAS_DATABASE_PASSWORD }}"
     volumes:
-      - "aas_database:/data/db"
+      - aas_database:/data/db
     healthcheck:
-      test: [ "CMD","mongosh", "--eval", "db.runCommand('ping').ok", "--quiet" ]
+      test: mongo
       interval: 10s
-      timeout: 10s
+      start_period: 5s
       retries: 5
 
-  aas-gui:
-    image: "ghcr.io/eclipse-slm/aas/gui:{{ AAS_GUI_VERSION }}"
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      VITE_REGISTRY_PATH: "http://{{ SLM_HOSTNAME }}:4000/registry"
-      VITE_AAS_SERVER_PATH: "http://{{ SLM_HOSTNAME }}:4001/aasServer"
-      VITE_PRIMARY_COLOR: "00A0E3"
-
   aas-broker:
-    image: "ghcr.io/fabos-ai/aas-transformer/aas-broker:{{ AAS_TRANSFORMER_VERSION }}"
+    image: "ghcr.io/eclipse-slm/aas/broker:{{ AAS_BROKER_VERSION }}"
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -73,8 +128,7 @@ services:
         max-file: "{{ LOGGING_MAX_FILE }}"
         max-size: "{{ LOGGING_MAX_SIZE }}"
     ports:
-      - "1883:1883"
-      - "1801:9001"
+      - "{{ AAS_BROKER_PORT }}:1884"
     networks:
       default:
         aliases:

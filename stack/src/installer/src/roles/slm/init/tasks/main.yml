@@ -89,7 +89,7 @@
         project_name: eclipse-slm
         definition: "{{ slm_compose | from_yaml}}"
         state: present
-        pull: always
+        pull: "{{ PULL_DOCKER_IMAGES }}"
 
 - name: "Store resulting compose file"
   template:
@@ -106,7 +106,7 @@
         project_name: eclipse-slm
         definition: "{{ catalog_compose | from_yaml }}"
         state: present
-        pull: always
+        pull: "{{ PULL_DOCKER_IMAGES }}"
 
 - name: "Store resulting compose file"
   template:

@@ -30,7 +30,9 @@ public class DockerComposeFileVolumeDeserializer extends StdDeserializer<DockerC
 
         if (node instanceof ObjectNode) {
             var mapper = new ObjectMapper(new YAMLFactory());
-            mapper.registerModule(new KotlinModule());
+            KotlinModule kotlinModule = new KotlinModule.Builder()
+                    .build();
+            mapper.registerModule(kotlinModule);
             return mapper.readValue(node.traverse(), DockerComposeFileVolume.class);
         }
         else {

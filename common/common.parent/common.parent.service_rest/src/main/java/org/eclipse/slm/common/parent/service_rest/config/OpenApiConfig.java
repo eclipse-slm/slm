@@ -1,23 +1,17 @@
 package org.eclipse.slm.common.parent.service_rest.config;
 
 import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.media.StringSchema;
-import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.security.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.method.HandlerMethod;
 
 import java.util.Arrays;
 
@@ -50,14 +44,17 @@ public class OpenApiConfig {
             @Value("${open-api.contact.url}") String contactUrl,
             @Value("${open-api.contact.email}") String contactMail
             ) {
-        var firstRealm = multiTenantKeycloakRegistration.getFirstRealm();
-        var tokenServerUrl = "";
+        var firstKeycloakOidcConfig = multiTenantKeycloakRegistration.getFirstOidcConfig();
         var authServerUrl = "";
-        try {
-            tokenServerUrl = firstRealm.getTokenUrl();
-            authServerUrl = tokenServerUrl.replace("token", "auth");
-        } catch (Exception e) {
-            LOG.error(e.getMessage());
+        var tokenServerUrl = "";
+        if (firstKeycloakOidcConfig != null) {
+            tokenServerUrl = firstKeycloakOidcConfig.getTokenServerUrl();
+            authServerUrl = "";
+            try {
+                authServerUrl = tokenServerUrl.replace("token", "auth");
+            } catch (Exception e) {
+                LOG.error(e.getMessage());
+            }
         }
 
         return new OpenAPI()
@@ -91,22 +88,6 @@ public class OpenApiConfig {
                                 .name(contactName)
                                 .url(contactUrl)
                                 .email(contactMail)));
-    }
-
-    @Bean
-    public OperationCustomizer customGlobalHeaders() {
-
-        return (Operation operation, HandlerMethod handlerMethod) -> {
-
-            var parameterSchema = new StringSchema();
-            parameterSchema.setDefault("fabos");
-            Parameter realmHeaderParameter = new Parameter().in(ParameterIn.HEADER.toString()).schema(parameterSchema)
-                    .name("Realm").description("Keycloak Realm").required(true);
-
-            operation.addParametersItem(realmHeaderParameter);
-
-            return operation;
-        };
     }
 
 }

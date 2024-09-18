@@ -28,10 +28,10 @@ import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType;
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.service.rest.resources.ResourcesConsulClient;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
@@ -73,12 +73,12 @@ class ClusterScaleFunctions extends AbstractClusterFunctions implements IAwxJobO
 
     //TODO: Make one function for scaleUp/scaleDown because scaleUp/Down almost identical
     public int scaleUp(
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             UUID consulServiceUuid,
             UUID resourceId
     ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException {
         Optional<MultiHostCapabilityService> serviceOptional = multiHostCapabilitiesConsulClient.getMultiHostCapabilityServiceOfUser(
-                new ConsulCredential(keycloakPrincipal),
+                new ConsulCredential(jwtAuthenticationToken),
                 consulServiceUuid
         );
 
@@ -111,12 +111,12 @@ class ClusterScaleFunctions extends AbstractClusterFunctions implements IAwxJobO
         Map<String, Object> extraVarsMap = new HashMap<>();
         extraVarsMap.put("resource_service_id", service.getService());
         extraVarsMap.put("resource_to_add_service_id", resourceToAddAsSerivce.get().getService());
-        extraVarsMap.put("keycloak_token", keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+        extraVarsMap.put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
         extraVarsMap.put("supported_connection_types", scaleUpAction.getConnectionTypes());
         ExtraVars extraVars = new ExtraVars(extraVarsMap);
 
         int jobId = awxJobExecutor.executeJob(
-                new AwxCredential(keycloakPrincipal),
+                new AwxCredential(jwtAuthenticationToken),
                 scaleUpAction.getAwxRepo(), scaleUpAction.getAwxBranch(), scaleUpAction.getPlaybook(),
                 extraVars
         );
@@ -126,10 +126,10 @@ class ClusterScaleFunctions extends AbstractClusterFunctions implements IAwxJobO
                 jobGoal,
                 this
         );
-        this.notificationServiceClient.postJobObserver(keycloakPrincipal, awxJobObserver);
+        this.notificationServiceClient.postJobObserver(jwtAuthenticationToken, awxJobObserver);
 
         var clusterJob = new ClusterJob(service);
-        clusterJob.setKeycloakPrincipal(keycloakPrincipal);
+        clusterJob.setJwtAuthenticationToken(jwtAuthenticationToken);
         clusterJob.setAwxJobObserver(awxJobObserver);
         clusterJob.setScaleOperation(new ScaleUpOperation(resourceId, clusterMemberTypeOptional.get()));
         this.clusterJobMap.put(clusterJob.getAwxJobObserver(), clusterJob);
@@ -138,14 +138,14 @@ class ClusterScaleFunctions extends AbstractClusterFunctions implements IAwxJobO
     }
 
     public int scaleDown(
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             UUID consulServiceUuid,
             UUID resourceId
     ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException {
         JobTarget jobTarget = JobTarget.RESOURCE;
         JobGoal jobGoal = JobGoal.MODIFY;
         Optional<MultiHostCapabilityService> serviceOptional = multiHostCapabilitiesConsulClient.getMultiHostCapabilityServiceOfUser(
-                new ConsulCredential(keycloakPrincipal),
+                new ConsulCredential(jwtAuthenticationToken),
                 consulServiceUuid
         );
 
@@ -165,21 +165,21 @@ class ClusterScaleFunctions extends AbstractClusterFunctions implements IAwxJobO
         Map<String, Object> extraVarsMap = new HashMap<>();
         extraVarsMap.put("resource_service_id", service.getService());
         extraVarsMap.put("resource_to_add_service_id", resourceToAddAsSerivce.get().getService());
-        extraVarsMap.put("keycloak_token", keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+        extraVarsMap.put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
         extraVarsMap.put("supported_connection_types", scaleDownAction.getConnectionTypes());
         ExtraVars extraVars = new ExtraVars(extraVarsMap);
 
         int jobId = awxJobExecutor.executeJob(
-                new AwxCredential(keycloakPrincipal),
+                new AwxCredential(jwtAuthenticationToken),
                 scaleDownAction.getAwxRepo(), scaleDownAction.getAwxBranch(), scaleDownAction.getPlaybook(),
                 extraVars
         );
 
         var awxJobObserver = this.awxJobObserverInitializer.init(jobId, jobTarget, jobGoal, this);
-        this.notificationServiceClient.postJobObserver(keycloakPrincipal, awxJobObserver);
+        this.notificationServiceClient.postJobObserver(jwtAuthenticationToken, awxJobObserver);
 
         var clusterJob = new ClusterJob(service);
-        clusterJob.setKeycloakPrincipal(keycloakPrincipal);
+        clusterJob.setJwtAuthenticationToken(jwtAuthenticationToken);
         clusterJob.setAwxJobObserver(awxJobObserver);
         clusterJob.setScaleOperation(new ScaleDownOperation(resourceId));
         this.clusterJobMap.put(clusterJob.getAwxJobObserver(), clusterJob);
@@ -196,7 +196,7 @@ class ClusterScaleFunctions extends AbstractClusterFunctions implements IAwxJobO
         JobGoal jobGoal = sender.jobGoal;
         JobTarget jobTarget = sender.jobTarget;
         ClusterJob clusterJob = this.clusterJobMap.get(sender);
-        KeycloakPrincipal keycloakPrincipal = clusterJob.getKeycloakPrincipal();
+        var jwtAuthenticationToken = clusterJob.getJwtAuthenticationToken();
         MultiHostCapabilityService multiHostCapabilityService = clusterJob.getMultiHostCapabilityService();
 
         if(!finalState.equals(JobFinalState.SUCCESSFUL)) {
@@ -216,7 +216,7 @@ class ClusterScaleFunctions extends AbstractClusterFunctions implements IAwxJobO
             );
 
             this.notificationServiceClient.postNotification(
-                    clusterJob.getKeycloakPrincipal(),
+                    clusterJob.getJwtAuthenticationToken(),
                     Category.Resources,
                     jobTarget,
                     jobGoal

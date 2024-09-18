@@ -1,6 +1,7 @@
 package org.eclipse.slm.common.awx.client.observer;
 
 
+import jakarta.websocket.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.http.HttpEntity;
@@ -9,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;

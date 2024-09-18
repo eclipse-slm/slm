@@ -7,10 +7,9 @@ import org.eclipse.slm.resource_management.model.cluster.Cluster;
 import org.eclipse.slm.resource_management.model.cluster.ClusterCreateRequest;
 import org.eclipse.slm.resource_management.model.consul.capability.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotFoundException;
-import org.eclipse.slm.resource_management.service.rest.handler.ClusterJob;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
@@ -48,32 +47,32 @@ public class ClusterHandler {
 
     public ClusterJob create(
             MultiHostCapabilityService multiHostCapabilityService,
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             ClusterCreateRequest clusterCreateRequest
     ) throws SSLException, ConsulLoginFailedException {
-        return this.clusterCreateFunctions.create(multiHostCapabilityService, keycloakPrincipal, clusterCreateRequest);
+        return this.clusterCreateFunctions.create(multiHostCapabilityService, jwtAuthenticationToken, clusterCreateRequest);
     }
 
     public void delete(
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             UUID consulServiceUuid
     ) throws SSLException, ConsulLoginFailedException {
-        this.clusterDeleteFunctions.delete(keycloakPrincipal, consulServiceUuid);
+        this.clusterDeleteFunctions.delete(jwtAuthenticationToken, consulServiceUuid);
     }
 
     public int scaleUp(
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             UUID consulServiceUuid,
             UUID resourceId
     ) throws ConsulLoginFailedException, SSLException, ResourceNotFoundException {
-        return this.clusterScaleFunctions.scaleUp(keycloakPrincipal, consulServiceUuid, resourceId);
+        return this.clusterScaleFunctions.scaleUp(jwtAuthenticationToken, consulServiceUuid, resourceId);
     }
 
     public int scaleDown(
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             UUID consulServiceUuid,
             UUID resourceId
     ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException {
-        return this.clusterScaleFunctions.scaleDown(keycloakPrincipal, consulServiceUuid, resourceId);
+        return this.clusterScaleFunctions.scaleDown(jwtAuthenticationToken, consulServiceUuid, resourceId);
     }
 }

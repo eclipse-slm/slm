@@ -1,7 +1,7 @@
 package org.eclipse.slm.catalog.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import javax.persistence.*
+import jakarta.persistence.*
 
 @MappedSuperclass
 abstract class AbstractBaseEntityLong {

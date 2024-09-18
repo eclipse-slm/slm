@@ -33,6 +33,11 @@ spring:
     hibernate:
       ddl-auto: create-drop
       database-platform: org.hibernate.dialect.MariaDB105Dialect
+    properties:
+      hibernate:
+        type:
+          preferred_uuid_jdbc_type: CHAR
+
   datasource:
     driver-class-name: 'org.testcontainers.jdbc.ContainerDatabaseDriver'
     url: jdbc:tc:mariadb:10.5:///mariadb://${database.schema}?createDatabaseIfNotExist=true&serverTimezone=UTC
@@ -51,19 +56,10 @@ logging:
       apache:
         http: INFO
 
+### Keycloak
 keycloak:
-  enabled: false
-  config:
-    tenants:
-      config-path: ../../src/test/resources/keycloak/
-      client-registration-enable: false
-      client-update-enable: false
-      resolve-by-path: true
-      resolve-by-header: true
-      resolver-base-path: /
-      resolver-header: Realm
-      redirect-uris:
-      web-origins:
+  tenants:
+    config-path: keycloak/
 
 awx:
   username: admin

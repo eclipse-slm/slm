@@ -29,9 +29,9 @@ import org.eclipse.slm.service_management.service.rest.docker_compose.DockerComp
 import org.eclipse.slm.service_management.service.rest.docker_compose.DockerComposeFileParser;
 import org.eclipse.slm.service_management.service.rest.service_instances.ServiceInstancesConsulClient;
 import org.apache.commons.lang3.NotImplementedException;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
@@ -69,7 +69,7 @@ public class ServiceUpdateHandler extends AbstractServiceDeploymentHandler imple
     }
 
     public UpdateJobRun updateServiceInstance(
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             ServiceInstance serviceInstance,
             ServiceOfferingVersion serviceOfferingVersion)
             throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, ApiException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException {
@@ -81,7 +81,7 @@ public class ServiceUpdateHandler extends AbstractServiceDeploymentHandler imple
                 .collect(Collectors.toList());
         var latestServiceOrder = successfulServiceOrdersSortedDescendingCreated.get(0);
 
-        var serviceHoster = this.getServiceHoster(keycloakPrincipal, latestServiceOrder.getDeploymentCapabilityServiceId());
+        var serviceHoster = this.getServiceHoster(jwtAuthenticationToken, latestServiceOrder.getDeploymentCapabilityServiceId());
         var deploymentCapability = (DeploymentCapability)serviceHoster.getCapabilityService().getCapability();
 
         switch (serviceOfferingVersion.getDeploymentType()) {
@@ -91,7 +91,7 @@ public class ServiceUpdateHandler extends AbstractServiceDeploymentHandler imple
                 var awxCapabilityAction = this.getAwxDeployCapabilityAction(ActionType.UPDATE, deploymentCapability);
 
                 HashMap<String, Object> extraVarsMap = new HashMap<>() {{
-                    put("keycloak_token", keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+                    put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
                     put("resource_id", serviceInstance.getResourceId());
                     put("service_id", serviceInstance.getId());
                     put("service_name", serviceHoster.getCapabilityService().getService());
@@ -101,15 +101,15 @@ public class ServiceUpdateHandler extends AbstractServiceDeploymentHandler imple
                 extraVarsMap = this.addExtraVarsForServiceRepositories(extraVarsMap, serviceOfferingVersion);
                 var extraVars = new ExtraVars(extraVarsMap);
 
-                var awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, keycloakPrincipal, extraVars, JobGoal.UPDATE, this);
-                this.notificationServiceClient.postJobObserver(keycloakPrincipal, awxJobObserver);
+                var awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, jwtAuthenticationToken, extraVars, JobGoal.UPDATE, this);
+                this.notificationServiceClient.postJobObserver(jwtAuthenticationToken, awxJobObserver);
 
                 var updateServiceOrder = new ServiceOrder();
                 updateServiceOrder.setServiceInstanceId(latestServiceOrder.getServiceInstanceId());
                 updateServiceOrder.setDeploymentCapabilityServiceId(latestServiceOrder.getDeploymentCapabilityServiceId());
                 updateServiceOrder.setServiceOptionValues(latestServiceOrder.getServiceOptionValues());
                 var updateJobRun = new UpdateJobRun(
-                        awxJobObserver, keycloakPrincipal, serviceInstance.getId(), updateServiceOrder,
+                        awxJobObserver, jwtAuthenticationToken, serviceInstance.getId(), updateServiceOrder,
                         serviceInstance.getResourceId(), serviceOfferingVersion);
                 this.observedAwxJobsToUpdateJobDetails.put(awxJobObserver, updateJobRun);
 
@@ -167,8 +167,8 @@ public class ServiceUpdateHandler extends AbstractServiceDeploymentHandler imple
         if (this.observedAwxJobsToUpdateJobDetails.containsKey(sender))
         {
             var jobDetails = this.observedAwxJobsToUpdateJobDetails.get(sender);
-            var keycloakPrincipal = jobDetails.getKeycloakPrincipal();
-            var userUuid = KeycloakTokenUtil.getUserUuid(keycloakPrincipal);
+            var jwtAuthenticationToken = jobDetails.getJwtAuthenticationToken();
+            var userUuid = KeycloakTokenUtil.getUserUuid(jwtAuthenticationToken);
             var serviceInstanceId = jobDetails.getServiceInstanceId();
             var serviceOfferingVersion = jobDetails.getServiceOfferingVersion();
             var serviceOrder = jobDetails.getServiceOrder();
@@ -183,7 +183,7 @@ public class ServiceUpdateHandler extends AbstractServiceDeploymentHandler imple
                     LOG.info("Service '" + serviceInstanceId + "' update for user '" + userUuid + "' to version '" + serviceOfferingVersion.getVersion() + "' successful");
 
                     serviceOrder.setServiceOrderResult(ServiceOrderResult.SUCCESSFULL);
-                    notificationServiceClient.postNotification(keycloakPrincipal, Category.Services, JobTarget.SERVICE, JobGoal.UPDATE);
+                    notificationServiceClient.postNotification(jwtAuthenticationToken, Category.Services, JobTarget.SERVICE, JobGoal.UPDATE);
                 } catch (ConsulLoginFailedException | ServiceInstanceNotFoundException e) {
                     LOG.error(e.getMessage());
                 }

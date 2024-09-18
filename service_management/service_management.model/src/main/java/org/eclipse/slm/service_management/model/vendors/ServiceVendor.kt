@@ -1,13 +1,12 @@
 package org.eclipse.slm.service_management.model.vendors
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Lob
+import jakarta.persistence.Table
 import org.eclipse.slm.service_management.model.AbstractBaseEntityUuid
-import org.hibernate.annotations.Type
 import java.util.*
-import javax.persistence.*
-import kotlin.collections.ArrayList
-import kotlin.jvm.Transient
 
 @Entity
 @Table(name = "service_vendor")
@@ -24,8 +23,7 @@ class ServiceVendor(id: UUID? = null) : AbstractBaseEntityUuid(id) {
     @Column(name = "description")
     var description = ""
 
-    @Lob
-    @Column(name = "logo")
+    @Column(name = "logo", columnDefinition="MEDIUMBLOB")
     var logo: ByteArray? = null
 
     @JsonIgnore

@@ -1,50 +1,20 @@
 package org.eclipse.slm.service_management.service.rest.utils;
 
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.adapters.RefreshableKeycloakSecurityContext;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.UUID;
 
 public class MultiTenancyUtil {
 
-    public static String getKeycloakUserNameFromKeycloakAuthenticationToken(KeycloakAuthenticationToken keycloakAuthenticationToken)
+    public static String getKeycloakUserNameFromAuthenticationToken(JwtAuthenticationToken jwtAuthenticationToken)
     {
-        var keycloakPrincipal = (KeycloakPrincipal)keycloakAuthenticationToken.getPrincipal();
-        return keycloakPrincipal.getName();
+        var username = jwtAuthenticationToken.getToken().getClaims().get("preferred_username").toString();
+        return username;
     }
 
-    public static UUID getKeycloakUserIdFromKeycloakAuthenticationToken(KeycloakAuthenticationToken keycloakAuthenticationToken)
+    public static UUID getKeycloakUserIdFromAuthenticationToken(JwtAuthenticationToken jwtAuthenticationToken)
     {
-        var keycloakPrincipal = (KeycloakPrincipal)keycloakAuthenticationToken.getPrincipal();
-        return UUID.fromString(keycloakPrincipal.getName());
-    }
-
-    public static String getRealmFromKeycloakAuthenticationToken(KeycloakAuthenticationToken keycloakAuthenticationToken)
-    {
-        var keycloakDeployment = ((RefreshableKeycloakSecurityContext)((KeycloakPrincipal)keycloakAuthenticationToken.getPrincipal())
-                .getKeycloakSecurityContext()).getDeployment();
-
-        return keycloakDeployment.getRealm();
-    }
-
-    public static UUID generateOrganisationIdFromKeycloakAuthenticationToken(KeycloakAuthenticationToken keycloakAuthenticationToken)
-    {
-        var keycloakDeployment = ((RefreshableKeycloakSecurityContext)((KeycloakPrincipal)keycloakAuthenticationToken.getPrincipal())
-                .getKeycloakSecurityContext()).getDeployment();
-        var uuidGenerationString = keycloakDeployment.getAuthUrl().getHost() + keycloakDeployment.getRealm();
-        return UUID.nameUUIDFromBytes(uuidGenerationString.getBytes());
-    }
-
-    public static UUID generateProjectId(String projectAbbreviation, KeycloakAuthenticationToken keycloakAuthenticationToken)
-    {
-        var uuidGenerationString = MultiTenancyUtil.generateOrganisationIdFromKeycloakAuthenticationToken(keycloakAuthenticationToken).toString() + projectAbbreviation;
-        return UUID.nameUUIDFromBytes(uuidGenerationString.getBytes());
-    }
-
-    public static UUID generateProjectId(String projectAbbreviation, UUID organisationId)
-    {
-        var uuidGenerationString = organisationId.toString() + projectAbbreviation;
-        return UUID.nameUUIDFromBytes(uuidGenerationString.getBytes());
+        var subject = jwtAuthenticationToken.getToken().getSubject();
+        return UUID.fromString(subject);
     }
 }

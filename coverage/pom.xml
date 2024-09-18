@@ -4,20 +4,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <artifactId>coverage</artifactId>
+    <version>${revision}</version>
+
     <parent>
         <artifactId>slm</artifactId>
         <groupId>org.eclipse.slm</groupId>
         <version>${revision}</version>
     </parent>
 
-    <artifactId>coverage</artifactId>
-    <name>coverage</name>
-
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
     </properties>
-
 
     <dependencies>
         <dependency>
@@ -78,7 +76,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco-maven-plugin.version}</version>
+                <version>${maven.plugin.jacoco.version}</version>
                 <executions>
                     <!-- aggregated unit test coverage report -->
                     <execution>
