@@ -246,7 +246,6 @@ const textAreaFileContentComponentKey = ref(0);
         this.$emit('canceled')
       },
       onAddButtonClicked () {
-        console.log(this.configParameterValues)
         clustersRestApi.createClusterResource(this.selectedClusterType.id, true, {}, this.configParameterValues)
         this.clearForm()
         this.$emit('confirmed')

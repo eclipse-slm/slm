@@ -6,8 +6,8 @@
       </template>
 
       <no-item-available-note
-        v-if="!resources.length && !clusters.length"
-        item="Resource and Cluster"
+        v-if="!resources.length"
+        item="Resource"
       />
 
       <v-card-text v-else>
@@ -16,15 +16,6 @@
             v-if="resources.length > 0"
             class="mt-0 flex"
             @resource-selected="onResourceSelected"
-          />
-        </v-row>
-
-        <v-row
-          v-if="clusters.length > 0"
-          class="mt-10"
-        >
-          <resources-table-clusters
-            class="mt-0 flex"
           />
         </v-row>
       </v-card-text>
@@ -57,7 +48,6 @@
 import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
 import ResourcesCreateDialog from '@/components/resources/dialogs/create/ResourcesCreateDialog'
 import ResourcesTableSingleHosts from '@/components/resources/ResourcesTableSingleHosts'
-import ResourcesTableClusters from '@/components/resources/ResourcesTableClusters'
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 import {useResourcesStore} from "@/stores/resourcesStore";
@@ -69,7 +59,6 @@ export default {
       ResourcesInfoDialog,
       ResourcesCreateDialog,
       ResourcesTableSingleHosts,
-      ResourcesTableClusters,
       NoItemAvailableNote,
     },
     setup(){
@@ -87,9 +76,6 @@ export default {
     computed: {
       resources () {
         return this.resourceStore.resources
-      },
-      clusters () {
-        return this.resourceStore.clusters
       },
     },
     mounted () {
