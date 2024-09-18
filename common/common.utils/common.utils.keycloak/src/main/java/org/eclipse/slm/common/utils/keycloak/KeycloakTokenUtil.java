@@ -1,7 +1,5 @@
 package org.eclipse.slm.common.utils.keycloak;
 
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -12,7 +10,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class KeycloakTokenUtil {

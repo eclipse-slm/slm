@@ -296,8 +296,8 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
         if (this.observedAwxJobsToDeploymentJobDetails.containsKey(sender))
         {
             var jobDetails = this.observedAwxJobsToDeploymentJobDetails.get(sender);
-            var keycloakPrincipal = jobDetails.getJwtAuthenticationToken();
-            var userUuid = KeycloakTokenUtil.getUserUuid(keycloakPrincipal);
+            var jwtAuthenticationToken = jobDetails.getJwtAuthenticationToken();
+            var userUuid = KeycloakTokenUtil.getUserUuid(jwtAuthenticationToken);
             var serviceInstance = jobDetails.getServiceInstance();
             var serviceOrder = jobDetails.getServiceOrder();
 
@@ -307,13 +307,13 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
 
                     // Add role for new service instance in Keycloak
                     var serviceKeycloakRoleName = "service_" + serviceInstance.getId();
-                    this.keycloakUtil.createRealmRoleAndAssignToUser(keycloakPrincipal, serviceKeycloakRoleName);
+                    this.keycloakUtil.createRealmRoleAndAssignToUser(jwtAuthenticationToken, serviceKeycloakRoleName);
 
                     // Add consul service for new service instance
                     this.serviceInstancesConsulClient.registerConsulServiceForServiceInstance(serviceInstance);
 
                     serviceOrder.setServiceOrderResult(ServiceOrderResult.SUCCESSFULL);
-                    this.notificationServiceClient.postNotification(keycloakPrincipal, Category.Services, JobTarget.SERVICE, JobGoal.CREATE);
+                    this.notificationServiceClient.postNotification(jwtAuthenticationToken, Category.Services, JobTarget.SERVICE, JobGoal.CREATE);
                 }
 
                 default -> {

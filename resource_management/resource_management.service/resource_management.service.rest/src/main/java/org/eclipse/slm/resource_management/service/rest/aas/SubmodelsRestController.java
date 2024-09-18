@@ -51,7 +51,7 @@ public class SubmodelsRestController {
     @Operation(summary = "Add submodels to existing resource")
     public ResponseEntity addSubmodels(
             @PathVariable(name = "resourceId") UUID resourceId,
-            @RequestParam("aasx") MultipartFile aasxFile
+            @RequestParam(name = "aasx") MultipartFile aasxFile
     ) throws ConsulLoginFailedException, ResourceNotFoundException, IOException, InvalidFormatException, DeserializationException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var resource = this.resourcesManager.getResourceWithCredentialsByRemoteAccessService(jwtAuthenticationToken, resourceId);

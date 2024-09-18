@@ -4,7 +4,6 @@ import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakGroupNotFoundEx
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakUserNotFoundException;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;

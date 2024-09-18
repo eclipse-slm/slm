@@ -11,7 +11,6 @@ import org.eclipse.slm.service_management.model.vendors.exceptions.ServiceVendor
 import org.eclipse.slm.service_management.model.vendors.responses.ServiceVendorCreateResponse;
 import org.eclipse.slm.service_management.persistence.keycloak.ServiceVendorRepository;
 import io.swagger.v3.oas.annotations.Operation;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -35,11 +35,6 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-messaging</artifactId>
         </dependency>
-        <!-- Keycloak !-->
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-spring-boot-starter</artifactId>
-        </dependency>
         <!-- Shared Modules !-->
         <dependency>
             <groupId>org.eclipse.slm</groupId>

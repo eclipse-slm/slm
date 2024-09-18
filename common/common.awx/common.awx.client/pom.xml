@@ -69,11 +69,6 @@
             <groupId>io.projectreactor.netty</groupId>
             <artifactId>reactor-netty-http</artifactId>
         </dependency>
-        <!-- Keycloak !-->
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-spring-boot-starter</artifactId>
-        </dependency>
         <!-- Client Dependencies !-->
         <dependency>
             <groupId>com.github.docker-java</groupId>

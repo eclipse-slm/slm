@@ -25,7 +25,6 @@ import org.eclipse.slm.service_management.service.rest.service_instances.Service
 import org.eclipse.slm.service_management.service.rest.service_offerings.ServiceOfferingVersionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
@@ -117,8 +116,8 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
     public void onJobStateFinished(AwxJobObserver sender, JobFinalState finalState) {
         if (this.observedAwxJobsToUndeploymentJobDetails.containsKey(sender)) {
             var jobDetails = this.observedAwxJobsToUndeploymentJobDetails.get(sender);
-            var keycloakPrincipal = jobDetails.getJwtAuthenticationToken();
-            var userUuid = KeycloakTokenUtil.getUserUuid(keycloakPrincipal);
+            var jwtAuthenticationToken = jobDetails.getJwtAuthenticationToken();
+            var userUuid = KeycloakTokenUtil.getUserUuid(jwtAuthenticationToken);
             var serviceInstanceId = jobDetails.getServiceInstanceId();
             var resourceId = jobDetails.getResourceId();
 
@@ -126,13 +125,13 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
                 case SUCCESSFUL -> {
                     // Remove role for service instance in Keycloak
                     var serviceKeycloakRoleName = "service_" + serviceInstanceId;
-                    this.keycloakUtil.deleteRealmRole(keycloakPrincipal, serviceKeycloakRoleName);
+                    this.keycloakUtil.deleteRealmRole(jwtAuthenticationToken, serviceKeycloakRoleName);
 
                     // Remove Consul service of service instance
                     try {
                         var serviceInstance = this.serviceInstancesConsulClient.getServiceInstance(serviceInstanceId);
                         this.serviceInstancesConsulClient.deregisterConsulServiceForServiceInstance(serviceInstance);
-                        notificationServiceClient.postNotification(keycloakPrincipal, Category.Services, JobTarget.SERVICE, JobGoal.DELETE);
+                        notificationServiceClient.postNotification(jwtAuthenticationToken, Category.Services, JobTarget.SERVICE, JobGoal.DELETE);
 
                     } catch (ConsulLoginFailedException | ServiceInstanceNotFoundException e) {
                         LOG.error(e.getMessage());

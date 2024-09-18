@@ -15,8 +15,6 @@ import org.eclipse.slm.service_management.model.services.exceptions.ServiceInsta
 import org.eclipse.slm.service_management.model.services.exceptions.ServiceInstanceNotFoundException;
 import org.eclipse.slm.service_management.model.services.exceptions.ServiceInstanceUpdateException;
 import io.swagger.v3.oas.annotations.Operation;
-import org.eclipse.slm.service_management.service.rest.service_instances.AvailableServiceInstanceVersionChange;
-import org.keycloak.KeycloakPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;

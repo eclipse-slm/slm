@@ -8,7 +8,6 @@ import org.eclipse.slm.resource_management.service.client.ResourceManagementApiC
 import org.eclipse.slm.service_management.model.offerings.*;
 import org.eclipse.slm.service_management.model.offerings.options.*;
 import org.eclipse.slm.service_management.service.rest.AbstractRestControllerIT;
-import org.eclipse.slm.service_management.service.rest.utils.MultiTenancyUtil;
 import org.eclipse.slm.service_management.model.offerings.docker.compose.DockerComposeDeploymentDefinition;
 import org.eclipse.slm.service_management.model.offerings.docker.container.DockerContainerDeploymentDefinition;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendor;
@@ -22,7 +21,6 @@ import org.eclipse.slm.service_management.service.rest.mocks.AwxMockedResponses;
 import org.eclipse.slm.service_management.service.rest.service_vendors.ServiceVendorHandler;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,7 +28,6 @@ import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -210,8 +207,6 @@ public class ServiceOfferingRestControllerIT extends AbstractRestControllerIT {
                         new ServiceOptionValue("label1", "labelVal1"),
                         new ServiceOptionValue("label2", "labelVal2")
                 ));
-                var serviceOwner = MultiTenancyUtil.getKeycloakUserNameFromKeycloakAuthenticationToken(
-                        ((KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication()));
 
                 wireMockServer.stubFor(
                         WireMock.post(WireMock.urlPathMatching("/api/v2/job_templates/(.*)/launch/"))

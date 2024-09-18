@@ -17,11 +17,6 @@
     <dependencies>
         <!-- Keycloak !-->
         <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-spring-security-adapter</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
             <artifactId>keycloak-admin-client</artifactId>
             <groupId>org.keycloak</groupId>
             <version>${keycloak.version}</version>

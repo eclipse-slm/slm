@@ -27,8 +27,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -187,7 +185,7 @@ public class ServiceDeploymentHandlerTest {
 
         this.serviceDeploymentHandler.onJobStateFinished(deploymentJobRun.getAwxJobObserver(), JobFinalState.SUCCESSFUL);
         verify(this.keycloakUtil).createRealmRoleAndAssignToUser(
-                argThat(keycloakPrincipal -> keycloakPrincipal.equals(this.jwtAuthenticationToken)),
+                argThat(jwtAuthenticationToken -> jwtAuthenticationToken.equals(this.jwtAuthenticationToken)),
                 argThat(roleName -> roleName.startsWith("service_")));
 
         ArgumentCaptor<ConsulCredential> consulCredentialArg = ArgumentCaptor.forClass(ConsulCredential.class);

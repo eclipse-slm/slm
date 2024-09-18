@@ -5,7 +5,6 @@ import org.eclipse.slm.common.awx.client.AwxCredential;
 import org.eclipse.slm.common.awx.model.ExtraVars;
 import org.eclipse.slm.notification_service.model.JobGoal;
 import org.eclipse.slm.notification_service.model.JobTarget;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

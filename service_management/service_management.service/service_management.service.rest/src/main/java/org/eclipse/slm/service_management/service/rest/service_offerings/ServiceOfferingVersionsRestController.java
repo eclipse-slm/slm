@@ -20,8 +20,6 @@ import org.eclipse.slm.service_management.model.offerings.ServiceRequirement;
 import org.eclipse.slm.service_management.model.offerings.responses.ServiceOfferingVersionCreateResponse;
 import org.eclipse.slm.service_management.model.vendors.exceptions.ServiceVendorNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
@@ -152,11 +150,10 @@ public class ServiceOfferingVersionsRestController {
     @RequestMapping(value = "/{serviceOfferingVersionId}/order", method = RequestMethod.POST)
     @Operation(summary = "Order service offering version")
     public ResponseEntity<Void> orderServiceOfferingVersionById(
-            KeycloakAuthenticationToken keycloakAuthenticationToken,
             @PathVariable(name = "serviceOfferingId") UUID serviceOfferingId,
             @PathVariable(name = "serviceOfferingVersionId") UUID serviceOfferingVersionId,
             @RequestBody ServiceOrder serviceOrder,
-            @RequestParam UUID deploymentCapabilityServiceId)
+            @RequestParam(name = "deploymentCapabilityServiceId") UUID deploymentCapabilityServiceId)
             throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, ApiException,
             ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException, ConsulLoginFailedException {
 

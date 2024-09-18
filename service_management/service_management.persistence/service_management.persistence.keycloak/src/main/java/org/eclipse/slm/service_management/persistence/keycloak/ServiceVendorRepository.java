@@ -8,7 +8,6 @@ import org.eclipse.slm.service_management.model.vendors.ServiceVendor;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendorDeveloper;
 import org.eclipse.slm.service_management.model.vendors.exceptions.ServiceVendorNotFoundException;
 import org.eclipse.slm.service_management.persistence.api.ServiceVendorJpaRepository;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
