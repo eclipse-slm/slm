@@ -115,7 +115,7 @@ resource-management:
 
 ### Security
 security:
-  auth-white-list: "/services/offerings/*/versions/*/aas/**"
+  auth-white-list: ""
   origins: "*"
 
 ### Keycloak

@@ -105,7 +105,7 @@ notification-service:
 
 ### Security
 security:
-    auth-white-list: "/resources/*/aas/**"
+    auth-white-list: ""
     origins: "*"
 
 ### Keycloak

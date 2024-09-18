@@ -97,6 +97,9 @@ services:
       AAS_REPO_PATH: "{{ AAS_AAS_REPOSITORY_URL }}/shells"
       SUBMODEL_REPO_PATH: "{{ AAS_SUBMODEL_REPOSITORY_URL }}/submodels"
       CD_REPO_PATH: "{{ AAS_CONCEPTDESCRIPTION_REPOSITORY_URL }}/concept-descriptions"
+      KEYCLOAK_URL: "{{ KEYCLOAK_AUTH_URL }}"
+      KEYCLOAK_REALM: "{{ KEYCLOAK_REALM }}"
+      KEYCLOAK_CLIENT_ID: "ui"
 
   aas-database:
     image: mongo:5.0.10
