@@ -1,15 +1,13 @@
 package org.eclipse.slm.service_management.model.services
 
-import org.hibernate.annotations.Type
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
 
 @Entity
 data class ServiceInstanceGroup(
     @Id
-    @Type(type="uuid-char")
     @Column(name = "uuid", length = 36, unique = true, nullable = false)
     var id : UUID,
 

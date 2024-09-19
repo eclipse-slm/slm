@@ -23,11 +23,11 @@ import org.eclipse.slm.resource_management.persistence.api.LocationJpaRepository
 import org.eclipse.slm.resource_management.service.rest.capabilities.CapabilitiesManager;
 import org.eclipse.slm.resource_management.service.rest.capabilities.CapabilitiesConsulClient;
 import org.eclipse.slm.resource_management.service.rest.utils.ConnectionTypeUtils;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -74,9 +74,9 @@ public class ResourcesManager {
     }
 
     public List<BasicResource> getResourcesWithCredentialsByRemoteAccessService(
-            KeycloakPrincipal keycloakPrincipal
+            JwtAuthenticationToken jwtAuthenticationToken
     ) throws ConsulLoginFailedException, JsonProcessingException, ResourceNotFoundException {
-        ConsulCredential consulCredential = new ConsulCredential(keycloakPrincipal);
+        ConsulCredential consulCredential = new ConsulCredential(jwtAuthenticationToken);
         List<BasicResource> resources = resourcesConsulClient.getResources(consulCredential);
 
         for(BasicResource basicResource : resources) {
@@ -129,7 +129,7 @@ public class ResourcesManager {
                 if (credentialClasses.size() > 0 && connectionTypes.size() > 0) {
                     try {
                         credential = resourcesVaultClient.getCredentialOfRemoteAccessService(
-                                keycloakPrincipal,
+                                jwtAuthenticationToken,
                                 serviceId,
                                 credentialClasses.get(0)
                         );
@@ -156,13 +156,13 @@ public class ResourcesManager {
     }
 
     public BasicResource getResourceWithCredentialsByRemoteAccessService(
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             UUID resourceId
     ) throws ConsulLoginFailedException, ResourceNotFoundException, JsonProcessingException {
-        ConsulCredential consulCredential = new ConsulCredential(keycloakPrincipal);
+        ConsulCredential consulCredential = new ConsulCredential(jwtAuthenticationToken);
 
         Optional<BasicResource> optionalResource = resourcesConsulClient.getResourceById(
-                new ConsulCredential(keycloakPrincipal),
+                new ConsulCredential(jwtAuthenticationToken),
                 resourceId
         );
 
@@ -192,7 +192,7 @@ public class ResourcesManager {
 
         if (credentialClasses.size() > 0 && connectionTypes.size() > 0) {
             Credential credential = resourcesVaultClient.getCredentialOfRemoteAccessService(
-                    keycloakPrincipal,
+                    jwtAuthenticationToken,
                     serviceId,
                     credentialClasses.get(0)
             );
@@ -224,7 +224,7 @@ public class ResourcesManager {
 
     //region ADD/DELETE
     public void addExistingResource(
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             BasicResource basicResource,
             ConnectionType connectionType,
             int connectionPort,
@@ -233,7 +233,7 @@ public class ResourcesManager {
             Optional<UUID> optionalResourceBaseConfigurationId
     ) throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, CapabilityNotFoundException, SSLException, JsonProcessingException {
         this.addExistingResource(
-                keycloakPrincipal,
+                jwtAuthenticationToken,
                 basicResource.getId(),
                 basicResource.getHostname(),
                 basicResource.getIp(),
@@ -247,7 +247,7 @@ public class ResourcesManager {
     }
 
     public BasicResource addExistingResource(
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             UUID resourceId,
             String resourceHostname,
             String resourceIp,
@@ -260,7 +260,7 @@ public class ResourcesManager {
     ) throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, CapabilityNotFoundException, SSLException, JsonProcessingException {
         /// Create realm role in Keycloak for new resource
         var resourceKeycloakRoleName = "resource_" + resourceId;
-        this.keycloakUtil.createRealmRoleAndAssignToUser(keycloakPrincipal, resourceKeycloakRoleName);
+        this.keycloakUtil.createRealmRoleAndAssignToUser(jwtAuthenticationToken, resourceKeycloakRoleName);
 
         boolean remoteAccessAvailable = (connectionType != null && ConnectionTypeUtils.isRemote(connectionType));
         CredentialUsernamePassword credential = null;
@@ -291,11 +291,10 @@ public class ResourcesManager {
             );
 
             var serviceKeycloakRoleName = "service_" + remoteAccessService.getId();
-            this.keycloakUtil.createRealmRoleAndAssignToUser(keycloakPrincipal, serviceKeycloakRoleName);
+            this.keycloakUtil.createRealmRoleAndAssignToUser(jwtAuthenticationToken, serviceKeycloakRoleName);
 
 
             this.resourcesVaultClient.addSecretsForConnectionService(
-                    keycloakPrincipal,
                     remoteAccessService
             );
         }
@@ -318,13 +317,13 @@ public class ResourcesManager {
         if(optionalResourceBaseConfigurationId.isPresent()) {
             UUID baseConfigurationId = optionalResourceBaseConfigurationId.get();
             capabilitiesManager.installBaseConfigurationOnResource(
-                    keycloakPrincipal,
+                    jwtAuthenticationToken,
                     resource.getId(),
                     baseConfigurationId
             );
         }
 
-        notificationServiceClient.postNotification(keycloakPrincipal, Category.Resources, JobTarget.RESOURCE, JobGoal.CREATE);
+        notificationServiceClient.postNotification(jwtAuthenticationToken, Category.Resources, JobTarget.RESOURCE, JobGoal.CREATE);
         publisher.publishEvent(new ResourceEvent(this, resourceId, ResourceEvent.Operation.CREATE));
         return resource;
 
@@ -332,13 +331,13 @@ public class ResourcesManager {
 
 
     public void deleteResource(
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             UUID resourceId
     ) throws ConsulLoginFailedException, JsonProcessingException {
         BasicResource resource = null;
         UUID remoteAccessServiceId = null;
         try {
-            resource = this.getResourceWithCredentialsByRemoteAccessService(keycloakPrincipal, resourceId);
+            resource = this.getResourceWithCredentialsByRemoteAccessService(jwtAuthenticationToken, resourceId);
         } catch(ResourceNotFoundException e) {
             LOG.warn(e.getMessage());
             LOG.warn("Delete of resource failed because resource with id = '"+resourceId+"' not found");
@@ -352,8 +351,7 @@ public class ResourcesManager {
         if(remoteAccessServiceId != null)
             realmRoles.add("service_" + remoteAccessServiceId);
 
-//        var resourceRoleName = "resource_" + resourceId;
-        this.keycloakUtil.deleteRealmRoles(keycloakPrincipal, realmRoles);
+        this.keycloakUtil.deleteRealmRoles(jwtAuthenticationToken, realmRoles);
         this.resourcesConsulClient.deleteResource(new ConsulCredential(), resource);
         this.resourcesVaultClient.removeSecretsForResource(new VaultCredential(), resource);
         if(resource.getRemoteAccessService() != null)
@@ -362,7 +360,7 @@ public class ResourcesManager {
                     remoteAccessServiceId
             );
 
-        notificationServiceClient.postNotification(keycloakPrincipal, Category.Resources, JobTarget.RESOURCE, JobGoal.DELETE);
+        notificationServiceClient.postNotification(jwtAuthenticationToken, Category.Resources, JobTarget.RESOURCE, JobGoal.DELETE);
         publisher.publishEvent(new ResourceEvent(this, resourceId, ResourceEvent.Operation.DELETE));
     }
     //endregion

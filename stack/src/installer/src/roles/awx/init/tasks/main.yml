@@ -138,7 +138,7 @@
         project_name: eclipse-slm
         definition: "{{ awx_compose | from_yaml}}"
         state: present
-        pull: always
+        pull: "{{ PULL_DOCKER_IMAGES }}"
     - name: "Wait for AWX being up"
       uri:
         url: "{{ AWX_URL }}"

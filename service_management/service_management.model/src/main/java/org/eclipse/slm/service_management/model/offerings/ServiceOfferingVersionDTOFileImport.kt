@@ -33,5 +33,5 @@ open class ServiceOfferingVersionDTOFileImport {
     open var deploymentDefinition: DeploymentDefinitionDTOFileImport? = null
 
     @JsonProperty("servicePorts", required = false)
-    var servicePorts: List<Integer> = mutableListOf()
+    var servicePorts: List<Int> = mutableListOf()
 }

@@ -1,26 +1,23 @@
 package org.eclipse.slm.notification_service.service.client;
 
-import org.apache.http.conn.HttpHostConnectException;
+import jakarta.annotation.PostConstruct;
 import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
 import org.eclipse.slm.notification_service.model.Category;
 import org.eclipse.slm.notification_service.model.JobGoal;
 import org.eclipse.slm.notification_service.model.JobTarget;
 import org.apache.http.client.utils.URIBuilder;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import javax.annotation.PostConstruct;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -58,15 +55,12 @@ public class NotificationServiceClient {
         this.restTemplate = new RestTemplate();
     }
 
-    public void postJobObserver(KeycloakPrincipal keycloakPrincipal, AwxJobObserver awxJobObserver) {
-        this.postJobObserver(keycloakPrincipal, awxJobObserver.jobId, awxJobObserver.jobTarget, awxJobObserver.jobGoal);
+    public void postJobObserver(JwtAuthenticationToken jwtAuthenticationToken, AwxJobObserver awxJobObserver) {
+        this.postJobObserver(jwtAuthenticationToken, awxJobObserver.jobId, awxJobObserver.jobTarget, awxJobObserver.jobGoal);
     }
 
-    public void postJobObserver(KeycloakPrincipal keycloakPrincipal, int jobId, JobTarget jobTarget, JobGoal jobGoal) {
-        var realm = keycloakPrincipal.getKeycloakSecurityContext().getRealm();
-        AccessToken accessToken = keycloakPrincipal.getKeycloakSecurityContext().getToken();
-
-        String userUuid = accessToken.getSubject();
+    public void postJobObserver(JwtAuthenticationToken jwtAuthenticationToken, int jobId, JobTarget jobTarget, JobGoal jobGoal) {
+        var userUuid = jwtAuthenticationToken.getToken().getSubject();
 
         LOG.info("Create JobObserver for job with id="+jobId+", jobTarget="+jobTarget+", jobGoal="+jobGoal);
 
@@ -79,8 +73,7 @@ public class NotificationServiceClient {
                     .queryParam("jobGoal", jobGoal.toString())
                     .build()
                 )
-                .header("Realm", realm)
-                .header("Authorization", "Bearer " + keycloakPrincipal.getKeycloakSecurityContext().getTokenString())
+                .header("Authorization", "Bearer " + jwtAuthenticationToken.getToken().getTokenValue())
                 .retrieve()
                 .toBodilessEntity()
                 .block();
@@ -88,10 +81,9 @@ public class NotificationServiceClient {
         return;
     }
 
-    public void postNotification(KeycloakPrincipal keycloakPrincipal, Category category, JobTarget jobTarget, JobGoal jobGoal) {
+    public void postNotification(JwtAuthenticationToken jwtAuthenticationToken, Category category, JobTarget jobTarget, JobGoal jobGoal) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
-        headers.add("Realm", keycloakPrincipal.getKeycloakSecurityContext().getRealm());
+        headers.setBearerAuth(jwtAuthenticationToken.getToken().getTokenValue());
         HttpEntity<String> request = new HttpEntity<String>(headers);
 
         try {

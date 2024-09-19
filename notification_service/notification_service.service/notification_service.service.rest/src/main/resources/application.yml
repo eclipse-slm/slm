@@ -29,7 +29,7 @@ springdoc:
     tags-sorter: alpha
     operations-sorter: alpha
     oauth:
-      clientId: self-service-portal
+      clientId: ui
       clientSecret: unused-and-not-required
 
 ### Database
@@ -72,6 +72,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        type:
+          preferred_uuid_jdbc_type: CHAR
   datasource:
     platform: mysql
     initialization-mode: always
@@ -92,20 +96,15 @@ notification-service:
   host: "localhost"
   port: ${server.port}
 
+### Security
+security:
+  auth-white-list: "/ws/**"
+  origins: "*"
+
 ### Keycloak
 keycloak:
-  config:
-    auth-white-list: /actuator/health
-    tenants:
-      config-path: consul:keycloak
-      client-registration-enable: false
-      client-update-enable: false
-      resolve-by-path: true
-      resolve-by-header: true
-      resolver-base-path: /
-      resolver-header: Realm
-      redirect-uris:
-      web-origins:
+  tenants:
+    config-path: consul:keycloak
 
 ### AWX
 awx:

@@ -10,15 +10,8 @@
         show-expand
         @click:row="expandRow"
       >
-        <template #top>
-          <v-toolbar flat>
-            <v-toolbar-title>
-              Clusters
-            </v-toolbar-title>
-          </v-toolbar>
-        </template>
         <template
-          #item.actions="{item}"
+          #item.actions="{ item }"
         >
           <div class="text-right">
             <v-btn
@@ -30,7 +23,7 @@
             </v-btn>
             <v-btn
               class="ml-4"
-              color="warning"
+              color="accent"
               :disabled="item.isManaged"
               @click.stop="removeNodeFromCluster(item)"
             >

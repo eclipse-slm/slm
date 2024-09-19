@@ -10,7 +10,6 @@ import org.eclipse.slm.resource_management.service.rest.resources.ResourcesManag
 import org.eclipse.slm.resource_management.model.consul.capability.CapabilityService;
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
-import org.keycloak.KeycloakPrincipal;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import javax.net.ssl.SSLException;
@@ -32,16 +32,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/resources")
 public class CapabilitiesRestController {
     private final static Logger LOG = LoggerFactory.getLogger(CapabilitiesRestController.class);
-    private final ResourcesManager resourcesManager;
+
     private final CapabilitiesManager capabilitiesManager;
+
     private ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
-    public CapabilitiesRestController(
-            ResourcesManager resourcesManager,
-            CapabilitiesManager capabilitiesManager
-    ) {
-        this.resourcesManager = resourcesManager;
+    public CapabilitiesRestController(CapabilitiesManager capabilitiesManager) {
         this.capabilitiesManager = capabilitiesManager;
 
         // DTO >>> Entity
@@ -111,13 +108,13 @@ public class CapabilitiesRestController {
     public ResponseEntity<List<DeploymentCapability>> getDeploymentCapabilitiesOfResource(
             @PathVariable(name = "resourceId")           UUID resourceId
     ) throws ResourceNotFoundException, ConsulLoginFailedException {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         // ToDo: K3S - Check if endpoint works for clusters
         var deploymentCapabilitiesOfResource =
                 this.capabilitiesManager.getDeploymentCapabilitiesOfResource(
                         resourceId,
-                        new ConsulCredential(keycloakPrincipal)
+                        new ConsulCredential(jwtAuthenticationToken)
                 );
 
         return ResponseEntity.ok(deploymentCapabilitiesOfResource);
@@ -128,10 +125,10 @@ public class CapabilitiesRestController {
     public ResponseEntity<List<CapabilityService>> getCapabilityServicesOfResource(
             @PathVariable(name = "resourceId") UUID resourceId
     ) throws ConsulLoginFailedException {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         List<CapabilityService> capabilityServices = capabilitiesManager
-                .getCapabilityServicesOfResourceById(resourceId, new ConsulCredential(keycloakPrincipal));
+                .getCapabilityServicesOfResourceById(resourceId, new ConsulCredential(jwtAuthenticationToken));
 
         return ResponseEntity.ok(capabilityServices);
     }
@@ -144,13 +141,13 @@ public class CapabilitiesRestController {
             @RequestParam(name = "skipInstall", required = false, defaultValue = "false")        Boolean skipInstall,
             @RequestBody                                                                         Map<String, String> configParameters
     ) throws ResourceNotFoundException, SSLException, ConsulLoginFailedException, CapabilityNotFoundException, JsonProcessingException, IllegalAccessException {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         this.capabilitiesManager.installCapabilityOnResource(
                 resourceId,
                 capabilityId,
                 skipInstall,
                 configParameters,
-                keycloakPrincipal
+                jwtAuthenticationToken
         );
 
         return ResponseEntity.ok().build();
@@ -162,12 +159,12 @@ public class CapabilitiesRestController {
             @PathVariable(name = "resourceId")           UUID resourceId,
             @RequestParam(name = "capabilityId")      UUID capabilityId
     ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         this.capabilitiesManager.uninstallCapabilityFromResource(
                 resourceId,
                 capabilityId,
-                keycloakPrincipal
+                jwtAuthenticationToken
         );
 
         return ResponseEntity.ok().build();

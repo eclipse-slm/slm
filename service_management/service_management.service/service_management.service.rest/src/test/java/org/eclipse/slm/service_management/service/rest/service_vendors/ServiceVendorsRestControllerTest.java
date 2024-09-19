@@ -1,7 +1,7 @@
 package org.eclipse.slm.service_management.service.rest.service_vendors;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.keycloak.WithMockKeycloakAuth;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.eclipse.slm.service_management.service.rest.AbstractRestControllerIT;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendor;
@@ -41,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@WithMockKeycloakAuth(
+@WithMockJwtAuth(
     claims = @OpenIdClaims(
             iss = "https://localhost/auth/realms/fabos",
             preferredUsername = "testUser123"

@@ -31,10 +31,10 @@ import org.eclipse.slm.resource_management.model.consul.capability.CapabilitySer
 import org.eclipse.slm.resource_management.model.consul.capability.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.model.resource.ConnectionType;
 import org.eclipse.slm.resource_management.model.utils.KubernetesKubeConfig;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -79,7 +79,7 @@ class ClusterCreateFunctions extends AbstractClusterFunctions implements IAwxJob
 
     public ClusterJob startInstallAction(
             MultiHostCapabilityService multiHostCapabilityService,
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             ClusterCreateRequest clusterCreateRequest
     ) throws SSLException {
 
@@ -95,13 +95,13 @@ class ClusterCreateFunctions extends AbstractClusterFunctions implements IAwxJob
         var extraVarsMap = new HashMap<String, Object>();
         String resourceId = multiHostCapabilityService.getId().toString();
         extraVarsMap.put("resource_id", resourceId);
-        extraVarsMap.put("keycloak_token", keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+        extraVarsMap.put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
         extraVarsMap.put("service_name", multiHostCapabilityService.getService());
         extraVarsMap.put("supported_connection_types", capabilityAction.getConnectionTypes());
         ExtraVars extraVars = new ExtraVars(extraVarsMap);
 
         var awxJobId = awxJobExecutor.executeJob(
-                new AwxCredential(keycloakPrincipal),
+                new AwxCredential(jwtAuthenticationToken),
                 capabilityAction.getAwxRepo(),
                 capabilityAction.getAwxBranch(),
                 capabilityAction.getPlaybook(),
@@ -142,7 +142,7 @@ class ClusterCreateFunctions extends AbstractClusterFunctions implements IAwxJob
 
     public ClusterJob create(
             MultiHostCapabilityService multiHostCapabilityService,
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             ClusterCreateRequest clusterCreateRequest
     ) throws SSLException, ConsulLoginFailedException {
         multiHostCapabilityService.setStatus(CapabilityServiceStatus.INSTALL);
@@ -157,34 +157,34 @@ class ClusterCreateFunctions extends AbstractClusterFunctions implements IAwxJob
         );
 
         // Create Keycloak role to allow user access the cluster
-        this.keycloakUtil.createRealmRoleAndAssignToUser(keycloakPrincipal, multiHostCapabilityService.getService());
-        this.keycloakUtil.createRealmRoleAndAssignToUser(keycloakPrincipal, "resource_" + multiHostCapabilityService.getId());
+        this.keycloakUtil.createRealmRoleAndAssignToUser(jwtAuthenticationToken, multiHostCapabilityService.getService());
+        this.keycloakUtil.createRealmRoleAndAssignToUser(jwtAuthenticationToken, "resource_" + multiHostCapabilityService.getId());
 
         // initialize vault kv engine and add access for user
         this.vaultClient.initKvEngineAndAddAccessForService(multiHostCapabilityService.getId().toString());
 
         var clusterJob = this.startInstallAction(
                 multiHostCapabilityService,
-                keycloakPrincipal,
+                jwtAuthenticationToken,
                 clusterCreateRequest
         );
 
-        clusterJob.setKeycloakPrincipal(keycloakPrincipal);
+        clusterJob.setJwtAuthenticationToken(jwtAuthenticationToken);
         clusterJob.setClusterCreateRequest(clusterCreateRequest);
 
         if (!clusterCreateRequest.getSkipInstall()) {
             this.clusterJobMap.put(clusterJob.getAwxJobObserver(), clusterJob);
-            this.notificationServiceClient.postJobObserver(keycloakPrincipal, clusterJob.getAwxJobObserver());
+            this.notificationServiceClient.postJobObserver(jwtAuthenticationToken, clusterJob.getAwxJobObserver());
         }
         else {
-            this.processSuccessfulClusterInstall(keycloakPrincipal, multiHostCapabilityService, clusterCreateRequest);
+            this.processSuccessfulClusterInstall(jwtAuthenticationToken, multiHostCapabilityService, clusterCreateRequest);
         }
 
         return clusterJob;
     }
 
     private void processSuccessfulClusterInstall(
-            KeycloakPrincipal keycloakPrincipal,
+            JwtAuthenticationToken jwtAuthenticationToken,
             MultiHostCapabilityService multiHostCapabilityService,
             ClusterCreateRequest clusterCreateRequest
     ) throws ConsulLoginFailedException {
@@ -360,7 +360,7 @@ class ClusterCreateFunctions extends AbstractClusterFunctions implements IAwxJob
         }
 
         this.notificationServiceClient.postNotification(
-                keycloakPrincipal,
+                jwtAuthenticationToken,
                 Category.Resources,
                 JobTarget.RESOURCE,
                 JobGoal.CREATE
@@ -375,7 +375,7 @@ class ClusterCreateFunctions extends AbstractClusterFunctions implements IAwxJob
         LOG.info("Job on cluster finished.");
         var jobGoal = sender.jobGoal;
         var clusterJob = this.clusterJobMap.get(sender);
-        var keycloakPrincipal = clusterJob.getKeycloakPrincipal();
+        var jwtAuthenticationToken = clusterJob.getJwtAuthenticationToken();
         var multiHostCapabilityService = clusterJob.getMultiHostCapabilityService();
         var clusterCreateRequest = clusterJob.getClusterCreateRequest();
 
@@ -383,7 +383,7 @@ class ClusterCreateFunctions extends AbstractClusterFunctions implements IAwxJob
             if (jobGoal.equals(JobGoal.CREATE)) {
                 try {
                     this.processSuccessfulClusterInstall(
-                            keycloakPrincipal,
+                            jwtAuthenticationToken,
                             multiHostCapabilityService,
                             clusterCreateRequest
                     );

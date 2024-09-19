@@ -86,8 +86,6 @@
 
       @click:row="setSelectedResource"
     >
-      <template #top />
-
       <template #group.header="{items, isOpen, toggle}">
         <th
           :colspan="tableHeaders.length"
@@ -571,17 +569,4 @@ export default {
 
 <style scoped>
 
-.row-pointer  {
-  cursor: pointer;
-}
-
-.v-tooltip__content {
-  pointer-events: initial;
-}
-
-.v-overlay__content {
-  --v-theme-surface-variant: 255, 255, 255;
-  --v-theme-on-surface-variant: 0, 0, 0;
-  border: 1px solid black;
-}
 </style>

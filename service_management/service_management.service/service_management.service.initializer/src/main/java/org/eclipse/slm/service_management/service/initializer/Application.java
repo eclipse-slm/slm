@@ -1,5 +1,6 @@
 package org.eclipse.slm.service_management.service.initializer;
 
+import jakarta.transaction.Transactional;
 import org.eclipse.slm.common.utils.serviceofferingimport.DTOConfig;
 import org.eclipse.slm.service_management.service.client.handler.ApiException;
 import org.slf4j.Logger;
@@ -20,7 +21,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package org.eclipse.slm.service_management.service.rest.service_categories;
 
-import com.c4_soft.springaddons.security.oauth2.test.annotations.keycloak.WithMockKeycloakAuth;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.eclipse.slm.service_management.service.rest.AbstractRestControllerIT;
 import org.eclipse.slm.service_management.model.offerings.ServiceCategory;
@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@WithMockKeycloakAuth
+@WithMockJwtAuth
 @DisplayName("REST API | Service Categories (/services/offerings/categories)")
 public class ServiceCategoriesRestControllerTest extends AbstractRestControllerIT {
 

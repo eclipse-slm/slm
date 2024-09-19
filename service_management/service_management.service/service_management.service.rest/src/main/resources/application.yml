@@ -6,7 +6,9 @@ application:
 
 ### Deployment
 deployment:
-  hostname: localhost
+  scheme: "http"
+  hostname: "localhost"
+  port: ${server.port}
 
 ### Server / API
 server:
@@ -29,7 +31,7 @@ springdoc:
     tags-sorter: alpha
     operations-sorter: alpha
     oauth:
-      clientId: self-service-portal
+      clientId: ui
       clientSecret: unused-and-not-required
 
 ### Database
@@ -75,6 +77,8 @@ spring:
     properties:
       hibernate:
         enable_lazy_load_no_trans: true
+        type:
+          preferred_uuid_jdbc_type: CHAR
     hibernate:
       ddl-auto: update
   datasource:
@@ -105,23 +109,19 @@ notification-service:
   host: "localhost"
   port: 9001
 
+### Resource Management
 resource-management:
   url: "http://localhost:9010"
 
+### Security
+security:
+  auth-white-list: ""
+  origins: "*"
+
 ### Keycloak
 keycloak:
-  config:
-    auth-white-list: /actuator/health
-    tenants:
-      config-path: consul:keycloak
-      client-registration-enable: false
-      client-update-enable: false
-      resolve-by-path: true
-      resolve-by-header: true
-      resolver-base-path: /
-      resolver-header: Realm
-      redirect-uris:
-      web-origins:
+  tenants:
+    config-path: consul:keycloak
 
 ### AWX
 awx:
@@ -152,6 +152,42 @@ minio:
   access-key: admin
   secret-key: password
 
+### AAS
+aas:
+  broker:
+    host: localhost
+    port: 1884
+  aas-registry:
+    scheme: http
+    host: localhost
+    port: 8082
+    path:
+    url: ${aas.aas-registry.scheme}://${aas.aas-registry.host}:${aas.aas-registry.port}${aas.aas-registry.path}
+  aas-repository:
+    scheme: http
+    host: localhost
+    port: 8081
+    path:
+    url: ${aas.aas-repository.scheme}://${aas.aas-repository.host}:${aas.aas-repository.port}${aas.aas-repository.path}
+  submodel-registry:
+    scheme: http
+    host: localhost
+    port: 8083
+    path:
+    url: ${aas.submodel-registry.scheme}://${aas.submodel-registry.host}:${aas.submodel-registry.port}${aas.submodel-registry.path}
+  submodel-repository:
+    scheme: http
+    host: localhost
+    port: 8081
+    path:
+    url: ${aas.submodel-repository.scheme}://${aas.submodel-repository.host}:${aas.submodel-repository.port}${aas.submodel-repository.path}
+  concept-descriptions-repository:
+    scheme: http
+    host: slm.local
+    port: 8081
+    path:
+    url: ${aas.concept-descriptions-repository.scheme}://${aas.concept-descriptions-repository.host}:${aas.concept-descriptions-repository.port}${aas.concept-descriptions-repository.path}
+
 ### Consul
 consul:
   scheme: http
@@ -160,12 +196,6 @@ consul:
   datacenter: fabos
   acl-token: your-consul-acl-token
 
-### BaSyx
-basyx:
-  aas-registry:
-    url: http://localhost:4000/registry
-  aas-server:
-    url: http://localhost:4001/aasServer
-
 service-management:
   url: http://localhost:9020
+

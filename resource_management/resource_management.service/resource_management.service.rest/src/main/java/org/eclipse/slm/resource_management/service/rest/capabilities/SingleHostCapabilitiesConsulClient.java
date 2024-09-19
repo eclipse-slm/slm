@@ -262,17 +262,17 @@ public class SingleHostCapabilitiesConsulClient {
 
         for (var serviceOfNode : servicesOfNode) {
             if (serviceOfNode.getTags().contains(SingleHostCapabilityService.class.getSimpleName())) {
-                Optional<Capability> capability = capabilityJpaRepository.findById(
+                Optional<Capability> capabilityOptional = capabilityJpaRepository.findById(
                         UUID.fromString(serviceOfNode.getMeta().get("capabilityId"))
                 );
 
-                singleHostCapabilityServices.add(new SingleHostCapabilityService(
-                    capability.get(),
-                    consulNodeId,
-                    UUID.fromString(serviceOfNode.getID()),
-                    capabilityUtil.getStatusOfConsulService(serviceOfNode),
-                    capabilityUtil.getIsManagedOfConsulService(serviceOfNode)
-                ));
+                capabilityOptional.ifPresent(capability -> singleHostCapabilityServices.add(new SingleHostCapabilityService(
+                        capability,
+                        consulNodeId,
+                        UUID.fromString(serviceOfNode.getID()),
+                        capabilityUtil.getStatusOfConsulService(serviceOfNode),
+                        capabilityUtil.getIsManagedOfConsulService(serviceOfNode)
+                )));
             }
         }
 

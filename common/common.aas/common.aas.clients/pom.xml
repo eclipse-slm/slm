@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>common.aas.clients</artifactId>
+    <version>${revision}</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.eclipse.slm</groupId>
+        <artifactId>common.aas</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <dependencies>
+        <!-- HTTP !-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webflux</artifactId>
+        </dependency>
+        <!-- AAS !-->
+        <dependency>
+            <groupId>org.eclipse.digitaltwin.aas4j</groupId>
+            <artifactId>aas4j-dataformat-aasx</artifactId>
+        </dependency>
+        <!-- BaSyx !-->
+        <dependency>
+            <groupId>org.eclipse.digitaltwin.basyx</groupId>
+            <artifactId>basyx.aasrepository-client</artifactId>
+            <version>${basyx.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springdoc</groupId>
+                    <artifactId>springdoc-openapi-starter-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springdoc</groupId>
+                    <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springdoc</groupId>
+                    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.digitaltwin.basyx</groupId>
+            <artifactId>basyx.submodelrepository-client</artifactId>
+            <version>${basyx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.digitaltwin.basyx</groupId>
+            <artifactId>basyx.aasregistry-client-native</artifactId>
+            <version>${basyx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.digitaltwin.basyx</groupId>
+            <artifactId>basyx.submodelregistry-client-native</artifactId>
+            <version>${basyx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.digitaltwin.basyx</groupId>
+            <artifactId>basyx.submodelservice-client</artifactId>
+            <version>${basyx.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

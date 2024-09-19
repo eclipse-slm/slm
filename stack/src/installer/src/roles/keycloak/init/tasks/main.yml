@@ -79,7 +79,7 @@
         project_name: eclipse-slm
         definition: "{{ keycloak_compose | from_yaml}}"
         state: present
-        pull: always
+        pull: "{{ PULL_DOCKER_IMAGES }}"
     - name: "Wait for Keycloak being up"
       uri:
         url: "{{ KEYCLOAK_AUTH_URL }}"

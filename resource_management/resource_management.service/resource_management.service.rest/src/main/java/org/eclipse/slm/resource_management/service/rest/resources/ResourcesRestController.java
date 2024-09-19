@@ -10,7 +10,6 @@ import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNot
 import org.eclipse.slm.resource_management.model.resource.BasicResource;
 import org.eclipse.slm.resource_management.service.rest.utils.ConnectionTypeUtils;
 import io.swagger.v3.oas.annotations.Operation;
-import org.keycloak.KeycloakPrincipal;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import javax.net.ssl.SSLException;
@@ -54,10 +54,10 @@ public class ResourcesRestController {
     @RequestMapping(value = "", method = RequestMethod.GET)
     @Operation(summary = "Get all resources")
     public ResponseEntity<List<BasicResource>> getResources() throws JsonProcessingException, ResourceNotFoundException {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         List<BasicResource> resources = new ArrayList<>();
         try {
-            resources = this.resourcesManager.getResourcesWithCredentialsByRemoteAccessService(keycloakPrincipal);
+            resources = this.resourcesManager.getResourcesWithCredentialsByRemoteAccessService(jwtAuthenticationToken);
         } catch (ConsulLoginFailedException e) {
             LOG.warn(e.getMessage());
         }
@@ -70,10 +70,10 @@ public class ResourcesRestController {
     public ResponseEntity<BasicResource> getResource(
             @PathVariable(name = "resourceId") UUID resourceId
     ) throws ResourceNotFoundException, ConsulLoginFailedException, JsonProcessingException {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         BasicResource resource = this.resourcesManager.getResourceWithCredentialsByRemoteAccessService(
-                keycloakPrincipal,
+                jwtAuthenticationToken,
                 resourceId
         );
 
@@ -92,11 +92,11 @@ public class ResourcesRestController {
             @RequestParam(name = "resourceLocation", required = false)                              Optional<UUID> optionalLocationId,
             @RequestParam(name = "resourceBaseConfiguration", required = false)                     Optional<UUID> optionalResourceBaseConfigurationId
     ) throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, CapabilityNotFoundException, SSLException, JsonProcessingException {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         UUID resourceId = UUID.randomUUID();
         this.resourcesManager.addExistingResource(
-                keycloakPrincipal,
+                jwtAuthenticationToken,
                 resourceId,
                 resourceHostname,
                 resourceIp,
@@ -123,11 +123,11 @@ public class ResourcesRestController {
             @RequestParam(name = "resourceConnectionPort", required = false, defaultValue = "0")    int connectionPort,
             @RequestParam(name = "resourceLocation", required = false)                              Optional<UUID> optionalLocationId,
             @RequestParam(name = "resourceBaseConfiguration", required = false)                     Optional<UUID> optionalResourceBaseConfigurationId
-    ) throws ResourceDefinitionException, ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, CapabilityNotFoundException, SSLException, JsonProcessingException {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    ) throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, CapabilityNotFoundException, SSLException, JsonProcessingException {
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         this.resourcesManager.addExistingResource(
-                keycloakPrincipal,
+                jwtAuthenticationToken,
                 resourceId,
                 resourceHostname,
                 resourceIp,
@@ -146,9 +146,9 @@ public class ResourcesRestController {
     @Operation(summary = "Delete resource")
     public ResponseEntity deleteResource(@PathVariable(name = "resourceId") UUID resourceId)
             throws ConsulLoginFailedException, JsonProcessingException {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-        this.resourcesManager.deleteResource(keycloakPrincipal, resourceId);
+        this.resourcesManager.deleteResource(jwtAuthenticationToken, resourceId);
 
         return ResponseEntity.ok().build();
     }

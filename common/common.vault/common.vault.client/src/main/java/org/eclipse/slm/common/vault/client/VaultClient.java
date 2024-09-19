@@ -3,14 +3,17 @@ package org.eclipse.slm.common.vault.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;
+import org.apache.hc.client5.http.ssl.TrustAllStrategy;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
+import org.apache.hc.core5.ssl.SSLContexts;
 import org.eclipse.slm.common.vault.model.*;
 import org.eclipse.slm.common.vault.model.exceptions.GroupAliasNotFoundException;
 import org.eclipse.slm.common.vault.model.exceptions.KvValueNotFound;
 import org.apache.commons.lang3.NotImplementedException;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -72,15 +75,20 @@ public class VaultClient {
         this.appRoleId = appRoleId;
         this.appRoleSecretId = appRoleSecretId;
 
-        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-        SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
-                .loadTrustMaterial(null, acceptingTrustStrategy)
+        var httpClient = HttpClients.custom()
+                .setConnectionManager(
+                    PoolingHttpClientConnectionManagerBuilder.create()
+                        .setSSLSocketFactory(
+                            SSLConnectionSocketFactoryBuilder.create()
+                                .setSslContext(
+                                        SSLContexts.custom()
+                                        .loadTrustMaterial(null, TrustAllStrategy.INSTANCE)
+                                        .build())
+                                    .setHostnameVerifier((s, sslSession) -> true)
+                                .build())
+                    .build())
                 .build();
-        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
-        CloseableHttpClient httpClient = HttpClients.custom()
-                .setSSLSocketFactory(csf)
-                .build();
-        HttpComponentsClientHttpRequestFactory requestFactory =
+        var requestFactory =
                 new HttpComponentsClientHttpRequestFactory();
         requestFactory.setHttpClient(httpClient);
         this.restTemplate = new RestTemplate(requestFactory);
@@ -106,15 +114,31 @@ public class VaultClient {
     }
 
     private HttpEntity loginAndCreateRequestWithBody(VaultCredential vaultCredential, Object body) {
+
+        var serializedBody = "";
+        if (body != null) {
+            try {
+                serializedBody = this.objectMapper.writeValueAsString(body);
+            } catch (JsonProcessingException e) {
+                LOG.error("Vault login failed: " + e.getMessage());
+            }
+        }
+
         switch (vaultCredential.getVaultCredentialType()) {
             case KEYCLOAK_TOKEN -> {
                 String url = "/auth/jwt/login";
 
-                Response loginResponse = restTemplate.postForObject(url, new LoginRequest(vaultCredential.getToken()), Response.class);
+                var loginBody = "";
+                try {
+                    loginBody = objectMapper.writeValueAsString(new LoginRequest(vaultCredential.getToken()));
+                } catch (JsonProcessingException e) {
+                    LOG.error("Vault login failed: " + e.getMessage());
+                }
+                var loginResponse = restTemplate.postForObject(url, loginBody, Response.class);
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.add("Authorization", "Bearer " + loginResponse.getAuth().getClient_token());
-                HttpEntity<Object> httpEntity = new HttpEntity<>(body,headers);
+                HttpEntity<Object> httpEntity = new HttpEntity<>(serializedBody,headers);
 
                 return httpEntity;
             }
@@ -123,25 +147,31 @@ public class VaultClient {
                 HttpHeaders headers = new HttpHeaders();
                 headers.add("Authorization", "Bearer " + vaultCredential.getToken());
 
-                return new HttpEntity(body, headers);
+                return new HttpEntity(serializedBody, headers);
             }
 
             case APPLICATION_PROPERTIES -> {
                 if(this.authentication.equalsIgnoreCase("approle")) {
                     String url = "/auth/approle/login";
 
-                    Response loginResponse = restTemplate.postForObject(url, new ApproleLoginRequest(this.appRoleId, this.appRoleSecretId), Response.class);
+                    var loginBody = "";
+                    try {
+                        loginBody = objectMapper.writeValueAsString(new ApproleLoginRequest(this.appRoleId, this.appRoleSecretId));
+                    } catch (JsonProcessingException e) {
+                        LOG.error("Vault login failed: " + e.getMessage());
+                    }
+                    var loginResponse = restTemplate.postForObject(url, loginBody, Response.class);
 
                     HttpHeaders headers = new HttpHeaders();
                     headers.add("Authorization", "Bearer " + loginResponse.getAuth().getClient_token());
-                    return new HttpEntity(body, headers);
+                    return new HttpEntity(serializedBody, headers);
                 }
                 else if(this.authentication.equalsIgnoreCase("token"))
                 {
                     HttpHeaders headers = new HttpHeaders();
                     headers.add("Authorization", "Bearer " + token);
 
-                    return new HttpEntity(body, headers);
+                    return new HttpEntity(serializedBody, headers);
                 }
                 else {
                     throw new IllegalArgumentException("Authentication method '" + this.authentication + "' not supported");
@@ -155,9 +185,9 @@ public class VaultClient {
     }
 
     public Map<String, String> getKvContentUsingApplicationProperties(VaultCredential vaultCredential, KvPath kvPath) throws KvValueNotFound {
-        var httpEntity  = this.loginAndCreateRequestWithBody(vaultCredential, null);
-
         try {
+            var httpEntity  = this.loginAndCreateRequestWithBody(vaultCredential, null);
+
             String url = "/" + kvPath.getFullPath();
             ResponseEntity<Response> responseEntity = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Response.class);
             try {
@@ -179,10 +209,12 @@ public class VaultClient {
     }
 
     public List<String> getKeysOfPath(VaultCredential vaultCredential, String secretEngineName, String path) {
-        var httpEntity = this.loginAndCreateRequestWithBody(vaultCredential, null);
-        ResponseEntity<Response> responseEntity;
+        List<String> returnList = new ArrayList<>();
 
         try {
+            var httpEntity = this.loginAndCreateRequestWithBody(vaultCredential, null);
+            ResponseEntity<Response> responseEntity;
+
             final String url = "/" + secretEngineName + "/metadata/" + path + "?list=true";
             responseEntity = restTemplate.exchange(
                     url,
@@ -190,13 +222,14 @@ public class VaultClient {
                     httpEntity,
                     Response.class
             );
+
+            returnList = (List<String>) responseEntity.getBody().getData().get("keys");
         } catch (HttpClientErrorException e) {
             if(e.getStatusCode().equals(HttpStatus.NOT_FOUND))
                 return null;
             throw e;
         }
 
-        List<String> returnList = (List<String>) responseEntity.getBody().getData().get("keys");
 
         return returnList;
     }

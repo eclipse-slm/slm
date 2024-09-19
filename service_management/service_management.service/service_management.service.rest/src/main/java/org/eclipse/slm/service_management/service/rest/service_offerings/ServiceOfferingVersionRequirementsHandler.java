@@ -1,69 +1,70 @@
 package org.eclipse.slm.service_management.service.rest.service_offerings;
 
-import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
+import org.eclipse.digitaltwin.aas4j.v3.model.Property;
+import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
+import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection;
+import org.eclipse.slm.common.aas.clients.AasRegistryClient;
+import org.eclipse.slm.common.aas.clients.AasRepositoryClient;
+import org.eclipse.slm.common.aas.clients.SubmodelRegistryClient;
+import org.eclipse.slm.common.aas.clients.SubmodelRepositoryClient;
+import org.eclipse.slm.resource_management.model.resource.ResourceAas;
 import org.eclipse.slm.service_management.model.offerings.RequirementLogicType;
 import org.eclipse.slm.service_management.model.offerings.RequirementProperty;
 import org.eclipse.slm.service_management.model.offerings.ServiceRequirement;
 import org.eclipse.slm.service_management.model.offerings.ServiceRequirementLogic;
-import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
-import org.eclipse.basyx.aas.metamodel.map.descriptor.CustomId;
-import org.eclipse.basyx.aas.registration.api.IAASRegistry;
-import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
-import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
-import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
-import org.eclipse.basyx.submodel.metamodel.api.reference.IKey;
-import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
-import org.eclipse.basyx.submodel.metamodel.connected.ConnectedSubmodel;
-import org.eclipse.basyx.submodel.metamodel.map.Submodel;
-import org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection;
-import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Component
 public class ServiceOfferingVersionRequirementsHandler {
     private static final Logger LOG = LoggerFactory.getLogger(ServiceOfferingVersionRequirementsHandler.class);
-    private final ConnectedAssetAdministrationShellManager aasManager;
 
-    ServiceOfferingVersionRequirementsHandler(
-            @Value("${basyx.aas-registry.url}") String aasRegistryUrl) {
-        IAASRegistry registry = new AASRegistryProxy(aasRegistryUrl);
-        this.aasManager = new ConnectedAssetAdministrationShellManager(registry);
+    private final AasRepositoryClient aasRepositoryClient;
+
+    private final SubmodelRegistryClient submodelRegistryClient;
+
+    private final SubmodelRepositoryClient submodelRepositoryClient;
+
+    public ServiceOfferingVersionRequirementsHandler(AasRegistryClient aasRegistryClient,
+                                              AasRepositoryClient aasRepositoryClient,
+                                              SubmodelRegistryClient submodelRegistryClient,
+                                              SubmodelRepositoryClient submodelRepositoryClient) {
+        this.aasRepositoryClient = aasRepositoryClient;
+        this.submodelRegistryClient = submodelRegistryClient;
+        this.submodelRepositoryClient = submodelRepositoryClient;
     }
 
-    public boolean isRequirementFulfilledByResource(ServiceRequirement requirementDTO, UUID resourceId) {
-        IIdentifier iIdentifier = new CustomId(resourceId.toString());
-        Map<String, ISubmodel> submodelMap;
-        try {
-            submodelMap = aasManager.retrieveSubmodels(iIdentifier);
-        } catch (org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException e) {
-            return false;
-        }
-        List<Submodel> submodels = new ArrayList<>();
-        for (Map.Entry<String, ISubmodel> entry: submodelMap.entrySet()) {
-            try {
-                Submodel submodel = ((ConnectedSubmodel) entry.getValue()).getLocalCopy();
-                submodels.add(submodel);
-            } catch(ResourceNotFoundException e) {
-                LOG.warn("Submodel not available anymore. Error Msg: " + e.getMessage());
+    public boolean isRequirementFulfilledByResource(ServiceRequirement serviceRequirement, UUID resourceId) {
+        var resourceAas = this.aasRepositoryClient.getAas(ResourceAas.createAasIdFromResourceId(resourceId));
+
+        var resourceSubmodels = new ArrayList<Submodel>();
+        for (var submodelRef: resourceAas.getSubmodels()) {
+            var submodelDescriptor = this.submodelRegistryClient.findSubmodelDescriptor(submodelRef.getKeys().get(0).getValue());
+            var submodelEndpoint = submodelDescriptor.get().getEndpoints().get(0).getProtocolInformation().getHref();
+            if (submodelEndpoint.startsWith(this.submodelRepositoryClient.getSubmodelRepositoryUrl())) {
+                var submodel = this.submodelRepositoryClient.getSubmodel(submodelDescriptor.get().getId());
+                resourceSubmodels.add(submodel);
             }
+
+            // TODO: Handle get of submodels not stored in basyx submodel repository
         }
-        return isRequirementFulfilledBySubmodels(requirementDTO, submodels);
+
+        // Check if requirement logic is fulfilled by submodels
+        return this.isRequirementFulfilledBySubmodels(serviceRequirement, resourceSubmodels);
+
     }
 
-    public static boolean isRequirementFulfilledBySubmodels(ServiceRequirement requirementDTO, List<Submodel> submodels) {
-        return requirementDTO.getLogics().stream().allMatch(logic -> isLogicFulfilledBySubmodels(logic, submodels));
+    public boolean isRequirementFulfilledBySubmodels(ServiceRequirement serviceRequirement, List<Submodel> submodels) {
+        return serviceRequirement.getLogics().stream().allMatch(logic -> isLogicFulfilledBySubmodels(logic, submodels));
     }
 
-    public static boolean isLogicFulfilledBySubmodels(ServiceRequirementLogic logic, List<Submodel> submodels) {
-        List<Boolean> propertiesFulfilled = new ArrayList<>();
+    public boolean isLogicFulfilledBySubmodels(ServiceRequirementLogic logic, List<Submodel> submodels) {
+        var propertiesFulfilled = new ArrayList<Boolean>();
         for (RequirementProperty requirementProperty : logic.getProperties()) {
             boolean propertyFulfilled = false;
             for (Submodel submodel : submodels) {
@@ -82,17 +83,17 @@ public class ServiceOfferingVersionRequirementsHandler {
         return false;
     }
 
-    public static boolean isRequirementPropertyFulfilledBySubmodel(RequirementProperty requirementProperty, Submodel submodel) {
+    public boolean isRequirementPropertyFulfilledBySubmodel(RequirementProperty requirementProperty, Submodel submodel) {
         if (!isCorrectParentSubmodel(requirementProperty, submodel)) {
             return false;
         }
-        Property property = findPropertyInSubmodel(submodel, requirementProperty.getSemanticId());
+        var property = findPropertyInSubmodel(submodel, requirementProperty.getSemanticId());
         return property != null && property.getValue().equals(requirementProperty.getValue());
     }
 
-    public static boolean isCorrectParentSubmodel(RequirementProperty property, Submodel submodel) {
+    public boolean isCorrectParentSubmodel(RequirementProperty property, Submodel submodel) {
         for (String parentSemanticId: property.getParentSubmodelsSemanticIds()) {
-            for (IKey key: submodel.getSemanticId().getKeys()) {
+            for (var key: submodel.getSemanticId().getKeys()) {
                 if (key.getValue().equals(parentSemanticId)) {
                     return true;
                 }
@@ -101,17 +102,15 @@ public class ServiceOfferingVersionRequirementsHandler {
         return false;
     }
 
-    public static Property findPropertyInSubmodel(Submodel submodel, String semanticId) {
-        for (Map.Entry<String, ISubmodelElement> entry: submodel.getSubmodelElements().entrySet()) {
-            ISubmodelElement iSubmodelElement = entry.getValue();
-            if (iSubmodelElement.getClass().equals(SubmodelElementCollection.class)) {
-                Property property = findPropertyInSubmodelElementCollection((SubmodelElementCollection) iSubmodelElement, semanticId);
+    public Property findPropertyInSubmodel(Submodel submodel, String semanticId) {
+        for (var submodelElement : submodel.getSubmodelElements()) {
+            if (submodelElement instanceof SubmodelElementCollection) {
+                Property property = findPropertyInSubmodelElementCollection((SubmodelElementCollection) submodelElement, semanticId);
                 if (property != null) {
                     return property;
                 }
-            } else if (iSubmodelElement.getClass().equals(Property.class)) {
-                Property property = (Property) iSubmodelElement;
-                System.out.println("property "+property);
+            } else if (submodelElement instanceof Property) {
+                Property property = (Property) submodelElement;
                 var keys = property.getSemanticId().getKeys();
                 if (keys.size() > 0 && keys.get(0).getValue().equals(semanticId)) {
                     return property;
@@ -121,16 +120,15 @@ public class ServiceOfferingVersionRequirementsHandler {
         return null;
     }
 
-    public static Property findPropertyInSubmodelElementCollection(SubmodelElementCollection smc, String semanticId) {
-        for (Map.Entry<String, ISubmodelElement> entry: smc.getSubmodelElements().entrySet()) {
-            ISubmodelElement iSubmodelElement = entry.getValue();
-            if (iSubmodelElement.getClass().equals(SubmodelElementCollection.class)) {
-                Property property = findPropertyInSubmodelElementCollection((SubmodelElementCollection) iSubmodelElement, semanticId);
+    public Property findPropertyInSubmodelElementCollection(SubmodelElementCollection smc, String semanticId) {
+        for (var submodelElement : smc.getValue()) {
+            if (submodelElement instanceof SubmodelElementCollection) {
+                Property property = findPropertyInSubmodelElementCollection((SubmodelElementCollection) submodelElement, semanticId);
                 if (property != null) {
                     return property;
                 }
-            } else if (iSubmodelElement.getClass().equals(Property.class)) {
-                Property property = (Property) iSubmodelElement;
+            } else if (submodelElement instanceof Property) {
+                var property = (Property) submodelElement;
                 var keys = property.getSemanticId().getKeys();
                 if (keys.size() > 0 && keys.get(0).getValue().equals(semanticId)) {
                     return property;

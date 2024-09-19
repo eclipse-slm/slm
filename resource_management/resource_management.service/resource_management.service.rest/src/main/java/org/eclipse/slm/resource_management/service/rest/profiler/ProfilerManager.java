@@ -16,10 +16,10 @@ import org.eclipse.slm.notification_service.model.JobState;
 import org.eclipse.slm.resource_management.model.actions.AwxAction;
 import org.eclipse.slm.resource_management.model.profiler.Profiler;
 import org.eclipse.slm.resource_management.persistence.api.ProfilerJpaRepository;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
@@ -101,14 +101,14 @@ public class ProfilerManager implements IAwxJobObserverListener {
         return profilerJpaRepository.findById(profilerId);
     }
 
-    public void runAllProfilerAction(KeycloakPrincipal keycloakPrincipal) {
+    public void runAllProfilerAction(JwtAuthenticationToken jwtAuthenticationToken) {
         List<Profiler> profiler = getProfiler();
 
         profiler.stream().forEach(pr -> {
-            runProfilerAction(pr.getId(), keycloakPrincipal);
+            runProfilerAction(pr.getId(), jwtAuthenticationToken);
         });
     }
-    public void runProfilerAction(UUID profilerId, KeycloakPrincipal keycloakPrincipal) {
+    public void runProfilerAction(UUID profilerId, JwtAuthenticationToken jwtAuthenticationToken) {
         Optional<Profiler> optionalProfiler = getProfiler(profilerId);
 
         if(optionalProfiler.isEmpty())
@@ -120,7 +120,7 @@ public class ProfilerManager implements IAwxJobObserverListener {
             AwxAction action = (AwxAction) profiler.getAction();
 
             int awxJobId = awxJobExecutor.executeJob(
-                    new AwxCredential(keycloakPrincipal),
+                    new AwxCredential(jwtAuthenticationToken),
                     action.getAwxRepo(),
                     action.getAwxBranch(),
                     action.getPlaybook(),

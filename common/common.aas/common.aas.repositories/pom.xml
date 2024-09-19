@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>common.aas.repositories</artifactId>
+    <version>${revision}</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.eclipse.slm</groupId>
+        <artifactId>common.aas</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <dependencies>
+        <!-- Spring !-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+        <!-- OpenAPI !-->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+        </dependency>
+        <!-- Jakarta !-->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+        <!-- BaSyx !-->
+        <dependency>
+            <groupId>org.eclipse.digitaltwin.basyx</groupId>
+            <artifactId>basyx.submodelrepository-core</artifactId>
+            <version>${basyx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.digitaltwin.basyx</groupId>
+            <artifactId>basyx.submodelrepository-http</artifactId>
+            <version>${basyx.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springdoc</groupId>
+                    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -47,7 +47,7 @@ module.exports = {
         pathRewrite: {
           '^/notification-service': '',
         },
-        changeOrigin: false,
+        changeOrigin: true,
         secure: false,
       },
       '/resource-management/*': {
@@ -55,7 +55,7 @@ module.exports = {
         pathRewrite: {
           '^/resource-management': '',
         },
-        changeOrigin: false,
+        changeOrigin: true,
         secure: false,
       },
       '/service-management/*': {
@@ -63,7 +63,7 @@ module.exports = {
         pathRewrite: {
           '^/service-management': '',
         },
-        changeOrigin: false,
+        changeOrigin: true,
         secure: false,
       },
       '/slm-catalog/*': {
@@ -71,7 +71,7 @@ module.exports = {
         pathRewrite: {
           '^/slm-catalog': '',
         },
-        changeOrigin: false,
+        changeOrigin: true,
         secure: false,
       },
     },

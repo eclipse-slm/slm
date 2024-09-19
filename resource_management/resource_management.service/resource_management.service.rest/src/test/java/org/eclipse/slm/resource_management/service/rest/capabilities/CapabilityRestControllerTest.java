@@ -1,7 +1,7 @@
 package org.eclipse.slm.resource_management.service.rest.capabilities;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.keycloak.WithMockKeycloakAuth;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.slm.common.model.DeploymentType;
@@ -12,26 +12,21 @@ import org.eclipse.slm.resource_management.model.capabilities.VirtualizationCapa
 import org.eclipse.slm.resource_management.model.actions.AwxAction;
 import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType;
-import org.eclipse.slm.resource_management.service.rest.Application;
-import org.eclipse.slm.resource_management.service.rest.resources.ResourcesManager;
-import org.eclipse.slm.resource_management.service.rest.resources.ResourcesRestController;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -42,48 +37,46 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-@ActiveProfiles("test")
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-        Application.class,
-        ResourcesRestController.class
-    },
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+@WebMvcTest(CapabilitiesRestController.class)
+@ContextConfiguration(
+    classes = {
+            CapabilitiesRestController.class,
+            RestTemplate.class
+    }
 )
-@AutoConfigureMockMvc
 @ComponentScan(basePackages = {
-        "org.eclipse.slm.common.consul.client",
-        "org.eclipse.slm.common.vault.client",
-        "org.eclipse.slm.common.awx.client",
-        "org.eclipse.slm.notification_service.service.client",
-        "org.eclipse.slm.common.keycloak.config",
-        "org.eclipse.slm.resource_management",
-        "org.eclipse.slm.resource_management.service.rest"
+    "org.eclipse.slm.common.consul.client",
 })
+@AutoConfigureMockMvc(addFilters = false)
+@WithMockJwtAuth(
+    claims = @OpenIdClaims(
+            iss = "https://localhost/auth/realms/vfk",
+            preferredUsername = "testUser123"
+    )
+)
+@ActiveProfiles("test")
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class CapabilityRestControllerTest {
 
     //region Variables
     public final static String BASE_PATH = "/resources/capabilities";
-    public static String BASE_URL = "";
-    @MockBean
-    CapabilitiesManager capabilitiesManager;
+
     @Autowired
-    RestTemplate restTemplate;
+    private CapabilitiesRestController controller;
+
     @Autowired
-    private ResourcesRestController controller;
+    private ObjectMapper objectMapper;
+
     @Autowired
-    private ResourcesManager resourcesManager;
-    @Autowired
-    ObjectMapper objectMapper;
-    private static MockMvc mockMvc;
-    @Autowired
-    private WebApplicationContext webApplicationContext;
+    private MockMvc mockMvc;
+
     private static DeploymentCapability dockerDeploymentCapability;
     private static DeploymentCapability dockerSwarmDeploymentCapability;
     private static VirtualizationCapability kvmQemuVirtualizationCapability;
+
+    @MockBean
+    private CapabilitiesManager capabilitiesManager;
     //endregion
 
     //region Functions
@@ -101,9 +94,7 @@ public class CapabilityRestControllerTest {
     //endregion
 
     @BeforeAll
-    public static void beforeAll(@Value("${local.server.port:80}") int port) {
-        BASE_URL = "http://localhost:"+port+BASE_PATH;
-
+    public static void beforeAll() {
         //region Create Java Object of Docker DeploymentCapability:
         dockerDeploymentCapability = new DeploymentCapability();
         dockerDeploymentCapability.setName("Docker");
@@ -195,20 +186,10 @@ public class CapabilityRestControllerTest {
         //endregion
     }
 
-    @BeforeEach
-    public void beforeEach() throws JsonProcessingException {
-        mockMvc = webAppContextSetup(webApplicationContext).build();
-    }
-
     @Nested
     @Order(10)
     @DisplayName("Pretests")
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-    @WithMockKeycloakAuth(
-        claims = @OpenIdClaims(
-                iss = "https://localhost/auth/realms/vfk",
-                preferredUsername = "testUser123"
-    ))
     public class doPreTests {
         @Test
         @Order(10)
@@ -222,7 +203,7 @@ public class CapabilityRestControllerTest {
         @DisplayName("Check availability of BASE_PATH (GET " + BASE_PATH + ")")
         public void checkBaseEndpoint() throws Exception {
             mockMvc.perform(
-                            get(BASE_URL))
+                            get(BASE_PATH))
                     .andExpect(status().isOk());
         }
     }
@@ -231,11 +212,6 @@ public class CapabilityRestControllerTest {
     @Nested
     @Order(20)
     @DisplayName("Deployment Capabilities")
-    @WithMockKeycloakAuth (
-        claims = @OpenIdClaims(
-            iss = "https://localhost/auth/realms/vfk",
-            preferredUsername = "testUser123"
-    ))
     @TestClassOrder(ClassOrderer.OrderAnnotation.class)
     public class testDeploymentCapabilities {
 
@@ -264,7 +240,7 @@ public class CapabilityRestControllerTest {
             @DisplayName("Create Single Host Deployment Capability (POST " + BASE_PATH + ")")
             public void createSingleHostDeploymentCapability() throws Exception {
                 mockMvc.perform(
-                                post(BASE_URL)
+                                post(BASE_PATH)
                                         .content( getSingleHostDeploymentCapabilityDTOAsJsonString() )
                                         .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isCreated())
@@ -296,7 +272,7 @@ public class CapabilityRestControllerTest {
                         .thenReturn(true);
 
                 mockMvc.perform(
-                                delete(BASE_URL + "/" + dockerDeploymentCapability.getId())
+                                delete(BASE_PATH + "/" + dockerDeploymentCapability.getId())
                         )
                         .andExpect(status().isOk())
                         .andDo(MockMvcResultHandlers.print());
@@ -328,7 +304,7 @@ public class CapabilityRestControllerTest {
             @DisplayName("Create Multi Host Deployment Capability (POST " + BASE_PATH + ")")
             public void createClusterCapability() throws Exception {
                 mockMvc.perform(
-                                post(BASE_URL)
+                                post(BASE_PATH)
                                         .content( getMultiHostDeploymentCapabilityDTOAsJsonString() )
                                         .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isCreated())
@@ -360,7 +336,7 @@ public class CapabilityRestControllerTest {
                         .thenReturn(true);
 
                 mockMvc.perform(
-                                delete(BASE_URL + "/" + dockerSwarmDeploymentCapability.getId())
+                                delete(BASE_PATH + "/" + dockerSwarmDeploymentCapability.getId())
                         )
                         .andExpect(status().isOk())
                         .andDo(MockMvcResultHandlers.print());
@@ -372,11 +348,6 @@ public class CapabilityRestControllerTest {
     @Nested
     @Order(30)
     @DisplayName("Virtualization Capabilities")
-    @WithMockKeycloakAuth (
-        claims = @OpenIdClaims(
-            iss = "https://localhost/auth/realms/vfk",
-            preferredUsername = "testUser123"
-    ))
     @TestClassOrder(ClassOrderer.OrderAnnotation.class)
     public class testVirtualizationCapabilities {
         @Nested
@@ -404,7 +375,7 @@ public class CapabilityRestControllerTest {
             @DisplayName("Create Single Host Virtualization Capability (POST " + BASE_PATH + ")")
             public void createSingleHostVirtualizationCapability() throws Exception {
                 mockMvc.perform(
-                                post(BASE_URL)
+                                post(BASE_PATH)
                                         .content( getSingleHostVirtualizationCapabilityDTOAsJsonString() )
                                         .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isCreated())
@@ -436,7 +407,7 @@ public class CapabilityRestControllerTest {
                         .thenReturn(true);
 
                 mockMvc.perform(
-                                delete(BASE_URL + "/" + kvmQemuVirtualizationCapability.getId())
+                                delete(BASE_PATH + "/" + kvmQemuVirtualizationCapability.getId())
                         )
                         .andExpect(status().isOk())
                         .andDo(MockMvcResultHandlers.print());

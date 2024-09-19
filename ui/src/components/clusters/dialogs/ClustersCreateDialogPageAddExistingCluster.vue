@@ -247,8 +247,6 @@ const textAreaFileContentComponentKey = ref(0);
         this.$emit('canceled')
       },
       onAddButtonClicked () {
-        console.log(this.configParameterValues);
-
         ResourceManagementClient.clusterApi.createClusterResource({
           clusterTypeId: this.selectedClusterType.id,
           skipInstall: true,

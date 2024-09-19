@@ -7,10 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import lombok.SneakyThrows;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 public class ArrayMapNodeDeserializer<T extends Map<String, Object>> extends StdDeserializer<T> {
@@ -23,13 +22,23 @@ public class ArrayMapNodeDeserializer<T extends Map<String, Object>> extends Std
         super(vc);
     }
 
-    @SneakyThrows
     @Override
     public T deserialize(JsonParser jp, DeserializationContext ctxt)
             throws IOException {
         JsonNode jsonNode = jp.getCodec().readTree(jp);
 
-        var map = (T)this._valueClass.getDeclaredConstructor().newInstance();
+        T map = null;
+        try {
+            map = (T)this._valueClass.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
 
         if (jsonNode.isArray()) {
             var arrayNode = (ArrayNode) jsonNode;
