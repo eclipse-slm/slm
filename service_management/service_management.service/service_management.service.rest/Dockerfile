@@ -5,7 +5,9 @@ ENV CONSUL_SCHEME="http" \
     CONSUL_HOST="consul" \
     CONSUL_PORT=8500 \
     CONSUL_DATACENTER="fabos" \
-    CONSUL_ACLTOKEN="password"
+    CONSUL_ACLTOKEN="password" \
+    AAS_BROKER="aas-broker"
+
 
 RUN apt update && \
     apt install -y curl jq

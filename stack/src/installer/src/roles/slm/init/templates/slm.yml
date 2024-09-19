@@ -36,9 +36,11 @@ services:
       CONSUL_HOST: "{{ app_configs['resource_management']['consul']['host'] }}"
       CONSUL_PORT: "{{ app_configs['resource_management']['consul']['port'] }}"
       CONSUL_ACLTOKEN: "{{ app_configs['resource_management']['consul']['acl-token'] }}"
-      KEYCLOAK_AUTHSERVERURL: "{{ KEYCLOAK_AUTH_URL }}"
-      BASYX_AASREGISTRY_URL: "http://{{ SLM_HOSTNAME }}:4000/registry"
-      BASYX_AASSERVER_URL: "http://{{ SLM_HOSTNAME }}:4001/aasServer"
+      AAS_AASREGISTRY_URL: "{{ AAS_AAS_REGISTRY_URL }}"
+      AAS_AASREPOSITORY_URL: "{{ AAS_AAS_REPOSITORY_URL }}"
+      AAS_SUBMODELREGISTRY_URL: "{{ AAS_SUBMODEL_REGISTRY_URL }}"
+      AAS_SUBMODELREPOSITORY_URL: "{{ AAS_SUBMODELREPOSITORY_URL }}"
+      AAS_CONCEPTDESCRIPTIONSREPOSITORY_URL: "{{ AAS_CONCEPTDESCRIPTION_REPOSITORY_URL }}"
       MONITORING_SERVICE_URL: "http://{{ SLM_HOSTNAME }}:{{ MONITORING_PROMETHEUS_AAS_PORT }}"
       SERVER_MAXHTTPHEADERSIZE: 100KB
     ports:
@@ -111,10 +113,12 @@ services:
       CONSUL_HOST: "{{ app_configs['service_management']['consul']['host'] }}"
       CONSUL_PORT: "{{ app_configs['service_management']['consul']['port'] }}"
       CONSUL_ACLTOKEN: "{{ app_configs['service_management']['consul']['acl-token'] }}"
-      KEYCLOAK_AUTHSERVERURL: "{{ KEYCLOAK_AUTH_URL }}"
       GIT_SERVICEOFFERINGIMPORTER_UPDATERINTERVALMINUTES: "{{ SERVICE_MANAGEMENT_GIT_CHECK_INTERVAL_MINUTES }}"
-      BASYX_AASREGISTRY_URL: "http://{{ SLM_HOSTNAME }}:4000/registry"
-      BASYX_AASSERVER_URL: "http://{{ SLM_HOSTNAME }}:4001/aasServer"
+      AAS_AASREGISTRY_URL: "{{ AAS_AAS_REGISTRY_URL }}"
+      AAS_AASREPOSITORY_URL: "{{ AAS_AAS_REPOSITORY_URL }}"
+      AAS_SUBMODELREGISTRY_URL: "{{ AAS_SUBMODEL_REGISTRY_URL }}"
+      AAS_SUBMODELREPOSITORY_URL: "{{ AAS_SUBMODELREPOSITORY_URL }}"
+      AAS_CONCEPTDESCRIPTIONSREPOSITORY_URL: "{{ AAS_CONCEPTDESCRIPTION_REPOSITORY_URL }}"
       SERVICEMANAGEMENT_URL: "http://{{ SLM_HOSTNAME }}:{{ SERVICE_MANAGEMENT_PORT }}"
       SERVER_MAXHTTPHEADERSIZE: 100KB
     ports:
