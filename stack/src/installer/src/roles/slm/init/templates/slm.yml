@@ -17,14 +17,12 @@ services:
     extra_hosts:
       - "{{ SLM_HOSTNAME }}:172.17.0.1"
     environment:
-      KEYCLOAK_URL: "http://{{ SLM_HOSTNAME }}:{{ KEYCLOAK_PORT }}/auth"
+      KEYCLOAK_URL: "http://{{ SLM_HOSTNAME }}/auth"
       AWX_URL: "http://{{ SLM_HOSTNAME }}:{{ AWX_PORT }}"
       BASYX_AAS_GUI_URL: "http://{{ SLM_HOSTNAME }}:3000"
       CONSUL_TOKEN: "{{ app_configs['resource_management']['consul']['acl-token'] }}"
     labels:
       - traefik.http.routers.slm-ui.rule=Host(`{{ SLM_HOSTNAME }}`)
-#      - traefik.http.routers.slm-ui.tls.certresolver=le
-#      - traefik.http.routers.slm-ui.tls=true
 
   resource-management:
     image: "ghcr.io/eclipse-slm/slm/resource-management:{{ SLM_VERSION }}"
@@ -59,8 +57,8 @@ services:
       test: [ "CMD", "curl", "http://localhost:9010/swagger-ui/index.html" ]
     labels:
       - traefik.http.routers.slm-resource-management.rule=Host(`{{ SLM_HOSTNAME }}`) && PathPrefix(`/resource-management`)
-      - traefik.http.middlewares.slm-resource-management-stripprefix.stripprefix.prefixes=/resource-management
       - traefik.http.routers.slm-resource-management.middlewares=slm-resource-management-stripprefix
+      - traefik.http.middlewares.slm-resource-management-stripprefix.stripprefix.prefixes=/resource-management
 
   resource-management-database:
     image: "mariadb:{{ RESOURCE_MANAGEMENT_DATABASE_VERSION }}"
@@ -141,8 +139,8 @@ services:
       test: [ "CMD", "curl", "http://localhost:9020/swagger-ui/index.html" ]
     labels:
       - traefik.http.routers.slm-service-management.rule=Host(`{{ SLM_HOSTNAME }}`) && PathPrefix(`/service-management`)
-      - traefik.http.middlewares.slm-service-management-stripprefix.stripprefix.prefixes=/service-management
       - traefik.http.routers.slm-service-management.middlewares=slm-service-management-stripprefix
+      - traefik.http.middlewares.slm-service-management-stripprefix.stripprefix.prefixes=/service-management
 
   service-management-init:
     image: "ghcr.io/eclipse-slm/slm/service-management-init:{{ SLM_VERSION }}"
@@ -217,8 +215,8 @@ services:
       test: [ "CMD", "curl", "http://localhost:9001/swagger-ui/index.html" ]
     labels:
       - traefik.http.routers.slm-notification-service.rule=Host(`{{ SLM_HOSTNAME }}`) && PathPrefix(`/notification-service`)
-      - traefik.http.middlewares.slm-notification-service-stripprefix.stripprefix.prefixes=/notification-service
       - traefik.http.routers.slm-notification-service.middlewares=slm-notification-service-stripprefix
+      - traefik.http.middlewares.slm-notification-service-stripprefix.stripprefix.prefixes=/notification-service
 
   notification-service-database:
     image: "mariadb:{{ NOTIFICATION_SERVICE_DATABASE_VERSION }}"
