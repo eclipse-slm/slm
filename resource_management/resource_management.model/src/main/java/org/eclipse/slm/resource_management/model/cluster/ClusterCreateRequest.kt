@@ -1,8 +1,10 @@
 package org.eclipse.slm.resource_management.model.cluster
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*
 
 class ClusterCreateRequest(
+    @JsonProperty("clusterTypeId")
     val clusterTypeId: UUID,
 )
 {

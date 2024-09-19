@@ -3,10 +3,10 @@ package org.eclipse.slm.common.awx.client.observer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.websocket.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.websocket.*;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;

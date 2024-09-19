@@ -5,7 +5,6 @@ import com.orbitz.consul.Consul;
 import com.orbitz.consul.ConsulException;
 import com.orbitz.consul.model.acl.ImmutableLogin;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.client.ConsulCredentialType;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import okhttp3.ConnectionPool;
 import org.slf4j.Logger;
@@ -108,11 +107,11 @@ class AbstractConsulApiClient {
                 }
             }
 
-            case KEYCLOAK_TOKEN -> {
-                var keycloakToken = consulCredential.getKeycloakPrincipal().getKeycloakSecurityContext().getTokenString();
-                var keycloakName = consulCredential.getKeycloakPrincipal().getName();
-                clientsKey = new ClientsKey(keycloakToken, consulHost);
-                ClientsKey keycloakClientsKey = new ClientsKey(keycloakName, consulHost);
+            case JWT -> {
+                var jwt = consulCredential.getJwtAuthenticationToken().getToken().getTokenValue();
+                var username = consulCredential.getJwtAuthenticationToken().getName();
+                clientsKey = new ClientsKey(jwt, consulHost);
+                ClientsKey keycloakClientsKey = new ClientsKey(username, consulHost);
 
                 Consul consulClient;
                 // Check if Keycloak token a consul client exists
@@ -121,7 +120,7 @@ class AbstractConsulApiClient {
                 }
                 else {
                     // Create new consul client for new Keycloak token
-                    var consulTokenFromKeycloakToken = this.getConsulToken(consulCredential.getKeycloakPrincipal().getKeycloakSecurityContext().getTokenString());
+                    var consulTokenFromKeycloakToken = this.getConsulToken(jwt);
                     var connectionPool = new ConnectionPool(20,1L, TimeUnit.MILLISECONDS);
                     consulClient = Consul.builder()
                             .withHostAndPort(HostAndPort.fromParts(consulHost, consulPort))
@@ -168,9 +167,9 @@ class AbstractConsulApiClient {
             case CONSUL_TOKEN -> {
                 return consulCredential.getConsulToken();
             }
-            case KEYCLOAK_TOKEN -> {
+            case JWT -> {
                 return getConsulToken(
-                        consulCredential.getKeycloakPrincipal().getKeycloakSecurityContext().getTokenString()
+                        consulCredential.getJwtAuthenticationToken().getToken().getTokenValue()
                 );
             }
             case APPLICATION_PROPERTIES -> {

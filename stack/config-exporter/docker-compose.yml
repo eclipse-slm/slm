@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   config-exporter:
     image: ghcr.io/eclipse-slm/slm/config-exporter:${SLM_VERSION}

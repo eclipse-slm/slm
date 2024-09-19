@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse.slm</groupId>
     <artifactId>common.vault.client</artifactId>
     <packaging>jar</packaging>
 
@@ -31,7 +30,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webflux</artifactId>
-            <version>5.3.9</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -42,13 +40,11 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.30</version>
         </dependency>
         <!-- HTTP !-->
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${apache.httpcomponents.version}</version>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -58,13 +54,12 @@
         <dependency>
             <groupId>io.projectreactor.netty</groupId>
             <artifactId>reactor-netty</artifactId>
-            <version>1.0.15</version>
+            <version>${reactor.netty.version}</version>
         </dependency>
         <!-- Utils !-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>${apache.commons.version}</version>
         </dependency>
         <!-- Shared Modules !-->
         <dependency>

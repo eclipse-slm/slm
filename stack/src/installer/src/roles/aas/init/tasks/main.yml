@@ -6,7 +6,7 @@
     project_name: eclipse-slm
     definition: "{{ aas_compose | from_yaml}}"
     state: present
-    pull: always
+    pull: "{{ PULL_DOCKER_IMAGES }}"
 
 - name: "Store resulting compose file"
   template:
@@ -22,17 +22,48 @@
     _service_name: "{{ item.name }}"
     _service_port: "{{ item.port }}"
     _service_address: "{{ SLM_HOSTNAME }}"
-    _http: "{{ item.url }}"
+    _http: "{{ item.http_check_url }}"
+    _additional_tags: "{{ item.additional_tags }}"
   loop:
+    - name: aas-discovery
+      port: "{{ AAS_AAS_DISCOVERY_PORT }}"
+      http_check_url: "{{ AAS_AAS_DISCOVERY_URL }}/actuator/health"
+      additional_tags: [ "aas" ]
     - name: aas-registry
-      port: 4000
-      url: "http://{{ SLM_HOSTNAME }}:4000/registry/api/v1/registry"
-    - name: aas-server
-      port: 4001
-      url: "http://{{ SLM_HOSTNAME }}:4001/aasServer/shells"
+      port: "{{ AAS_AAS_REGISTRY_PORT }}"
+      http_check_url: "{{ AAS_AAS_REGISTRY_URL }}/actuator/health"
+      additional_tags: [ "aas" ]
+    - name: aas-repository
+      port: "{{ AAS_AAS_REPOSITORY_PORT }}"
+      http_check_url: "{{ AAS_AAS_REPOSITORY_URL }}/actuator/health"
+      additional_tags: [ "aas" ]
+    - name: submodel-registry
+      port: "{{ AAS_SUBMODEL_REGISTRY_PORT }}"
+      http_check_url: "{{ AAS_SUBMODEL_REGISTRY_URL }}/actuator/health"
+      additional_tags: [ "aas" ]
+    - name: submodel-repository
+      port: "{{ AAS_SUBMODEL_REPOSITORY_PORT }}"
+      http_check_url: "{{ AAS_SUBMODEL_REPOSITORY_URL }}/actuator/health"
+      additional_tags: [ "aas" ]
+    - name: concept-description-repository
+      port: "{{ AAS_CONCEPTDESCRIPTIONS_REPOSITORY_PORT }}"
+      http_check_url: "{{ AAS_CONCEPTDESCRIPTIONS_REPOSITORY_URL }}/actuator/health"
+      additional_tags: [ "aas" ]
     - name: aas-gui
       port: 3000
-      url: "http://{{ SLM_HOSTNAME }}:3000"
+      http_check_url: "http://{{ SLM_HOSTNAME }}:3000"
+      additional_tags: [ "aas" ]
+
+- name: "Register AAS broker at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: aas-broker
+    _service_port: "{{ AAS_BROKER_PORT }}"
+    _service_address: "{{ AAS_BROKER_HOST }}"
+    _tcp: "{{ AAS_BROKER_HOST }}:{{ AAS_BROKER_PORT }}"
+    _additional_tags: [ "aas" ]
 
 - name: "Register AAS database at Consul (discovery server)"
   include_role:
@@ -43,7 +74,4 @@
     _service_port: 27017
     _service_address: aas-database
     _tcp: "aas-database:27017"
-    _additional_tags:
-      - "aas"
-      - "database"
-      - "docker-internal"
+    _additional_tags: [ "aas", "database", "docker-internal" ]

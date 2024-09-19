@@ -14,10 +14,13 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -29,7 +32,10 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -51,12 +57,15 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Testcontainers
 public class CapabilitiesVaultClientTest {
-    @Autowired
-    SingleHostCapabilitiesVaultClient singleHostCapabilitiesVaultClient;
-    @Autowired
-    CapabilitiesVaultClientTestConfig capabilitiesVaultClientTestConfig;
+
+    private final SingleHostCapabilitiesVaultClient singleHostCapabilitiesVaultClient;
+
+    private final CapabilitiesVaultClientTestConfig capabilitiesVaultClientTestConfig;
+
+
+
     @MockBean
-    CapabilityJpaRepository capabilityJpaRepository;
+    private CapabilityJpaRepository capabilityJpaRepository;
 
     @Container
     static GenericContainer<?> vaultDockerContainer = new GenericContainer<>(DockerImageName.parse("vault:"+ ClusterHandlerITConfig.VAULT_VERSION))
@@ -64,18 +73,20 @@ public class CapabilitiesVaultClientTest {
             .withEnv("VAULT_DEV_ROOT_TOKEN_ID", CapabilitiesVaultClientTestConfig.VAULT_TOKEN)
             .waitingFor(new HostPortWaitStrategy());
 
+    @Autowired
+    public CapabilitiesVaultClientTest(SingleHostCapabilitiesVaultClient singleHostCapabilitiesVaultClient, CapabilitiesVaultClientTestConfig capabilitiesVaultClientTestConfig) {
+        this.singleHostCapabilitiesVaultClient = singleHostCapabilitiesVaultClient;
+        this.capabilitiesVaultClientTestConfig = capabilitiesVaultClientTestConfig;
+
+        capabilitiesVaultClientTestConfig.createResourcesSecretEngine();
+        capabilitiesVaultClientTestConfig.createRemoteAccessService();
+    }
+
     @DynamicPropertySource
     static void vaultProperties(DynamicPropertyRegistry registry) {
         registry.add("vault.port", vaultDockerContainer::getFirstMappedPort);
-//        registry.add("vault.host", () -> CapabilitiesVaultClientTestConfig.VAULT_HOST);
         registry.add("vault.token", () -> CapabilitiesVaultClientTestConfig.VAULT_TOKEN);
         registry.add("vault.authentication", () -> "token");
-    }
-
-    @Autowired
-    public void CapabilitiesVaultClientTest() {
-        capabilitiesVaultClientTestConfig.createResourcesSecretEngine();
-        capabilitiesVaultClientTestConfig.createRemoteAccessService();
     }
 
     @Test

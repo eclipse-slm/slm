@@ -24,9 +24,9 @@ import org.eclipse.slm.resource_management.model.actions.AwxAction;
 import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.consul.capability.CapabilityServiceStatus;
 import org.eclipse.slm.resource_management.model.consul.capability.MultiHostCapabilityService;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
@@ -63,7 +63,7 @@ class ClusterDeleteFunctions extends AbstractClusterFunctions implements IAwxJob
                 vaultClient);
     }
 
-    public ClusterJob createClusterJob(KeycloakPrincipal keycloakPrincipal, MultiHostCapabilityService multiHostCapabilityService
+    public ClusterJob createClusterJob(JwtAuthenticationToken jwtAuthenticationToken, MultiHostCapabilityService multiHostCapabilityService
     ) throws SSLException {
         var clusterJob = new ClusterJob(multiHostCapabilityService);
 
@@ -72,13 +72,13 @@ class ClusterDeleteFunctions extends AbstractClusterFunctions implements IAwxJob
 
         Map<String, Object> extraVarsMap = new HashMap<>();
         extraVarsMap.put("resource_id",multiHostCapabilityService.getId().toString());
-        extraVarsMap.put("keycloak_token", keycloakPrincipal.getKeycloakSecurityContext().getTokenString());
+        extraVarsMap.put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
         extraVarsMap.put("service_name", multiHostCapabilityService.getService());
         extraVarsMap.put("supported_connection_types", uninstallAction.getConnectionTypes());
         ExtraVars extraVars = new ExtraVars(extraVarsMap);
 
         var jobId = awxJobExecutor.executeJob(
-                new AwxCredential(keycloakPrincipal),
+                new AwxCredential(jwtAuthenticationToken),
                 uninstallAction.getAwxRepo(),
                 uninstallAction.getAwxBranch(),
                 uninstallAction.getPlaybook(),
@@ -90,14 +90,14 @@ class ClusterDeleteFunctions extends AbstractClusterFunctions implements IAwxJob
         return clusterJob;
     }
 
-    private void delete(KeycloakPrincipal keycloakPrincipal, MultiHostCapabilityService multiHostCapabilityService
+    private void delete(JwtAuthenticationToken jwtAuthenticationToken, MultiHostCapabilityService multiHostCapabilityService
     ) throws SSLException, ConsulLoginFailedException {
         var clusterJob = createClusterJob(
-                keycloakPrincipal,
+                jwtAuthenticationToken,
                 multiHostCapabilityService
         );
 
-        clusterJob.setKeycloakPrincipal(keycloakPrincipal);
+        clusterJob.setJwtAuthenticationToken(jwtAuthenticationToken);
         this.clusterJobMap.put(clusterJob.getAwxJobObserver(), clusterJob);
         multiHostCapabilityService.setStatus(CapabilityServiceStatus.UNINSTALL);
         multiHostCapabilitiesConsulClient.updateMultiHostCapabilityService(
@@ -105,18 +105,18 @@ class ClusterDeleteFunctions extends AbstractClusterFunctions implements IAwxJob
                 multiHostCapabilityService
         );
 
-        this.notificationServiceClient.postJobObserver(keycloakPrincipal, clusterJob.getAwxJobObserver());
+        this.notificationServiceClient.postJobObserver(jwtAuthenticationToken, clusterJob.getAwxJobObserver());
     }
 
-    public void delete(KeycloakPrincipal keycloakPrincipal, UUID consulServiceUuid
+    public void delete(JwtAuthenticationToken jwtAuthenticationToken, UUID consulServiceUuid
     ) throws SSLException, ConsulLoginFailedException {
         Optional<MultiHostCapabilityService> service = multiHostCapabilitiesConsulClient.getMultiHostCapabilityServiceOfUser(
-                new ConsulCredential(keycloakPrincipal),
+                new ConsulCredential(jwtAuthenticationToken),
                 consulServiceUuid
         );
 
         if(service.isPresent()) {
-            this.delete(keycloakPrincipal, service.get());
+            this.delete(jwtAuthenticationToken, service.get());
         }
     }
 
@@ -129,7 +129,7 @@ class ClusterDeleteFunctions extends AbstractClusterFunctions implements IAwxJob
         var jobGoal = sender.jobGoal;
         var jobTarget = sender.jobTarget;
         var clusterJob = this.clusterJobMap.get(sender);
-        var keycloakPrincipal = clusterJob.getKeycloakPrincipal();
+        var jwtAuthenticationToken = clusterJob.getJwtAuthenticationToken();
         var multiHostCapabilityService = clusterJob.getMultiHostCapabilityService();
 
         if(!finalState.equals(JobFinalState.SUCCESSFUL)) {
@@ -140,8 +140,8 @@ class ClusterDeleteFunctions extends AbstractClusterFunctions implements IAwxJob
 
         if (jobGoal.equals(JobGoal.DELETE)) {
             // Delete Keycloak role
-            this.keycloakUtil.deleteRealmRole(keycloakPrincipal, multiHostCapabilityService.getService());
-            this.keycloakUtil.deleteRealmRole(keycloakPrincipal, "resource_" + multiHostCapabilityService.getId());
+            this.keycloakUtil.deleteRealmRole(jwtAuthenticationToken, multiHostCapabilityService.getService());
+            this.keycloakUtil.deleteRealmRole(jwtAuthenticationToken, "resource_" + multiHostCapabilityService.getId());
 
             // Remove read access for secret of awx policy
             String resourceId = multiHostCapabilityService.getId().toString();
@@ -182,7 +182,7 @@ class ClusterDeleteFunctions extends AbstractClusterFunctions implements IAwxJob
             }
 
             this.notificationServiceClient.postNotification(
-                    clusterJob.getKeycloakPrincipal(),
+                    clusterJob.getJwtAuthenticationToken(),
                     Category.Resources,
                     jobTarget,
                     jobGoal

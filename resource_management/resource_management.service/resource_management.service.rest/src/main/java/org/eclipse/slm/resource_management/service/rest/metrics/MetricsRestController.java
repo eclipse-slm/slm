@@ -1,14 +1,11 @@
 package org.eclipse.slm.resource_management.service.rest.metrics;
 
-import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
-import org.eclipse.basyx.aas.registration.api.IAASRegistry;
-import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
-import org.eclipse.basyx.submodel.metamodel.api.identifier.IdentifierType;
-import org.eclipse.basyx.submodel.metamodel.map.identifier.Identifier;
-import org.eclipse.basyx.vab.exception.provider.ProviderException;
+import org.eclipse.slm.common.aas.clients.AasRegistryClient;
+import org.eclipse.slm.common.aas.clients.AasRepositoryClient;
+import org.eclipse.slm.common.aas.clients.SubmodelRegistryClient;
+import org.eclipse.slm.common.aas.clients.SubmodelServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,14 +21,15 @@ import java.util.UUID;
 public class MetricsRestController {
 
     private final Logger LOG = LoggerFactory.getLogger(MetricsRestController.class);
-    private final IAASRegistry registry;
-    private final ConnectedAssetAdministrationShellManager manager;
+    private final AasRegistryClient registry;
+    private final AasRepositoryClient aasRepositoryClient;
 
-    MetricsRestController(
-            @Value("${basyx.aas-registry.url}") String aasRegistryUrl
-    ) {
-        this.registry = new AASRegistryProxy(aasRegistryUrl);
-        this.manager = new ConnectedAssetAdministrationShellManager(registry);
+    private final SubmodelRegistryClient submodelRegistryClient;
+
+    public MetricsRestController(AasRegistryClient registry, AasRepositoryClient aasRepositoryClient, SubmodelRegistryClient submodelRegistryClient) {
+        this.registry = registry;
+        this.aasRepositoryClient = aasRepositoryClient;
+        this.submodelRegistryClient = submodelRegistryClient;
     }
 
     @RequestMapping(value = "/{resourceId}", method = RequestMethod.GET)
@@ -40,14 +38,30 @@ public class MetricsRestController {
     ) {
         Map<String, Object> monitoringValues = new HashMap<>();
         try {
-            var resourceAASDescriptor = registry.lookupAAS(new Identifier(IdentifierType.CUSTOM, resourceId.toString()));
-            var monitoringSubmodelDescriptor = resourceAASDescriptor.getSubmodelDescriptorFromIdShort("PlatformResources");
-            var monitoringSubmodel = manager.retrieveSubmodel(resourceAASDescriptor.getIdentifier(), monitoringSubmodelDescriptor.getIdentifier());
-            monitoringValues = monitoringSubmodel.getValues();
-        } catch (ProviderException e) {
-            LOG.info("Monitoring for resource with id '" + resourceId + "' not available (no AAS found)");
+            var submodelId = "PlatformResources-" + resourceId;
+            var platformResourcesSubmodelDescriptorOptional = submodelRegistryClient.findSubmodelDescriptor(submodelId);
+
+            if (platformResourcesSubmodelDescriptorOptional.isPresent()) {
+                var endpoints = platformResourcesSubmodelDescriptorOptional.get().getEndpoints();
+                if (endpoints.size() > 0) {
+                    var submodelEndpoint = endpoints.get(0);
+                    var submodelServiceEndpointUrl = submodelEndpoint.getProtocolInformation().getHref();
+                    var submodelServiceClient = new SubmodelServiceClient(submodelServiceEndpointUrl);
+                    var submodelValues = submodelServiceClient.getSubmodelValues();
+
+                    return ResponseEntity.ok(submodelValues);
+                }
+            }
         } catch (NullPointerException e) {
             LOG.info("Monitoring for resource with id '" + resourceId + "' not available (submodel not found)");
+        } catch (org.eclipse.digitaltwin.basyx.client.internal.ApiException e) {
+            if (e.getMessage().equals("java.net.ConnectException")) {
+                LOG.warn("Monitoring for resource with id '" + resourceId + "' not available (submodel not accessible)");
+                return ResponseEntity.ok(monitoringValues);
+            }
+            else {
+                LOG.error(e.getMessage());
+            }
         }
 
         return ResponseEntity.ok(monitoringValues);

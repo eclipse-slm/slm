@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse.slm</groupId>
     <artifactId>service_management.service.client</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
@@ -16,12 +15,6 @@
     </parent>
 
     <dependencies>
-        <!-- Swagger !-->
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
-            <version>${swagger.version}</version>
-        </dependency>
         <!-- Jersey HTTP Client !-->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
@@ -74,7 +67,6 @@
         <dependency>
             <groupId>com.brsanthu</groupId>
             <artifactId>migbase64</artifactId>
-            <version>${migbase.version}</version>
         </dependency>
         <!-- Others !-->
         <dependency>
@@ -124,6 +116,7 @@
                             <inputSpec>${project.basedir}/src/main/resources/api-docs.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <configOptions>
+                                <useJakartaEe>true</useJakartaEe>
                                 <sourceFolder>src/gen/java/main</sourceFolder>
                                 <dateLibrary>joda</dateLibrary>
                                 <hideGenerationTimestamp>true</hideGenerationTimestamp>

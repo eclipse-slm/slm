@@ -10,13 +10,14 @@ import org.eclipse.slm.resource_management.model.actions.AwxAction;
 import org.eclipse.slm.resource_management.model.actions.Action;
 import org.eclipse.slm.resource_management.model.actions.ActionType;
 import org.eclipse.slm.resource_management.model.resource.ConnectionType;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,7 +34,7 @@ public class ResourcesManagerITDevConfig {
     public static DeploymentCapability dockerDeploymentCapability = new DeploymentCapability();
     public static AccessToken accessToken = new AccessToken();
     public static String keycloakSubject = "9141256b-3094-47f1-b1f6-11016c59cd2b";
-    public static KeycloakPrincipal keycloakPrincipal;
+    public static JwtAuthenticationToken jwtAuthenticationToken;
 
     static {
         //region docker compose
@@ -111,7 +112,8 @@ public class ResourcesManagerITDevConfig {
 
         //region Keycloak
         accessToken.setSubject(keycloakSubject);
-        keycloakPrincipal = new KeycloakPrincipal<>("testUser", new KeycloakSecurityContext("",accessToken, "", null));
+        var jwt = new Jwt(accessToken.toString(), null, null, new HashMap<>(), new HashMap<>());
+        jwtAuthenticationToken = new JwtAuthenticationToken(jwt, new ArrayList<>(), "testUser");
         //endregion
     }
 

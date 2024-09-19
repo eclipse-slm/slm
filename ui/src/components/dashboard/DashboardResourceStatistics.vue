@@ -19,14 +19,14 @@
       </v-container>
     </template>
     <no-item-available-note
-      v-if="!resourceAAS.length"
+      v-if="!resourceStore.resourceAASs.length"
       item="Device statistics"
     />
     <aas-circular-chart
       v-else
       chart-type="Doughnut"
       :show-unknown="true"
-      :aas="resourceAAS"
+      :aas="resourceStore.resourceAASs"
       submodel-id-short="operating_system"
       :submodel-element-keys="['system', 'distribution', 'distribution_major_version']"
     />
@@ -45,11 +45,6 @@ export default {
     setup(){
       const resourceStore = useResourcesStore();
       return {resourceStore}
-    },
-    computed: {
-      resourceAAS() {
-        return this.resourceStore.resourceAAS
-      },
     },
     mounted () {
       this.resourceStore.getResourceAASFromBackend();

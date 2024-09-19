@@ -1,7 +1,7 @@
 package org.eclipse.slm.resource_management.service.rest.capabilities;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.keycloak.WithMockKeycloakAuth;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import org.eclipse.slm.resource_management.service.rest.Application;
 import org.eclipse.slm.resource_management.service.rest.resources.ResourcesManager;
 import org.assertj.core.api.Assertions;
@@ -48,7 +48,7 @@ public class CapabilityRestControllerIT {
     @Order(10)
     @DisplayName("Pretests")
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-    @WithMockKeycloakAuth(
+    @WithMockJwtAuth(
             claims = @OpenIdClaims(
                     iss = "https://localhost/auth/realms/vfk",
                     preferredUsername = "testUser123"
@@ -66,7 +66,7 @@ public class CapabilityRestControllerIT {
     @Order(20)
     @DisplayName("CapabilitiesRestController - IT")
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-    @WithMockKeycloakAuth(
+    @WithMockJwtAuth(
             claims = @OpenIdClaims(
                     iss = "https://localhost/auth/realms/vfk",
                     preferredUsername = "testUser123"

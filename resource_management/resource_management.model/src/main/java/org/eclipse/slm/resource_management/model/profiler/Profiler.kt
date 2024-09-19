@@ -1,11 +1,12 @@
 package org.eclipse.slm.resource_management.model.profiler
 
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
 import org.eclipse.slm.resource_management.model.actions.Action
-import org.hibernate.annotations.Type
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
 
 @Entity
 class Profiler(id: UUID? = null) {
@@ -13,7 +14,6 @@ class Profiler(id: UUID? = null) {
     constructor() : this(UUID.randomUUID()) {}
 
     @Id
-    @Type(type="uuid-char")
     @Column(name = "uuid", length = 36, unique = true, nullable = false)
     var id: UUID = id ?: UUID.randomUUID()
 
@@ -21,7 +21,7 @@ class Profiler(id: UUID? = null) {
     var name: String = ""
 
     @Column(name = "action", columnDefinition = "LONGTEXT")
-    @Type(type = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
     var action: Action? = null
 
     override fun equals(other: Any?): Boolean {

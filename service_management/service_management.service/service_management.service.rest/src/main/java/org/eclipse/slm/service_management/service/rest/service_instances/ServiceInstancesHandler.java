@@ -25,13 +25,11 @@ import org.eclipse.slm.service_management.model.services.exceptions.ServiceInsta
 import org.eclipse.slm.service_management.model.services.exceptions.ServiceInstanceUpdateException;
 import org.eclipse.slm.service_management.persistence.api.ServiceInstanceGroupJpaRepository;
 import org.eclipse.slm.service_management.persistence.api.ServiceOrderJpaRepository;
-import org.eclipse.slm.service_management.service.rest.service_instances.AvailableServiceInstanceVersionChange;
-import org.eclipse.slm.service_management.service.rest.service_instances.AvailableServiceInstanceVersionChangeType;
 import org.eclipse.slm.service_management.service.rest.service_offerings.ServiceOfferingHandler;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -77,9 +75,9 @@ public class ServiceInstancesHandler {
         this.objectMapper = objectMapper;
     }
 
-    public List<ServiceInstance> getServiceInstancesOfUser(KeycloakPrincipal keycloakPrincipal) throws ConsulLoginFailedException {
+    public List<ServiceInstance> getServiceInstancesOfUser(JwtAuthenticationToken jwtAuthenticationToken) throws ConsulLoginFailedException {
         Map<String,List<String>> allCatalogServicesOfUser = this.consulServicesApiClient.getServices(
-                new ConsulCredential(keycloakPrincipal)
+                new ConsulCredential(jwtAuthenticationToken)
         );
 
         var deployedServicesOfUser = allCatalogServicesOfUser.entrySet().stream()
@@ -87,7 +85,7 @@ public class ServiceInstancesHandler {
                 .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
 
         var deployedServicesWithDetails = this.consulServicesApiClient
-                .getServicesByName(new ConsulCredential(keycloakPrincipal), deployedServicesOfUser.keySet());
+                .getServicesByName(new ConsulCredential(jwtAuthenticationToken), deployedServicesOfUser.keySet());
         var serviceInstances = new ArrayList<ServiceInstance>();
         for (var consulService : deployedServicesWithDetails.values())
         {
@@ -100,11 +98,11 @@ public class ServiceInstancesHandler {
         return serviceInstances;
     }
 
-    public ServiceInstance getServiceInstanceOfUser(UUID serviceInstanceId, KeycloakPrincipal keycloakPrincipal)
+    public ServiceInstance getServiceInstanceOfUser(UUID serviceInstanceId, JwtAuthenticationToken jwtAuthenticationToken)
             throws ConsulLoginFailedException, ServiceInstanceNotFoundException {
 
         var consulCatalogServiceOptional = this.consulServicesApiClient.getServiceById(
-                new ConsulCredential(keycloakPrincipal), serviceInstanceId
+                new ConsulCredential(jwtAuthenticationToken), serviceInstanceId
         );
 
         if (consulCatalogServiceOptional.isPresent()) {
@@ -116,15 +114,15 @@ public class ServiceInstancesHandler {
         }
     }
 
-    public void deleteServiceInstanceOfUser(UUID serviceInstanceId, KeycloakPrincipal keycloakPrincipal)
+    public void deleteServiceInstanceOfUser(UUID serviceInstanceId, JwtAuthenticationToken jwtAuthenticationToken)
             throws ConsulLoginFailedException, ServiceInstanceNotFoundException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, SSLException, ApiException, CapabilityServiceNotFoundException {
 
         var optionalConsulService = this.consulServicesApiClient
-                .getServiceByName(new ConsulCredential(keycloakPrincipal), "service_" + serviceInstanceId);
+                .getServiceByName(new ConsulCredential(jwtAuthenticationToken), "service_" + serviceInstanceId);
 
         if (optionalConsulService.isPresent()) {
             if (!optionalConsulService.get().isEmpty()) {
-                this.serviceUndeploymentHandler.deleteService(keycloakPrincipal, optionalConsulService.get());
+                this.serviceUndeploymentHandler.deleteService(jwtAuthenticationToken, optionalConsulService.get());
             }
             else {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Service instance '" + serviceInstanceId + "' known, but not sub-services registered");
@@ -135,10 +133,12 @@ public class ServiceInstancesHandler {
         }
     }
 
-    public List<AvailableServiceInstanceVersionChange> getAvailableVersionChangesForServiceInstance(UUID serviceInstanceId, KeycloakPrincipal keycloakPrincipal)
+    public List<AvailableServiceInstanceVersionChange> getAvailableVersionChangesForServiceInstance(
+            UUID serviceInstanceId,
+            JwtAuthenticationToken jwtAuthenticationToken)
             throws ConsulLoginFailedException, ServiceInstanceNotFoundException,
             ServiceOfferingNotFoundException {
-        var serviceInstance = this.getServiceInstanceOfUser(serviceInstanceId, keycloakPrincipal);
+        var serviceInstance = this.getServiceInstanceOfUser(serviceInstanceId, jwtAuthenticationToken);
         var serviceOffering = serviceOfferingHandler.getServiceOfferingById(serviceInstance.getServiceOfferingId());
 
         Optional<ServiceOfferingVersion> currentServiceOfferingVersionOptional;
@@ -171,15 +171,16 @@ public class ServiceInstancesHandler {
         return availableServiceInstanceVersionChanges;
     }
 
-    public void updateServiceInstanceToVersion(UUID serviceInstanceId, UUID targetServiceOfferingVersionId, KeycloakPrincipal keycloakPrincipal)
+    public void updateServiceInstanceToVersion(UUID serviceInstanceId, UUID targetServiceOfferingVersionId,
+                                               JwtAuthenticationToken jwtAuthenticationToken)
             throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException, ServiceInstanceUpdateException, SSLException, JsonProcessingException, ServiceOptionNotFoundException, ApiException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException {
-        var serviceInstance = this.getServiceInstanceOfUser(serviceInstanceId, keycloakPrincipal);
+        var serviceInstance = this.getServiceInstanceOfUser(serviceInstanceId, jwtAuthenticationToken);
         var serviceOffering = serviceOfferingHandler.getServiceOfferingById(serviceInstance.getServiceOfferingId());
 
         Optional<ServiceOfferingVersion> currentServiceOfferingVersionOptional;
         if ((currentServiceOfferingVersionOptional
                 = serviceOffering.hasVersionWithId(targetServiceOfferingVersionId)).isPresent()) {
-            serviceUpdateHandler.updateServiceInstance(keycloakPrincipal, serviceInstance, currentServiceOfferingVersionOptional.get());
+            serviceUpdateHandler.updateServiceInstance(jwtAuthenticationToken, serviceInstance, currentServiceOfferingVersionOptional.get());
         }
         else {
             throw new ServiceInstanceUpdateException("Service offering '" + serviceOffering.getId() +"' has no version " +
@@ -201,10 +202,10 @@ public class ServiceInstancesHandler {
         return orders;
     }
 
-    public ServiceInstanceDetails getServiceInstanceDetails(KeycloakPrincipal keycloakPrincipal, UUID serviceInstanceId)
+    public ServiceInstanceDetails getServiceInstanceDetails(JwtAuthenticationToken jwtAuthenticationToken, UUID serviceInstanceId)
             throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException {
 
-        var serviceInstance = this.getServiceInstanceOfUser(serviceInstanceId, keycloakPrincipal);
+        var serviceInstance = this.getServiceInstanceOfUser(serviceInstanceId, jwtAuthenticationToken);
         var orders = this.getOrdersOfServiceInstance(serviceInstanceId);
         orders = orders.stream()
                 .sorted(Comparator.comparing(ServiceOrder::getCreated))
@@ -241,9 +242,9 @@ public class ServiceInstancesHandler {
         return details;
     }
 
-    public void setGroupsForServiceInstance(KeycloakPrincipal keycloakPrincipal, List<UUID> groupIds, UUID serviceInstanceId)
+    public void setGroupsForServiceInstance(JwtAuthenticationToken jwtAuthenticationToken, List<UUID> groupIds, UUID serviceInstanceId)
             throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceInstanceGroupNotFoundException {
-        var serviceInstance = this.getServiceInstanceOfUser(serviceInstanceId, keycloakPrincipal);
+        var serviceInstance = this.getServiceInstanceOfUser(serviceInstanceId, jwtAuthenticationToken);
 
         for (var groupId : groupIds) {
             var optionalGroup = serviceInstanceGroupJpaRepository.findById(groupId);

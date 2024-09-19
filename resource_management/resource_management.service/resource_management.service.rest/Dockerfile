@@ -6,8 +6,7 @@ ENV CONSUL_SCHEME="http" \
     CONSUL_PORT=8500 \
     CONSUL_DATACENTER="fabos" \
     CONSUL_ACLTOKEN="password" \
-    BASYX_AASREGISTRY_PATH="http://aas-registry:4000" \
-    BASYX_AASSERVER_PATH="http://aas-server:4001"
+    AAS_BROKER="aas-broker"
 
 RUN apt update && \
     apt install -y curl jq

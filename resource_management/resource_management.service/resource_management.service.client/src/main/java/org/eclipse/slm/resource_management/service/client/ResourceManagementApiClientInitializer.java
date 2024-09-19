@@ -5,12 +5,12 @@ import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.service.client.handler.ApiClient;
 import org.eclipse.slm.resource_management.service.client.handler.auth.Authentication;
 import org.eclipse.slm.resource_management.service.client.handler.auth.HttpBearerAuth;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
@@ -50,8 +50,8 @@ public class ResourceManagementApiClientInitializer {
         return apiClient;
     }
 
-    public ApiClient init(KeycloakPrincipal keycloakPrincipal) throws SSLException {
-        var accessToken = KeycloakTokenUtil.getToken(keycloakPrincipal);
+    public ApiClient init(JwtAuthenticationToken jwtAuthenticationToken) throws SSLException {
+        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
 
         return init(accessToken);
     }

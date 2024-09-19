@@ -5,7 +5,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@SpringBootApplication(scanBasePackages = { "org.eclipse.slm.notification_service", "org.eclipse.slm.notification_service.communication.websocket", "org.eclipse.slm.common" })
+@SpringBootApplication(scanBasePackages = {
+        "org.eclipse.slm.notification_service",
+        "org.eclipse.slm.notification_service.communication.websocket",
+        "org.eclipse.slm.common.parent.service_rest",
+        "org.eclipse.slm.common.awx.client",
+        "org.eclipse.slm.common.keycloak"
+    }
+)
 @EntityScan(basePackages = { "org.eclipse.slm.notification_service.model" })
 @EnableJpaRepositories(basePackages = "org.eclipse.slm.notification_service.persistence")
 public class Application {

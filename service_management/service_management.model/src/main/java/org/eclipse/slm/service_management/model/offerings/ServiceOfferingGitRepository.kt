@@ -1,9 +1,12 @@
 package org.eclipse.slm.service_management.model.offerings
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.OneToOne
+import jakarta.persistence.Table
 import org.eclipse.slm.service_management.model.AbstractBaseEntityUuid
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Table(name = "service_offering_git_repo")

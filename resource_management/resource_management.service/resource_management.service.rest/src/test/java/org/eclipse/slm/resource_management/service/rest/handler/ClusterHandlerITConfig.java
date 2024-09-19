@@ -168,7 +168,7 @@ public class ClusterHandlerITConfig {
             String keycloakAuthServerUrl
     ) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        File keycloakClientConfigFile = new File("src/test/resources/keycloak/fabos-keycloak.json");
+        File keycloakClientConfigFile = new File("src/test/resources/keycloak/fabos-test-keycloak.json");
 
         JsonNode keycloakClientConfig = objectMapper.readTree(keycloakClientConfigFile);
         ((ObjectNode) keycloakClientConfig).put("auth-server-url", keycloakAuthServerUrl);

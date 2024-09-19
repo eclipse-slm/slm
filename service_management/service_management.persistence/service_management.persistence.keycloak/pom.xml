@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse.slm</groupId>
     <artifactId>service_management.persistence.keycloak</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
@@ -18,11 +17,6 @@
     <dependencies>
         <!-- Keycloak !-->
         <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-spring-security-adapter</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
             <artifactId>keycloak-admin-client</artifactId>
             <groupId>org.keycloak</groupId>
             <version>${keycloak.version}</version>
@@ -31,25 +25,24 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <version>${testcontainers.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${testcontainers.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>mariadb</artifactId>
-            <version>${testcontainers.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>${mariadb.client.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.c4-soft.springaddons</groupId>
+            <artifactId>spring-addons-oauth2-test</artifactId>
+            <version>${springaddons-c4-soft.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- Shared Modules !-->

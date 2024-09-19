@@ -14,9 +14,9 @@ class SubmodelsApi {
       .catch(logRequestError)
   }
 
-  async deleteSubmodel(resourceId, submodelIdShort) {
+  async deleteSubmodel(resourceId, submodelId) {
     return axios
-      .delete(this.API_URL + `/${resourceId}/submodels/${submodelIdShort}`, {})
+      .delete(this.API_URL + `/${resourceId}/submodels/${submodelId}`, {})
       .then(response => {
         return response.data
       })

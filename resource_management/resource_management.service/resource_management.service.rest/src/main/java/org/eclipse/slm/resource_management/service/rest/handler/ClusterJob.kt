@@ -4,7 +4,7 @@ import org.eclipse.slm.common.awx.client.observer.AwxJobObserver
 import org.eclipse.slm.resource_management.model.cluster.ClusterCreateRequest
 import org.eclipse.slm.resource_management.model.consul.capability.MultiHostCapabilityService
 import org.eclipse.slm.resource_management.model.consul.capability.ScaleOperation
-import org.keycloak.KeycloakPrincipal
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 
 class ClusterJob(
     var multiHostCapabilityService: MultiHostCapabilityService,
@@ -13,7 +13,7 @@ class ClusterJob(
 
     var scaleOperation: ScaleOperation? = null
 
-    var keycloakPrincipal: KeycloakPrincipal<*>? = null
+    var jwtAuthenticationToken: JwtAuthenticationToken? = null
 
     var clusterCreateRequest: ClusterCreateRequest? = null
 
@@ -21,12 +21,12 @@ class ClusterJob(
         multiHostCapabilityService: MultiHostCapabilityService,
         awxJobObserver: AwxJobObserver,
         scaleOperation: ScaleOperation?,
-        keycloakPrincipal: KeycloakPrincipal<*>,
+        jwtAuthenticationToken: JwtAuthenticationToken,
         clusterCreateRequest: ClusterCreateRequest
     ) : this(multiHostCapabilityService) {
         this.awxJobObserver = awxJobObserver
         this.scaleOperation = scaleOperation
-        this.keycloakPrincipal = keycloakPrincipal
+        this.jwtAuthenticationToken = jwtAuthenticationToken
         this.clusterCreateRequest = clusterCreateRequest
     }
 }

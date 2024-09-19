@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse.slm</groupId>
     <artifactId>common.utils.keycloak</artifactId>
     <version>${revision}</version>
 
@@ -20,12 +19,20 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
-        <!-- Keycloak !-->
         <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-spring-security-adapter</artifactId>
-            <version>${keycloak.version}</version>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-resource-server</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
+        <!-- Logging !-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <!-- Keycloak !-->
         <dependency>
             <artifactId>keycloak-admin-client</artifactId>
             <groupId>org.keycloak</groupId>

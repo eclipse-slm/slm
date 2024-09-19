@@ -12,7 +12,7 @@
         >
           {{ title }}
         </v-toolbar>
-        <v-card-text>
+        <v-card-text class="my-4">
           {{ text }}
         </v-card-text>
         <v-card-actions class="justify-center">

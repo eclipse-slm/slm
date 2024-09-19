@@ -16,7 +16,7 @@ import org.eclipse.slm.resource_management.model.capabilities.provider.ServiceHo
 import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
 import org.eclipse.slm.resource_management.service.client.handler.*;
 import org.eclipse.slm.service_management.service.rest.service_instances.ServiceInstancesConsulClient;
-import org.keycloak.KeycloakPrincipal;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import javax.net.ssl.SSLException;
 import java.util.UUID;
@@ -57,14 +57,14 @@ public class AbstractServiceDeploymentHandler {
     }
 
     protected AwxJobObserver runAwxCapabilityAction(AwxAction awxCapabilityAction,
-                                                    KeycloakPrincipal keycloakPrincipal,
+                                                    JwtAuthenticationToken jwtAuthenticationToken,
                                                     ExtraVars extraVars,
                                                     JobGoal jobGoal,
                                                     IAwxJobObserverListener listner)
             throws SSLException {
         var jobTarget = JobTarget.SERVICE;
         var awxJobId = awxJobExecutor.executeJob(
-                new AwxCredential(keycloakPrincipal),
+                new AwxCredential(jwtAuthenticationToken),
                 awxCapabilityAction.getAwxRepo(), awxCapabilityAction.getAwxBranch(), awxCapabilityAction.getPlaybook(),
                 extraVars);
         var awxJobObserver = awxJobObserverInitializer.init(awxJobId, jobTarget, jobGoal, listner);
@@ -73,9 +73,9 @@ public class AbstractServiceDeploymentHandler {
     }
 
     protected ServiceHoster getServiceHoster(
-            KeycloakPrincipal keycloakPrincipal, UUID deploymentCapabilityServiceId)
+            JwtAuthenticationToken jwtAuthenticationToken, UUID deploymentCapabilityServiceId)
             throws SSLException, ApiException, CapabilityServiceNotFoundException, ApiException {
-        var resourceManagementApiClient = resourceManagementApiClientInitializer.init(keycloakPrincipal);
+        var resourceManagementApiClient = resourceManagementApiClientInitializer.init(jwtAuthenticationToken);
         var capabilityProvidersRestControllerApi = new CapabilityProvidersRestControllerApi(resourceManagementApiClient);
 
         var serviceHosterFilter = new ServiceHosterFilter.Builder()

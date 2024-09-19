@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
@@ -214,7 +214,9 @@ public class ResourcesRestControllerIT {
             .andReturn().getResponse().getContentAsString();
 
             var objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new KotlinModule());
+            KotlinModule kotlinModule = new KotlinModule.Builder()
+                    .build();
+            objectMapper.registerModule(kotlinModule);
             var resources = objectMapper.readValue(responseContent, new TypeReference<List<BasicResource>>(){});
 
             assertEquals(resources.size(), 1);
@@ -277,7 +279,9 @@ public class ResourcesRestControllerIT {
 
             assertTrue(responseContent.length() > 5);
             var objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new KotlinModule());
+            KotlinModule kotlinModule = new KotlinModule.Builder()
+                    .build();
+            objectMapper.registerModule(kotlinModule);
             var resources = objectMapper.readValue(responseContent, new TypeReference<List<BasicResource>>(){});
 
             assertEquals(resources.size(), 1);

@@ -20,13 +20,13 @@ import org.eclipse.slm.resource_management.persistence.api.CapabilityJpaReposito
 import org.eclipse.slm.resource_management.service.rest.handler.ClusterHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.commons.lang3.NotImplementedException;
-import org.keycloak.KeycloakPrincipal;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import javax.net.ssl.SSLException;
@@ -91,15 +91,15 @@ public class ClustersRestController {
     @Operation(summary = "Get all cluster resources of user")
     public @ResponseBody
     List<Cluster> getClusterResources() throws NotImplementedException {
-        var keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return clusterHandler.getClusters(new ConsulCredential(keycloakPrincipal));
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        return clusterHandler.getClusters(new ConsulCredential(jwtAuthenticationToken));
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     @Operation(summary = "Create a cluster")
     public void createClusterResource(@RequestBody ClusterCreateRequest clusterCreateRequest)
             throws SSLException, ConsulLoginFailedException {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         Optional<Capability> clusterCapability = capabilityJpaRepository.findById(clusterCreateRequest.getClusterTypeId());
 
@@ -113,7 +113,7 @@ public class ClustersRestController {
 
             clusterHandler.create(
                     multiHostCapabilityService,
-                    keycloakPrincipal,
+                    jwtAuthenticationToken,
                     clusterCreateRequest
             );
         }
@@ -124,8 +124,9 @@ public class ClustersRestController {
     public void deleteClusterResource(
             @PathVariable(name = "clusterUuid") UUID consulServiceUuid
     ) throws SSLException, ConsulLoginFailedException {
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         clusterHandler.delete(
-                (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
+                jwtAuthenticationToken,
                 consulServiceUuid
         );
     }
@@ -136,8 +137,8 @@ public class ClustersRestController {
     public List<CatalogService> getClusterMembers(
             @PathVariable(name = "clusterName") String clusterName
     ) throws ConsulLoginFailedException {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var clusterNodes = this.clusterHandler.getClusterMembers(new ConsulCredential(keycloakPrincipal), clusterName);
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        var clusterNodes = this.clusterHandler.getClusterMembers(new ConsulCredential(jwtAuthenticationToken), clusterName);
 
         return clusterNodes;
     }
@@ -148,8 +149,9 @@ public class ClustersRestController {
             @PathVariable(name = "clusterUuid") UUID consulServiceUuid,
             @RequestParam(name = "resourceId") UUID resourceId
     ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException {
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         clusterHandler.scaleUp(
-                (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
+                jwtAuthenticationToken,
                 consulServiceUuid,
                 resourceId
         );
@@ -162,8 +164,9 @@ public class ClustersRestController {
             @PathVariable(name = "clusterUuid") UUID consulServiceUuid,
             @RequestParam(name = "resourceId") UUID resourceId
     ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException {
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         clusterHandler.scaleDown(
-                (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
+                jwtAuthenticationToken,
                 consulServiceUuid,
                 resourceId
         );

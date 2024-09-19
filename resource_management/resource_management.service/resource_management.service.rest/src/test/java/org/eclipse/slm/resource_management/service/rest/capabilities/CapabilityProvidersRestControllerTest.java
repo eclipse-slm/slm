@@ -1,8 +1,8 @@
 package org.eclipse.slm.resource_management.service.rest.capabilities;
 
-import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.keycloak.WithMockKeycloakAuth;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockAuthentication;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
+import org.eclipse.slm.resource_management.persistence.api.CapabilityJpaRepository;
 import org.eclipse.slm.resource_management.service.rest.handler.provider.ServiceHosterHandler;
 import org.eclipse.slm.resource_management.service.rest.handler.provider.VirtualResourceProviderHandler;
 import org.eclipse.slm.resource_management.model.capabilities.CapabilityType;
@@ -14,27 +14,18 @@ import org.eclipse.slm.resource_management.model.cluster.ClusterMemberType;
 import org.eclipse.slm.resource_management.model.consul.capability.CapabilityServiceStatus;
 import org.eclipse.slm.resource_management.model.consul.capability.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.model.consul.capability.SingleHostCapabilityService;
-import org.eclipse.slm.resource_management.service.rest.Application;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.web.context.WebApplicationContext;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.utility.DockerImageName;
 
 import java.util.*;
 
@@ -43,75 +34,47 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-@ActiveProfiles("test")
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-        Application.class,
-        CapabilityProvidersRestController.class
-},
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+
+@WebMvcTest(CapabilityProvidersRestController.class)
+@ContextConfiguration(
+    classes = {
+            CapabilityProvidersRestController.class
+    }
 )
 @AutoConfigureMockMvc
-@ComponentScan(basePackages = {
-        "org.eclipse.slm.common.keycloak.config"
-})
+@WithMockJwtAuth
+@ActiveProfiles("test")
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class CapabilityProvidersRestControllerTest {
-    //region Variables
-    public final static String BASE_PATH = "/resources/providers";
-    public static String BASE_URL = "";
-    @Autowired
-    private static MockMvc mockMvc;
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-    @Autowired
-    CapabilityProvidersRestController capabilityProvidersRestController;
-    @MockBean
-    VirtualResourceProviderHandler virtualResourceProviderHandler;
-    @MockBean
-    ServiceHosterHandler serviceHosterHandler;
 
-    public final static GenericContainer<?> consulDockerContainer;
+    public final static String BASE_PATH = "/resources/providers";
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private CapabilityProvidersRestController capabilityProvidersRestController;
+
+    @MockBean
+    private VirtualResourceProviderHandler virtualResourceProviderHandler;
+
+    @MockBean
+    private CapabilityJpaRepository capabilityJpaRepository;
+
+    @MockBean
+    private ServiceHosterHandler serviceHosterHandler;
+
     private static int CONSUL_PORT = 8500;
 
-    @DynamicPropertySource
-    static void consulProperties(DynamicPropertyRegistry registry){
-        registry.add("consul.port", consulDockerContainer::getFirstMappedPort);
-    }
-    //endregion
-
-    static {
-        consulDockerContainer = new GenericContainer<>(DockerImageName.parse("consul:1.14"))
-                .withExposedPorts(CONSUL_PORT)
-                .withEnv("CONSUL_LOCAL_CONFIG", "{\"datacenter\": \"fabos\", \"domain\": \".fabos\", \"bind_addr\": \"0.0.0.0\", \"retry_join\": [\"0.0.0.0\"], \"acl\":{\"enabled\": true, \"default_policy\": \"allow\", \"tokens\":{\"master\": \"myroot\"}}}");
-        consulDockerContainer.start();
-    }
-
-    @AfterAll
-    public static void afterAll(){
-        consulDockerContainer.stop();
-    }
-
-    @BeforeAll
-    public static void beforeAll(@Value("${local.server.port:80}") int port) {
-        BASE_URL = "http://localhost:" + port + BASE_PATH;
-    }
-
-    @BeforeEach
-    public void beforeEach() throws JsonProcessingException {
-        mockMvc = webAppContextSetup(webApplicationContext).build();
-    }
+//    @Container
+//    private final GenericContainer<?> consulDockerContainer = new GenericContainer<>(DockerImageName.parse("consul:1.14"))
+//            .withExposedPorts(CONSUL_PORT)
+//            .withEnv("CONSUL_LOCAL_CONFIG", "{\"datacenter\": \"fabos\", \"domain\": \".fabos\", \"bind_addr\": \"0.0.0.0\", \"retry_join\": [\"0.0.0.0\"], \"acl\":{\"enabled\": true, \"default_policy\": \"allow\", \"tokens\":{\"master\": \"myroot\"}}}");
 
     @Nested
     @Order(10)
     @DisplayName("Pretests")
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-    @WithMockKeycloakAuth(
-        claims = @OpenIdClaims(
-            iss = "https://localhost/auth/realms/vfk",
-            preferredUsername = "testUser123"
-    ))
     public class doPreTests {
         @Test
         @Order(10)
@@ -125,22 +88,17 @@ public class CapabilityProvidersRestControllerTest {
     @Order(20)
     @DisplayName("VirtualResourceProvider")
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-    @WithMockKeycloakAuth(
-        claims = @OpenIdClaims(
-                iss = "https://localhost/auth/realms/vfk",
-                preferredUsername = "testUser123"
-    ))
     public class virtualResourceProviderEndpointTests {
         private final static String BASE_URL_EXT = "/virtual-resource-provider";
 
-        private static String BASE_URL_TEST = BASE_URL + BASE_URL_EXT;
+        private static String BASE_URL_TEST = BASE_PATH + BASE_URL_EXT;
 
         private static List<VirtualResourceProvider> oneSingleHostVirtualResourceProvider = new ArrayList<>();
         private static List<VirtualResourceProvider> oneMultiHostVirtualResourceProvider = new ArrayList<>();
         private static List<VirtualResourceProvider> mixedVirtualResourceProvider = new ArrayList<>();
 
         @BeforeAll
-        private static void beforeAll() {
+        public static void beforeAll() {
             //region INIT - SingleHost VirtualizationCapability
             VirtualizationCapability vc = new VirtualizationCapability();
             vc.setName("KVM/QEMU(SH)");
@@ -222,7 +180,7 @@ public class CapabilityProvidersRestControllerTest {
         @Order(10)
         @DisplayName("Check availability of '" + BASE_URL_EXT + "'")
         public void testAvailabilityOfBaseEndpoint() throws Exception {
-            mockMvc.perform(get(BASE_URL_TEST))
+            mockMvc.perform(get(BASE_PATH + "/virtual-resource-provider"))
                     .andExpect(status().isOk());
         }
 
@@ -277,15 +235,10 @@ public class CapabilityProvidersRestControllerTest {
     @Order(30)
     @DisplayName("ServiceHosters")
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-    @WithMockKeycloakAuth(
-            claims = @OpenIdClaims(
-                    iss = "https://localhost/auth/realms/vfk",
-                    preferredUsername = "testUser123"
-            ))
     public class serviceHosterEndpointTests {
         private final static String BASE_URL_EXT = "/service-hoster";
 
-        private static String BASE_URL_TEST = BASE_URL + BASE_URL_EXT;
+        private static String BASE_URL_TEST = BASE_PATH + BASE_URL_EXT;
 
         @Test
         @Order(10)

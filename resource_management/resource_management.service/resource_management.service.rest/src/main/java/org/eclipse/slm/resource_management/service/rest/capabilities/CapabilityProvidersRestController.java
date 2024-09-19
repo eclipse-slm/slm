@@ -9,10 +9,10 @@ import org.eclipse.slm.resource_management.model.capabilities.provider.ServiceHo
 import org.eclipse.slm.resource_management.model.capabilities.provider.ServiceHosterFilter;
 import org.eclipse.slm.resource_management.model.capabilities.provider.VirtualResourceProvider;
 import io.swagger.v3.oas.annotations.Operation;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class CapabilityProvidersRestController {
     @Operation(summary = "Get all virtual resource provider")
     public @ResponseBody
     List<VirtualResourceProvider> getVirtualResourceProviders() {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         try {
             return virtualResourceProviderHandler.getVirtualResourceProviders(
@@ -53,11 +53,11 @@ public class CapabilityProvidersRestController {
 
     @RequestMapping(value = "/virtual-resource-provider/{virtualResourceProviderId}/vm", method = RequestMethod.POST)
     @Operation(summary = "Create Virtual Machine")
-    public @ResponseBody void createVm(@PathVariable UUID virtualResourceProviderId) throws ConsulLoginFailedException {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public @ResponseBody void createVm(@PathVariable(name = "virtualResourceProviderId") UUID virtualResourceProviderId) throws ConsulLoginFailedException {
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         virtualResourceProviderHandler.createVm(
-                new AwxCredential(keycloakPrincipal),
-                new ConsulCredential(keycloakPrincipal),
+                new AwxCredential(jwtAuthenticationToken),
+                new ConsulCredential(jwtAuthenticationToken),
                 virtualResourceProviderId
         );
     }
@@ -66,10 +66,10 @@ public class CapabilityProvidersRestController {
     @Operation(summary = "Get all service hoster")
     public @ResponseBody
     List<ServiceHoster> getServiceHosters(Optional<ServiceHosterFilter> filter) {
-        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         try {
-            return serviceHosterHandler.getServiceHosters(new ConsulCredential(keycloakPrincipal), filter);
+            return serviceHosterHandler.getServiceHosters(new ConsulCredential(jwtAuthenticationToken), filter);
         } catch (ConsulLoginFailedException e) {
             LOG.warn("Failed to log into Consul. Return empty list of service hoster.");
             return new ArrayList<>();

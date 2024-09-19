@@ -1,5 +1,6 @@
 package org.eclipse.slm.service_management.service.rest.service_categories;
 
+import jakarta.transaction.Transactional;
 import org.eclipse.slm.service_management.model.offerings.ServiceCategory;
 import org.eclipse.slm.service_management.model.offerings.responses.ServiceCategoryCreateResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 @RestController
@@ -68,7 +68,7 @@ public class ServiceCategoriesRestController {
     @RequestMapping(value = "/{serviceCategoryId}", method = RequestMethod.DELETE)
     @Operation(summary = "Delete a service category")
     @ResponseBody
-    public ResponseEntity<ServiceCategoryCreateResponse> deleteServiceCategories(@PathVariable("serviceCategoryId") long serviceCategoryId)
+    public ResponseEntity<ServiceCategoryCreateResponse> deleteServiceCategories(@PathVariable(name = "serviceCategoryId") long serviceCategoryId)
             throws ServiceCategoryNotFoundException {
         try {
             var serviceCategory =  this.serviceCategoryHandler.getServiceCategoryById(serviceCategoryId);

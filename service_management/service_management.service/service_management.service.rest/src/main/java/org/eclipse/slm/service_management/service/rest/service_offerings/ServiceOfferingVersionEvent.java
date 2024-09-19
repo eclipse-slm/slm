@@ -5,21 +5,21 @@ import org.springframework.context.ApplicationEvent;
 import java.util.UUID;
 
 public class ServiceOfferingVersionEvent extends ApplicationEvent {
-    private final UUID id;
+    private final UUID serviceOfferingVersionId;
     private final Operation operation;
 
     public enum Operation {
         CREATE, UPDATE, DELETE
     }
 
-    ServiceOfferingVersionEvent(Object object, UUID id, Operation operation) {
+    ServiceOfferingVersionEvent(Object object, UUID serviceOfferingVersionId, Operation operation) {
         super(object);
-        this.id = id;
+        this.serviceOfferingVersionId = serviceOfferingVersionId;
         this.operation = operation;
     }
 
-    public UUID getId() {
-        return id;
+    public UUID getServiceOfferingVersionId() {
+        return serviceOfferingVersionId;
     }
 
     public Operation getOperation() { return operation; }

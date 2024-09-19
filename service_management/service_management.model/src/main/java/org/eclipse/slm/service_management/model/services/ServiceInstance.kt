@@ -21,7 +21,7 @@ class ServiceInstance(
 
     var serviceOfferingVersionId: UUID,
 
-    var ports: List<Integer> = mutableListOf(),
+    var ports: List<Int> = mutableListOf(),
 
     var groupIds: List<UUID> = mutableListOf()
 
@@ -95,7 +95,7 @@ class ServiceInstance(
             metaData.remove(META_DATA_KEY_SERVICE_OFFERING_VERSION_ID)
             var capabilityServiceId = UUID.fromString(metaData[META_DATA_KEY_CAPABILITY_SERVICE_ID])
             metaData.remove(META_DATA_KEY_CAPABILITY_SERVICE_ID)
-            var ports = JSON.readValue(metaData[META_DATA_KEY_PORTS], object: TypeReference<List<Integer>>() {})
+            var ports = JSON.readValue(metaData[META_DATA_KEY_PORTS], object: TypeReference<List<Int>>() {})
             metaData.remove(META_DATA_KEY_PORTS)
             var groupsIds = JSON.readValue(metaData[META_DATA_KEY_GROUPS], object: TypeReference<List<UUID>>() {})
             metaData.remove(META_DATA_KEY_GROUPS)
