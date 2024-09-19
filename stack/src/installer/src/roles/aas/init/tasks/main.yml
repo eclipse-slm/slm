@@ -46,8 +46,8 @@
       http_check_url: "{{ AAS_SUBMODEL_REPOSITORY_URL }}/actuator/health"
       additional_tags: [ "aas" ]
     - name: concept-description-repository
-      port: "{{ AAS_CONCEPTDESCRIPTION_REPOSITORY_PORT }}"
-      http_check_url: "{{ AAS_CONCEPTDESCRIPTION_REPOSITORY_URL }}/actuator/health"
+      port: "{{ AAS_CONCEPTDESCRIPTIONS_REPOSITORY_PORT }}"
+      http_check_url: "{{ AAS_CONCEPTDESCRIPTIONS_REPOSITORY_URL }}/actuator/health"
       additional_tags: [ "aas" ]
     - name: aas-gui
       port: 3000
