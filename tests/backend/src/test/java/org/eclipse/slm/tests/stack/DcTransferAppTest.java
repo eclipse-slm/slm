@@ -31,8 +31,8 @@ public class DcTransferAppTest {
     @BeforeAll
     public static void init()
     {
-        RestAssured.baseURI = TestConfig.RESOURCE_REGISTRY_BASE_URL;
-        RestAssured.port = TestConfig.RESOURCE_REGISTRY_PORT;
+        RestAssured.baseURI = TestConfig.RESOURCE_MANAGEMENT_BASE_URL;
+        RestAssured.port = TestConfig.RESOURCE_MANAGEMENT_PORT;
         RestAssured.basePath = "";
     }
 
@@ -127,8 +127,8 @@ public class DcTransferAppTest {
     @DisplayName("Create Service Offering")
     public void createServiceOffering() throws URISyntaxException, IOException {
         RequestSpecification requestSpecification = RestAssured.given()
-            .baseUri(TestConfig.SERVICE_REGISTRY_BASE_URL)
-            .port(TestConfig.SERVICE_REGISTRY_PORT);
+            .baseUri(TestConfig.SERVICE_MANAGEMENT_BASE_URL)
+            .port(TestConfig.SERVICE_MANAGEMENT_PORT);
         TestServiceVendor serviceVendor = TestConfig.TEST_SERVICE_VENDOR;
 
         ClassLoader classLoader = getClass().getClassLoader();
@@ -199,8 +199,8 @@ public class DcTransferAppTest {
     @DisplayName("Deploy Service")
     public void deployService() throws URISyntaxException, IOException, InterruptedException {
         RequestSpecification requestSpecification = RestAssured.given()
-            .baseUri(TestConfig.SERVICE_REGISTRY_BASE_URL)
-            .port(TestConfig.SERVICE_REGISTRY_PORT);
+            .baseUri(TestConfig.SERVICE_MANAGEMENT_BASE_URL)
+            .port(TestConfig.SERVICE_MANAGEMENT_PORT);
 
         ClassLoader classLoader = getClass().getClassLoader();
         URL resource = classLoader.getResource("service-order.json");
@@ -290,8 +290,8 @@ public class DcTransferAppTest {
     @DisplayName("Undeploy docker service")
     public void undeployService() throws InterruptedException {
         RequestSpecification requestSpecification = RestAssured.given()
-            .baseUri(TestConfig.SERVICE_REGISTRY_BASE_URL)
-            .port(TestConfig.SERVICE_REGISTRY_PORT);
+            .baseUri(TestConfig.SERVICE_MANAGEMENT_BASE_URL)
+            .port(TestConfig.SERVICE_MANAGEMENT_PORT);
 
         // Get Service Instance ID
         String serviceInstanceId = given().spec(requestSpecification)

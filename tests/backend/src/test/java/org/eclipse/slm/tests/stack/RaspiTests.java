@@ -21,8 +21,8 @@ public class RaspiTests {
     @BeforeAll
     public static void init()
     {
-        RestAssured.baseURI = TestConfig.RESOURCE_REGISTRY_BASE_URL;
-        RestAssured.port = TestConfig.RESOURCE_REGISTRY_PORT;
+        RestAssured.baseURI = TestConfig.RESOURCE_MANAGEMENT_BASE_URL;
+        RestAssured.port = TestConfig.RESOURCE_MANAGEMENT_PORT;
         RestAssured.basePath = "";
     }
 

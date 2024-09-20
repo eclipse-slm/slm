@@ -11,7 +11,7 @@ public class TestConfig {
 
     // Common
     public static final String DOCKER_HOST = System.getenv().getOrDefault("DOCKER_HOST", "tcp://localhost:2375");
-    public static final String HOST = System.getenv().getOrDefault("TARGET_HOST", "localhost");
+    public static final String HOST = System.getenv().getOrDefault("TARGET_HOST", "10.17.165.36");
 
     /// Keycloak
     public static final String KEYCLOAK_REALM = System.getenv().getOrDefault("KEYCLOAK_REALM", "fabos");
@@ -68,13 +68,13 @@ public class TestConfig {
     public static final int NOTIFICATION_SERVICE_PORT = Integer.parseInt(System.getenv().getOrDefault("NOTIFICATION_SERVICE_PORT", "9001"));
     public static final String NOTIFICATION_SERVICE_BASE_URL =  "http://" + TestConfig.HOST;
 
-    // Resource Registry
-    public static final int RESOURCE_REGISTRY_PORT = Integer.parseInt(System.getenv().getOrDefault("RESOURCE_REGISTRY_PORT", "9010"));
-    public static final String RESOURCE_REGISTRY_BASE_URL =  "http://" + TestConfig.HOST;
+    // Resource Management
+    public static final int RESOURCE_MANAGEMENT_PORT = Integer.parseInt(System.getenv().getOrDefault("RESOURCE_REGISTRY_PORT", "9010"));
+    public static final String RESOURCE_MANAGEMENT_BASE_URL =  "http://" + TestConfig.HOST;
 
-    // Service Registry
-    public static final int SERVICE_REGISTRY_PORT = Integer.parseInt(System.getenv().getOrDefault("SERVICE_REGISTRY_PORT", "9020"));
-    public static final String SERVICE_REGISTRY_BASE_URL =  "http://" + TestConfig.HOST;
+    // Service Management
+    public static final int SERVICE_MANAGEMENT_PORT = Integer.parseInt(System.getenv().getOrDefault("SERVICE_REGISTRY_PORT", "9020"));
+    public static final String SERVICE_MANAGEMENT_BASE_URL =  "http://" + TestConfig.HOST;
 
     // Test Service Vendor
     public static final TestServiceVendor TEST_SERVICE_VENDOR =  new TestServiceVendor("fabos");
