@@ -17,7 +17,7 @@ services:
     extra_hosts:
       - "{{ SLM_HOSTNAME }}:172.17.0.1"
     environment:
-      KEYCLOAK_URL: "http://{{ SLM_HOSTNAME }}/auth"
+      KEYCLOAK_URL: "http://{{ SLM_HOSTNAME }}:{{ KEYCLOAK_PORT }}/auth"
       AWX_URL: "http://{{ SLM_HOSTNAME }}:{{ AWX_PORT }}"
       BASYX_AAS_GUI_URL: "http://{{ SLM_HOSTNAME }}:3000"
       CONSUL_TOKEN: "{{ app_configs['resource_management']['consul']['acl-token'] }}"
