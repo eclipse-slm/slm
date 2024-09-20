@@ -18,15 +18,6 @@
         <docker.image.name>slm/ui</docker.image.name>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.openapitools</groupId>
-            <artifactId>openapi-generator-maven-plugin</artifactId>
-            <version>5.4.0</version> <!-- Check for the latest version -->
-        </dependency>
-    </dependencies>
-
-
     <build>
         <plugins>
             <!-- Docker Image !-->
@@ -37,7 +28,7 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.7.0</version>
+                <version>${maven.plugin.openapi-generator.version}</version>
                 <executions>
                     <execution>
                         <id>resource-management-client</id>
