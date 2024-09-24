@@ -73,11 +73,11 @@
 <script>
 
 import ServiceVendorCreateOrEditDialog from '@/components/service_vendors/ServiceVendorCreateOrEditDialog'
-import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 import {app} from "@/main";
 import {useServicesStore} from "@/stores/servicesStore";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
 
 export default {
     name: 'ServiceVendorTable',
@@ -118,7 +118,7 @@ export default {
       onDeleteServiceVendorClicked (serviceVendor) {
         this.selectedServiceVendor = null
         this.editServiceVendor = false
-        ServiceVendorsRestApi.deleteServiceVendorById(serviceVendor.id).then(
+        ServiceManagementClient.serviceVendorsApi.deleteServiceVendor(serviceVendor.id).then(
           response => {
             app.config.globalProperties.$toast.info('Service vendor successfully deleted')
             this.servicesStore.getServiceVendors();

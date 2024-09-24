@@ -51,10 +51,10 @@
 
 <script>
 
-import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
 import {toRef} from 'vue'
 import {app} from "@/main";
 import {useServicesStore} from "@/stores/servicesStore";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
 
 export default {
     name: 'ServiceCategoryCreateOrEditDialog',
@@ -91,9 +91,9 @@ export default {
       onConfirmedClicked () {
         let apiCall
         if (this.editMode) {
-          apiCall = ServiceOfferingsRestApi.createOrUpdateServiceCategoryWithId(this.serviceCategoryUpdate)
+          apiCall = ServiceManagementClient.serviceCategoriesApi.createOrUpdateServiceCategory(this.serviceCategoryUpdate)
         } else {
-          apiCall = ServiceOfferingsRestApi.createServiceCategory(this.serviceCategoryUpdate)
+          apiCall = ServiceManagementClient.serviceCategoriesApi.createServiceCategory(this.serviceCategoryUpdate)
         }
 
         apiCall.then(() => {

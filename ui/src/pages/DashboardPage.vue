@@ -170,39 +170,35 @@
               </template>
 
               <template #item.status="{item}">
-                <span v-if="item.status === 'running'" />
-                <span v-else-if="item.elapsed > 60">
-                  {{ Math.floor(item.elapsed/60) }}m {{ Math.round(item.elapsed % 60) }}s
+                <span v-if="item.status === 'running'">
+                  {{ getFormattedTime(new Date().getTime() - new Date(item.started).getTime()) }}
                 </span>
                 <span v-else>
-                  {{ Math.round(item.elapsed % 60) }}s
+                  {{ getFormattedTime(new Date(item.finished).getTime() - new Date(item.started).getTime()) }}
                 </span>
                 <v-tooltip location="right">
                   <template #activator="{ props }">
                     <v-icon
-                      v-if="item.status == 'successful'"
+                      v-if="item.status === 'successful'"
                       v-bind="props"
                     >
                       mdi-check-circle-outline
                     </v-icon>
                     <v-icon
-                      v-if="item.status == 'running'"
-                      v-bind="attrs"
-                      v-on="on"
+                      v-if="item.status === 'running'"
+                      v-bind="props"
                     >
                       mdi-run-fast
                     </v-icon>
                     <v-icon
-                      v-else-if="item.status == 'pending'"
-                      v-bind="attrs"
-                      v-on="on"
+                      v-else-if="item.status === 'pending'"
+                      v-bind="props"
                     >
                       mdi-timer-sand-empty
                     </v-icon>
                     <v-icon
-                      v-else-if="item.status == 'canceled' || item.status == 'failed'|| item.status == 'error'"
-                      v-bind="attrs"
-                      v-on="on"
+                      v-else-if="item.status === 'canceled' || item.status === 'failed'|| item.status === 'error'"
+                      v-bind="props"
                     >
                       mdi-alert-circle-outline
                     </v-icon>

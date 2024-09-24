@@ -64,9 +64,9 @@
 
 <script>
 import 'vue-json-pretty/lib/styles.css'
-import ServiceOfferingVersionsRestApi from "@/api/service-management/serviceOfferingVersionsRestApi";
+import axios from 'axios'
 
-  export default {
+export default {
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys',
     components: {
     },
@@ -119,7 +119,12 @@ import ServiceOfferingVersionsRestApi from "@/api/service-management/serviceOffe
         }
       },
       onDownloadCodesysApplicationClick(){
-        ServiceOfferingVersionsRestApi.downloadFileForServiceOfferingVersion(this.serviceOfferingVersion.serviceOfferingId, this.serviceOfferingVersion.id, 'application.zip').then(response => {
+
+        const serviceOfferingId = this.serviceOfferingVersion.serviceOfferingId;
+        const serviceOfferingVersionId = this.serviceOfferingVersion.id;
+        const fileName = 'application.zip';
+        axios.get(`/service-management/services/offerings/${serviceOfferingId}/versions/${serviceOfferingVersionId}/file/${fileName}`,
+            {responseType: 'blob'}).then(response => {
           const url = window.URL.createObjectURL(new Blob([response.data]));
           const link = document.createElement('a');
           link.href = url;

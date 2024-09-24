@@ -185,9 +185,10 @@
 
 <script>
 
-import ServiceOfferingVersionsRestApi from "@/api/service-management/serviceOfferingVersionsRestApi";
 import {useServicesStore} from "@/stores/servicesStore";
 import {storeToRefs} from "pinia";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 export default {
   name: "ServiceOfferingTable",
@@ -241,10 +242,10 @@ export default {
         updateExpanded: () => {
           if (this.expandedServiceOffering != undefined) {
             console.log("Updated expanded")
-            ServiceOfferingVersionsRestApi.getVersionsOfServiceOffering(this.expandedServiceOffering.id).then(response => {
-              this.serviceOfferingVersionOfServiceOfferingId[this.expandedServiceOffering.id] = response;
-              this.expandedServiceOfferingVersions = response
-            })
+            ServiceManagementClient.serviceOfferingVersionsApi.getServiceOfferingVersionsOfServiceOffering(this.expandedServiceOffering.id).then(response => {
+              this.serviceOfferingVersionOfServiceOfferingId[this.expandedServiceOffering.id] = response.data;
+              this.expandedServiceOfferingVersions = response.data
+            }).catch(logRequestError)
           }
         }
       });
@@ -272,10 +273,11 @@ export default {
       this.expandedServiceOffering = serviceOffering
       if (this.serviceOfferingVersionOfServiceOfferingId[serviceOffering.id] == undefined) {
         this.expandedServiceOfferingVersions = undefined
-        ServiceOfferingVersionsRestApi.getVersionsOfServiceOffering(serviceOffering.id).then(response => {
-          this.serviceOfferingVersionOfServiceOfferingId[serviceOffering.id] = response;
-          this.expandedServiceOfferingVersions = response
-        })}
+        ServiceManagementClient.serviceOfferingVersionsApi.getServiceOfferingVersionsOfServiceOffering(serviceOffering.id).then(response => {
+          this.serviceOfferingVersionOfServiceOfferingId[serviceOffering.id] = response.data;
+          this.expandedServiceOfferingVersions = response.data
+        }).catch(logRequestError);
+      }
       else {
         this.expandedServiceOfferingVersions = this.serviceOfferingVersionOfServiceOfferingId[serviceOffering.id]
       }

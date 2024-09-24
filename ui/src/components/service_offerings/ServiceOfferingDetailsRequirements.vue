@@ -48,7 +48,8 @@
 </template>
 
 <script>
-import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
+import ServiceManagementClient from "@/api/service-management/service-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 export default {
     name: 'ServiceDetailsRequirements',
@@ -74,10 +75,10 @@ export default {
         if (!this.serviceOfferingVersionId) {
           return
         }
-        ServiceOfferingVersionsRestApi.getServiceOfferingVersionById(this.serviceOffering.id, this.serviceOfferingVersionId)
-          .then(serviceOfferingVersion => {
-            this.requirements = serviceOfferingVersion.serviceRequirements
-          })
+        ServiceManagementClient.serviceOfferingVersionsApi.getServiceOfferingVersionById(this.serviceOffering.id, this.serviceOfferingVersionId)
+          .then(response => {
+            this.requirements =response.data.serviceRequirements
+          }).catch(logRequestError)
       }
     }
   }

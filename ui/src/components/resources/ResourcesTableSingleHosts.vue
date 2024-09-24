@@ -182,7 +182,7 @@
                 id="mushroom-button"
                 color="info"
                 v-bind="props"
-                :disabled="item.clusterMember || availableSingleHostCapabilitiesNoDefault.length == 0"
+                :disabled="item.clusterMember || availableSingleHostCapabilitiesNoDefault.length === 0"
                 class="resource-single-host-add-capability"
               >
                 <v-icon
@@ -275,11 +275,11 @@
 
 import ConfirmDialog from '@/components/base/ConfirmDialog'
 import CapabilityParamsDialog from "@/components/resources/dialogs/CapabilityParamsDialog.vue";
-import ResourcesRestApi from '@/api/resource-management/resourcesRestApi'
 import {capabilityUtilsMixin} from '@/utils/capabilityUtils'
-import ProfilerRestApi from "@/api/resource-management/profilerRestApi";
 import {app} from "@/main";
 import {useResourcesStore} from "@/stores/resourcesStore";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 export default {
     name: 'ResourcesTableSingleHosts',
@@ -372,8 +372,7 @@ export default {
       },
       deleteResource (resource) {
         const resourceId = resource.id
-        ResourcesRestApi.deleteResource(resourceId).then(response => {
-        })
+        ResourceManagementClient.resourcesApi.deleteResource(resourceId).then();
         this.resourceStore.setResourceMarkedForDelete(resource);
         this.resourceToDelete = null
       },
@@ -392,7 +391,7 @@ export default {
 
       },
       addCapability (resourceId, capabilityId, skipInstall, configParameterMap) {
-        ResourcesRestApi.addCapabilityToSingleHost(resourceId, capabilityId, skipInstall, configParameterMap)
+        ResourceManagementClient.capabilityApi.installCapabilityOnSingleHost(resourceId, capabilityId, configParameterMap, skipInstall).then();
         this.unsetSelected()
       },
       unsetSelected() {
@@ -419,7 +418,9 @@ export default {
           return true
       },
       removeCapability (resourceId, capabilityId) {
-        ResourcesRestApi.removeCapabilityFromSingleHost(resourceId, capabilityId)
+        ResourceManagementClient.capabilityApi.removeCapabilityFromSingleHost(resourceId, capabilityId)
+            .then().catch(logRequestError);
+
       },
       setSelectedResource (event, { item }) {
         this.$emit('resource-selected', item)
@@ -558,7 +559,7 @@ export default {
         return string.replace(/([A-Z])/g, ' $1').trim()
       },
       runProfiler() {
-        let result = ProfilerRestApi.runProfiler()
+        ResourceManagementClient.profilerApi.runProfiler1().then().catch(logRequestError);
         app.config.globalProperties.$toast.info('Started Profiler for all devices.')
       }
     }

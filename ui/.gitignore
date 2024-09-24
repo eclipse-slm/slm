@@ -6,6 +6,11 @@ package-lock.json
 /tests/e2e/videos/
 /tests/e2e/screenshots/
 
+# Ignore generated clients
+src/api/resource-management/client
+src/api/service-management/client
+src/api/notification-service/client
+
 # local env files
 .env.local
 .env.*.local

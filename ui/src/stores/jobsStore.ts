@@ -1,5 +1,6 @@
-import JobsRestApi from '@/api/resource-management/jobsRestApi'
 import {defineStore} from "pinia";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
 import ApiState from "@/api/apiState";
 
 export interface JobsStoreState{
@@ -29,26 +30,29 @@ export const useJobsStore = defineStore('jobsStore', {
     }
   },
   actions:{
-    async updateJobsStore () {
-      this.apiStateJobs_ = ApiState.LOADING
-      JobsRestApi.getJobs().then(jobs => {
-            this.jobs_ = jobs;
+      async updateJobsStore() {
+          this.apiStateJobs_ = ApiState.LOADING
+                  ResourceManagementClient.jobApi.getJobs().then(result => {
+                      if (result.data) {
+                          const jobs = <any[]>result.data;
+                          this.jobs_ = jobs;
 
-            if (this.jobs_ && this.jobs_.length > 0) {
-              if (jobs.filter(job => job.status === 'running').length > 0) {
-                this.timeoutObject = setInterval(() => {
-                  this.calculateElapsed();
-                }, 1000)
-              } else {
-                if (this.timeoutObject) {
-                  clearInterval(this.timeoutObject)
-                }
-              }
-            }
-            this.apiStateJobs_ = ApiState.LOADED
-          },
-      )
-    },
+                          if (this.jobs_ && this.jobs_.length > 0) {
+                              if (jobs.filter(job => job.status === 'running').length > 0) {
+                                  this.timeoutObject = setInterval(() => {
+                                      this.calculateElapsed();
+                                  }, 1000)
+                              } else {
+                              if (this.timeoutObject) {
+                                  clearInterval(this.timeoutObject)
+                              }
+                          }
+                      }
+                  }
+                  this.apiStateJobs_ = ApiState.LOADED
+              },
+          ).catch(logRequestError)
+      },
     calculateElapsed () {
       this.jobs_running_.forEach(job => {
         const elapsed = new Date().getTime() - new Date(job.started).getTime()

@@ -198,13 +198,14 @@
 
 <script>
 import ServiceInstanceDeleteDialog from '@/components/services/ServiceInstanceDeleteDialog'
-import ServiceInstancesRestApi from '@/api/service-management/serviceInstancesRestApi'
 import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
 import ConfirmDialog from "@/components/base/ConfirmDialog";
 import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
 import {useServicesStore} from "@/stores/servicesStore";
 import {useResourcesStore} from "@/stores/resourcesStore";
 import {storeToRefs} from "pinia";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 export default {
     name: 'ServiceInstancesTable',
@@ -256,12 +257,11 @@ export default {
       this.groupedServices = this.services
       console.log('SERVICES',this.services);
       this.services.forEach(service => {
-        ServiceInstancesRestApi.getAvailableVersionsForServiceInstance(service.id).then(availableUpdates => {
-          console.log('adsf',availableUpdates);
-          if (availableUpdates.length > 0) {
-            this.availableVersionChangesOfServices[service.id] = availableUpdates;
+        ServiceManagementClient.serviceInstancesApi.getAvailableVersionChangesForServiceInstance(service.id).then(response => {
+          if (response.data && response.data.length > 0) {
+            this.availableVersionChangesOfServices[service.id] = response.data;
           }
-        })
+        }).catch(logRequestError)
       })
     },
     methods: {
@@ -272,7 +272,7 @@ export default {
         this.serviceToDelete = null
       },
       onServiceDeleteConfirmed () {
-        ServiceInstancesRestApi.deleteServiceInstance(this.serviceToDelete.id)
+        ServiceManagementClient.serviceInstancesApi.deleteServiceInstance(this.serviceToDelete.id).then().catch(logRequestError)
         this.servicesStore.setServiceMarkedForDelete(this.serviceToDelete);
         this.serviceToDelete = null
         this.$toast.info('Service deletion started')
@@ -293,9 +293,10 @@ export default {
       },
 
       onServiceInstanceVersionChangedConfirmed() {
-        ServiceInstancesRestApi.changeServiceInstanceVersion(
+        ServiceManagementClient.serviceInstancesApi.updateServiceInstanceToVersion(
             this.serviceVersionChange.serviceInstance.id,
-            this.serviceVersionChange.targetServiceVersion.serviceOfferingVersionId)
+            this.serviceVersionChange.targetServiceVersion.serviceOfferingVersionId
+        ).then().catch(logRequestError)
       },
 
       onServiceInstanceClicked (event, serviceInstance) {

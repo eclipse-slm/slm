@@ -1,5 +1,6 @@
-import ResourceProvidersRestApi from "@/api/resource-management/resourceProvidersRestApi";
 import {defineStore} from "pinia";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 interface ProviderStoreState{
   virtualResourceProviders_: any[],
@@ -23,16 +24,20 @@ export const useProviderStore = defineStore('providerStore', {
 
   actions: {
     async getVirtualResourceProviders () {
-      return await ResourceProvidersRestApi.getVirtualResourceProviders()
+      return await ResourceManagementClient.capabilityProvidersApi.getVirtualResourceProviders()
           .then(response => {
-            this.virtualResourceProviders_ = response;
-          })
+            if(response.data){
+              this.virtualResourceProviders_ = response.data;
+            }
+          }).catch(logRequestError)
     },
     async getServiceHosters () {
-      return await ResourceProvidersRestApi.getServiceHosters()
+      return await ResourceManagementClient.capabilityProvidersApi.getServiceHosters()
           .then(response => {
-            this.serviceHosters_ = response;
-          })
+            if(response.data){
+              this.serviceHosters_ = response.data;
+            }
+          }).catch(logRequestError)
     }
   },
 

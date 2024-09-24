@@ -84,11 +84,11 @@
 
 <script>
 
-import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
 import {toRef} from 'vue'
 import getImageUrl from '@/utils/imageUtil'
 import {app} from "@/main";
 import {useServicesStore} from "@/stores/servicesStore";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
 
 export default {
     name: 'ServiceVendorCreateOrEditDialog',
@@ -146,9 +146,9 @@ export default {
 
         let apiCall
         if (this.editMode) {
-          apiCall = ServiceVendorsRestApi.createOrUpdateServiceVendorWithId(this.serviceVendorUpdate)
+          apiCall = ServiceManagementClient.serviceVendorsApi.createOrUpdateServiceVendorWithId(this.serviceVendorUpdate.id, this.serviceVendorUpdate)
         } else {
-          apiCall = ServiceVendorsRestApi.createServiceVendor(this.serviceVendorUpdate)
+          apiCall = ServiceManagementClient.serviceVendorsApi.createServiceVendor(this.serviceVendorUpdate)
         }
 
         apiCall.then(() => {

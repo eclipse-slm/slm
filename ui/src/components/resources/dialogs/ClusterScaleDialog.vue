@@ -165,8 +165,9 @@
 
 <script>
 
-import ClustersRestApi from '@/api/resource-management/clustersRestApi.js'
 import {useResourcesStore} from "@/stores/resourcesStore";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 export default {
     name: 'ClusterScaleDialog',
@@ -249,15 +250,15 @@ export default {
         const resourceId = this.selectedBareMetalResource
 
         if (this.action === 'up') {
-          ClustersRestApi.addMemberToCluster(clusterUuid, resourceId).then(response => {
+          ResourceManagementClient.clusterApi.addClusterMember(clusterUuid, resourceId).then((response) => {
             this.closeDialog()
-          })
+          }).catch(logRequestError)
         }
 
         if (this.action === 'down') {
-          ClustersRestApi.removeMemberFromCluster(clusterUuid, resourceId).then(response => {
+          ResourceManagementClient.clusterApi.removeClusterMember(clusterUuid, resourceId).then(response => {
             this.closeDialog()
-          })
+          }).catch(logRequestError)
         }
       },
       closeDialog () {
