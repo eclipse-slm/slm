@@ -331,7 +331,7 @@ export default {
 
               response.data.serviceOptions.forEach(serviceOption => {
                 if (serviceOption.valueType === "AAS_SM_TEMPLATE") {
-                  ResourceManagementClient.aasApi.getSubmodelTemplateInstancesBySemanticId(serviceOption.defaultValue, serviceOption.currentValue)
+                  ResourceManagementClient.submodelTemplatesRestControllerApi.getSubmodelTemplateInstancesBySemanticId(serviceOption.defaultValue, serviceOption.currentValue)
                       .then(res => {
                         let response = res.data;
                     let aasGuiBaseUrl = getEnv("VUE_APP_BASYX_AAS_GUI_URL")

@@ -1,4 +1,5 @@
 import {
+    AasRestControllerApi,
     CapabilitiesRestControllerApi,
     CapabilityProvidersRestControllerApi,
     ClustersRestControllerApi,
@@ -17,7 +18,8 @@ class ResourceManagementClient{
     apiUrl = "/resource-management";
 
     resourcesApi = new ResourcesRestControllerApi(undefined, this.apiUrl);
-    aasApi = new SubmodelTemplatesRestControllerApi(undefined, this.apiUrl);
+    aasApi = new AasRestControllerApi(undefined, this.apiUrl);
+    submodelTemplatesRestControllerApi = new SubmodelTemplatesRestControllerApi(undefined, this.apiUrl);
     clusterApi = new ClustersRestControllerApi(undefined, this.apiUrl)
     jobApi = new JobsRestControllerApi(undefined, this.apiUrl);
     locationApi = new LocationRestControllerApi(undefined, this.apiUrl);

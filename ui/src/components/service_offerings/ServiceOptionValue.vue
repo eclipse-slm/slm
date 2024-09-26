@@ -196,7 +196,7 @@ export default {
     },
     created() {
       if (this.serviceOption.valueType === 'AAS_SM_TEMPLATE' && !this.definitionMode) {
-        ResourceManagementClient.aasApi.getSubmodelTemplateInstancesBySemanticId(this.serviceOption.defautlValue)
+        ResourceManagementClient.submodelTemplatesRestControllerApi.getSubmodelTemplateInstancesBySemanticId(this.serviceOption.defautlValue)
             .then(response => {
               if(response.data){
                 this.aasSubmodelTemplateInstances = response.data;

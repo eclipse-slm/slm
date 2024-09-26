@@ -124,7 +124,7 @@ export default {
       })
     },
     getAasDescriptor() {
-      ResourceManagementClient.aasApi.getResourceAASDescriptors(this.resourceId).then(response => {
+      ResourceManagementClient.submodelTemplatesRestControllerApi.getResourceAASDescriptors(this.resourceId).then(response => {
         this.aasDescriptor = response
       }).catch((e) => {
         console.log(e)
