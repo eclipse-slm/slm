@@ -16,16 +16,23 @@
       block:
         - set_fact:
             CONSUL_URL: "{{ CONSUL_SCHEME }}://{{ CONSUL_HOST }}:{{ CONSUL_PORT }}"
-            KEYCLOAK_AUTH_URL: "{{ KEYCLOAK_SCHEME }}://{{ KEYCLOAK_HOST }}:{{ KEYCLOAK_PORT }}/auth"
+            KEYCLOAK_AUTH_URL: "{{ KEYCLOAK_SCHEME }}://{{ KEYCLOAK_HOST }}/auth"
             VAULT_URL: "{{ VAULT_SCHEME }}://{{ VAULT_HOST }}:{{ VAULT_PORT }}"
             AWX_URL: "{{ AWX_SCHEME }}://{{ AWX_HOST }}:{{ AWX_PORT }}"
             MINIO_API_URL: "{{ MINIO_SCHEME }}://{{ MINIO_HOST }}:{{ MINIO_API_PORT }}"
             MINIO_CONSOLE_URL: "{{ MINIO_SCHEME }}://{{ MINIO_HOST }}:{{ MINIO_CONSOLE_PORT }}"
+            TRAEFIK_URL: "{{ TRAEFIK_SCHEME }}://{{ TRAEFIK_HOST }}:{{ TRAEFIK_API_PORT }}"
 
 #    - name: Display all variables/facts known for a host
 #      debug:
 #        var: hostvars['localhost']
 #      tags: debug_info
+
+    - name: "Start Traefik"
+      include_role:
+        name: traefik/init
+      vars:
+        _store_compose_file: /compose/traefik.yml
 
     - name: "Start Consul"
       include_role:

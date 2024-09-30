@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  traefik:
+    image: traefik:{{TRAEFIK_VERSION}}
+    command:
+    - --api.insecure=true
+    - --providers.docker
+    - --entrypoints.web.address=:80
+    - --entrypoints.websecure.address=:443
+    - --certificatesresolvers.le.acme.email=my@email.com
+    - --certificatesresolvers.le.acme.storage=/acme.json
+    - --certificatesresolvers.le.acme.tlschallenge=true
+    ports:
+      # The HTTP port
+      - "{{TRAEFIK_HTTP_PORT}}:80"
+      # The HTTPS port
+      - "{{TRAEFIK_HTTPS_PORT}}:443"
+      # The Web UI (enabled by --api.insecure=true)
+      - "{{TRAEFIK_API_PORT}}:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      default:
+        aliases:
+          - 'traefik'
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"

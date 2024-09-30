@@ -2,53 +2,6 @@ server {
     listen       80;
     server_name  localhost;
 
-    location /resource-management/ {
-        {{ $services := service "resource-management" }}
-        {{ if $services }}
-            {{ range $index, $instance := $services }}
-            {{ if eq $index 0 }}
-            proxy_pass http://{{ .Address }}:{{ .Port }}/;
-            {{ end }}
-            {{ end }}
-        {{ else }}
-            return 404;
-        {{ end }}
-        proxy_set_header Origin "";
-    }
-
-    location /service-management/ {
-        {{ $services := service "service-management" }}
-        {{ if $services }}
-            {{ range $index, $instance := $services }}
-            {{ if eq $index 0 }}
-            proxy_pass http://{{ .Address }}:{{ .Port }}/;
-            {{ end }}
-            {{ end }}
-        {{ else }}
-            return 404;
-        {{ end }}
-        proxy_set_header Origin "";
-    }
-
-    location /notification-service/ {
-        {{ $services := service "notification-service" }}
-        {{ if $services }}
-            {{ range $index, $instance := $services }}
-            {{ if eq $index 0 }}
-            proxy_pass http://{{ .Address }}:{{ .Port }}/;
-            {{ end }}
-            {{ end }}
-        {{ else }}
-            return 404;
-        {{ end }}
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
-        proxy_set_header Host $host;
-        proxy_pass_header X-XSRF-TOKEN;
-        proxy_set_header Origin "";
-    }
-
     location /slm-catalog/ {
         {{ $services := service "slm-catalog" }}
         {{ if $services }}

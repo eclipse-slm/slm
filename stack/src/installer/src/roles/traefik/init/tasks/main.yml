@@ -1,0 +1,24 @@
+- name: "TRAEFIK | Create compose definition from template"
+  set_fact:
+    traefik_compose: "{{ lookup('template', 'traefik.yml') }}"
+- name: "TRAEFIK | Start Traefik containers"
+  community.docker.docker_compose_v2:
+    project_name: eclipse-slm
+    definition: "{{ traefik_compose | from_yaml}}"
+    state: present
+    pull: always
+  register: traefik_compose_start_output
+- name: "TRAEFIK | Wait for Traefik being up"
+  uri:
+    url: "{{TRAEFIK_URL}}/"
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 120
+  delay: 3
+
+- name: "TRAEFIK | Store resulting compose file"
+  template:
+    src: "traefik.yml"
+    dest: "{{ _store_compose_file }}"
+  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
