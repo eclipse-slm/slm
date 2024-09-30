@@ -38,7 +38,8 @@
   </div>
 </template>
 <script>
-import MetricsRestApi from '@/api/resource-management/metricsRestApi'
+// import { LineChart } from 'vue-chart-3'
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 
 export default {
     name: 'ResourceMetrics',
@@ -73,8 +74,10 @@ export default {
       },
 
       getMetric () {
-        MetricsRestApi.getMetricsOfResource(this.resourceId).then(response => {
-          if (Object.keys(response).length === 0) {
+
+        ResourceManagementClient.metricsApi.getMetric(this.resourceId).then(response => {
+          const metric = response.data;
+          if (Object.keys(metric).length === 0) {
             return
           }
 

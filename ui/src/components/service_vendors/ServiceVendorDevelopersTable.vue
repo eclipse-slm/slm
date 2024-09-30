@@ -87,13 +87,13 @@
 
 <script>
 
-import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
-import UsersRestApi from '@/api/service-management/usersRestApi'
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import {app} from "@/main";
 import {useUserStore} from "@/stores/userStore";
 import {useServicesStore} from "@/stores/servicesStore";
 import {storeToRefs} from "pinia";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 export default {
     name: 'ServiceVendorDevelopersTable',
@@ -158,7 +158,7 @@ export default {
         if (this.developersOfServiceVendor.length === 1) {
           app.config.globalProperties.$toast.warning('Last developer of service vendor cannot be deleted')
         } else {
-          ServiceVendorsRestApi.removeDeveloperFromServiceVendor(this.serviceVendor.id, deletedDeveloper.id).then(() => {
+          ServiceManagementClient.serviceVendorsApi.removeDeveloperFromServiceVendor(this.serviceVendor.id, deletedDeveloper.id).then(() => {
             app.config.globalProperties.$toast.info(`Successfully removed developer '${deletedDeveloper.username}'`)
             this.loadDevelopersOfServiceVendor()
           })
@@ -170,28 +170,28 @@ export default {
       onSaveDevelopersClicked () {
         console.log(this.addedDevelopers)
         this.addedDevelopers.forEach(developer => {
-          ServiceVendorsRestApi.addDeveloperToServiceVendor(this.serviceVendor.id, developer.id).then(() => {
+          ServiceManagementClient.serviceVendorsApi.addDeveloperToServiceVendor(this.serviceVendor.id, developer.id).then(() => {
             this.developersOfServiceVendor.push(developer)
             app.config.globalProperties.$toast.info(`Successfully added developer '${developer.username}'`)
             app.config.globalProperties.$keycloak.keycloak.updateToken(100000) // Force refresh of token
-          })
+          }).catch(logRequestError)
         })
         this.addedDevelopers = []
       },
 
       loadDevelopersOfServiceVendor () {
-        ServiceVendorsRestApi.getDevelopersOfServiceVendor(this.serviceVendor.id).then(
-          developers => {
-            this.developersOfServiceVendor = developers
+        ServiceManagementClient.serviceVendorsApi.getDevelopersOfServiceVendor(this.serviceVendor.id).then(
+          response => {
+            this.developersOfServiceVendor = response.data
           },
-        )
+        ).catch(logRequestError)
       },
       loadUsers () {
-        UsersRestApi.getUsers().then(
-          users => {
-            this.users = users
+        ServiceManagementClient.usersApi.getUsers().then(
+          response => {
+            this.users = response.data
           },
-        )
+        ).catch(logRequestError);
       },
     },
   }

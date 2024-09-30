@@ -1,5 +1,6 @@
-import ResourcesRestApi from '@/api/resource-management/resourcesRestApi'
 import {defineStore} from "pinia";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 interface OverviewStoreState{
   resources: any[],
@@ -17,7 +18,15 @@ export const useOverviewStore = defineStore('overviewStore', {
   },
   actions: {
     async getResourcesOverview () {
-      this.resources = await ResourcesRestApi.getResources();
+      try{
+        const resources = await ResourceManagementClient.resourcesApi.getResources();
+        if (resources.data){
+          this.resources = resources.data;
+        }
+      }catch (e) {
+        logRequestError(e)
+      }
+
     },
   },
 });

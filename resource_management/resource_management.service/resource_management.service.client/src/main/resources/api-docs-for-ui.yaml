@@ -1,0 +1,2803 @@
+---
+openapi: 3.0.1
+info:
+  title: Resource Management
+  description: REST API of Resource Management
+  contact:
+    name: Fraunhofer IPA
+    url: https://www.ipa.fraunhofer.de
+    email: matthias.schneider@ipa.fraunhofer.de
+  version: 1.4.0-SNAPSHOT
+servers:
+  - url: http://localhost:9010
+    description: Generated server url
+security:
+  - bearer_auth: []
+  - spring_oauth: []
+paths:
+  "/resources":
+    get:
+      tags:
+        - resources-rest-controller
+      summary: Get all resources
+      operationId: getResources
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/BasicResource"
+    put:
+      tags:
+        - resources-rest-controller
+      summary: Add existing resource
+      operationId: addExistingResource
+      parameters:
+        - name: resourceUsername
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: resourcePassword
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: resourceHostname
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: resourceIp
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: resourceConnectionType
+          in: query
+          required: true
+          schema:
+            "$ref": "#/components/schemas/ConnectionType"
+        - name: resourceConnectionPort
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: resourceLocation
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: resourceBaseConfiguration
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+                format: uuid
+  "/resources/{resourceId}":
+    get:
+      tags:
+        - resources-rest-controller
+      summary: Get resource
+      operationId: getResource
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/BasicResource"
+    put:
+      tags:
+        - resources-rest-controller
+      summary: Add existing resource with id
+      operationId: addExistingResourceWithId
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: resourceUsername
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: resourcePassword
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: resourceHostname
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: resourceIp
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: resourceConnectionType
+          in: query
+          required: true
+          schema:
+            "$ref": "#/components/schemas/ConnectionType"
+        - name: resourceConnectionPort
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: resourceLocation
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: resourceBaseConfiguration
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+    delete:
+      tags:
+        - resources-rest-controller
+      summary: Delete resource
+      operationId: deleteResource
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+  "/resources/{resourceId}/capabilities":
+    put:
+      tags:
+        - capabilities-rest-controller
+      summary: Install capability on resource
+      operationId: installCapabilityOnSingleHost
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: capabilityId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: skipInstall
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+    delete:
+      tags:
+        - capabilities-rest-controller
+      summary: Uninstall capability from resource
+      operationId: removeCapabilityFromSingleHost
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: capabilityId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+  "/resources/{resourceId}/submodels":
+    get:
+      tags:
+        - submodels-rest-controller
+      summary: Get resource submodels
+      operationId: getResourceSubmodels
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+    post:
+      tags:
+        - submodels-rest-controller
+      summary: Add submodels to existing resource
+      operationId: addSubmodels
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - aasx
+              type: object
+              properties:
+                aasx:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+  "/resources/providers/virtual-resource-provider/{virtualResourceProviderId}/vm":
+    post:
+      tags:
+        - capability-providers-rest-controller
+      summary: Create Virtual Machine
+      operationId: createVm
+      parameters:
+        - name: virtualResourceProviderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+  "/resources/profiler":
+    get:
+      tags:
+        - profiler-rest-controller
+      summary: Get all Profiler
+      operationId: getProfiler
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Profiler"
+    post:
+      tags:
+        - profiler-rest-controller
+      summary: Create Profiler
+      operationId: createProfiler
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ProfilerDTOApi"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/Profiler"
+  "/resources/profiler/{profilerId}/execute":
+    post:
+      tags:
+        - profiler-rest-controller
+      summary: Run one Profiler
+      operationId: runProfiler
+      parameters:
+        - name: profilerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+  "/resources/profiler/execute":
+    post:
+      tags:
+        - profiler-rest-controller
+      summary: Run all Profiler
+      operationId: runProfiler_1
+      responses:
+        '200':
+          description: OK
+  "/resources/locations":
+    get:
+      tags:
+        - location-rest-controller
+      summary: Get locations
+      operationId: getLocations
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Location"
+    post:
+      tags:
+        - location-rest-controller
+      summary: Create new Location
+      operationId: addLocation
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+    delete:
+      tags:
+        - location-rest-controller
+      summary: Delete Location
+      operationId: deleteLocation
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+  "/resources/clusters":
+    get:
+      tags:
+        - clusters-rest-controller
+      summary: Get all cluster resources of user
+      operationId: getClusterResources
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Cluster"
+    post:
+      tags:
+        - clusters-rest-controller
+      summary: Create a cluster
+      operationId: createClusterResource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ClusterCreateRequest"
+        required: true
+      responses:
+        '200':
+          description: OK
+  "/resources/clusters/{clusterUuid}/members":
+    post:
+      tags:
+        - clusters-rest-controller
+      summary: Add new Member to cluster
+      operationId: addClusterMember
+      parameters:
+        - name: clusterUuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: resourceId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - clusters-rest-controller
+      summary: Remove member of cluster
+      operationId: removeClusterMember
+      parameters:
+        - name: clusterUuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: resourceId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+  "/resources/capabilities":
+    get:
+      tags:
+        - capabilities-rest-controller
+      summary: Get capabilities
+      operationId: getCapabilities
+      parameters:
+        - name: arg0
+          in: query
+          required: false
+          schema:
+            "$ref": "#/components/schemas/CapabilityFilter"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - "$ref": "#/components/schemas/BaseConfigurationCapabilityDTOApi"
+                    - "$ref": "#/components/schemas/DeploymentCapabilityDTOApi"
+                    - "$ref": "#/components/schemas/VirtualizationCapabilityDTOApi"
+    post:
+      tags:
+        - capabilities-rest-controller
+      summary: Add capability
+      operationId: createCapability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - "$ref": "#/components/schemas/BaseConfigurationCapabilityDTOApi"
+                - "$ref": "#/components/schemas/DeploymentCapabilityDTOApi"
+                - "$ref": "#/components/schemas/VirtualizationCapabilityDTOApi"
+        required: true
+      responses:
+        '200':
+          description: OK
+  "/resources/{resourceId}/deployment-capabilities":
+    get:
+      tags:
+        - capabilities-rest-controller
+      summary: Get deployment capabilities of resource
+      operationId: getDeploymentCapabilitiesOfResource
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/DeploymentCapability"
+  "/resources/{resourceId}/capability-services":
+    get:
+      tags:
+        - capabilities-rest-controller
+      summary: Get capability services of resource
+      operationId: getCapabilityServicesOfResource
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - "$ref": "#/components/schemas/CapabilityService"
+                    - "$ref": "#/components/schemas/MultiHostCapabilityService"
+                    - "$ref": "#/components/schemas/SingleHostCapabilityService"
+  "/resources/{resourceId}/aas-descriptor":
+    get:
+      tags:
+        - aas-rest-controller
+      summary: Get AAS descriptor of resource
+      operationId: getResourceAasDescriptor
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/AssetAdministrationShellDescriptor"
+  "/resources/{aasId}/aas/submodels":
+    get:
+      tags:
+        - resources-submodel-repository-api-http-controller
+      summary: Returns all Submodels
+      operationId: getAllSubmodels
+      parameters:
+        - name: aasId
+          in: path
+          description: Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)
+          required: true
+          schema:
+            type: string
+        - name: semanticId
+          in: query
+          description: The value of the semantic id reference (UTF8-BASE64-URL-encoded)
+          required: false
+          schema:
+            type: string
+        - name: idShort
+          in: query
+          description: The Asset Administration Shell’s IdShort
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: The maximum number of elements in the response array
+          required: false
+          schema:
+            minimum: 1
+            type: string
+            enum:
+              - '1'
+        - name: cursor
+          in: query
+          description: A server-generated identifier retrieved from pagingMetadata that
+            specifies from which position the result listing should continue
+          required: false
+          schema:
+            "$ref": "#/components/schemas/Base64UrlEncodedCursor"
+        - name: level
+          in: query
+          description: Determines the structural depth of the respective resource content
+          required: false
+          schema:
+            type: string
+            default: deep
+            enum:
+              - deep
+              - core
+        - name: extent
+          in: query
+          description: Determines to which extent the resource is being serialized
+          required: false
+          schema:
+            type: string
+            default: withoutBlobValue
+            enum:
+              - withBlobValue
+              - withoutBlobValue
+      responses:
+        '200':
+          description: Requested Submodels
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/GetSubmodelsResult"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Result"
+  "/resources/{aasId}/aas/submodels/{submodelIdentifier}":
+    get:
+      tags:
+        - resources-submodel-repository-api-http-controller
+      summary: Returns a specific Submodel
+      operationId: getSubmodelById
+      parameters:
+        - name: aasId
+          in: path
+          description: Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)
+          required: true
+          schema:
+            type: string
+        - name: submodelIdentifier
+          in: path
+          description: The Submodel’s unique id (UTF8-BASE64-URL-encoded)
+          required: true
+          schema:
+            type: string
+        - name: level
+          in: query
+          description: Determines the structural depth of the respective resource content
+          required: false
+          schema:
+            type: string
+            default: deep
+            enum:
+              - deep
+              - core
+        - name: extent
+          in: query
+          description: Determines to which extent the resource is being serialized
+          required: false
+          schema:
+            type: string
+            default: withoutBlobValue
+            enum:
+              - withBlobValue
+              - withoutBlobValue
+      responses:
+        '200':
+          description: Requested Submodel
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Submodel"
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Result"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Result"
+  "/resources/{aasId}/aas/submodels/{submodelIdentifier}/submodel-elements":
+    get:
+      tags:
+        - resources-submodel-repository-api-http-controller
+      summary: Returns all submodel elements including their hierarchy
+      operationId: getAllSubmodelElements
+      parameters:
+        - name: aasId
+          in: path
+          description: Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)
+          required: true
+          schema:
+            type: string
+        - name: submodelIdentifier
+          in: path
+          description: The Submodel’s unique id (UTF8-BASE64-URL-encoded)
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: The maximum number of elements in the response array
+          required: false
+          schema:
+            minimum: 1
+            type: string
+            enum:
+              - '1'
+        - name: cursor
+          in: query
+          description: A server-generated identifier retrieved from pagingMetadata that
+            specifies from which position the result listing should continue
+          required: false
+          schema:
+            "$ref": "#/components/schemas/Base64UrlEncodedCursor"
+        - name: level
+          in: query
+          description: Determines the structural depth of the respective resource content
+          required: false
+          schema:
+            type: string
+            default: deep
+            enum:
+              - deep
+              - core
+        - name: extent
+          in: query
+          description: Determines to which extent the resource is being serialized
+          required: false
+          schema:
+            type: string
+            default: withoutBlobValue
+            enum:
+              - withBlobValue
+              - withoutBlobValue
+      responses:
+        '200':
+          description: List of found submodel elements
+          content:
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Result"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Result"
+  "/resources/{aasId}/aas/submodels/{submodelIdentifier}/submodel-elements/{idShortPath}":
+    get:
+      tags:
+        - resources-submodel-repository-api-http-controller
+      summary: Returns a specific submodel element from the Submodel at a specified
+        path
+      operationId: getSubmodelElementByPathSubmodelRepo
+      parameters:
+        - name: aasId
+          in: path
+          description: Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)
+          required: true
+          schema:
+            type: string
+        - name: submodelIdentifier
+          in: path
+          description: The Submodel’s unique id (UTF8-BASE64-URL-encoded)
+          required: true
+          schema:
+            type: string
+        - name: idShortPath
+          in: path
+          description: IdShort path to the submodel element (dot-separated)
+          required: true
+          schema:
+            type: string
+        - name: level
+          in: query
+          description: Determines the structural depth of the respective resource content
+          required: false
+          schema:
+            type: string
+            default: deep
+            enum:
+              - deep
+              - core
+        - name: extent
+          in: query
+          description: Determines to which extent the resource is being serialized
+          required: false
+          schema:
+            type: string
+            default: withoutBlobValue
+            enum:
+              - withBlobValue
+              - withoutBlobValue
+      responses:
+        '200':
+          description: Requested submodel element
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SubmodelElement"
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Result"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Result"
+  "/resources/{aasId}/aas/submodels/{submodelIdentifier}/submodel-elements/{idShortPath}/$value":
+    get:
+      tags:
+        - resources-submodel-repository-api-http-controller
+      summary: Returns a specific submodel element from the Submodel at a specified
+        path in the ValueOnly representation
+      operationId: getSubmodelElementByPathValueOnlySubmodelRepo
+      parameters:
+        - name: aasId
+          in: path
+          description: Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)
+          required: true
+          schema:
+            type: string
+        - name: submodelIdentifier
+          in: path
+          description: The Submodel’s unique id (UTF8-BASE64-URL-encoded)
+          required: true
+          schema:
+            type: string
+        - name: idShortPath
+          in: path
+          description: IdShort path to the submodel element (dot-separated)
+          required: true
+          schema:
+            type: string
+        - name: level
+          in: query
+          description: Determines the structural depth of the respective resource content
+          required: false
+          schema:
+            type: string
+            default: deep
+            enum:
+              - deep
+              - core
+        - name: extent
+          in: query
+          description: Determines to which extent the resource is being serialized
+          required: false
+          schema:
+            type: string
+            default: withoutBlobValue
+            enum:
+              - withBlobValue
+              - withoutBlobValue
+      responses:
+        '200':
+          description: Requested submodel element
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SubmodelElementValue"
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Result"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Result"
+  "/resources/{aasId}/aas/submodels/{submodelIdentifier}/$value":
+    get:
+      tags:
+        - resources-submodel-repository-api-http-controller
+      summary: Returns a specific Submodel in the ValueOnly representation
+      operationId: getSubmodelByIdValueOnly
+      parameters:
+        - name: aasId
+          in: path
+          description: Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)
+          required: true
+          schema:
+            type: string
+        - name: submodelIdentifier
+          in: path
+          description: The Submodel’s unique id (UTF8-BASE64-URL-encoded)
+          required: true
+          schema:
+            type: string
+        - name: level
+          in: query
+          description: Determines the structural depth of the respective resource content
+          required: false
+          schema:
+            type: string
+            default: deep
+            enum:
+              - deep
+              - core
+        - name: extent
+          in: query
+          description: Determines to which extent the resource is being serialized
+          required: false
+          schema:
+            type: string
+            default: withoutBlobValue
+            enum:
+              - withBlobValue
+              - withoutBlobValue
+      responses:
+        '200':
+          description: Requested Submodel
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SubmodelValueOnly"
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Result"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Result"
+  "/resources/{aasId}/aas/submodels/{submodelIdentifier}/$metadata":
+    get:
+      tags:
+        - resources-submodel-repository-api-http-controller
+      summary: Returns the metadata attributes of a specific Submodel
+      operationId: getSubmodelByIdMetadata
+      parameters:
+        - name: aasId
+          in: path
+          description: Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)
+          required: true
+          schema:
+            type: string
+        - name: submodelIdentifier
+          in: path
+          description: The Submodel’s unique id (UTF8-BASE64-URL-encoded)
+          required: true
+          schema:
+            type: string
+        - name: level
+          in: query
+          description: Determines the structural depth of the respective resource content
+          required: false
+          schema:
+            type: string
+            default: deep
+            enum:
+              - deep
+              - core
+      responses:
+        '200':
+          description: Requested Submodel in the metadata representation
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Submodel"
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Result"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Result"
+  "/resources/providers/virtual-resource-provider":
+    get:
+      tags:
+        - capability-providers-rest-controller
+      summary: Get all virtual resource provider
+      operationId: getVirtualResourceProviders
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/VirtualResourceProvider"
+  "/resources/providers/service-hoster":
+    get:
+      tags:
+        - capability-providers-rest-controller
+      summary: Get all service hoster
+      operationId: getServiceHosters
+      parameters:
+        - name: arg0
+          in: query
+          required: false
+          schema:
+            "$ref": "#/components/schemas/ServiceHosterFilter"
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/ServiceHoster"
+  "/resources/profiler/{profilerId}":
+    get:
+      tags:
+        - profiler-rest-controller
+      summary: Get Profiler
+      operationId: getProfiler_1
+      parameters:
+        - name: profilerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/Profiler"
+    delete:
+      tags:
+        - profiler-rest-controller
+      summary: Delete Profiler
+      operationId: deleteProfiler
+      parameters:
+        - name: profilerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+  "/resources/discovery/drivers":
+    get:
+      tags:
+        - discovery-rest-controller
+      operationId: getRegisteredDrivers
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/DriverInfo"
+  "/resources/discovery/discover":
+    get:
+      tags:
+        - discovery-rest-controller
+      operationId: discover
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+                format: uuid
+  "/resources/discovery/discover/job/{discoveryJobId}":
+    get:
+      tags:
+        - discovery-rest-controller
+      operationId: getDiscoveryJob
+      parameters:
+        - name: discoveryJobId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/DiscoveryJob"
+  "/resources/connection-types":
+    get:
+      tags:
+        - resources-rest-controller
+      summary: Get available remote connection types
+      operationId: getResourceConnectionTypes
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/ConnectionTypeDTO"
+  "/resources/clusters/{clusterName}/members":
+    get:
+      tags:
+        - clusters-rest-controller
+      summary: Get members of cluster
+      operationId: getClusterMembers
+      parameters:
+        - name: clusterName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/CatalogService"
+  "/resources/clusters/types":
+    get:
+      tags:
+        - clusters-rest-controller
+      summary: Get all available cluster types
+      operationId: getClusterTypes
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - "$ref": "#/components/schemas/BaseConfigurationCapabilityDTOApi"
+                    - "$ref": "#/components/schemas/DeploymentCapabilityDTOApi"
+                    - "$ref": "#/components/schemas/VirtualizationCapabilityDTOApi"
+  "/resources/aas":
+    get:
+      tags:
+        - aas-rest-controller
+      summary: Get all AAS of resources
+      operationId: getResourceAASDescriptors
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/AssetAdministrationShell"
+  "/metrics/{resourceId}":
+    get:
+      tags:
+        - metrics-rest-controller
+      operationId: getMetric
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+  "/jobs":
+    get:
+      tags:
+        - jobs-rest-controller
+      operationId: getJobs
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+  "/aas/submodels/templates/{smTemplateSemanticId}/instances":
+    get:
+      tags:
+        - submodel-templates-rest-controller
+      summary: Get instances of submodel templates using semantic id
+      operationId: getSubmodelTemplateInstancesBySemanticId
+      parameters:
+        - name: smTemplateSemanticId
+          in: path
+          description: The semantic id to search for submodel instances (UTF8-BASE64-URL-encoded)
+          required: true
+          schema:
+            type: string
+        - name: filterByAasId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+  "/resources/{resourceId}/submodels/{submodelIdBase64Encoded}":
+    delete:
+      tags:
+        - submodels-rest-controller
+      summary: Delete resource submodel
+      operationId: deleteSubmodel
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: submodelIdBase64Encoded
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+  "/resources/clusters/{clusterUuid}":
+    delete:
+      tags:
+        - clusters-rest-controller
+      summary: Delete cluster resource
+      operationId: deleteClusterResource
+      parameters:
+        - name: clusterUuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+  "/resources/capabilities/{capabilityId}":
+    delete:
+      tags:
+        - capabilities-rest-controller
+      summary: Delete capability
+      operationId: deleteCapability
+      parameters:
+        - name: capabilityId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+components:
+  schemas:
+    ConnectionType:
+      type: string
+      enum:
+        - ssh
+        - WinSsh
+        - WinRM
+        - http
+        - tcp
+    Action:
+      required:
+        - actionClass
+        - configParameters
+        - connectionTypes
+        - skipable
+      type: object
+      properties:
+        actionClass:
+          type: string
+        actionType:
+          "$ref": "#/components/schemas/ActionType"
+        skipable:
+          type: boolean
+        configParameters:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ActionConfigParameter"
+        connectionTypes:
+          uniqueItems: true
+          type: array
+          items:
+            "$ref": "#/components/schemas/ConnectionType"
+      discriminator:
+        propertyName: actionClass
+    ActionConfigParameter:
+      required:
+        - description
+        - name
+        - prettyName
+        - requiredType
+        - secret
+        - valueType
+      type: object
+      properties:
+        name:
+          type: string
+        prettyName:
+          type: string
+        description:
+          type: string
+        valueType:
+          "$ref": "#/components/schemas/ActionConfigParameterValueType"
+        defaultValue:
+          type: string
+        requiredType:
+          "$ref": "#/components/schemas/ActionConfigParameterRequiredType"
+        secret:
+          type: boolean
+    ActionConfigParameterRequiredType:
+      type: string
+      enum:
+        - ALWAYS
+        - SKIP
+    ActionConfigParameterValueType:
+      type: string
+      enum:
+        - SERVICE_PORT
+        - STRING
+        - FILE
+        - KUBE_CONF
+    ActionType:
+      type: string
+      enum:
+        - INSTALL
+        - UNINSTALL
+        - SCALE_UP
+        - SCALE_DOWN
+        - CREATE_VM
+        - DELETE_VM
+        - DEPLOY
+        - UNDEPLOY
+        - UPDATE
+        - RUN
+    AwxAction:
+      required:
+        - actionClass
+        - awxBranch
+        - awxRepo
+        - configParameters
+        - connectionTypes
+        - playbook
+        - skipable
+      type: object
+      allOf:
+        - "$ref": "#/components/schemas/Action"
+        - type: object
+          properties:
+            awxRepo:
+              type: string
+            awxBranch:
+              type: string
+            playbook:
+              type: string
+            parameter:
+              type: array
+              items:
+                "$ref": "#/components/schemas/SurveyItem"
+    ProfilerDTOApi:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        action:
+          oneOf:
+            - "$ref": "#/components/schemas/AwxAction"
+    SurveyItem:
+      required:
+        - choices
+        - default
+        - question_description
+        - question_name
+        - required
+        - type
+        - variable
+      type: object
+      properties:
+        type:
+          "$ref": "#/components/schemas/SurveyItemType"
+        question_name:
+          type: string
+        question_description:
+          type: string
+        variable:
+          type: string
+        choices:
+          type: array
+          items:
+            type: string
+        min:
+          type: integer
+          format: int32
+        max:
+          type: integer
+          format: int32
+        required:
+          type: boolean
+        default:
+          type: string
+    SurveyItemType:
+      type: string
+      enum:
+        - text
+        - password
+        - integer
+        - float
+        - multiplechoice
+        - multiselect
+    Profiler:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        action:
+          oneOf:
+            - "$ref": "#/components/schemas/AwxAction"
+    ClusterCreateRequest:
+      required:
+        - clusterMembers
+        - clusterTypeId
+        - configParameterValues
+        - skipInstall
+      type: object
+      properties:
+        clusterTypeId:
+          type: string
+          format: uuid
+        skipInstall:
+          type: boolean
+        clusterMembers:
+          type: object
+          additionalProperties:
+            type: string
+        configParameterValues:
+          type: object
+          additionalProperties:
+            type: string
+    BaseConfigurationCapabilityDTOApi:
+      required:
+        - actions
+        - capabilityClass
+        - clusterMemberTypes
+        - id
+        - logo
+        - name
+        - type
+      type: object
+      allOf:
+        - "$ref": "#/components/schemas/CapabilityDTOApi"
+    CapabilityDTOApi:
+      required:
+        - actions
+        - capabilityClass
+        - clusterMemberTypes
+        - id
+        - logo
+        - name
+        - type
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        capabilityClass:
+          type: string
+        name:
+          type: string
+        logo:
+          type: string
+        type:
+          type: array
+          items:
+            "$ref": "#/components/schemas/CapabilityType"
+        actions:
+          type: object
+          additionalProperties:
+            oneOf:
+              - "$ref": "#/components/schemas/AwxAction"
+        healthCheck:
+          "$ref": "#/components/schemas/CapabilityHealthCheck"
+        clusterMemberTypes:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ClusterMemberType"
+        connection:
+          "$ref": "#/components/schemas/ConnectionType"
+        executionEnvironment:
+          "$ref": "#/components/schemas/ExecutionEnvironment"
+      discriminator:
+        propertyName: capabilityClass
+    CapabilityHealthCheck:
+      required:
+        - interval
+        - path
+        - port
+        - type
+      type: object
+      properties:
+        type:
+          "$ref": "#/components/schemas/CapabilityHealthCheckType"
+        port:
+          type: integer
+          format: int32
+        path:
+          type: string
+        interval:
+          type: integer
+          format: int32
+    CapabilityHealthCheckType:
+      type: string
+      enum:
+        - HTTP
+    CapabilityType:
+      type: string
+      enum:
+        - SETUP
+        - DEPLOY
+        - SCALE
+        - VM
+    ClusterMemberType:
+      required:
+        - minNumber
+        - name
+        - prettyName
+        - scalable
+      type: object
+      properties:
+        name:
+          type: string
+        prettyName:
+          type: string
+        minNumber:
+          type: integer
+          format: int32
+        scalable:
+          type: boolean
+    DeploymentCapabilityDTOApi:
+      required:
+        - actions
+        - capabilityClass
+        - clusterMemberTypes
+        - id
+        - logo
+        - name
+        - supportedDeploymentTypes
+        - type
+      type: object
+      allOf:
+        - "$ref": "#/components/schemas/CapabilityDTOApi"
+        - type: object
+          properties:
+            supportedDeploymentTypes:
+              type: array
+              items:
+                "$ref": "#/components/schemas/DeploymentType"
+    DeploymentType:
+      type: string
+      enum:
+        - DOCKER_CONTAINER
+        - DOCKER_COMPOSE
+        - KUBERNETES
+        - CODESYS
+    ExecutionEnvironment:
+      required:
+        - description
+        - image
+        - pull
+      type: object
+      properties:
+        image:
+          type: string
+        pull:
+          "$ref": "#/components/schemas/ExecutionEnvironmentPull"
+        description:
+          type: string
+        registryCredential:
+          "$ref": "#/components/schemas/RegistryCredentials"
+    ExecutionEnvironmentPull:
+      type: string
+      enum:
+        - ''
+        - always
+        - missing
+        - never
+    RegistryCredentials:
+      required:
+        - authenticationURL
+        - password
+        - username
+        - verifySSL
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        description:
+          type: string
+        authenticationURL:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        verifySSL:
+          type: boolean
+    VirtualizationCapabilityDTOApi:
+      required:
+        - actions
+        - capabilityClass
+        - clusterMemberTypes
+        - id
+        - logo
+        - name
+        - type
+      type: object
+      allOf:
+        - "$ref": "#/components/schemas/CapabilityDTOApi"
+    BaseConfigurationCapability:
+      required:
+        - actions
+        - capabilityClass
+        - clusterMemberTypes
+        - connectionTypes
+        - id
+        - isCluster
+        - logo
+        - name
+        - type
+      type: object
+      allOf:
+        - "$ref": "#/components/schemas/Capability"
+    BasicResource:
+      required:
+        - clusterMember
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        location:
+          "$ref": "#/components/schemas/Location"
+        ip:
+          type: string
+        hostname:
+          type: string
+        project:
+          type: string
+        clusterMember:
+          type: boolean
+        capabilityServices:
+          type: array
+          items:
+            oneOf:
+              - "$ref": "#/components/schemas/CapabilityService"
+              - "$ref": "#/components/schemas/MultiHostCapabilityService"
+              - "$ref": "#/components/schemas/SingleHostCapabilityService"
+        remoteAccessService:
+          "$ref": "#/components/schemas/RemoteAccessService"
+    Capability:
+      required:
+        - actions
+        - capabilityClass
+        - clusterMemberTypes
+        - connectionTypes
+        - id
+        - isCluster
+        - logo
+        - name
+        - type
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        capabilityClass:
+          type: string
+        name:
+          type: string
+        logo:
+          type: string
+        type:
+          type: array
+          items:
+            "$ref": "#/components/schemas/CapabilityType"
+        actions:
+          type: object
+          additionalProperties:
+            oneOf:
+              - "$ref": "#/components/schemas/AwxAction"
+        healthCheck:
+          "$ref": "#/components/schemas/CapabilityHealthCheck"
+        clusterMemberTypes:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ClusterMemberType"
+        connection:
+          "$ref": "#/components/schemas/ConnectionType"
+        executionEnvironment:
+          "$ref": "#/components/schemas/ExecutionEnvironment"
+        connectionTypes:
+          uniqueItems: true
+          type: array
+          items:
+            "$ref": "#/components/schemas/ConnectionType"
+        isCluster:
+          type: boolean
+      discriminator:
+        propertyName: capabilityClass
+    CapabilityService:
+      required:
+        - ID
+        - capabilityServiceClass
+        - customMeta
+        - managed
+        - serviceClass
+        - serviceMeta
+        - status
+        - tags
+      type: object
+      properties:
+        service:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        serviceMeta:
+          type: object
+          additionalProperties:
+            type: string
+        capability:
+          oneOf:
+            - "$ref": "#/components/schemas/BaseConfigurationCapability"
+            - "$ref": "#/components/schemas/DeploymentCapability"
+            - "$ref": "#/components/schemas/VirtualizationCapability"
+        status:
+          "$ref": "#/components/schemas/CapabilityServiceStatus"
+        serviceClass:
+          type: string
+        customMeta:
+          type: object
+          additionalProperties:
+            type: string
+        managed:
+          type: boolean
+        ID:
+          type: string
+          format: uuid
+        Address:
+          type: string
+        Port:
+          type: integer
+          format: int32
+        capabilityServiceClass:
+          type: string
+      discriminator:
+        propertyName: capabilityServiceClass
+    CapabilityServiceStatus:
+      type: string
+      enum:
+        - INSTALL
+        - READY
+        - UNINSTALL
+        - FAILED
+        - UNKNOWN
+    Credential:
+      required:
+        - credentialClass
+      type: object
+      properties:
+        credentialClass:
+          type: string
+      discriminator:
+        propertyName: credentialClass
+    CredentialUsernamePassword:
+      required:
+        - password
+        - username
+      type: object
+      allOf:
+        - "$ref": "#/components/schemas/Credential"
+        - type: object
+          properties:
+            password:
+              type: string
+            username:
+              type: string
+    DeploymentCapability:
+      required:
+        - actions
+        - capabilityClass
+        - clusterMemberTypes
+        - connectionTypes
+        - id
+        - isCluster
+        - logo
+        - name
+        - supportedDeploymentTypes
+        - type
+      type: object
+      allOf:
+        - "$ref": "#/components/schemas/Capability"
+        - type: object
+          properties:
+            supportedDeploymentTypes:
+              type: array
+              items:
+                "$ref": "#/components/schemas/DeploymentType"
+    Location:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    MultiHostCapabilityService:
+      required:
+        - ID
+        - customMeta
+        - managed
+        - mapOfNodeIdsAndCatalogServices
+        - serviceClass
+        - serviceMeta
+        - status
+        - tags
+      type: object
+      allOf:
+        - "$ref": "#/components/schemas/CapabilityService"
+        - type: object
+          properties:
+            memberMapping:
+              type: object
+              additionalProperties:
+                type: string
+            mapOfNodeIdsAndCatalogServices:
+              type: object
+              additionalProperties:
+                "$ref": "#/components/schemas/Service"
+    RemoteAccessService:
+      required:
+        - ID
+        - serviceMeta
+        - tags
+      type: object
+      properties:
+        service:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        serviceMeta:
+          type: object
+          additionalProperties:
+            type: string
+        credential:
+          oneOf:
+            - "$ref": "#/components/schemas/CredentialUsernamePassword"
+        connectionType:
+          "$ref": "#/components/schemas/ConnectionType"
+        ID:
+          type: string
+          format: uuid
+        Address:
+          type: string
+        Port:
+          type: integer
+          format: int32
+    Service:
+      required:
+        - ID
+        - Meta
+        - Tags
+      type: object
+      properties:
+        ID:
+          type: string
+          format: uuid
+        Address:
+          type: string
+        Service:
+          type: string
+        Tags:
+          type: array
+          items:
+            type: string
+        Port:
+          type: integer
+          format: int32
+        Meta:
+          type: object
+          additionalProperties:
+            type: string
+    SingleHostCapabilityService:
+      required:
+        - ID
+        - customMeta
+        - managed
+        - serviceClass
+        - serviceMeta
+        - status
+        - tags
+      type: object
+      allOf:
+        - "$ref": "#/components/schemas/CapabilityService"
+        - type: object
+          properties:
+            consulNodeId:
+              type: string
+              format: uuid
+    VirtualizationCapability:
+      required:
+        - actions
+        - capabilityClass
+        - clusterMemberTypes
+        - connectionTypes
+        - id
+        - isCluster
+        - logo
+        - name
+        - type
+      type: object
+      allOf:
+        - "$ref": "#/components/schemas/Capability"
+    AdministrativeInformation:
+      type: object
+      properties:
+        version:
+          type: string
+        creator:
+          "$ref": "#/components/schemas/Reference"
+        revision:
+          type: string
+        templateId:
+          type: string
+        embeddedDataSpecifications:
+          type: array
+          items:
+            "$ref": "#/components/schemas/EmbeddedDataSpecification"
+    AssetAdministrationShellDescriptor:
+      type: object
+      properties:
+        id:
+          type: string
+        idShort:
+          type: string
+        endpoints:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Endpoint"
+        specificAssetIds:
+          type: array
+          items:
+            "$ref": "#/components/schemas/SpecificAssetId"
+        submodelDescriptors:
+          type: array
+          items:
+            "$ref": "#/components/schemas/SubmodelDescriptor"
+        administration:
+          "$ref": "#/components/schemas/AdministrativeInformation"
+        globalAssetId:
+          type: string
+        assetKind:
+          "$ref": "#/components/schemas/AssetKind"
+        assetType:
+          type: string
+        description:
+          type: array
+          items:
+            "$ref": "#/components/schemas/LangStringTextType"
+        displayName:
+          type: array
+          items:
+            "$ref": "#/components/schemas/LangStringNameType"
+        extensions:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Extension"
+    AssetKind:
+      type: string
+      enum:
+        - INSTANCE
+        - NOT_APPLICABLE
+        - TYPE
+    DataSpecificationContent:
+      type: object
+    DataTypeDefXsd:
+      type: string
+      enum:
+        - ANY_URI
+        - BASE64BINARY
+        - BOOLEAN
+        - BYTE
+        - DATE
+        - DATE_TIME
+        - DECIMAL
+        - DOUBLE
+        - DURATION
+        - FLOAT
+        - GDAY
+        - GMONTH
+        - GMONTH_DAY
+        - GYEAR
+        - GYEAR_MONTH
+        - HEX_BINARY
+        - INT
+        - INTEGER
+        - LONG
+        - NEGATIVE_INTEGER
+        - NON_NEGATIVE_INTEGER
+        - NON_POSITIVE_INTEGER
+        - POSITIVE_INTEGER
+        - SHORT
+        - STRING
+        - TIME
+        - UNSIGNED_BYTE
+        - UNSIGNED_INT
+        - UNSIGNED_LONG
+        - UNSIGNED_SHORT
+    EmbeddedDataSpecification:
+      type: object
+      properties:
+        dataSpecificationContent:
+          "$ref": "#/components/schemas/DataSpecificationContent"
+        dataSpecification:
+          "$ref": "#/components/schemas/Reference"
+    Endpoint:
+      type: object
+      properties:
+        protocolInformation:
+          "$ref": "#/components/schemas/ProtocolInformation"
+        get_interface:
+          type: string
+    Extension:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        valueType:
+          "$ref": "#/components/schemas/DataTypeDefXsd"
+        refersTo:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Reference"
+        semanticId:
+          "$ref": "#/components/schemas/Reference"
+        supplementalSemanticIds:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Reference"
+    Key:
+      type: object
+      properties:
+        type:
+          "$ref": "#/components/schemas/KeyTypes"
+        value:
+          type: string
+    KeyTypes:
+      type: string
+      enum:
+        - ANNOTATED_RELATIONSHIP_ELEMENT
+        - ASSET_ADMINISTRATION_SHELL
+        - BASIC_EVENT_ELEMENT
+        - BLOB
+        - CAPABILITY
+        - CONCEPT_DESCRIPTION
+        - DATA_ELEMENT
+        - ENTITY
+        - EVENT_ELEMENT
+        - FILE
+        - FRAGMENT_REFERENCE
+        - GLOBAL_REFERENCE
+        - IDENTIFIABLE
+        - MULTI_LANGUAGE_PROPERTY
+        - OPERATION
+        - PROPERTY
+        - RANGE
+        - REFERABLE
+        - REFERENCE_ELEMENT
+        - RELATIONSHIP_ELEMENT
+        - SUBMODEL
+        - SUBMODEL_ELEMENT
+        - SUBMODEL_ELEMENT_COLLECTION
+        - SUBMODEL_ELEMENT_LIST
+    LangStringNameType:
+      type: object
+      properties:
+        language:
+          type: string
+        text:
+          type: string
+    LangStringTextType:
+      type: object
+      properties:
+        language:
+          type: string
+        text:
+          type: string
+    ProtocolInformation:
+      type: object
+      properties:
+        href:
+          type: string
+        endpointProtocol:
+          type: string
+        endpointProtocolVersion:
+          type: array
+          items:
+            type: string
+        subprotocolBody:
+          type: string
+        subprotocol:
+          type: string
+        securityAttributes:
+          type: array
+          items:
+            "$ref": "#/components/schemas/SecurityAttributeObject"
+        subprotocolBodyEncoding:
+          type: string
+    Reference:
+      type: object
+      properties:
+        type:
+          "$ref": "#/components/schemas/ReferenceTypes"
+        keys:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Key"
+        referredSemanticId:
+          "$ref": "#/components/schemas/Reference"
+    ReferenceTypes:
+      type: string
+      enum:
+        - EXTERNAL_REFERENCE
+        - MODEL_REFERENCE
+    SecurityAttributeObject:
+      type: object
+      properties:
+        type:
+          "$ref": "#/components/schemas/SecurityTypeEnum"
+        value:
+          type: string
+        key:
+          type: string
+    SecurityTypeEnum:
+      type: string
+      enum:
+        - NONE
+        - RFC_TLSA
+        - W3C_DID
+    SpecificAssetId:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        externalSubjectId:
+          "$ref": "#/components/schemas/Reference"
+        semanticId:
+          "$ref": "#/components/schemas/Reference"
+        supplementalSemanticIds:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Reference"
+    SubmodelDescriptor:
+      type: object
+      properties:
+        id:
+          type: string
+        idShort:
+          type: string
+        endpoints:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Endpoint"
+        semanticId:
+          "$ref": "#/components/schemas/Reference"
+        supplementalSemanticId:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Reference"
+        administration:
+          "$ref": "#/components/schemas/AdministrativeInformation"
+        description:
+          type: array
+          items:
+            "$ref": "#/components/schemas/LangStringTextType"
+        displayName:
+          type: array
+          items:
+            "$ref": "#/components/schemas/LangStringNameType"
+        extensions:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Extension"
+    Base64UrlEncodedCursor:
+      type: object
+      properties:
+        encodedCursor:
+          type: string
+        decodedCursor:
+          type: string
+    Message:
+      type: object
+      properties:
+        text:
+          type: string
+        timestamp:
+          type: string
+        code:
+          type: string
+        correlationId:
+          type: string
+        messageType:
+          "$ref": "#/components/schemas/MessageTypeEnum"
+    MessageTypeEnum:
+      type: string
+      enum:
+        - ERROR
+        - EXCEPTION
+        - INFO
+        - WARNING
+    Result:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Message"
+    GetSubmodelsResult:
+      type: object
+      properties:
+        paging_metadata:
+          "$ref": "#/components/schemas/PagedResultPagingMetadata"
+        result:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Submodel"
+    ModellingKind:
+      type: string
+      enum:
+        - INSTANCE
+        - TEMPLATE
+    PagedResultPagingMetadata:
+      type: object
+      properties:
+        cursor:
+          type: string
+          example: wJlCDLIl6KTWypN7T6vc6nWEmEYe99Hjf1XY1xmqV-M=#
+    Qualifier:
+      type: object
+      properties:
+        type:
+          type: string
+        value:
+          type: string
+        kind:
+          "$ref": "#/components/schemas/QualifierKind"
+        valueType:
+          "$ref": "#/components/schemas/DataTypeDefXsd"
+        valueId:
+          "$ref": "#/components/schemas/Reference"
+        semanticId:
+          "$ref": "#/components/schemas/Reference"
+        supplementalSemanticIds:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Reference"
+    QualifierKind:
+      type: string
+      enum:
+        - CONCEPT_QUALIFIER
+        - TEMPLATE_QUALIFIER
+        - VALUE_QUALIFIER
+    Submodel:
+      type: object
+      properties:
+        submodelElements:
+          type: array
+          items:
+            "$ref": "#/components/schemas/SubmodelElement"
+        id:
+          type: string
+        administration:
+          "$ref": "#/components/schemas/AdministrativeInformation"
+        description:
+          type: array
+          items:
+            "$ref": "#/components/schemas/LangStringTextType"
+        displayName:
+          type: array
+          items:
+            "$ref": "#/components/schemas/LangStringNameType"
+        idShort:
+          type: string
+        category:
+          type: string
+        extensions:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Extension"
+        embeddedDataSpecifications:
+          type: array
+          items:
+            "$ref": "#/components/schemas/EmbeddedDataSpecification"
+        semanticId:
+          "$ref": "#/components/schemas/Reference"
+        supplementalSemanticIds:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Reference"
+        qualifiers:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Qualifier"
+        kind:
+          "$ref": "#/components/schemas/ModellingKind"
+    SubmodelElement:
+      type: object
+      properties:
+        embeddedDataSpecifications:
+          type: array
+          items:
+            "$ref": "#/components/schemas/EmbeddedDataSpecification"
+        description:
+          type: array
+          items:
+            "$ref": "#/components/schemas/LangStringTextType"
+        displayName:
+          type: array
+          items:
+            "$ref": "#/components/schemas/LangStringNameType"
+        idShort:
+          type: string
+        category:
+          type: string
+        extensions:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Extension"
+        semanticId:
+          "$ref": "#/components/schemas/Reference"
+        supplementalSemanticIds:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Reference"
+        qualifiers:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Qualifier"
+    SubmodelElementValue:
+      type: object
+    SubmodelValueOnly:
+      type: object
+      properties:
+        idShort:
+          type: string
+        valuesOnlyMap:
+          type: object
+          additionalProperties:
+            "$ref": "#/components/schemas/SubmodelElementValue"
+    VirtualResourceProvider:
+      required:
+        - capabilityClass
+      type: object
+      properties:
+        capabilityService:
+          oneOf:
+            - "$ref": "#/components/schemas/CapabilityService"
+            - "$ref": "#/components/schemas/MultiHostCapabilityService"
+            - "$ref": "#/components/schemas/SingleHostCapabilityService"
+        capabilityClass:
+          type: string
+    CapabilityHostType:
+      type: string
+      enum:
+        - SINGLE_HOST
+        - MULTI_HOST
+    ServiceHosterFilter:
+      type: object
+      properties:
+        capabilityServiceId:
+          type: string
+          format: uuid
+        supportedDeploymentType:
+          "$ref": "#/components/schemas/DeploymentType"
+        capabilityHostType:
+          "$ref": "#/components/schemas/CapabilityHostType"
+    ServiceHoster:
+      required:
+        - capabilityClass
+      type: object
+      properties:
+        capabilityService:
+          oneOf:
+            - "$ref": "#/components/schemas/CapabilityService"
+            - "$ref": "#/components/schemas/MultiHostCapabilityService"
+            - "$ref": "#/components/schemas/SingleHostCapabilityService"
+        capabilityClass:
+          type: string
+    DriverInfo:
+      type: object
+      properties:
+        instanceId:
+          type: string
+        domainName:
+          type: string
+        portNumber:
+          type: integer
+          format: int32
+        ipv4Address:
+          type: string
+    DiscoveredResource:
+      type: object
+      properties:
+        id:
+          type: string
+        serialNumber:
+          type: string
+        manufacturerName:
+          type: string
+        productName:
+          type: string
+        ipAddress:
+          type: string
+        macAddress:
+          type: string
+    DiscoveryJob:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        startDate:
+          type: string
+          format: date-time
+        finishDate:
+          type: string
+          format: date-time
+        state:
+          "$ref": "#/components/schemas/DiscoveryJobState"
+        discoveryResult:
+          type: array
+          items:
+            "$ref": "#/components/schemas/DiscoveredResource"
+    DiscoveryJobState:
+      type: string
+      enum:
+        - CREATED
+        - IN_PROGRESS
+        - COMPLETED
+        - FAILED
+    ConnectionTypeDTO:
+      required:
+        - isRemote
+        - name
+        - prettyName
+      type: object
+      properties:
+        connectionType:
+          "$ref": "#/components/schemas/ConnectionType"
+        name:
+          type: string
+        prettyName:
+          type: string
+        defaultPort:
+          type: integer
+          format: int32
+        isRemote:
+          type: boolean
+    Cluster:
+      required:
+        - clusterMemberTypes
+        - clusterType
+        - id
+        - managed
+        - memberMapping
+        - nodes
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        clusterType:
+          type: string
+        clusterMemberTypes:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ClusterMemberType"
+        nodes:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Node"
+        memberMapping:
+          type: object
+          additionalProperties:
+            type: string
+        metaData:
+          type: object
+          additionalProperties:
+            type: string
+        capabilityService:
+          "$ref": "#/components/schemas/MultiHostCapabilityService"
+        managed:
+          type: boolean
+    Node:
+      type: object
+      properties:
+        ID:
+          type: string
+          format: uuid
+        Node:
+          type: string
+        Address:
+          type: string
+        Datacenter:
+          type: string
+        TaggedAddresses:
+          "$ref": "#/components/schemas/TaggedAddresses"
+        Meta:
+          type: object
+          additionalProperties:
+            type: string
+        CreateIndex:
+          type: integer
+          format: int64
+        ModifyIndex:
+          type: integer
+          format: int64
+    TaggedAddresses:
+      type: object
+      properties:
+        Lan:
+          type: string
+        Wan:
+          type: string
+    CatalogService:
+      type: object
+      properties:
+        ID:
+          type: string
+          format: uuid
+        Node:
+          type: string
+        Address:
+          type: string
+        Datacenter:
+          type: string
+        TaggedAddresses:
+          "$ref": "#/components/schemas/TaggedAddresses"
+        NodeMeta:
+          type: object
+          additionalProperties:
+            type: string
+        ServiceID:
+          type: string
+        ServiceName:
+          type: string
+        ServiceTags:
+          type: array
+          items:
+            type: string
+        ServiceAddress:
+          type: string
+        ServiceMeta:
+          type: object
+          additionalProperties:
+            type: string
+        ServicePort:
+          type: integer
+          format: int32
+        ServiceEnableTagOverride:
+          type: boolean
+        CreateIndex:
+          type: integer
+          format: int64
+        ModifyIndex:
+          type: integer
+          format: int64
+    CapabilityFilter:
+      type: object
+      properties:
+        capabilityId:
+          type: string
+          format: uuid
+        capabilityHostType:
+          "$ref": "#/components/schemas/CapabilityHostType"
+    AssetAdministrationShell:
+      type: object
+      properties:
+        submodels:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Reference"
+        assetInformation:
+          "$ref": "#/components/schemas/AssetInformation"
+        derivedFrom:
+          "$ref": "#/components/schemas/Reference"
+        id:
+          type: string
+        administration:
+          "$ref": "#/components/schemas/AdministrativeInformation"
+        description:
+          type: array
+          items:
+            "$ref": "#/components/schemas/LangStringTextType"
+        displayName:
+          type: array
+          items:
+            "$ref": "#/components/schemas/LangStringNameType"
+        idShort:
+          type: string
+        category:
+          type: string
+        extensions:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Extension"
+        embeddedDataSpecifications:
+          type: array
+          items:
+            "$ref": "#/components/schemas/EmbeddedDataSpecification"
+    AssetInformation:
+      type: object
+      properties:
+        specificAssetIds:
+          type: array
+          items:
+            "$ref": "#/components/schemas/SpecificAssetId"
+        globalAssetId:
+          type: string
+        assetKind:
+          "$ref": "#/components/schemas/AssetKind"
+        assetType:
+          type: string
+        defaultThumbnail:
+          "$ref": "#/components/schemas/Resource"
+    Resource:
+      type: object
+      properties:
+        contentType:
+          type: string
+        path:
+          type: string
+  securitySchemes:
+    spring_oauth:
+      type: oauth2
+      description: Oauth2 flow
+      flows:
+        authorizationCode:
+          authorizationUrl: http://slm.local:7080/auth/realms/fabos/protocol/openid-connect/auth
+          tokenUrl: http://slm.local:7080/auth/realms/fabos/protocol/openid-connect/token
+          refreshUrl: http://slm.local:7080/auth/realms/fabos/protocol/openid-connect/token
+          scopes: {}
+    bearer_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -100,10 +100,11 @@
 
 <script>
 
-import clustersRestApi from '@/api/resource-management/clustersRestApi'
 import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
 import {useResourcesStore} from "@/stores/resourcesStore";
 import {useProviderStore} from "@/stores/providerStore";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 export default {
     name: 'ResourcesCreateDialogPageCreateNewResourceCluster',
@@ -224,7 +225,13 @@ export default {
           })
         }
 
-        clustersRestApi.createClusterResource(this.selectedClusterType.id, false, clusterMembers, {})
+        ResourceManagementClient.clusterApi.createClusterResource({
+          clusterTypeId: this.selectedClusterType.id,
+          skipInstall: false,
+          clusterMembers: clusterMembers,
+          configParameterValues: {}
+        }).then().catch(logRequestError);
+
         this.clearForm()
         this.$emit('confirmed')
       },

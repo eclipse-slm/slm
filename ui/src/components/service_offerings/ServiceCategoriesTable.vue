@@ -71,11 +71,11 @@
 <script>
 
 import ServiceCategoryCreateOrEditDialog from '@/components/service_offerings/ServiceCategoryCreateOrEditDialog'
-import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 import {app} from "@/main";
 import {useServicesStore} from "@/stores/servicesStore";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
 
 export default {
     name: 'ServiceCategoriesTable',
@@ -116,7 +116,7 @@ export default {
       onDeleteServiceCategoryClicked (serviceVendor) {
         this.selectedServiceCategory = null
         this.editServiceCategory = false
-        ServiceOfferingsRestApi.deleteServiceCategory(serviceVendor.id).then(
+        ServiceManagementClient.serviceCategoriesApi.deleteServiceCategories(serviceVendor.id).then(
           response => {
             app.config.globalProperties.$toast.info('Service category successfully deleted')
 

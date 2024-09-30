@@ -14,15 +14,15 @@ import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
-@DisplayName("Resource Registry")
+@DisplayName("Resource Management")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ResourceManagementTests {
 
     @BeforeAll
     public static void init()
     {
-        RestAssured.baseURI = TestConfig.RESOURCE_REGISTRY_BASE_URL;
-        RestAssured.port = TestConfig.RESOURCE_REGISTRY_PORT;
+        RestAssured.baseURI = TestConfig.RESOURCE_MANAGEMENT_BASE_URL;
+        RestAssured.port = TestConfig.RESOURCE_MANAGEMENT_PORT;
         RestAssured.basePath = "";
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
     }
@@ -34,7 +34,7 @@ public class ResourceManagementTests {
     @Order(10)
     @Test
     @DisplayName("Swagger UI is reachable")
-    public void checkResourceRegistrySwaggerUiReachable() {
+    public void checkSwaggerUiReachable() {
         get("/swagger-ui.html")
             .then().assertThat() .statusCode(200);
     }
@@ -42,9 +42,9 @@ public class ResourceManagementTests {
     @Order(20)
     @Test
     @DisplayName("REST API is reachable and endpoint secured")
-    public void checkResourceRegistryReachable() {
-        get("/resources/")
-            .then().assertThat() .statusCode(200);
+    public void checkRestApiReachableAndSecured() {
+        get("/resources")
+            .then().assertThat() .statusCode(401);
     }
 
     @Order(30)

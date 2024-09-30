@@ -46,7 +46,6 @@
   vars:
     _app_name: "service_management"
 
-
 - name: "Get Keycloak admin access token"
   include_role:
     name: keycloak/client

@@ -1,0 +1,202 @@
+openapi: 3.0.1
+info:
+  title: Notification Service
+  description: REST API of Notification Service
+  contact:
+    name: Fraunhofer IPA
+    url: https://www.ipa.fraunhofer.de
+    email: matthias.schneider@ipa.fraunhofer.de
+  version: 1.4.0-SNAPSHOT
+servers:
+- url: http://localhost:9001
+  description: Generated server url
+security:
+- bearer_auth: []
+- spring_oauth: []
+paths:
+  /observer/job:
+    post:
+      tags:
+      - observer-rest-controller
+      summary: Create observer for running job
+      operationId: createJobObserver
+      parameters:
+      - name: userUuid
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: jobId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: jobTarget
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/JobTarget'
+      - name: jobGoal
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/JobGoal'
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+  /notification:
+    post:
+      tags:
+      - notification-rest-controller
+      summary: Create new notifications
+      operationId: createNotification
+      parameters:
+      - name: category
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Category'
+      - name: jobTarget
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/JobTarget'
+      - name: jobGoal
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/JobGoal'
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+  /notifications/read:
+    patch:
+      tags:
+      - notification-rest-controller
+      summary: Set read property of notifications
+      operationId: setReadOfNotifications
+      parameters:
+      - name: read
+        in: query
+        required: true
+        schema:
+          type: boolean
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Notification'
+        required: true
+      responses:
+        "200":
+          description: OK
+  /notifications:
+    get:
+      tags:
+      - notification-rest-controller
+      summary: Get notifications of a user
+      operationId: getNotifications
+      parameters:
+      - name: isRead
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: Realm
+        in: header
+        description: Keycloak Realm
+        required: false
+        schema:
+          type: string
+          default: fabos
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+components:
+  schemas:
+    JobTarget:
+      type: string
+      enum:
+      - PROJECT
+      - RESOURCE
+      - SERVICE
+      - DEPLOYMENT_CAPABILITY
+      - BASE_CONFIGURATION_CAPABILITY
+    JobGoal:
+      type: string
+      enum:
+      - CREATE
+      - DELETE
+      - UPDATE
+      - UPGRADE
+      - MOVE
+      - MODIFY
+      - ADD
+    Category:
+      type: string
+      enum:
+      - Jobs
+      - Resources
+      - Services
+      - Projects
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        category:
+          $ref: '#/components/schemas/Category'
+        text:
+          type: string
+        owner:
+          type: string
+        date:
+          type: string
+          format: date-time
+        read:
+          type: boolean
+  securitySchemes:
+    spring_oauth:
+      type: oauth2
+      description: Oauth2 flow
+      flows:
+        authorizationCode:
+          authorizationUrl: http://fabos.local:7080/auth/realms/fabos/protocol/openid-connect/auth
+          tokenUrl: http://fabos.local:7080/auth/realms/fabos/protocol/openid-connect/token
+          refreshUrl: http://fabos.local:7080/auth/realms/fabos/protocol/openid-connect/token
+          scopes: {}
+    bearer_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,12 +1,9 @@
-import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
-import ServiceInstancesRestApi from '@/api/service-management/serviceInstancesRestApi'
-import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
 import ApiState from '@/api/apiState.js'
 import {UUID} from "vue-uuid";
-import ServiceManagementTemplatesRestApi from "@/api/service-management/serviceManagementVariablesRestApi";
-import ServiceInstancesGroupsRestApi from "@/api/service-management/serviceInstancesGroupsRestApi";
 import {app} from "@/main";
 import {defineStore} from "pinia";
+import logRequestError from "@/api/restApiHelper";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
 
 
 interface ServiceStoreState{
@@ -196,62 +193,65 @@ export const useServicesStore = defineStore('servicesStore', {
         },
         
         async initServiceStore () {
-            await ServiceManagementTemplatesRestApi.getSystemVariables()
+            await ServiceManagementClient.variablesApi.getSystemVariables()
                 .then(
-                    templateVariables => {
-                        this.serviceManagementSystemVariables_ = templateVariables;
-                    })
+                    response => {
+                        this.serviceManagementSystemVariables_ = response.data;
+                    }).catch(logRequestError)
 
-            await ServiceManagementTemplatesRestApi.getDeploymentVariables()
+            await ServiceManagementClient.variablesApi.getDeploymentVariables()
                 .then(
-                    templateVariables => {
-                        this.serviceManagementDeploymentVariables_ = templateVariables;
-                    })
+                    response => {
+                        this.serviceManagementDeploymentVariables_ = response.data;
+                    }).catch(logRequestError)
         },
 
         async getServiceOfferingCategories () {
             this.apiStateServices_.serviceOfferingCategories = ApiState.LOADING
-            await ServiceOfferingsRestApi.getServiceCategories()
+            await ServiceManagementClient.serviceCategoriesApi.getServiceCategories()
                 .then(
                     response => {
-                        this.serviceOfferingCategories_ = response;
+                        this.serviceOfferingCategories_ = response.data;
                         this.apiStateServices_.serviceOfferingCategories = ApiState.LOADED
-                    })
+                    }).catch(logRequestError);
         },
 
         async getServiceOfferingDeploymentTypes () {
             this.apiStateServices_.serviceOfferingDeploymentTypes = ApiState.LOADING
-            await ServiceOfferingsRestApi.getDeploymentTypes()
+            await ServiceManagementClient.serviceOfferingsApi.getDeploymentTypes()
                 .then(
                     response => {
-                        this.setDeploymentTypes(response)
+                        this.setDeploymentTypes(response.data)
                         this.apiStateServices_.serviceOfferingDeploymentTypes = ApiState.LOADED
-                    })
+                    }).catch(logRequestError)
         },
 
         async getServiceOfferings () {
-            await ServiceOfferingsRestApi.getOfferings()
+            await ServiceManagementClient.serviceOfferingsApi.getServiceOfferings()
                 .then(
-                    serviceOfferings => {
-                        this.serviceOfferings_ = serviceOfferings
+                    response => {
+                        this.serviceOfferings_ = response.data
                         this.apiStateServices_.serviceOfferings = ApiState.LOADED
-                    })
+                    }).catch(logRequestError)
         },
 
         async getServiceOfferingImages (serviceOfferingId: UUID) {
             const coverImage = this.serviceOfferingCoverImage(serviceOfferingId)
             if (coverImage == null) {
-                return ServiceOfferingsRestApi.getServiceOfferingCoverImage(serviceOfferingId)
+                return ServiceManagementClient.serviceOfferingsApi.getServiceOfferingCover(`${serviceOfferingId}`)
                     .then(
-                        coverImage => {
-                            if (coverImage != null && coverImage !== '') {
-                                if (!coverImage.startsWith('data:')) {
-                                    coverImage = 'data:image/jpeg;base64,' + coverImage
+                        response => {
+                            if (response.data && response.data !== ''){
+                                let coverImage = response.data;
+                                if (coverImage != null && coverImage !== '') {
+                                    if (!coverImage.startsWith('data:')) {
+                                        coverImage = 'data:image/jpeg;base64,' + coverImage
+                                    }
                                 }
+                                this.setServiceOfferingCoverImage({ serviceOfferingId, coverImage })
+                                return coverImage
                             }
-                            this.setServiceOfferingCoverImage({ serviceOfferingId, coverImage })
-                            return coverImage
-                        })
+                        }).catch(logRequestError)
             } else {
                 return coverImage
             }
@@ -259,21 +259,21 @@ export const useServicesStore = defineStore('servicesStore', {
 
         async getServiceVendors () {
             this.apiStateServices_.serviceVendors = ApiState.LOADING
-            return await ServiceVendorsRestApi.getVendors()
+            return await ServiceManagementClient.serviceVendorsApi.getServiceVendors()
                 .then(
                     response => {
-                        this.serviceVendors_ = response
+                        this.serviceVendors_ = response.data
                         this.apiStateServices_.serviceVendors = ApiState.LOADED
-                    })
+                    }).catch(logRequestError)
         },
 
         async getServices () {
             this.apiStateServices_.services = ApiState.LOADING
-            await ServiceInstancesRestApi.getServiceInstances()
+            await ServiceManagementClient.serviceInstancesApi.getServicesOfUser()
                 .then(
                     response => {
-                        this.setServices(response)
-                    })
+                        this.setServices(response.data)
+                    }).catch(logRequestError)
             this.apiStateServices_.services = ApiState.LOADED
         },
 
@@ -288,12 +288,14 @@ export const useServicesStore = defineStore('servicesStore', {
 
         async getServiceInstanceGroups () {
             this.apiStateServices_.serviceInstanceGroups = ApiState.LOADING
-            await ServiceInstancesGroupsRestApi.getServiceInstanceGroups()
+            await ServiceManagementClient.serviceInstancesGroupsApi.getServiceInstanceGroups()
                 .then(
                     response => {
-                        this.serviceInstanceGroups_ = response
-                        this.apiStateServices_.serviceInstanceGroups = ApiState.LOADED
-                    })
+                        if(response.data){
+                            this.serviceInstanceGroups_ = response.data
+                            this.apiStateServices_.serviceInstanceGroups = ApiState.LOADED
+                        }
+                    }).catch(logRequestError)
         },
     },
     

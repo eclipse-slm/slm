@@ -17,22 +17,22 @@ import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
-@DisplayName("Service Registry")
+@DisplayName("Service Management")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceManagementTests {
 
     @BeforeAll
     public static void init()
     {
-        RestAssured.baseURI = TestConfig.SERVICE_REGISTRY_BASE_URL;
-        RestAssured.port = TestConfig.SERVICE_REGISTRY_PORT;
+        RestAssured.baseURI = TestConfig.SERVICE_MANAGEMENT_BASE_URL;
+        RestAssured.port = TestConfig.SERVICE_MANAGEMENT_PORT;
         RestAssured.basePath = "";
     }
 
     @Order(10)
     @Test
     @DisplayName("Swagger UI is reachable")
-    public void checkResourceRegistrySwaggerUiReachable() {
+    public void checkSwaggerUiReachable() {
         get("/swagger-ui.html")
                 .then().assertThat() .statusCode(200);
     }
@@ -40,9 +40,9 @@ public class ServiceManagementTests {
     @Order(20)
     @Test
     @DisplayName("REST API is reachable and endpoint secured")
-    public void checkRestApiReachable() {
+    public void checkRestApiReachableAndSecured() {
         get("/services/offerings")
-            .then().assertThat() .statusCode(200);
+            .then().assertThat() .statusCode(401);
     }
 
     @Order(30)
@@ -52,7 +52,7 @@ public class ServiceManagementTests {
         given()
             .auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
             .log().all()
-        .get("/services/offerings/?withImage=false")
+        .get("/services/offerings?withImage=false")
         .then().assertThat() .statusCode(200);
     }
 
@@ -78,7 +78,7 @@ public class ServiceManagementTests {
             .log().all()
         .contentType(ContentType.JSON)
         .body(serviceVendor)
-        .post("/services/vendors/")
+        .post("/services/vendors")
         .then().assertThat() .statusCode(200);
 
         given()
@@ -153,14 +153,14 @@ public class ServiceManagementTests {
             .log().all()
         .contentType(ContentType.JSON)
         .body(serviceOfferingJson)
-        .post("/services/offerings/")
+        .post("/services/offerings")
         .then()
         .assertThat() .statusCode(is(200));
 
         given()
             .auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
             .log().all()
-        .get("/services/offerings/?withImage=false")
+        .get("/services/offerings?withImage=false")
         .then().assertThat() .statusCode(200).body("$", hasSize(greaterThanOrEqualTo (1)));
 
         return;
@@ -173,7 +173,7 @@ public class ServiceManagementTests {
         var serviceOfferingId = given()
             .auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
             .log().all()
-        .get("/services/offerings/?withImage=false")
+        .get("/services/offerings?withImage=false")
         .then().assertThat() .statusCode(200).body("$", hasSize(greaterThanOrEqualTo (1)))
         .extract().body().path("[0].id").toString();
 

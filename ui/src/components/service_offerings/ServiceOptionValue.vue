@@ -141,12 +141,13 @@
 
 <script>
 import {serviceOptionMixin} from '@/utils/serviceOptionUtil'
-import AASRestApi from "@/api/resource-management/aasRestApi";
 
 import {Field} from "vee-validate";
 import {useServicesStore} from "@/stores/servicesStore";
 import {useResourcesStore} from "@/stores/resourcesStore";
 import {useCatalogStore} from "@/stores/catalogStore";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
 
 export default {
     name: 'ServiceOptionValue',
@@ -195,9 +196,12 @@ export default {
     },
     created() {
       if (this.serviceOption.valueType === 'AAS_SM_TEMPLATE' && !this.definitionMode) {
-        AASRestApi.getSubmodelTemplateInstancesBySemanticId(this.serviceOption.defaultValue).then(aasSmTemplateInstances => {
-          this.aasSubmodelTemplateInstances = aasSmTemplateInstances
-        })
+        ResourceManagementClient.submodelTemplatesRestControllerApi.getSubmodelTemplateInstancesBySemanticId(this.serviceOption.defautlValue)
+            .then(response => {
+              if(response.data){
+                this.aasSubmodelTemplateInstances = response.data;
+              }
+            }).catch(logRequestError)
       }
     },
     methods: {
