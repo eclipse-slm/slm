@@ -1,5 +1,5 @@
 keycloak:
-  auth-server-url: "{{ keycloak_config['scheme'] }}://{{ keycloak_config['host'] }}:{{ keycloak_config['port'] }}{{ keycloak_config['http']['relative_path'] }}"
+  auth-server-url: "{{ keycloak_config['scheme'] }}://{{ keycloak_config['host'] }}{{ keycloak_config['http']['relative_path'] }}"
 
 awx:
   url: "{{ awx_config['scheme'] }}://{{ awx_config['host'] }}:{{ awx_config['port'] }}"

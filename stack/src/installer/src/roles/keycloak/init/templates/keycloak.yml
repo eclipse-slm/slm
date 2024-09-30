@@ -30,7 +30,7 @@ services:
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:8080/auth" ]
     labels:
-      - traefik.http.routers.slm-keycloak.rule=Host(`{{ KEYCLOAK_HOST }}`) && PathPrefix(`/auth`)
+      - traefik.http.routers.slm-keycloak.rule=Host(`{{ SLM_HOSTNAME }}`) && PathPrefix(`/auth`)
 
   keycloak-database:
     image: "mariadb:{{ KEYCLOAK_DATABASE_VERSION }}"
