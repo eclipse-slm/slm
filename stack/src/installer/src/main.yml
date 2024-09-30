@@ -16,7 +16,7 @@
       block:
         - set_fact:
             CONSUL_URL: "{{ CONSUL_SCHEME }}://{{ CONSUL_HOST }}:{{ CONSUL_PORT }}"
-            KEYCLOAK_AUTH_URL: "{{ KEYCLOAK_SCHEME }}://{{ KEYCLOAK_HOST }}:{{ KEYCLOAK_PORT }}/auth"
+            KEYCLOAK_AUTH_URL: "{{ KEYCLOAK_SCHEME }}://{{ KEYCLOAK_HOST }}/auth"
             VAULT_URL: "{{ VAULT_SCHEME }}://{{ VAULT_HOST }}:{{ VAULT_PORT }}"
             AWX_URL: "{{ AWX_SCHEME }}://{{ AWX_HOST }}:{{ AWX_PORT }}"
             MINIO_API_URL: "{{ MINIO_SCHEME }}://{{ MINIO_HOST }}:{{ MINIO_API_PORT }}"
@@ -27,6 +27,10 @@
 #      debug:
 #        var: hostvars['localhost']
 #      tags: debug_info
+
+    - name: "Start Traefik"
+      include_role:
+        name: traefik/init
 
     - name: "Start Consul"
       include_role:
@@ -90,10 +94,6 @@
       vars:
         _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
         _store_compose_file: /compose/slm.yml
-
-    - name: "Start Traefik"
-      include_role:
-        name: traefik/init
 
     - debug:
         msg: "Eclipse Service Lifecycle Management version '{{ SLM_VERSION }}' successfully installed. Your Consul master token: {{ CONSUL_MASTER_TOKEN }}"

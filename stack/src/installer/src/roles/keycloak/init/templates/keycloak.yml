@@ -25,8 +25,12 @@ services:
       default:
         aliases:
           - 'keycloak'
+    extra_hosts:
+      - "{{ SLM_HOSTNAME }}:172.17.0.1"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:8080/auth" ]
+    labels:
+      - traefik.http.routers.slm-keycloak.rule=Host(`{{ KEYCLOAK_HOST }}`) && PathPrefix(`/auth`)
 
   keycloak-database:
     image: "mariadb:{{ KEYCLOAK_DATABASE_VERSION }}"
