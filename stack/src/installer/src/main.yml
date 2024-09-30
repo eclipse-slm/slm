@@ -31,6 +31,8 @@
     - name: "Start Traefik"
       include_role:
         name: traefik/init
+      vars:
+        _store_compose_file: /compose/traefik.yml
 
     - name: "Start Consul"
       include_role:
