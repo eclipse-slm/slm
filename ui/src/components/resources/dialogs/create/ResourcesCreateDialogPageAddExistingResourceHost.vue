@@ -291,9 +291,9 @@ export default {
         ResourceManagementClient.resourcesApi.addExistingResource(
           this.resourceHostname,
           this.resourceIp,
+          this.resourceConnectionType,
           this.resourceUsername,
           this.resourcePassword,
-          this.resourceConnectionType,
           this.resourceConnectionPort,
           this.resourceLocation,
           this.resourceBaseConfigurationId
