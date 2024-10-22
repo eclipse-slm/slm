@@ -54,9 +54,23 @@
             v-if="item.children"
             :key="`group-${i}`"
             :item="item"
+            :subGroup="item.subGroup"
+            :text="item.text"
           >
           <!--  -->
           </base-item-group>
+
+          <div
+            v-else-if="item.divider && !item.title"
+          >
+            <v-divider />
+          </div>
+
+          <div
+            v-else-if="item.divider && item.title"
+          >
+            <v-divider>{{ item.title }}</v-divider>
+          </div>
 
           <base-item
             v-else
@@ -172,12 +186,50 @@ export default {
             to: '/services/vendors',
             visible: this.userStore.isUserDeveloper,
           },
+          // {
+          //   id: 'main-menu-button-admin',
+          //   title: this.$t('drawer.section.admin.title'),
+          //   icon: 'mdi-shield-account-variant-outline',
+          //   to: '/admin',
+          //   visible: this.userStore.userRoles.includes('slm-admin'),
+          // },
+          {
+            id: 'main-menu-divider-admin',
+            title: this.$t('drawer.section.admin.title'),
+            divider: true,
+            visible: true
+          },
           {
             id: 'main-menu-button-admin',
             title: this.$t('drawer.section.admin.title'),
             icon: 'mdi-shield-account-variant-outline',
-            to: '/admin',
+            group: '/admin',
+            subGroup:true,
+            text: true,
             visible: this.userStore.userRoles.includes('slm-admin'),
+            children: [
+              {
+                id: 'main-menu-button-admin-components',
+                title: this.$t('drawer.section.admin.components.title'),
+                icon: 'mdi-shield-account-variant-outline',
+                to: 'components',
+                visible: this.userStore.userRoles.includes('slm-admin'),
+              },
+              {
+                id: 'main-menu-button-admin-service-categories',
+                title: this.$t('drawer.section.admin.service-categories.title'),
+                icon: 'mdi-shield-account-variant-outline',
+                to: 'service-categories',
+                visible: this.userStore.userRoles.includes('slm-admin'),
+              },
+              {
+                id: 'main-menu-button-admin-service-vendors',
+                title: this.$t('drawer.section.admin.service-vendors.title'),
+                icon: 'mdi-shield-account-variant-outline',
+                to: 'service-vendors',
+                visible: this.userStore.userRoles.includes('slm-admin'),
+              }
+            ],
           },
         ]
       },

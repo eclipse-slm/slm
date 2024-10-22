@@ -26,7 +26,16 @@
         "title": "Services"
       },
       "admin": {
-        "title": "Admin"
+        "title": "Admin",
+        "components":{
+          "title": "Components"
+        },
+        "service-categories":{
+          "title": "Service Categories"
+        },
+        "service-vendors":{
+          "title": "Service Vendors"
+        }
       }
     }
   },

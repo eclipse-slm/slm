@@ -149,6 +149,24 @@ const routes = [
         component: () => import('@/pages/AdminPage'),
         meta: { adminPermissionRequired: true },
       },
+      {
+        name: 'AdminComponents',
+        path: '/admin/components',
+        component: () => import('@/pages/AdminComponentsPage'),
+        meta: { adminPermissionRequired: true },
+      },
+      {
+        name: 'AdminServiceCategories',
+        path: '/admin/service-categories',
+        component: () => import('@/pages/AdminServiceCategoriesPage'),
+        meta: { adminPermissionRequired: true },
+      },
+      {
+        name: 'AdminServiceVendors',
+        path: '/admin/service-vendors',
+        component: () => import('@/pages/AdminServiceVendorsPage'),
+        meta: { adminPermissionRequired: true },
+      },
     ],
   }
 ];

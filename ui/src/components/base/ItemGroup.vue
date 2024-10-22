@@ -1,41 +1,49 @@
 <template>
   <v-list-group
+    :value="item.title"
     :prepend-icon="item.icon"
     :subgroup="subGroup"
     append-icon="mdi-menu-down"
     :color="store.barColor !== 'rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.7)' ? 'white' : 'grey darken-1'"
   >
-    <template #activator>
-      <v-list-item v-if="text">
-        {{ computedText }}
+    <template #activator="{ props }">
+      <v-list-item v-if="text"
+                   v-bind="props"
+                   :tile="item.title"
+      >
+        {{ item.title }}
       </v-list-item>
 
-      <v-list-item 
-        v-else-if="item.avatar"
+      <v-list-item
+        v-else-if="item.icon"
+        v-bind="props"
+        :tile="item.title"
+        :prepend-icon="item.icon"
         class="align-self-center"
         color="white"
         contain
       >
-        <v-img src="https://demos.creative-tim.com/vuetify-material-dashboard/favicon.ico" />
       </v-list-item>
-
-
-      <v-list-item-title> {{ item.title }} </v-list-item-title>
     </template>
 
     <template v-for="(child, i) in children">
-      <v-list-group
-        v-if="child.children"
+      <div
+        v-if="child.visible"
         :key="`sub-group-${i}`"
-        :item="child"
-      />
+      >
+        <v-list-group
+          v-if="child.children"
+          :item="child"
+        />
 
-      <v-list-item
-        v-else
-        :key="`item-${i}`"
-        :item="child"
-        text
-      />
+        <base-item
+          v-else
+          :id="child.id"
+          :key="`item-${i}`"
+          :item="child"
+        />
+      </div>
+
     </template>
   </v-list-group>
 </template>
@@ -120,4 +128,10 @@ export default {
 .v-list-group__activator p {
   margin-bottom: 0;
 }
+
+.v-list-group {
+  --list-indent-size: 0px;
+  --prepend-width: 0px;
+}
+
 </style>
