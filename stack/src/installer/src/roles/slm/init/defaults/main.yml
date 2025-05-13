@@ -27,6 +27,13 @@ keycloak_clients:
     protocol_mappers:
       audience: true
       groups: true
+  - client_id: services
+    public_client: false
+    service_accounts_enabled: false
+    assign_client_role_to_service_account: false
+    protocol_mappers:
+      audience: true
+      groups: true
 
 vault:
   approles:
