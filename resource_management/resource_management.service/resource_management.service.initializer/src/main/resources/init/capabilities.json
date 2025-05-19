@@ -522,5 +522,64 @@
       "CODESYS"
     ],
     "clusterMemberTypes": []
+  },
+  {
+    "id": "a19bb5e8-90e7-4570-9e60-69fc02abc810",
+    "capabilityClass": "DeploymentCapability",
+    "name": "Self Description Service",
+    "logo": "mdi-deployed-cube",
+    "type": [
+      "SETUP",
+      "DEPLOY"
+    ],
+    "connection": "tcp",
+    "actions": {
+      "DEPLOY": {
+        "actionClass": "AwxAction",
+        "actionType": "DEPLOY",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-codesys",
+        "awxBranch": "main",
+        "playbook": "deploy.yml",
+        "connectionTypes": ["ssh"]
+      },
+      "UNINSTALL": {
+        "actionClass": "AwxAction",
+        "actionType": "UNINSTALL",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-codesys",
+        "awxBranch": "main",
+        "playbook": "uninstall.yml",
+        "connectionTypes": ["ssh"]
+      },
+      "INSTALL": {
+        "actionClass": "AwxAction",
+        "actionType": "INSTALL",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-codesys",
+        "awxBranch": "main",
+        "playbook": "install.yml",
+        "connectionTypes": ["ssh"],
+        "configParameters": [
+          {
+            "name": "hosts",
+            "prettyName": "Hosts",
+            "description": "etc/hosts configuration",
+            "valueType": "STRING",
+            "requiredType": "SKIP",
+            "secret": false
+          }
+        ]
+      },
+      "UNDEPLOY": {
+        "actionClass": "AwxAction",
+        "actionType": "UNDEPLOY",
+        "awxRepo": "https://github.com/eclipse-slm/slm-dc-codesys",
+        "awxBranch": "main",
+        "playbook": "undeploy.yml",
+        "connectionTypes": ["ssh"]
+      }
+    },
+    "supportedDeploymentTypes": [
+      "CODESYS"
+    ],
+    "clusterMemberTypes": []
   }
 ]
