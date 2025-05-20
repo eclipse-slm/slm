@@ -534,14 +534,6 @@
     ],
     "connection": "tcp",
     "actions": {
-      "DEPLOY": {
-        "actionClass": "AwxAction",
-        "actionType": "DEPLOY",
-        "awxRepo": "https://github.com/Ilgmi/ansible-role-resource-self-description-service",
-        "awxBranch": "main",
-        "playbook": "deploy.yml",
-        "connectionTypes": ["ssh"]
-      },
       "UNINSTALL": {
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
@@ -567,14 +559,6 @@
             "secret": false
           }
         ]
-      },
-      "UNDEPLOY": {
-        "actionClass": "AwxAction",
-        "actionType": "UNDEPLOY",
-        "awxRepo": "https://github.com/Ilgmi/ansible-role-resource-self-description-service",
-        "awxBranch": "main",
-        "playbook": "undeploy.yml",
-        "connectionTypes": ["ssh"]
       }
     },
     "supportedDeploymentTypes": [
