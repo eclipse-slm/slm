@@ -529,8 +529,7 @@
     "name": "Self Description Service",
     "logo": "mdi-deployed-cube",
     "type": [
-      "SETUP",
-      "DEPLOY"
+      "SETUP"
     ],
     "connection": "tcp",
     "actions": {
@@ -538,7 +537,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
         "awxRepo": "https://github.com/Ilgmi/ansible-role-resource-self-description-service",
-        "awxBranch": "main",
+        "awxBranch": "0.0.1-SNAPSHOT",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh"]
       },
@@ -546,7 +545,7 @@
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
         "awxRepo": "https://github.com/Ilgmi/ansible-role-resource-self-description-service",
-        "awxBranch": "main",
+        "awxBranch": "0.0.1-SNAPSHOT",
         "playbook": "install.yml",
         "connectionTypes": ["ssh"],
         "configParameters": [
