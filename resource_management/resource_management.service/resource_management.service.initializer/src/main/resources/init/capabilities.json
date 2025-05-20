@@ -537,7 +537,7 @@
       "DEPLOY": {
         "actionClass": "AwxAction",
         "actionType": "DEPLOY",
-        "awxRepo": "https://github.com/eclipse-slm/slm-dc-codesys",
+        "awxRepo": "https://github.com/Ilgmi/ansible-role-resource-self-description-service",
         "awxBranch": "main",
         "playbook": "deploy.yml",
         "connectionTypes": ["ssh"]
@@ -545,7 +545,7 @@
       "UNINSTALL": {
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
-        "awxRepo": "https://github.com/eclipse-slm/slm-dc-codesys",
+        "awxRepo": "https://github.com/Ilgmi/ansible-role-resource-self-description-service",
         "awxBranch": "main",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh"]
@@ -553,7 +553,7 @@
       "INSTALL": {
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
-        "awxRepo": "https://github.com/eclipse-slm/slm-dc-codesys",
+        "awxRepo": "https://github.com/Ilgmi/ansible-role-resource-self-description-service",
         "awxBranch": "main",
         "playbook": "install.yml",
         "connectionTypes": ["ssh"],
@@ -561,7 +561,7 @@
           {
             "name": "hosts",
             "prettyName": "Hosts",
-            "description": "etc/hosts configuration",
+            "description": "etc/hosts configuration. Format IP:Host;",
             "valueType": "STRING",
             "requiredType": "SKIP",
             "secret": false
@@ -571,14 +571,13 @@
       "UNDEPLOY": {
         "actionClass": "AwxAction",
         "actionType": "UNDEPLOY",
-        "awxRepo": "https://github.com/eclipse-slm/slm-dc-codesys",
+        "awxRepo": "https://github.com/Ilgmi/ansible-role-resource-self-description-service",
         "awxBranch": "main",
         "playbook": "undeploy.yml",
         "connectionTypes": ["ssh"]
       }
     },
     "supportedDeploymentTypes": [
-      "CODESYS"
     ],
     "clusterMemberTypes": []
   }
