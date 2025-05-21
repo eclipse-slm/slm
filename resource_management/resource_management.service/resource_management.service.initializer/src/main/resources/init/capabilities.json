@@ -550,9 +550,33 @@
         "connectionTypes": ["ssh"],
         "configParameters": [
           {
-            "name": "hosts",
-            "prettyName": "Hosts",
-            "description": "etc/hosts configuration. Format IP:Host;",
+            "name": "aas-registry",
+            "prettyName": "AAS Registry Host and IP (IP:HOST)",
+            "description": "",
+            "valueType": "STRING",
+            "requiredType": "SKIP",
+            "secret": false
+          },
+          {
+            "name": "aas-repository",
+            "prettyName": "AAS Repository Host and IP (IP:HOST)",
+            "description": "",
+            "valueType": "STRING",
+            "requiredType": "SKIP",
+            "secret": false
+          },
+          {
+            "name": "submodel-registry",
+            "prettyName": "AAS Submodel Registry Host and IP (IP:HOST)",
+            "description": "",
+            "valueType": "STRING",
+            "requiredType": "SKIP",
+            "secret": false
+          },
+          {
+            "name": "submodel-repository",
+            "prettyName": "Own Submodel Repository Host and IP (IP:HOST)",
+            "description": "",
             "valueType": "STRING",
             "requiredType": "SKIP",
             "secret": false
