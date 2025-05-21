@@ -558,24 +558,24 @@
             "secret": false
           },
           {
-            "name": "aas-repository",
-            "prettyName": "AAS Repository Host and IP (IP:HOST)",
+            "name": "aas_repository",
+            "prettyName": "AAS Repository IP ",
             "description": "",
             "valueType": "STRING",
             "requiredType": "SKIP",
             "secret": false
           },
           {
-            "name": "submodel-registry",
-            "prettyName": "AAS Submodel Registry Host and IP (IP:HOST)",
+            "name": "submodel_registry",
+            "prettyName": "AAS Submodel Registry IP",
             "description": "",
             "valueType": "STRING",
             "requiredType": "SKIP",
             "secret": false
           },
           {
-            "name": "submodel-repository",
-            "prettyName": "Own Submodel Repository Host and IP (IP:HOST)",
+            "name": "submodel_repository",
+            "prettyName": "Own Submodel Repository IP",
             "description": "",
             "valueType": "STRING",
             "requiredType": "SKIP",
