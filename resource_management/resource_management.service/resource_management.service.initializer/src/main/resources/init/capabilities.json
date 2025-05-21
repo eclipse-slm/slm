@@ -550,8 +550,8 @@
         "connectionTypes": ["ssh"],
         "configParameters": [
           {
-            "name": "aas-registry",
-            "prettyName": "AAS Registry Host and IP (IP:HOST)",
+            "name": "aas_registry",
+            "prettyName": "AAS Registry IP",
             "description": "",
             "valueType": "STRING",
             "requiredType": "SKIP",
@@ -559,7 +559,7 @@
           },
           {
             "name": "aas_repository",
-            "prettyName": "AAS Repository IP ",
+            "prettyName": "AAS Repository IP",
             "description": "",
             "valueType": "STRING",
             "requiredType": "SKIP",
