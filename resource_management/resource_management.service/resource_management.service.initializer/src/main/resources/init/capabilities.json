@@ -558,6 +558,14 @@
             "secret": false
           },
           {
+            "name": "keycloak",
+            "prettyName": "Keycloak IP",
+            "description": "",
+            "valueType": "STRING",
+            "requiredType": "SKIP",
+            "secret": false
+          },
+          {
             "name": "aas_registry",
             "prettyName": "AAS Registry IP",
             "description": "",
