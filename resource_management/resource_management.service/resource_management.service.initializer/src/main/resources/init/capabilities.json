@@ -550,6 +550,14 @@
         "connectionTypes": ["ssh"],
         "configParameters": [
           {
+            "name": "consul",
+            "prettyName": "Consul IP",
+            "description": "",
+            "valueType": "STRING",
+            "requiredType": "SKIP",
+            "secret": false
+          },
+          {
             "name": "aas_registry",
             "prettyName": "AAS Registry IP",
             "description": "",
