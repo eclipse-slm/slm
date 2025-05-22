@@ -550,16 +550,24 @@
         "connectionTypes": ["ssh"],
         "configParameters": [
           {
-            "name": "consul",
-            "prettyName": "Consul IP",
+            "name": "slm_host_name",
+            "prettyName": "SLM Host",
             "description": "",
             "valueType": "STRING",
             "requiredType": "SKIP",
             "secret": false
           },
           {
-            "name": "keycloak",
-            "prettyName": "Keycloak IP",
+            "name": "slm_host_ip",
+            "prettyName": "SLM Host IP",
+            "description": "",
+            "valueType": "STRING",
+            "requiredType": "SKIP",
+            "secret": false
+          },
+          {
+            "name": "consul",
+            "prettyName": "Consul IP",
             "description": "",
             "valueType": "STRING",
             "requiredType": "SKIP",
