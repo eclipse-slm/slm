@@ -522,5 +522,94 @@
       "CODESYS"
     ],
     "clusterMemberTypes": []
+  },
+  {
+    "id": "a19bb5e8-90e7-4570-9e60-69fc02abc810",
+    "capabilityClass": "DeploymentCapability",
+    "name": "Self Description Service",
+    "logo": "mdi-deployed-cube",
+    "type": [
+      "SETUP"
+    ],
+    "connection": "tcp",
+    "actions": {
+      "UNINSTALL": {
+        "actionClass": "AwxAction",
+        "actionType": "UNINSTALL",
+        "awxRepo": "https://github.com/Ilgmi/ansible-role-resource-self-description-service",
+        "awxBranch": "0.0.1-SNAPSHOT",
+        "playbook": "uninstall.yml",
+        "connectionTypes": ["ssh"]
+      },
+      "INSTALL": {
+        "actionClass": "AwxAction",
+        "actionType": "INSTALL",
+        "awxRepo": "https://github.com/Ilgmi/ansible-role-resource-self-description-service",
+        "awxBranch": "0.0.1-SNAPSHOT",
+        "playbook": "install.yml",
+        "connectionTypes": ["ssh"],
+        "configParameters": [
+          {
+            "name": "slm_host_name",
+            "prettyName": "SLM Host",
+            "description": "",
+            "valueType": "STRING",
+            "requiredType": "SKIP",
+            "secret": false
+          },
+          {
+            "name": "slm_host_ip",
+            "prettyName": "SLM Host IP",
+            "description": "",
+            "valueType": "STRING",
+            "requiredType": "SKIP",
+            "secret": false
+          },
+          {
+            "name": "consul",
+            "prettyName": "Consul IP",
+            "description": "",
+            "valueType": "STRING",
+            "requiredType": "SKIP",
+            "secret": false
+          },
+          {
+            "name": "aas_registry",
+            "prettyName": "AAS Registry IP",
+            "description": "",
+            "valueType": "STRING",
+            "requiredType": "SKIP",
+            "secret": false
+          },
+          {
+            "name": "aas_repository",
+            "prettyName": "AAS Repository IP",
+            "description": "",
+            "valueType": "STRING",
+            "requiredType": "SKIP",
+            "secret": false
+          },
+          {
+            "name": "submodel_registry",
+            "prettyName": "AAS Submodel Registry IP",
+            "description": "",
+            "valueType": "STRING",
+            "requiredType": "SKIP",
+            "secret": false
+          },
+          {
+            "name": "submodel_repository",
+            "prettyName": "Own Submodel Repository IP",
+            "description": "",
+            "valueType": "STRING",
+            "requiredType": "SKIP",
+            "secret": false
+          }
+        ]
+      }
+    },
+    "supportedDeploymentTypes": [
+    ],
+    "clusterMemberTypes": []
   }
 ]
