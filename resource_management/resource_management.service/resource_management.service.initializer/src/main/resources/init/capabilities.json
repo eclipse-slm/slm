@@ -525,7 +525,7 @@
   },
   {
     "id": "a19bb5e8-90e7-4570-9e60-69fc02abc810",
-    "capabilityClass": "DeploymentCapability",
+    "capabilityClass": "BaseConfigurationCapability",
     "name": "Self Description Service",
     "logo": "mdi-deployed-cube",
     "type": [
