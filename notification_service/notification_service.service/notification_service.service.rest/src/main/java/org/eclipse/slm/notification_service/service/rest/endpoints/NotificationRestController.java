@@ -39,11 +39,14 @@ public class NotificationRestController {
     public void createNotification(
             @RequestParam(name = "category", required = true) Category category,
             @RequestParam(name="jobTarget", required = true) JobTarget jobTarget,
-            @RequestParam(name="jobGoal", required = true) JobGoal jobGoal
+            @RequestParam(name="jobGoal", required = true) JobGoal jobGoal,
+            @RequestParam(name="text", required = false, defaultValue = "") String text
     ) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        String text = jobTarget.name().toLowerCase() + " has been " + jobGoal.toString().toLowerCase();
-        Notification notification = new Notification(category, text, jwtAuthenticationToken.getToken().getSubject());
+        if (text.isEmpty()) {
+            text = jobTarget.name().toLowerCase() + " has been " + jobGoal.toString().toLowerCase();
+        }
+        var notification = new Notification(category, jobTarget, jobGoal, text, jwtAuthenticationToken.getToken().getSubject());
 
         notificationRepository.save(notification);
         notificationWsService.notifyFrontend(notification);

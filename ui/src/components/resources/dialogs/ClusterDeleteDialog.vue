@@ -76,7 +76,8 @@
 
 <script>
 import {toRef} from "vue";
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceInstancesStore} from "@/stores/serviceInstancesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 import {storeToRefs} from "pinia";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import logRequestError from "@/api/restApiHelper";
@@ -95,15 +96,16 @@ export default {
     },
     setup(props){
       const active = toRef(props, 'showDialog')
-      const servicesStore = useServicesStore();
-      const {serviceOfferingById} = storeToRefs(servicesStore)
+      const serviceInstancesStore = useServiceInstancesStore();
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      const {serviceOfferingById} = storeToRefs(serviceOfferingsStore)
       return{
-        active, servicesStore, serviceOfferingById
+        active, serviceInstancesStore, serviceOfferingById
       }
     },
     computed: {
       services() {
-        return this.servicesStore.services
+        return this.serviceInstancesStore.services
       },
 
       serviceInstancesForCluster(){

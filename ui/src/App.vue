@@ -5,13 +5,12 @@
 <script>
   import updateToken from '@/utils/updateToken'
   import NotificationServiceWebsocketClient from '@/api/notification-service/notificationServiceWebsocketClient'
-  import {app} from "@/main";
 
   export default {
     name: 'App',
-    computed: {
-      app() {
-        return app
+    data() {
+      return {
+        tokenRefreshTimer: null
       }
     },
     watch: {
@@ -20,12 +19,16 @@
       },
     },
     created () {
+      this.timer = setInterval(() => {
+        updateToken()
+      }, 60000)
     },
     mounted () {
 
     },
     unmounted () {
       NotificationServiceWebsocketClient.disconnect()
+      clearInterval(this.timer)
     },
   }
 </script>

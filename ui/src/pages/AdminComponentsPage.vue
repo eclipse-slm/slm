@@ -1,5 +1,4 @@
 <template>
-
   <div>
     <!-- Version !-->
     <versions-overview />
@@ -8,22 +7,22 @@
 <script>
 
 import VersionsOverview from '@/components/admin/VersionsOverview'
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 
 export default {
   name: 'AdminComponentsPage',
   components: { VersionsOverview, },
   setup(){
-    const servicesStore = useServicesStore();
-    return {servicesStore};
+    const serviceOfferingsStore = useServiceOfferingsStore();
+    return {serviceOfferingsStore};
   },
   computed: {
     serviceVendors() {
-      return this.servicesStore.serviceVendors
+      return this.serviceOfferingsStore.serviceVendors
     },
   },
   created () {
-    this.servicesStore.getServiceVendors();
+    this.serviceOfferingsStore.getServiceVendors();
   },
   methods: {
   },

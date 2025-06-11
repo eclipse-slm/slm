@@ -14,7 +14,8 @@ public class NotificationServiceTests {
     {
         RestAssured.baseURI = TestConfig.NOTIFICATION_SERVICE_BASE_URL;
         RestAssured.port = TestConfig.NOTIFICATION_SERVICE_PORT;
-        RestAssured.basePath = "";
+        RestAssured.basePath = TestConfig.NOTIFICATION_SERVICE_BASE_PATH;
+        RestAssured.useRelaxedHTTPSValidation();
     }
 
     @Order(10)

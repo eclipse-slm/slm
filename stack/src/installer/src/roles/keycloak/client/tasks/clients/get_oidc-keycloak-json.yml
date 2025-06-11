@@ -2,14 +2,15 @@
 - name: "Assert inputs of 'keycloak/client | get_oidc-keycloak-json.yml'"
   assert:
     that:
-      - (KEYCLOAK_AUTH_URL is defined) and (KEYCLOAK_AUTH_URL|length > 0)               # Auth URL of the Keycloak instance
+      - (keycloak.url.external is defined) and (keycloak.url.external|length > 0)               # Auth URL of the Keycloak instance
       - (_keycloak_access_token is defined) and (_keycloak_access_token|length > 0)     # Access token to authenticate with Keycloak
       - (_keycloak_realm_name is defined) and (_keycloak_realm_name|length > 0)         # Name of the Keycloak realm the client belongs to
       - (client_id is defined) and (client_id|length > 0)                               # Id of the client
 
 - name: "Get Keylcoak client details of '{{ client_id }}'"
   uri:
-    url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ _keycloak_realm_name }}/clients?clientId={{ client_id }}"
+    url: "{{ keycloak.url.external }}/admin/realms/{{ _keycloak_realm_name }}/clients?clientId={{ client_id }}"
+    validate_certs: no
     method: GET
     headers:
       authorization: "Bearer {{ keycloak_access_token }}"
@@ -20,7 +21,8 @@
 
 - name: "Get OIDC Keycloak JSON of '{{ client_id }}'"
   uri:
-    url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ _keycloak_realm_name }}/clients/{{ keylcoak_client.id }}/installation/providers/keycloak-oidc-keycloak-json"
+    url: "{{ keycloak.url.external }}/admin/realms/{{ _keycloak_realm_name }}/clients/{{ keylcoak_client.id }}/installation/providers/keycloak-oidc-keycloak-json"
+    validate_certs: no
     method: GET
     headers:
       authorization: "Bearer {{ keycloak_access_token }}"

@@ -17,6 +17,7 @@ public class AWXTests {
         RestAssured.baseURI = TestConfig.AWX_BASE_URL;
         RestAssured.port = TestConfig.AWX_PORT;
         RestAssured.basePath = "";
+        RestAssured.useRelaxedHTTPSValidation();
     }
 
     @Test

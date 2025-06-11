@@ -2,6 +2,7 @@ package org.eclipse.slm.common.consul.client.apis;
 
 import com.orbitz.consul.model.catalog.CatalogRegistration;
 import com.orbitz.consul.model.catalog.ImmutableCatalogDeregistration;
+import com.orbitz.consul.model.catalog.ImmutableCatalogRegistration;
 import com.orbitz.consul.model.catalog.TaggedAddresses;
 import com.orbitz.consul.option.ImmutableQueryOptions;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
@@ -23,8 +24,9 @@ public class ConsulNodesApiClient extends AbstractConsulApiClient {
 
     public final static Logger LOG = LoggerFactory.getLogger(ConsulNodesApiClient.class);
     private final ConsulAclApiClient consulAclApiClient;
+
     @Autowired
-    RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
     @Autowired
     public ConsulNodesApiClient(
@@ -79,7 +81,9 @@ public class ConsulNodesApiClient extends AbstractConsulApiClient {
         node.setDatacenter(String.valueOf(getNode.getDatacenter()));
         node.setAddress(getNode.getAddress());
         node.setTaggedAddresses(taggedAddresses);
-        node.setMeta(getNode.getNodeMeta().get());
+        if (getNode.getNodeMeta().isPresent()) {
+            node.setMeta(getNode.getNodeMeta().get());
+        }
 
         return node;
     }
@@ -97,5 +101,21 @@ public class ConsulNodesApiClient extends AbstractConsulApiClient {
                 .setNode(consulNodeName)
                 .build();
         this.getConsulClient(consulCredential).catalogClient().deregister(deregistration);
+    }
+
+    public void addMetaDataToNode(ConsulCredential consulCredential, UUID nodeId, Map<String, String> additionalMetaData)
+            throws ConsulLoginFailedException {
+        var node = this.getNodeById(consulCredential, nodeId).orElseThrow();
+        node.getMeta().putAll(additionalMetaData);
+
+        var catalogRegistration = ImmutableCatalogRegistration.builder()
+                .putAllNodeMeta(node.getMeta())
+                .setNode(node.getNode())
+                .setAddress(node.getAddress())
+                .setDatacenter(node.getDatacenter())
+                .setId(node.getId().toString())
+                .build();
+        this.getConsulClient(consulCredential).catalogClient().register(catalogRegistration);
+
     }
 }

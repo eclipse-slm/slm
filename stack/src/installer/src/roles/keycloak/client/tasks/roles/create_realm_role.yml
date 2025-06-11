@@ -2,14 +2,15 @@
 - name: "Assert inputs of 'keycloak/client | create_realm_role.yml'"
   assert:
     that:
-      - (KEYCLOAK_AUTH_URL is defined) and (KEYCLOAK_AUTH_URL|length > 0)             # Auth URL of the Keycloak instance
+      - (keycloak.url.external is defined) and (keycloak.url.external|length > 0)             # Auth URL of the Keycloak instance
       - (_keycloak_access_token is defined) and (_keycloak_access_token|length > 0)   # Access token to authenticate with Keycloak
       - (_keycloak_realm_name is defined) and (_keycloak_realm_name|length > 0)       # Name of the Keycloak realm where the realm role should be created
       - (_keycloak_realm_role is defined) and (_keycloak_realm_role|length > 0)       # Definition of the realm role
 
 - name: "Create realm role '{{ _keycloak_realm_role }}'"
   uri:
-    url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ _keycloak_realm_name }}/roles"
+    url: "{{ keycloak.url.external }}/admin/realms/{{ _keycloak_realm_name }}/roles"
+    validate_certs: no
     method: POST
     headers:
       authorization: "Bearer {{ _keycloak_access_token }}"

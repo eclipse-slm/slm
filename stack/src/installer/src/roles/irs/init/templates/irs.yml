@@ -1,0 +1,77 @@
+services:
+  irs-poller:
+    image: {{ ENV.DOCKER_IMAGE_REGISTRY }}/information-receiving-service/poller:{{ ENV.IRS.VERSION }}
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
+    environment:
+      APP_CONFIG: '{{ ENV.IRS.CONFIG | to_json }}'
+      COUCHDB_USERNAME: "{{ ENV.IRS.DATABASE.USERNAME }}"
+      COUCHDB_PASSWORD: "{{ app_configs.irs.database.password }}"
+      COUCHDB_HOST: "{{ ENV.IRS.DATABASE.HOST.INTERNAL }}"
+      COUCHDB_PORT: "{{ ENV.IRS.DATABASE.PORT.INTERNAL }}"
+    cpus: "0.5"
+
+  irs-api:
+    image: {{ ENV.DOCKER_IMAGE_REGISTRY }}/information-receiving-service/api:{{ ENV.IRS.VERSION }}
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
+    networks:
+      default:
+        aliases:
+          - "{{ ENV.IRS.HOST.INTERNAL }}"
+    environment:
+      USE_IN_MEMORY_STORE: false
+      APP_CONFIG: '{{ ENV.IRS.CONFIG | to_json }}'
+      COUCHDB_USERNAME: "{{ ENV.IRS.DATABASE.USERNAME }}"
+      COUCHDB_PASSWORD: "{{ app_configs.irs.database.password }}"
+      COUCHDB_HOST: "{{ ENV.IRS.DATABASE.HOST.INTERNAL }}"
+      COUCHDB_PORT: "{{ ENV.IRS.DATABASE.PORT.INTERNAL }}"
+    cpus: "0.5"
+
+  irs-gc:
+    image: {{ ENV.DOCKER_IMAGE_REGISTRY }}/information-receiving-service/gc:{{ ENV.IRS.VERSION }}
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
+    environment:
+      APP_CONFIG: '{{ ENV.IRS.CONFIG | to_json }}'
+      COUCHDB_USERNAME: "{{ ENV.IRS.DATABASE.USERNAME }}"
+      COUCHDB_PASSWORD: "{{ app_configs.irs.database.password }}"
+      COUCHDB_HOST: "{{ ENV.IRS.DATABASE.HOST.INTERNAL }}"
+      COUCHDB_PORT: "{{ ENV.IRS.DATABASE.PORT.INTERNAL }}"
+    cpus: "0.5"
+
+  couch-db:
+    image: couchdb:{{ ENV.IRS.DATABASE.VERSION }}
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
+    ports:
+      - "{{ ENV.IRS.DATABASE.PORT.EXTERNAL }}:{{ ENV.IRS.DATABASE.PORT.INTERNAL }}"
+    networks:
+      default:
+        aliases:
+          - "{{ ENV.IRS.DATABASE.HOST.INTERNAL }}"
+    environment:
+      COUCHDB_USER: "{{ ENV.IRS.DATABASE.USERNAME }}"
+      COUCHDB_PASSWORD: "{{ app_configs.irs.database.password }}"
+    cpus: "1.0"
+    healthcheck:
+      test: [ "CMD", "curl", "-s", "http://localhost:{{ ENV.IRS.DATABASE.PORT.INTERNAL }}/_up", "|", "grep", "'\"status\":\"ok\"'", "||", "exit", "1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3

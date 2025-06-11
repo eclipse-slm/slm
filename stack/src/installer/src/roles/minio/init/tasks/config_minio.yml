@@ -16,7 +16,7 @@
     minio_alias: "slm"
 
 - name: "MINIO | Configure minio connection alias"
-  command: "{{ mc_command }} alias set {{ minio_alias }} {{ MINIO_API_URL }} {{ _minio_root_user }} {{ _minio_root_password }}"
+  command: "{{ mc_command }} alias set {{ minio_alias }} {{ minio.url.api.internal }} {{ _minio_root_user }} {{ _minio_root_password }}"
   register: alias_command
   changed_when: false
   failed_when: '"Added `slm` successfully." not in alias_command.stdout'

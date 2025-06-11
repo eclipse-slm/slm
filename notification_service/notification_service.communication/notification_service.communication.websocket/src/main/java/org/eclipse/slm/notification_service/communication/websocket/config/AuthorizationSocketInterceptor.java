@@ -10,10 +10,10 @@ import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
+import org.eclipse.slm.common.parent.service_rest.config.CustomJwtDecoder;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -48,7 +48,7 @@ public class AuthorizationSocketInterceptor implements ChannelInterceptor {
                     Jwt jwt;
                     try {
                         //Validate JWT token with any resource server
-                        JwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerHeader);
+                        JwtDecoder jwtDecoder = CustomJwtDecoder.fromIssuer(issuerHeader);
                         jwt = jwtDecoder.decode(token);
                     } catch (JwtException ex) {
                         //In case the JWT token is expired or cannot be decoded, an AccessDeniedException should be thrown

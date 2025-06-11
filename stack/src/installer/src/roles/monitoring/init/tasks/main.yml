@@ -2,11 +2,12 @@
     monitoring_compose: "{{ lookup('template', 'monitoring.yml') }}"
 
 - name: "Start containers"
+  delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
   community.docker.docker_compose_v2:
     project_name: eclipse-slm
     definition: "{{ monitoring_compose | from_yaml}}"
     state: present
-    pull: "{{ PULL_DOCKER_IMAGES }}"
+    pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
 
 - name: "Store config in Consul"
   include_role:
@@ -16,13 +17,13 @@
     _app_name: "monitoring"
     _config:
       prometheus:
-        scheme: "{{ PROMETHEUS_SCHEME }}"
-        host: "{{ PROMETHEUS_HOST }}"
-        port: "{{ PROMETHEUS_PORT }}"
+        scheme: "{{ ENV.MONITORING.PROMETHEUS.SCHEME.INTERNAL }}"
+        host: "{{ ENV.MONITORING.PROMETHEUS.HOST.INTERNAL }}"
+        port: "{{ ENV.MONITORING.PROMETHEUS.PORT.INTERNAL }}"
       service:
-        scheme: "{{ MONITORING_PROMETHEUS_AAS_SCHEME }}"
-        host: "{{ MONITORING_PROMETHEUS_AAS_HOST }}"
-        port: "{{ MONITORING_PROMETHEUS_AAS_PORT }}"
+        scheme: "{{ ENV.MONITORING.PROMETHEUS_AAS.SCHEME.INTERNAL }}"
+        host: "{{ ENV.MONITORING.PROMETHEUS_AAS.HOST.INTERNAL }}"
+        port: "{{ ENV.MONITORING.PROMETHEUS_AAS.PORT.INTERNAL }}"
 
 - name: "Store resulting compose file"
   template:
@@ -36,8 +37,8 @@
     tasks_from: register_service
   vars:
     _service_name: prometheus
-    _service_port: "{{ PROMETHEUS_PORT }}"
-    _service_address: "{{ PROMETHEUS_HOST }}"
-    _http: "{{ PROMETHEUS_SCHEME }}://{{ PROMETHEUS_HOST }}:{{ PROMETHEUS_PORT }}/-/healthy"
+    _service_port: "{{ ENV.MONITORING.PROMETHEUS.PORT.INTERNAL }}"
+    _service_address: "{{ ENV.MONITORING.PROMETHEUS.HOST.INTERNAL }}"
+    _http: "{{ ENV.MONITORING.PROMETHEUS.SCHEME.INTERNAL }}://{{ ENV.MONITORING.PROMETHEUS.HOST.INTERNAL }}:{{ ENV.MONITORING.PROMETHEUS.PORT.INTERNAL }}/-/healthy"
     _additional_tags:
       - "monitoring"

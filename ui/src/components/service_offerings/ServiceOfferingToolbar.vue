@@ -63,14 +63,14 @@
 
 <script>
 
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 
 export default {
     name: 'ServiceOfferingOverviewToolbar',
     props: [],
     setup(){
-      const servicesStore = useServicesStore();
-      return {servicesStore};
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      return {serviceOfferingsStore};
     },
     data () {
       return {
@@ -83,16 +83,16 @@ export default {
 
     computed: {
       apiStateServices() {
-        return this.servicesStore.apiStateServices
+        return this.serviceOfferingsStore.apiStateServices
       },
       serviceOfferings () {
-        return this.servicesStore.serviceOfferings
+        return this.serviceOfferingsStore.serviceOfferings
       },
       serviceOfferingCategories() {
-        return this.servicesStore.serviceOfferingCategories
+        return this.serviceOfferingsStore.serviceOfferingCategories
       },
       serviceVendors () {
-        return this.servicesStore.serviceVendors
+        return this.serviceOfferingsStore.serviceVendors
       },
     },
 

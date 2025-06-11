@@ -89,7 +89,7 @@ import 'vue-json-pretty/lib/styles.css'
 
 import {Field, Form as ValidationForm} from "vee-validate";
 import * as yup from 'yup';
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 
   export default {
     name: 'ServiceOfferingVersionWizardStep1Common',
@@ -106,9 +106,9 @@ import {useServicesStore} from "@/stores/servicesStore";
     },
     setup(){
       const required = yup.string().required();
-      const servicesStore = useServicesStore();
+      const serviceOfferingsStore = useServiceOfferingsStore();
       return {
-        required, servicesStore
+        required, serviceOfferingsStore
       }
     },
     data () {
@@ -118,10 +118,10 @@ import {useServicesStore} from "@/stores/servicesStore";
     },
     computed: {
       serviceOfferingDeploymentTypes() {
-        return this.servicesStore.serviceOfferingDeploymentTypes
+        return this.serviceOfferingsStore.serviceOfferingDeploymentTypes
       },
       serviceOfferings () {
-        return this.servicesStore.serviceOfferings
+        return this.serviceOfferingsStore.serviceOfferings
       },
 
       apiStateLoaded() {

@@ -1,0 +1,28 @@
+- name: "{{ _app_name }} | Create password for user '{{ _username }}'"
+  set_fact:
+    __password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
+  when: (_password is not defined) or (_password | length == 0)
+- set_fact:
+    __password: "{{ _password }}"
+  when: (_password is defined) and (_password | length > 0)
+
+- name: "{{ _app_name }} | Update config dictionary and override default values"
+  set_fact:
+    app_configs: "{{ app_configs | default({}) | combine(
+        {
+          _app_name: {
+            'users': {
+              _username: {
+                'username': _username,
+                'password': __password
+              }
+            }
+          }
+        }, recursive=true) }}"
+
+  when: (app_configs[_app_name].users[_username].password is not defined) or (app_configs[_app_name].users[_username].password | length == 0)
+
+- name: "{{ _app_name }} | Store config in Consul"
+  include_role:
+    name: consul/client
+    tasks_from: store_app_config

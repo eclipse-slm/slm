@@ -29,9 +29,6 @@ public class DockerStackTests {
         put("aas-gui", "running");
         put("aas-registry", "running");
         put("aas-environment", "running");
-        put("aas-transformer", "running");
-        put("aas-transformer-database", "healthy");
-//        put("aas-transformer-initializer", "exited");
         put("awx-jwt-authenticator", "healthy");
         put("awx-postgres", "healthy");
         put("awx-redis-init", "exited");

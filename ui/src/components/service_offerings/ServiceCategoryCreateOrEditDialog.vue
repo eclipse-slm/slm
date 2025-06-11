@@ -52,8 +52,7 @@
 <script>
 
 import {toRef} from 'vue'
-import {app} from "@/main";
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 import ServiceManagementClient from "@/api/service-management/service-management-client";
 
 export default {
@@ -98,17 +97,17 @@ export default {
 
         apiCall.then(() => {
           if (this.editMode) {
-            app.config.globalProperties.$toast.info('Service category successfully updated')
+            this.$toast.info('Service category successfully updated')
           } else {
-            app.config.globalProperties.$toast.info('Service category successfully created')
+            this.$toast.info('Service category successfully created')
           }
 
-          const serviceStore = useServicesStore();
-          serviceStore.getServiceOfferingCategories();
+          const serviceOfferingsStore = useServiceOfferingsStore();
+          serviceOfferingsStore.getServiceOfferingCategories();
 
           this.$emit('confirmed', this.serviceVendorUpdate)
         }).catch(exception => {
-          app.config.globalProperties.$toast.error('Failed to create service category')
+          this.$toast.error('Failed to create service category')
           console.log('Service category creation failed: ' + exception.response.data.message)
           console.log(exception)
         })

@@ -9,12 +9,17 @@ deployment:
   hostname: localhost
   scheme: "http"
   port: ${server.port}
+  path: "/resource-management"
+  url: ${deployment.scheme}://${deployment.hostname}:${deployment.port}${deployment.path}
 
 ### Server / API
 server:
   port: 9010
   error:
     include-message: always
+  servlet:
+    context-path: ${deployment.path}
+  forward-headers-strategy: framework
 
 open-api:
   title: Resource Management
@@ -56,12 +61,18 @@ spring:
       port: ${consul.port}
       discovery:
         enabled: true
-        hostname: ${deployment.hostname}
-        port: ${deployment.port}
+        hostname: ${consul.service.address}
+        port: ${consul.service.port}
         acl-token: ${consul.acl-token}
         register-health-check: true
-        tags: slm, backend, ${spring.application.name}
-        service-name: ${spring.application.name}
+        healthCheckPath: ${deployment.path}/actuator/health
+        tags:
+          - slm
+          - backend
+          - ${spring.application.name}
+          - exposed
+        service-name: ${consul.service.name}
+        instance-id: ${consul.service.name}
         metadata:
           version: ${application.version}
       config:
@@ -90,6 +101,11 @@ spring:
     init:
       platform: mysql
       mode: always
+  rabbitmq:
+    host: "localhost"
+    port: 5672
+    username: "myuser"
+    password: "secret"
 
 management:
   endpoints:
@@ -102,6 +118,8 @@ notification-service:
   scheme: "http"
   host: "localhost"
   port: 9001
+  path: "/notification-service"
+  url: ${notification-service.scheme}://${notification-service.host}:${notification-service.port}${notification-service.path}
 
 ### Security
 security:
@@ -144,35 +162,45 @@ aas:
     scheme: http
     host: localhost
     port: 8082
-    path:
+    path: /aas/shell-registry
     url: ${aas.aas-registry.scheme}://${aas.aas-registry.host}:${aas.aas-registry.port}${aas.aas-registry.path}
   aas-repository:
     scheme: http
     host: localhost
     port: 8081
-    path:
+    path: /aas/environment
     url: ${aas.aas-repository.scheme}://${aas.aas-repository.host}:${aas.aas-repository.port}${aas.aas-repository.path}
   submodel-registry:
     scheme: http
     host: localhost
     port: 8083
-    path:
+    path: /aas/submodel-registry
     url: ${aas.submodel-registry.scheme}://${aas.submodel-registry.host}:${aas.submodel-registry.port}${aas.submodel-registry.path}
   submodel-repository:
     scheme: http
     host: localhost
     port: 8081
-    path:
+    path: /aas/environment
     url: ${aas.submodel-repository.scheme}://${aas.submodel-repository.host}:${aas.submodel-repository.port}${aas.submodel-repository.path}
   concept-descriptions-repository:
     scheme: http
     host: localhost
     port: 8081
-    path:
+    path: /aas/environment
     url: ${aas.concept-descriptions-repository.scheme}://${aas.concept-descriptions-repository.host}:${aas.concept-descriptions-repository.port}${aas.concept-descriptions-repository.path}
+
+### Discovery
+discovery:
+  driver-registry:
+    address: localhost
+    port: 50051
 
 ### Consul
 consul:
+  service:
+    name: resource-management
+    address: host.docker.internal
+    port: ${server.port}
   scheme: http
   host: localhost
   port: 8500

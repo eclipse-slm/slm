@@ -95,9 +95,9 @@
 
 <script>
 
-import ClusterScaleDialog from '@/components/resources/dialogs/ClusterScaleDialog'
-import ClusterDeleteDialog from '@/components/resources/dialogs/ClusterDeleteDialog'
-import {useResourcesStore} from "@/stores/resourcesStore";
+import ClusterScaleDialog from '@/components/resources/dialogs/ClusterScaleDialog.vue'
+import ClusterDeleteDialog from '@/components/resources/dialogs/ClusterDeleteDialog.vue'
+import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
 
 export default {
     name: 'ResourcesTableClusters',
@@ -106,8 +106,8 @@ export default {
       ClusterDeleteDialog,
     },
     setup(){
-      const resourceStore = useResourcesStore();
-      return {resourceStore};
+      const resourceDevicesStore = useResourceDevicesStore();
+      return {resourceDevicesStore};
     },
     data () {
       return {
@@ -134,20 +134,20 @@ export default {
     },
     computed: {
       clusters () {
-        return this.resourceStore.clusters
+        return this.resourceDevicesStore.clusters
       },
     },
     methods: {
       addNodeToCluster (cluster) {
         this.scaleAction = 'up'
-        this.resourceStore.selectedClusterForScale_ = cluster;
+        this.resourceDevicesStore.selectedClusterForScale_ = cluster;
       },
       removeNodeFromCluster (cluster) {
         this.scaleAction = 'down'
-        this.resourceStore.selectedClusterForScale_ = cluster;
+        this.resourceDevicesStore.selectedClusterForScale_ = cluster;
       },
       selectClusterForDelete (cluster) {
-        this.resourceStore.selectedClusterForDelete_ = cluster;
+        this.resourceDevicesStore.selectedClusterForDelete_ = cluster;
       },
       expandRow (event, row) {
         const item = row.item;

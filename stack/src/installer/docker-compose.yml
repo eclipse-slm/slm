@@ -5,9 +5,14 @@ services:
     image: ghcr.io/eclipse-slm/slm/installer:${SLM_VERSION}
     environment:
       SLM_HOSTNAME: ${SLM_HOSTNAME}
+      DEPLOYMENT_HOST_HOSTNAME: ${DEPLOYMENT_HOST_HOSTNAME}
+      DEPLOYMENT_HOST_USER: ${DEPLOYMENT_HOST_USER}
+      DEPLOYMENT_HOST_PASSWORD: ${DEPLOYMENT_HOST_PASSWORD}
+      ANSIBLE_CMD_PARAMETERS: -v
     volumes:
       - "//var/run/docker.sock:/var/run/docker.sock"
       - "./env.yml:/env/env.yml"
+      - "./env.override.yml:/env/env.override.yml"
       - "./src:/src"
       - "./result_compose:/compose"
     extra_hosts:

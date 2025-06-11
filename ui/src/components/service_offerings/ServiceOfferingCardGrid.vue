@@ -85,8 +85,8 @@
 
 import TextWithLabel from '@/components/base/TextWithLabel'
 import getImageUrl from '@/utils/imageUtil'
-import ProgressCircular from "@/components/base/ProgressCircular";
-import {useServicesStore} from "@/stores/servicesStore";
+import ProgressCircular from "@/components/base/ProgressCircular.vue";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 import {storeToRefs} from "pinia";
 
 export default {
@@ -94,9 +94,9 @@ export default {
     components: {ProgressCircular, TextWithLabel },
     props: ['serviceOffering', 'imgWidth', 'passive', 'createOrEditMode', "showOnlyLatestVersion"],
     setup(){
-      const servicesStore = useServicesStore();
-      const {serviceVendorById, serviceOfferingCategoryNameById, serviceOfferingDeploymentTypePrettyName} = storeToRefs(servicesStore);
-      return {servicesStore, serviceVendorById, serviceOfferingCategoryNameById, serviceOfferingDeploymentTypePrettyName};
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      const {serviceVendorById, serviceOfferingCategoryNameById, serviceOfferingDeploymentTypePrettyName} = storeToRefs(serviceOfferingsStore);
+      return {serviceOfferingsStore, serviceVendorById, serviceOfferingCategoryNameById, serviceOfferingDeploymentTypePrettyName};
     },
     data: function () {
       return {
@@ -128,7 +128,7 @@ export default {
     },
     mounted () {
       if (this.serviceOffering.id !== undefined) {
-        this.servicesStore.getServiceOfferingImages(this.serviceOffering.id).then(coverImage => {
+        this.serviceOfferingsStore.getServiceOfferingImages(this.serviceOffering.id).then(coverImage => {
           this.coverImage = coverImage
         });
       }

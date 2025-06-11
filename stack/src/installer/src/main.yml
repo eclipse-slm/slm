@@ -1,3 +1,34 @@
+- name: "Define inventory"
+  hosts: localhost
+  pre_tasks:
+    - set_fact:
+        ENV:
+          DEPLOYMENT_HOST_HOSTNAME: "{{ lookup('ansible.builtin.env', 'DEPLOYMENT_HOST_HOSTNAME') }}"
+          DEPLOYMENT_HOST_USER: "{{ lookup('ansible.builtin.env', 'DEPLOYMENT_HOST_USER') }}"
+          DEPLOYMENT_HOST_PASSWORD: "{{ lookup('ansible.builtin.env', 'DEPLOYMENT_HOST_PASSWORD') }}"
+  tasks:
+    - fail:
+        msg: "Deployment target is remote host, but environment variable 'DEPLOYMENT_HOST_HOSTNAME' is not set"
+      when: (ENV.DEPLOYMENT_HOST_HOSTNAME != 'localhost') and (ENV.DEPLOYMENT_HOST_HOSTNAME != '127.0.0.1') and (ENV.DEPLOYMENT_HOST_HOSTNAME != 'slm.local')
+            and ((ENV.DEPLOYMENT_HOST_USER is not defined) or (ENV.DEPLOYMENT_HOST_USER|length == 0))
+    - fail:
+        msg: "Deployment target is remote host, but environment Variable 'DEPLOYMENT_HOST_PASSWORD' is not set"
+      when: (ENV.DEPLOYMENT_HOST_HOSTNAME != 'localhost') and (ENV.DEPLOYMENT_HOST_HOSTNAME != '127.0.0.1') and (ENV.DEPLOYMENT_HOST_HOSTNAME != 'slm.local')
+        and ((ENV.DEPLOYMENT_HOST_PASSWORD is not defined) or (ENV.DEPLOYMENT_HOST_PASSWORD|length == 0))
+    - ansible.builtin.add_host:
+        name: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+        groups: "slm"
+        ansible_host: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+        ansible_ssh_user: '{{ ENV.DEPLOYMENT_HOST_USER }}'
+        ansible_ssh_pass: '{{ ENV.DEPLOYMENT_HOST_PASSWORD }}'
+        ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
+      when: (ENV.DEPLOYMENT_HOST_HOSTNAME != 'localhost') and (ENV.DEPLOYMENT_HOST_HOSTNAME != '127.0.0.1') and (ENV.DEPLOYMENT_HOST_HOSTNAME != 'slm.local')
+            and (ENV.DEPLOYMENT_HOST_USER is defined) and (ENV.DEPLOYMENT_HOST_USER|length > 0)
+            and (ENV.DEPLOYMENT_HOST_PASSWORD is defined) and (ENV.DEPLOYMENT_HOST_PASSWORD|length > 0)
+    - ansible.builtin.group_by:
+        key: 'slm'
+      when: (ENV.DEPLOYMENT_HOST_HOSTNAME == 'localhost') or (ENV.DEPLOYMENT_HOST_HOSTNAME == '127.0.0.1') or (ENV.DEPLOYMENT_HOST_HOSTNAME == 'slm.local')
+
 - name: "Install Service Lifecycle Management"
   hosts: localhost
   gather_facts: yes
@@ -7,20 +38,204 @@
   vars_files:
     - config.yml
   pre_tasks:
-    - name: "Import config from env.yml"
-      include_vars: "/env/env.yml"
     - set_fact:
         SLM_HOSTNAME: "{{ lookup('ansible.builtin.env', 'SLM_HOSTNAME') }}"
+    - name: "Import config from env.yml"
+      include_vars:
+        file: "/env/env.yml"
+      loop:
+        - "/env/env.yml"
+      register: include_vars_env
+    - name: "Import config from env.yml"
+      include_vars:
+        file: "{{ item }}"
+      loop:
+        - "/env/env.override.yml"
+      register: include_vars_env_override
+    - set_fact:
+        ENV: "{{ ENV | combine(include_vars_env.results[0].ansible_facts, recursive=true) }}"
+    - set_fact:
+        ENV: "{{ ENV | combine(include_vars_env_override.results[0].ansible_facts, recursive=true) }}"
+    - set_fact:
+        ENV: "{{ ENV | combine({
+                    'SLM_HOSTNAME': lookup('ansible.builtin.env', 'SLM_HOSTNAME')
+                }, recursive=True) }}"
   tasks:
     - name: "Define global variables"
       block:
         - set_fact:
-            CONSUL_URL: "{{ CONSUL_SCHEME }}://{{ CONSUL_HOST }}:{{ CONSUL_PORT }}"
-            KEYCLOAK_AUTH_URL: "{{ KEYCLOAK_SCHEME }}://{{ KEYCLOAK_HOST }}:{{ KEYCLOAK_PORT }}/auth"
-            VAULT_URL: "{{ VAULT_SCHEME }}://{{ VAULT_HOST }}:{{ VAULT_PORT }}"
-            AWX_URL: "{{ AWX_SCHEME }}://{{ AWX_HOST }}:{{ AWX_PORT }}"
-            MINIO_API_URL: "{{ MINIO_SCHEME }}://{{ MINIO_HOST }}:{{ MINIO_API_PORT }}"
-            MINIO_CONSOLE_URL: "{{ MINIO_SCHEME }}://{{ MINIO_HOST }}:{{ MINIO_CONSOLE_PORT }}"
+            traefik:
+              url:
+                api: "{{ ENV.TRAEFIK.SCHEME.INTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.API_PORT }}"
+            catalog_service:
+              url:
+                internal: "{{ ENV.SLM_CATALOG_SERVICE.SCHEME.INTERNAL }}://{{ ENV.SLM_CATALOG_SERVICE.HOST.INTERNAL }}:{{ ENV.SLM_CATALOG_SERVICE.PORT.INTERNAL }}{{ ENV.SLM_CATALOG_SERVICE.PATH.INTERNAL }}"
+                external: "{{ ENV.SLM_CATALOG_SERVICE.SCHEME.EXTERNAL }}://{{ ENV.SLM_CATALOG_SERVICE.HOST.EXTERNAL }}:{{ ENV.SLM_CATALOG_SERVICE.PORT.EXTERNAL }}{{ ENV.SLM_CATALOG_SERVICE.PATH.EXTERNAL }}"
+                proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.SLM_CATALOG_SERVICE.PATH.EXTERNAL }}"
+            notification_service:
+              url:
+                internal: "{{ ENV.NOTIFICATION_SERVICE.SCHEME.INTERNAL }}://{{ ENV.NOTIFICATION_SERVICE.HOST.INTERNAL }}:{{ ENV.NOTIFICATION_SERVICE.PORT.INTERNAL }}{{ ENV.NOTIFICATION_SERVICE.PATH.INTERNAL }}"
+                external: "{{ ENV.NOTIFICATION_SERVICE.SCHEME.EXTERNAL }}://{{ ENV.NOTIFICATION_SERVICE.HOST.EXTERNAL }}:{{ ENV.NOTIFICATION_SERVICE.PORT.EXTERNAL }}{{ ENV.NOTIFICATION_SERVICE.PATH.EXTERNAL }}"
+                proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.NOTIFICATION_SERVICE.PATH.EXTERNAL }}"
+            information_service:
+              url:
+                internal: "{{ ENV.INFORMATION_SERVICE.SCHEME.INTERNAL }}://{{ ENV.INFORMATION_SERVICE.HOST.INTERNAL }}:{{ ENV.INFORMATION_SERVICE.PORT.INTERNAL }}{{ ENV.INFORMATION_SERVICE.PATH.INTERNAL }}"
+                external: "{{ ENV.INFORMATION_SERVICE.SCHEME.EXTERNAL }}://{{ ENV.INFORMATION_SERVICE.HOST.EXTERNAL }}:{{ ENV.INFORMATION_SERVICE.PORT.EXTERNAL }}{{ ENV.INFORMATION_SERVICE.PATH.EXTERNAL }}"
+                proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.INFORMATION_SERVICE.PATH.EXTERNAL }}"
+            irs:
+              url:
+                internal: "{{ ENV.IRS.SCHEME.INTERNAL }}://{{ ENV.IRS.HOST.INTERNAL }}:{{ ENV.IRS.PORT.INTERNAL }}{{ ENV.IRS.PATH.INTERNAL }}"
+                external: "{{ ENV.IRS.SCHEME.EXTERNAL }}://{{ ENV.IRS.HOST.EXTERNAL }}:{{ ENV.IRS.PORT.EXTERNAL }}{{ ENV.IRS.PATH.EXTERNAL }}"
+                proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.IRS.PATH.EXTERNAL }}"
+            resource_management:
+              url:
+                internal: "{{ ENV.RESOURCE_MANAGEMENT.SCHEME.INTERNAL }}://{{ ENV.RESOURCE_MANAGEMENT.HOST.INTERNAL }}:{{ ENV.RESOURCE_MANAGEMENT.PORT.INTERNAL }}{{ ENV.RESOURCE_MANAGEMENT.PATH.INTERNAL }}"
+                external: "{{ ENV.RESOURCE_MANAGEMENT.SCHEME.EXTERNAL }}://{{ ENV.RESOURCE_MANAGEMENT.HOST.EXTERNAL }}:{{ ENV.RESOURCE_MANAGEMENT.PORT.EXTERNAL }}{{ ENV.RESOURCE_MANAGEMENT.PATH.EXTERNAL }}"
+                proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.RESOURCE_MANAGEMENT.PATH.EXTERNAL }}"
+            service_management:
+              url:
+                internal: "{{ ENV.SERVICE_MANAGEMENT.SCHEME.INTERNAL }}://{{ ENV.SERVICE_MANAGEMENT.HOST.INTERNAL }}:{{ ENV.SERVICE_MANAGEMENT.PORT.INTERNAL }}{{ ENV.SERVICE_MANAGEMENT.PATH.INTERNAL }}"
+                external: "{{ ENV.SERVICE_MANAGEMENT.SCHEME.EXTERNAL }}://{{ ENV.SERVICE_MANAGEMENT.HOST.EXTERNAL }}:{{ ENV.SERVICE_MANAGEMENT.PORT.EXTERNAL }}{{ ENV.SERVICE_MANAGEMENT.PATH.EXTERNAL }}"
+                proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.SERVICE_MANAGEMENT.PATH.EXTERNAL }}"
+
+            monitoring_service:
+              url:
+                internal: "{{ ENV.MONITORING.PROMETHEUS_AAS.SCHEME.INTERNAL }}://{{ ENV.MONITORING.PROMETHEUS_AAS.HOST.INTERNAL }}:{{ ENV.MONITORING.PROMETHEUS_AAS.PORT.INTERNAL }}{{ ENV.MONITORING.PROMETHEUS_AAS.PATH.INTERNAL }}"
+                external: "{{ ENV.MONITORING.PROMETHEUS_AAS.SCHEME.EXTERNAL }}://{{ ENV.MONITORING.PROMETHEUS_AAS.HOST.EXTERNAL }}:{{ ENV.MONITORING.PROMETHEUS_AAS.PORT.EXTERNAL }}{{ ENV.MONITORING.PROMETHEUS_AAS.PATH.EXTERNAL }}"
+                proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.MONITORING.PROMETHEUS_AAS.PATH.EXTERNAL }}"
+
+            awx:
+              url:
+                internal: "{{ ENV.AWX.SCHEME.INTERNAL }}://{{ ENV.AWX.HOST.INTERNAL }}:{{ ENV.AWX.PORT.INTERNAL }}{{ ENV.AWX.PATH.INTERNAL }}"
+                external: "{{ ENV.AWX.SCHEME.EXTERNAL }}://{{ ENV.AWX.HOST.EXTERNAL }}:{{ ENV.AWX.PORT.EXTERNAL }}{{ ENV.AWX.PATH.EXTERNAL }}"
+
+            consul:
+              url:
+                internal: "{{ ENV.CONSUL.SCHEME.INTERNAL }}://{{ ENV.CONSUL.HOST.INTERNAL }}:{{ ENV.CONSUL.PORT.INTERNAL }}{{ ENV.CONSUL.PATH.INTERNAL }}"
+                external: "{{ ENV.CONSUL.SCHEME.EXTERNAL }}://{{ ENV.CONSUL.HOST.EXTERNAL }}:{{ ENV.CONSUL.PORT.EXTERNAL }}{{ ENV.CONSUL.PATH.EXTERNAL }}"
+            vault:
+              url:
+                internal: "{{ ENV.VAULT.SCHEME.INTERNAL }}://{{ ENV.VAULT.HOST.INTERNAL }}:{{ ENV.VAULT.PORT.INTERNAL }}{{ ENV.VAULT.PATH.INTERNAL }}"
+                external: "{{ ENV.VAULT.SCHEME.EXTERNAL }}://{{ ENV.VAULT.HOST.EXTERNAL }}:{{ ENV.VAULT.PORT.EXTERNAL }}{{ ENV.VAULT.PATH.EXTERNAL }}"
+            keycloak:
+              url:
+                internal: "{{ ENV.KEYCLOAK.SCHEME.INTERNAL }}://{{ ENV.KEYCLOAK.HOST.INTERNAL }}:{{ ENV.KEYCLOAK.PORT.INTERNAL }}{{ ENV.KEYCLOAK.PATH.INTERNAL }}"
+                external: "{{ ENV.KEYCLOAK.SCHEME.EXTERNAL }}://{{ ENV.KEYCLOAK.HOST.EXTERNAL }}:{{ ENV.KEYCLOAK.PORT.EXTERNAL }}{{ ENV.KEYCLOAK.PATH.EXTERNAL }}"
+                external_without_port: "{{ ENV.KEYCLOAK.SCHEME.EXTERNAL }}://{{ ENV.KEYCLOAK.HOST.EXTERNAL }}{{ ENV.KEYCLOAK.PATH.EXTERNAL }}"
+            aas:
+              aas_gui:
+                url:
+                  internal: "{{ ENV.AAS.AAS_GUI.SCHEME.INTERNAL }}://{{ ENV.AAS.AAS_GUI.HOST.INTERNAL }}:{{ ENV.AAS.AAS_GUI.PORT.INTERNAL }}{{ ENV.AAS.AAS_GUI.PATH.INTERNAL }}"
+                  external: "{{ ENV.AAS.AAS_GUI.SCHEME.EXTERNAL }}://{{ ENV.AAS.AAS_GUI.HOST.EXTERNAL }}:{{ ENV.AAS.AAS_GUI.PORT.EXTERNAL }}{{ ENV.AAS.AAS_GUI.PATH.EXTERNAL }}"
+                  proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}{{ ENV.AAS.AAS_GUI.PATH.EXTERNAL }}"
+              aas_discovery:
+                url:
+                  internal: "{{ ENV.AAS.AAS_DISCOVERY.SCHEME.INTERNAL }}://{{ ENV.AAS.AAS_DISCOVERY.HOST.INTERNAL }}:{{ ENV.AAS.AAS_DISCOVERY.PORT.INTERNAL }}{{ ENV.AAS.AAS_DISCOVERY.PATH.INTERNAL }}"
+                  external: "{{ ENV.AAS.AAS_DISCOVERY.SCHEME.EXTERNAL }}://{{ ENV.AAS.AAS_DISCOVERY.HOST.EXTERNAL }}:{{ ENV.AAS.AAS_DISCOVERY.PORT.EXTERNAL }}{{ ENV.AAS.AAS_DISCOVERY.PATH.EXTERNAL }}"
+                  proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.AAS.AAS_DISCOVERY.PATH.EXTERNAL }}"
+              aas_registry:
+                url:
+                  internal: "{{ ENV.AAS.AAS_REGISTRY.SCHEME.INTERNAL }}://{{ ENV.AAS.AAS_REGISTRY.HOST.INTERNAL }}:{{ ENV.AAS.AAS_REGISTRY.PORT.INTERNAL }}{{ ENV.AAS.AAS_REGISTRY.PATH.INTERNAL }}"
+                  external: "{{ ENV.AAS.AAS_REGISTRY.SCHEME.EXTERNAL }}://{{ ENV.AAS.AAS_REGISTRY.HOST.EXTERNAL }}:{{ ENV.AAS.AAS_REGISTRY.PORT.EXTERNAL }}{{ ENV.AAS.AAS_REGISTRY.PATH.EXTERNAL }}"
+                  proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.AAS.AAS_REGISTRY.PATH.EXTERNAL }}"
+              aas_repository:
+                url:
+                  internal: "{{ ENV.AAS.AAS_REPOSITORY.SCHEME.INTERNAL }}://{{ ENV.AAS.AAS_REPOSITORY.HOST.INTERNAL }}:{{ ENV.AAS.AAS_REPOSITORY.PORT.INTERNAL }}{{ ENV.AAS.AAS_REPOSITORY.PATH.INTERNAL }}"
+                  external: "{{ ENV.AAS.AAS_REPOSITORY.SCHEME.EXTERNAL }}://{{ ENV.AAS.AAS_REPOSITORY.HOST.EXTERNAL }}:{{ ENV.AAS.AAS_REPOSITORY.PORT.EXTERNAL }}{{ ENV.AAS.AAS_REPOSITORY.PATH.EXTERNAL }}"
+                  proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.AAS.AAS_REPOSITORY.PATH.EXTERNAL }}"
+              submodel_registry:
+                url:
+                  internal: "{{ ENV.AAS.SUBMODEL_REGISTRY.SCHEME.INTERNAL }}://{{ ENV.AAS.SUBMODEL_REGISTRY.HOST.INTERNAL }}:{{ ENV.AAS.SUBMODEL_REGISTRY.PORT.INTERNAL }}{{ ENV.AAS.SUBMODEL_REGISTRY.PATH.INTERNAL }}"
+                  external: "{{ ENV.AAS.SUBMODEL_REGISTRY.SCHEME.EXTERNAL }}://{{ ENV.AAS.SUBMODEL_REGISTRY.HOST.EXTERNAL }}:{{ ENV.AAS.SUBMODEL_REGISTRY.PORT.EXTERNAL }}{{ ENV.AAS.SUBMODEL_REGISTRY.PATH.EXTERNAL }}"
+                  proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.AAS.SUBMODEL_REGISTRY.PATH.EXTERNAL }}"
+              submodel_repository:
+                url:
+                  internal: "{{ ENV.AAS.SUBMODEL_REPOSITORY.SCHEME.INTERNAL }}://{{ ENV.AAS.SUBMODEL_REPOSITORY.HOST.INTERNAL }}:{{ ENV.AAS.SUBMODEL_REPOSITORY.PORT.INTERNAL }}{{ ENV.AAS.SUBMODEL_REPOSITORY.PATH.INTERNAL }}"
+                  external: "{{ ENV.AAS.SUBMODEL_REPOSITORY.SCHEME.EXTERNAL }}://{{ ENV.AAS.SUBMODEL_REPOSITORY.HOST.EXTERNAL }}:{{ ENV.AAS.SUBMODEL_REPOSITORY.PORT.EXTERNAL }}{{ ENV.AAS.SUBMODEL_REPOSITORY.PATH.EXTERNAL }}"
+                  proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.AAS.SUBMODEL_REPOSITORY.PATH.EXTERNAL }}"
+              concept_description_repository:
+                url:
+                  internal: "{{ ENV.AAS.CONCEPTDESCRIPTION_REPOSITORY.SCHEME.INTERNAL }}://{{ ENV.AAS.CONCEPTDESCRIPTION_REPOSITORY.HOST.INTERNAL }}:{{ ENV.AAS.CONCEPTDESCRIPTION_REPOSITORY.PORT.INTERNAL }}{{ ENV.AAS.CONCEPTDESCRIPTION_REPOSITORY.PATH.INTERNAL }}"
+                  external: "{{ ENV.AAS.CONCEPTDESCRIPTION_REPOSITORY.SCHEME.EXTERNAL }}://{{ ENV.AAS.CONCEPTDESCRIPTION_REPOSITORY.HOST.EXTERNAL }}:{{ ENV.AAS.CONCEPTDESCRIPTION_REPOSITORY.PORT.EXTERNAL }}{{ ENV.AAS.CONCEPTDESCRIPTION_REPOSITORY.PATH.EXTERNAL }}"
+                  proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.AAS.CONCEPTDESCRIPTION_REPOSITORY.PATH.EXTERNAL }}"
+            minio:
+              url:
+                api:
+                  internal: "{{ ENV.MINIO.SCHEME.INTERNAL }}://{{ ENV.MINIO.HOST.INTERNAL }}:{{ ENV.MINIO.API_PORT.INTERNAL }}"
+                  external: "{{ ENV.MINIO.SCHEME.EXTERNAL }}://{{ ENV.MINIO.HOST.EXTERNAL }}:{{ ENV.MINIO.API_PORT.EXTERNAL }}"
+                console:
+                  internal: "{{ ENV.MINIO.SCHEME.INTERNAL }}://{{ ENV.MINIO.HOST.INTERNAL }}:{{ ENV.MINIO.CONSOLE_PORT.INTERNAL }}"
+                  external: "{{ ENV.MINIO.SCHEME.EXTERNAL }}://{{ ENV.MINIO.HOST.EXTERNAL }}:{{ ENV.MINIO.CONSOLE_PORT.EXTERNAL }}"
+
+        - debug:
+            msg:
+              catalog_service_internal: "{{ catalog_service.url.internal }}"
+              catalog_service_external: "{{ catalog_service.url.external }}"
+              notification_service_internal: "{{ notification_service.url.internal }}"
+              notification_service_external: "{{ notification_service.url.external }}"
+              information_service_internal: "{{ information_service.url.internal }}"
+              information_service_external: "{{ information_service.url.external }}"
+              resource_management_internal: "{{ resource_management.url.internal }}"
+              resource_management_external: "{{ resource_management.url.external }}"
+              service_management_internal: "{{ service_management.url.internal }}"
+              service_management_external: "{{ service_management.url.external }}"
+              awx_internal: "{{ awx.url.internal }}"
+              awx_external: "{{ awx.url.external }}"
+              consul_internal: "{{ consul.url.internal }}"
+              consul _external: "{{ consul.url.external }}"
+              vault_internal: "{{ vault.url.internal }}"
+              vault _external: "{{ vault.url.external }}"
+              keycloak_internal: "{{ keycloak.url.internal }}"
+              keycloak_external: "{{ keycloak.url.external }}"
+              aas_aas_discovery_internal: "{{ aas.aas_discovery.url.internal }}"
+              aas_aas_discovery_external: "{{ aas.aas_discovery.url.external }}"
+              aas_aas_registry_internal: "{{ aas.aas_registry.url.internal }}"
+              aas_aas_registry_external: "{{ aas.aas_registry.url.external }}"
+              aas_aas_repository_internal: "{{ aas.aas_repository.url.internal }}"
+              aas_aas_repository_external: "{{ aas.aas_repository.url.external }}"
+              aas_submodel_registry_internal: "{{ aas.submodel_registry.url.internal }}"
+              aas_submodel_registry_external: "{{ aas.submodel_registry.url.external }}"
+              aas_submodel_repository_internal: "{{ aas.submodel_repository.url.internal }}"
+              aas_submodel_repository_external: "{{ aas.submodel_repository.url.external }}"
+              aas_concept_description_repository_internal: "{{ aas.concept_description_repository.url.internal }}"
+              aas_concept_description_repository_external: "{{ aas.concept_description_repository.url.external }}"
+              minio_api_internal: "{{ minio.url.api.internal }}"
+              minio_api_external: "{{ minio.url.api.external }}"
+              minio_console_internal: "{{ minio.url.console.internal }}"
+              minio_console_external: "{{ minio.url.console.external }}"
+
+    - name: "Login to private docker registry (if credentials are defined)"
+      community.docker.docker_login:
+        registry_url: "{{ ENV.DOCKER_IMAGE_REGISTRY_LOGIN_URL }}"
+        username: "{{ ENV.DOCKER_IMAGE_REGISTRY_USERNAME }}"
+        password: "{{ ENV.DOCKER_IMAGE_REGISTRY_PASSWORD }}"
+      when: >
+        ((ENV.DOCKER_IMAGE_REGISTRY_LOGIN_URL is defined) and (ENV.DOCKER_IMAGE_REGISTRY_LOGIN_URL|length > 0)) and
+        ((ENV.DOCKER_IMAGE_REGISTRY_USERNAME is defined) and (ENV.DOCKER_IMAGE_REGISTRY_USERNAME|length > 0)) and
+        ((ENV.DOCKER_IMAGE_REGISTRY_PASSWORD) is defined and (ENV.DOCKER_IMAGE_REGISTRY_PASSWORD|length > 0))
+
+    - block:
+      - name: "Create docker network for SLM"
+        community.docker.docker_compose_v2:
+          project_name: "eclipse-slm"
+          definition:
+            services:
+              installer-helper:
+                image: hello-world
+                networks:
+                  default:
+
+      - name: "Add installer to SLM docker network"
+        community.docker.docker_network:
+          name: "eclipse-slm_default"
+          connected:
+            - eclipse-slm-installer
+          appends: true
+
+      - name: "Remove helper container for network creation"
+        community.docker.docker_container:
+          name: eclipse-slm-installer-helper-1
+          state: absent
 
     - name: "Start Consul"
       include_role:
@@ -29,38 +244,52 @@
       vars:
         _store_compose_file: /compose/consul.yml
 
+    - name: "Start Traefik"
+      include_role:
+        name: traefik/init
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_compose_file: /compose/traefik.yml
+
     - name: "Start Keycloak"
       include_role:
         name: keycloak/init
       vars:
-        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_file: /compose/keycloak.yml
 
     - name: "Init Consul"
       include_role:
         name: consul/init
       vars:
-        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
 
     - name: "Start Vault"
       include_role:
         name: vault/init
       vars:
-        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_file: /compose/vault.yml
+
+    - name: "Start RabbitMQ"
+      include_role:
+        name: rabbitmq/init
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_compose_file: /compose/rabbitmq.yml
 
     - name: "Start Minio"
       include_role:
         name: minio/init
       vars:
-        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_file: /compose/minio.yml
 
     - name: "Start AWX"
       include_role:
         name: awx/init
       vars:
-        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _vault_token: "{{ vault_root_token }}"
         _store_compose_file: /compose/awx.yml
 
@@ -68,22 +297,38 @@
       include_role:
         name: aas/init
       vars:
-        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_file: /compose/aas.yml
 
     - name: "Start monitoring"
       ansible.builtin.include_role:
         name: monitoring/init
       vars:
-        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_file: /compose/monitoring.yml
+
+    - name: "Start discovery"
+      ansible.builtin.include_role:
+        name: discovery/init
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_compose_file: /compose/discovery.yml
+
+    - name: "Start IRS"
+      include_role:
+        name: irs/init
+        tasks_from: main.yml
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_compose_file: /compose/irs.yml
+      when: ENV.IRS.ENABLED
 
     - name: "Start internal SLM components"
       include_role:
         name: slm/init
       vars:
-        _consul_token: "{{ CONSUL_MASTER_TOKEN }}"
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_file: /compose/slm.yml
 
     - debug:
-        msg: "Eclipse Service Lifecycle Management version '{{ SLM_VERSION }}' successfully installed. Your Consul master token: {{ CONSUL_MASTER_TOKEN }}"
+        msg: "Eclipse Service Lifecycle Management version '{{ ENV.SLM_VERSION }}' successfully installed. Your Consul master token: {{ ENV.CONSUL.MASTER_TOKEN }}"

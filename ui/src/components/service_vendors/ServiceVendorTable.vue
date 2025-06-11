@@ -75,16 +75,15 @@
 import ServiceVendorCreateOrEditDialog from '@/components/service_vendors/ServiceVendorCreateOrEditDialog'
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-import {app} from "@/main";
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 import ServiceManagementClient from "@/api/service-management/service-management-client";
 
 export default {
     name: 'ServiceVendorTable',
     components: {NoItemAvailableNote, OverviewHeading, ServiceVendorCreateOrEditDialog },
     setup(){
-      const servicesStore = useServicesStore();
-      return {servicesStore};
+      const servicesOfferingsStore = useServiceOfferingsStore();
+      return {servicesOfferingsStore};
     },
     data () {
       return {
@@ -95,7 +94,7 @@ export default {
     },
     computed: {
       serviceVendors () {
-        return this.servicesStore.serviceVendors
+        return this.servicesOfferingsStore.serviceVendors
       },
       ServiceVendorsTableHeaders () {
         return [
@@ -107,7 +106,7 @@ export default {
       },
     },
     created () {
-      this.servicesStore.getServiceVendors();
+      this.servicesOfferingsStore.getServiceVendors();
     },
     methods: {
       onEditServiceVendorClicked (serviceVendor) {
@@ -120,11 +119,11 @@ export default {
         this.editServiceVendor = false
         ServiceManagementClient.serviceVendorsApi.deleteServiceVendor(serviceVendor.id).then(
           response => {
-            app.config.globalProperties.$toast.info('Service vendor successfully deleted')
-            this.servicesStore.getServiceVendors();
+            this.$toast.info('Service vendor successfully deleted')
+            this.servicesOfferingsStore.getServiceVendors();
           })
           .catch(exception => {
-            app.config.globalProperties.$toast.error('Failed to create service offering')
+            this.$toast.error('Failed to create service offering')
             console.log('Service vendor deletion failed: ' + exception.response.data.message)
             console.log(exception)
           })
@@ -146,7 +145,7 @@ export default {
         this.showCreateOrEditServiceVendorDialog = false
         this.selectedServiceVendor = null
         this.editServiceVendor = false
-        this.servicesStore.getServiceVendors();
+        this.servicesOfferingsStore.getServiceVendors();
       },
       onRowClick(click, row){
         this.$emit('serviceVendorClicked', row.item)

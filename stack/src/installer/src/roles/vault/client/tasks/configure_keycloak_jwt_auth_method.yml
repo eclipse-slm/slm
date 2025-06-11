@@ -2,7 +2,7 @@
 - name: "Assert inputs of 'vault/client | configure_keycloak_jwt_auth_method.yml'"
   assert:
     that:
-      - (VAULT_URL is defined) and (VAULT_URL|length > 0)                       # URL of the Vault instance
+      - (vault.url.internal is defined) and (vault.url.internal|length > 0)     # URL of the Vault instance
       - (_vault_token is defined) and (_vault_token|length > 0)                 # Token to authenticate with Vault
       - (_mount_auth_path is defined) and (_mount_auth_path|length > 0)         # Mount path of the auth method
       - (_oidc_discovery_url is defined) and (_oidc_discovery_url|length > 0)   # OIDC discovery URL
@@ -10,7 +10,7 @@
 
 - name: "Mount auth path '{{ _mount_auth_path }}'"
   uri:
-    url: "{{ VAULT_URL }}/v1/sys/auth/{{ _mount_auth_path }}"
+    url: "{{ vault.url.internal }}/v1/sys/auth/{{ _mount_auth_path }}"
     validate_certs: no
     method: POST
     headers:
@@ -24,7 +24,7 @@
 
 - name: "Set base url for auth path '{{ _mount_auth_path }}'"
   set_fact:
-    base_url: "{{ VAULT_URL }}/v1/auth/{{ _mount_auth_path }}"
+    base_url: "{{ vault.url.internal }}/v1/auth/{{ _mount_auth_path }}"
 
 - debug:
     var: _oidc_discovery_url
@@ -39,7 +39,7 @@
     body_format: json
     body:
       oidc_discovery_url: "{{ _oidc_discovery_url }}"
-      oidc_discovery_ca_pem: "{{ oidc_discovery_ca_pem | default('') }}"
+      oidc_discovery_ca_pem: "{{ oidc_discovery_crt }}"
       oidc_client_id: "{{ oidc_client_id | default('') }}"
       bound_issuer: "{{ bound_issuer | default('') }}"
     status_code: 204

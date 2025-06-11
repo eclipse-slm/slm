@@ -2,9 +2,9 @@
 - name: "Assert inputs of 'consul/client | create_or_add_config.yml'"
   assert:
     that:
-      - (CONSUL_SCHEME is defined) and (CONSUL_SCHEME|length > 0)     # Scheme of the Consul instance
-      - (CONSUL_HOST is defined) and (CONSUL_HOST|length > 0)         # Host of the Consul instance
-      - (CONSUL_PORT is defined)                                      # Port of the Consul instance
+      - (ENV.CONSUL.SCHEME.INTERNAL is defined) and (ENV.CONSUL.SCHEME.INTERNAL|length > 0)     # Scheme of the Consul instance
+      - (ENV.CONSUL.HOST.INTERNAL is defined) and (ENV.CONSUL.HOST.INTERNAL|length > 0)         # Host of the Consul instance
+      - (ENV.CONSUL.PORT.INTERNAL is defined)                                      # Port of the Consul instance
       - (_consul_token is defined) and (_consul_token|length > 0)     # Token to authenticate with Consul
       - (_app_name is defined) and (_app_name|length > 0)             # Name of the app for which the config should be get
 
@@ -13,7 +13,7 @@
 
 - name: "Check if config exists in Consul at '{{ __consul_kv_path }}'"
   set_fact:
-    app_config_consul: "{{ lookup('community.general.consul_kv', __consul_kv_path, scheme=CONSUL_SCHEME, host=CONSUL_HOST, port=CONSUL_PORT, token=_consul_token) | from_yaml }}"
+    app_config_consul: "{{ lookup('community.general.consul_kv', __consul_kv_path, scheme=CONSUL.SCHEME.INTERNAL, host=CONSUL.HOST.INTERNAL, port=CONSUL.PORT.INTERNAL, token=_consul_token) | from_yaml }}"
 
 - name: "Add config to variable app_configs['{{ _app_name }}']"
   set_fact:

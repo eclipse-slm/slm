@@ -14,7 +14,7 @@
           color="primary"
           icon="mdi-desktop-classic"
           title="Resources"
-          :value="overviewResources.length.toString()"
+          :value="resources.length.toString()"
           @click.native="onResourcesCardClicked"
         />
       </v-col>
@@ -227,11 +227,12 @@
 
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 import DashboardResourceStatistics from "@/components/dashboard/DashboardResourceStatistics.vue";
-import {useServicesStore} from "@/stores/servicesStore";
-import {useResourcesStore} from "@/stores/resourcesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
+import {useServiceInstancesStore} from "@/stores/serviceInstancesStore";
+import {useResourceClustersStore} from "@/stores/resourceClustersStore";
 import {useUserStore} from "@/stores/userStore";
 import {useJobsStore} from "@/stores/jobsStore";
-import {useOverviewStore} from "@/stores/overviewStore";
+import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
 
 export default {
     name: 'DashboardDashboard',
@@ -241,12 +242,13 @@ export default {
     },
 
     setup(){
-      const servicesStore = useServicesStore();
-      const resourcesStore = useResourcesStore();
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      const serviceInstancesStore = useServiceInstancesStore();
+      const resourceClustersStore = useResourceClustersStore();
       const userStore = useUserStore();
       const jobsStore = useJobsStore();
-      const overviewStore = useOverviewStore();
-      return {servicesStore, resourcesStore, userStore, jobsStore, overviewStore};
+      const resourceDevicesStore = useResourceDevicesStore();
+      return {serviceInstancesStore, serviceOfferingsStore, resourceClustersStore, userStore, jobsStore, resourceDevicesStore};
     },
 
     data () {
@@ -262,11 +264,11 @@ export default {
             ],
           },
           options: {
-            lineSmooth: this.$chartist.Interpolation.cardinal({
-              tension: 0,
-            }),
+            // lineSmooth: this.$chartist.Interpolation.cardinal({
+            //   tension: 0,
+            // }),
             low: 0,
-            high: 1000, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            high: 1000,
             chartPadding: {
               top: 0,
               right: 0,
@@ -312,20 +314,20 @@ export default {
       userGroups() {
         return this.userStore.userGroups
       },
-      overviewResources() {
-        return this.overviewStore.overviewResources
+      resources() {
+        return this.resourceDevicesStore.resources
+      },
+      clusters() {
+        return this.resourceClustersStore.clusters;
       },
       services() {
-        return this.servicesStore.services
+        return this.serviceInstancesStore.services
       },
       serviceOfferings() {
-        return this.servicesStore.serviceOfferings
+        return this.serviceOfferingsStore.serviceOfferings
       },
       jobs() {
         return this.jobsStore.jobs
-      },
-      clusters() {
-        return this.resourcesStore.clusters;
       },
 
       DataTableHeaders () {
@@ -341,8 +343,10 @@ export default {
     },
 
     mounted () {
-      this.overviewStore.getResourcesOverview()
-      this.servicesStore.updateServicesStore();
+      this.resourceDevicesStore.updateStore()
+      this.resourceClustersStore.updateStore()
+      this.serviceOfferingsStore.updateStore();
+      this.serviceInstancesStore.updateStore();
     },
 
     methods: {

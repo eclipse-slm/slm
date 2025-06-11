@@ -2,7 +2,7 @@
 - name: "Assert inputs of 'keycloak/client | create_client.yml'"
   assert:
     that:
-      - (KEYCLOAK_AUTH_URL is defined) and (KEYCLOAK_AUTH_URL|length > 0)               # Auth URL of the Keycloak instance
+      - (keycloak.url.external is defined) and (keycloak.url.external|length > 0)               # Auth URL of the Keycloak instance
       - (_keycloak_access_token is defined) and (_keycloak_access_token|length > 0)     # Access token to authenticate with Keycloak
       - (_keycloak_realm_name is defined) and (_keycloak_realm_name|length > 0)         # Name of the Keycloak realm where the client should be created
       - (_keycloak_client is defined) and (_keycloak_client|length > 0)                 # Definition of the client to be created
@@ -11,7 +11,8 @@
 
 - name: "Create Keycloak client '{{ _keycloak_client.client_id }}'"
   uri:
-    url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ _keycloak_realm_name }}/clients"
+    url: "{{ keycloak.url.external }}/admin/realms/{{ _keycloak_realm_name }}/clients"
+    validate_certs: no
     method: POST
     headers:
       authorization: "Bearer {{ _keycloak_access_token }}"
@@ -35,7 +36,8 @@
 
 - name: "Get uuid of '{{ _keycloak_client.client_id }}'"
   uri:
-    url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ _keycloak_realm_name }}/clients?clientId={{ _keycloak_client.client_id }}"
+    url: "{{ keycloak.url.external }}/admin/realms/{{ _keycloak_realm_name }}/clients?clientId={{ _keycloak_client.client_id }}"
+    validate_certs: no
     method: GET
     headers:
       authorization: "Bearer {{ _keycloak_access_token }}"
@@ -46,7 +48,8 @@
 
 - name: "Create protocol mapper 'Groups' for '{{ _keycloak_client.client_id }}'"
   uri:
-    url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ _keycloak_realm_name }}/clients/{{ client_uuid }}/protocol-mappers/models"
+    url: "{{ keycloak.url.external }}/admin/realms/{{ _keycloak_realm_name }}/clients/{{ client_uuid }}/protocol-mappers/models"
+    validate_certs: no
     method: POST
     headers:
       authorization: "Bearer {{ _keycloak_access_token }}"
@@ -68,7 +71,8 @@
 
 - name: "Create protocol mapper 'Audience' for '{{ _keycloak_client.client_id }}'"
   uri:
-    url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ _keycloak_realm_name }}/clients/{{ client_uuid }}/protocol-mappers/models"
+    url: "{{ keycloak.url.external }}/admin/realms/{{ _keycloak_realm_name }}/clients/{{ client_uuid }}/protocol-mappers/models"
+    validate_certs: no
     method: POST
     headers:
       authorization: "Bearer {{ _keycloak_access_token }}"

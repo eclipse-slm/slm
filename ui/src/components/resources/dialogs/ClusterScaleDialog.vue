@@ -165,7 +165,8 @@
 
 <script>
 
-import {useResourcesStore} from "@/stores/resourcesStore";
+import {useResourceClustersStore} from "@/stores/resourceClustersStore";
+import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import logRequestError from "@/api/restApiHelper";
 
@@ -178,8 +179,9 @@ export default {
       }
     },
     setup(){
-      const resourceStore = useResourcesStore();
-      return {resourceStore};
+      const resourceClustersStore = useResourceClustersStore();
+      const resourceDevicesStore = useResourceDevicesStore();
+      return {resourceClustersStore, resourceDevicesStore};
     },
     data () {
       return {
@@ -190,20 +192,17 @@ export default {
     },
     computed: {
       nonClusterResources() {
-        return this.resourceStore.nonClusterResources
+        return this.resourceDevicesStore.nonClusterResources
       },
       selectedClusterForScale () {
-        return this.resourceStore.selectedClusterForScale
-      },
-      selectedProject () {
-        return this.resourceStore.selectedProject
+        return this.resourceClustersStore.selectedClusterForScale
       },
       availableClusterTypes() {
-        return this.resourceStore.availableClusterTypes
+        return this.resourceClustersStore.availableClusterTypes
       },
 
       showDialog () {
-        return this.resourceStore.selectedClusterForScale_ !== null;
+        return this.resourceClustersStore._selectedClusterForScale !== null;
       },
       downScalableClusterMembers () {
 
@@ -265,7 +264,7 @@ export default {
         this.page = ''
         this.selectedClusterMemberTypeName = ''
         this.selectedBareMetalResource = ''
-        this.resourceStore.selectedClusterForScale_ = null;
+        this.resourceClustersStore._selectedClusterForScale = null;
       },
     },
   }

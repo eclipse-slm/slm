@@ -17,8 +17,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.oauth2.server.resource.authentication.JwtIssuerAuthenticationManagerResolver;
 import org.springframework.security.web.SecurityFilterChain;
@@ -121,7 +119,7 @@ public class WebSecurityConfig {
     }
 
     JwtAuthenticationProvider authenticationProvider(String issuer, JwtAuthenticationConverter authenticationConverter) {
-        JwtDecoder decoder = JwtDecoders.fromIssuerLocation(issuer);
+        var decoder = CustomJwtDecoder.fromIssuer(issuer);
         var provider = new JwtAuthenticationProvider(decoder);
         provider.setJwtAuthenticationConverter(authenticationConverter);
         return provider;

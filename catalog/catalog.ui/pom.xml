@@ -6,6 +6,7 @@
 
     <artifactId>catalog.ui</artifactId>
     <version>${revision}</version>
+    <packaging>pom</packaging>
 
     <parent>
         <groupId>org.eclipse.slm</groupId>

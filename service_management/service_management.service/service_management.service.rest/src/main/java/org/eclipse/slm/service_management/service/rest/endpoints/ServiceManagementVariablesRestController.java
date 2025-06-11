@@ -20,9 +20,9 @@ public class ServiceManagementVariablesRestController extends VariablesRestContr
         super(systemVariableHandler);
 
         systemVariableHandler.addSystemVariable(new SystemVariable("AAS_REGISTRY", "AAS Registry URL",
-                SystemVariableValueSource.APPLICATION_PROPERTIES, "aas.aas-registry.url"));
-        systemVariableHandler.addSystemVariable(new SystemVariable("AAS_SERVER", "AAS Server URL",
-                SystemVariableValueSource.APPLICATION_PROPERTIES, "basyx.aas-server.url"));
+                SystemVariableValueSource.APPLICATION_PROPERTIES, "aas.aas-registry.proxy"));
+        systemVariableHandler.addSystemVariable(new SystemVariable("SUBMODEL_REGISTRY", "Submodel Registry URL",
+                SystemVariableValueSource.APPLICATION_PROPERTIES, "aas.submodel-registry.proxy"));
     }
 
     @RequestMapping(value = "/deployment", method = RequestMethod.GET)

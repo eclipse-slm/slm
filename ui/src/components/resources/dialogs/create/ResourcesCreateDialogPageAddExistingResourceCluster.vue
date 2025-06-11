@@ -160,7 +160,7 @@
 import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
 import {Field, Form as ValidationForm} from "vee-validate";
 import * as yup from 'yup';
-import {useResourcesStore} from "@/stores/resourcesStore";
+import {useResourceClustersStore} from "@/stores/resourceClustersStore";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import logRequestError from "@/api/restApiHelper";
 
@@ -172,9 +172,9 @@ export default {
     },
     setup(){
       const is_required = yup.string().required();
-      const resourceStore = useResourcesStore();
+      const resourceClustersStore = useResourceClustersStore();
       return {
-        is_required, resourceStore
+        is_required, resourceClustersStore
       }
     },
     data () {
@@ -188,7 +188,7 @@ export default {
     },
     computed: {
       availableClusterTypes () {
-        return this.resourceStore.availableClusterTypes
+        return this.resourceClustersStore.availableClusterTypes
       },
 
       availableClusterTypesWithSkipInstall () {

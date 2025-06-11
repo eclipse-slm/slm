@@ -2,22 +2,22 @@
 - name: "Assert inputs of 'keycloak/client | get_admin_access_token.yml'"
   assert:
     that:
-      - (KEYCLOAK_AUTH_URL is defined) and (KEYCLOAK_AUTH_URL|length > 0)               # Auth URL of the Keycloak instance
-      - (KEYCLOAK_ADMIN_USERNAME is defined) and (KEYCLOAK_ADMIN_USERNAME|length > 0)   # Username of Keycloak admin
-      - (KEYCLOAK_ADMIN_USERNAME is defined) and (KEYCLOAK_ADMIN_USERNAME|length > 0)   # Password of Keycloak admin
+      - (keycloak.url.external is defined) and (keycloak.url.external|length > 0)               # Auth URL of the Keycloak instance
+      - (ENV.KEYCLOAK.ADMIN_USERNAME is defined) and (ENV.KEYCLOAK.ADMIN_USERNAME|length > 0)   # Username of Keycloak admin
+      - (ENV.KEYCLOAK.ADMIN_USERNAME is defined) and (ENV.KEYCLOAK.ADMIN_USERNAME|length > 0)   # Password of Keycloak admin
 
 - name: "Get Keycloak admin access token"
   uri:
-    url: "{{ KEYCLOAK_AUTH_URL }}/realms/master/protocol/openid-connect/token"
+    url: "{{ keycloak.url.external }}/realms/master/protocol/openid-connect/token"
+    validate_certs: no
     method: POST
     body_format: form-urlencoded
     body:
-      username: "{{ KEYCLOAK_ADMIN_USERNAME }}"
-      password: "{{ KEYCLOAK_ADMIN_PASSWORD }}"
+      username: "{{ ENV.KEYCLOAK.ADMIN_USERNAME }}"
+      password: "{{ ENV.KEYCLOAK.ADMIN_PASSWORD }}"
       grant_type: "password"
       client_id: "admin-cli"
     status_code: 200
-    validate_certs: no
   register: output_keycloak_login
 
 ### Outputs

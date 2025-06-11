@@ -2,11 +2,11 @@
 - name: "Assert inputs of 'awx/init | main.yml'"
   assert:
     that:
-      - (VAULT_URL is defined) and (VAULT_URL|length > 0)
+      - (vault.url.internal is defined) and (vault.url.internal|length > 0)
       - (_vault_token is defined) and (_vault_token|length > 0)
-      - (CONSUL_SCHEME is defined) and (CONSUL_SCHEME|length > 0)
-      - (CONSUL_HOST is defined) and (CONSUL_HOST|length > 0)
-      - (CONSUL_PORT is defined)
+      - (ENV.CONSUL.SCHEME.INTERNAL is defined) and (ENV.CONSUL.SCHEME.INTERNAL|length > 0)
+      - (ENV.CONSUL.HOST.INTERNAL is defined) and (ENV.CONSUL.HOST.INTERNAL|length > 0)
+      - (ENV.CONSUL.PORT.INTERNAL is defined)
       - (_consul_token is defined) and (_consul_token|length > 0)
 
 ### ToDo: Generate separate Consul token for AWX
@@ -17,9 +17,9 @@
   block:
     - name: "AWX | Check if config exists in Consul"
       community.general.consul_kv:
-        scheme: "{{ CONSUL_SCHEME }}"
-        host: "{{ CONSUL_HOST }}"
-        port: "{{ CONSUL_PORT }}"
+        scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+        host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+        port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
         token: "{{ _consul_token }}"
         key: "config/awx/data"
       register: awx_config_consul_response
@@ -34,9 +34,9 @@
         app_configs: "{{ app_configs | default({}) | combine(
           { 
             'awx': {
-              'scheme': AWX_SCHEME,
-              'host': AWX_HOST,
-              'port': AWX_PORT,
+              'scheme': ENV.AWX.SCHEME.INTERNAL,
+              'host': ENV.AWX.HOST.INTERNAL,
+              'port': ENV.AWX.PORT.INTERNAL,
               'consul': {
                 'token': _awx_consul_token | b64encode
               }
@@ -46,8 +46,12 @@
       block:
       - name: "AWX | Create AWX admin password"
         set_fact:
-          AWX_ADMIN_PASSWORD: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
-        when: (AWX_ADMIN_PASSWORD is not defined) or (AWX_ADMIN_PASSWORD | length == 0)
+          ENV: "{{ ENV | combine({
+                  'AWX': {
+                    'ENV.ADMIN_PASSWORD': lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) 
+                    }
+                  }, recursive=true) }}"
+        when: (ENV.AWX.ADMIN_PASSWORD is not defined) or (ENV.AWX.ADMIN_PASSWORD | length == 0)
       - name: "AWX | Update config dictionary and override default values"
         set_fact:
           app_configs: "{{ app_configs | default({}) | combine(
@@ -56,7 +60,7 @@
                 'users': { 
                   'admin': {
                     'username': 'admin',
-                    'password': AWX_ADMIN_PASSWORD
+                    'password': AWX.ADMIN_PASSWORD
                   }
                 }
               }
@@ -84,9 +88,9 @@
 
     - name: "AWX | Store AWX config in Consul"
       community.general.consul_kv:
-        scheme: "{{ CONSUL_SCHEME }}"
-        host: "{{ CONSUL_HOST }}"
-        port: "{{ CONSUL_PORT }}"
+        scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+        host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+        port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
         token: "{{ _consul_token }}"
         key: "{{ item.key }}"
         value: "{{ item.value }}"
@@ -134,14 +138,15 @@
       set_fact:
         awx_compose: "{{ lookup('template', 'awx.yml') }}"
     - name: "Start AWX containers"
+      delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
       community.docker.docker_compose_v2:
         project_name: eclipse-slm
         definition: "{{ awx_compose | from_yaml}}"
         state: present
-        pull: "{{ PULL_DOCKER_IMAGES }}"
-    - name: "Wait for AWX being up"
+        pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+    - name: "Wait for AWX ('{{ awx.url.internal }}') being up"
       uri:
-        url: "{{ AWX_URL }}"
+        url: "{{ awx.url.internal }}"
         status_code: 200
       register: result
       until: result.status == 200
@@ -174,11 +179,12 @@
     tasks_from: register_service
   vars:
     _service_name: awx
-    _service_port: "{{ AWX_PORT }}"
-    _service_address: "{{ AWX_HOST }}"
-    _http: "{{ AWX_URL }}"
+    _service_port: "{{ ENV.AWX.PORT.INTERNAL }}"
+    _service_address: "{{ ENV.AWX.HOST.INTERNAL }}"
+    _http: "{{ awx.url.internal }}"
     _additional_tags:
       - "awx"
+      - "exposed"
 
 - name: "Register AWX database at Consul (discovery server)"
   include_role:

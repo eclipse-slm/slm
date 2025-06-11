@@ -2,7 +2,7 @@
 - name: "Assert inputs of 'awx/init | awx_init.yml'"
   assert:
     that:
-      - (AWX_URL is defined) and (AWX_URL|length > 0)
+      - (awx.url.internal is defined) and (awx.url.internal|length > 0)
       - (_awx_admin_username is defined) and (_awx_admin_username|length > 0)
       - (_awx_admin_password is defined) and (_awx_admin_password|length > 0)
       - (_consul_token is defined) and (_consul_token|length > 0)
@@ -25,7 +25,7 @@
 
 - name: "Remove organization"
   awx.awx.organization:
-    controller_host: "{{ AWX_URL }}"
+    controller_host: "{{ awx.url.internal }}"
     controller_username: "{{ _awx_admin_username }}"
     controller_password: "{{ _awx_admin_password }}"
     name: "Self Service Portal"
@@ -34,7 +34,7 @@
 
 - name: "Add organization"
   awx.awx.organization:
-    controller_host: "{{ AWX_URL }}"
+    controller_host: "{{ awx.url.internal }}"
     controller_username: "{{ _awx_admin_username }}"
     controller_password: "{{ _awx_admin_password }}"
     name: "{{ awx_slm_organization_name }}"
@@ -43,7 +43,7 @@
 
 - name: "Create default inventory"
   awx.awx.inventory:
-    controller_host: "{{ AWX_URL }}"
+    controller_host: "{{ awx.url.internal }}"
     controller_username: "{{ _awx_admin_username }}"
     controller_password: "{{ _awx_admin_password }}"
     name: "Default"
@@ -56,7 +56,7 @@
 
 - name: "Add credential types"
   awx.awx.credential_type:
-    controller_host: "{{ AWX_URL }}"
+    controller_host: "{{ awx.url.internal }}"
     controller_username: "{{ _awx_admin_username }}"
     controller_password: "{{ _awx_admin_password }}"
     name: "{{ item.name }}"
@@ -69,7 +69,7 @@
 
 - name: "Add credentials"
   awx.awx.credential:
-    controller_host: "{{ AWX_URL }}"
+    controller_host: "{{ awx.url.internal }}"
     controller_username: "{{ _awx_admin_username }}"
     controller_password: "{{ _awx_admin_password }}"
     name: "{{ item.name }}"
@@ -80,7 +80,7 @@
 
 - name: "Add Execution Environment"
   awx.awx.execution_environment:
-    controller_host: "{{ AWX_URL }}"
+    controller_host: "{{ awx.url.internal }}"
     controller_username: "{{ _awx_admin_username }}"
     controller_password: "{{ _awx_admin_password }}"
     name: "AWX-EE-SLM-1.4.0-SNAPSHOT"
@@ -88,14 +88,17 @@
     organization: "{{ awx_slm_organization_name }}"
 
 - block:
+  - debug:
+      var: awx
+
   - name: "Create Keycloak client for AWX"
     include_role:
       name: keycloak/client
       tasks_from: clients/create_client.yml
     vars:
-      _keycloak_client: "{{ awx.keycloak_client }}"
+      _keycloak_client: "{{ awx_keycloak_client }}"
       _keycloak_access_token: "{{ keycloak_access_token }}"
-      _keycloak_realm_name: "{{ KEYCLOAK_REALM }}"
+      _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
 
   - name: "Get OIDC JSON for Keycloak client '{{ client_id }}'"
     include_role:
@@ -103,8 +106,8 @@
       tasks_from: clients/get_oidc-keycloak-json
     vars:
       _keycloak_access_token: "{{ keycloak_access_token }}"
-      _keycloak_realm_name: "{{ KEYCLOAK_REALM }}"
-      client_id: "{{ awx.keycloak_client.client_id }}"
+      _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
+      client_id: "{{ awx_keycloak_client.client_id }}"
 
   - name: "Create OIDC JSON Object"
     set_fact:
@@ -121,7 +124,7 @@
 
   - name: "Configure AWX OIDC adapter "
     awx.awx.settings:
-      controller_host: "{{ AWX_URL }}"
+      controller_host: "{{ awx.url.internal }}"
       controller_username: "{{ _awx_admin_username }}"
       controller_password: "{{ _awx_admin_password }}"
       settings: "{{ new_oidc }}"
@@ -133,7 +136,7 @@
 
   - name: "Configure Auth Organization and Team Map "
     awx.awx.settings:
-      controller_host: "{{ AWX_URL }}"
+      controller_host: "{{ awx.url.internal }}"
       controller_username: "{{ _awx_admin_username }}"
       controller_password: "{{ _awx_admin_password }}"
       settings: "{{ auth_mapping }}"

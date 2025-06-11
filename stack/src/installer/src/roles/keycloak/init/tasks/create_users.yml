@@ -2,12 +2,13 @@
   set_fact:
     keycloak_default_user: "{{ keycloak_default_user | combine(updated_entry, recursive=true) }}"
   vars:
-    updated_entry: { 'credentials': [ { 'type': 'password', 'value': '{{ KEYCLOAK_DEFAULT_USER_PASSWORD }}', 'temporary': false } ] }
+    updated_entry: { 'credentials': [ { 'type': 'password', 'value': '{{ ENV.KEYCLOAK.DEFAULT_USER_PASSWORD }}', 'temporary': false } ] }
   with_dict: "{{ keycloak_default_user }}"
 
 - name: "Create default user"
   uri:
-    url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ KEYCLOAK_REALM }}/users"
+    url: "{{ keycloak.url.external }}/admin/realms/{{ ENV.KEYCLOAK.REALM }}/users"
+    validate_certs: no
     method: POST
     headers:
       authorization: "Bearer {{ keycloak_access_token }}"
@@ -22,6 +23,6 @@
     name: "keycloak/client"
     tasks_from: roles/assign_realm_roles_to_user.yml
   vars:
-    _keycloak_realm_name: "{{ KEYCLOAK_REALM }}"
+    _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
     _keycloak_access_token: "{{ keycloak_access_token }}"
     _keycloak_user: "{{ keycloak_default_user }}"

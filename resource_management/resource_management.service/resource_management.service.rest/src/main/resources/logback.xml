@@ -8,4 +8,5 @@
     <root level="info">
         <appender-ref ref="console"/>
     </root>
+    <logger name="io.grpc.internal.ManagedChannelImpl" level="ERROR" />
 </configuration>

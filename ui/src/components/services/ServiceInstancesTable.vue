@@ -180,7 +180,7 @@
       @confirmed="onServiceDeleteConfirmed"
     />
 
-    <resources-info-dialog
+    <DeviceInfoView
       :resource="selectedResource"
       @closed="selectedResource = null"
     />
@@ -197,12 +197,13 @@
 </template>
 
 <script>
-import ServiceInstanceDeleteDialog from '@/components/services/ServiceInstanceDeleteDialog'
-import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
-import ConfirmDialog from "@/components/base/ConfirmDialog";
+import ServiceInstanceDeleteDialog from '@/components/services/ServiceInstanceDeleteDialog.vue'
+import DeviceInfoView from '@/components/resources/deviceinfo/DeviceInfoView.vue'
+import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
 import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
-import {useServicesStore} from "@/stores/servicesStore";
-import {useResourcesStore} from "@/stores/resourcesStore";
+import {useServiceInstancesStore} from "@/stores/serviceInstancesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
+import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
 import {storeToRefs} from "pinia";
 import ServiceManagementClient from "@/api/service-management/service-management-client";
 import logRequestError from "@/api/restApiHelper";
@@ -212,14 +213,16 @@ export default {
     comments: {
       ServiceInstanceDeleteDialog,
     },
-    components: { ServiceInstanceDeleteDialog, ResourcesInfoDialog, ConfirmDialog },
+    components: { ServiceInstanceDeleteDialog, DeviceInfoView, ConfirmDialog },
     mixins: [ serviceInstanceMixin ],
     setup(){
-      const servicesStore = useServicesStore();
-      const resourceStore = useResourcesStore();
-      const {serviceOfferingById, serviceInstanceGroupById} = storeToRefs(servicesStore)
-      const {resourceById} = storeToRefs(resourceStore)
-      return {servicesStore, resourceStore, serviceOfferingById, serviceInstanceGroupById, resourceById};
+      const serviceInstancesStore = useServiceInstancesStore();
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      const resourceDevicesStore = useResourceDevicesStore();
+      const {serviceInstanceGroupById} = storeToRefs(serviceInstancesStore)
+      const {serviceOfferingById} = storeToRefs(serviceOfferingsStore)
+      const {resourceById} = storeToRefs(resourceDevicesStore)
+      return {serviceInstancesStore, resourceDevicesStore, serviceOfferingById, serviceInstanceGroupById, resourceById};
     },
     data () {
       return {
@@ -248,14 +251,13 @@ export default {
     },
     computed: {
       services () {
-        return this.servicesStore.services
+        return this.serviceInstancesStore.services
       },
 
     },
     created() {
 
       this.groupedServices = this.services
-      console.log('SERVICES',this.services);
       this.services.forEach(service => {
         ServiceManagementClient.serviceInstancesApi.getAvailableVersionChangesForServiceInstance(service.id).then(response => {
           if (response.data && response.data.length > 0) {
@@ -273,7 +275,7 @@ export default {
       },
       onServiceDeleteConfirmed () {
         ServiceManagementClient.serviceInstancesApi.deleteServiceInstance(this.serviceToDelete.id).then().catch(logRequestError)
-        this.servicesStore.setServiceMarkedForDelete(this.serviceToDelete);
+        this.serviceInstancesStore.setServiceMarkedForDelete(this.serviceToDelete);
         this.serviceToDelete = null
         this.$toast.info('Service deletion started')
       },
@@ -300,7 +302,6 @@ export default {
       },
 
       onServiceInstanceClicked (event, serviceInstance) {
-        console.log(serviceInstance)
         this.$emit('service-instance-clicked', serviceInstance.item)
       },
 
@@ -308,7 +309,6 @@ export default {
         if (this.groupByServiceInstanceGroups === 1) {
           this.groupedServices = []
           this.services.forEach(service => {
-            console.log('service:', service)
             if (service.groupIds.length === 0) {
               let serviceWithGroup = JSON.parse(JSON.stringify(service))
               serviceWithGroup.groupName = 'No group'

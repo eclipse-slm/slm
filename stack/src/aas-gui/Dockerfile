@@ -1,4 +1,4 @@
-FROM eclipsebasyx/aas-gui:v2-240327
+FROM eclipsebasyx/aas-gui:v2-241220
 
 ENV PRIMARY_COLOR=00A0E3
 

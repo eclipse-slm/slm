@@ -17,6 +17,7 @@ public class ConsulTests {
         RestAssured.baseURI = TestConfig.CONSUL_BASE_URL;
         RestAssured.port = TestConfig.CONSUL_PORT;
         RestAssured.basePath = "";
+        RestAssured.useRelaxedHTTPSValidation();
     }
 
     @Test

@@ -59,7 +59,7 @@ jobs:
         run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' deploy
       - name: Build '${{ matrix.build.type }}' with Maven
         if: github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')
-        run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' clean org.jacoco:jacoco-maven-plugin:prepare-agent install -q org.jacoco:jacoco-maven-plugin:report -Pcoverage verify
+        run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' verify
       - name: Build Coveralls Report
         if: ${{ env.COVERALLS_TOKEN != '' && matrix.build.type == 'backend' && (github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')) }}
         run: mvn jacoco:report coveralls:report  -DrepoToken=$COVERALLS_TOKEN
@@ -76,7 +76,7 @@ jobs:
     runs-on: self-hosted
     env:
       STAGING_VM_IP: ${{ github.ref_name == 'develop' && '10.17.165.36' || '10.17.166.74' }}
-      STAGING_VM_HOSTNAME: ${{ github.ref_name == 'develop' && '10.17.165.36' || '10.17.166.74' }}
+      STAGING_VM_HOSTNAME: ${{ github.ref_name == 'develop' && 'develop.staging.slm.local' || 'main.staging.slm.local' }}
     steps:
       - name: Deploy stack von staging VM
         uses: appleboy/ssh-action@v0.1.10
@@ -100,9 +100,11 @@ jobs:
               ghcr.io/eclipse-slm/slm/uninstaller:$CORE_VERSION
             docker system prune -f
 
-            docker pull ghcr.io/eclipse-slm/slm/installer:$CORE_VERSION
+            docker stop eclipse-slm-installer || true
             docker run \
               --rm \
+              --name eclipse-slm-installer \
+              --pull=always \
               --env SLM_HOSTNAME=$STAGING_VM_HOSTNAME \
               --volume /var/run/docker.sock:/var/run/docker.sock \
               --add-host $STAGING_VM_HOSTNAME:host-gateway \

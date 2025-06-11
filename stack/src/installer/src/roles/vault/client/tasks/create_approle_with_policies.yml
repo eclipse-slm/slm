@@ -2,7 +2,7 @@
 - name: "Assert inputs of 'create_approle_with_policies.yml'"
   assert:
     that:
-      - (VAULT_URL is defined) and (VAULT_URL|length > 0)         # URL of Vault
+      - (vault.url.internal is defined) and (vault.url.internal|length > 0)         # URL of Vault
       - (_vault_token is defined) and (_vault_token|length > 0)     # Token to authenticate with Vault
       - (_approle_name is defined) and (_approle_name|length > 0)   # Name of the app rol to be created
       # Optional

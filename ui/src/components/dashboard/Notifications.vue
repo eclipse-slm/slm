@@ -259,7 +259,7 @@
                 </div>
 
                 <div class="text-grey">
-                  The first step is to create an account at Creative Tim. You can choose a social network or go for the classic version, whatever works best for you.
+                  Your notfication
                 </div>
               </div>
             </v-col>
@@ -270,7 +270,7 @@
             >
               <v-sheet>
                 <v-img
-                  src="https://demos.creative-tim.com/material-dashboard/assets/img/card-1.jpg"
+                  src=""
                   height="100"
                   width="200"
                 />
@@ -287,7 +287,7 @@
                 </div>
 
                 <div class="text-grey">
-                  The first step is to create an account at <a href="http://www.creative-tim.com/">Creative Tim</a>. You can choose a social network or go for the classic version, whatever works best for you.
+                  Text
                 </div>
               </div>
             </v-col>
@@ -298,15 +298,11 @@
             >
               <v-sheet>
                 <v-img
-                  src="https://demos.creative-tim.com/material-dashboard/assets/img/card-2.jpg"
+                  src=""
                   height="100"
                   width="200"
                 />
               </v-sheet>
-            </v-col>
-
-            <v-col cols="12">
-              If you have more questions, don't hesitate to contact us or send us a tweet @creativetim. We're here to help!
             </v-col>
           </v-row>
 

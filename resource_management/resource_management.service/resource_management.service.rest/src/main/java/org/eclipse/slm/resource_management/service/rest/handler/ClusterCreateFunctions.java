@@ -361,7 +361,7 @@ class ClusterCreateFunctions extends AbstractClusterFunctions implements IAwxJob
 
         this.notificationServiceClient.postNotification(
                 jwtAuthenticationToken,
-                Category.Resources,
+                Category.RESOURCES,
                 JobTarget.RESOURCE,
                 JobGoal.CREATE
         );

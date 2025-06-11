@@ -131,7 +131,7 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
                     try {
                         var serviceInstance = this.serviceInstancesConsulClient.getServiceInstance(serviceInstanceId);
                         this.serviceInstancesConsulClient.deregisterConsulServiceForServiceInstance(serviceInstance);
-                        notificationServiceClient.postNotification(jwtAuthenticationToken, Category.Services, JobTarget.SERVICE, JobGoal.DELETE);
+                        notificationServiceClient.postNotification(jwtAuthenticationToken, Category.SERVICES, JobTarget.SERVICE, JobGoal.DELETE);
 
                     } catch (ConsulLoginFailedException | ServiceInstanceNotFoundException e) {
                         LOG.error(e.getMessage());

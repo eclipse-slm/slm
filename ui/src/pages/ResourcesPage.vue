@@ -20,59 +20,84 @@
     </div>
 
     <div v-if="apiStateLoaded">
-      <resources-overview />
+      <div>
+        <base-material-card>
+          <template #heading>
+            <overview-heading text="Devices" />
+          </template>
+
+          <no-item-available-note
+            v-if="resources.length == 0"
+            item="Resource"
+          />
+
+          <v-card-text v-else>
+            <v-row>
+              <ResourcesTableDevices
+                v-if="resources.length > 0"
+                class="mt-0 flex"
+                @resource-selected="onResourceSelected"
+              />
+            </v-row>
+          </v-card-text>
+        </base-material-card>
+
+        <DeviceInfoView
+          :resource="selectedResource"
+          :section="selectedSection"
+          @closed="selectedResource = null"
+        />
+        <resources-create-dialog
+          :show="showCreateDialog"
+          @canceled="showCreateDialog = false"
+        />
+        <v-fab
+          :active="!showCreateButton"
+          icon="mdi-plus"
+          class="mx-4"
+          elevation="15"
+          color="primary"
+          location="right bottom"
+          :app="true"
+          @click="showCreateDialog = true"
+        />
+      </div>
     </div>
   </v-container>
 </template>
 
-<script>
-import ResourcesOverview from '@/components/resources/ResourcesOverview'
-import ApiState from '@/api/apiState'
-import {useStore} from "@/stores/store";
-import {useResourcesStore} from "@/stores/resourcesStore";
+<script setup>
+import {computed, onMounted, ref} from 'vue';
+import ApiState from '@/api/apiState';
+import { useResourceDevicesStore } from "@/stores/resourceDevicesStore";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import ResourcesCreateDialog from "@/components/resources/dialogs/create/ResourcesCreateDialog.vue";
+import DeviceInfoView from "@/components/resources/deviceinfo/DeviceInfoView.vue";
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import ResourcesTableDevices from "@/components/resources/ResourcesTableDevices.vue";
 
-export default {
-    components: {
-      ResourcesOverview,
-    },
-    setup(){
-      const store = useStore();
-      const resourcesStore = useResourcesStore();
+const resourceDevicesStore = useResourceDevicesStore();
 
-      return {store, resourcesStore}
-    },
-    data () {
-      return {
-        selectedResource: null,
-        createResourceDialog: false,
-      }
-    },
-    computed: {
-      themeColorMain() {
-        return this.store.themeColorMain
-      },
-      apiStateResources() {
-        return this.resourcesStore.apiStateResources
-      },
-      resources() {
-        return this.resourcesStore.resources
-      },
-      apiStateLoaded () {
-        return (this.apiStateResources === ApiState.LOADED || this.apiStateResources === ApiState.UPDATING)
-      },
-      apiStateLoading () {
-        return this.apiStateResources === ApiState.LOADING || this.apiStateResources === ApiState.INIT
-      },
-      apiStateError () {
-        return this.apiStateResources === ApiState.ERROR
-      },
-    },
-    methods: {
-      onResourceSelected (resource) {
-        this.selectedResource = resource
-      },
-    },
-  }
+const selectedResource = ref(null);
+const selectedSection = ref("common");
+const showCreateDialog = ref(false);
+const showCreateButton = ref(false);
+
+const resources = computed(() => resourceDevicesStore.resources);
+
+const apiStateResources = computed(() => resourceDevicesStore.apiState);
+const apiStateLoaded = computed(() => apiStateResources.value === ApiState.LOADED || apiStateResources.value === ApiState.UPDATING);
+const apiStateLoading = computed(() => apiStateResources.value === ApiState.LOADING || apiStateResources.value === ApiState.INIT);
+const apiStateError = computed(() => apiStateResources.value === ApiState.ERROR);
+
+const onResourceSelected = (resource, section) => {
+  selectedResource.value = resource;
+  selectedSection.value = section;
+};
+
+onMounted(() => {
+  resourceDevicesStore.getDeploymentCapabilities();
+});
 </script>
 
 <style scoped />

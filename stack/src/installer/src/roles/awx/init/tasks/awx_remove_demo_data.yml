@@ -1,6 +1,6 @@
 - name: "Remove Demo Inventory"
   awx.awx.inventory:
-    controller_host: "{{ AWX_URL }}"
+    controller_host: "{{ awx.url.internal }}"
     controller_username: "{{ app_configs.awx.users.admin.username }}"
     controller_password: "{{ app_configs.awx.users.admin.password }}"
     name: "Demo Inventory"
@@ -10,7 +10,7 @@
 
 - name: "Remove Demo Project"
   awx.awx.project:
-    controller_host: "{{ AWX_URL }}"
+    controller_host: "{{ awx.url.internal }}"
     controller_username: "{{ app_configs.awx.users.admin.username }}"
     controller_password: "{{ app_configs.awx.users.admin.password }}"
     name: "Demo Project"
@@ -18,7 +18,7 @@
 
 - name: "Remove Demo Template Project"
   awx.awx.project:
-    controller_host: "{{ AWX_URL }}"
+    controller_host: "{{ awx.url.internal }}"
     controller_username: "{{ app_configs.awx.users.admin.username }}"
     controller_password: "{{ app_configs.awx.users.admin.password }}"
     name: "Demo Job Template"

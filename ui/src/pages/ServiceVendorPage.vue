@@ -1,17 +1,17 @@
 <template>
   <div>
     <div
-      v-if="apiStateLoading"
+      v-if="apiState === ApiState.INIT || apiState === ApiState.LOADING || apiState === ApiState.UPDATING"
       class="text-center"
     >
-      <progress-circular />
+      <ProgressCircular />
     </div>
-    <div v-if="apiStateError">
+    <div v-if="apiState === ApiState.ERROR">
       Error
     </div>
 
     <v-container
-      v-if="apiStateLoaded"
+      v-if="apiState === ApiState.LOADED"
       id="user-profile"
       fluid
       tag="section"
@@ -237,13 +237,12 @@ import ServiceVendorsDevelopersTable from '@/components/service_vendors/ServiceV
 import ServiceVendorCreateOrEditDialog from '@/components/service_vendors/ServiceVendorCreateOrEditDialog'
 import logRequestError from '@/api/restApiHelper'
 import getImageUrl from '@/utils/imageUtil'
-import ServiceOfferingTable from "@/components/service_offerings/ServiceOfferingTable";
-import ConfirmDialog from "@/components/base/ConfirmDialog";
-import ServiceOfferingCreateDialog from "@/components/service_offerings/dialogs/ServiceOfferingCreateDialog";
-import ProgressCircular from "@/components/base/ProgressCircular";
+import ServiceOfferingTable from "@/components/service_offerings/ServiceOfferingTable.vue";
+import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
+import ServiceOfferingCreateDialog from "@/components/service_offerings/dialogs/ServiceOfferingCreateDialog.vue";
+import ProgressCircular from "@/components/base/ProgressCircular.vue";
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
-import {app} from "@/main";
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 import {useStore} from "@/stores/store";
 import {useUserStore} from "@/stores/userStore";
 import {storeToRefs} from "pinia";
@@ -269,9 +268,9 @@ export default {
     setup(){
       const store = useStore();
       const userStore = useUserStore();
-      const servicesStore = useServicesStore();
-      const {serviceVendorById, serviceOfferingCategoryNameById} = storeToRefs(servicesStore)
-      return {store, userStore, servicesStore, serviceVendorById, serviceOfferingCategoryNameById};
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      const {apiState, serviceVendorById, serviceOfferingCategoryNameById} = storeToRefs(serviceOfferingsStore)
+      return {apiState, store, userStore, serviceOfferingsStore, serviceVendorById, serviceOfferingCategoryNameById};
     },
     data () {
       return {
@@ -300,27 +299,11 @@ export default {
       }
     },
     computed: {
-      themeColorMain() {
-        return this.store.themeColorMain
-      },
-      apiStateServices() {
-        return this.servicesStore.apiStateServices
+      ApiState() {
+        return ApiState
       },
       userId () {
         return this.userStore.userId
-      },
-
-      apiStateLoaded () {
-        return this.apiStateServices.serviceOfferingCategories === ApiState.LOADED
-      },
-      apiStateLoading () {
-        if (this.apiStateServices.serviceOfferingCategories === ApiState.INIT) {
-          this.servicesStore.getServiceOfferingCategories();
-        }
-        return this.apiStateServices.serviceOfferingCategories === ApiState.LOADING || this.apiStateServices.serviceOfferingCategories === ApiState.INIT
-      },
-      apiStateError () {
-        return this.apiStateServices.serviceOfferingCategories === ApiState.ERROR
       },
       RepositoriesTableHeaders () {
         return [
@@ -334,7 +317,7 @@ export default {
       },
     },
     created () {
-      this.servicesStore.getServiceVendors().then(() => {
+      this.serviceOfferingsStore.getServiceVendors().then(() => {
         ServiceManagementClient.usersApi.getServiceVendorsOfUser(this.userId).then(response => {
           this.serviceVendorsOfDeveloper = []
           response.data.forEach(serviceVendorId => {
@@ -361,9 +344,9 @@ export default {
       },
       onDeleteServiceOfferingConfirmed () {
         ServiceManagementClient.serviceOfferingsApi.deleteServiceOffering(this.serviceOfferingToDelete.id).then(response => {
-          app.config.globalProperties.$toast.info(`Successfully delete service offering '${this.serviceOfferingToDelete.name}'`)
+          this.$toast.info(`Successfully delete service offering '${this.serviceOfferingToDelete.name}'`)
           this.serviceOfferingDeleteDialog = false
-          this.servicesStore.getServiceOfferings();
+          this.serviceOfferingsStore.getServiceOfferings();
           ServiceManagementClient.serviceOfferingsApi.getServiceOfferings(false, this.selectedServiceVendor.id).then(
               response => {
                 this.serviceOfferingsOfVendor = response.data
@@ -382,7 +365,7 @@ export default {
         ServiceManagementClient.serviceOfferingVersionsApi.deleteServiceOfferingVersion(
             this.serviceOfferingVersionToDelete.serviceOfferingId, this.serviceOfferingVersionToDelete.id)
         .then(response => {
-          app.config.globalProperties.$toast.info(`Successfully delete service offering version '${this.serviceOfferingVersionToDelete.version}'`)
+          this.$toast.info(`Successfully delete service offering version '${this.serviceOfferingVersionToDelete.version}'`)
           this.serviceOfferingVersionDeleteDialog = false
           this.serviceOfferingVersionToDelete = undefined
           this.$options.serviceOfferingTableInterface.updateExpanded()
@@ -412,18 +395,18 @@ export default {
 
         api.then(response => {
           this.loadRepositories()
-          app.config.globalProperties.$toast.info(`Successfully created repository '${repository.address}'`)
+          this.$toast.info(`Successfully created repository '${repository.address}'`)
           this.serviceRepositoryCreateDialog = false
         })
           .catch((error) => {
-            app.config.globalProperties.$toast.error(`Failed to created repository '${repository.address}'`)
+            this.$toast.error(`Failed to created repository '${repository.address}'`)
             logRequestError(error)
           })
       },
       onDeleteRepositoryClicked (repository) {
         ServiceManagementClient.serviceRepositoriesApi.deleteRepository(this.selectedServiceVendor.id, repository.id).then(() => {
           this.loadRepositories()
-          app.config.globalProperties.$toast.info(`Successfully removed repository '${repository.address}'`)
+          this.$toast.info(`Successfully removed repository '${repository.address}'`)
         }).catch(logRequestError)
       },
 

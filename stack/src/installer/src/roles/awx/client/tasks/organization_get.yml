@@ -1,13 +1,13 @@
 - assert:
     that:
-      - (AWX_URL is defined) and (AWX_URL|length > 0)
+      - (awx.url.internal is defined) and (awx.url.internal|length > 0)
       - (awx_username is defined) and (awx_username|length > 0)
       - (awx_password is defined) and (awx_password|length > 0)
       - (awx_organization_name is defined) and (awx_organization_name|length > 0)
 
 - name: "Get organizations"
   uri:
-    url: "{{ AWX_URL }}/api/v2/organizations"
+    url: "{{ awx.url.internal }}/api/v2/organizations"
     method: GET
     force_basic_auth: yes
     url_username: "{{ awx_username }}"

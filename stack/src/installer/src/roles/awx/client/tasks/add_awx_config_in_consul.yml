@@ -2,9 +2,9 @@
 - name: "Assert inputs of 'awx/client | add_awx_config_in_consul.yml'"
   assert:
     that:
-      - (CONSUL_SCHEME is defined) and (CONSUL_SCHEME|length > 0)     # Scheme of the Consul instance
-      - (CONSUL_HOST is defined) and (CONSUL_HOST|length > 0)         # Host of the Consul instance
-      - (CONSUL_PORT is defined)                                      # Port of the Consul instance
+      - (ENV.CONSUL.SCHEME.INTERNAL is defined) and (ENV.CONSUL.SCHEME.INTERNAL|length > 0)     # Scheme of the Consul instance
+      - (ENV.CONSUL.HOST.INTERNAL is defined) and (ENV.CONSUL.HOST.INTERNAL|length > 0)         # Host of the Consul instance
+      - (ENV.CONSUL.PORT.INTERNAL is defined)                                      # Port of the Consul instance
       - (_consul_token is defined) and (_consul_token|length > 0)     # Token to authenticate with Consul
       - (_app_name is defined) and (_app_name|length > 0)             # Name of the app the AWX config should be added
 
@@ -15,6 +15,6 @@
   vars:
     _config:
       awx:
-        scheme: '{{ AWX_SCHEME }}'
-        host: '{{ AWX_HOST}}'
-        port: '{{ AWX_PORT}}'
+        scheme: '{{ ENV.AWX.SCHEME.INTERNAL }}'
+        host: '{{ ENV.AWX.HOST.INTERNAL }}'
+        port: '{{ ENV.AWX.PORT.INTERNAL }}'

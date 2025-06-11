@@ -1,0 +1,37 @@
+### Inputs
+- name: "Assert inputs of 'rabbitmq/client | add_user.yml'"
+  assert:
+    that:
+      - (_username is defined) and (_username|length > 0)     # Username of the user to be created
+      - (app_configs.rabbitmq.users is defined)               # RabbitMQ app config which contains credentials of the user to be created
+### Optional
+    # - _tags                                                 # Tags to be added to the user (https://docs.ansible.com/ansible/latest/collections/community/rabbitmq/rabbitmq_user_module.html#parameter-tags)
+    # - _permissions                                          # Permissions to be added to the user (https://docs.ansible.com/ansible/latest/collections/community/rabbitmq/rabbitmq_user_module.html#parameter-permissions)
+
+- set_fact:
+    _tags: ""
+  when: _tags is not defined
+
+- set_fact:
+    _permissions: []
+  when: permissions is not defined
+
+- name: "RabbitMQ | Client | Add user '{{ _username }}'"
+  include_role:
+    name: utils
+    tasks_from: app_config_add_user
+  vars:
+    _app_name: "rabbitmq"
+
+- name: "RabbitMQ | Client | Add or update user '{{ app_configs.rabbitmq.users[_username].username }}' using the RabbitMQ Management API"
+  community.rabbitmq.rabbitmq_user:
+    login_protocol: "{{ ENV.RABBITMQ.SCHEME.INTERNAL }}"
+    login_host: "{{ ENV.RABBITMQ.HOST.INTERNAL }}"
+    login_port: "{{ ENV.RABBITMQ.MANAGEMENT_PORT.INTERNAL }}"
+    login_user: "{{ app_configs.rabbitmq.users.admin.username }}"
+    login_password: "{{ app_configs.rabbitmq.users.admin.password }}"
+    user:  "{{ app_configs.rabbitmq.users[_username].username }}"
+    password: "{{ app_configs.rabbitmq.users[_username].password }}"
+    tags: "{{ _tags }}"
+    permissions: "{{ _permissions }}"
+    state: present

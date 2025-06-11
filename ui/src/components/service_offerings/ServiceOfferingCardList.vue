@@ -56,16 +56,16 @@
 
 <script>
 
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 import {storeToRefs} from "pinia";
 
 export default {
     name: 'ServiceOfferingCardList',
     props: ['service', 'imgWidth', 'passive'],
     setup(){
-      const servicesStore = useServicesStore();
-      const {serviceVendorById} = storeToRefs(servicesStore)
-      return {servicesStore, serviceVendorById};
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      const {serviceVendorById} = storeToRefs(serviceOfferingsStore)
+      return {serviceOfferingsStore, serviceVendorById};
     },
     data: function () {
       return {

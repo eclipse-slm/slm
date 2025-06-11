@@ -1,35 +1,39 @@
 services:
 
   installer:
-    image: ghcr.io/eclipse-slm/slm/installer:${SLM_VERSION}
+    image: ${DOCKER_IMAGE_REGISTRY}/slm/installer:${SLM_VERSION}
     build: ../src/installer
 
   uninstaller:
-    image: ghcr.io/eclipse-slm/slm/uninstaller:${SLM_VERSION}
+    image: ${DOCKER_IMAGE_REGISTRY}/slm/uninstaller:${SLM_VERSION}
     build: ../src/uninstaller
 
   aas-broker:
-    image: ghcr.io/eclipse-slm/aas/broker:${AAS_BROKER_VERSION}
+    image: ${DOCKER_IMAGE_REGISTRY}/aas/broker:${AAS_BROKER_VERSION}
     build: ../src/aas-broker
 
   aas-gui:
-    image: ghcr.io/eclipse-slm/aas/gui:${AAS_GUI_VERSION}
+    image: ${DOCKER_IMAGE_REGISTRY}/aas/gui:${AAS_GUI_VERSION}
     build: ../src/aas-gui
 
   keycloak:
-    image: ghcr.io/eclipse-slm/keycloak:${KEYCLOAK_VERSION}
+    image: ${DOCKER_IMAGE_REGISTRY}/keycloak:${KEYCLOAK_VERSION}
     build: ../src/keycloak/keycloak
 
   vault:
-    image: ghcr.io/eclipse-slm/vault:${VAULT_VERSION}
+    image: ${DOCKER_IMAGE_REGISTRY}/vault:${VAULT_VERSION}
     build: ../src/vault
 
   config-exporter:
-    image: ghcr.io/eclipse-slm/slm/config-exporter:${SLM_VERSION}
+    image: ${DOCKER_IMAGE_REGISTRY}/slm/config-exporter:${SLM_VERSION}
     build: ../src/config-exporter
 
   prometheus:
-    image: ghcr.io/eclipse-slm/monitoring-prometheus:${PROMETHEUS_VERSION}
+    image: ${DOCKER_IMAGE_REGISTRY}/monitoring-prometheus:${PROMETHEUS_VERSION}
     build: ../src/prometheus
+
+  traefik:
+    image: ${DOCKER_IMAGE_REGISTRY}/traefik:${TRAEFIK_VERSION}
+    build: ../src/traefik
 
 

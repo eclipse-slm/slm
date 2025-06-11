@@ -516,7 +516,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
                 configParameters
         );
 
-        this.notificationServiceClient.postNotification(jwtAuthenticationToken, Category.Resources, JobTarget.DEPLOYMENT_CAPABILITY, ADD);
+        this.notificationServiceClient.postNotification(jwtAuthenticationToken, Category.RESOURCES, JobTarget.DEPLOYMENT_CAPABILITY, ADD);
 
         this.keycloakUtil.createRealmRoleAndAssignToUser(
                 jwtAuthenticationToken,
@@ -709,7 +709,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
             );
             this.notificationServiceClient.postNotification(
                     jwtAuthenticationToken,
-                    Category.Resources,
+                    Category.RESOURCES,
                     JobTarget.DEPLOYMENT_CAPABILITY,
                     DELETE
             );
@@ -742,7 +742,7 @@ public class CapabilitiesManager implements IAwxJobObserverListener {
 //                            singleHostCapabilitiesConsulClient.addSingleHostCapabilityToNode(
 //                                    new ConsulCredential(),
 //                                    capability,
-//                                    jobDetails.getResourceId()
+//                                    jobDetails.resourceId()
 //                            );
                         }
 

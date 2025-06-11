@@ -214,7 +214,6 @@
 
 <script>
 
-import {app} from "@/main";
 import {useTheme} from "vuetify";
 import {useNotificationStore} from "@/stores/notificationStore";
 import {useStore} from "@/stores/store";
@@ -269,7 +268,7 @@ export default {
           id: 'logout-button',
           icon: 'mdi-logout',
           click () {
-            app.config.globalProperties.$keycloak.logoutFn()
+            this.$keycloak.logoutFn()
           },
         },
       ],

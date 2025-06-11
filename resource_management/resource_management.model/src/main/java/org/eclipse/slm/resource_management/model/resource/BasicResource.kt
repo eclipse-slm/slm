@@ -12,11 +12,15 @@ class BasicResource
     var id: UUID
 )
 {
+    var assetId: String? = null
+
     var location: Location? = null
 
     var ip: String? = null
 
     var hostname: String? = null
+
+    var firmwareVersion: String? = null;
 
     var project: String? = null
 

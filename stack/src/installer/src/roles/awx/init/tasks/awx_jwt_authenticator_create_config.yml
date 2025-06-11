@@ -2,7 +2,7 @@
 - name: "Assert inputs of 'awx/init | awx_create_config.yml'"
   assert:
     that:
-      - (AWX_URL is defined) and (AWX_URL|length > 0)
+      - (awx.url.internal is defined) and (awx.url.internal|length > 0)
       - (_awx_jwt_authenticator_username is defined) and (_awx_jwt_authenticator_username|length > 0)
       - (_awx_jwt_authenticator_password is defined) and (_awx_jwt_authenticator_password|length > 0)
       - (_consul_token is defined) and (_consul_token|length > 0)
@@ -72,7 +72,7 @@
   vars:
     _keycloak_client: "{{ awx_jwt_authenticator.keycloak_client }}"
     _keycloak_access_token: "{{ keycloak_access_token }}"
-    _keycloak_realm_name: "{{ KEYCLOAK_REALM }}"
+    _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
 
 - name: "Get client secret of awx-jwt-authenticator"
   block:
@@ -82,7 +82,7 @@
       vars:
         _client_id: "{{ awx_jwt_authenticator.keycloak_client.client_id }}"
         _keycloak_access_token: "{{ keycloak_access_token }}"
-        _keycloak_realm_name: "{{ KEYCLOAK_REALM }}"
+        _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
     - set_fact:
         awx_jwt_authenticator_keycloak_secret_id: "{{ client_secret }}"
 

@@ -29,6 +29,8 @@ public class ResourcesConsulClient {
     public final static Logger LOG = LoggerFactory.getLogger(ResourcesConsulClient.class);
     private static final String META_KEY_LOCATION = "locationId";
     private static final String META_KEY_RESOURCE_ID = "resourceId";
+    private static final String META_KEY_ASSET_ID = "assetId";
+    private static final String META_KEY_FIRMWARE_VERSION = "firmwareVersion";
     private static final String META_KEY_CONNECTION_TYPE = "resourceConnectionType";
     private final ConsulNodesApiClient consulNodesApiClient;
     private final ConsulAclApiClient consulAclApiClient;
@@ -115,7 +117,7 @@ public class ResourcesConsulClient {
     public RemoteAccessService addConnectionService(
             ConnectionType connectionType,
             int connectionPort,
-            BasicResource basicResource,
+            UUID resourceId,
             CredentialUsernamePassword credential
     ) throws ConsulLoginFailedException {
         RemoteAccessService remoteAccessService = new RemoteAccessService(
@@ -127,7 +129,7 @@ public class ResourcesConsulClient {
         //Register Service:
         consulGenericServicesClient.registerService(
                 new ConsulCredential(),
-                basicResource.getId(),
+                resourceId,
                 remoteAccessService.getService(),
                 remoteAccessService.getId(),
                 Optional.ofNullable(remoteAccessService.getPort()),
@@ -218,50 +220,51 @@ public class ResourcesConsulClient {
     //endregion
 
     //region ADD/DELETE
-    public BasicResource addResource(BasicResource basicResource) throws ConsulLoginFailedException {
-        return addResource(
-                basicResource.getId(),
-                basicResource.getHostname(),
-                basicResource.getIp(),
-                ConnectionType.ssh,
-                Optional.ofNullable(basicResource.getLocation())
-        );
-
-    }
-
-    public BasicResource addResource(
-            UUID resourceId,
-            String resourceHostname,
-            String resourceIp,
-            ConnectionType connectionType,
-            Optional<Location> optionalLocation
-    ) throws ConsulLoginFailedException {
+    public BasicResource addResource(BasicResource resource) throws ConsulLoginFailedException {
         /// Add new resource as node in Consul
         CatalogNode node = new CatalogNode();
-        node.setId(resourceId);
-        node.setNode(resourceHostname);
-        node.setAddress(resourceIp);
+        node.setId(resource.getId());
+        node.setNode(resource.getHostname());
+        node.setAddress(resource.getIp());
 
         var taggedAddresses = new TaggedAddresses();
-        taggedAddresses.setLan(resourceIp);
+        taggedAddresses.setLan(resource.getIp());
         node.setTaggedAddresses(taggedAddresses);
 
         HashMap<String, String> meta = new HashMap<>();
         meta.put("external-node", "true");
         meta.put("external-probe", "true");
-        meta.put(META_KEY_RESOURCE_ID, resourceId.toString());
-        if (optionalLocation.isPresent())
-            meta.put(META_KEY_LOCATION, optionalLocation.get().getId().toString());
-        if (connectionType!=null)
-            meta.put(META_KEY_CONNECTION_TYPE, connectionType.name());
+        meta.put(META_KEY_RESOURCE_ID, resource.getId().toString());
+        if (resource.getAssetId() != null) {
+            meta.put(META_KEY_ASSET_ID, resource.getAssetId());
+        }
+        if (resource.getFirmwareVersion() != null) {
+            meta.put(META_KEY_FIRMWARE_VERSION, resource.getFirmwareVersion());
+        }
         node.setNodeMeta(meta);
 
         this.consulNodesApiClient.registerNode(new ConsulCredential(), node);
 
-        var newResourceNode = this.consulNodesApiClient.getNodeById(new ConsulCredential(), resourceId);
-        var resource = this.convertConsulNodeToBasicResource(newResourceNode.get());
+        var newResourceNode = this.consulNodesApiClient.getNodeById(new ConsulCredential(), resource.getId());
+        resource = this.convertConsulNodeToBasicResource(newResourceNode.get());
 
         return resource;
+    }
+
+    public void setResourceLocation (UUID resourceId, Location location)
+            throws ConsulLoginFailedException {
+        Map<String, String> locationMetaData = new HashMap<>();
+        locationMetaData.put(META_KEY_LOCATION, location.getId().toString());
+
+        this.consulNodesApiClient.addMetaDataToNode(new ConsulCredential(), resourceId, locationMetaData);
+    }
+
+    public void setResourceConnectionType (UUID resourceId, ConnectionType connectionType)
+            throws ConsulLoginFailedException {
+        Map<String, String> connectionTypeMetaData = new HashMap<>();
+        connectionTypeMetaData.put(META_KEY_CONNECTION_TYPE, connectionType.name());
+
+        this.consulNodesApiClient.addMetaDataToNode(new ConsulCredential(), resourceId, connectionTypeMetaData);
     }
 
     public void deleteResource(ConsulCredential consulCredential, BasicResource resource)
@@ -349,6 +352,13 @@ public class ResourcesConsulClient {
         );
         basicResource.setHostname(node.getNode());
         basicResource.setIp(node.getAddress());
+        if (node.getMeta().containsKey(META_KEY_ASSET_ID)) {
+            basicResource.setAssetId(node.getMeta().get(META_KEY_ASSET_ID));
+        }
+        if (node.getMeta().containsKey(META_KEY_FIRMWARE_VERSION)) {
+            basicResource.setFirmwareVersion(node.getMeta().get(META_KEY_FIRMWARE_VERSION));
+        }
+
 
         return basicResource;
     }

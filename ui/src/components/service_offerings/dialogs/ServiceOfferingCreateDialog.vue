@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import CustomDialog from "@/components/base/CustomDialog";
+import CustomDialog from "@/components/base/CustomDialog.vue";
 
 export default {
   name: "ServiceOfferingCreateDialog",

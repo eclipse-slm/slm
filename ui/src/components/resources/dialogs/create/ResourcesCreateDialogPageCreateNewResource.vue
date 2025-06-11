@@ -63,7 +63,7 @@
 <script>
 
 import ResourcesCreateDialogPage from '@/components/resources/dialogs/create/ResourcesCreateDialogPage'
-import {useResourcesStore} from "@/stores/resourcesStore";
+import {useResourceClustersStore} from "@/stores/resourceClustersStore";
 import {useProviderStore} from "@/stores/providerStore";
 
 export default {
@@ -73,19 +73,16 @@ export default {
     },
     setup(){
       const providerStore = useProviderStore();
-      const resourceStore = useResourcesStore();
+      const resourceClustersStore = useResourceClustersStore();
 
-      return {providerStore, resourceStore};
+      return {providerStore, resourceClustersStore};
     },
     computed: {
-      ResourcesCreateDialogPage() {
-        return ResourcesCreateDialogPage
-      },
       virtualResourceProviders() {
         return this.providerStore.virtualResourceProviders
       },
       availableClusterTypes() {
-        return this.resourceStore.availableClusterTypes
+        return this.resourceClustersStore.availableClusterTypes
       },
     },
     mounted() {

@@ -26,7 +26,8 @@ public class ServiceManagementTests {
     {
         RestAssured.baseURI = TestConfig.SERVICE_MANAGEMENT_BASE_URL;
         RestAssured.port = TestConfig.SERVICE_MANAGEMENT_PORT;
-        RestAssured.basePath = "";
+        RestAssured.basePath = TestConfig.SERVICE_MANAGEMENT_BASE_PATH;
+        RestAssured.useRelaxedHTTPSValidation();
     }
 
     @Order(10)

@@ -63,11 +63,6 @@ export default {
         default: false
       }
     },
-  computed: {
-    ResourcesCreateDialogPage() {
-      return ResourcesCreateDialogPage
-    }
-  },
     enums: {
       ResourcesCreateDialogPage,
     },

@@ -148,8 +148,7 @@ import ServiceOfferingVersionWizardStep4Requirements
   from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep4Requirements'
 
 import ApiState from '@/api/apiState'
-import {app} from "@/main";
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 import {storeToRefs} from "pinia";
 import ServiceManagementClient from "@/api/service-management/service-management-client";
 import logRequestError from "@/api/restApiHelper";
@@ -185,9 +184,9 @@ export default {
       }
     },
     setup(){
-      const servicesStore = useServicesStore();
-      const {serviceOfferingDeploymentTypePrettyName} = storeToRefs(servicesStore)
-      return {servicesStore, serviceOfferingDeploymentTypePrettyName}
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      const {serviceOfferingDeploymentTypePrettyName} = storeToRefs(serviceOfferingsStore)
+      return {serviceOfferingsStore, serviceOfferingDeploymentTypePrettyName}
     },
     data () {
       return {
@@ -243,20 +242,19 @@ export default {
 
     computed: {
       apiStateServices () {
-        return this.servicesStore.apiStateServices
+        return this.serviceOfferingsStore.apiState
       },
       apiStateLoaded () {
-        console.log('asdf', this.apiStateServices.serviceOfferingDeploymentTypes)
-        return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADED
+        return this.apiStateServices === ApiState.LOADED
       },
       apiStateLoading () {
-        if (this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT) {
-          this.servicesStore.getServiceOfferingDeploymentTypes();
+        if (this.apiStateServices === ApiState.INIT) {
+          this.serviceOfferingsStore.getServiceOfferingDeploymentTypes();
         }
-        return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADING || this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT
+        return this.apiStateServices === ApiState.LOADING || this.apiStateServices === ApiState.INIT
       },
       apiStateError () {
-        return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.ERROR
+        return this.apiStateServices === ApiState.ERROR
       },
     },
 
@@ -363,12 +361,12 @@ export default {
                           response.data.serviceOfferingVersionId,
                           this.newServiceOfferingVersion.deploymentDefinition.codesysFile
                       ).then(uploadFileResponse => {
-                        app.config.globalProperties.$toast.info('Successfully uploaded file for offering')
+                        this.$toast.info('Successfully uploaded file for offering')
                       }).catch(error => console.log(error));
                     }
 
-                    app.config.globalProperties.$toast.info('Successfully updated service offering version')
-                    this.servicesStore.getServiceOfferings();
+                    this.$toast.info('Successfully updated service offering version')
+                    this.serviceOfferingsStore.getServiceOfferings();
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
                   } else {
                     console.log(response)
@@ -405,19 +403,19 @@ export default {
                           response.data.serviceOfferingVersionId,
                           this.newServiceOfferingVersion.deploymentDefinition.codesysFile
                       ).then(uploadFileResponse => {
-                        app.config.globalProperties.$toast.info('Successfully uploaded file for offering')
+                        this.$toast.info('Successfully uploaded file for offering')
                       }).catch(error => console.log(error));
                     }
 
-                    app.config.globalProperties.$toast.info('Successfully created service offering version')
-                    this.servicesStore.getServiceOfferings();
+                    this.$toast.info('Successfully created service offering version')
+                    this.serviceOfferingsStore.getServiceOfferings();
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
                   } else {
                     console.log(response)
                   }
                 })
                 .catch(exception => {
-                  app.config.globalProperties.$toast.error('Failed to create service offering version')
+                  this.$toast.error('Failed to create service offering version')
                   console.log('Service offering version creation failed: ' + exception?.response?.data?.message)
                   console.log(exception)
                 })

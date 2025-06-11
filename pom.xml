@@ -16,6 +16,7 @@
         <module>service_management</module>
         <module>ui</module>
         <module>notification_service</module>
+        <module>information_service</module>
         <module>catalog</module>
         <module>coverage</module>
     </modules>
@@ -51,18 +52,18 @@
         <maven.plugin.apache.compiler.version>3.13.0</maven.plugin.apache.compiler.version>
         <maven.plugin.apache.deploy.version>3.1.3</maven.plugin.apache.deploy.version>
         <maven.plugin.apache.resources.version>3.2.0</maven.plugin.apache.resources.version>
-        <maven.plugin.codehaus.exec.version>3.4.1</maven.plugin.codehaus.exec.version>
+        <maven.plugin.codehaus.exec.version>3.5.0</maven.plugin.codehaus.exec.version>
         <maven.plugin.jacoco.version>0.8.12</maven.plugin.jacoco.version>
         <maven.plugin.openapi-generator.version>7.8.0</maven.plugin.openapi-generator.version>
         <maven.plugin.deploy.version>3.1.3</maven.plugin.deploy.version>
 
-        <spring.boot.version>3.3.3</spring.boot.version>
+        <spring.boot.version>3.3.9</spring.boot.version>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
         <spring-cloud-contract-wiremock.version>4.1.4</spring-cloud-contract-wiremock.version>
         <springaddons-c4-soft.version>7.8.10</springaddons-c4-soft.version>
         <springdoc.openapi.version>2.5.0</springdoc.openapi.version>
         <swagger.version>2.2.22</swagger.version>
-        <keycloak.version>19.0.3</keycloak.version>
+        <keycloak.version>20.0.0</keycloak.version>
         <migbase.version>2.2</migbase.version>
         <joda-time.version>2.12.7</joda-time.version>
         <mariadb.client.version>3.4.1</mariadb.client.version>
@@ -77,8 +78,10 @@
         <basyx.version>2.0.0-milestone-04</basyx.version>
         <aas.aas4j.version>1.0.2</aas.aas4j.version>
         <minio.version>8.5.7</minio.version>
-        <commons.io.version>2.11.0</commons.io.version>
+        <commons.io.version>2.18.0</commons.io.version>
         <hypersistence-utils-version>3.8.2</hypersistence-utils-version>
+        <uuid.generator.version>5.0.0</uuid.generator.version>
+        <resteasy.version>4.7.4.Final</resteasy.version>
 
         <testcontainers.version>1.20.1</testcontainers.version>
         <assertj.version>3.26.3</assertj.version>
@@ -258,6 +261,12 @@
             <groupId>com.esotericsoftware.yamlbeans</groupId>
             <artifactId>yamlbeans</artifactId>
             <version>1.15</version>
+        </dependency>
+        <!-- UUID !-->
+        <dependency>
+            <groupId>com.fasterxml.uuid</groupId>
+            <artifactId>java-uuid-generator</artifactId>
+            <version>${uuid.generator.version}</version>
         </dependency>
         <!-- Serialization !-->
         <dependency>
@@ -680,12 +689,5 @@
             </plugin>
         </plugins>
     </reporting>
-
-    <distributionManagement>
-        <site>
-            <id>cloud-edge-deployment</id>
-            <url>http://10.3.7.149/</url>
-        </site>
-    </distributionManagement>
 
 </project>

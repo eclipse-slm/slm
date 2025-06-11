@@ -2,13 +2,13 @@
 - name: "Assert inputs of 'keycloak/client | store_client_config_consul.yml'"
   assert:
     that:
-      - (KEYCLOAK_AUTH_URL is defined) and (KEYCLOAK_AUTH_URL|length > 0)               # Auth URL of the Keycloak instance
+      - (keycloak.url.external is defined) and (keycloak.url.external|length > 0)               # Auth URL of the Keycloak instance
       - (_keycloak_access_token is defined) and (_keycloak_access_token|length > 0)     # Access token to authenticate with Keycloak
       - (_keycloak_realm_name is defined) and (_keycloak_realm_name|length > 0)         # Name of the Keycloak realm the client belongs to
       - (client_id is defined) and (client_id|length > 0)                               # Id of the client
-      - (CONSUL_SCHEME is defined) and (CONSUL_SCHEME|length > 0)                       # Scheme of Consul instance
-      - (CONSUL_HOST is defined) and (CONSUL_HOST|length > 0)                           # Host of Consul instance
-      - (CONSUL_PORT is defined)                                                        # Port of Consul instance
+      - (ENV.CONSUL.SCHEME.INTERNAL is defined) and (ENV.CONSUL.SCHEME.INTERNAL|length > 0)                       # Scheme of Consul instance
+      - (ENV.CONSUL.HOST.INTERNAL is defined) and (ENV.CONSUL.HOST.INTERNAL|length > 0)                           # Host of Consul instance
+      - (ENV.CONSUL.PORT.INTERNAL is defined)                                                        # Port of Consul instance
       - (_consul_token is defined) and (_consul_token|length > 0)                       # Token to authenticate with Consul
 
 - name: "Get OIDC JSON for Keycloak client '{{ client_id }}'"
@@ -16,9 +16,9 @@
 
 - name: "Store config of Keycloak client 'client_id' in Consul"
   community.general.consul_kv:
-    scheme: "{{ CONSUL_SCHEME }}"
-    host: "{{ CONSUL_HOST }}"
-    port: "{{ CONSUL_PORT }}"
+    scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+    host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+    port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
     token: "{{ _consul_token }}"
     key: "config/{{ client_id }}/keycloak"
     value: "{{ keycloak_oidc_json }}"

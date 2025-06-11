@@ -14,6 +14,15 @@
         },
         "clusters": {
           "title": "Clusters"
+        },
+        "discovery": {
+          "title": "Discovery",
+          "inbox": {
+              "title": "Inbox"
+          },
+          "drivers": {
+            "title": "Drivers"
+          }
         }
       },
       "services": {
@@ -79,7 +88,6 @@
   "settings": "Settings",
   "tables": "Tables",
   "tabs": "Tabs",
-  "tim": "Creative Tim",
   "timeline": "Timeline",
   "typography": "Typography",
   "upgrade": "Upgrade To PRO",
@@ -184,5 +192,94 @@
     "Deployment_Type": "DeploymentType",
     "Service_Options": "Service Options",
     "Requirements": "Requirements"
+  },
+
+  "AAS": {
+    "SubmodelTemplates": {
+      "DigitalNameplateV3": {
+        "Properties": {
+          "URIOfTheProduct": {
+            "Name": "URI of the Product",
+            "Description": "Unique global identification of the product instance using an universal resource identifier (URI)"
+          },
+          "ManufacturerName": {
+            "Name": "Manufacturer Name",
+            "Description": "Legally valid designation of the natural or judicial person which is directly responsible for the design, production, packaging and labeling of a product in respect to its being brought into circulation"
+          },
+          "ManufacturerProductDesignation": {
+            "Name": "Manufacturer Product Designation",
+            "Description": "Short description of the product (short text), third or lowest level of a 3 level manufacturer specific product hierarchy"
+          },
+          "AddressInformation": {
+            "Name": "Address Information",
+            "Description": "Address information in the form of IDTA Submodel Template 'Contact Information' (IDTA Number 02002)"
+          },
+          "ManufacturerProductRoot": {
+            "Name": "Manufacturer Product Root",
+            "Description": "Top level of a 3 level manufacturer specific product hierarchy"
+          },
+          "ManufacturerProductFamily": {
+            "Name": "Manufacturer Product Family",
+            "Description": "Second level of a 3 level manufacturer specific product hierarchy"
+          },
+          "ManufacturerProductType": {
+            "Name": "Manufacturer Product Type",
+            "Description": "Characteristic to differentiate between different products of a product family or special variants"
+          },
+          "OrderCodeOfManufacturer": {
+            "Name": "Order Code of Manufacturer",
+            "Description": "Unique combination of numbers and letters issued by the manufacturer that is used to identify the device for ordering"
+          },
+          "ProductArticleNumberOfManufacturer": {
+            "Name": "Product Article Number of Manufacturer",
+            "Description": "Unique product identifier of the manufacturer"
+          },
+          "SerialNumber": {
+            "Name": "Serial Number",
+            "Description": "Unique combination of numbers and letters used to identify the device once it has been manufactured"
+          },
+          "YearOfConstruction": {
+            "Name": "Year of Construction",
+            "Description": "Year in which the manufacturing process is completed"
+          },
+          "DateOfManufacture": {
+            "Name": "Date of Manufacture",
+            "Description": "Date when an item was manufactured"
+          },
+          "HardwareVersion": {
+            "Name": "Hardware Version",
+            "Description": "Version of the hardware supplied with the device"
+          },
+          "FirmwareVersion": {
+            "Name": "Firmware Version",
+            "Description": "Version of the firmware supplied with the device"
+          },
+          "SoftwareVersion": {
+            "Name": "Software Version",
+            "Description": "Version of the software used by the device"
+          },
+          "CountryOfOrigin": {
+            "Name": "Country of Origin",
+            "Description": "Country where the product was manufactured Note: Country codes defined accord. to DIN EN ISO 3166-1 alpha-2 codes"
+          },
+          "UniqueFacilityIdentifier": {
+            "Name": "Unique Facility Identifier",
+            "Description": "Unique string of characters for the identification of locations or buildings involved in a product’s value chain or used by actors involved in a product’s value chain"
+          },
+          "CompanyLogo": {
+            "Name": "Company Logo",
+            "Description": "A graphic mark used to represent a company, an organisation or a product"
+          },
+          "Markings": {
+            "Name": "Markings",
+            "Description": "Markings on the product"
+          },
+          "AssetSpecificProperties": {
+            "Name": "Asset Specific Properties",
+            "Description": "Asset specific properties of the product"
+          }
+        }
+      }
+    }
   }
 }

@@ -1,21 +1,21 @@
 services:
 
   vault:
-    image: "ghcr.io/eclipse-slm/vault:{{ VAULT_VERSION }}"
+    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/vault:{{ ENV.VAULT.VERSION }}"
     restart: unless-stopped
     logging:
       driver: "json-file"
       options:
-        max-file: "{{ LOGGING_MAX_FILE }}"
-        max-size: "{{ LOGGING_MAX_SIZE }}"
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
     ports:
-      - "{{ VAULT_PORT }}:8200"
+      - "{{ ENV.VAULT.PORT.EXTERNAL }}:{{ ENV.VAULT.PORT.INTERNAL }}"
     networks:
       default:
         aliases:
           - vault
     extra_hosts:
-      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
     volumes:
       - vault_config_root:/vault/config/root
       - vault_data:/vault/file

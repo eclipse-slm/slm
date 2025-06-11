@@ -88,9 +88,8 @@
 <script>
 
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
-import {app} from "@/main";
 import {useUserStore} from "@/stores/userStore";
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 import {storeToRefs} from "pinia";
 import ServiceManagementClient from "@/api/service-management/service-management-client";
 import logRequestError from "@/api/restApiHelper";
@@ -106,9 +105,9 @@ export default {
     },
     setup(){
       const userStore = useUserStore();
-      const servicesStore = useServicesStore();
-      const {serviceOfferingCategoryNameById, serviceVendorById} = storeToRefs(servicesStore)
-      return {userStore, servicesStore, serviceOfferingCategoryNameById, serviceVendorById}
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      const {serviceOfferingCategoryNameById, serviceVendorById} = storeToRefs(serviceOfferingsStore)
+      return {userStore, serviceOfferingsStore, serviceOfferingCategoryNameById, serviceVendorById}
     },
     data () {
       return {
@@ -156,24 +155,22 @@ export default {
     methods: {
       onDeleteDeveloperClicked (deletedDeveloper) {
         if (this.developersOfServiceVendor.length === 1) {
-          app.config.globalProperties.$toast.warning('Last developer of service vendor cannot be deleted')
+          this.$toast.warning('Last developer of service vendor cannot be deleted')
         } else {
           ServiceManagementClient.serviceVendorsApi.removeDeveloperFromServiceVendor(this.serviceVendor.id, deletedDeveloper.id).then(() => {
-            app.config.globalProperties.$toast.info(`Successfully removed developer '${deletedDeveloper.username}'`)
+            this.$toast.info(`Successfully removed developer '${deletedDeveloper.username}'`)
             this.loadDevelopersOfServiceVendor()
           })
             .catch(() => {
-              app.config.globalProperties.$toast.error(`Failed to remove developer '${deletedDeveloper.username}'`)
+              this.$toast.error(`Failed to remove developer '${deletedDeveloper.username}'`)
             })
         }
       },
       onSaveDevelopersClicked () {
-        console.log(this.addedDevelopers)
         this.addedDevelopers.forEach(developer => {
           ServiceManagementClient.serviceVendorsApi.addDeveloperToServiceVendor(this.serviceVendor.id, developer.id).then(() => {
             this.developersOfServiceVendor.push(developer)
-            app.config.globalProperties.$toast.info(`Successfully added developer '${developer.username}'`)
-            app.config.globalProperties.$keycloak.keycloak.updateToken(100000) // Force refresh of token
+            this.$toast.info(`Successfully added developer '${developer.username}'`)
           }).catch(logRequestError)
         })
         this.addedDevelopers = []

@@ -7,12 +7,15 @@ application:
 ### Deployment
 deployment:
   hostname: localhost
+  path: ""
 
 ### Server / API
 server:
   port: 10000
   error:
     include-message: always
+  servlet:
+    context-path: ${deployment.path}
 
 open-api:
   title: Service Lifecycle Management Catalog
@@ -49,11 +52,18 @@ spring:
       port: ${consul.port}
       discovery:
         enabled: true
+        hostname: ${consul.service.address}
+        port: ${consul.service.port}
         acl-token: ${consul.acl-token}
         register-health-check: true
-        hostname: ${deployment.hostname}
-        tags: slm, backend, ${spring.application.name}
+        healthCheckPath: ${deployment.path}/actuator/health
+        tags:
+          - slm
+          - backend
+          - ${spring.application.name}
+          - exposed
         service-name: ${spring.application.name}
+        instance-id: ${consul.service.name}
         metadata:
           version: ${application.version}
       config:
@@ -88,6 +98,10 @@ management:
 
 ### Consul
 consul:
+  service:
+    name: catalog-service
+    address: host.docker.internal
+    port: ${server.port}
   scheme: http
   host: localhost
   port: 8500

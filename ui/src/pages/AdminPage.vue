@@ -24,14 +24,14 @@ import VersionsOverview from '@/components/admin/VersionsOverview'
 import ServiceCategoriesTable from '@/components/service_offerings/ServiceCategoriesTable'
 import ServiceVendorsDevelopersTable from '@/components/service_vendors/ServiceVendorDevelopersTable'
 import ServiceVendorTable from '@/components/service_vendors/ServiceVendorTable'
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 
 export default {
     name: 'AdminPage',
     components: { ServiceCategoriesTable, ServiceVendorTable, ServiceVendorsDevelopersTable, VersionsOverview, },
     setup(){
-      const servicesStore = useServicesStore();
-      return {servicesStore};
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      return {serviceOfferingsStore};
     },
     data () {
       return {
@@ -42,7 +42,7 @@ export default {
     },
     computed: {
       serviceVendors() {
-        return this.servicesStore.serviceVendors
+        return this.serviceOfferingsStore.serviceVendors
       },
       ServiceVendorsTableHeaders () {
         return [
@@ -54,7 +54,7 @@ export default {
       },
     },
     created () {
-      this.servicesStore.getServiceVendors();
+      this.serviceOfferingsStore.getServiceVendors();
     },
     methods: {
       onServiceVendorClicked (serviceVendor) {

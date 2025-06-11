@@ -1,9 +1,7 @@
-FROM fabos4ai/ansible-core:2.11.9
+FROM ghcr.io/eclipse-slm/ansible:2.17.2
 
 ENV CONFIGURE_CORE_PROJECT=false \
     LOCAL_HOST=172.17.0.1
-
-RUN pip install docker docker-compose python-consul
 
 COPY src /src
 COPY templates /templates

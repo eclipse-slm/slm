@@ -12,7 +12,7 @@ export default {
     },
     created () {
       const jobStore = useJobsStore();
-      jobStore.updateJobsStore();
+      jobStore.updateStore();
     },
   }
 </script>

@@ -129,7 +129,7 @@
 
 <script>
 import {VueDraggableNext} from 'vue-draggable-next'
-import ServiceOptionValue from "@/components/service_offerings/ServiceOptionValue";
+import ServiceOptionValue from "@/components/service_offerings/ServiceOptionValue.vue";
 import {Field} from "vee-validate";
 import * as yup from 'yup';
 

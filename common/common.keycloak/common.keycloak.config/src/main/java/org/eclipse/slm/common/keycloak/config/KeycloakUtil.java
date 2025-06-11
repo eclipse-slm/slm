@@ -1,5 +1,6 @@
 package org.eclipse.slm.common.keycloak.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakGroupNotFoundException;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakUserNotFoundException;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.ClientErrorException;
 import java.util.*;
 
 @Component
@@ -41,7 +41,7 @@ public class KeycloakUtil {
         newRole.setName(roleName);
         try {
             realmResource.roles().create(newRole);
-        } catch(ClientErrorException e) {
+        } catch(Exception e) {
             LOG.info("Realm role '" + newRole + "' already exists");
         }
 
@@ -72,7 +72,7 @@ public class KeycloakUtil {
         var realmResource = getKeycloakRealmResource(jwtAuthenticationToken);
         try {
             realmResource.roles().deleteRole(roleName);
-        } catch(ClientErrorException e) {
+        } catch(Exception e) {
             LOG.info("Error deleting role '" + roleName + "': " + e);
         }
     }
@@ -82,7 +82,7 @@ public class KeycloakUtil {
         var realmResource = getKeycloakRealmResource(jwtAuthenticationToken);
         try {
             realmResource.roles().deleteRole(roleName);
-        } catch(ClientErrorException e) {
+        } catch(Exception e) {
             LOG.info("Error deleting role '" + roleName + "': " + e);
         }
     }
@@ -169,8 +169,12 @@ public class KeycloakUtil {
         newGroup.setName(groupName);
         newGroup.setAttributes(attributes);
         try {
-            realmResource.groups().add(newGroup);
-        } catch(ClientErrorException e) {
+            var response = realmResource.groups().add(newGroup);
+            if (response.getStatus() != 201) {
+                var objectMapper = new ObjectMapper();
+                LOG.error("Error creating Kyylcoak group '" + groupName + "': " + objectMapper.writeValueAsString(response));
+            }
+        } catch(Exception e) {
             LOG.info("Group '" + groupName + "' already exists");
         }
 

@@ -29,8 +29,8 @@
 import ServiceInstancesTable from '@/components/services/ServiceInstancesTable'
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-import ServiceInstanceDetailsDialog from "@/components/services/dialog/ServiceInstanceDetailsDialog";
-import {useServicesStore} from "@/stores/servicesStore";
+import ServiceInstanceDetailsDialog from "@/components/services/dialog/ServiceInstanceDetailsDialog.vue";
+import {useServiceInstancesStore} from "@/stores/serviceInstancesStore";
 
 export default {
     name: 'ServiceInstancesOverview',
@@ -41,8 +41,8 @@ export default {
       NoItemAvailableNote
     },
     setup(){
-      const servicesStore = useServicesStore();
-      return {servicesStore};
+      const serviceInstancesStore = useServiceInstancesStore();
+      return {serviceInstancesStore};
     },
     data () {
       return {
@@ -51,7 +51,7 @@ export default {
     },
     computed: {
       services () {
-        return this.servicesStore.services
+        return this.serviceInstancesStore.services
       },
     },
     methods: {

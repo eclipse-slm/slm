@@ -1,18 +1,18 @@
 services:
   keycloak:
-    image: "ghcr.io/eclipse-slm/keycloak:{{ KEYCLOAK_VERSION }}"
+    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/keycloak:{{ ENV.KEYCLOAK.VERSION }}"
     restart: unless-stopped
     logging:
       driver: "json-file"
       options:
-        max-file: "{{ LOGGING_MAX_FILE }}"
-        max-size: "{{ LOGGING_MAX_SIZE }}"
-    ports:
-      - "{{ KEYCLOAK_PORT }}:8080"
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
+#    ports:
+#      - "{{ ENV.KEYCLOAK.PORT.EXTERNAL }}:{{ ENV.KEYCLOAK.PORT.INTERNAL }}"
     depends_on:
       - keycloak-database
     environment:
-      KC_HOSTNAME: "{{ keycloak_config.host }}"
+      KC_HOSTNAME: "{{ ENV.KEYCLOAK.HOST.EXTERNAL }}"
       KC_DB_HOST: "{{ keycloak_config.database.host }}"
       KC_DB_URL_HOST: "{{ keycloak_config.database.url_host }}"
       KC_DB_SCHEMA: "{{ keycloak_config.database.schema }}"
@@ -21,27 +21,35 @@ services:
       KEYCLOAK_ADMIN: "{{ keycloak_config.users.admin.username }}"
       KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak_config.users.admin.password }}"
       KC_HTTP_RELATIVE_PATH: "{{ keycloak_config.http.relative_path }}"
+      KC_PROXY: edge
+      KC_PROXY_ADDRESS_FORWARDING: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: "xforwarded"
     networks:
       default:
         aliases:
-          - 'keycloak'
+          - "{{ ENV.KEYCLOAK.HOST.INTERNAL }}"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:8080/auth" ]
+    extra_hosts:
+      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
 
   keycloak-database:
-    image: "mariadb:{{ KEYCLOAK_DATABASE_VERSION }}"
+    image: "mariadb:{{ ENV.KEYCLOAK.DATABASE.VERSION }}"
     restart: unless-stopped
     logging:
       driver: "json-file"
       options:
-        max-file: "{{ LOGGING_MAX_FILE }}"
-        max-size: "{{ LOGGING_MAX_SIZE }}"
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
     volumes:
       - keycloak-database_data:/var/lib/mysql
     networks:
       default:
         aliases:
-          - keycloak-database
+          - "{{ ENV.KEYCLOAK.DATABASE.HOST.INTERNAL }}"
     environment:
       MARIADB_ROOT_PASSWORD: "{{ keycloak_config.database.root_password }}"
       MARIADB_USER: "{{ keycloak_config.database.username }}"

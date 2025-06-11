@@ -5,10 +5,8 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
-import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;
 import org.apache.hc.client5.http.ssl.TrustAllStrategy;
-import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.apache.hc.core5.ssl.SSLContexts;
 import org.eclipse.slm.common.vault.model.*;
 import org.eclipse.slm.common.vault.model.exceptions.GroupAliasNotFoundException;
@@ -24,12 +22,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
-import javax.annotation.PostConstruct;
-import javax.net.ssl.SSLContext;
+import jakarta.annotation.PostConstruct;;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -190,11 +186,6 @@ public class VaultClient {
 
             String url = "/" + kvPath.getFullPath();
             ResponseEntity<Response> responseEntity = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Response.class);
-            try {
-                LOG.info(this.objectMapper.writeValueAsString(responseEntity));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
             var secretsData = (Map<String, String>)responseEntity.getBody().getData().get("data");
 
             return secretsData;
@@ -251,26 +242,9 @@ public class VaultClient {
             return new HashMap<>();
         }
 
-        try {
-            LOG.info(this.objectMapper.writeValueAsString(responseEntity));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
         var secretsData = (Map<String, String>)responseEntity.getBody().getData().get("data");
 
         return secretsData;
-    }
-
-    public String getOtp(VaultCredential vaultCredential, String ip, String username, String project) {
-        String url = "/" + project + "_ca/creds/" + ip + "_" + username;
-        OtpRequest otpRequest = new OtpRequest(username, ip);
-        HttpEntity httpEntity = loginAndCreateRequestWithBody(vaultCredential, otpRequest);
-
-        ResponseEntity<Response> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Response.class);
-        Response response = responseEntity.getBody();
-
-        return (String) response.getData().get("key");
     }
 
     public void createKvSecretEngine(VaultCredential vaultCredential, String path) {

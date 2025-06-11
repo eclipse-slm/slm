@@ -1,0 +1,71 @@
+- name: "Store RabbitMQ config in Consul"
+  block:
+    - name: "Check if config exists in Consul"
+      community.general.consul_kv:
+        scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+        host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+        port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
+        token: "{{ _consul_token }}"
+        key: "config/rabbitmq/data"
+      register: rabbitmq_config_consul_response
+    - set_fact:
+        app_configs: "{{ app_configs | default({}) | combine(
+        { 
+          'rabbitmq': rabbitmq_config_consul_response.data.Value | from_yaml
+        }, recursive=true) }}"
+      when: rabbitmq_config_consul_response.data.Value is defined
+    - name: "Update config dictionary and override default values"
+      set_fact:
+        app_configs: "{{ app_configs | default({}) | combine(
+          { 
+            'rabbitmq': {
+              'host': RABBITMQ.HOST.INTERNAL,
+              'port': RABBITMQ.PORT.INTERNAL,
+            }
+          }, recursive=true) }}"
+    - name: "Create admin user"
+      include_role:
+        name: utils
+        tasks_from: app_config_add_user
+      vars:
+        _app_name: "rabbitmq"
+        _username: "{{ item.username }}"
+        _password: "{{ item.password }}"
+      loop:
+        - username: "{{ ENV.RABBITMQ.ADMIN_USERNAME }}"
+          password: "{{ ENV.RABBITMQ.ADMIN_PASSWORD }}"
+
+    - name: "Store RabbitMQ config in Consul"
+      include_role:
+        name: consul/client
+        tasks_from: store_app_config
+      vars:
+        _app_name: "rabbitmq"
+
+- set_fact:
+    rabbitmq_compose: "{{ lookup('template', 'rabbitmq.yml') }}"
+
+- name: "Start containers"
+  delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+  community.docker.docker_compose_v2:
+    project_name: eclipse-slm
+    definition: "{{ rabbitmq_compose | from_yaml}}"
+    state: present
+    pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+
+- name: "Store resulting compose file"
+  template:
+    src: "rabbitmq.yml"
+    dest: "{{ _store_compose_file }}"
+  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
+- name: "Register RabbitMQ at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: "{{ ENV.RABBITMQ.HOST.INTERNAL }}"
+    _service_port: "{{ ENV.RABBITMQ.PORT.INTERNAL }}"
+    _service_address: "{{ ENV.RABBITMQ.HOST.INTERNAL }}"
+    _tcp: "{{ ENV.RABBITMQ.HOST.INTERNAL }}:{{ ENV.RABBITMQ.PORT.INTERNAL }}"
+    _additional_tags: [ "message-queue", "rabbitmq" ]

@@ -1,28 +1,36 @@
 services:
   monitoring-prometheus-aas:
-    image: "ghcr.io/eclipse-slm/slm-monitoring-prometheus-aas:{{ MONITORING_PROMETHEUS_AAS_VERSION }}"
+    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm-monitoring-prometheus-aas:{{ ENV.MONITORING.PROMETHEUS_AAS.VERSION }}"
     restart: unless-stopped
     networks:
       default:
         aliases:
-          - monitoring
+          - "{{ ENV.MONITORING.PROMETHEUS_AAS.HOST.INTERNAL }}"
     ports:
-      - "{{ MONITORING_PROMETHEUS_AAS_PORT }}:8080"
+      - "{{ ENV.MONITORING.PROMETHEUS_AAS.PORT.EXTERNAL }}:{{ ENV.MONITORING.PROMETHEUS_AAS.PORT.INTERNAL }}"
+    environment:
+      DEPLOYMENT_URL: "{{ monitoring_service.url.proxy }}"
+      CONSUL_SCHEME: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+      CONSUL_HOST: "{{ CONSUL.HOST.INTERNAL  }}"
+      CONSUL_PORT: "{{ CONSUL.PORT.INTERNAL  }}"
+      CONSUL_ACLTOKEN: "{{ _consul_token }}"
+      CONSUL_SERVICE_ADDRESS: "{{ ENV.MONITORING.PROMETHEUS_AAS.HOST.INTERNAL }}"
+      CONSUL_SERVICE_PORT: "{{ ENV.MONITORING.PROMETHEUS_AAS.PORT.INTERNAL }}"
 
   prometheus:
-    image: "ghcr.io/eclipse-slm/monitoring-prometheus:{{ PROMETHEUS_VERSION }}"
+    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/monitoring-prometheus:{{ ENV.MONITORING.PROMETHEUS.VERSION }}"
     restart: unless-stopped
     environment:
-      CONSUL_URL: "{{ CONSUL_URL }}"
+      CONSUL_URL: "{{ consul.url.internal }}"
       CONSUL_TOKEN: "{{ _consul_token }}"
     networks:
       default:
         aliases:
-          - prometheus
+          - "{{ ENV.MONITORING.PROMETHEUS.HOST.INTERNAL }}"
     extra_hosts:
-      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
     ports:
-      - "{{ PROMETHEUS_PORT }}:9090"
+      - "{{ ENV.MONITORING.PROMETHEUS.PORT.EXTERNAL }}:{{ ENV.MONITORING.PROMETHEUS.PORT.INTERNAL }}"
     healthcheck:
       test:  wget --quiet --tries=1 --spider http://localhost:9090/-/healthy || exit
       interval: 60s

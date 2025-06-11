@@ -11,6 +11,7 @@ import org.eclipse.slm.resource_management.model.resource.ResourceAas;
 import org.eclipse.slm.resource_management.service.rest.resources.ResourcesManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -47,7 +48,7 @@ public class SubmodelsRestController {
         return ResponseEntity.ok(submodelManager.getSubmodels(resource));
     }
 
-    @RequestMapping(value = "/{resourceId}/submodels", method = RequestMethod.POST)
+    @RequestMapping(value = "/{resourceId}/submodels", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, method = RequestMethod.POST)
     @Operation(summary = "Add submodels to existing resource")
     public ResponseEntity addSubmodels(
             @PathVariable(name = "resourceId") UUID resourceId,

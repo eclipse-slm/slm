@@ -16,7 +16,7 @@
             >
               mdi-desktop-classic
             </v-icon>
-            Host
+            Device
           </v-btn>
         </v-col>
         <v-col class="text-center">
@@ -62,7 +62,7 @@
 <script>
 
 import ResourcesCreateDialogPage from '@/components/resources/dialogs/create/ResourcesCreateDialogPage'
-import {useResourcesStore} from "@/stores/resourcesStore";
+import {useResourceClustersStore} from "@/stores/resourceClustersStore";
 
 export default {
     name: 'ResourcesCreateDialogPageAddExistingResource',
@@ -70,15 +70,12 @@ export default {
       ResourcesCreateDialogPage,
     },
     setup(){
-      const resourceStore = useResourcesStore();
-      return {resourceStore};
+      const resourceClustersStore = useResourceClustersStore();
+      return {resourceClustersStore};
     },
     computed: {
-      ResourcesCreateDialogPage() {
-        return ResourcesCreateDialogPage
-      },
       availableClusterTypes() {
-        return this.resourceStore.availableClusterTypes
+        return this.resourceClustersStore.availableClusterTypes
       },
     },
     mounted() {

@@ -1,7 +1,7 @@
 services:
 
   awx:
-    image: "ghcr.io/eclipse-slm/awx/awx-task:{{ AWX_VERSION }}"
+    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/awx/awx-task:{{ ENV.AWX.VERSION }}"
     user: "0"
     command: launch_awx.sh
     environment:
@@ -24,8 +24,8 @@ services:
     logging:
       driver: "json-file"
       options:
-        max-file: "{{ LOGGING_MAX_FILE }}"
-        max-size: "{{ LOGGING_MAX_SIZE }}"
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
     depends_on:
       - awx-redis
       - awx-redis-init
@@ -45,22 +45,22 @@ services:
       - "8013:8013"  # http
       - "8053:8043"  # https
     extra_hosts:
-      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
 
   awx-jwt-authenticator:
-    image: ghcr.io/eclipse-slm/awx-jwt-authenticator:1.1.0-SNAPSHOT
+    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/awx-jwt-authenticator:1.1.0-SNAPSHOT"
     restart: unless-stopped
     logging:
       driver: "json-file"
       options:
-        max-file: "{{ LOGGING_MAX_FILE }}"
-        max-size: "{{ LOGGING_MAX_SIZE }}"
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:8051/swagger-ui.html" ]
     ports:
       - "8051:8051"
     environment:
-      DEPLOYMENT_HOSTNAME: "{{ AWX_HOST }}"
+      DEPLOYMENT_HOSTNAME: "awx-jwt-authenticator"
       CONSUL_SCHEME: "{{ app_configs['awx_jwt_authenticator']['consul']['scheme'] }}"
       CONSUL_HOST: "{{ app_configs['awx_jwt_authenticator']['consul']['host'] }}"
       CONSUL_PORT: "{{ app_configs['awx_jwt_authenticator']['consul']['port'] }}"
@@ -70,17 +70,17 @@ services:
         aliases:
           - awx-jwt-authenticator
     extra_hosts:
-      - "{{ SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
 
   awx-redis:
-    image: "ghcr.io/eclipse-slm/awx/redis:{{ AWX_REDIS_VERSION }}"
+    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/awx/redis:{{ ENV.AWX.REDIS_VERSION }}"
     entrypoint: [ "redis-server" ]
     restart: unless-stopped
     logging:
       driver: "json-file"
       options:
-        max-file: "{{ LOGGING_MAX_FILE }}"
-        max-size: "{{ LOGGING_MAX_SIZE }}"
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
     depends_on:
       - awx-redis-init
     environment:
@@ -103,14 +103,14 @@ services:
     logging:
       driver: "json-file"
       options:
-        max-file: "{{ LOGGING_MAX_FILE }}"
-        max-size: "{{ LOGGING_MAX_SIZE }}"
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
     command: sh -c "cd /var/run/redis/ && chmod -R 777 ."
     volumes:
       - awx-redis:/var/run/redis/
 
   awx-postgres:
-    image: "ghcr.io/eclipse-slm/awx/awx-postgres:{{ AWX_POSTGRES_VERSION }}"
+    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/awx/awx-postgres:{{ ENV.AWX.POSTGRES_VERSION }}"
     command: postgres -c log_destination=stderr -c log_min_messages=info -c log_min_duration_statement=1000 -c max_connections=1024
     restart: unless-stopped
     networks:
@@ -121,8 +121,8 @@ services:
     logging:
       driver: "json-file"
       options:
-        max-file: "{{ LOGGING_MAX_FILE }}"
-        max-size: "{{ LOGGING_MAX_SIZE }}"
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_USER: awx

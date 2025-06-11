@@ -29,7 +29,7 @@ import ClustersOverview from "@/components/clusters/ClustersOverview.vue";
 
 import ApiState from "@/api/apiState";
 import {useStore} from "@/stores/store";
-import {useResourcesStore} from "@/stores/resourcesStore";
+import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
 
 export default {
       components: {
@@ -37,19 +37,16 @@ export default {
       },
     setup(){
         const store = useStore();
-        const resourcesStore = useResourcesStore();
+        const resourceDevicesStore = useResourceDevicesStore();
 
-        return {store, resourcesStore}
+        return {store, resourceDevicesStore}
     },
       computed: {
-        themeColorMain () {
-          return this.store.themeColorMain
-        },
         apiStateResources() {
-          return this.resourcesStore.apiStateResources
+          return this.resourceDevicesStore.apiState
         },
         resources () {
-          return this.resourcesStore.resources
+          return this.resourceDevicesStore.resources
         },
 
           apiStateLoaded () {

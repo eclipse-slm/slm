@@ -101,7 +101,8 @@
 <script>
 
 import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
-import {useResourcesStore} from "@/stores/resourcesStore";
+import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
+import {useResourceClustersStore} from "@/stores/resourceClustersStore";
 import {useProviderStore} from "@/stores/providerStore";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import logRequestError from "@/api/restApiHelper";
@@ -113,8 +114,9 @@ export default {
     },
     setup(){
       const providerStore = useProviderStore();
-      const resourceStore = useResourcesStore();
-      return {providerStore, resourceStore};
+      const resourceDevicesStore = useResourceDevicesStore();
+      const resourceClustersStore = useResourceClustersStore();
+      return {providerStore, resourceDevicesStore, resourceClustersStore};
     },
     data () {
       return {
@@ -132,10 +134,10 @@ export default {
         return this.providerStore.virtualResourceProviders
       },
       availableClusterTypes() {
-        return this.resourceStore.availableClusterTypes
+        return this.resourceClustersStore.availableClusterTypes
       },
       resources() {
-        return this.resourceStore.resources
+        return this.resourceDevicesStore.resources
       },
       clusterCreateOptions () {
         const options = [

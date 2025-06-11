@@ -24,6 +24,7 @@ jobs:
           - keycloak
           - vault
           - prometheus
+          - traefik
           - config-exporter
           - installer
           - uninstaller

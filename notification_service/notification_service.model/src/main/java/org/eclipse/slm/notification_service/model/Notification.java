@@ -13,6 +13,8 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.AUTO)
     long id;
     Category category;
+    JobTarget target;
+    JobGoal goal;
     String text;
     String owner;
     Boolean isRead = false;
@@ -23,6 +25,14 @@ public class Notification {
 
     public Notification(Category category, String text, String owner) {
         this.category = category;
+        this.text = text;
+        this.owner = owner;
+    }
+
+    public Notification(Category category, JobTarget jobTarget, JobGoal goal, String text, String owner) {
+        this.category = category;
+        this.target = jobTarget;
+        this.goal = goal;
         this.text = text;
         this.owner = owner;
     }
@@ -92,15 +102,33 @@ public class Notification {
         this.date = date;
     }
 
+    public JobTarget getTarget() {
+        return target;
+    }
+
+    public void setTarget(JobTarget target) {
+        this.target = target;
+    }
+
+    public JobGoal getGoal() {
+        return goal;
+    }
+
+    public void setGoal(JobGoal goal) {
+        this.goal = goal;
+    }
+
     @Override
     public String toString() {
         return "Notification{" +
-                "id=" + id +
-                ", category=" + category +
-                ", text='" + text + '\'' +
-                ", owner='" + owner + '\'' +
-                ", isRead=" + isRead +
-                ", date=" + date +
+                "id=" + this.id +
+                ", category=" + this.category +
+                ", target=" + this.target +
+                ", goal=" + this.goal +
+                ", text='" + this.text + '\'' +
+                ", owner='" + this.owner + '\'' +
+                ", isRead=" + this.isRead +
+                ", date=" + this.date +
                 '}';
     }
 }

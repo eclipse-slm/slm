@@ -7,6 +7,8 @@ import org.eclipse.slm.common.aas.clients.SubmodelServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -36,6 +38,8 @@ public class MetricsRestController {
     public ResponseEntity<Map<String, Object>> getMetric(
             @PathVariable(name = "resourceId") UUID resourceId
     ) {
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+
         Map<String, Object> monitoringValues = new HashMap<>();
         try {
             var submodelId = "PlatformResources-" + resourceId;
@@ -46,7 +50,7 @@ public class MetricsRestController {
                 if (endpoints.size() > 0) {
                     var submodelEndpoint = endpoints.get(0);
                     var submodelServiceEndpointUrl = submodelEndpoint.getProtocolInformation().getHref();
-                    var submodelServiceClient = new SubmodelServiceClient(submodelServiceEndpointUrl);
+                    var submodelServiceClient = new SubmodelServiceClient(submodelServiceEndpointUrl, jwtAuthenticationToken);
                     var submodelValues = submodelServiceClient.getSubmodelValues();
 
                     return ResponseEntity.ok(submodelValues);

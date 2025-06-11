@@ -2,13 +2,13 @@
 - name: "Assert inputs of 'vault/client | create_approle_auth_method.yml'"
   assert:
     that:
-      - (VAULT_URL is defined) and (VAULT_URL|length > 0)     # URL of the Vault instance
-      - (_vault_token is defined) and (VAULT_URL|length > 0)  # Token to authenticate with Vault
+      - (vault.url.internal is defined) and (vault.url.internal|length > 0)     # URL of the Vault instance
+      - (_vault_token is defined) and (vault.url.internal|length > 0)  # Token to authenticate with Vault
     fail_msg: "Variable must be defined and not empty"
 
 - name: "Create app role Auth Method 'approle'"
   uri:
-    url: "{{ VAULT_URL }}/v1/sys/auth/approle"
+    url: "{{ vault.url.internal }}/v1/sys/auth/approle"
     validate_certs: no
     method: POST
     headers:

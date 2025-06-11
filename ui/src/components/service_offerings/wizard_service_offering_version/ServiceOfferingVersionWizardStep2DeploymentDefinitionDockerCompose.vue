@@ -179,7 +179,7 @@
 import DockerContainerEnvironmentVariables
   from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerEnvironmentVariables'
 import 'vue-json-pretty/lib/styles.css'
-import YAML from 'yaml'
+import { parseDocument } from 'yaml'
 import ServiceRepositorySelect
   from '@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect'
 
@@ -318,7 +318,7 @@ const { parse } = require('dot-properties')
         this.$emit('step-completed', this.stepNumber)
       },
       parseComposeFile (composeFileContent) {
-        const parsedComposeFile = YAML.parse(composeFileContent)
+        const parsedComposeFile = parseDocument(composeFileContent)
         let envFilesDefined = false
         let envVarsDefined = false
         this.serviceOfferingVersion.deploymentDefinition.envFiles = {}

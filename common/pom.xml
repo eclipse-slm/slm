@@ -24,6 +24,7 @@
         <module>common.keycloak</module>
         <module>common.model</module>
         <module>common.minio</module>
+        <module>common.messaging</module>
     </modules>
 
 </project>

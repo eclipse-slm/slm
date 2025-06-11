@@ -80,17 +80,10 @@ public class ResourcesRestController {
         return ResponseEntity.ok(resource);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.PUT)
+    @RequestMapping(value = "", method = RequestMethod.POST)
     @Operation(summary = "Add existing resource")
     public @ResponseBody ResponseEntity<UUID> addExistingResource(
-            @RequestParam(name = "resourceUsername", required = false)                              String resourceUsername,
-            @RequestParam(name = "resourcePassword", required = false)                              String resourcePassword,
-            @RequestParam(name = "resourceHostname")                                                String resourceHostname,
-            @RequestParam(name = "resourceIp")                                                      String resourceIp,
-            @RequestParam(name = "resourceConnectionType", required = false)                        ConnectionType connectionType,
-            @RequestParam(name = "resourceConnectionPort", required = false, defaultValue = "0")    int connectionPort,
-            @RequestParam(name = "resourceLocation", required = false)                              Optional<UUID> optionalLocationId,
-            @RequestParam(name = "resourceBaseConfiguration", required = false)                     Optional<UUID> optionalResourceBaseConfigurationId
+            @RequestBody CreateResourceRequest createResourceRequest
     ) throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, CapabilityNotFoundException, SSLException, JsonProcessingException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
@@ -98,14 +91,11 @@ public class ResourcesRestController {
         this.resourcesManager.addExistingResource(
                 jwtAuthenticationToken,
                 resourceId,
-                resourceHostname,
-                resourceIp,
-                optionalLocationId,
-                resourceUsername,
-                resourcePassword,
-                connectionType,
-                connectionPort,
-                optionalResourceBaseConfigurationId
+                null,
+                createResourceRequest.getResourceHostname(),
+                createResourceRequest.getResourceIp(),
+                null,
+                createResourceRequest.getDigitalNameplateV3()
         );
 
         return new ResponseEntity(resourceId, HttpStatus.CREATED);
@@ -113,30 +103,20 @@ public class ResourcesRestController {
 
     @RequestMapping(value = "/{resourceId}", method = RequestMethod.PUT)
     @Operation(summary = "Add existing resource with id")
-    public @ResponseBody ResponseEntity addExistingResourceWithId(
-            @PathVariable(name = "resourceId")                                                      UUID resourceId,
-            @RequestParam(name = "resourceUsername", required = false)                              String resourceUsername,
-            @RequestParam(name = "resourcePassword", required = false)                              String resourcePassword,
-            @RequestParam(name = "resourceHostname")                                                String resourceHostname,
-            @RequestParam(name = "resourceIp")                                                      String resourceIp,
-            @RequestParam(name = "resourceConnectionType", required = false)                        ConnectionType connectionType,
-            @RequestParam(name = "resourceConnectionPort", required = false, defaultValue = "0")    int connectionPort,
-            @RequestParam(name = "resourceLocation", required = false)                              Optional<UUID> optionalLocationId,
-            @RequestParam(name = "resourceBaseConfiguration", required = false)                     Optional<UUID> optionalResourceBaseConfigurationId
+    public ResponseEntity addExistingResourceWithId(
+            @PathVariable(name = "resourceId") UUID resourceId,
+            @RequestBody CreateResourceRequest createResourceRequest
     ) throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, CapabilityNotFoundException, SSLException, JsonProcessingException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         this.resourcesManager.addExistingResource(
                 jwtAuthenticationToken,
                 resourceId,
-                resourceHostname,
-                resourceIp,
-                optionalLocationId,
-                resourceUsername,
-                resourcePassword,
-                connectionType,
-                connectionPort,
-                optionalResourceBaseConfigurationId
+                null,
+                createResourceRequest.getResourceHostname(),
+                createResourceRequest.getResourceIp(),
+                null,
+                createResourceRequest.getDigitalNameplateV3()
         );
 
         return new ResponseEntity(HttpStatus.CREATED);
@@ -149,6 +129,34 @@ public class ResourcesRestController {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         this.resourcesManager.deleteResource(jwtAuthenticationToken, resourceId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/{resourceId}/remote-access", method = RequestMethod.PUT)
+    @Operation(summary = "Set remote access of resource with id")
+    public @ResponseBody ResponseEntity setRemoteAccessOfResource(
+        @PathVariable(name = "resourceId")  UUID resourceId,
+        @RequestParam(name = "resourceUsername", required = false)                              String resourceUsername,
+        @RequestParam(name = "resourcePassword", required = false)                              String resourcePassword,
+        @RequestParam(name = "resourceConnectionType", required = false)                        ConnectionType connectionType,
+        @RequestParam(name = "resourceConnectionPort", required = false, defaultValue = "0")    int connectionPort)
+            throws ConsulLoginFailedException {
+
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        this.resourcesManager.setRemoteAccessOfResource(jwtAuthenticationToken,
+                resourceId, resourceUsername, resourcePassword, connectionType, connectionPort);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/{resourceId}/location", method = RequestMethod.PUT)
+    @Operation(summary = "Set location of resource with id")
+    public @ResponseBody ResponseEntity setLocationOfResource(
+            @PathVariable(name = "resourceId")  UUID resourceId,
+            @RequestParam(name = "locationId", required = false)  UUID locationId) throws ConsulLoginFailedException {
+
+        this.resourcesManager.setLocationOfResource(resourceId, locationId);
 
         return ResponseEntity.ok().build();
     }

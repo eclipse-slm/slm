@@ -2,7 +2,7 @@
 - name: "Assert inputs of 'keycloak/client | assign_realm_role_to_user.yml'"
   assert:
     that:
-      - (KEYCLOAK_AUTH_URL is defined) and (KEYCLOAK_AUTH_URL|length > 0)             # Auth URL of the Keycloak instance
+      - (keycloak.url.external is defined) and (keycloak.url.external|length > 0)             # Auth URL of the Keycloak instance
       - (_keycloak_realm_name is defined) and (_keycloak_realm_name|length > 0)       # Name of the Keycloak realm where the realm role should be created
       - (_keycloak_access_token is defined) and (_keycloak_access_token|length > 0)   # Access token to authenticate with Keycloak
       - (_username is defined) and (_username|length > 0)                             # Username of the user to which the realm role should be assigned
@@ -10,7 +10,7 @@
 
 - name: "Get user '{{ _username }}'"
   uri:
-    url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ _keycloak_realm_name }}/users?username={{ _username }}"
+    url: "{{ keycloak.url.external }}/admin/realms/{{ _keycloak_realm_name }}/users?username={{ _username }}"
     validate_certs: no
     method: GET
     headers:
@@ -23,7 +23,8 @@
 
 - name: "Get realm roles"
   uri:
-    url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ _keycloak_realm_name }}/roles"
+    url: "{{ keycloak.url.external }}/admin/realms/{{ _keycloak_realm_name }}/roles"
+    validate_certs: no
     method: GET
     headers:
       authorization: "Bearer {{ _keycloak_access_token }}"
@@ -36,7 +37,7 @@
 
 - name: "Map user '{{ found_keycloak_user.username }}' (id: '{{ found_keycloak_user.id }}') to realm role '{{ _keycloak_realm_name_role.name }}' (id: '{{ _keycloak_realm_name_role.id }}')"
   uri:
-    url: "{{ KEYCLOAK_AUTH_URL }}/admin/realms/{{ _keycloak_realm_name }}/users/{{ found_keycloak_user.id }}/role-mappings/realm"
+    url: "{{ keycloak.url.external }}/admin/realms/{{ _keycloak_realm_name }}/users/{{ found_keycloak_user.id }}/role-mappings/realm"
     validate_certs: no
     method: POST
     headers:

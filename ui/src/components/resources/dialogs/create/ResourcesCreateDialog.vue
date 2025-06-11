@@ -46,7 +46,7 @@
         @confirmed="closeDialog"
       />
 
-      <resources-create-dialog-page-add-existing-resource-host
+      <resources-create-dialog-page-add-existing-resource-device
         v-if="page === ResourcesCreateDialogPage.ADD_EXISTING_RESOURCE_HOST"
         @page-changed="onPageChanged"
         @title-changed="onTitleChanged"
@@ -83,17 +83,17 @@
 
 <script>
 import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
-import ResourcesCreateDialogPageStart from "@/components/resources/dialogs/create/ResourcesCreateDialogPageStart";
-import ResourcesCreateDialogPageAddExistingResourceHost
-  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResourceHost";
+import ResourcesCreateDialogPageStart from "@/components/resources/dialogs/create/ResourcesCreateDialogPageStart.vue";
+import ResourcesCreateDialogPageAddExistingResourceDevice
+  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResourceDevice.vue";
 import ResourcesCreateDialogPageAddExistingResource
-  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResource";
+  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResource.vue";
 import ResourcesCreateDialogPageAddExistingResourceCluster
-  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResourceCluster";
+  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageAddExistingResourceCluster.vue";
 import ResourcesCreateDialogPageCreateNewResource
-  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageCreateNewResource";
+  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageCreateNewResource.vue";
 import ResourcesCreateDialogPageCreateNewResourceCluster
-  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageCreateNewResourceCluster";
+  from "@/components/resources/dialogs/create/ResourcesCreateDialogPageCreateNewResourceCluster.vue";
 import {toRef} from "vue";
 
 export default {
@@ -101,7 +101,7 @@ export default {
     components: {
       ResourcesCreateDialogPageStart,
       ResourcesCreateDialogPageAddExistingResource,
-      ResourcesCreateDialogPageAddExistingResourceHost,
+      ResourcesCreateDialogPageAddExistingResourceDevice,
       ResourcesCreateDialogPageAddExistingResourceCluster,
       ResourcesCreateDialogPageCreateNewResource,
       ResourcesCreateDialogPageCreateNewResourceCluster
@@ -123,11 +123,6 @@ export default {
         page: ResourcesCreateDialogPage.START,
         title: '',
         dialog: this.active
-      }
-    },
-    computed: {
-      ResourcesCreateDialogPage() {
-        return ResourcesCreateDialogPage
       }
     },
     enums: {

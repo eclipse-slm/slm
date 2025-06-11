@@ -21,7 +21,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;;
 import java.util.UUID;
 
 @Component
@@ -39,25 +39,18 @@ public class AasHandler implements ApplicationListener<ServiceOfferingVersionEve
 
     private final ServiceOfferingVersionJpaRepository serviceOfferingVersionRepository;
 
-    private final String externalScheme;
-    private final String externalHostname;
-    private final String externalPort;
-
+    private final String externalUrl;
 
     public AasHandler(AasRegistryClient aasRegistryClient, AasRepositoryClient aasRepositoryClient,
                       SubmodelRegistryClient submodelRegistryClient, SubmodelRepositoryClient submodelRepositoryClient,
                       ServiceOfferingVersionJpaRepository serviceOfferingVersionRepository,
-                      @Value("${deployment.scheme}") String externalScheme,
-                      @Value("${deployment.hostname}") String externalHostname,
-                      @Value("${deployment.port}") String externalPort) {
+                      @Value("${deployment.url}") String externalUrl) {
         this.aasRegistryClient = aasRegistryClient;
         this.aasRepositoryClient = aasRepositoryClient;
         this.submodelRegistryClient = submodelRegistryClient;
         this.submodelRepositoryClient = submodelRepositoryClient;
         this.serviceOfferingVersionRepository = serviceOfferingVersionRepository;
-        this.externalScheme = externalScheme;
-        this.externalHostname = externalHostname;
-        this.externalPort = externalPort;
+        this.externalUrl = externalUrl;
     }
 
     @PostConstruct
@@ -77,7 +70,7 @@ public class AasHandler implements ApplicationListener<ServiceOfferingVersionEve
     private String getServiceOfferingVersionsSubmodelRepositoryUrl(Base64UrlEncodedIdentifier aasId) {
         var basePath = ServiceOfferingVersionsSubmodelRepositoryApiHTTPController.class.getAnnotation(RequestMapping.class).value()[0];
         basePath = basePath.replace("{aasId}", aasId.getEncodedIdentifier());
-        var url = this.externalScheme + "://" + this.externalHostname + ":" + this.externalPort + basePath;
+        var url = this.externalUrl + basePath;
 
         return url;
     }

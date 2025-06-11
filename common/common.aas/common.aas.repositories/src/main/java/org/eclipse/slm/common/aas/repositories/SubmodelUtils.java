@@ -2,8 +2,14 @@ package org.eclipse.slm.common.aas.repositories;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.*;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultKey;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangStringTextType;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultQualifier;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultReference;
+import org.eclipse.digitaltwin.basyx.submodelrepository.client.ConnectedSubmodelRepository;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class SubmodelUtils {
 
@@ -32,6 +38,14 @@ public class SubmodelUtils {
                         .value(value)
                         .build())
                 .build();
+    }
+
+    public static LangStringTextType generateLangString(String language, String text) {
+        return new DefaultLangStringTextType.Builder().language(language).text(text).build();
+    }
+
+    public static List<LangStringTextType> generateEnglishDescription(String text) {
+        return new ArrayList<>(Collections.singletonList(SubmodelUtils.generateLangString("en", text)));
     }
 
 }

@@ -5,17 +5,13 @@ import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.SerializationException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonDeserializer;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonSerializer;
-import org.eclipse.digitaltwin.aas4j.v3.model.KeyTypes;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultKey;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultReference;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodelDescriptor;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.api.SubmodelRegistryApi;
-import org.eclipse.digitaltwin.basyx.submodelregistry.client.model.Endpoint;
-import org.eclipse.digitaltwin.basyx.submodelregistry.client.model.Key;
-import org.eclipse.digitaltwin.basyx.submodelregistry.client.model.Reference;
-import org.eclipse.digitaltwin.basyx.submodelregistry.client.model.SubmodelDescriptor;
+import org.eclipse.digitaltwin.basyx.submodelregistry.client.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -93,13 +89,13 @@ public class SubmodelRegistryClient {
         submodelDescriptor.setIdShort(smIdShort);
         submodelDescriptor.setEndpoints(endpoints);
         if (semanticId != null) {
-// Correct KeyType cannot be set with current version of Submodel Registry Client
-//            var semanticIdRef = new Reference();
-//            var semanticIdKey = new Key();
-//            semanticIdKey.setType(org.eclipse.digitaltwin.basyx.submodelregistry.client.model.KeyTypes.CONCEPTDESCRIPTION);
-//            semanticIdKey.setValue(semanticId);
-//            semanticIdRef.addKeysItem(semanticIdKey);
-//            submodelDescriptor.setSemanticId(semanticIdRef);
+            var semanticIdRef = new Reference();
+            semanticIdRef.setType(ReferenceTypes.EXTERNALREFERENCE);
+            var semanticIdKey = new Key();
+            semanticIdKey.setType(KeyTypes.GLOBALREFERENCE);
+            semanticIdKey.setValue(semanticId);
+            semanticIdRef.addKeysItem(semanticIdKey);
+            submodelDescriptor.setSemanticId(semanticIdRef);
         }
 
         try {

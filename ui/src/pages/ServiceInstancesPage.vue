@@ -1,66 +1,33 @@
 <template>
   <v-container fluid>
     <div
-      v-if="apiStateLoading"
+      v-if="apiState === ApiState.LOADING || apiState === ApiState.INIT || apiState === ApiState.UPDATING"
       class="text-center"
     >
-      <v-progress-circular
-        :size="70"
-        :width="7"
-        color="primary"
-        indeterminate
-      />
+      <ProgressCircular />
     </div>
-    <div v-if="apiStateError">
+    <div v-if="apiState === ApiState.ERROR">
       Error
     </div>
 
-    <div v-if="apiStateLoaded">
+    <div v-if="apiState === ApiState.LOADED">
       <service-instances-overview />
     </div>
   </v-container>
 </template>
 
-<script>
+<script setup>
+import { onMounted } from 'vue';
+import ApiState from '@/api/apiState.js';
+import ServiceInstancesOverview from '@/components/services/ServiceInstancesOverview';
+import { useServiceInstancesStore } from "@/stores/serviceInstancesStore";
+import ProgressCircular from "@/components/base/ProgressCircular.vue";
+import {storeToRefs} from "pinia";
 
-import ApiState from '@/api/apiState.js'
-import ServiceInstancesOverview from '@/components/services/ServiceInstancesOverview'
-import {useServicesStore} from "@/stores/servicesStore";
+const serviceInstancesStore = useServiceInstancesStore();
+const {apiState} = storeToRefs(serviceInstancesStore);
 
-export default {
-    components: {
-      ServiceInstancesOverview,
-    },
-    setup(){
-      const servicesStore = useServicesStore();
-
-      return {servicesStore}
-    },
-    data () {
-      return {
-      }
-    },
-    computed: {
-      apiStateServices() {
-        return this.servicesStore.apiStateServices
-      },
-      apiStateLoaded () {
-        return this.apiStateServices.services === ApiState.LOADED
-      },
-      apiStateLoading () {
-        if (this.apiStateServices.services === ApiState.INIT) {
-          this.servicesStore.getServices();
-        }
-        return this.apiStateServices.services === ApiState.LOADING || this.apiStateServices.services === ApiState.INIT
-      },
-      apiStateError () {
-        return this.apiStateServices.services === ApiState.ERROR
-      },
-    },
-    created () {
-      this.servicesStore.getServices();
-      this.servicesStore.getServiceOfferings();
-    },
-  }
-
+onMounted(() => {
+  serviceInstancesStore.updateStore();
+});
 </script>

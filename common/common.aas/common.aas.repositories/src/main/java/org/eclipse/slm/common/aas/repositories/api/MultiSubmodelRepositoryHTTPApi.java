@@ -16,7 +16,6 @@ import org.eclipse.digitaltwin.basyx.http.pagination.Base64UrlEncodedCursor;
 import org.eclipse.digitaltwin.basyx.http.pagination.PagedResult;
 import org.eclipse.digitaltwin.basyx.submodelrepository.http.pagination.GetSubmodelsResult;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelValueOnly;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -36,10 +35,26 @@ public interface MultiSubmodelRepositoryHTTPApi {
 	@Operation(	summary = "Returns all Submodels", description = "")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Requested Submodels", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetSubmodelsResult.class))),
-			@ApiResponse(responseCode = "200", description = "Default error handling for unmentioned status codes", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Result.class)))
 	})
 	@RequestMapping(value = "/submodels", produces = { "application/json" }, method = RequestMethod.GET)
 	ResponseEntity<PagedResult> getAllSubmodels(
+			@Parameter(in = ParameterIn.PATH, description = "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("aasId") Base64UrlEncodedIdentifier aasId,
+			@Base64UrlEncodedIdentifierSize(min = 1, max = 3072) @Parameter(in = ParameterIn.QUERY, description = "The value of the semantic id reference (UTF8-BASE64-URL-encoded)", schema = @Schema(implementation = String.class)) @Valid @RequestParam(value = "semanticId", required = false) Base64UrlEncodedIdentifier semanticId,
+			@Parameter(in = ParameterIn.QUERY, description = "The Asset Administration Shell’s IdShort", schema = @Schema()) @Valid @RequestParam(value = "idShort", required = false) String idShort,
+			@Min(1) @Parameter(in = ParameterIn.QUERY, description = "The maximum number of elements in the response array", schema = @Schema(allowableValues = {
+					"1" }, minimum = "1")) @Valid @RequestParam(value = "limit", required = false) Integer limit,
+			@Parameter(in = ParameterIn.QUERY, description = "A server-generated identifier retrieved from pagingMetadata that specifies from which position the result listing should continue", schema = @Schema()) @Valid @RequestParam(value = "cursor", required = false) Base64UrlEncodedCursor cursor,
+			@Parameter(in = ParameterIn.QUERY, description = "Determines the structural depth of the respective resource content", schema = @Schema(allowableValues = { "deep",
+					"core" }, defaultValue = "deep")) @Valid @RequestParam(value = "level", required = false, defaultValue = "deep") String level,
+			@Parameter(in = ParameterIn.QUERY, description = "Determines to which extent the resource is being serialized", schema = @Schema(allowableValues = { "withBlobValue",
+					"withoutBlobValue" }, defaultValue = "withoutBlobValue")) @Valid @RequestParam(value = "extent", required = false, defaultValue = "withoutBlobValue") String extent);
+
+	@Operation(	summary = "Returns all Submodels in their ValueOnly representation", description = "")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Requested Submodels in value only representation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetSubmodelsValueOnlyResult.class))),
+	})
+	@RequestMapping(value = "/submodels/$value", produces = { "application/json" }, method = RequestMethod.GET)
+	ResponseEntity<GetSubmodelsValueOnlyResult> getAllSubmodelsValueOnly(
 			@Parameter(in = ParameterIn.PATH, description = "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("aasId") Base64UrlEncodedIdentifier aasId,
 			@Base64UrlEncodedIdentifierSize(min = 1, max = 3072) @Parameter(in = ParameterIn.QUERY, description = "The value of the semantic id reference (UTF8-BASE64-URL-encoded)", schema = @Schema(implementation = String.class)) @Valid @RequestParam(value = "semanticId", required = false) Base64UrlEncodedIdentifier semanticId,
 			@Parameter(in = ParameterIn.QUERY, description = "The Asset Administration Shell’s IdShort", schema = @Schema()) @Valid @RequestParam(value = "idShort", required = false) String idShort,
@@ -65,9 +80,9 @@ public interface MultiSubmodelRepositoryHTTPApi {
 			@Parameter(in = ParameterIn.QUERY, description = "Determines to which extent the resource is being serialized", schema = @Schema(allowableValues = { "withBlobValue",
 					"withoutBlobValue" }, defaultValue = "withoutBlobValue")) @Valid @RequestParam(value = "extent", required = false, defaultValue = "withoutBlobValue") String extent);
 
-	@Operation(summary = "Returns a specific Submodel in the ValueOnly representation", description = "")
+	@Operation(summary = "Returns a specific Submodel in the value only representation", description = "")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Requested Submodel", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SubmodelValueOnly.class))),
+			@ApiResponse(responseCode = "200", description = "Requested Submodel in value only representation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SubmodelValueOnly.class))),
 			@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Result.class))),
 	})
 	@RequestMapping(value = "/submodels/{submodelIdentifier}/$value", produces = { "application/json" }, method = RequestMethod.GET)

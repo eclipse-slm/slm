@@ -172,7 +172,8 @@ public class ServiceOfferingOrderHandler {
 
                         return serviceOfferingVersion.getServiceRequirements()
                                 .stream()
-                                .allMatch(requirementDTO -> serviceOfferingVersionRequirementsHandler.isRequirementFulfilledByResource(requirementDTO, resourceId));
+                                .allMatch(requirementDTO -> serviceOfferingVersionRequirementsHandler
+                                        .isRequirementFulfilledByResource(requirementDTO, resourceId, jwtAuthenticationToken));
                     }
                     else {
                         return true;

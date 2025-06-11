@@ -2,22 +2,26 @@
 - name: "Assert inputs of 'consul/init | main.yml'"
   assert:
     that:
-      - (CONSUL_URL is defined) and (CONSUL_URL|length > 0)                 # URL of the Consul instance to be configured
+      - (consul.url.internal is defined) and (consul.url.internal|length > 0)                 # URL of the Consul instance to be configured
       - (_consul_token is defined) and (_consul_token|length > 0)           # Token to authenticate with Consul
-      - (KEYCLOAK_AUTH_URL is defined) and (KEYCLOAK_AUTH_URL|length > 0)   # Auth URL of the Keycloak instance used for auth method
+      - (keycloak.url.internal is defined) and (keycloak.url.internal|length > 0)   # Auth URL of the Keycloak instance used for auth method
 
-- name: "Consul Init | Wait for Keycloak being up"
+- name: "Consul Init | Wait for Keycloak ('{{ keycloak.url.internal }}') being up "
   uri:
-    url: "{{ KEYCLOAK_AUTH_URL }}/realms/fabos/.well-known/openid-configuration"
+    url: "{{ keycloak.url.internal }}/realms/fabos/.well-known/openid-configuration"
+    validate_certs: false
     status_code: 200
   register: result
   until: result.status == 200
   retries: 120
   delay: 3
 
+- debug:
+    var: oidc_discovery_crt
+
 - name: "Consul Init | Create auth method for Keycloak"
   uri:
-    url: "{{ CONSUL_URL }}/v1/acl/auth-method"
+    url: "{{ consul.url.internal }}/v1/acl/auth-method"
     method: PUT
     headers:
       authorization: "Bearer {{ _consul_token }}"
@@ -27,8 +31,8 @@
       Type: jwt
       Description: FabOS Keycloak Instance
       Config:
-        OIDCDiscoveryURL: "{{ KEYCLOAK_AUTH_URL }}/realms/fabos"
-        OIDCDiscoveryCACert: ''
+        OIDCDiscoveryURL: "{{ keycloak.url.external_without_port }}/realms/{{ ENV.KEYCLOAK.REALM }}"
+        OIDCDiscoveryCACert: "{{ oidc_discovery_crt }}"
         ClaimMappings:
           given_name: first_name
           family_name: last_name

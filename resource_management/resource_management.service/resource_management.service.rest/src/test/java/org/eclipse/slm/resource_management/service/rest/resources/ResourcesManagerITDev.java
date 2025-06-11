@@ -22,6 +22,7 @@ import org.eclipse.slm.resource_management.model.resource.RemoteAccessService;
 import org.eclipse.slm.resource_management.model.resource.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.persistence.api.CapabilityJpaRepository;
 import org.eclipse.slm.resource_management.persistence.api.LocationJpaRepository;
+import org.eclipse.slm.resource_management.service.rest.aas.resources.digitalnameplate.DigitalNameplateV3;
 import org.eclipse.slm.resource_management.service.rest.capabilities.CapabilitiesConsulClient;
 import org.eclipse.slm.resource_management.service.rest.capabilities.CapabilitiesManager;
 import org.eclipse.slm.resource_management.service.rest.capabilities.CapabilityUtil;
@@ -176,17 +177,24 @@ public class ResourcesManagerITDev {
         @Test
         @Order(20)
         public void createBasicResourcesWithRemoteAccessService() throws ConsulLoginFailedException, ResourceNotFoundException, JsonProcessingException, IllegalAccessException, CapabilityNotFoundException, SSLException {
+            var digitalNameplate = new DigitalNameplateV3.Builder("", "", "", "").build();
+
             BasicResource basicResourceSsh = resourcesManager.addExistingResource(
                     config.jwtAuthenticationToken,
                     basicResourceSshId,
+                    null,
                     "test-host-ssh",
                     "1.2.3.4",
-                    Optional.empty(),
+                    null,
+                    digitalNameplate
+            );
+            resourcesManager.setRemoteAccessOfResource(
+                    config.jwtAuthenticationToken,
+                    basicResourceSshId,
                     username,
                     password,
                     ConnectionType.ssh,
-                    ConnectionType.ssh.getDefaultPort(),
-                    Optional.empty()
+                    ConnectionType.ssh.getDefaultPort()
             );
 
             assertEquals(basicResourceSshId, basicResourceSsh.getId());
@@ -194,14 +202,19 @@ public class ResourcesManagerITDev {
             BasicResource basicResourceWinrm = resourcesManager.addExistingResource(
                     config.jwtAuthenticationToken,
                     basicResourceWinRmId,
+                    null,
                     "test-host-winrm",
                     "1.2.3.5",
-                    Optional.empty(),
+                    null,
+                    digitalNameplate
+            );
+            resourcesManager.setRemoteAccessOfResource(
+                    config.jwtAuthenticationToken,
+                    basicResourceWinRmId,
                     username,
                     password,
                     ConnectionType.WinRM,
-                    ConnectionType.WinRM.getDefaultPort(),
-                    Optional.empty()
+                    ConnectionType.WinRM.getDefaultPort()
             );
 
             assertEquals(basicResourceWinRmId, basicResourceWinrm.getId());
@@ -339,17 +352,16 @@ public class ResourcesManagerITDev {
         @Test
         @Order(20)
         public void createBasicResourcesWithoutRemoteAccessService() throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, CapabilityNotFoundException, SSLException, JsonProcessingException {
-            BasicResource basicResourceWithNoCredentials = resourcesManager.addExistingResource(
+            var digitalNameplate = new DigitalNameplateV3.Builder("", "", "", "").build();
+
+            var basicResourceWithNoCredentials = resourcesManager.addExistingResource(
                     config.jwtAuthenticationToken,
                     uuid,
+                    null,
                     hostname,
                     ip,
-                    Optional.empty(),
                     null,
-                    null,
-                    null,
-                    0,
-                    Optional.empty()
+                    digitalNameplate
             );
 
             assertEquals(uuid, basicResourceWithNoCredentials.getId());
@@ -427,10 +439,11 @@ public class ResourcesManagerITDev {
     @Order(30)
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     public class registerResourceWithLocation {
-        private static UUID uuid = UUID.randomUUID();
+        private static UUID resourceId = UUID.randomUUID();
         private static String hostname = "host-with-location";
         private static String ip = "1.2.3.7";
         private static Location location = new Location(UUID.randomUUID(), "test-location");
+        private static DigitalNameplateV3 digitalNameplate = new DigitalNameplateV3.Builder("", "", "", "").build();
 
 
         @Test
@@ -441,18 +454,17 @@ public class ResourcesManagerITDev {
                     .when(locationJpaRepository)
                     .findById(location.getId());
 
-            BasicResource basicResourceWithLocation = resourcesManager.addExistingResource(
+            var basicResourceWithLocation = resourcesManager.addExistingResource(
                     config.jwtAuthenticationToken,
-                    uuid,
+                    resourceId,
+                    null,
                     hostname,
                     ip,
-                    Optional.of(location.getId()),
                     null,
-                    null,
-                    null,
-                    0,
-                    Optional.empty()
+                    digitalNameplate
             );
+
+            resourcesManager.setLocationOfResource(resourceId, location.getId());
 
             assertThat(basicResourceWithLocation.getLocation(), samePropertyValuesAs(location));
         }
@@ -462,15 +474,12 @@ public class ResourcesManagerITDev {
         public void registerResourceWithoutLocationExpectLocationNull() throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, CapabilityNotFoundException, SSLException, JsonProcessingException {
             BasicResource basicResourceWithoutLocation = resourcesManager.addExistingResource(
                     config.jwtAuthenticationToken,
-                    uuid,
+                    resourceId,
+                    null,
                     hostname,
                     ip,
-                    Optional.empty(),
                     null,
-                    null,
-                    null,
-                    0,
-                    Optional.empty()
+                    digitalNameplate
             );
 
             assertNull(basicResourceWithoutLocation.getLocation());
@@ -481,16 +490,14 @@ public class ResourcesManagerITDev {
         public void registerResourceWithWrongLocationIdExpectLocationNull() throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, CapabilityNotFoundException, SSLException, JsonProcessingException {
             BasicResource basicResourceWithWrongLocationId = resourcesManager.addExistingResource(
                     config.jwtAuthenticationToken,
-                    uuid,
+                    resourceId,
+                    null,
                     hostname,
                     ip,
-                    Optional.of(UUID.randomUUID()),
                     null,
-                    null,
-                    null,
-                    0,
-                    Optional.empty()
+                    digitalNameplate
             );
+            resourcesManager.setLocationOfResource(resourceId, UUID.randomUUID());
 
             assertNotNull(basicResourceWithWrongLocationId);
             assertNull(basicResourceWithWrongLocationId.getLocation());

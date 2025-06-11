@@ -16,14 +16,14 @@
 <script>
 
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 
 export default {
   name: 'ServiceHosterTable',
   components: {NoItemAvailableNote},
   setup(){
-    const servicesStore = useServicesStore();
-    return {servicesStore}
+    const serviceOfferingsStore = useServiceOfferingsStore();
+    return {serviceOfferingsStore}
   },
   data() {
     return {
@@ -40,7 +40,7 @@ export default {
   },
   computed: {
     serviceHosters () {
-      return this.servicesStore.serviceHosters
+      return this.serviceOfferingsStore.serviceHosters
     }
   },
 }

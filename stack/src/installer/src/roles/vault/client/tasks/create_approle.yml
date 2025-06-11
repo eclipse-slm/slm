@@ -2,7 +2,7 @@
 - name: "Assert inputs of 'vault/client | create_approle.yml'"
   assert:
     that:
-      - (VAULT_URL is defined) and (VAULT_URL|length > 0)           # URL of Vault
+      - (vault.url.internal is defined) and (vault.url.internal|length > 0)           # URL of Vault
       - (_vault_token is defined) and (_vault_token|length > 0)     # Token to authenticate with Vault
       - (_vault_token is defined) and (_vault_token|length > 0)     # Token to authenticate with Consul
       - (_consul_token is defined) and (_consul_token|length > 0)    # Token to authenticate with Consul
@@ -10,7 +10,7 @@
 
 - name: "Create app role '{{ _approle_name }}'"
   uri:
-    url: "{{ VAULT_URL }}/v1/auth/approle/role/{{ _approle_name }}"
+    url: "{{ vault.url.internal }}/v1/auth/approle/role/{{ _approle_name }}"
     validate_certs: no
     method: POST
     headers:
@@ -20,7 +20,7 @@
 
 - name: "Set app role id to app role name '{{ _approle_name }}'"
   uri:
-    url: "{{ VAULT_URL }}/v1/auth/approle/role/{{ _approle_name }}/role-id"
+    url: "{{ vault.url.internal }}/v1/auth/approle/role/{{ _approle_name }}/role-id"
     validate_certs: no
     method: POST
     headers:
@@ -33,7 +33,7 @@
 
 - name: "Create secret id for app role with id '{{ _approle_name }}'"
   uri:
-    url: "{{ VAULT_URL }}/v1/auth/approle/role/{{ _approle_name }}/secret-id"
+    url: "{{ vault.url.internal }}/v1/auth/approle/role/{{ _approle_name }}/secret-id"
     validate_certs: no
     method: POST
     headers:

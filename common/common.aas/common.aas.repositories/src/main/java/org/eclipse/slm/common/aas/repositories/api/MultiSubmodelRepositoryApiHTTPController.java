@@ -13,7 +13,6 @@ import org.eclipse.digitaltwin.basyx.http.pagination.PagedResultPagingMetadata;
 import org.eclipse.digitaltwin.basyx.pagination.GetSubmodelElementsResult;
 import org.eclipse.digitaltwin.basyx.submodelrepository.http.pagination.GetSubmodelsResult;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelValueOnly;
 import org.eclipse.slm.common.aas.repositories.SubmodelRepositoryFactory;
 import org.eclipse.slm.common.aas.repositories.exceptions.MethodNotImplementedException;
 import org.springframework.core.io.Resource;
@@ -25,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/{aasId}")
@@ -58,7 +58,25 @@ public abstract class MultiSubmodelRepositoryApiHTTPController implements MultiS
         paginatedSubmodel.result(new ArrayList<>(cursorResult.getResult()));
         paginatedSubmodel.setPagingMetadata(new PagedResultPagingMetadata().cursor(encodedCursor));
 
-        return new ResponseEntity<PagedResult>(paginatedSubmodel, HttpStatus.OK);
+        return new ResponseEntity<>(paginatedSubmodel, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<GetSubmodelsValueOnlyResult> getAllSubmodelsValueOnly(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier semanticId, String idShort, Integer limit, Base64UrlEncodedCursor cursor, String level, String extent) {
+        if (limit == null) {
+            limit = 100;
+        }
+
+        String decodedCursor = "";
+        if (cursor != null) {
+            decodedCursor = cursor.getDecodedCursor();
+        }
+
+        PaginationInfo pInfo = new PaginationInfo(limit, decodedCursor);
+
+        var submodelValuesOnlyMap = submodelRepositoryFactory.getSubmodelRepository(aasId.getIdentifier()).getAllSubmodelsValueOnly(pInfo);
+
+        return new ResponseEntity<>(submodelValuesOnlyMap, HttpStatus.OK);
     }
 
     @Override

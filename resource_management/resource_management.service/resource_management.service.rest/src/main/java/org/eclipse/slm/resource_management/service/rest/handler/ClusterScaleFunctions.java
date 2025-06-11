@@ -217,7 +217,7 @@ class ClusterScaleFunctions extends AbstractClusterFunctions implements IAwxJobO
 
             this.notificationServiceClient.postNotification(
                     clusterJob.getJwtAuthenticationToken(),
-                    Category.Resources,
+                    Category.RESOURCES,
                     jobTarget,
                     jobGoal
             );

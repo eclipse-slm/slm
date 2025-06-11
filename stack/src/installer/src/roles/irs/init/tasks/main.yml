@@ -1,0 +1,88 @@
+- name: "Get config from Consul"
+  include_role:
+    name: consul/client
+    tasks_from: get_app_config
+  vars:
+    _app_name: irs
+
+- name: "IRS | Create or get database passwords"
+  block:
+    - name: "IRS | Create passwords"
+      set_fact:
+        database_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
+      when: (ENV.IRS.DATABASE.PASSWORD is not defined) or (ENV.IRS.DATABASE.PASSWORD | length == 0)
+
+    - name: "IRS | Get passwords"
+      set_fact:
+        database_password: "{{ app_configs['irs']['database']['password'] }}"
+      when: app_configs['irs']['database'] is defined
+
+    - name: "IRS | GET database password from env"
+      set_fact:
+        database_password: "{{ ENV.IRS.DATABASE.PASSWORD }}"
+      when: (database_password is not defined) and (ENV.IRS.DATABASE.PASSWORD is defined) and (ENV.IRS.DATABASE.PASSWORD | length > 0)
+
+    - name: "IRS | Store config in Consul"
+      include_role:
+        name: consul/client
+        tasks_from: create_or_add_config
+      vars:
+        _app_name: irs
+        _config:
+          database:
+            host: "{{ ENV.IRS.DATABASE.HOST.INTERNAL }}"
+            port: "{{ ENV.IRS.DATABASE.PORT.INTERNAL }}"
+            username: "{{ ENV.IRS.DATABASE.USERNAME }}"
+            password: "{{ database_password }}"
+
+- name: "IRS | Start Information Receiving Service"
+  block:
+    - set_fact:
+        irs_compose: "{{ lookup('template', 'irs.yml') }}"
+    - name: "Start containers"
+      delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+      community.docker.docker_compose_v2:
+        project_name: eclipse-slm
+        definition: "{{ irs_compose | from_yaml}}"
+        state: present
+        pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+      register: irs_compose_start_output
+
+- name: "IRS | CouchDB init system databases"
+  delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+  community.docker.docker_container_exec:
+    container: "{{ irs_compose_start_output.images | community.general.json_query(query) | first }}"
+    command: "curl -X PUT http://{{ ENV.IRS.DATABASE.USERNAME }}:{{ database_password }}@127.0.0.1:{{ ENV.IRS.DATABASE.PORT.INTERNAL }}/{{ item }}"
+  vars:
+    query: "[?Repository.contains(@, 'couchdb')].ContainerName"
+  loop:
+    - "_users"
+    - "_replicator"
+    - "_global_changes"
+  retries: 5
+  delay: 3
+
+- name: "IRS | Register components at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: "{{ item.name }}"
+    _service_port: "{{ item.port }}"
+    _service_address: "{{ item.service_address }}"
+    _additional_tags: "{{ item.additional_tags }}"
+  loop:
+    - name: irs
+      service_address: "{{ ENV.IRS.HOST.INTERNAL }}"
+      port: "{{ ENV.IRS.PORT.INTERNAL }}"
+      additional_tags:
+        - "irs"
+        - "exposed"
+        - "traefik.http.routers.irs.rule=PathPrefix(`{{ ENV.IRS.PATH.EXTERNAL }}`)"
+        - "traefik.http.routers.irs.middlewares=irs"
+        - "traefik.http.middlewares.irs.stripprefix.prefixes=/irs"
+    - name: irs-database
+      service_address: "{{ ENV.IRS.HOST.INTERNAL }}"
+      port: "{{ ENV.IRS.PORT.INTERNAL }}"
+      additional_tags:
+        - "irs"

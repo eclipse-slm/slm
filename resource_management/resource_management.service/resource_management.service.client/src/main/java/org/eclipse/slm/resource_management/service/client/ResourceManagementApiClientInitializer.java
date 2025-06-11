@@ -66,7 +66,7 @@ public class ResourceManagementApiClientInitializer {
                         "http",
                         instances.get(0).getHost(),
                         instances.get(0).getPort(),
-                        ""
+                        "/resource-management"
                 );
             } else {
                 resourceManagementUrl = new URL(this.resourceManagementUrl);

@@ -1,5 +1,4 @@
-awx:
-  keycloak_client:
+awx_keycloak_client:
     client_id: awx
     public_client: false
     service_accounts_enabled: false
@@ -27,7 +26,7 @@ awx_credential_types:
     injectors:
       env:
         CONSUL_TOKEN: "{{ _awx_consul_token }}"
-        CONSUL_URL: "{{ CONSUL_URL }}"
+        CONSUL_URL: "{{ consul.url.internal }}"
   - name: HashiCorp Vault
     inputs:
       fields:
@@ -52,7 +51,7 @@ awx_credential_types:
         - vault_approle_secret_id
     injectors:
       env:
-        VAULT_URL: "{{ VAULT_URL }}"
+        VAULT_URL: "{{ vault.url.internal }}"
         VAULT_APPROLE_ROLE_ID: "{{ app_configs.awx.vault['app-role']['role-id'] }}"
         VAULT_APPROLE_SECRET_ID: "{{ app_configs.awx.vault['app-role']['secret-id'] }}"
   - name: Minio
@@ -78,7 +77,7 @@ awx_credential_types:
         - minio_secret_key
     injectors:
       env:
-        MINIO_URL: "{{ MINIO_API_URL }}"
+        MINIO_URL: "{{ minio.url.api.internal }}"
         MINIO_ACCESS_KEY: "{{ app_configs.awx.minio['access-key'] }}"
         MINIO_SECRET_KEY: "{{ app_configs.awx.minio['secret-key'] }}"
 
@@ -97,7 +96,7 @@ awx_credentials:
   - name: Minio
     credential_type: Minio
     inputs:
-      minio_url: "{{ MINIO_API_URL }}"
+      minio_url: "{{ minio.url.api.internal }}"
       minio_access_key: "{{ app_configs.awx.minio['access-key'] }}"
       minio_secret_key: "{{ app_configs.awx.minio['secret-key'] }}"
 

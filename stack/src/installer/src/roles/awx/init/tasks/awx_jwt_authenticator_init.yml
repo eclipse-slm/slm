@@ -2,7 +2,7 @@
 - name: "Assert inputs of 'awx/init | awx_jwt_authenticator_init.yml'"
   assert:
     that:
-      - (AWX_URL is defined) and (AWX_URL|length > 0)
+      - (awx.url.internal is defined) and (awx.url.internal|length > 0)
       - (_awx_admin_username is defined) and (_awx_admin_username|length > 0)
       - (_awx_admin_password is defined) and (_awx_admin_password|length > 0)
       - (_awx_jwt_authenticator_username is defined) and (_awx_jwt_authenticator_username|length > 0)
@@ -13,7 +13,7 @@
   block:
     - name: "Add user in AWX"
       awx.awx.user:
-        controller_host: "{{ AWX_URL }}"
+        controller_host: "{{ awx.url.internal }}"
         controller_username: "{{ _awx_admin_username }}"
         controller_password: "{{ _awx_admin_password }}"
         username: "{{ _awx_jwt_authenticator_username }}"
@@ -46,7 +46,7 @@
 
 - name: "Create team in which AWX JWT Authenticator can add new users"
   awx.awx.team:
-    controller_host: "{{ AWX_URL }}"
+    controller_host: "{{ awx.url.internal }}"
     controller_username: "{{ _awx_admin_username }}"
     controller_password: "{{ _awx_admin_password }}"
     name: "user"

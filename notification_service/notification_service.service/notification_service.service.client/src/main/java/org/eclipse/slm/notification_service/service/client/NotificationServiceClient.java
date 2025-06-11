@@ -20,7 +20,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 
 @Component
@@ -32,26 +31,30 @@ public class NotificationServiceClient {
 
     private RestTemplate restTemplate;
 
-    @Value("${notification-service.scheme}")
     private String notificationServiceScheme;
 
-    @Value("${notification-service.host}")
-    private String notificationServiceHost;
+    private String notificationServiceUrl;
 
-    @Value("${notification-service.port}")
-    private int notificationServicePort;
+    private String notificationServicePath;
 
     private WebClient webClient;
 
     private final DiscoveryClient discoveryClient;
 
-    public NotificationServiceClient(DiscoveryClient discoveryClient) {
+    public NotificationServiceClient(DiscoveryClient discoveryClient,
+                                     @Value("${notification-service.scheme}") String notificationServiceScheme,
+                                     @Value("${notification-service.url}") String notificationServiceUrl,
+                                     @Value("${notification-service.path}") String notificationServicePath
+    ) {
         this.discoveryClient = discoveryClient;
+        this.notificationServiceScheme = notificationServiceScheme;
+        this.notificationServiceUrl = notificationServiceUrl;
+        this.notificationServicePath = notificationServicePath;
     }
 
     @PostConstruct
     private void init() throws MalformedURLException {
-        this.webClient = WebClient.create(getNotificationServiceUrl().toString());
+        this.webClient = WebClient.create(getNotificationServiceUrl());
         this.restTemplate = new RestTemplate();
     }
 
@@ -77,59 +80,59 @@ public class NotificationServiceClient {
                 .retrieve()
                 .toBodilessEntity()
                 .block();
-
-        return;
     }
 
     public void postNotification(JwtAuthenticationToken jwtAuthenticationToken, Category category, JobTarget jobTarget, JobGoal jobGoal) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(jwtAuthenticationToken.getToken().getTokenValue());
-        HttpEntity<String> request = new HttpEntity<String>(headers);
-
         try {
-            URIBuilder builder = new URIBuilder();
-            URL url = getNotificationServiceUrl();
-            String uri = builder.setScheme(url.getProtocol())
-                    .setHost(url.getHost())
-                    .setPort(url.getPort())
-                    .setPath("/notification")
-                    .addParameter("category", category.name())
-                    .addParameter("jobTarget", jobTarget.name())
-                    .addParameter("jobGoal", jobGoal.name())
-                    .build()
-                    .toString();
-            restTemplate.postForEntity(uri, request, String.class);
-
-        }
-        catch (URISyntaxException e)
-        {
-            LOG.error(e.toString());
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            this.postNotification(jwtAuthenticationToken, category, jobTarget, jobGoal, "");
+        } catch (Exception e) {
+            try {
+                LOG.error("Error with Notification Service ('{}'), skipping post of notification: {}", this.getNotificationServiceUrl(), e.getMessage());
+            } catch (MalformedURLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
-    private URL getNotificationServiceUrl() throws MalformedURLException {
-        URL notificationServiceUrl =  new URL(
-                this.notificationServiceScheme,
-                this.notificationServiceHost,
-                this.notificationServicePort,
-                ""
-        );
+    public void postNotification(JwtAuthenticationToken jwtAuthenticationToken, Category category, JobTarget jobTarget, JobGoal jobGoal, String text) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(jwtAuthenticationToken.getToken().getTokenValue());
+            HttpEntity<String> request = new HttpEntity<String>(headers);
+
+            try {
+                var uri = new URIBuilder(this.getNotificationServiceUrl() + "/notification")
+                        .addParameter("category", category.name())
+                        .addParameter("jobTarget", jobTarget.name())
+                        .addParameter("jobGoal", jobGoal.name())
+                        .addParameter("text", text)
+                        .build()
+                        .toString();
+                var response = restTemplate.postForEntity(uri, request, String.class);
+            } catch (URISyntaxException e) {
+                LOG.error(e.toString());
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (Exception e) {
+            try {
+                LOG.error("Error with Notification Service ('{}'), skipping post of notification: {}", this.getNotificationServiceUrl(), e.getMessage());
+            } catch (MalformedURLException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    private String getNotificationServiceUrl() throws MalformedURLException {
+        var notificationServiceUrl =  this.notificationServiceUrl;
 
         try {
             List<ServiceInstance> instances = discoveryClient.getInstances(CONSUL_SERVICE_ID);
-
-            if (instances.size() > 0) {
-                notificationServiceUrl = new URL(
-                        this.notificationServiceScheme,
-                        instances.get(0).getHost(),
-                        instances.get(0).getPort(),
-                        ""
-                );
+            if (!instances.isEmpty()) {
+                notificationServiceUrl =  this.notificationServiceScheme + "://" + instances.get(0).getHost() + ":" + instances.get(0).getPort() + this.notificationServicePath;
             }
         } catch(Exception e) {
-            LOG.warn("Failed to connect to consul server. Fallback to connection details of notification service from application.yml");
+            LOG.warn("Failed to connect to consul server or to get notification service details. Fallback to connection details of notification service from application.yml: {}", e.getMessage());
         }
 
         return notificationServiceUrl;

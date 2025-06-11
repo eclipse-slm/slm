@@ -19,7 +19,7 @@
     name: consul/client
     tasks_from: get_app_config
 
-- name: "Create or get passwords"
+- name: "Create or get database passwords"
   block:
   - name: "Create passwords"
     set_fact:
@@ -32,6 +32,21 @@
       database_root_password: "{{ app_configs[_app_name]['database']['root_password'] }}"
       database_user_password: "{{ app_configs[_app_name]['database']['password'] }}"
     when: app_configs[_app_name]['database'] is defined
+  when: database_host is defined
+
+- set_fact:
+    _rabbitmq_username: "{{ _app_name }}"
+- name: "Add RabbitMQ user for '{{ _app_name }}'"
+  include_role:
+    name: rabbitmq/client
+    tasks_from: add_user
+  vars:
+    _username: "{{ _rabbitmq_username }}"
+    _permissions:
+      - vhost: "/"
+        configure_priv: ".*"
+        read_priv: ".*"
+        write_priv: ".*"
 
 - name: "Store config in Consul"
   include_role:
@@ -43,11 +58,26 @@
       host: "{{ host }}"
       port: "{{ port }}"
       awx:
-        scheme: "{{ AWX_SCHEME }}"
-        host: "{{ AWX_HOST }}"
-        port: "{{ AWX_PORT }}"
+        scheme: "{{ ENV.AWX.SCHEME.INTERNAL }}"
+        host: "{{ ENV.AWX.HOST.INTERNAL }}"
+        port: "{{ ENV.AWX.PORT.INTERNAL }}"
         username: "{{ awx_config.users.admin.username }}"
         password: "{{ awx_config.users.admin.password }}"
+      consul:
+        acl-token: "{{ consul_app_token }}"
+      spring:
+        rabbitmq:
+          host: "{{ app_configs.rabbitmq.host }}"
+          port: "{{ app_configs.rabbitmq.port }}"
+          username: "{{ app_configs.rabbitmq.users[_app_name].username }}"
+          password: "{{ app_configs.rabbitmq.users[_app_name].password }}"
+
+- name: "Store database config in Consul"
+  include_role:
+    name: consul/client
+    tasks_from: create_or_add_config
+  vars:
+    _config:
       database:
         host: "{{ database_host }}"
         port: "{{ database_port }}"
@@ -55,8 +85,7 @@
         password: "{{ database_user_password }}"
         root_password: "{{ database_root_password }}"
         schema: "{{ database_schema }}"
-      consul:
-        acl-token: "{{ consul_app_token }}"
+  when: database_host is defined
 
 - name: "Register {{ _app_name }} database at Consul (discovery server)"
   include_role:
@@ -70,3 +99,4 @@
     _additional_tags:
       - "{{ _app_name }}"
       - "database"
+  when: database_host is defined

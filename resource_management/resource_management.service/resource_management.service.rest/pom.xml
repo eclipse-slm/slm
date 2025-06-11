@@ -27,6 +27,18 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
+            <artifactId>resource_management.service.discovery</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>resource_management.service.importer</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
             <artifactId>common.parent.service_rest</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -79,6 +91,12 @@
         <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>common.aas.repositories</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.messaging.resources</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

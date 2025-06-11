@@ -6,7 +6,7 @@
       </template>
 
       <no-item-available-note
-        v-if="!resourcesStore.clusters.length"
+        v-if="!resourceClustersStore.clusters.length"
         item="Cluster"
       />
 
@@ -20,13 +20,12 @@
 
     <v-fab
       id="resources-button-add-resource"
-      class="mb-10"
+      icon="mdi-plus"
+      class="mx-4"
       elevation="15"
       color="primary"
-      icon="mdi-plus"
-      location="top end"
-      absolute
-      offset
+      location="right bottom"
+      :app="true"
       @click="showCreateDialog = true"
     />
 
@@ -43,7 +42,8 @@ import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 import ClustersCreateDialog from "@/components/clusters/dialogs/ClustersCreateDialog.vue";
 import ResourcesTableClusters from "@/components/resources/ResourcesTableClusters.vue";
-import {useResourcesStore} from "@/stores/resourcesStore";
+import {useResourceClustersStore} from "@/stores/resourceClustersStore";
+import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
 
 export default {
   name: 'ClustersOverview',
@@ -54,8 +54,9 @@ export default {
     ClustersCreateDialog
   },
   setup(){
-    const resourcesStore = useResourcesStore();
-    return {resourcesStore}
+    const resourceClustersStore = useResourceClustersStore();
+    const resourceDevicesStore = useResourceDevicesStore();
+    return {resourceClustersStore, resourceDevicesStore}
   },
   data () {
     return {
@@ -66,7 +67,7 @@ export default {
   computed: {
   },
   mounted () {
-    this.resourcesStore.getDeploymentCapabilities();
+    this.resourceDevicesStore.getDeploymentCapabilities();
   },
   methods: {
   },

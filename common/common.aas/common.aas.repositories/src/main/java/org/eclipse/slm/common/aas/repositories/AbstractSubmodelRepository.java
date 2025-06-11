@@ -7,12 +7,14 @@ import org.eclipse.digitaltwin.basyx.core.exceptions.*;
 import org.eclipse.digitaltwin.basyx.core.pagination.CursorResult;
 import org.eclipse.digitaltwin.basyx.core.pagination.PaginationInfo;
 import org.eclipse.digitaltwin.basyx.core.pagination.PaginationSupport;
-import org.eclipse.digitaltwin.basyx.submodelrepository.SubmodelRepository;
 import org.eclipse.digitaltwin.basyx.submodelservice.SubmodelService;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelElementValue;
-import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelValueOnly;
+import org.eclipse.slm.common.aas.repositories.api.GetSubmodelsValueOnlyResult;
+import org.eclipse.slm.common.aas.repositories.api.SubmodelValueOnly;
 import org.eclipse.slm.common.aas.repositories.exceptions.MethodNotImplementedException;
 import org.eclipse.slm.common.aas.repositories.exceptions.SubmodelNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
@@ -21,9 +23,11 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractSubmodelRepository implements SubmodelRepository {
 
+    public final static Logger LOG = LoggerFactory.getLogger(AbstractSubmodelRepository.class);
+
     private static final PaginationInfo NO_LIMIT_PAGINATION_INFO = new PaginationInfo(0, null);
 
-    private String aasId;
+    protected String aasId;
 
     private Map<String, SubmodelServiceFactory> submodelServiceFactories = new HashMap<>();
 
@@ -51,6 +55,22 @@ public abstract class AbstractSubmodelRepository implements SubmodelRepository {
         PaginationSupport<Submodel> paginationSupport = new PaginationSupport<>(submodelMap, Submodel::getId);
 
         return paginationSupport.getPaged(pInfo);
+    }
+
+    @Override
+    public GetSubmodelsValueOnlyResult getAllSubmodelsValueOnly(PaginationInfo pInfo) {
+        var submodelsValueOnly = new GetSubmodelsValueOnlyResult();
+        for (var submodelFactory : submodelServiceFactories.values()) {
+            var submodel = submodelFactory.getSubmodelService(this.aasId).getSubmodel();
+            if (submodel.getId() != null) {
+                var submodelValueOnly = this.getSubmodelByIdValueOnly(submodel.getId());
+                submodelValueOnly.setIdShort(submodel.getIdShort());
+
+                submodelsValueOnly.put(submodel.getIdShort(), submodelValueOnly);
+            }
+        }
+
+        return submodelsValueOnly;
     }
 
     @Override
@@ -168,7 +188,13 @@ public abstract class AbstractSubmodelRepository implements SubmodelRepository {
         var prefixSplit = submodelId.split("-");
         if (prefixSplit.length > 1) {
             var submodelPrefix = prefixSplit[0];
-            return this.submodelServiceFactories.get(submodelPrefix);
+
+            if ( this.submodelServiceFactories.containsKey(submodelPrefix)) {
+                return this.submodelServiceFactories.get(submodelPrefix);
+            }
+            else {
+                throw new SubmodelNotFoundException(this.aasId, submodelId);
+            }
         }
 
         throw new SubmodelNotFoundException(this.aasId, submodelId);

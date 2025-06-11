@@ -45,15 +45,18 @@
 </template>
 
 <script>
-import getEnv from "@/utils/env";
 import ServiceManagementActuatorRestApi from "@/api/service-management/serviceManagementActuatorRestApi";
 import ResourceManagementActuatorRestApi from "@/api/resource-management/resourceManagementActuatorRestApi";
 import NotificationServiceActuatorRestApi from "@/api/notification-service/notificationServiceActuatorRestApi";
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import {useEnvStore} from "@/stores/environmentStore";
 
 export default {
   name: "VersionsOverview",
   components: { OverviewHeading },
+  setup() {
+    return { envStore: useEnvStore() }
+  },
   data () {
     return {
       components: {
@@ -95,7 +98,7 @@ export default {
     },
   },
   mounted() {
-    this.components.ui.version = getEnv('VUE_APP_VERSION')
+    this.components.ui.version = this.envStore.appVersion
 
     ServiceManagementActuatorRestApi.getInfo().then((info) => {
       this.components.service_management.version = info.build.version

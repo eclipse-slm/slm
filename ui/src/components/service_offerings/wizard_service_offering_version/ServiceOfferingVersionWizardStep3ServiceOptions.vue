@@ -96,7 +96,6 @@
 import {serviceOptionMixin} from "@/utils/serviceOptionUtil";
 import serviceOptionsDefinitionTable
   from "@/components/service_offerings/wizard_service_offering_version/serviceOptions/serviceOptionsDefinitionTable";
-import {app} from "@/main";
 import {Form as ValidationForm} from "vee-validate";
 
 export default {
@@ -144,7 +143,7 @@ export default {
           1
         );
       } else {
-        app.config.globalProperties.$toast.warning(
+        this.$toast.warning(
           `A category that contains service options cannot be deleted`
         );
       }

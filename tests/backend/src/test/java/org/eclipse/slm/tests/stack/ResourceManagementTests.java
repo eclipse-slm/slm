@@ -7,6 +7,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -23,8 +24,9 @@ public class ResourceManagementTests {
     {
         RestAssured.baseURI = TestConfig.RESOURCE_MANAGEMENT_BASE_URL;
         RestAssured.port = TestConfig.RESOURCE_MANAGEMENT_PORT;
-        RestAssured.basePath = "";
+        RestAssured.basePath = TestConfig.RESOURCE_MANAGEMENT_BASE_PATH;
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        RestAssured.useRelaxedHTTPSValidation();
     }
 
     public static Stream<TestResource> getTestResources() {
@@ -68,19 +70,32 @@ public class ResourceManagementTests {
         .then()
             .assertThat() .statusCode(200);
 
+        var resourceDefinition = new HashMap<String, Object>();
+        resourceDefinition.put("resourceHostname", testResource.hostname);
+        resourceDefinition.put("resourceIp", testResource.ip);
+        var digitalNameplate = new HashMap<String, String>();
+        digitalNameplate.put("uriOfTheProduct", "N/A");
+        digitalNameplate.put("manufacturerName", "N/A");
+        digitalNameplate.put("serialNumber", "N/A");
+        resourceDefinition.put("digitalNameplateV3", digitalNameplate);
         var resourceId = given().auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
             .log().all()
-                .queryParam("project", "fabos")
-                .queryParam("sshAccessAvailable", "true")
-                .queryParam("checkResource", "false")
-                .queryParam("resourceHostname", testResource.hostname)
-                .queryParam("resourceIp", testResource.ip)
-                .queryParam("resourceUsername", testResource.username)
-                .queryParam("resourcePassword", testResource.password)
-                .queryParam("checkResource", false)
-        .put("/resources")
+                .contentType(ContentType.JSON)
+                .body(resourceDefinition)
+        .post("/resources")
         .then()
             .assertThat() .statusCode(201).extract().body().asString().replace("\"", "");
+
+        given().auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
+                .log().all()
+                .queryParam("resourceId ", resourceId)
+                .queryParam("resourceUsername", testResource.username)
+                .queryParam("resourcePassword", testResource.password)
+                .queryParam("resourceConnectionType", "ssh")
+                .queryParam("resourceConnectionPort", 22)
+                .put("/resources/" + resourceId + "/remote-access")
+                .then()
+                .assertThat() .statusCode(200).extract().body().asString().replace("\"", "");
 
         try{
             var uuid = UUID.fromString(resourceId);

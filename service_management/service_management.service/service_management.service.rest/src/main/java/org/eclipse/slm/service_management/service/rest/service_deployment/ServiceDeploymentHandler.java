@@ -313,7 +313,7 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                     this.serviceInstancesConsulClient.registerConsulServiceForServiceInstance(serviceInstance);
 
                     serviceOrder.setServiceOrderResult(ServiceOrderResult.SUCCESSFULL);
-                    this.notificationServiceClient.postNotification(jwtAuthenticationToken, Category.Services, JobTarget.SERVICE, JobGoal.CREATE);
+                    this.notificationServiceClient.postNotification(jwtAuthenticationToken, Category.SERVICES, JobTarget.SERVICE, JobGoal.CREATE);
                 }
 
                 default -> {

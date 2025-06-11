@@ -28,13 +28,11 @@ import org.springframework.web.client.RestTemplate;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
-import javax.xml.catalog.Catalog;
 import java.io.File;
 import java.util.*;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {

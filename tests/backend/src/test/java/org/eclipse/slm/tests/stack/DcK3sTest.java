@@ -32,6 +32,7 @@ public class DcK3sTest {
         RestAssured.baseURI = TestConfig.RESOURCE_MANAGEMENT_BASE_URL;
         RestAssured.port = TestConfig.RESOURCE_MANAGEMENT_PORT;
         RestAssured.basePath = "";
+        RestAssured.useRelaxedHTTPSValidation();
     }
 
     public static Stream<TestResource> getTestResources() {

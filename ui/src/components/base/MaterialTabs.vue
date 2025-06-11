@@ -14,12 +14,12 @@
 
 <script>
 // Mixins
-import Proxyable from 'vuetify'
+// import Proxyable from 'vuetify'
 
 export default {
     name: 'MaterialTabs',
 
-    mixins: [Proxyable],
+    // mixins: [Proxyable],
 
     props: {
       color: {

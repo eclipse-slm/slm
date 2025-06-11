@@ -5,6 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>notification_service</artifactId>
+    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <parent>

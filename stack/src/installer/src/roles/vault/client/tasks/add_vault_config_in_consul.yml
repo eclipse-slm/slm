@@ -2,9 +2,9 @@
 - name: "Assert inputs of 'consul/client | add_vault_config_in_consul.yml'"
   assert:
     that:
-      - (CONSUL_SCHEME is defined) and (CONSUL_SCHEME|length > 0)     # Scheme of the Consul instance
-      - (CONSUL_HOST is defined) and (CONSUL_HOST|length > 0)         # Host of the Consul instance
-      - (CONSUL_PORT is defined)                                      # Port of the Consul instance
+      - (ENV.CONSUL.SCHEME.INTERNAL is defined) and (ENV.CONSUL.SCHEME|length > 0)     # Scheme of the Consul instance
+      - (ENV.CONSUL.HOST.INTERNAL is defined) and (ENV.CONSUL.HOST.INTERNAL|length > 0)         # Host of the Consul instance
+      - (ENV.CONSUL.PORT.INTERNAL is defined)                                      # Port of the Consul instance
       - (_consul_token is defined) and (_consul_token|length > 0)     # Token to authenticate with Consul
       - (_app_name is defined) and (_app_name|length > 0)             # Name of the app the Vault config should be added
 
@@ -15,6 +15,6 @@
   vars:
     _config:
       vault:
-        scheme: '{{ VAULT_SCHEME }}'
-        host: '{{ VAULT_HOST}}'
-        port: '{{ VAULT_PORT}}'
+        scheme: '{{ ENV.VAULT.SCHEME.INTERNAL }}'
+        host: '{{ ENV.VAULT.HOST.INTERNAL }}'
+        port: '{{ ENV.VAULT.PORT.INTERNAL }}'

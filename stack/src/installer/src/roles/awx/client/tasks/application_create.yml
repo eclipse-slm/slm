@@ -1,6 +1,6 @@
 - assert:
     that:
-      - (AWX_URL is defined) and (AWX_URL|length > 0)
+      - (awx.url.internal is defined) and (awx.url.internal|length > 0)
       - (awx_username is defined) and (awx_username|length > 0)
       - (awx_password is defined) and (awx_password|length > 0)
       - (awx_application_name is defined) and (awx_application_name|length > 0)
@@ -11,7 +11,7 @@
 
 - name: "Delete application '{{ awx_application_name }}' if exists"
   awx.awx.application:
-    controller_host: "{{ AWX_URL }}"
+    controller_host: "{{ awx.url.internal }}"
     controller_username: "{{ awx_config.users.admin.username }}"
     controller_password: "{{ awx_config.users.admin.password }}"
     name: "{{ awx_application_name }}"
@@ -20,7 +20,7 @@
 
 - name: "Create application '{{ awx_application_name }}'"
   uri:
-    url: "{{ AWX_URL }}/api/v2/applications/"
+    url: "{{ awx.url.internal }}/api/v2/applications/"
     method: POST
     force_basic_auth: yes
     url_username: "{{ awx_username }}"

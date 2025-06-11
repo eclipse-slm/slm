@@ -1,4 +1,4 @@
-- name: "Discover service instance in Consul"
+- name: "Discover service instance '{{ _service_name }}' in Consul"
   uri:
     url: "{{ consul_scheme }}://{{ consul_host }}:{{ consul_port }}/v1/catalog/service/{{ _service_name }}"
     method: GET

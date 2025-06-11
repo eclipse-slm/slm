@@ -117,7 +117,7 @@ public class ObserverRestController implements IAwxJobObserverListener {
     }
 
     private void sendJobChangedNotification(int jobId, String jobState, String userUuid) {
-        Category category = Category.Jobs;
+        Category category = Category.JOBS;
         String text = "Job " + jobId + " turned into state '" + jobState + "'";
         Notification notification = new Notification(category, text, userUuid);
 

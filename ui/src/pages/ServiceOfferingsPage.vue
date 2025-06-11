@@ -84,9 +84,9 @@
 import ApiState from '@/api/apiState.js'
 import ServiceOfferingCardGrid from '@/components/service_offerings/ServiceOfferingCardGrid'
 import ServiceOfferingOverviewToolbar from '@/components/service_offerings/ServiceOfferingToolbar'
-import ProgressCircular from "@/components/base/ProgressCircular";
+import ProgressCircular from "@/components/base/ProgressCircular.vue";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 
 export default {
     components: {
@@ -96,9 +96,9 @@ export default {
       ServiceOfferingCardGrid,
     },
     setup(){
-      const servicesStore = useServicesStore();
+      const serviceOfferingsStore = useServiceOfferingsStore();
 
-      return {servicesStore}
+      return {serviceOfferingsStore}
     },
     data () {
       return {
@@ -109,54 +109,28 @@ export default {
     },
     computed: {
       apiStateServices() {
-        return this.servicesStore.apiStateServices
+        return this.serviceOfferingsStore.apiState
       },
       serviceOfferings () {
-        return this.servicesStore.serviceOfferings
+        return this.serviceOfferingsStore.serviceOfferings
       },
 
       apiStateLoaded () {
-        const apiStateLoaded =
-          this.apiStateServices.serviceOfferingCategories === ApiState.LOADED &&
-          this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADED &&
-          this.apiStateServices.serviceOfferings === ApiState.LOADED &&
-          this.apiStateServices.serviceVendors === ApiState.LOADED
-        return apiStateLoaded
+        return this.apiStateServices === ApiState.LOADED
       },
       apiStateLoading () {
-        if (this.apiStateServices.serviceOfferingCategories === ApiState.INIT) {
-          this.servicesStore.getServiceOfferingCategories();
+        if (this.apiStateServices === ApiState.INIT) {
+          this.serviceOfferingsStore.updateStore();
         }
-        if (this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT) {
-          this.servicesStore.getServiceOfferingDeploymentTypes();
-        }
-        if (this.apiStateServices.serviceOfferings === ApiState.INIT) {
-          this.servicesStore.getServiceOfferings();
-        }
-        if (this.apiStateServices.serviceVendors === ApiState.INIT) {
-          this.servicesStore.getServiceVendors();
-        }
-        const apiStateLoading =
-          this.apiStateServices.serviceOfferingCategories === ApiState.LOADING || this.apiStateServices.serviceOfferingCategories === ApiState.INIT ||
-          this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADING || this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT ||
-          this.apiStateServices.serviceOfferings === ApiState.LOADING || this.apiStateServices.serviceOfferings === ApiState.INIT ||
-          this.apiStateServices.serviceVendors === ApiState.LOADING || this.apiStateServices.serviceVendors === ApiState.INIT
-        return apiStateLoading
+        return this.apiStateServices === ApiState.LOADING || this.apiStateServices === ApiState.INIT
       },
       apiStateError () {
-        const apiStateError = this.apiStateServices.serviceOfferingCategories === ApiState.ERROR &&
-          this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.ERROR &&
-          this.apiStateServices.serviceOfferings === ApiState.ERROR &&
-          this.apiStateServices.serviceVendors === ApiState.ERROR
-        return apiStateError
+        return this.apiStateServices === ApiState.ERROR
       },
     },
     created () {
-      const serviceStore = useServicesStore();
-      serviceStore.getServiceOfferingCategories();
-      serviceStore.getServiceOfferingDeploymentTypes();
-      serviceStore.getServiceOfferings();
-      serviceStore.getServiceVendors();
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      serviceOfferingsStore.updateStore();
     },
     methods: {
       onServiceOfferingClicked (selectedService) {

@@ -53,7 +53,7 @@ export default {
     },
     avatar: {
       type: String,
-      default: 'https://demos.creative-tim.com/material-dashboard/assets/img/faces/card-profile1-square.jpg',
+      default: '',
     },
     blurb: {
       type: String,

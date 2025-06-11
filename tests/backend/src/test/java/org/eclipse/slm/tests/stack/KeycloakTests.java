@@ -15,6 +15,7 @@ public class KeycloakTests {
         RestAssured.baseURI = TestConfig.KEYCLOAK_BASE_URL;
         RestAssured.port = TestConfig.KEYCLOAK_PORT;
         RestAssured.basePath= "/auth";
+        RestAssured.useRelaxedHTTPSValidation();
     }
 
     @Test

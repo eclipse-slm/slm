@@ -136,11 +136,11 @@
 </template>
 
 <script>
-import ServiceOfferingCardGrid from "@/components/service_offerings/ServiceOfferingCardGrid";
+import ServiceOfferingCardGrid from "@/components/service_offerings/ServiceOfferingCardGrid.vue";
 
 import {Field, Form as ValidationForm} from "vee-validate";
 import * as yup from 'yup';
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 
 export default {
   name: "ServiceOfferingWizardManualStep1Common",
@@ -157,9 +157,9 @@ export default {
   },
   setup(){
     const required = yup.string().required();
-    const servicesStore = useServicesStore();
+    const serviceOfferingsStore = useServiceOfferingsStore();
     return {
-      required, servicesStore
+      required, serviceOfferingsStore
     }
   },
   data() {
@@ -170,10 +170,10 @@ export default {
   },
   computed: {
     serviceOfferingCategories() {
-      return this.servicesStore.serviceOfferingCategories
+      return this.serviceOfferingsStore.serviceOfferingCategories
     },
     serviceOfferingDeploymentTypes () {
-      return this.servicesStore.serviceOfferingDeploymentTypes
+      return this.serviceOfferingsStore.serviceOfferingDeploymentTypes
     },
   },
   methods: {

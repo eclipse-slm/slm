@@ -7,12 +7,19 @@ application:
 ### Deployment
 deployment:
   hostname: localhost
+  scheme: "http"
+  port: ${server.port}
+  path: "/notification-service"
+  url: ${deployment.scheme}://${deployment.hostname}:${deployment.port}${deployment.path}
 
 ### Server / API
 server:
   port: 9001
   error:
     include-message: always
+  servlet:
+    context-path: ${deployment.path}
+  forward-headers-strategy: framework
 
 open-api:
   title: Notification Service
@@ -56,11 +63,18 @@ spring:
       port: ${consul.port}
       discovery:
         enabled: true
-        hostname: ${deployment.hostname}
+        hostname: ${consul.service.address}
+        port: ${consul.service.port}
         acl-token: ${consul.acl-token}
         register-health-check: true
-        tags: slm, backend, ${spring.application.name}
+        healthCheckPath: ${deployment.path}/actuator/health
+        tags:
+          - slm
+          - backend
+          - ${spring.application.name}
+          - exposed
         service-name: ${spring.application.name}
+        instance-id: ${consul.service.name}
         metadata:
           version: ${application.version}
       config:
@@ -95,6 +109,8 @@ notification-service:
   scheme: "http"
   host: "localhost"
   port: ${server.port}
+  path: ""
+  url: ${notification-service.scheme}://${notification-service.host}:${notification-service.port}${notification-service.path}
 
 ### Security
 security:
@@ -117,6 +133,10 @@ awx:
 
 ### Consul
 consul:
+  service:
+    name: notification-service
+    address: host.docker.internal
+    port: ${server.port}
   scheme: http
   host: localhost
   port: 8500

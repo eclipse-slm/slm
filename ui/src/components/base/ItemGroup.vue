@@ -10,7 +10,6 @@
       <v-list-item
         v-if="text"
         v-bind="props"
-        :tile="item.title"
       >
         <v-list-item-title>
           {{ item.title }}
@@ -89,17 +88,6 @@ export default {
           ...item,
           to: !item.to ? undefined : `${this.item.group}/${item.to}`,
         }))
-      },
-      computedText () {
-        if (!this.item || !this.item.title) return ''
-
-        let text = ''
-
-        this.item.title.split(' ').forEach(val => {
-          text += val.substring(0, 1)
-        })
-
-        return text
       },
       group () {
         return this.genGroup(this.item.children)

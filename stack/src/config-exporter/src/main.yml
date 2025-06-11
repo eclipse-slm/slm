@@ -33,6 +33,8 @@
         service_management_keycloak_config: "{{ lookup('community.general.consul_kv', 'config/service_management/keycloak', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         notification_service_config: "{{ lookup('community.general.consul_kv', 'config/notification_service/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         notification_service_keycloak_config: "{{ lookup('community.general.consul_kv', 'config/notification_service/keycloak', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        information_service_config: "{{ lookup('community.general.consul_kv', 'config/information_service/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        information_service_keycloak_config: "{{ lookup('community.general.consul_kv', 'config/information_service/keycloak', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         catalog_service_config: "{{ lookup('community.general.consul_kv', 'config/catalog_service/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         monitoring_config: "{{ lookup('community.general.consul_kv', 'config/monitoring/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         minio_config: "{{ lookup('community.general.consul_kv', 'config/minio/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
@@ -48,8 +50,9 @@
         - service_name: "resource-management"
         - service_name: "service-management"
         - service_name: "notification-service"
+        - service_name: "information-service"
         - service_name: "awx"
-        - service_name: "keycloak"
+        - service_name: "auth"
         - service_name: "aas-gui"
         - service_name: "catalog-service"
         - service_name: "minio"
@@ -87,6 +90,8 @@
       loop:
         - application_yml_file: /project/notification_service/notification_service.service/notification_service.service.rest/src/main/resources/application.yml
           app_config: "{{ notification_service_config }}"
+        - application_yml_file: /project/information_service/information_service.service/information_service.service.impl/src/main/resources/application.yml
+          app_config: "{{ information_service_config }}"
         - application_yml_file: /project/resource_management/resource_management.service/resource_management.service.rest/src/main/resources/application.yml
           app_config: "{{ resource_management_config }}"
         - application_yml_file: /project/resource_management/resource_management.service/resource_management.service.initializer/src/main/resources/application.yml
@@ -103,6 +108,6 @@
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
       with_items:
-        - src: /templates/ui/.env
-          dest: /project/ui/.env
+        - src: /templates/ui/.env.development
+          dest: /project/ui/.env.development
       when: CONFIGURE_CORE_PROJECT|default(false)|bool == true

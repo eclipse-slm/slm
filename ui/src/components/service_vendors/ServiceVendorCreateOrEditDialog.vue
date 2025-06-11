@@ -86,8 +86,7 @@
 
 import {toRef} from 'vue'
 import getImageUrl from '@/utils/imageUtil'
-import {app} from "@/main";
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 import ServiceManagementClient from "@/api/service-management/service-management-client";
 
 export default {
@@ -153,16 +152,16 @@ export default {
 
         apiCall.then(() => {
           if (this.editMode) {
-            app.config.globalProperties.$toast.info('Service vendor successfully updated')
+            this.$toast.info('Service vendor successfully updated')
           } else {
-            app.config.globalProperties.$toast.info('Service vendor successfully created')
+            this.$toast.info('Service vendor successfully created')
           }
 
-          const serviceStore = useServicesStore();
-          serviceStore.getServiceVendors();
+          const serviceOfferingsStore = useServiceOfferingsStore();
+          serviceOfferingsStore.getServiceVendors();
           this.$emit('confirmed', this.serviceVendorUpdate)
         }).catch(exception => {
-          app.config.globalProperties.$toast.error('Failed to create service vendor')
+          this.$toast.error('Failed to create service vendor')
           console.log('Service vendor creation failed: ' + exception.response.data.message)
           console.log(exception)
         })

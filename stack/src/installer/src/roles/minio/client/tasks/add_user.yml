@@ -19,6 +19,8 @@
 
 - name: "MINIO | Add user policy"
   command: "{{ mc_command }} admin policy attach {{ _alias }} readwrite --user {{ _user }}"
+  ignore_errors: true
 
 - name: "MINIO | Add user policy"
   command: "{{ mc_command }} admin user svcacct add --access-key {{ _access_key }} --secret-key {{ _secret_key }} {{ _alias }} {{ _user }}"
+  ignore_errors: true

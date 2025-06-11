@@ -103,7 +103,7 @@
         <div
           v-if="selectedResourceId"
         >
-          <!--          <base-material-card
+          <base-material-card
             v-for="serviceOptionCategory in serviceOfferingVersion.serviceOptionCategories"
             :key="serviceOptionCategory.id"
             color="secondary"
@@ -141,14 +141,14 @@
                     </v-tooltip>
                   </v-col>
                   <v-col cols="9">
-                    <service-option-value
+                    <ServiceOptionValue
                       :service-option="serviceOption"
                     />
                   </v-col>
                 </v-row>
               </v-container>
             </v-card-text>
-          </base-material-card>-->
+          </base-material-card>
         </div>
 
         <!-- Cancel & Checkout Buttons-->
@@ -157,7 +157,7 @@
           <v-btn
             variant="elevated"
             class="mr-3"
-            @click="cancel()"
+            @click="onCancelButtonClicked"
           >
             {{ $t('buttons.Cancel') }}
           </v-btn>
@@ -181,165 +181,120 @@
   </v-container>
 </template>
 
-<script>
-
-import ApiState from '@/api/apiState'
-import logRequestError from '@/api/restApiHelper'
-import ProgressCircular from "@/components/base/ProgressCircular";
-import {Field, Form as ValidationForm} from "vee-validate";
-import * as yup from 'yup';
-import {useServicesStore} from "@/stores/servicesStore";
-import {useResourcesStore} from "@/stores/resourcesStore";
-import {useUserStore} from "@/stores/userStore";
-import {useJobsStore} from "@/stores/jobsStore";
-import {storeToRefs} from "pinia";
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import {useRoute, useRouter} from 'vue-router';
+import ApiState from '@/api/apiState';
+import logRequestError from '@/api/restApiHelper';
+import ProgressCircular from "@/components/base/ProgressCircular.vue";
+import { Field, Form as ValidationForm } from "vee-validate";
+import { useResourceDevicesStore } from "@/stores/resourceDevicesStore";
+import { useResourceClustersStore } from "@/stores/resourceClustersStore";
+import { storeToRefs } from "pinia";
 import ServiceManagementClient from "@/api/service-management/service-management-client";
+import * as yup from "yup";
+import ServiceOptionValue from "@/components/service_offerings/ServiceOptionValue.vue";
+import {useToast} from "vue-toast-notification";
 
-export default {
-    name: 'ServiceOrderView',
-    components: {
-      Field,
-       ProgressCircular, ValidationForm
-    },
-    props: {
-      serviceOfferingId: {
-        type: String,
-        default: null
-      },
-      serviceOfferingVersionId: {
-        type: String,
-        default: null
-      },
-    },
-    setup(){
-      const required = yup.string().required();
-      const servicesStore = useServicesStore();
-      const resourcesStore = useResourcesStore();
-      const userStore = useUserStore();
-      const jobsStore = useJobsStore();
-      const {resourceById, clusterById} = storeToRefs(resourcesStore);
-      const {serviceOfferingById} = storeToRefs(servicesStore);
-      return {
-        required, servicesStore, resourcesStore, userStore, jobsStore,
-        resourceById, clusterById, serviceOfferingById
-      }
-    },
-    data () {
-      return {
-        selectedResourceId: '',
-        orderButtonPressed: false,
-        serviceOfferingVersion: null,
-        matchingResources: [],
-        apiState: {
-          serviceOfferingVersion: ApiState.INIT,
-          matchingResources: ApiState.INIT,
-        },
-        showProgressCircular: false
-      }
-    },
+const route = useRoute();
+const required = yup.string().required();
+const $toast = useToast();
+const resourceDevicesStore = useResourceDevicesStore();
+const resourceClustersStore = useResourceClustersStore();
+const { resourceById } = storeToRefs(resourceDevicesStore);
+const { clusterById } = storeToRefs(resourceClustersStore);
 
-    computed: {
-      apiStateServices() {
-        return this.servicesStore.apiStateServices
-      },
-      resources() {
-        return this.resourcesStore.resources
-      },
-      clusters () {
-        return this.resourcesStore.clusters
-      },
-
-      totalResourcesCount () {
-        return this.resources?.length + this.clusters?.length
-      },
-
-      apiStateLoaded () {
-        return this.apiState.serviceOfferingVersion === ApiState.LOADED
-            && this.apiState.matchingResources === ApiState.LOADED
-      },
-      apiStateLoading () {
-        return this.apiState.serviceOfferingVersion === ApiState.LOADING
-            && this.apiState.matchingResources === ApiState.LOADING
-      },
-      apiStateError () {
-        return this.apiState.serviceOfferingVersion === ApiState.ERROR
-            && this.apiState.matchingResources === ApiState.ERROR
-      },
-    },
-    created () {
-      ServiceManagementClient.serviceOfferingVersionsApi.getServiceOfferingVersionById(this.serviceOfferingId, this.serviceOfferingVersionId).then(response => {
-            this.serviceOfferingVersion = response.data;
-            this.apiState.serviceOfferingVersion = ApiState.LOADED;
-      }).catch(logRequestError)
-
-      ServiceManagementClient.serviceOfferingVersionsApi.getResourcesMatchingServiceRequirements(this.serviceOfferingId, this.serviceOfferingVersionId)
-          .then((response) => {
-        this.matchingResources = []
-        this.apiState.matchingResources = ApiState.LOADED;
-
-        if (response.data.length > 0) {
-          // this.matchingResources.push({ header: "Nodes" });
-          let matchingNodeResources = response.data.filter(matchingResource => !matchingResource.isCluster)
-          this.matchingResources.push(...matchingNodeResources)
-
-          // this.matchingResources.push({ header: "Clusters" });
-          let matchingClusterResources = response.data.filter(matchingResource => matchingResource.isCluster)
-          this.matchingResources.push(...matchingClusterResources)
+const selectedResourceId = ref('');
+const orderButtonPressed = ref(false);
+const serviceOfferingVersion = ref(null);
+const matchingResources = ref([]);
+const showProgressCircular = ref(false);
+// Computed properties
+const resources = computed(() => resourceDevicesStore.resources);
+const clusters = computed(() => resourceClustersStore.clusters);
+const totalResourcesCount = computed(() => resources.value?.length + clusters.value?.length);
+const serviceOfferingId = computed(() => route.params.serviceOfferingId);
+const serviceOfferingVersionId = computed(() => route.params.serviceOfferingVersionId);
+// Api State
+const apiState = ref({
+  serviceOfferingVersion: ApiState.INIT,
+  matchingResources: ApiState.INIT,
+});
+const apiStateLoaded = computed(() => apiState.value.serviceOfferingVersion === ApiState.LOADED && apiState.value.matchingResources === ApiState.LOADED);
+const apiStateLoading = computed(() => apiState.value.serviceOfferingVersion === ApiState.LOADING || apiState.value.matchingResources === ApiState.LOADING);
+const apiStateError = computed(() => apiState.value.serviceOfferingVersion === ApiState.ERROR || apiState.value.matchingResources === ApiState.ERROR);
 
 
-          // preselect resource
-          this.selectedResourceId = this.matchingResources.filter(obj => obj.hasOwnProperty('resourceId'))[0].resourceId;
-        }
-      }).catch(logRequestError)
-    },
-    methods: {
-      order () {
-        if (this.orderButtonPressed) {
-          return
-        } else {
-          this.orderButtonPressed = true
-        }
+const router = useRouter();
 
-        const serviceOptionValues = []
-        this.serviceOfferingVersion.serviceOptionCategories.forEach(function (serviceOptionCategory) {
-          serviceOptionCategory.serviceOptions.forEach(function (serviceOption) {
-            serviceOptionValues.push({
-              serviceOptionId: (serviceOption.relation === '' ? serviceOption.key : serviceOption.relation + '|' + serviceOption.key),
-              value: serviceOption.defaultValue,
-            })
-          })
-        })
-
-        const serviceOfferingVersionOrder = {
-          serviceOptionValues: serviceOptionValues,
-        }
-
-        this.showProgressCircular = true
-        ServiceManagementClient.serviceOfferingVersionsApi.orderServiceOfferingVersionById(
-            this.serviceOfferingId,
-            this.serviceOfferingVersionId,
-            this.matchingResources.find(obj => obj.resourceId === this.selectedResourceId).capabilityServiceId,
-            serviceOfferingVersionOrder
-        ).then(response => {
-          console.log(response)
-          this.$toast.info('Service deployment started')
-          this.$router.push({ path: '/services/instances' })
-          this.orderButtonPressed = false
-          this.showProgressCircular = false
-        }).catch(error => {
-          this.$toast.error('Service deployment request failed. See log for more information.')
-          this.orderButtonPressed = false
-          logRequestError(error)
-          this.showProgressCircular = false
-        })
-      },
-      cancel () {
-        this.$router.push({ path: '/services/offerings' })
-      },
-    },
+const order = () => {
+  if (orderButtonPressed.value) {
+    return;
+  } else {
+    orderButtonPressed.value = true;
   }
+
+  const serviceOptionValues = [];
+  serviceOfferingVersion.value.serviceOptionCategories.forEach(function (serviceOptionCategory) {
+    serviceOptionCategory.serviceOptions.forEach(function (serviceOption) {
+      serviceOptionValues.push({
+        serviceOptionId: (serviceOption.relation === '' ? serviceOption.key : serviceOption.relation + '|' + serviceOption.key),
+        value: serviceOption.defaultValue,
+      });
+    });
+  });
+
+  const serviceOfferingVersionOrder = {
+    serviceOptionValues: serviceOptionValues,
+  };
+
+  showProgressCircular.value = true;
+  ServiceManagementClient.serviceOfferingVersionsApi.orderServiceOfferingVersionById(
+    serviceOfferingId.value,
+    serviceOfferingVersionId.value,
+    matchingResources.value.find(obj => obj.resourceId === selectedResourceId.value).capabilityServiceId,
+    serviceOfferingVersionOrder
+  ).then(response => {
+    console.log(response);
+    $toast.info('Service deployment started');
+    router.push({ path: '/services/instances' });
+    orderButtonPressed.value = false;
+    showProgressCircular.value = false;
+  }).catch(error => {
+    $toast.error('Service deployment request failed. See log for more information.');
+    orderButtonPressed.value = false;
+    logRequestError(error);
+    showProgressCircular.value = false;
+  });
+};
+
+const onCancelButtonClicked = () => {
+  router.push({ path: '/services/offerings' });
+};
+
+onMounted(() => {
+  ServiceManagementClient.serviceOfferingVersionsApi.getServiceOfferingVersionById(serviceOfferingId.value, serviceOfferingVersionId.value).then(response => {
+    serviceOfferingVersion.value = response.data;
+    apiState.value.serviceOfferingVersion = ApiState.LOADED;
+  }).catch(logRequestError);
+
+  ServiceManagementClient.serviceOfferingVersionsApi.getResourcesMatchingServiceRequirements(serviceOfferingId.value, serviceOfferingVersionId.value)
+    .then((response) => {
+      matchingResources.value = [];
+      apiState.value.matchingResources = ApiState.LOADED;
+
+      if (response.data.length > 0) {
+        let matchingNodeResources = response.data.filter(matchingResource => !matchingResource.isCluster);
+        matchingResources.value.push(...matchingNodeResources);
+
+        let matchingClusterResources = response.data.filter(matchingResource => matchingResource.isCluster);
+        matchingResources.value.push(...matchingClusterResources);
+
+        selectedResourceId.value = matchingResources.value.filter(obj => obj.hasOwnProperty('resourceId'))[0].resourceId;
+      }
+    }).catch(logRequestError);
+});
 </script>
 
 <style scoped>
-
 </style>

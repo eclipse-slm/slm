@@ -49,6 +49,9 @@ public class ConceptDescriptionRepositoryClient {
                         .bodyToMono(String.class)
                         .block();
             }
+            catch (WebClientResponseException.NotFound e) {
+                LOG.error("Concept description repository not found");
+            }
         }
         catch (SerializationException e) {
             throw new RuntimeException(e);

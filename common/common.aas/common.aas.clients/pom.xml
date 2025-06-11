@@ -20,6 +20,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-webflux</artifactId>
         </dependency>
+        <!-- Discovery !-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-commons</artifactId>
+        </dependency>
         <!-- AAS !-->
         <dependency>
             <groupId>org.eclipse.digitaltwin.aas4j</groupId>
@@ -64,6 +69,12 @@
             <groupId>org.eclipse.digitaltwin.basyx</groupId>
             <artifactId>basyx.submodelservice-client</artifactId>
             <version>${basyx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.aas.repositories</artifactId>
+            <version>1.4.0-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

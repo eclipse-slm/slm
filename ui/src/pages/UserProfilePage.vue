@@ -123,7 +123,7 @@ export default {
     },
     computed: {
       apiStateUser () {
-        return this.userStore.apiStateUser
+        return this.userStore.apiState
       },
       userId() {
         return this.userStore.userId
@@ -143,7 +143,7 @@ export default {
       },
       apiStateLoading () {
         if (this.apiStateUser === ApiState.INIT) {
-          this.userStore.getUserDetails();
+          this.userStore.updateStore()
         }
         return this.apiStateUser === ApiState.LOADING || this.apiStateUser === ApiState.INIT
       },

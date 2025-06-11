@@ -3,6 +3,7 @@ package org.eclipse.slm.common.keycloak.config;
 import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import org.eclipse.slm.common.keycloak.config.jwt.IssuerProperties;
 import org.eclipse.slm.common.keycloak.config.jwt.MisconfigurationException;
 import org.keycloak.OAuth2Constants;
@@ -13,18 +14,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 
-import javax.annotation.PostConstruct;
+import javax.ws.rs.client.ClientBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * The multi-tenant keycloak registration resolves all keycloak configurations within a directory based on
@@ -148,9 +147,14 @@ public class MultiTenantKeycloakRegistration {
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
                 .clientId(keycloakOidcConfig.getResource())
                 .clientSecret(keycloakOidcConfig.getCredentials().getSecret())
+                .resteasyClient(new ResteasyClientBuilderImpl()
+                        .disableTrustManager()
+                        .build())
                 .build();
 
-        this.realmResourceMap.put(realm, keycloak.realm(realm) );
+
+        var realmResource = keycloak.realm(realm);
+        this.realmResourceMap.put(realm,  realmResource);
 
         var issuerProperties = new IssuerProperties();
         try {

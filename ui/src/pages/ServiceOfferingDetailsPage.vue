@@ -90,7 +90,7 @@ import ServiceCard from '@/components/service_offerings/ServiceOfferingCardGrid'
 import ServiceDetailsOverview from '@/components/service_offerings/ServiceOfferingDetailsOverview'
 import ServiceDetailsRequirements from '@/components/service_offerings/ServiceOfferingDetailsRequirements.vue'
 import ApiState from '@/api/apiState'
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 
 export default {
     name: 'ServiceOfferingDetailsPage',
@@ -111,9 +111,9 @@ export default {
     },
         // ['serviceOfferingId', 'selectedService'],
     setup(){
-      const servicesStore = useServicesStore();
+      const serviceOfferingsStore = useServiceOfferingsStore();
 
-      return {servicesStore}
+      return {serviceOfferingsStore}
     },
     data () {
       return {
@@ -124,38 +124,29 @@ export default {
     },
     computed: {
       apiStateServices () {
-        return this.servicesStore.apiStateServices
+        return this.serviceOfferingsStore.apiState
       },
 
       apiStateLoaded () {
-        return this.apiStateServices.serviceOfferingCategories === ApiState.LOADED &&
-          this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADED &&
-          this.apiStateServices.serviceOfferings === ApiState.LOADED &&
-          this.apiStateServices.serviceVendors === ApiState.LOADED
+        return this.apiStateServices === ApiState.LOADED
       },
       apiStateLoading () {
-        if (this.apiStateServices.serviceOfferingCategories === ApiState.INIT) {
-          this.servicesStore.getServiceOfferingCategories();
+        if (this.apiStateServices === ApiState.INIT) {
+          this.serviceOfferingsStore.getServiceOfferingCategories();
         }
-        if (this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT) {
-          this.servicesStore.getServiceOfferingDeploymentTypes();
+        if (this.apiStateServices === ApiState.INIT) {
+          this.serviceOfferingsStore.getServiceOfferingDeploymentTypes();
         }
-        if (this.apiStateServices.serviceOfferings === ApiState.INIT) {
-          this.servicesStore.getServiceOfferings();
+        if (this.apiStateServices === ApiState.INIT) {
+          this.serviceOfferingsStore.getServiceOfferings();
         }
-        if (this.apiStateServices.serviceVendors === ApiState.INIT) {
-          this.servicesStore.getServiceVendors();
+        if (this.apiStateServices === ApiState.INIT) {
+          this.serviceOfferingsStore.getServiceVendors();
         }
-        return this.apiStateServices.serviceOfferingCategories === ApiState.LOADING || this.apiStateServices.serviceOfferingCategories === ApiState.INIT ||
-          this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADING || this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT ||
-          this.apiStateServices.serviceOfferings === ApiState.LOADING || this.apiStateServices.serviceOfferings === ApiState.INIT ||
-          this.apiStateServices.serviceVendors === ApiState.LOADING || this.apiStateServices.serviceVendors === ApiState.INIT
+        return this.apiStateServices === ApiState.LOADING || this.apiStateServices === ApiState.INIT
       },
       apiStateError () {
-        return this.apiStateServices.serviceOfferingCategories === ApiState.ERROR &&
-          this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.ERROR &&
-          this.apiStateServices.serviceOfferings === ApiState.ERROR &&
-          this.apiStateServices.serviceVendors === ApiState.ERROR
+        return this.apiStateServices === ApiState.ERROR
       },
       serviceOffering () {
         const serviceOffering = this.serviceOfferingById(this.serviceOfferingId)
@@ -173,7 +164,7 @@ export default {
         this.selectedServiceOfferingVersionId = serviceOfferingVersionId
       },
       serviceOfferingById (id) {
-        return this.servicesStore.serviceOfferingById(id)
+        return this.serviceOfferingsStore.serviceOfferingById(id)
       },
     },
 

@@ -143,8 +143,8 @@
 import {serviceOptionMixin} from '@/utils/serviceOptionUtil'
 
 import {Field} from "vee-validate";
-import {useServicesStore} from "@/stores/servicesStore";
-import {useResourcesStore} from "@/stores/resourcesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
+import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
 import {useCatalogStore} from "@/stores/catalogStore";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import logRequestError from "@/api/restApiHelper";
@@ -170,10 +170,10 @@ export default {
       }
     },
     setup(){
-      const servicesStore = useServicesStore();
-      const resourceStore = useResourcesStore();
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      const resourceDevicesStore = useResourceDevicesStore();
       const catalogStore = useCatalogStore();
-      return {servicesStore, resourceStore, catalogStore};
+      return {serviceOfferingsStore, resourceDevicesStore, catalogStore};
     },
     data () {
       return {
@@ -181,14 +181,11 @@ export default {
       }
     },
     computed: {
-      valueOfTemplateVariable() {
-        return this.resourceStore.valueOfTemplateVariable
-      },
       serviceManagementSystemVariables() {
-        return this.servicesStore.serviceManagementSystemVariables
+        return this.serviceOfferingsStore.serviceManagementSystemVariables
       },
       serviceManagementDeploymentVariables () {
-        return this.servicesStore.serviceManagementDeploymentVariables
+        return this.serviceOfferingsStore.serviceManagementDeploymentVariables
       },
       aasSubmodelTemplates () {
         return this.catalogStore.aasSubmodelTemplates
@@ -207,6 +204,9 @@ export default {
     methods: {
       ipValueChanged (value) {
         console.log(value)
+      },
+      valueOfTemplateVariable(templateVariableKey) {
+        return this.serviceOfferingsStore.valueOfTemplateVariable(templateVariableKey)
       },
     },
   }

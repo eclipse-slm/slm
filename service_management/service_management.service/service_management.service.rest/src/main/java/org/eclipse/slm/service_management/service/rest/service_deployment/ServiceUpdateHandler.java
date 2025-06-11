@@ -183,7 +183,7 @@ public class ServiceUpdateHandler extends AbstractServiceDeploymentHandler imple
                     LOG.info("Service '" + serviceInstanceId + "' update for user '" + userUuid + "' to version '" + serviceOfferingVersion.getVersion() + "' successful");
 
                     serviceOrder.setServiceOrderResult(ServiceOrderResult.SUCCESSFULL);
-                    notificationServiceClient.postNotification(jwtAuthenticationToken, Category.Services, JobTarget.SERVICE, JobGoal.UPDATE);
+                    notificationServiceClient.postNotification(jwtAuthenticationToken, Category.SERVICES, JobTarget.SERVICE, JobGoal.UPDATE);
                 } catch (ConsulLoginFailedException | ServiceInstanceNotFoundException e) {
                     LOG.error(e.getMessage());
                 }

@@ -183,7 +183,7 @@ class ClusterDeleteFunctions extends AbstractClusterFunctions implements IAwxJob
 
             this.notificationServiceClient.postNotification(
                     clusterJob.getJwtAuthenticationToken(),
-                    Category.Resources,
+                    Category.RESOURCES,
                     jobTarget,
                     jobGoal
             );

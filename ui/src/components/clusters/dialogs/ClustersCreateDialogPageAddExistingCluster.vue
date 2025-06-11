@@ -170,7 +170,7 @@ import ClustersCreateDialogPage from "@/components/clusters/dialogs/ClustersCrea
 import {ref} from "vue";
 import {Field, Form as ValidationForm} from "vee-validate";
 import * as yup from 'yup';
-import {useResourcesStore} from "@/stores/resourcesStore";
+import {useResourceClustersStore} from "@/stores/resourceClustersStore";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import logRequestError from "@/api/restApiHelper";
 
@@ -183,12 +183,12 @@ const textAreaFileContentComponentKey = ref(0);
       ClustersCreateDialogPage,
     },
     setup(){
-      const resourceStore = useResourcesStore();
+      const resourceClustersStore = useResourceClustersStore();
 
       const required = yup.object().required();
       const required_string = yup.string().required();
       return {
-        required, required_string, resourceStore
+        required, required_string, resourceClustersStore
       }
     },
     data () {
@@ -202,7 +202,7 @@ const textAreaFileContentComponentKey = ref(0);
     },
     computed: {
       availableClusterTypes() {
-        return this.resourceStore.availableClusterTypes;
+        return this.resourceClustersStore.availableClusterTypes;
       },
       availableClusterTypesWithSkipInstall () {
         let clusterTypes = []

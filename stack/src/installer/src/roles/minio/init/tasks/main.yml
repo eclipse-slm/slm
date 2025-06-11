@@ -2,20 +2,20 @@
 - name: "MINIO | Assert inputs of 'minio/init | main.yml'"
   assert:
     that:
-      - (MINIO_API_URL is defined) and (MINIO_API_URL|length > 0)           # URL of the Minio instance
-      - (MINIO_CONSOLE_URL is defined) and (MINIO_CONSOLE_URL|length > 0)           # URL of the Minio instance
-      - (CONSUL_SCHEME is defined) and (CONSUL_SCHEME|length > 0)   # Scheme of the Consul instance
-      - (CONSUL_HOST is defined) and (CONSUL_HOST|length > 0)       # Host of the Consul instance
-      - (CONSUL_PORT is defined)                                    # Port of the Consul instance
-      - (_consul_token is defined) and (_consul_token|length > 0)   # Token to authenticate with Consul
+      - (minio.url.api.internal is defined) and (minio.url.api.internal|length > 0)           # URL of the Minio instance
+      - (minio.url.console.internal is defined) and (minio.url.console.internal|length > 0)   # URL of the Minio instance
+      - (ENV.CONSUL.SCHEME.INTERNAL is defined) and (ENV.CONSUL.SCHEME.INTERNAL|length > 0)           # Scheme of the Consul instance
+      - (ENV.CONSUL.HOST.INTERNAL is defined) and (ENV.CONSUL.HOST.INTERNAL|length > 0)               # Host of the Consul instance
+      - (ENV.CONSUL.PORT.INTERNAL is defined)                                                     # Port of the Consul instance
+      - (_consul_token is defined) and (_consul_token|length > 0)                             # Token to authenticate with Consul
 
 - name: "MINIO | Get config"
   block:
     - name: "MINIO | Check if config exists in Consul"
       community.general.consul_kv:
-        scheme: "{{ CONSUL_SCHEME }}"
-        host: "{{ CONSUL_HOST }}"
-        port: "{{ CONSUL_PORT }}"
+        scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+        host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+        port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
         token: "{{ _consul_token }}"
         key: "config/minio/data"
       register: minio_config_consul
@@ -30,8 +30,12 @@
       block:
         - name: "MINIO | Set admin password"
           set_fact:
-            MINIO_ADMIN_PASSWORD: "{{ minio_config.users.admin.password }}"
-          when: (MINIO_ADMIN_PASSWORD is not defined) or (MINIO_ADMIN_PASSWORD | default([]) | length == 0)
+            ENV: "{{ ENV | combine({
+                    'MINIO': {
+                      'ADMIN_PASSWORD': minio_config.users.admin.password 
+                      }
+                    }, recursive=true) }}"
+          when: (ENV.MINIO.ADMIN_PASSWORD is not defined) or (ENV.MINIO.ADMIN_PASSWORD | default([]) | length == 0)
       when: minio_config_consul.data.Value is defined
       no_log: True
 
@@ -39,29 +43,33 @@
       block:
         - name: "MINIO | Create admin password"
           set_fact:
-            MINIO_ADMIN_PASSWORD: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
-          when: (MINIO_ADMIN_PASSWORD is not defined) or (MINIO_ADMIN_PASSWORD | default([]) | length == 0)
+            ENV: "{{ ENV | combine({
+                    'MINIO': {
+                      'ADMIN_PASSWORD': lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) 
+                      }
+                    }, recursive=true) }}"
+          when: (ENV.MINIO.ADMIN_PASSWORD is not defined) or (ENV.MINIO.ADMIN_PASSWORD | default([]) | length == 0)
 
         - name: "MINIO | Update minio_config dictionary and override default values"
           set_fact:
             minio_config: "{{ minio_config | combine(
-            { 'scheme': '{{ MINIO_SCHEME }}',
-              'host': '{{ MINIO_HOST }}',
-              'console-port': '{{ MINIO_CONSOLE_PORT }}',
-              'api-port': '{{ MINIO_API_PORT }}',
+            { 'scheme': '{{ ENV.MINIO.SCHEME.INTERNAL }}',
+              'host': '{{ ENV.MINIO.HOST.INTERNAL }}',
+              'console-port': '{{ ENV.MINIO.CONSOLE_PORT.INTERNAL }}',
+              'api-port': '{{ ENV.MINIO.API_PORT.INTERNAL }}',
               'users': {
                 'admin': {
                   'username': 'admin',
-                  'password': '{{ MINIO_ADMIN_PASSWORD }}'
+                  'password': '{{ ENV.MINIO.ADMIN_PASSWORD }}'
                 }            
               }
             }
         , recursive=true) }}"
         - name: "MINIO | Store Minio config in Consul"
           community.general.consul_kv:
-            scheme: "{{ CONSUL_SCHEME }}"
-            host: "{{ CONSUL_HOST }}"
-            port: "{{ CONSUL_PORT }}"
+            scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+            host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+            port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
             token: "{{ _consul_token }}"
             key: "{{ item.key }}"
             value: "{{ item.value }}"
@@ -76,15 +84,16 @@
       set_fact:
         minio_compose: "{{ lookup('template', 'minio.yml') }}"
     - name: "MINIO | Start Minio containers"
+      delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
       community.docker.docker_compose_v2:
         project_name: eclipse-slm
         definition: "{{ minio_compose | from_yaml}}"
         state: present
-        pull: "{{ PULL_DOCKER_IMAGES }}"
+        pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
       register: minio_compose_start_output
-    - name: "MINIO | Wait for Minio being up"
+    - name: "MINIO | Wait for Minio ('{{ minio.url.console.internal }}') being up"
       uri:
-        url: "{{ MINIO_CONSOLE_URL }}"
+        url: "{{ minio.url.console.internal }}"
         status_code: 200
       register: result
       until: result.status == 200
@@ -105,9 +114,9 @@
     tasks_from: register_service
   vars:
     _service_name: minio
-    _service_port: "{{ MINIO_API_PORT }}"
-    _service_address: "{{ MINIO_HOST }}"
-    _http: "{{ MINIO_API_URL }}/minio/health/live"
+    _service_port: "{{ ENV.MINIO.API_PORT.INTERNAL }}"
+    _service_address: "{{ ENV.MINIO.HOST.INTERNAL }}"
+    _http: "{{ minio.url.api.internal }}/minio/health/live"
     _additional_tags:
       - "minio"
   no_log: True
@@ -116,4 +125,4 @@
   include_tasks: config_minio.yml
   vars:
     _minio_root_user: "admin"
-    _minio_root_password: "{{ MINIO_ADMIN_PASSWORD }}"
+    _minio_root_password: "{{ ENV.MINIO.ADMIN_PASSWORD }}"

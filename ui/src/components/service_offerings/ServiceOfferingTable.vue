@@ -185,7 +185,7 @@
 
 <script>
 
-import {useServicesStore} from "@/stores/servicesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 import {storeToRefs} from "pinia";
 import ServiceManagementClient from "@/api/service-management/service-management-client";
 import logRequestError from "@/api/restApiHelper";
@@ -200,9 +200,9 @@ export default {
     }
   },
   setup(){
-    const servicesStore = useServicesStore();
-    const {serviceVendorById, serviceOfferingCategoryNameById} = storeToRefs(servicesStore);
-    return {servicesStore, serviceVendorById, serviceOfferingCategoryNameById};
+    const serviceOfferingsStore = useServiceOfferingsStore();
+    const {serviceVendorById, serviceOfferingCategoryNameById} = storeToRefs(serviceOfferingsStore);
+    return {serviceOfferingsStore, serviceVendorById, serviceOfferingCategoryNameById};
   },
   data () {
     return {

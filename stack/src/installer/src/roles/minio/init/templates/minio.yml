@@ -1,31 +1,29 @@
 services:
   minio:
-    image: quay.io/minio/minio:{{ MINIO_VERSION }}
+    image: quay.io/minio/minio:{{ ENV.MINIO.VERSION }}
     restart: unless-stopped
-    command: minio server --console-address :{{ MINIO_CONSOLE_PORT }} --address :{{ MINIO_API_PORT }}
+    command: minio server --console-address :{{ ENV.MINIO.CONSOLE_PORT.INTERNAL }} --address :{{ ENV.MINIO.API_PORT.INTERNAL }}
     ports:
-      - "{{ MINIO_API_PORT }}:{{ MINIO_API_PORT }}"
-      - "{{ MINIO_CONSOLE_PORT }}:{{ MINIO_CONSOLE_PORT }}"
+      - "{{ ENV.MINIO.API_PORT.EXTERNAL }}:{{ ENV.MINIO.API_PORT.INTERNAL }}"
+      - "{{ ENV.MINIO.CONSOLE_PORT.EXTERNAL }}:{{ ENV.MINIO.CONSOLE_PORT.INTERNAL }}"
     logging:
       driver: "json-file"
       options:
-        max-file: "{{ LOGGING_MAX_FILE }}"
-        max-size: "{{ LOGGING_MAX_SIZE }}"
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
     environment:
-      KC_HOSTNAME: {{SLM_HOSTNAME}}
-      MINIO_ROOT_USER: "{{ MINIO_ADMIN_USERNAME }}"
-      MINIO_ROOT_PASSWORD: "{{ MINIO_ADMIN_PASSWORD }}"
+      KC_HOSTNAME: {{ ENV.SLM_HOSTNAME }}
+      MINIO_ROOT_USER: "{{ ENV.MINIO.ADMIN_USERNAME }}"
+      MINIO_ROOT_PASSWORD: "{{ ENV.MINIO.ADMIN_PASSWORD }}"
       MINIO_VOLUMES: "/mnt/data"
     volumes:
       - minio_data:/mnt/data
     networks:
       default:
         aliases:
-          - 'minio'
+          - "{{ ENV.MINIO.HOST.INTERNAL }}"
     extra_hosts:
-      - "{{ SLM_HOSTNAME }}:172.17.0.1"
-
-
+      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
 
 volumes:
   minio_data:

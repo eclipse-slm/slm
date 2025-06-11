@@ -1,0 +1,48 @@
+- name: "Traefik | Generate self-signed certificate or import existing certificate"
+  include_role:
+    name: cert
+    tasks_from: generate_or_import_certificate
+  vars:
+    _common_name: "{{ ENV.SLM_HOSTNAME }}"
+
+- name: "Traefik | Configure Consul"
+  community.general.consul_kv:
+    scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+    host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+    port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
+    token: "{{ _consul_token }}"
+    key: "{{ item.key }}"
+    value: "{{ item.value }}"
+  with_items:
+#    - { key: "traefik/http/routers/dashboard/entryPoints/0", value: "web" }
+#    - { key: "traefik/http/routers/dashboard/rule", value: "Host(`{{ ENV.SLM_HOSTNAME }}`)" }
+#    - { key: "traefik/http/routers/dashboard/service", value: "api@internal" }
+    - { key: "traefik/tls/stores/default/defaultCertificate/certFile", value: "/certs/certificate.crt" }
+    - { key: "traefik/tls/stores/default/defaultCertificate/keyFile", value: "/certs/certificate.key" }
+
+- name: "Traefik | Create compose definition from template"
+  set_fact:
+    traefik_compose: "{{ lookup('template', 'traefik.yml') }}"
+
+- name: "Traefik | Start Traefik containers"
+  community.docker.docker_compose_v2:
+    project_name: eclipse-slm
+    definition: "{{ traefik_compose | from_yaml}}"
+    state: present
+    pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+  register: traefik_compose_start_output
+
+- name: "Traefik | Wait for Traefik ('{{ traefik.url.api }}') being up"
+  uri:
+    url: "{{ traefik.url.api }}/"
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 120
+  delay: 3
+
+- name: "Traefik | Store resulting compose file"
+  template:
+    src: "traefik.yml"
+    dest: "{{ _store_compose_file }}"
+  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)

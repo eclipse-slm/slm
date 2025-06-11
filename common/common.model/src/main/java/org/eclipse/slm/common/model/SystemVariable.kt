@@ -15,4 +15,8 @@ class SystemVariable(
 
     var value: Any? = null
 
+    override fun toString(): String {
+        return "[key='$key', name='$name', valueSource=$valueSource, valuePath='$valuePath', value=$value]"
+    }
+
 }
