@@ -1,6 +1,7 @@
 package org.eclipse.slm.common.vault.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -9,6 +10,7 @@ import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;
 import org.apache.hc.client5.http.ssl.TrustAllStrategy;
 import org.apache.hc.core5.ssl.SSLContexts;
 import org.eclipse.slm.common.vault.model.*;
+import org.eclipse.slm.common.vault.model.exceptions.CertificateAuthorityException;
 import org.eclipse.slm.common.vault.model.exceptions.GroupAliasNotFoundException;
 import org.eclipse.slm.common.vault.model.exceptions.KvValueNotFound;
 import org.apache.commons.lang3.NotImplementedException;
@@ -587,6 +589,133 @@ public class VaultClient {
         LOG.info("Vault policy creation done");
         //endregion
     }
+
+
+    public void addIntermediateCA(VaultCredential vaultCredential, String resourceId) {
+        var pkiName = "pki_int_%s".formatted(resourceId);
+
+        LOG.info("Enable the pki secrets engine at 'pki_int_{}' path.", resourceId);
+        String path = "/v1/sys/mounts/%s".formatted(pkiName);
+        Map<String, Object> body = new HashMap<>();
+        body.put("type", "pki");
+
+        try {
+            var httpEntity = loginAndCreateRequestWithBody(vaultCredential, body);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(path, HttpMethod.POST, httpEntity, String.class);
+        } catch (HttpClientErrorException.BadRequest e) {
+            LOG.error("Could not enable the pki secrets engine at '{}' path.", pkiName);
+            throw new CertificateAuthorityException(e.getMessage());
+        }
+
+        LOG.info("Tune the {} secrets engine to issue certificates with a maximum time-to-live (TTL) of 43800h hours.", pkiName);
+        path = "/v1/sys/mounts/%s/tune".formatted(pkiName);
+        body = new HashMap<>();
+        body.put("max_lease_ttl", "43800h");
+
+        try {
+            var httpEntity = loginAndCreateRequestWithBody(vaultCredential, body);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(path, HttpMethod.POST, httpEntity, String.class);
+        } catch (HttpClientErrorException.BadRequest e) {
+            LOG.error("Could not set the maximum time-to-live (TTL) of 43800h hours for '{}'.", pkiName);
+            throw new CertificateAuthorityException(e.getMessage());
+        }
+
+        LOG.info("Generate an intermediate using the /{}/intermediate/generate/internal endpoint", pkiName);
+        path = "/v1/%s/intermediate/generate/internal".formatted(pkiName);
+        body = new HashMap<>();
+        body.put("common_name", "Resource %s Intermediate Authority".formatted(resourceId));
+        body.put("issuer_name", "resource-%s-intermediate".formatted(resourceId));
+
+        ResponseEntity<JsonNode> pkiIntermediateCAResponse;
+
+        String pkiIntermediateCert;
+        try {
+            var httpEntity = loginAndCreateRequestWithBody(vaultCredential, body);
+            pkiIntermediateCAResponse = restTemplate.exchange(path, HttpMethod.POST, httpEntity, JsonNode.class);
+            var intermediateCA = pkiIntermediateCAResponse.getBody();
+            pkiIntermediateCert = Objects.requireNonNull(intermediateCA).get("data").get("csr").asText();
+        } catch (HttpClientErrorException.BadRequest e) {
+            LOG.error("Could not generate an intermediate using the /{}/intermediate/generate/internal endpoint", pkiName);
+            throw new CertificateAuthorityException(e.getMessage());
+        }catch (Exception e){
+            throw new CertificateAuthorityException("Intermediate CA response is null");
+        }
+
+        LOG.info("Sign the intermediate certificate with the root CA private key, and save the certificate");
+        path = "v1/pki/root/sign-intermediate";
+        body = new HashMap<>();
+        body.put("csr", "%s".formatted(pkiIntermediateCert));
+        body.put("format", "pem_bundle");
+        body.put("ttl", "43800h");
+
+        ResponseEntity<JsonNode> intermediateCAResponse;
+
+        String intermediateCert;
+        try {
+            var httpEntity = loginAndCreateRequestWithBody(vaultCredential, body);
+            intermediateCAResponse = restTemplate.exchange(path, HttpMethod.POST, httpEntity, JsonNode.class);
+            var intermediateCA = intermediateCAResponse.getBody();
+            intermediateCert = Objects.requireNonNull(intermediateCA).get("data").get("certificate").asText();
+        } catch (HttpClientErrorException.BadRequest e) {
+            LOG.error("Could not sign the intermediate certificate with the root CA private key");
+            throw new CertificateAuthorityException(e.getMessage());
+        }catch (Exception e){
+            throw new CertificateAuthorityException("Intermediate CA response is null");
+        }
+
+
+        LOG.info("Import the signed CSR back to Vault ");
+        path = "/v1/%s/intermediate/set-signed".formatted(pkiName);
+        body = new HashMap<>();
+        body.put("certificate", "%s".formatted(intermediateCert));
+
+        try {
+            var httpEntity = loginAndCreateRequestWithBody(vaultCredential, body);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(path, HttpMethod.POST, httpEntity, String.class);
+        } catch (HttpClientErrorException.BadRequest e) {
+            LOG.error("Could not set the signed cert.pem to Vault for {} ", pkiName);
+            throw new CertificateAuthorityException(e.getMessage());
+        }
+
+    }
+
+    public void createRole(VaultCredential vaultCredential, String resourceId, List<String> domains, String roleName){
+        var pkiName = "pki_int_%s".formatted(resourceId);
+
+        LOG.info("Get the IssuerRef of the intermediate CA with name 'pki_int_{}'.", pkiName);
+        String path = "/v1/%s/config/issuers".formatted(pkiName);
+
+        String issuerRef;
+        try {
+            var httpEntity = loginAndCreateRequestWithBody(vaultCredential, null);
+            ResponseEntity<JsonNode> responseEntity = restTemplate.exchange(path, HttpMethod.POST, httpEntity, JsonNode.class);
+            issuerRef = responseEntity.getBody().get("default").textValue();
+        } catch (HttpClientErrorException.BadRequest e) {
+            LOG.error("Could not get the IssuerRef of the pki for '{}'.", pkiName);
+            throw new CertificateAuthorityException(e.getMessage());
+        }catch (Exception e){
+            throw new CertificateAuthorityException("Intermediate CA response is null");
+        }
+
+        LOG.info("Create a role named {} which allows subdomains", roleName);
+        path = "v1/%s/roles/%s".formatted(pkiName, roleName);
+        var body = new HashMap<>();
+        body.put("allowed_domains", domains);
+        body.put("allow_subdomains", true);
+        body.put("allow_glob_domains", true);
+        body.put("issuer_ref", issuerRef);
+        body.put("max_ttl", "43800h");
+
+        try {
+            var httpEntity = loginAndCreateRequestWithBody(vaultCredential, body);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(path, HttpMethod.POST, httpEntity, String.class);
+        } catch (HttpClientErrorException.BadRequest e) {
+            LOG.error("Could not create role named {} ", roleName);
+            throw new CertificateAuthorityException(e.getMessage());
+        }
+
+    }
+
 
 
     public String getScheme() {
