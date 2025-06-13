@@ -40,7 +40,7 @@ vault_config:
     - name: "resource_management"
       policies:
         - name: "resource_management"
-          policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"resources/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
+          policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"resources/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"pki*\" {  capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\", \"patch\" ]}"
     - name: "service_management"
       policies:
         - name: "service_management"
