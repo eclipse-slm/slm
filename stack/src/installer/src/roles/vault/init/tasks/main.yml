@@ -102,5 +102,32 @@
     _additional_tags:
       - "vault"
 
+- name: "Create root certificate"
+  include_role:
+    name: vault/client
+    tasks_from: ca/create_root_certificate_authority
+  vars:
+    _vault_token: "{{ vault_root_token }}"
+    _host: "{{ SLM_HOSTNAME }}"
+    _issuer_name: "{{ ENV.VAULT.ROOT_CA.ISSUER_NAME }}"
+    _roles_name: "{{ ENV.VAULT.ROOT_CA.ROLES_NAME }}"
+
+- name: "Create intermediate ca"
+  include_role:
+    name: vault/client
+    tasks_from: ca/create_intermediate_ca
+  vars:
+    _vault_token: "{{ vault_root_token }}"
+    _host: "{{ SLM_HOSTNAME }}"
+
+- name: "Create role name"
+  include_role:
+    name: vault/client
+    tasks_from: ca/create_role_name
+  vars:
+    _vault_token: "{{ vault_root_token }}"
+    _host: "{{ SLM_HOSTNAME }}"
+    _role_name: "{{ SLM_HOSTNAME }}"
+    _allowed_domains: "{{ SLM_HOSTNAME }}"
 ### Outputs
 # - vault_root_token
