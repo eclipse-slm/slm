@@ -594,7 +594,7 @@ public class VaultClient {
     public void addIntermediateCA(VaultCredential vaultCredential, String resourceId) {
         var pkiName = "pki_int_%s".formatted(resourceId);
 
-        LOG.info("Enable the pki secrets engine at 'pki_int_{}' path.", resourceId);
+        LOG.info("Enable the pki secrets engine at '{}' path.", resourceId);
         String path = "/v1/sys/mounts/%s".formatted(pkiName);
         Map<String, Object> body = new HashMap<>();
         body.put("type", "pki");
@@ -679,10 +679,10 @@ public class VaultClient {
 
     }
 
-    public void createRole(VaultCredential vaultCredential, String resourceId, List<String> domains, String roleName){
+    public void createIntermediateRole(VaultCredential vaultCredential, String resourceId, List<String> domains, String roleName){
         var pkiName = "pki_int_%s".formatted(resourceId);
 
-        LOG.info("Get the IssuerRef of the intermediate CA with name 'pki_int_{}'.", pkiName);
+        LOG.info("Get the IssuerRef of the intermediate CA with name '{}'.", pkiName);
         String path = "/v1/%s/config/issuers".formatted(pkiName);
 
         String issuerRef;
@@ -714,6 +714,36 @@ public class VaultClient {
             throw new CertificateAuthorityException(e.getMessage());
         }
 
+    }
+
+    public void disableIntermediateCA(VaultCredential vaultCredential, String resourceId){
+        var pkiName = "pki_int_%s".formatted(resourceId);
+
+        LOG.info("Disable the pki secrets engine at '{}' path.", resourceId);
+        String path = "/v1/sys/mounts/%s".formatted(pkiName);
+
+        try {
+            var httpEntity = loginAndCreateRequestWithBody(vaultCredential, null);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(path, HttpMethod.DELETE, httpEntity, String.class);
+        } catch (HttpClientErrorException.BadRequest e) {
+            LOG.error("Could not disable the pki secrets engine at '{}' path.", pkiName);
+            throw new CertificateAuthorityException(e.getMessage());
+        }
+    }
+
+    public void removeIntermediateRole(VaultCredential vaultCredential, String resourceId, String roleName){
+        var pkiName = "pki_int_%s".formatted(resourceId);
+
+        LOG.info("Delete role name {} for {}", roleName, pkiName);
+        var path = "v1/%s/roles/%s".formatted(pkiName, roleName);
+
+        try {
+            var httpEntity = loginAndCreateRequestWithBody(vaultCredential, null);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(path, HttpMethod.POST, httpEntity, String.class);
+        } catch (HttpClientErrorException.BadRequest e) {
+            LOG.error("Could not delete role name {} for {}", roleName, pkiName);
+            throw new CertificateAuthorityException(e.getMessage());
+        }
     }
 
 
