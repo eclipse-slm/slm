@@ -5,6 +5,7 @@ import org.eclipse.slm.common.vault.client.VaultClient;
 import org.eclipse.slm.common.vault.client.VaultCredential;
 import org.eclipse.slm.common.vault.client.VaultCredentialType;
 import org.eclipse.slm.common.vault.model.KvPath;
+import org.eclipse.slm.common.vault.model.exceptions.CertificateAuthorityException;
 import org.eclipse.slm.resource_management.model.resource.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,4 +219,37 @@ public class ResourcesVaultClient {
         this.vaultClient.removePolicy(vaultCredential, policyName);
         this.vaultClient.removeGroup(vaultCredential, policyGroupName);
     }
+
+    public void createIntermediateCertificate(BasicResource resource) {
+        var credential = new VaultCredential();
+        var resourceId = resource.getId().toString();
+        try {
+            var domains = new ArrayList<String>();
+
+            if (resource.getHostname() != null) {
+                domains.add(resource.getHostname());
+            }
+            if ((resource.getIp() != null)) {
+                domains.add(resource.getIp());
+            }
+
+            this.vaultClient.addIntermediateCA(credential, resourceId);
+            this.vaultClient.createIntermediateRole(credential, resourceId, domains, resourceId);
+        }catch (CertificateAuthorityException e) {
+            LOG.info("Could not create Intermediate Certificate for Resource: {}", resourceId);
+        }
+
+    }
+
+    public void removeIntermediateCertificate(BasicResource resource) {
+        var credential = new VaultCredential();
+        var resourceId = resource.getId().toString();
+        try {
+            this.vaultClient.removeIntermediateRole(credential, resourceId, resourceId);
+            this.vaultClient.disableIntermediateCA(credential, resourceId);
+        }catch (CertificateAuthorityException e) {
+            LOG.info("Could not delete Intermediate Certificate for resource '{}'", resourceId);
+        }
+    }
+
 }

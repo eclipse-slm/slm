@@ -278,6 +278,8 @@ public class ResourcesManager {
             }
         }
 
+        this.resourcesVaultClient.createIntermediateCertificate(resource);
+
         this.aasHandler.createResourceAasAndSubmodels(resource, digitalNameplateV3);
 
         notificationServiceClient.postNotification(jwtAuthenticationToken, Category.RESOURCES, JobTarget.RESOURCE, JobGoal.CREATE);
@@ -316,6 +318,8 @@ public class ResourcesManager {
                     new VaultCredential(),
                     remoteAccessServiceId
             );
+
+        this.resourcesVaultClient.removeIntermediateCertificate(resource);
 
         notificationServiceClient.postNotification(jwtAuthenticationToken, Category.RESOURCES, JobTarget.RESOURCE, JobGoal.DELETE);
         publisher.publishEvent(new ResourceEvent(this, resourceId, ResourceEvent.Operation.DELETE));
