@@ -595,7 +595,7 @@ public class VaultClient {
         var pkiName = "pki_int_%s".formatted(resourceId);
 
         LOG.info("Enable the pki secrets engine at '{}' path.", resourceId);
-        String path = "/v1/sys/mounts/%s".formatted(pkiName);
+        String path = "/sys/mounts/%s".formatted(pkiName);
         Map<String, Object> body = new HashMap<>();
         body.put("type", "pki");
 
@@ -608,7 +608,7 @@ public class VaultClient {
         }
 
         LOG.info("Tune the {} secrets engine to issue certificates with a maximum time-to-live (TTL) of 43800h hours.", pkiName);
-        path = "/v1/sys/mounts/%s/tune".formatted(pkiName);
+        path = "/sys/mounts/%s/tune".formatted(pkiName);
         body = new HashMap<>();
         body.put("max_lease_ttl", "43800h");
 
@@ -621,7 +621,7 @@ public class VaultClient {
         }
 
         LOG.info("Generate an intermediate using the /{}/intermediate/generate/internal endpoint", pkiName);
-        path = "/v1/%s/intermediate/generate/internal".formatted(pkiName);
+        path = "/%s/intermediate/generate/internal".formatted(pkiName);
         body = new HashMap<>();
         body.put("common_name", "Resource %s Intermediate Authority".formatted(resourceId));
         body.put("issuer_name", "resource-%s-intermediate".formatted(resourceId));
@@ -642,7 +642,7 @@ public class VaultClient {
         }
 
         LOG.info("Sign the intermediate certificate with the root CA private key, and save the certificate");
-        path = "v1/pki/root/sign-intermediate";
+        path = "/pki/root/sign-intermediate";
         body = new HashMap<>();
         body.put("csr", "%s".formatted(pkiIntermediateCert));
         body.put("format", "pem_bundle");
@@ -665,7 +665,7 @@ public class VaultClient {
 
 
         LOG.info("Import the signed CSR back to Vault ");
-        path = "/v1/%s/intermediate/set-signed".formatted(pkiName);
+        path = "/%s/intermediate/set-signed".formatted(pkiName);
         body = new HashMap<>();
         body.put("certificate", "%s".formatted(intermediateCert));
 
@@ -683,7 +683,7 @@ public class VaultClient {
         var pkiName = "pki_int_%s".formatted(resourceId);
 
         LOG.info("Get the IssuerRef of the intermediate CA with name '{}'.", pkiName);
-        String path = "/v1/%s/config/issuers".formatted(pkiName);
+        String path = "/%s/config/issuers".formatted(pkiName);
 
         String issuerRef;
         try {
@@ -698,7 +698,7 @@ public class VaultClient {
         }
 
         LOG.info("Create a role named {} which allows subdomains", roleName);
-        path = "v1/%s/roles/%s".formatted(pkiName, roleName);
+        path = "/%s/roles/%s".formatted(pkiName, roleName);
         var body = new HashMap<>();
         body.put("allowed_domains", domains);
         body.put("allow_subdomains", true);
@@ -720,7 +720,7 @@ public class VaultClient {
         var pkiName = "pki_int_%s".formatted(resourceId);
 
         LOG.info("Disable the pki secrets engine at '{}' path.", resourceId);
-        String path = "/v1/sys/mounts/%s".formatted(pkiName);
+        String path = "/sys/mounts/%s".formatted(pkiName);
 
         try {
             var httpEntity = loginAndCreateRequestWithBody(vaultCredential, null);
@@ -735,7 +735,7 @@ public class VaultClient {
         var pkiName = "pki_int_%s".formatted(resourceId);
 
         LOG.info("Delete role name {} for {}", roleName, pkiName);
-        var path = "v1/%s/roles/%s".formatted(pkiName, roleName);
+        var path = "/%s/roles/%s".formatted(pkiName, roleName);
 
         try {
             var httpEntity = loginAndCreateRequestWithBody(vaultCredential, null);
