@@ -623,7 +623,7 @@ public class VaultClient {
         LOG.info("Generate an intermediate using the /{}/intermediate/generate/internal endpoint", pkiName);
         path = "/%s/intermediate/generate/internal".formatted(pkiName);
         body = new HashMap<>();
-        body.put("common_name", "Resource %s Intermediate Authority".formatted(resourceId));
+        body.put("common_name", "resource-%s".formatted(resourceId));
         body.put("issuer_name", "resource-%s-intermediate".formatted(resourceId));
 
         ResponseEntity<JsonNode> pkiIntermediateCAResponse;
