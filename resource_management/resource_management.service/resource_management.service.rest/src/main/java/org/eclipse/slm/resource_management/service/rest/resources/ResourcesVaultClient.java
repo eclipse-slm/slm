@@ -235,8 +235,8 @@ public class ResourcesVaultClient {
 
             this.vaultClient.addIntermediateCA(credential, resourceId);
             this.vaultClient.createIntermediateRole(credential, resourceId, domains, resourceId);
-        }catch (CertificateAuthorityException e) {
-            LOG.info("Could not create Intermediate Certificate for Resource: {}", resourceId);
+        } catch (Exception e) {
+            LOG.error("Could not create Intermediate Certificate for Resource \"{}\" with message {}", resourceId, e.getMessage());
         }
 
     }
