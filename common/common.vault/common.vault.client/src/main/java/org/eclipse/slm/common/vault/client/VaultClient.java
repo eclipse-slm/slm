@@ -14,6 +14,7 @@ import org.eclipse.slm.common.vault.model.exceptions.CertificateAuthorityExcepti
 import org.eclipse.slm.common.vault.model.exceptions.GroupAliasNotFoundException;
 import org.eclipse.slm.common.vault.model.exceptions.KvValueNotFound;
 import org.apache.commons.lang3.NotImplementedException;
+import org.eclipse.slm.common.vault.model.pki.CreatePkiRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -149,11 +150,13 @@ public class VaultClient {
             }
 
             case APPLICATION_PROPERTIES -> {
+                LOG.info("Loging type {}", this.authentication);
                 if(this.authentication.equalsIgnoreCase("approle")) {
                     String url = "/auth/approle/login";
 
                     var loginBody = "";
                     try {
+                        LOG.info("Login and create request {}:{}", this.appRoleId, this.appRoleSecretId);
                         loginBody = objectMapper.writeValueAsString(new ApproleLoginRequest(this.appRoleId, this.appRoleSecretId));
                     } catch (JsonProcessingException e) {
                         LOG.error("Vault login failed: " + e.getMessage());
@@ -596,10 +599,9 @@ public class VaultClient {
 
         LOG.info("Enable the pki secrets engine at '{}' path.", resourceId);
         String path = "/v1/sys/mounts/%s".formatted(pkiName);
-        Map<String, Object> body = new HashMap<>();
-        body.put("type", "pki");
 
         try {
+            var body = new CreatePkiRequest();
             var httpEntity = loginAndCreateRequestWithBody(vaultCredential, body);
             ResponseEntity<String> responseEntity = restTemplate.exchange(path, HttpMethod.POST, httpEntity, String.class);
         } catch (HttpClientErrorException.BadRequest e) {
@@ -609,7 +611,7 @@ public class VaultClient {
 
         LOG.info("Tune the {} secrets engine to issue certificates with a maximum time-to-live (TTL) of 43800h hours.", pkiName);
         path = "/v1/sys/mounts/%s/tune".formatted(pkiName);
-        body = new HashMap<>();
+        var body = new HashMap<>();
         body.put("max_lease_ttl", "43800h");
 
         try {
