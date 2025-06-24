@@ -688,7 +688,7 @@ public class VaultClient {
         String issuerRef;
         try {
             var httpEntity = loginAndCreateRequestWithBody(vaultCredential, null);
-            ResponseEntity<JsonNode> responseEntity = restTemplate.exchange(path, HttpMethod.POST, httpEntity, JsonNode.class);
+            ResponseEntity<JsonNode> responseEntity = restTemplate.exchange(path, HttpMethod.GET, httpEntity, JsonNode.class);
             issuerRef = responseEntity.getBody().get("default").textValue();
         } catch (HttpClientErrorException.BadRequest e) {
             LOG.error("Could not get the IssuerRef of the pki for '{}'.", pkiName);
