@@ -700,9 +700,8 @@ public class VaultClient {
         LOG.info("Create a role named {} which allows subdomains", roleName);
         path = "/%s/roles/%s".formatted(pkiName, roleName);
         var body = new HashMap<>();
-        body.put("allowed_domains", domains);
-        body.put("allow_subdomains", true);
-        body.put("allow_glob_domains", true);
+//        body.put("allowed_domains", domains);
+        body.put("allow_any_name", true);
         body.put("issuer_ref", issuerRef);
         body.put("max_ttl", "43800h");
 
