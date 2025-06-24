@@ -689,12 +689,12 @@ public class VaultClient {
         try {
             var httpEntity = loginAndCreateRequestWithBody(vaultCredential, null);
             ResponseEntity<JsonNode> responseEntity = restTemplate.exchange(path, HttpMethod.GET, httpEntity, JsonNode.class);
-            issuerRef = responseEntity.getBody().get("default").textValue();
+            issuerRef = responseEntity.getBody().get("data").get("default").textValue();
         } catch (HttpClientErrorException.BadRequest e) {
             LOG.error("Could not get the IssuerRef of the pki for '{}'.", pkiName);
             throw new CertificateAuthorityException(e.getMessage());
         }catch (Exception e){
-            throw new CertificateAuthorityException("Intermediate CA response is null");
+            throw new CertificateAuthorityException(e.getMessage());
         }
 
         LOG.info("Create a role named {} which allows subdomains", roleName);
