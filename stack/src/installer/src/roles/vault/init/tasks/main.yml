@@ -57,24 +57,6 @@
     vars:
       _vault_token: "{{ vault_root_token }}"
 
-  - name: "Wait for Keycloak ('{{ keycloak.url.external }}/realms/{{ ENV.KEYCLOAK.REALM }}/.well-known/openid-configuration') being up"
-    uri:
-      url: "{{ keycloak.url.external }}/realms/{{ ENV.KEYCLOAK.REALM }}/.well-known/openid-configuration"
-      validate_certs: no
-      status_code: 200
-    register: result
-    until: result.status == 200
-    retries: 120
-    delay: 3
-  - name: "Configure JWT auth via Keycloak"
-    import_role:
-      name: vault/client
-      tasks_from: configure_keycloak_jwt_auth_method
-    vars:
-      _vault_token: "{{ vault_root_token }}"
-      _mount_auth_path: "jwt"
-      _oidc_discovery_url: "{{ keycloak.url.external_without_port }}/realms/{{ ENV.KEYCLOAK.REALM }}"
-
 - name: "Store config"
   block:
   - set_fact:
@@ -119,6 +101,8 @@
   vars:
     _vault_token: "{{ vault_root_token }}"
     _host: "{{ SLM_HOSTNAME }}"
+    _organization: "Eclipse SLM"
+    _country: "DE"
 
 - name: "Create role name"
   include_role:
@@ -129,5 +113,6 @@
     _host: "{{ SLM_HOSTNAME }}"
     _role_name: "{{ SLM_HOSTNAME }}"
     _allowed_domains: "{{ SLM_HOSTNAME }}"
+    _allow_any_name: "true"
 ### Outputs
 # - vault_root_token

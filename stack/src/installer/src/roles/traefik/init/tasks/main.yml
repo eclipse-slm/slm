@@ -4,6 +4,7 @@
     tasks_from: generate_or_import_certificate
   vars:
     _common_name: "{{ ENV.SLM_HOSTNAME }}"
+    _cm_name: "{{ ENV.SLM_HOSTNAME }}"
 
 - name: "Traefik | Configure Consul"
   community.general.consul_kv:

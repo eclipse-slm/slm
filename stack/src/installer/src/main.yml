@@ -244,12 +244,20 @@
       vars:
         _store_compose_file: /compose/consul.yml
 
+    - name: "Start Vault"
+      include_role:
+        name: vault/init
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_compose_file: /compose/vault.yml
+
     - name: "Start Traefik"
       include_role:
         name: traefik/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_file: /compose/traefik.yml
+        _vault_root_token: "{{ vault_root_token }}"
 
     - name: "Start Keycloak"
       include_role:
@@ -258,18 +266,32 @@
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_file: /compose/keycloak.yml
 
+    - name: "Wait for Keycloak ('{{ keycloak.url.external }}/realms/{{ ENV.KEYCLOAK.REALM }}/.well-known/openid-configuration') being up"
+      uri:
+        url: "{{ keycloak.url.external }}/realms/{{ ENV.KEYCLOAK.REALM }}/.well-known/openid-configuration"
+        validate_certs: no
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 120
+      delay: 3
+    - name: "Configure JWT auth via Keycloak"
+      import_role:
+        name: vault/client
+        tasks_from: configure_keycloak_jwt_auth_method
+      vars:
+        _vault_token: "{{ vault_root_token }}"
+        _mount_auth_path: "jwt"
+        _oidc_discovery_url: "{{ keycloak.url.external_without_port }}/realms/{{ ENV.KEYCLOAK.REALM }}"
+
+
     - name: "Init Consul"
       include_role:
         name: consul/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
 
-    - name: "Start Vault"
-      include_role:
-        name: vault/init
-      vars:
-        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_file: /compose/vault.yml
+
 
     - name: "Start RabbitMQ"
       include_role:

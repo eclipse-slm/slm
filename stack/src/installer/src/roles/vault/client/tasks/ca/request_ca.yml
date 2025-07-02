@@ -1,0 +1,30 @@
+- name: "Assert inputs of 'vault/client | ca/create_root_certificate_authority.yml'"
+  assert:
+    that:
+      - (vault.url.internal is defined) and (vault.url.internal|length > 0)
+      - (_vault_token is defined) and (_vault_token|length > 0)
+      - (_common_name is defined) and (_common_name|length > 0)
+      - (_pki is defined) and (_pki|length > 0)
+      - (_pki_role is defined) and (_pki_role|length > 0)
+
+    fail_msg: "Variable must be defined and not empty"
+
+- name: "Request Certificate"
+  uri:
+    url: "{{ vault.url.internal }}/v1/{{ _pki }}/issue/{{ _pki_role }}"
+    validate_certs: no
+    method: POST
+    headers:
+      Authorization: "Bearer {{ _vault_token }}"
+    status_code: 200, 204
+    body_format: json
+    body:
+      common_name: "{{ _common_name }}"
+      ttl: "{{ _ttl | default('43000h') }}"
+  register: vault_certificate
+
+- set_fact:
+    certificates:
+      certificate: "{{ vault_certificate.json.data.certificate }}"
+      issuing_ca: "{{ vault_certificate.json.data.issuing_ca }}"
+      private_key: "{{ vault_certificate.json.data.private_key }}"
