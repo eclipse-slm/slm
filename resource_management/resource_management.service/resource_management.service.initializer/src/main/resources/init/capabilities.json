@@ -148,7 +148,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
         "awxRepo": "https://github.com/ilgmi/slm-cc-base",
-        "awxBranch": "main",
+        "awxBranch": "feature/request-vault-CA",
         "playbook": "uninstall.yml",
         "connectionTypes": [
           "ssh"
@@ -158,7 +158,7 @@
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
         "awxRepo": "https://github.com/ilgmi/slm-cc-base",
-        "awxBranch": "main",
+        "awxBranch": "feature/request-vault-CA",
         "playbook": "install.yml",
         "connectionTypes": [
           "ssh"
