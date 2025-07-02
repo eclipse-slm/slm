@@ -17,6 +17,15 @@
     status_code: 200, 204
   register: pki_int_issuers
 
+- name: "Check if the role name already exist"
+  uri:
+    url: "{{ vault.url.internal }}/v1/pki_int_{{ _host }}/roles/{{ _role_name }}"
+    validate_certs: no
+    method: GET
+    headers:
+      Authorization: "Bearer {{ _vault_token }}"
+    status_code: 200, 204, 400, 404
+  register: app_role
 
 - name: "Create a role named {{ _role_name }} which allows subdomains."
   uri:
@@ -30,5 +39,7 @@
     body:
       allowed_domains: " {{ _allowed_domains }}"
       allow_subdomains: "true"
+      allow_any_name: "{{ _allow_any_name | default('false')}}"
       issuer_ref: "{{pki_int_issuers.json.data.default}}"
       max_ttl: "720h"
+  when: app_role.status != 200

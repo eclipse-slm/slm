@@ -6,84 +6,103 @@
       - (_host is defined) and (_host|length > 0)
     fail_msg: "Variable must be defined and not empty"
 
-- name: "Enable the pki secrets engine at pki_int_{{_host}} path."
+- name: "Check if pki secret already exists"
   uri:
     url: "{{ vault.url.internal }}/v1/sys/mounts/pki_int_{{_host}}"
     validate_certs: no
-    method: POST
+    method: GET
     headers:
       Authorization: "Bearer {{ _vault_token }}"
-    status_code: 200, 204
+    status_code: 200, 400
     body_format: json
     body:
       type: "pki"
+  register: pki
 
-- name: "Tune the pki_int_{{_host}} secrets engine to issue certificates with a maximum time-to-live (TTL) of 43800h hours."
-  uri:
-    url: "{{ vault.url.internal }}/v1/sys/mounts/pki_int_{{_host}}/tune"
-    validate_certs: no
-    method: POST
-    headers:
-      Authorization: "Bearer {{ _vault_token }}"
-    status_code: 200, 204
-    body_format: json
-    body:
-      max_lease_ttl: "43800h"
+- block:
+    - name: "Enable the pki secrets engine at pki_int_{{_host}} path."
+      uri:
+        url: "{{ vault.url.internal }}/v1/sys/mounts/pki_int_{{_host}}"
+        validate_certs: no
+        method: POST
+        headers:
+          Authorization: "Bearer {{ _vault_token }}"
+        status_code: 200, 204
+        body_format: json
+        body:
+          type: "pki"
 
-- name: "Generate an intermediate using the /pki_int_{{_host}}/intermediate/generate/internal endpoint"
-  uri:
-    url: "{{ vault.url.internal }}/v1/pki_int_{{_host}}/intermediate/generate/internal"
-    validate_certs: no
-    method: POST
-    headers:
-      Authorization: "Bearer {{ _vault_token }}"
-    status_code: 200, 204
-    body_format: json
-    body:
-      common_name: "{{_host}} Intermediate Authority"
-      issuer_name: "{{_host}}-intermediate"
-  register: intermediate_ca
+    - name: "Tune the pki_int_{{_host}} secrets engine to issue certificates with a maximum time-to-live (TTL) of 43800h hours."
+      uri:
+        url: "{{ vault.url.internal }}/v1/sys/mounts/pki_int_{{_host}}/tune"
+        validate_certs: no
+        method: POST
+        headers:
+          Authorization: "Bearer {{ _vault_token }}"
+        status_code: 200, 204
+        body_format: json
+        body:
+          max_lease_ttl: "43800h"
 
-
-- name: "Assert intermediate ca"
-  assert:
-    that:
-      - (intermediate_ca is defined) and (intermediate_ca|length > 0) and (intermediate_ca.json.data.csr is defined) and (intermediate_ca.json.data.csr |length > 0)
-    fail_msg: "Intermediate Ca must be created"
-
-
-- name: "Sign the intermediate certificate with the root CA private key, and save the certificate as intermediate.cert.pem"
-  uri:
-    url: "{{ vault.url.internal }}/v1/pki/root/sign-intermediate"
-    validate_certs: no
-    method: POST
-    headers:
-      Authorization: "Bearer {{ _vault_token }}"
-    status_code: 200, 204
-    body_format: json
-    body:
-      csr: "{{intermediate_ca.json.data.csr}}"
-      format: "pem_bundle"
-      ttl: "43800h"
-  register: intermediate_cert
+    - name: "Generate an intermediate using the /pki_int_{{_host}}/intermediate/generate/internal endpoint"
+      uri:
+        url: "{{ vault.url.internal }}/v1/pki_int_{{_host}}/intermediate/generate/internal"
+        validate_certs: no
+        method: POST
+        headers:
+          Authorization: "Bearer {{ _vault_token }}"
+        status_code: 200, 204
+        body_format: json
+        body:
+          common_name: "{{_host}} Intermediate Authority"
+          issuer_name: "{{_host}}-intermediate"
+          organization: "{{ _organization | default('')}}"
+          country: "{{ _country | default('')}}"
+          use_common_name_for_san: true
+      register: intermediate_ca
 
 
-- name: "Assert intermediate ca"
-  assert:
-    that:
-      - (intermediate_cert is defined) and (intermediate_cert|length > 0) and (intermediate_cert.json.data.certificate is defined) and (intermediate_cert.json.data.certificate |length > 0)
-    fail_msg: "intermediate_cert must be created"
+    - name: "Assert intermediate ca"
+      assert:
+        that:
+          - (intermediate_ca is defined) and (intermediate_ca|length > 0) and (intermediate_ca.json.data.csr is defined) and (intermediate_ca.json.data.csr |length > 0)
+        fail_msg: "Intermediate Ca must be created"
 
-- name: "Submit the signed certificate."
-  uri:
-    url: "{{ vault.url.internal }}/v1/pki_int_{{_host}}/intermediate/set-signed"
-    validate_certs: no
-    method: POST
-    headers:
-      Authorization: "Bearer {{ _vault_token }}"
-    status_code: 200, 204
-    body_format: json
-    body:
-      certificate: "{{intermediate_cert.json.data.certificate}}"
-      format: "pem_bundle"
-      ttl: "43800h"
+
+    - name: "Sign the intermediate certificate with the root CA private key, and save the certificate as intermediate.cert.pem"
+      uri:
+        url: "{{ vault.url.internal }}/v1/pki/root/sign-intermediate"
+        validate_certs: no
+        method: POST
+        headers:
+          Authorization: "Bearer {{ _vault_token }}"
+        status_code: 200, 204
+        body_format: json
+        body:
+          csr: "{{intermediate_ca.json.data.csr}}"
+          format: "pem_bundle"
+          ttl: "43800h"
+      register: intermediate_cert
+
+
+    - name: "Assert intermediate ca"
+      assert:
+        that:
+          - (intermediate_cert is defined) and (intermediate_cert|length > 0) and (intermediate_cert.json.data.certificate is defined) and (intermediate_cert.json.data.certificate |length > 0)
+        fail_msg: "intermediate_cert must be created"
+
+    - name: "Submit the signed certificate."
+      uri:
+        url: "{{ vault.url.internal }}/v1/pki_int_{{_host}}/intermediate/set-signed"
+        validate_certs: no
+        method: POST
+        headers:
+          Authorization: "Bearer {{ _vault_token }}"
+        status_code: 200, 204
+        body_format: json
+        body:
+          certificate: "{{intermediate_cert.json.data.certificate}}"
+          format: "pem_bundle"
+          ttl: "43800h"
+  when: pki.status != 200
+

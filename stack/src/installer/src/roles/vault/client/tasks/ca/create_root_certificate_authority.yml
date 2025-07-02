@@ -9,74 +9,89 @@
 
     fail_msg: "Variable must be defined and not empty"
 
-- name: "Enable the pki secrets engine at pki path using /sys/mounts"
+- name: "Check if pki secret already exists"
   uri:
     url: "{{ vault.url.internal }}/v1/sys/mounts/pki"
     validate_certs: no
-    method: POST
+    method: GET
     headers:
       Authorization: "Bearer {{ _vault_token }}"
-    status_code: 200, 204
+    status_code: 200, 400
     body_format: json
     body:
       type: "pki"
+  register: pki
 
-- name: "Tune the pki secrets engine to issue certificates with a maximum time-to-live (TTL) of 87600 hours."
-  uri:
-    url: "{{ vault.url.internal }}/v1/sys/mounts/pki/tune"
-    validate_certs: no
-    method: POST
-    headers:
-      Authorization: "Bearer {{ _vault_token }}"
-    status_code: 200, 204
-    body_format: json
-    body:
-      max_lease_ttl: "87600h"
+- block:
+    - name: "Enable the pki secrets engine at pki path using /sys/mounts"
+      uri:
+        url: "{{ vault.url.internal }}/v1/sys/mounts/pki"
+        validate_certs: no
+        method: POST
+        headers:
+          Authorization: "Bearer {{ _vault_token }}"
+        status_code: 200, 204
+        body_format: json
+        body:
+          type: "pki"
 
-- name: "Generate the root certificate and extract the CA certificate and save it as root_2025_ca.crt"
-  uri:
-    url: "{{ vault.url.internal }}/v1/pki/root/generate/internal"
-    validate_certs: no
-    method: POST
-    headers:
-      Authorization: "Bearer {{ _vault_token }}"
-    status_code: 200, 204
-    body_format: json
-    body:
-      common_name: "{{ _host }}"
-      issuer_name: "{{ _issuer_name }}"
-      ttl: "87600h"
-  register: root_ca
+    - name: "Tune the pki secrets engine to issue certificates with a maximum time-to-live (TTL) of 87600 hours."
+      uri:
+        url: "{{ vault.url.internal }}/v1/sys/mounts/pki/tune"
+        validate_certs: no
+        method: POST
+        headers:
+          Authorization: "Bearer {{ _vault_token }}"
+        status_code: 200, 204
+        body_format: json
+        body:
+          max_lease_ttl: "87600h"
 
-- name: "Assert root ca"
-  assert:
-    that:
-      - (root_ca is defined) and (root_ca|length > 0) and (root_ca.json.data.certificate is defined) and (root_ca.json.data.certificate |length > 0)
-    fail_msg: "Root Ca must be created"
+    - name: "Generate the root certificate and extract the CA certificate and save it as root_2025_ca.crt"
+      uri:
+        url: "{{ vault.url.internal }}/v1/pki/root/generate/internal"
+        validate_certs: no
+        method: POST
+        headers:
+          Authorization: "Bearer {{ _vault_token }}"
+        status_code: 200, 204
+        body_format: json
+        body:
+          common_name: "{{ _host }}"
+          issuer_name: "{{ _issuer_name }}"
+          ttl: "87600h"
+      register: root_ca
+
+    - name: "Assert root ca"
+      assert:
+        that:
+          - (root_ca is defined) and (root_ca|length > 0) and (root_ca.json.data.certificate is defined) and (root_ca.json.data.certificate |length > 0)
+        fail_msg: "Root Ca must be created"
 
 
-- name: "Create a role for the root CA."
-  uri:
-    url: "{{ vault.url.internal }}/v1/pki/roles/{{ _roles_name }}"
-    validate_certs: no
-    method: PUT
-    headers:
-      Authorization: "Bearer {{ _vault_token }}"
-    status_code: 200, 204
-    body_format: json
-    body:
-      allow_any_name: "true"
-      issuer_ref: "{{ _issuer_name }}"
+    - name: "Create a role for the root CA."
+      uri:
+        url: "{{ vault.url.internal }}/v1/pki/roles/{{ _roles_name }}"
+        validate_certs: no
+        method: PUT
+        headers:
+          Authorization: "Bearer {{ _vault_token }}"
+        status_code: 200, 204
+        body_format: json
+        body:
+          allow_any_name: "true"
+          issuer_ref: "{{ _issuer_name }}"
 
-- name: "Configure the CA and CRL URLs."
-  uri:
-    url: "{{ vault.url.internal }}/v1/pki/config/urls"
-    validate_certs: no
-    method: POST
-    headers:
-      Authorization: "Bearer {{ _vault_token }}"
-    status_code: 200, 204
-    body_format: json
-    body:
-      issuing_certificates: "{{ vault.url.external }}/v1/pki/ca"
-      crl_distribution_points: "{{ vault.url.external }}/v1/pki/crl"
+    - name: "Configure the CA and CRL URLs."
+      uri:
+        url: "{{ vault.url.internal }}/v1/pki/config/urls"
+        validate_certs: no
+        method: POST
+        headers:
+          Authorization: "Bearer {{ _vault_token }}"
+        status_code: 200, 204
+        body_format: json
+        body:
+          issuing_certificates: "{{ vault.url.external }}/v1/pki/ca, http://127.0.0.1:8200/v1/pki/ca, http://vault:8200/v1/pki/ca"
+          crl_distribution_points: "{{ vault.url.external }}/v1/pki/crl, http://127.0.0.1:8200/v1/pki/crl, http://vault:8200/v1/pki/crl"
+  when: pki.status != 200
