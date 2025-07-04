@@ -537,7 +537,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
         "awxRepo": "https://github.com/Ilgmi/ansible-role-resource-self-description-service",
-        "awxBranch": "0.0.1-SNAPSHOT",
+        "awxBranch": "dev",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh"]
       },
@@ -545,7 +545,7 @@
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
         "awxRepo": "https://github.com/Ilgmi/ansible-role-resource-self-description-service",
-        "awxBranch": "0.0.1-SNAPSHOT",
+        "awxBranch": "dev",
         "playbook": "install.yml",
         "connectionTypes": ["ssh"],
         "configParameters": [
