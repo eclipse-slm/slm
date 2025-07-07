@@ -27,6 +27,8 @@ services:
       default:
         aliases:
           - "{{ ENV.IRS.HOST.INTERNAL }}"
+    ports:
+      - "{{ ENV.IRS.PORT.EXTERNAL }}:{{ ENV.IRS.PORT.INTERNAL }}"
     environment:
       USE_IN_MEMORY_STORE: false
       APP_CONFIG: '{{ ENV.IRS.CONFIG | to_json }}'
@@ -52,7 +54,7 @@ services:
       COUCHDB_PORT: "{{ ENV.IRS.DATABASE.PORT.INTERNAL }}"
     cpus: "0.5"
 
-  couch-db:
+  irs-db:
     image: couchdb:{{ ENV.IRS.DATABASE.VERSION }}
     restart: unless-stopped
     logging:

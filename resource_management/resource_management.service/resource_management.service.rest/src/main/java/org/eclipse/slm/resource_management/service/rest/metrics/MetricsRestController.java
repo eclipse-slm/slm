@@ -1,9 +1,6 @@
 package org.eclipse.slm.resource_management.service.rest.metrics;
 
-import org.eclipse.slm.common.aas.clients.AasRegistryClient;
-import org.eclipse.slm.common.aas.clients.AasRepositoryClient;
-import org.eclipse.slm.common.aas.clients.SubmodelRegistryClient;
-import org.eclipse.slm.common.aas.clients.SubmodelServiceClient;
+import org.eclipse.slm.common.aas.clients.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -23,15 +20,11 @@ import java.util.UUID;
 public class MetricsRestController {
 
     private final Logger LOG = LoggerFactory.getLogger(MetricsRestController.class);
-    private final AasRegistryClient registry;
-    private final AasRepositoryClient aasRepositoryClient;
 
     private final SubmodelRegistryClient submodelRegistryClient;
 
-    public MetricsRestController(AasRegistryClient registry, AasRepositoryClient aasRepositoryClient, SubmodelRegistryClient submodelRegistryClient) {
-        this.registry = registry;
-        this.aasRepositoryClient = aasRepositoryClient;
-        this.submodelRegistryClient = submodelRegistryClient;
+    public MetricsRestController(SubmodelRegistryClientFactory submodelRegistryClientFactory) {
+        this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
     }
 
     @RequestMapping(value = "/{resourceId}", method = RequestMethod.GET)
@@ -43,7 +36,7 @@ public class MetricsRestController {
         Map<String, Object> monitoringValues = new HashMap<>();
         try {
             var submodelId = "PlatformResources-" + resourceId;
-            var platformResourcesSubmodelDescriptorOptional = submodelRegistryClient.findSubmodelDescriptor(submodelId);
+            var platformResourcesSubmodelDescriptorOptional = this.submodelRegistryClient.findSubmodelDescriptor(submodelId);
 
             if (platformResourcesSubmodelDescriptorOptional.isPresent()) {
                 var endpoints = platformResourcesSubmodelDescriptorOptional.get().getEndpoints();

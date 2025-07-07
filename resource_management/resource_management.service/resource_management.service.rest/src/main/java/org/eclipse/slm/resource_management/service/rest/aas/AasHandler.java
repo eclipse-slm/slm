@@ -7,6 +7,7 @@ import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistExceptio
 import org.eclipse.digitaltwin.basyx.http.Base64UrlEncodedIdentifier;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException;
 import org.eclipse.slm.common.aas.clients.*;
+import org.eclipse.slm.common.aas.clients.exceptions.ShellNotFoundException;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.model.resource.BasicResource;
@@ -49,15 +50,17 @@ public class AasHandler implements ApplicationListener<ResourceEvent> {
     private final String externalUrl;
 
 
-    public AasHandler(AasRegistryClient aasRegistryClient, AasRepositoryClient aasRepositoryClient,
-                      SubmodelRegistryClient submodelRegistryClient, SubmodelRepositoryClient submodelRepositoryClient,
+    public AasHandler(AasRegistryClientFactory aasRegistryClientFactory,
+                      AasRepositoryClientFactory aasRepositoryClientFactory,
+                      SubmodelRegistryClientFactory submodelRegistryClientFactory,
+                      SubmodelRepositoryClientFactory submodelRepositoryClientFactory,
                       ResourcesConsulClient resourcesConsulClient,
                       @Value("${monitoring.service.url}") String monitoringServiceUrl,
                       @Value("${deployment.url}") String externalUrl) {
-        this.aasRegistryClient = aasRegistryClient;
-        this.aasRepositoryClient = aasRepositoryClient;
-        this.submodelRegistryClient = submodelRegistryClient;
-        this.submodelRepositoryClient = submodelRepositoryClient;
+        this.aasRegistryClient = aasRegistryClientFactory.getClient();
+        this.aasRepositoryClient = aasRepositoryClientFactory.getClient();
+        this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
+        this.submodelRepositoryClient = submodelRepositoryClientFactory.getClient();
         this.resourcesConsulClient = resourcesConsulClient;
         this.monitoringServiceUrl = monitoringServiceUrl;
         this.externalUrl = externalUrl;
@@ -103,11 +106,13 @@ public class AasHandler implements ApplicationListener<ResourceEvent> {
         try {
             // Create AAS if it does not exist
             AssetAdministrationShell resourceAAS;
-            try {
-                resourceAAS = this.aasRepositoryClient.getAas(ResourceAas.createAasIdFromResourceId(resource.getId()));
-            } catch (ElementDoesNotExistException e) {
+            var resourceAASOptional = this.aasRepositoryClient.getAas(ResourceAas.createAasIdFromResourceId(resource.getId()));
+            if (resourceAASOptional.isEmpty()) {
                 resourceAAS = new ResourceAas(resource);
                 this.aasRepositoryClient.createOrUpdateAas(resourceAAS);
+            }
+            else {
+                resourceAAS = resourceAASOptional.get();
             }
             var resourceAASIdEncoded = new Base64UrlEncodedIdentifier(resourceAAS.getId());
 
@@ -167,9 +172,14 @@ public class AasHandler implements ApplicationListener<ResourceEvent> {
     private void deleteResourceAasAndSubmodels (UUID resourceId) {
         try {
             var resourceAasId = ResourceAas.createAasIdFromResourceId(resourceId);
-            var resourceAAS = this.aasRepositoryClient.getAas(resourceAasId);
+            var resourceAasOptional = aasRepositoryClient.getAas(resourceAasId);
+            if (resourceAasOptional.isEmpty()) {
+                LOG.error("Resource AAS with ID {} not found", resourceAasId);
+                throw new ShellNotFoundException(resourceAasId);
+            }
+            var resourceAas = resourceAasOptional.get();
 
-            for (var submodelRef : resourceAAS.getSubmodels()) {
+            for (var submodelRef : resourceAas.getSubmodels()) {
                 if (submodelRef.getKeys().get(0).getType().equals(KeyTypes.SUBMODEL)) {
                     var submodelId = submodelRef.getKeys().get(0).getValue();
 

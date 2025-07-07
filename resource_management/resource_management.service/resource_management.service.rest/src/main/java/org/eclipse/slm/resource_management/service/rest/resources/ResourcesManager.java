@@ -253,7 +253,7 @@ public class ResourcesManager {
             String resourceIp,
             String firmwareVersion,
             DigitalNameplateV3 digitalNameplateV3
-    ) throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, CapabilityNotFoundException, SSLException, JsonProcessingException {
+    ) throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException {
         /// Create realm role in Keycloak for new resource
         var resourceKeycloakRoleName = "resource_" + resourceId;
         this.keycloakUtil.createRealmRoleAndAssignToUser(jwtAuthenticationToken, resourceKeycloakRoleName);
@@ -355,5 +355,9 @@ public class ResourcesManager {
         var optionalLocation = locationJpaRepository.findById(locationId);
 
         this.resourcesConsulClient.setResourceLocation(resourceId, optionalLocation.get());
+    }
+
+    public void setConnectionParametersOfResource(UUID resourceId, String ConnectionParameters) {
+        this.resourcesVaultClient.addSecretsForResource(new VaultCredential(), resourceId, "ConnectionParameters", Map.of("ConnectionParameters", ConnectionParameters));
     }
 }

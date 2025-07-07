@@ -22,6 +22,8 @@ public class DiscoveredResource {
 
     private String firmwareVersion = "N/A";
 
+    private String connectionParameters = "";
+
     private boolean ignored = false;
 
     public DiscoveredResource() {
@@ -37,6 +39,7 @@ public class DiscoveredResource {
         this.ipAddress = builder.ipAddress;
         this.macAddress = builder.macAddress;
         this.firmwareVersion = builder.firmwareVersion;
+        this.connectionParameters = builder.connectionParameters;
         this.ignored = builder.ignored;
     }
 
@@ -112,6 +115,14 @@ public class DiscoveredResource {
         this.firmwareVersion = firmwareVersion;
     }
 
+    public String getConnectionParameters() {
+        return connectionParameters;
+    }
+
+    public void setConnectionParameters(String connectionParameters) {
+        this.connectionParameters = connectionParameters;
+    }
+
     public boolean isIgnored() {
         return ignored;
     }
@@ -131,6 +142,7 @@ public class DiscoveredResource {
         private String ipAddress = "N/A";;
         private String macAddress = "N/A";;
         private String firmwareVersion = "N/A";;
+        private String connectionParameters = "";
         private boolean ignored = false;
 
         public Builder id(String id) {
@@ -175,6 +187,11 @@ public class DiscoveredResource {
 
         public Builder firmwareVersion(String firmwareVersion) {
             this.firmwareVersion = firmwareVersion;
+            return this;
+        }
+
+        public Builder connectionParameters(String connectionParameters) {
+            this.connectionParameters = connectionParameters;
             return this;
         }
 

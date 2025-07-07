@@ -7,9 +7,11 @@ import org.eclipse.digitaltwin.basyx.core.pagination.CursorResult;
 import org.eclipse.digitaltwin.basyx.core.pagination.PaginationInfo;
 import org.eclipse.digitaltwin.basyx.core.pagination.PaginationSupport;
 import org.eclipse.slm.common.aas.clients.*;
+import org.eclipse.slm.common.aas.clients.exceptions.ShellNotFoundException;
 import org.eclipse.slm.common.aas.repositories.AbstractSubmodelRepository;
 import org.eclipse.slm.common.aas.repositories.api.GetSubmodelsValueOnlyResult;
 import org.eclipse.slm.common.aas.repositories.api.SubmodelValueOnly;
+import org.eclipse.slm.resource_management.model.resource.ResourceAas;
 import org.eclipse.slm.resource_management.service.rest.aas.resources.deviceinfo.DeviceInfoSubmodelServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,16 +33,16 @@ public class ResourcesSubmodelRepository extends AbstractSubmodelRepository {
 
     private final DeviceInfoSubmodelServiceFactory deviceInfoSubmodelServiceFactory;
 
-    public ResourcesSubmodelRepository(String aasId, AasRegistryClient aasRegistryClient,
-                                       AasRepositoryClient aasRepositoryClient,
-                                       SubmodelRegistryClient submodelRegistryClient,
-                                       SubmodelRepositoryClient submodelRepositoryClient,
+    public ResourcesSubmodelRepository(String aasId, AasRegistryClientFactory aasRegistryClientFactory,
+                                       AasRepositoryClientFactory aasRepositoryClientFactory,
+                                       SubmodelRegistryClientFactory submodelRegistryClientFactory,
+                                       SubmodelRepositoryClientFactory submodelRepositoryClientFactory,
                                        DeviceInfoSubmodelServiceFactory deviceInfoSubmodelServiceFactory) {
         super(aasId);
-        this.aasRegistryClient = aasRegistryClient;
-        this.aasRepositoryClient = aasRepositoryClient;
-        this.submodelRegistryClient = submodelRegistryClient;
-        this.submodelRepositoryClient = submodelRepositoryClient;
+        this.aasRegistryClient = aasRegistryClientFactory.getClient();
+        this.aasRepositoryClient = aasRepositoryClientFactory.getClient();
+        this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
+        this.submodelRepositoryClient = submodelRepositoryClientFactory.getClient();
         this.deviceInfoSubmodelServiceFactory = deviceInfoSubmodelServiceFactory;
         this.addSubmodelServiceFactory("DeviceInfo", deviceInfoSubmodelServiceFactory);
     }
@@ -52,9 +54,14 @@ public class ResourcesSubmodelRepository extends AbstractSubmodelRepository {
         List<String> localSubmodelIds = localSubmodels.stream().map(Submodel::getId).toList();
 
         var remoteSubmodels = new ArrayList<Submodel>();
-        var aas = this.aasRepositoryClient.getAas(this.aasId);
+        var resourceAasOptional = aasRepositoryClient.getAas(this.aasId);
+        if (resourceAasOptional.isEmpty()) {
+            LOG.error("Resource AAS with ID {} not found", this.aasId);
+            throw new ShellNotFoundException(this.aasId);
+        }
+        var resourceAas = resourceAasOptional.get();
 
-        for (var submodelRef : aas.getSubmodels()) {
+        for (var submodelRef : resourceAas.getSubmodels()) {
             var submodelId = submodelRef.getKeys().get(0).getValue();
 
             try {
@@ -87,9 +94,14 @@ public class ResourcesSubmodelRepository extends AbstractSubmodelRepository {
         List<String> localSubmodelIds = localSubmodels.stream().map(Submodel::getId).toList();
 
         var submodelsValueOnlyLocalRemote = new GetSubmodelsValueOnlyResult();
-        var aas = this.aasRepositoryClient.getAas(this.aasId);
+        var resourceAasOptional = aasRepositoryClient.getAas(this.aasId);
+        if (resourceAasOptional.isEmpty()) {
+            LOG.error("Resource AAS with ID {} not found", this.aasId);
+            throw new ShellNotFoundException(this.aasId);
+        }
+        var resourceAas = resourceAasOptional.get();
 
-        for (var submodelRef : aas.getSubmodels()) {
+        for (var submodelRef : resourceAas.getSubmodels()) {
             var submodelId = submodelRef.getKeys().get(0).getValue();
 
             try {

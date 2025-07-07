@@ -6,9 +6,9 @@ application:
 
 ### Deployment
 deployment:
-  hostname: localhost
-  scheme: "http"
-  port: ${server.port}
+  scheme: "https"
+  hostname: "localhost"
+  port: 443
   path: "/notification-service"
   url: ${deployment.scheme}://${deployment.hostname}:${deployment.port}${deployment.path}
 

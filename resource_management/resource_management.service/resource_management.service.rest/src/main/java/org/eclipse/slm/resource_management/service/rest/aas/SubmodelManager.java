@@ -4,8 +4,8 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.aasx.AASXDeserializer;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor;
-import org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException;
 import org.eclipse.slm.common.aas.clients.*;
+import org.eclipse.slm.common.aas.clients.exceptions.ShellNotFoundException;
 import org.eclipse.slm.resource_management.model.resource.BasicResource;
 import org.eclipse.slm.resource_management.model.resource.ResourceAas;
 import org.slf4j.Logger;
@@ -33,11 +33,15 @@ public class SubmodelManager {
 
     private final ConceptDescriptionRepositoryClient conceptDescriptionRepositoryClient;
 
-    SubmodelManager(AasRegistryClient aasRegistryClient, AasRepositoryClient aasRepositoryClient, SubmodelRegistryClient submodelRegistryClient, SubmodelRepositoryClient submodelRepositoryClient, ConceptDescriptionRepositoryClient conceptDescriptionRepositoryClient) {
-        this.aasRegistryClient = aasRegistryClient;
-        this.aasRepositoryClient = aasRepositoryClient;
-        this.submodelRegistryClient = submodelRegistryClient;
-        this.submodelRepositoryClient = submodelRepositoryClient;
+    SubmodelManager(AasRegistryClientFactory aasRegistryClientFactory,
+                    AasRepositoryClientFactory aasRepositoryClientFactory,
+                    SubmodelRegistryClientFactory submodelRegistryClientFactory,
+                    SubmodelRepositoryClientFactory submodelRepositoryClientFactory,
+                    ConceptDescriptionRepositoryClient conceptDescriptionRepositoryClient) {
+        this.aasRegistryClient = aasRegistryClientFactory.getClient();
+        this.aasRepositoryClient = aasRepositoryClientFactory.getClient();
+        this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
+        this.submodelRepositoryClient = submodelRepositoryClientFactory.getClient();
         this.conceptDescriptionRepositoryClient = conceptDescriptionRepositoryClient;
     }
 
@@ -45,7 +49,12 @@ public class SubmodelManager {
         var submodelDescriptors = new ArrayList<SubmodelDescriptor>();
 
         var aasId = ResourceAas.createAasIdFromResourceId(resource.getId());
-        var aas = this.aasRepositoryClient.getAas(aasId);
+        var aasOptional = aasRepositoryClient.getAas(aasId);
+        if (aasOptional.isEmpty()) {
+            LOG.error("AAS with ID {} not found", aasId);
+            throw new ShellNotFoundException(aasId);
+        }
+        var aas = aasOptional.get();
         var submodelRefs = aas.getSubmodels();
         for (var submodelRef : submodelRefs) {
             var submodelId = submodelRef.getKeys().get(0).getValue();

@@ -4,11 +4,14 @@
     that:
       - (ENV.CONSUL.SCHEME.INTERNAL is defined) and (ENV.CONSUL.SCHEME.INTERNAL|length > 0)       # Scheme of the Consul instance
       - (ENV.CONSUL.HOST.INTERNAL is defined) and (ENV.CONSUL.HOST.INTERNAL|length > 0)           # Host of the Consul instance
-      - (ENV.CONSUL.PORT.INTERNAL is defined)                                        # Port of the Consul instance
-      - (_consul_token is defined) and (_consul_token|length > 0)       # Token to authenticate with Consul
-      - (_service_name is defined) and (_service_name|length > 0)       # Name of the service
-      - (_service_port is defined)                                      # Port of the service
-      - (_service_address is defined) and (_service_address|length > 0) # Address of the service
+      - (ENV.CONSUL.PORT.INTERNAL is defined)                                                     # Port of the Consul instance
+      - (_consul_token is defined) and (_consul_token|length > 0)                                 # Token to authenticate with Consul
+      - (_service_name is defined) and (_service_name|length > 0)                                 # Name of the service
+      - (_service_port is defined)                                                                # Port of the service
+      - (_service_address is defined) and (_service_address|length > 0)                           # Address of the service
+      ### Optional
+      # _additional_tags                                                                          # Additional tags of the service in addition to the default ones
+      # _meta                                                                                      # Meta data of the service
 
 - set_fact:
     tags:
@@ -19,42 +22,42 @@
     tags: "{{ tags + _additional_tags }}"
   when: (_additional_tags is defined) and (_additional_tags|length > 0)
 
-- name: "Register service '{{ _service_name }}' at Consul (discovery server)"
-  community.general.consul:
-    scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
-    host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
-    port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
-    token: "{{ _consul_token }}"
-    service_name: "{{ _service_name }}"
-    service_port: "{{ _service_port }}"
-    service_address: "{{ _service_address }}"
-    tags: "{{ tags }}"
-    interval: 60s
+- set_fact:
+    _meta:
+  when: (_meta is not defined)
 
-- name: "Register service '{{ _service_name }}' at Consul (discovery server) with HTTP health check"
-  community.general.consul:
+- name: "Register service '{{ _service_name }}' at Consul (discovery server)"
+  community.general.consul_agent_service:
     scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
     host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
     port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
     token: "{{ _consul_token }}"
-    service_name: "{{ _service_name }}"
+    name: "{{ _service_name }}"
     service_port: "{{ _service_port }}"
-    service_address: "{{ _service_address }}"
+    address: "{{ _service_address }}"
     tags: "{{ tags }}"
+    meta: "{{ _meta }}"
+
+- name: "Register HTTP health check for service '{{ _service_name }}' at Consul (discovery server)"
+  community.general.consul_agent_check:
+    scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+    host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+    port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
+    token: "{{ _consul_token }}"
+    name: "http_{{ _service_name }}"
+    service_id: "{{ _service_name }}"
     interval: 60s
     http: "{{ _http }}"
   when: (_http is defined) and (_http|length > 0)
 
-- name: "Register service '{{ _service_name }}' at Consul (discovery server) with TCP health check"
-  community.general.consul:
+- name: "Register TCP health check for service '{{ _service_name }}' at Consul (discovery server)"
+  community.general.consul_agent_check:
     scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
     host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
     port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
     token: "{{ _consul_token }}"
-    service_name: "{{ _service_name }}"
-    service_port: "{{ _service_port }}"
-    service_address: "{{ _service_address }}"
-    tags: "{{ tags }}"
+    name: "tcp_{{ _service_name }}"
+    service_id: "{{ _service_name }}"
     interval: 60s
     tcp: "{{ _tcp }}"
   when: (_tcp is defined) and (_tcp|length > 0)

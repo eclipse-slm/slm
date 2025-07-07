@@ -6,9 +6,9 @@ application:
 
 ### Deployment
 deployment:
-  scheme: "http"
+  scheme: "https"
   hostname: "localhost"
-  port: ${server.port}
+  port: 443
   path: "/service-management"
   url: ${deployment.scheme}://${deployment.hostname}:${deployment.port}${deployment.path}
 

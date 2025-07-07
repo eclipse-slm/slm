@@ -51,7 +51,14 @@ public abstract class AbstractSubmodelRepository implements SubmodelRepository {
             submodels.add(submodel);
         }
 
-        TreeMap<String, Submodel> submodelMap = submodels.stream().collect(Collectors.toMap(Submodel::getId, submodel -> submodel, (a, b) -> a, TreeMap::new));
+        TreeMap<String, Submodel> submodelMap = submodels.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(
+                        Submodel::getId,
+                        submodel -> submodel,
+                        (a, b) -> a,
+                        TreeMap::new
+                ));
         PaginationSupport<Submodel> paginationSupport = new PaginationSupport<>(submodelMap, Submodel::getId);
 
         return paginationSupport.getPaged(pInfo);
@@ -62,11 +69,13 @@ public abstract class AbstractSubmodelRepository implements SubmodelRepository {
         var submodelsValueOnly = new GetSubmodelsValueOnlyResult();
         for (var submodelFactory : submodelServiceFactories.values()) {
             var submodel = submodelFactory.getSubmodelService(this.aasId).getSubmodel();
-            if (submodel.getId() != null) {
-                var submodelValueOnly = this.getSubmodelByIdValueOnly(submodel.getId());
-                submodelValueOnly.setIdShort(submodel.getIdShort());
+            if (submodel != null) {
+                if (submodel.getId() != null) {
+                    var submodelValueOnly = this.getSubmodelByIdValueOnly(submodel.getId());
+                    submodelValueOnly.setIdShort(submodel.getIdShort());
 
-                submodelsValueOnly.put(submodel.getIdShort(), submodelValueOnly);
+                    submodelsValueOnly.put(submodel.getIdShort(), submodelValueOnly);
+                }
             }
         }
 

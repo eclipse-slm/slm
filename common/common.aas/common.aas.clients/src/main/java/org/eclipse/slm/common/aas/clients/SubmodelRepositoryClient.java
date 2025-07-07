@@ -3,12 +3,9 @@ package org.eclipse.slm.common.aas.clients;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonDeserializer;
-import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonMapperFactory;
-import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.SimpleAbstractTypeResolverFactory;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
-import org.eclipse.digitaltwin.basyx.client.internal.ApiClient;
 import org.eclipse.digitaltwin.basyx.core.exceptions.CollidingIdentifierException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.submodelrepository.client.ConnectedSubmodelRepository;
@@ -17,60 +14,30 @@ import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelValueOnly;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.exception.ValueMapperNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.http.HttpClient;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.regex.Pattern;
 
-@Component
 public class SubmodelRepositoryClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(SubmodelRepositoryClient.class);
 
-    private String submodelRepositoryUrl;
-
-    private final DiscoveryClient discoveryClient;
-
-    private final String submodelRepositoryDiscoveryInstanceId = "submodel-repository";
+    private final String submodelRepositoryUrl;
 
     private final ConnectedSubmodelRepository connectedSubmodelRepository;
 
-    @Autowired
-    public SubmodelRepositoryClient(@Value("${aas.submodel-repository.url}") String submodelRepositoryUrl,
-                                    DiscoveryClient discoveryClient) {
-        this.submodelRepositoryUrl = submodelRepositoryUrl;
-        this.connectedSubmodelRepository = this.getConnectedSubmodelRepository(submodelRepositoryUrl, null);
-        this.discoveryClient = discoveryClient;
-
-        var submodelRepositoryServiceInstance = this.discoveryClient.getInstances(submodelRepositoryDiscoveryInstanceId).get(0);
-        if (submodelRepositoryServiceInstance != null) {
-            this.submodelRepositoryUrl = "http://" + submodelRepositoryServiceInstance.getHost()
-                    + ":" + submodelRepositoryServiceInstance.getPort();
-        } else {
-            LOG.warn("No service instance '" + submodelRepositoryDiscoveryInstanceId + "' found via discovery client. Using default URL from application.yml.");
-        }
+    public SubmodelRepositoryClient(String submodelRepositoryUrl) {
+        this(submodelRepositoryUrl, null);
     }
 
     public SubmodelRepositoryClient(String submodelRepositoryUrl, JwtAuthenticationToken jwtAuthenticationToken) {
         this.submodelRepositoryUrl = submodelRepositoryUrl;
-        this.connectedSubmodelRepository = this.getConnectedSubmodelRepository(submodelRepositoryUrl, jwtAuthenticationToken);
-        this.discoveryClient = null;
+        var apiClient = ClientUtils.getApiClient(submodelRepositoryUrl, jwtAuthenticationToken);
+        var submodelRepositoryApi = new SubmodelRepositoryApi(apiClient);
+
+        this.connectedSubmodelRepository = new ConnectedSubmodelRepository(submodelRepositoryUrl, submodelRepositoryApi);
     }
 
     public static SubmodelRepositoryClient FromSubmodelDescriptor(SubmodelDescriptor submodelDescriptor, JwtAuthenticationToken jwtAuthenticationToken) {
@@ -91,21 +58,10 @@ public class SubmodelRepositoryClient {
         throw new IllegalArgumentException("Submodel endpoint '" + submodelEndpoint + "' not valid for submodel repository");
     }
 
-    private ConnectedSubmodelRepository getConnectedSubmodelRepository(String submodelRepositoryUrl,
-                                                                       JwtAuthenticationToken jwtAuthenticationToken) {
-
-            var apiClient = ClientUtils.getApiClient(submodelRepositoryUrl, jwtAuthenticationToken);
-            var submodelRepositoryApi = new SubmodelRepositoryApi(apiClient);
-
-            var newConnectedSubmodelRepository = new ConnectedSubmodelRepository(submodelRepositoryUrl, submodelRepositoryApi);
-
-            return newConnectedSubmodelRepository;
-    }
-
     public List<Submodel> getAllSubmodels() throws DeserializationException {
         WebClient webClient = WebClient.create();
         var responseBody = webClient.get()
-                .uri(submodelRepositoryUrl + "/submodels")
+                .uri(this.submodelRepositoryUrl + "/submodels")
                 .retrieve()
                 .bodyToMono(JsonNode.class)
                 .block();

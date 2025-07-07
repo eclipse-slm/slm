@@ -161,6 +161,17 @@ public class ResourcesRestController {
         return ResponseEntity.ok().build();
     }
 
+    @RequestMapping(value = "/{resourceId}/connection-parameters", method = RequestMethod.PUT)
+    @Operation(summary = "Set connection parameters of resource with id")
+    public @ResponseBody ResponseEntity setConnectionParametersOfResource(
+            @PathVariable(name = "resourceId")  UUID resourceId,
+            @RequestParam(name = "connectionParameters", required = false)  String connectionParameters) {
+
+        this.resourcesManager.setConnectionParametersOfResource(resourceId, connectionParameters);
+
+        return ResponseEntity.ok().build();
+    }
+
     @RequestMapping(value = "/connection-types", method = RequestMethod.GET)
     @Operation(summary="Get available remote connection types")
     public List<ConnectionTypeDTO> getResourceConnectionTypes() {

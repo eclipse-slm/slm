@@ -26,7 +26,13 @@ public class DeviceInfoSubmodelService extends AbstractSubmodelService {
     @Override
     public Submodel getSubmodel() {
 
-        var resourceId = UUID.fromString(aasId.split(ResourceAas.AAS_ID_PREFIX)[1]);
+        var aasIdSplitted = aasId.split(ResourceAas.AAS_ID_PREFIX);
+        if (aasIdSplitted.length != 2) {
+            LOG.error("Invalid AAS ID format: '{}'", aasId);
+            return null;
+        }
+        var resourceIdstring = aasIdSplitted[1];
+        var resourceId = UUID.fromString(resourceIdstring);
 
         var resource = resourcesManager.getResourceWithoutCredentials(resourceId);
 

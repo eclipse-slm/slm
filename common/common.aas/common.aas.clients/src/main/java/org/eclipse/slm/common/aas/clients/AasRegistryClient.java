@@ -13,8 +13,6 @@ import org.eclipse.digitaltwin.basyx.aasregistry.client.api.RegistryAndDiscovery
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.model.SubmodelDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.net.http.HttpClient;
 import java.util.ArrayList;
@@ -22,26 +20,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Component
 public class AasRegistryClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(AasRegistryClient.class);
 
-    private final String aasRegistryUrl;
-
-    private final String aasRepositoryUrl;
-
     private RegistryAndDiscoveryInterfaceApi aasRegistryApi;
 
-    private final ObjectMapper objectMapper;
+    public AasRegistryClient(String aasRegistryUrl) {
+        var objectMapper = new ObjectMapper();
+        var aasRegistryApiClient = new ApiClient(HttpClient.newBuilder(), objectMapper, aasRegistryUrl);
+        this.aasRegistryApi = new RegistryAndDiscoveryInterfaceApi(aasRegistryApiClient);
+    }
 
-    public AasRegistryClient(@Value("${aas.aas-registry.url}") String aasRegistryUrl,
-                             @Value("${aas.aas-repository.url}") String aasRepositoryUrl, ObjectMapper objectMapper) {
-        this.aasRegistryUrl = aasRegistryUrl;
-        this.aasRepositoryUrl = aasRepositoryUrl;
-        this.objectMapper = objectMapper;
-        var aasRegistryClient = new ApiClient(HttpClient.newBuilder(), objectMapper, this.aasRegistryUrl);
-        this.aasRegistryApi = new RegistryAndDiscoveryInterfaceApi(aasRegistryClient);
+    public AasRegistryClient(RegistryAndDiscoveryInterfaceApi aasRegistryApi) {
+        this.aasRegistryApi = aasRegistryApi;
     }
 
     public List<AssetAdministrationShellDescriptor> getAllShellDescriptors() {

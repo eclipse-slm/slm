@@ -6,32 +6,68 @@ class DeviceUtils {
         const resourceDevicesStore = useResourceDevicesStore();
 
         let productValue = "N/A";
-        let productValueChecked = "";
-        let manufacturerProductDesignation = resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId,
-            'Nameplate', '$.ManufacturerProductDesignation..en');
-        if (manufacturerProductDesignation !== 'N/A' && manufacturerProductDesignation.length < 40) {
-            productValue = manufacturerProductDesignation;
-        } else if ((productValueChecked = resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId,
-            'Nameplate', '$.ManufacturerProductType..en')) !== 'N/A') {
-            productValue = productValueChecked;
-        } else if ((productValue = resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId,
-            'Nameplate', '$.ManufacturerProductType')) !== 'N/A') {
-            productValue = productValueChecked;
-        } else if ((productValue = resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId,
-            'Nameplate', '$.OrderCodeOfManufacturer')) !== 'N/A') {
-            productValue = productValueChecked;
+        const paths = [
+            '$.ManufacturerProductDesignation..de',
+            '$.ManufacturerProductDesignation..["de-DE"]',
+            '$.ManufacturerProductDesignation..en',
+            '$.ManufacturerProductDesignation..["en-EN"]',
+            '$.ManufacturerProductDesignation..["en-US"]',
+            '$.ManufacturerProductDesignation..["en-GB"]',
+        ];
+        for (const path of paths) {
+            const value = resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, "Nameplate", path);
+            if (value !== 'N/A') {
+                productValue = value;
+            }
         }
 
-        return productValue;
+        if (productValue !== 'N/A' && productValue.length < 40) {
+            return productValue;
+        } else {
+            const paths = [
+                '$.ManufacturerProductType..de',
+                '$.ManufacturerProductType..["de-DE"]',
+                '$.ManufacturerProductType..en',
+                '$.ManufacturerProductType..["en-EN"]',
+                '$.ManufacturerProductType..["en-US"]',
+                '$.ManufacturerProductType..["en-GB"]',
+            ];
+            for (const path of paths) {
+                const value = resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, "Nameplate", path);
+                if (value !== 'N/A') {
+                    productValue = value;
+                }
+
+                if (productValue !== 'N/A') {
+                    return productValue;
+                } else {
+                    productValue = resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId,
+                        'Nameplate', '$.OrderCodeOfManufacturer');
+                    return productValue;
+                }
+            }
+        }
     }
 
     static getVendor(resourceId) {
         const resourceDevicesStore = useResourceDevicesStore();
-        if (resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, 'Nameplate', '$.ManufacturerName..en') == 'N/A') {
-            return resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, "Nameplate", "$.ManufacturerName..de");
-        } else {
-            return resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, "Nameplate", "$.ManufacturerName..en");
+
+        const paths = [
+            '$.ManufacturerName..de',
+            '$.ManufacturerName..["de-DE"]',
+            '$.ManufacturerName..en',
+            '$.ManufacturerName..["en-EN"]',
+            '$.ManufacturerName..["en-US"]',
+            '$.ManufacturerName..["en-GB"]',
+        ];
+
+        for (const path of paths) {
+            const value = resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, "Nameplate", path);
+            if (value !== 'N/A') {
+                return value;
+            }
         }
+        return 'N/A';
     }
 }
 

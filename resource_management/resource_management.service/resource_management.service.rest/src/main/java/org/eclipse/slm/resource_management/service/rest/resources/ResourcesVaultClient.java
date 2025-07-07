@@ -100,9 +100,10 @@ public class ResourcesVaultClient {
         );
     }
 
-    public void addSecretsForResource(VaultCredential vaultCredential,String resourceId, Map<String, String> secretsOfResource) {
+    public void addSecretsForResource(VaultCredential vaultCredential, UUID resourceId, String path, Map<String, String> secretsOfResource) {
         // Add secrets for resource
-        KvPath resourceVaultPath = new KvPath("resources", resourceId);
+        var kvPathSegment = resourceId + "/" + path;
+        KvPath resourceVaultPath = new KvPath("resources", kvPathSegment);
         this.vaultClient.addSecretToKvEngine(
                 vaultCredential,
                 resourceVaultPath.getSecretEngine(),
@@ -200,8 +201,10 @@ public class ResourcesVaultClient {
         var secretsEngine = "resources";
         var resourceId = resource.getId().toString();
 
-        this.vaultClient.removeSecretFromKvEngine(vaultCredential, secretsEngine, resourceId);
-
+        List<String> secrets = vaultClient.listSecrets(vaultCredential, secretsEngine, resourceId);
+        for (var secret : secrets) {
+            vaultClient.removeSecretFromKvEngine(vaultCredential, "resources", resourceId + "/" + secret);
+        }
         this.vaultClient.removePolicy(vaultCredential, "policy_resource_" + resourceId);
 
         var resourceSecretsReadGroupName = "group_resource_" + resourceId;

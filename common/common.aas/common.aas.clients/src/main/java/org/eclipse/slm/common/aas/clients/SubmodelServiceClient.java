@@ -25,9 +25,12 @@ public class SubmodelServiceClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(SubmodelServiceClient.class);
 
+    private final String submodelServiceUrl;
+
     private final ConnectedSubmodelService submodelService;
 
     public SubmodelServiceClient(String submodelServiceUrl, JwtAuthenticationToken jwtAuthenticationToken) {
+        this. submodelServiceUrl = submodelServiceUrl;
         var apiClient = ClientUtils.getApiClient(submodelServiceUrl, jwtAuthenticationToken);
         var submodelServiceApi = new SubmodelServiceApi(apiClient);
 
@@ -58,15 +61,21 @@ public class SubmodelServiceClient {
 
             return Optional.of(submodel);
         } catch (Exception e) {
-            LOG.debug("Submodel not found or failed to get submodel", e);
+            LOG.debug("Submodel of Submodel Service '" + this.submodelServiceUrl + "' not found or failed to get submodel", e);
             return Optional.empty();
         }
     }
 
     public List<SubmodelElement> getSubmodelElements() {
-        var submodelElements = this.getSubmodel().get().getSubmodelElements();
-
-        return submodelElements;
+        var submodelOptional = this.getSubmodel();
+        if (submodelOptional.isPresent()) {
+            var submodelElements = submodelOptional.get().getSubmodelElements();
+            return submodelElements;
+        }
+        else {
+            LOG.debug("Submodel of Submodel Service '" + this.submodelServiceUrl + "' not found, cannot get submodel elements");
+            return List.of();
+        }
     }
 
     public Map<String, Object> getSubmodelValues() {

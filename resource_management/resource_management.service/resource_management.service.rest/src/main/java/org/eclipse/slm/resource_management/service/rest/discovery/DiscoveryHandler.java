@@ -163,13 +163,14 @@ public class DiscoveryHandler implements DiscoveryJobListener {
 
     public void onboard(JwtAuthenticationToken jwtAuthenticationToken, String resultId)
             throws CapabilityNotFoundException, ConsulLoginFailedException, ResourceNotFoundException, SSLException, JsonProcessingException, IllegalAccessException {
-        String discoveryJobId = resultId.split(":")[0];
-        String resourceId = resultId.split(":")[1];
+        var discoveryJobId = resultId.split(":")[0];
+        var resourceIdString = resultId.split(":")[1];
+        var resourceId = UUID.fromString(resourceIdString);
 
         var discoveryJobOptional = this.discoveryJobRepository.findById(UUID.fromString(discoveryJobId));
         if (discoveryJobOptional.isPresent()) {
             var discoveryJob = discoveryJobOptional.get();
-            var discoveredResourceOptional = discoveryJob.getDiscoveryResult().stream().filter(discoveredResource -> discoveredResource.getResourceId().equals(UUID.fromString(resourceId))).findFirst();
+            var discoveredResourceOptional = discoveryJob.getDiscoveryResult().stream().filter(discoveredResource -> discoveredResource.getResourceId().equals(resourceId)).findFirst();
             if (discoveredResourceOptional.isPresent()) {
                 var discoveredResource = discoveredResourceOptional.get();
 
@@ -188,6 +189,8 @@ public class DiscoveryHandler implements DiscoveryJobListener {
                         discoveredResource.getIpAddress(),
                         discoveredResource.getFirmwareVersion(),
                         digitalNameplateV3.build());
+
+                resourcesManager.setConnectionParametersOfResource(resourceId, discoveredResource.getConnectionParameters());
             }
         }
     }

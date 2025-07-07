@@ -27,21 +27,17 @@ public class ServiceOfferingVersionRequirementsHandler {
 
     private final SubmodelRegistryClient submodelRegistryClient;
 
-    private final SubmodelRepositoryClient submodelRepositoryClient;
-
-    public ServiceOfferingVersionRequirementsHandler(AasRegistryClient aasRegistryClient,
-                                              AasRepositoryClient aasRepositoryClient,
-                                              SubmodelRegistryClient submodelRegistryClient,
-                                              SubmodelRepositoryClient submodelRepositoryClient) {
-        this.aasRepositoryClient = aasRepositoryClient;
-        this.submodelRegistryClient = submodelRegistryClient;
-        this.submodelRepositoryClient = submodelRepositoryClient;
+    public ServiceOfferingVersionRequirementsHandler(AasRepositoryClientFactory aasRepositoryClientFactory,
+                                                     SubmodelRegistryClientFactory submodelRegistryClientFactory) {
+        this.aasRepositoryClient = aasRepositoryClientFactory.getClient();
+        this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
     }
 
     public boolean isRequirementFulfilledByResource(ServiceRequirement serviceRequirement,
                                                     UUID resourceId,
                                                     JwtAuthenticationToken jwtAuthenticationToken) {
-        var resourceAas = this.aasRepositoryClient.getAas(ResourceAas.createAasIdFromResourceId(resourceId));
+        var resourceAasOptional = this.aasRepositoryClient.getAas(ResourceAas.createAasIdFromResourceId(resourceId));
+        var resourceAas = resourceAasOptional.get();
 
         var resourceSubmodels = new ArrayList<Submodel>();
         for (var submodelRef: resourceAas.getSubmodels()) {

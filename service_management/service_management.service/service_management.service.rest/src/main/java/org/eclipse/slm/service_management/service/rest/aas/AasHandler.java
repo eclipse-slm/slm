@@ -3,10 +3,7 @@ package org.eclipse.slm.service_management.service.rest.aas;
 import org.eclipse.digitaltwin.aas4j.v3.model.KeyTypes;
 import org.eclipse.digitaltwin.basyx.http.Base64UrlEncodedIdentifier;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException;
-import org.eclipse.slm.common.aas.clients.AasRegistryClient;
-import org.eclipse.slm.common.aas.clients.AasRepositoryClient;
-import org.eclipse.slm.common.aas.clients.SubmodelRegistryClient;
-import org.eclipse.slm.common.aas.clients.SubmodelRepositoryClient;
+import org.eclipse.slm.common.aas.clients.*;
 import org.eclipse.slm.service_management.model.offerings.ServiceOfferingVersion;
 import org.eclipse.slm.service_management.persistence.api.ServiceOfferingVersionJpaRepository;
 import org.eclipse.slm.service_management.service.rest.aas.serviceofferingversions.ServiceOfferingVersionAas;
@@ -41,14 +38,16 @@ public class AasHandler implements ApplicationListener<ServiceOfferingVersionEve
 
     private final String externalUrl;
 
-    public AasHandler(AasRegistryClient aasRegistryClient, AasRepositoryClient aasRepositoryClient,
-                      SubmodelRegistryClient submodelRegistryClient, SubmodelRepositoryClient submodelRepositoryClient,
+    public AasHandler(AasRegistryClientFactory aasRegistryClientFactory,
+                      AasRepositoryClientFactory aasRepositoryClientFactory,
+                      SubmodelRegistryClientFactory submodelRegistryClientFactory,
+                      SubmodelRepositoryClientFactory submodelRepositoryClientFactory,
                       ServiceOfferingVersionJpaRepository serviceOfferingVersionRepository,
                       @Value("${deployment.url}") String externalUrl) {
-        this.aasRegistryClient = aasRegistryClient;
-        this.aasRepositoryClient = aasRepositoryClient;
-        this.submodelRegistryClient = submodelRegistryClient;
-        this.submodelRepositoryClient = submodelRepositoryClient;
+        this.aasRegistryClient = aasRegistryClientFactory.getClient();
+        this.aasRepositoryClient = aasRepositoryClientFactory.getClient();
+        this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
+        this.submodelRepositoryClient = submodelRepositoryClientFactory.getClient();
         this.serviceOfferingVersionRepository = serviceOfferingVersionRepository;
         this.externalUrl = externalUrl;
     }
@@ -111,7 +110,8 @@ public class AasHandler implements ApplicationListener<ServiceOfferingVersionEve
     private void deleteServiceOfferingVersionAasAndSubmodels(UUID serviceOfferingVersion) {
         try {
             var serviceOfferingVersionAasId = ServiceOfferingVersionAas.createAasIdFromServiceOfferingVersionId(serviceOfferingVersion);
-            var serviceOfferingVersionAas = this.aasRepositoryClient.getAas(serviceOfferingVersionAasId);
+            var serviceOfferingVersionAasOptional = this.aasRepositoryClient.getAas(serviceOfferingVersionAasId);
+            var serviceOfferingVersionAas = serviceOfferingVersionAasOptional.get();
 
             for (var submodelRef : serviceOfferingVersionAas.getSubmodels()) {
                 if (submodelRef.getKeys().get(0).getType().equals(KeyTypes.SUBMODEL)) {

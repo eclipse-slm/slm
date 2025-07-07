@@ -4,9 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.eclipse.digitaltwin.aas4j.v3.model.Property;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection;
-import org.eclipse.slm.common.aas.clients.AasRepositoryClient;
-import org.eclipse.slm.common.aas.clients.SubmodelRegistryClient;
-import org.eclipse.slm.common.aas.clients.SubmodelRepositoryClient;
+import org.eclipse.slm.common.aas.clients.*;
+import org.eclipse.slm.common.aas.clients.exceptions.ShellNotFoundException;
 import org.eclipse.slm.resource_management.model.resource.ResourceAas;
 import org.eclipse.slm.resource_management.service.rest.resources.ResourcesManager;
 import org.slf4j.Logger;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -35,11 +33,11 @@ public class UpdatesRestController {
 
     private final ResourcesManager resourcesManager;
 
-    public UpdatesRestController(AasRepositoryClient aasRepositoryClient,
-                                 SubmodelRegistryClient submodelRegistryClient,
-                                 ResourcesManager resourcesManager, SubmodelRepositoryClient submodelRepositoryClient) {
-        this.aasRepositoryClient = aasRepositoryClient;
-        this.submodelRegistryClient = submodelRegistryClient;
+    public UpdatesRestController(AasRepositoryClientFactory aasRepositoryClientFactory,
+                                 SubmodelRegistryClientFactory submodelRegistryClientFactory,
+                                 ResourcesManager resourcesManager) {
+        this.aasRepositoryClient = aasRepositoryClientFactory.getClient();
+        this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
         this.resourcesManager = resourcesManager;
     }
 
@@ -50,7 +48,14 @@ public class UpdatesRestController {
     ) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-        var resourceAas = aasRepositoryClient.getAas(ResourceAas.createAasIdFromResourceId(resourceId));
+        var resourceAasId = ResourceAas.createAasIdFromResourceId(resourceId);
+        var resourceAasOptional = aasRepositoryClient.getAas(resourceAasId);
+        if (resourceAasOptional.isEmpty()) {
+            LOG.error("Resource AAS with ID {} not found", resourceAasId);
+            throw new ShellNotFoundException(resourceAasId);
+        }
+        var resourceAas = resourceAasOptional.get();
+
         var softwareNameplateSubmodels = new ArrayList<Submodel>();
         for (var submodelRef : resourceAas.getSubmodels()) {
             var submodelId = submodelRef.getKeys().get(0).getValue();

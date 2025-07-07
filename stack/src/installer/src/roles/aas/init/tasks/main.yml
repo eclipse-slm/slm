@@ -25,6 +25,7 @@
     _service_address: "{{ item.service_address }}"
     _http: "{{ item.http_check_url }}"
     _additional_tags: "{{ item.additional_tags }}"
+    _meta: "{{ item.meta | default({}) }}"
   loop:
     - name: aas-discovery
       service_address: "{{ ENV.AAS.AAS_DISCOVERY.HOST.INTERNAL }}"
@@ -34,6 +35,8 @@
         - "aas"
         - "exposed"
         - "traefik.http.routers.aas-discovery.rule=PathPrefix(`{{ ENV.AAS.AAS_DISCOVERY.PATH.EXTERNAL }}`)"
+      meta:
+        path: "{{ ENV.AAS.AAS_DISCOVERY.PATH.INTERNAL }}"
     - name: aas-registry
       service_address: "{{ ENV.AAS.AAS_REGISTRY.HOST.INTERNAL }}"
       port: "{{ ENV.AAS.AAS_REGISTRY.PORT.INTERNAL }}"
@@ -42,6 +45,8 @@
         - "aas"
         - "exposed"
         - "traefik.http.routers.aas-registry.rule=PathPrefix(`{{ ENV.AAS.AAS_REGISTRY.PATH.EXTERNAL }}`)"
+      meta:
+        path: "{{ ENV.AAS.AAS_REGISTRY.PATH.INTERNAL }}"
     - name: aas-repository
       service_address: "{{ ENV.AAS.AAS_REPOSITORY.HOST.INTERNAL }}"
       port: "{{ ENV.AAS.AAS_REPOSITORY.PORT.INTERNAL }}"
@@ -50,6 +55,8 @@
         - "aas"
         - "exposed"
         - "traefik.http.routers.aas-repository.rule=PathPrefix(`{{ ENV.AAS.AAS_REPOSITORY.PATH.EXTERNAL }}`)"
+      meta:
+        path: "{{ ENV.AAS.AAS_REPOSITORY.PATH.INTERNAL }}"
     - name: submodel-registry
       service_address: "{{ ENV.AAS.SUBMODEL_REGISTRY.HOST.INTERNAL }}"
       port: "{{ ENV.AAS.SUBMODEL_REGISTRY.PORT.INTERNAL }}"
@@ -58,6 +65,8 @@
         - "aas"
         - "exposed"
         - "traefik.http.routers.submodel-registry.rule=PathPrefix(`{{ ENV.AAS.SUBMODEL_REGISTRY.PATH.EXTERNAL }}`)"
+      meta:
+        path: "{{ ENV.AAS.SUBMODEL_REGISTRY.PATH.INTERNAL }}"
     - name: submodel-repository
       service_address: "{{ ENV.AAS.SUBMODEL_REPOSITORY.HOST.INTERNAL }}"
       port: "{{ ENV.AAS.SUBMODEL_REPOSITORY.PORT.INTERNAL }}"
@@ -66,6 +75,8 @@
         - "aas"
         - "exposed"
         - "traefik.http.routers.submodel-repository.rule=PathPrefix(`{{ ENV.AAS.SUBMODEL_REPOSITORY.PATH.EXTERNAL }}`)"
+      meta:
+        path: "{{ ENV.AAS.SUBMODEL_REPOSITORY.PATH.INTERNAL }}"
     - name: concept-description-repository
       service_address: "{{ ENV.AAS.CONCEPTDESCRIPTION_REPOSITORY.HOST.INTERNAL }}"
       port: "{{ ENV.AAS.CONCEPTDESCRIPTION_REPOSITORY.PORT.INTERNAL }}"
@@ -74,6 +85,8 @@
         - "aas"
         - "exposed"
         - "traefik.http.routers.concept-description-repository.rule=PathPrefix(`{{ ENV.AAS.CONCEPTDESCRIPTION_REPOSITORY.PATH.EXTERNAL }}`)"
+      meta:
+        path: "{{ ENV.AAS.CONCEPTDESCRIPTION_REPOSITORY.PATH.INTERNAL }}"
     - name: aas-gui
       port: "{{ ENV.AAS.AAS_GUI.PORT.INTERNAL }}"
       service_address: "{{ ENV.AAS.AAS_GUI.HOST.INTERNAL }}"
@@ -82,6 +95,8 @@
         - "aas"
         - "exposed"
         - "traefik.http.routers.aas-ui.rule=PathPrefix(`{{ AAS.AAS_GUI.PATH.EXTERNAL }}/`)"
+      meta:
+        path: "{{ ENV.AAS.AAS_GUI.PATH.INTERNAL }}"
 
 - name: "Register AAS broker at Consul (discovery server)"
   include_role:

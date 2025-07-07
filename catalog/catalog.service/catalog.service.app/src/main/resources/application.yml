@@ -6,8 +6,11 @@ application:
 
 ### Deployment
 deployment:
-  hostname: localhost
-  path: ""
+  scheme: "https"
+  hostname: "localhost"
+  port: 443
+  path: "/catalog-service"
+  url: ${deployment.scheme}://${deployment.hostname}:${deployment.port}${deployment.path}
 
 ### Server / API
 server:

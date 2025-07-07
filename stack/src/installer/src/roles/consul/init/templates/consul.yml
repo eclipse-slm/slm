@@ -36,8 +36,7 @@ services:
         max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
     environment:
       CONSUL_HTTP_ADDR: consul:8500
-    command: >
-      sh -c "export CONSUL_HTTP_TOKEN=$$(cat /consul/CONSUL.MASTER_TOKEN) && consul-esm"
+      CONSUL_HTTP_TOKEN: "{{ ENV.CONSUL.MASTER_TOKEN }}"
     extra_hosts:
       - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
 

@@ -6,9 +6,9 @@ application:
 
 ### Deployment
 deployment:
+  scheme: "https"
   hostname: "localhost"
-  scheme: "http"
-  port: ${server.port}
+  port: 443
   path: "/information-service"
   url: ${deployment.scheme}://${deployment.hostname}:${deployment.port}${deployment.path}
 
@@ -119,11 +119,21 @@ aas:
 
 ### Information Receiving Service (IRS)
 irs:
-  scheme: http
-  host: localhost
-  port: 3000
+  scheme:
+    internal: http
+    external: https
+  host:
+    internal: localhost
+    external: localhost
+  port:
+    internal: 3001
+    external: 443
   path:
-  url: ${irs.scheme}://${irs.host}:${irs.port}${irs.path}
+    internal:
+    external: /irs
+  url:
+    internal: ${irs.scheme.internal}://${irs.host.internal}:${irs.port.internal}${irs.path.internal}
+    external: ${irs.scheme.external}://${irs.host.external}:${irs.port.external}${irs.path.external}
 
 ### Consul
 consul:

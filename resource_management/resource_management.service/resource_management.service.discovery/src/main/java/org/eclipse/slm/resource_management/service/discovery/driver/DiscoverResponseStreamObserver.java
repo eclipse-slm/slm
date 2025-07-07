@@ -80,14 +80,24 @@ public class DiscoverResponseStreamObserver implements StreamObserver<IahDiscove
             var deviceJson = objectMapper.createObjectNode();
             for (var jsonIdentifier : jsonIdentifiers) {
                 if (jsonIdentifier.has("software_components")) {
-                    var softwareComponentName = jsonIdentifier.get("software_components").get("artifact").get("software_identifier").get("name").asText();
-                    if (jsonIdentifier.get("software_components").get("artifact").get("software_identifier").has("version")) {
-                        var softwareComponentVersion = jsonIdentifier.get("software_components").get("artifact").get("software_identifier").get("version").asText();
+                    String softwareComponentName = null;
+                    String softwareComponentVersion = null;
+                    if (jsonIdentifier.get("software_components").has("artifact")) {
+                        softwareComponentName = jsonIdentifier.get("software_components").get("artifact").get("software_identifier").get("name").asText();
+                        if (jsonIdentifier.get("software_components").get("artifact").get("software_identifier").has("version")) {
+                            softwareComponentVersion = jsonIdentifier.get("software_components").get("artifact").get("software_identifier").get("version").asText();
+                        }
+                    }
+                    else {
+                        softwareComponentName = jsonIdentifier.get("software_components").get("software_identifier").get("name").asText();
+                        softwareComponentVersion = jsonIdentifier.get("software_components").get("software_identifier").get("version").asText();
+                    }
+
+                    if (softwareComponentName != null && softwareComponentVersion != null) {
                         if (deviceJson.has("software_components")) {
                             var softwareComponents = (ObjectNode) deviceJson.get("software_components");
                             softwareComponents.put(softwareComponentName, softwareComponentVersion);
                         } else {
-
                             var softwareComponents = objectMapper.createObjectNode();
                             softwareComponents.put(softwareComponentName, softwareComponentVersion);
                             deviceJson.put("software_components", softwareComponents);

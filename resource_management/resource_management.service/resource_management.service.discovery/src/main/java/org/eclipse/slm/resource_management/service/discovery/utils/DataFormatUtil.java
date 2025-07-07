@@ -65,6 +65,10 @@ public class DataFormatUtil {
                 }
             }
         }
+        if (jsonNode.has("metadata")) {
+            var metadata = jsonNode.get("metadata").get("metadata").asText();
+            discoveredResourceBuilder.connectionParameters(metadata);
+        }
 
         var uuidNamespace = Generators.nameBasedGenerator().generate(driverInfo.getInstanceId());
         var resourceId = Generators.nameBasedGenerator(uuidNamespace).generate(id);

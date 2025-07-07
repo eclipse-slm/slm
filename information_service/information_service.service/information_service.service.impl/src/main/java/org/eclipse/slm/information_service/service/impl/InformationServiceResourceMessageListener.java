@@ -1,15 +1,8 @@
 package org.eclipse.slm.information_service.service.impl;
 
-import jakarta.annotation.PostConstruct;
 import org.eclipse.digitaltwin.aas4j.v3.model.KeyTypes;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor;
-import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodel;
-import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodelDescriptor;
-import org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException;
-import org.eclipse.slm.common.aas.clients.AasRepositoryClient;
-import org.eclipse.slm.common.aas.clients.IDTASubmodelTemplates;
-import org.eclipse.slm.common.aas.clients.SubmodelRegistryClient;
-import org.eclipse.slm.common.aas.clients.SubmodelRepositoryClient;
+import org.eclipse.slm.common.aas.clients.*;
 import org.eclipse.slm.common.messaging.resources.ResourceCreatedMessage;
 import org.eclipse.slm.common.messaging.resources.ResourceInformationFoundMessage;
 import org.eclipse.slm.common.messaging.resources.ResourceMessageListener;
@@ -41,23 +34,24 @@ public class InformationServiceResourceMessageListener extends ResourceMessageLi
 
     private final AasRepositoryClient irsAasRepositoryClient;
     private final SubmodelRegistryClient irsSubmodelRegistryClient;
-    private final String irsUrl;
+    private final String irsUrlInternal;
+    private final String irsUrlExternal;
 
-    public InformationServiceResourceMessageListener(@Value("${irs.url}") String irsUrl,
-                                                     AasRepositoryClient aasRepositoryClient,
-                                                     SubmodelRepositoryClient submodelRepositoryClient,
-                                                     SubmodelRegistryClient submodelRegistryClient,
+    public InformationServiceResourceMessageListener(@Value("${irs.url.internal}") String irsUrlInternal,
+                                                     @Value("${irs.url.external}") String irsUrlExternal,
+                                                     AasRepositoryClientFactory aasRepositoryClientFactory,
+                                                     SubmodelRepositoryClientFactory submodelRepositoryClientFactory,
+                                                     SubmodelRegistryClientFactory submodelRegistryClientFactory,
                                                      ResourceMessageSender resourceMessageSender) {
-        this.irsUrl = irsUrl;
-        this.aasRepositoryClient = aasRepositoryClient;
-        this.submodelRepositoryClient = submodelRepositoryClient;
-        this.submodelRegistryClient = submodelRegistryClient;
+        this.irsUrlInternal = irsUrlInternal;
+        this.irsUrlExternal = irsUrlExternal;
+        this.aasRepositoryClient = aasRepositoryClientFactory.getClient();
+        this.submodelRepositoryClient = submodelRepositoryClientFactory.getClient();
+        this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
         this.resourceMessageSender = resourceMessageSender;
 
-        this.irsAasRepositoryClient = new AasRepositoryClient(this.irsUrl + "/api/shell_repo");
-        this.irsSubmodelRegistryClient = new SubmodelRegistryClient(
-                this.irsUrl + "/api/submodel_registry",
-                this.irsUrl + "/api/submodel_repo");
+        this.irsAasRepositoryClient = new AasRepositoryClient(this.irsUrlInternal + "/api/shell_repo");
+        this.irsSubmodelRegistryClient = new SubmodelRegistryClient(this.irsUrlInternal + "/api/submodel_registry");
     }
 
     @Override
@@ -66,7 +60,13 @@ public class InformationServiceResourceMessageListener extends ResourceMessageLi
 
         try {
             var resourceAasId = "Resource_" + resourceCreatedMessage.resourceId();
-            var resourceAas = aasRepositoryClient.getAas(resourceAasId);
+            var resourceAasOptional = aasRepositoryClient.getAas(resourceAasId);
+            if (resourceAasOptional.isEmpty()) {
+                LOG.info("No AAS found for resource '{}', skipping information retrieval", resourceCreatedMessage.resourceId());
+                return;
+            }
+            var resourceAas = resourceAasOptional.get();
+
             var semanticIdToSubmodelDescriptors = new HashMap<String, List<SubmodelDescriptor>>();
 
             // Get all submodel descriptors of submodels contained in the AAS
@@ -102,7 +102,7 @@ public class InformationServiceResourceMessageListener extends ResourceMessageLi
 
             // Get submodels of device via Information Receiving Service using ID Link
             var webClientBuilder = WebClient.builder();
-            var webClient = webClientBuilder.baseUrl(irsUrl)
+            var webClient = webClientBuilder.baseUrl(irsUrlInternal)
                     .codecs(codecs -> codecs
                             .defaultCodecs()
                             .maxInMemorySize(10000 * 1024))
@@ -125,7 +125,8 @@ public class InformationServiceResourceMessageListener extends ResourceMessageLi
 
             var receivedSubmodelDescriptors = new ArrayList<SubmodelDescriptor>();
             for (var shellId : shellIds) {
-                var shell = irsAasRepositoryClient.getAas(shellId);
+                var shellOptional = irsAasRepositoryClient.getAas(shellId);
+                var shell = shellOptional.get();
                 shell.getSubmodels().forEach(submodelRef -> {
                     var submodelRefKey = submodelRef.getKeys().get(0);
                     if (submodelRefKey.getType().equals(KeyTypes.SUBMODEL)) {
@@ -161,14 +162,7 @@ public class InformationServiceResourceMessageListener extends ResourceMessageLi
                 }
 
                 // Register submodel of IRS at submodel registry of SLM
-                String submodelEndpoint;
-                if (!submodelDescriptor.getEndpoints().isEmpty()) {
-                    submodelEndpoint = submodelDescriptor.getEndpoints().get(0).getProtocolInformation().getHref();
-                }
-                else {
-                    LOG.info("No endpoint found for submodel descriptor '{}', skipping", submodelDescriptor.getId());
-                    return;
-                }
+                var submodelEndpoint = irsUrlExternal + "/api/submodel_repo/submodels/" + Base64.getEncoder().encodeToString(submodelDescriptor.getId().getBytes());
                 String semanticId = null;
                 if (submodelDescriptor.getSemanticId() != null) {
                     if (!submodelDescriptor.getSemanticId().getKeys().isEmpty()) {

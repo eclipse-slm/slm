@@ -8,9 +8,8 @@ import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShellDescriptor;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.digitaltwin.basyx.http.Base64UrlEncodedIdentifier;
-import org.eclipse.slm.common.aas.clients.AasRegistryClient;
-import org.eclipse.slm.common.aas.clients.AasRepositoryClient;
-import org.eclipse.slm.common.aas.clients.SubmodelRegistryClient;
+import org.eclipse.slm.common.aas.clients.*;
+import org.eclipse.slm.common.aas.clients.exceptions.ShellNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,10 +31,12 @@ public class SubmodelTemplatesRestController {
 
     private final SubmodelRegistryClient submodelRegistryClient;
 
-    public SubmodelTemplatesRestController(AasRegistryClient aasRegistryClient, AasRepositoryClient aasRepositoryClient, SubmodelRegistryClient submodelRegistryClient) {
-        this.aasRegistryClient = aasRegistryClient;
-        this.aasRepositoryClient = aasRepositoryClient;
-        this.submodelRegistryClient = submodelRegistryClient;
+    public SubmodelTemplatesRestController(AasRegistryClientFactory aasRegistryClientFactory,
+                                           AasRepositoryClientFactory aasRepositoryClientFactory,
+                                           SubmodelRegistryClientFactory submodelRegistryClientFactory) {
+        this.aasRegistryClient = aasRegistryClientFactory.getClient();
+        this.aasRepositoryClient = aasRepositoryClientFactory.getClient();
+        this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
     }
 
     @RequestMapping(value = "/submodels/templates/{smTemplateSemanticId}/instances", method = RequestMethod.GET)
@@ -51,7 +52,13 @@ public class SubmodelTemplatesRestController {
         var allAASDescriptors = this.aasRegistryClient.getAllShellDescriptors();
         var submodelIdToAasDescriptor = new HashMap<String, AssetAdministrationShellDescriptor>();
         for (var aasDescriptor : allAASDescriptors) {
-            var aas = this.aasRepositoryClient.getAas(aasDescriptor.getId());
+            var aasOptional = aasRepositoryClient.getAas(aasDescriptor.getId());
+            if (aasOptional.isEmpty()) {
+                LOG.error("AAS with ID {} not found", aasDescriptor.getId());
+                throw new ShellNotFoundException(aasDescriptor.getId());
+            }
+            var aas = aasOptional.get();
+
             for (var submodelRef : aas.getSubmodels()) {
                 var submodelId = submodelRef.getKeys().get(0).getValue();
                 submodelIdToAasDescriptor.put(submodelId, aasDescriptor);

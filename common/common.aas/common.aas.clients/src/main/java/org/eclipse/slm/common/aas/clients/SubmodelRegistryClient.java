@@ -5,17 +5,12 @@ import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.SerializationException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonDeserializer;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonSerializer;
-import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
-import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultKey;
-import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultReference;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodelDescriptor;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.api.SubmodelRegistryApi;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.net.http.HttpClient;
 import java.util.ArrayList;
@@ -23,24 +18,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Component
 public class SubmodelRegistryClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(SubmodelRegistryClient.class);
 
-    private final String submodelRegistryUrl;
-
-    private final String submodelRepositoryUrl;
-
     private SubmodelRegistryApi submodelRegistryApi;
 
-    public SubmodelRegistryClient(@Value("${aas.submodel-registry.url}") String submodelRegistryUrl,
-                                  @Value("${aas.submodel-repository.url}") String submodelRepositoryUrl) {
-        this.submodelRegistryUrl = submodelRegistryUrl;
-        this.submodelRepositoryUrl = submodelRepositoryUrl;
+    public SubmodelRegistryClient(String submodelRegistryUrl) {
         var objectMapper = new ObjectMapper();
-        var submodelRegistryClient = new org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiClient(HttpClient.newBuilder(), objectMapper, this.submodelRegistryUrl);
-        this.submodelRegistryApi = new SubmodelRegistryApi(submodelRegistryClient);
+        var submodelRegistryApiClient = new org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiClient(HttpClient.newBuilder(), objectMapper, submodelRegistryUrl);
+        this.submodelRegistryApi = new SubmodelRegistryApi(submodelRegistryApiClient);
+    }
+
+    public SubmodelRegistryClient(SubmodelRegistryApi submodelRegistryApi) {
+        this.submodelRegistryApi = submodelRegistryApi;
     }
 
     public List<org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor> getAllSubmodelDescriptors() {
@@ -108,10 +99,6 @@ public class SubmodelRegistryClient {
                 throw e;
             }
         }
-    }
-
-    public void registerSubmodel(String submodelRepositoryUrl, Submodel submodel) throws ApiException {
-        this.registerSubmodel(submodelRepositoryUrl, submodel.getId(), submodel.getIdShort(), submodel.getSemanticId().getKeys().get(0).getValue());
     }
 
     public void unregisterSubmodel(String submodelId) throws ApiException {

@@ -6,6 +6,8 @@ import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultKey;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultReference;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodel;
+import org.eclipse.slm.common.aas.clients.AasRepositoryClientFactory;
+import org.eclipse.slm.common.aas.clients.SubmodelRegistryClientFactory;
 import org.eclipse.slm.service_management.model.offerings.ServiceRequirementLogic;
 import org.eclipse.slm.service_management.model.offerings.RequirementLogicType;
 import org.eclipse.slm.service_management.model.offerings.RequirementProperty;
@@ -28,8 +30,9 @@ public class ServiceOfferingVersionRequirementsHandlerTest {
 
     @BeforeEach
     public void ServiceOfferingVersionRequirementsHandlerTest() {
-        this.serviceOfferingVersionRequirementsHandler = new ServiceOfferingVersionRequirementsHandler(
-                null, null, null, null);
+        var aasRepositoryClientFactory = new AasRepositoryClientFactory(null, null);
+        var submodelRegistryClientFactory = new SubmodelRegistryClientFactory(null, null);
+        this.serviceOfferingVersionRequirementsHandler = new ServiceOfferingVersionRequirementsHandler(aasRepositoryClientFactory, submodelRegistryClientFactory);
     }
 
     @Test
