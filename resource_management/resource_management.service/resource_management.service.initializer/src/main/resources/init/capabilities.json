@@ -147,8 +147,8 @@
       "UNINSTALL": {
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
-        "awxRepo": "https://github.com/ilgmi/slm-cc-base",
-        "awxBranch": "feature/request-vault-CA",
+        "awxRepo": "https://github.com/eclipse-slm/slm-cc-base",
+        "awxBranch": "main",
         "playbook": "uninstall.yml",
         "connectionTypes": [
           "ssh"
@@ -157,8 +157,8 @@
       "INSTALL": {
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
-        "awxRepo": "https://github.com/ilgmi/slm-cc-base",
-        "awxBranch": "feature/request-vault-CA",
+        "awxRepo": "https://github.com/eclipse-slm/slm-cc-base",
+        "awxBranch": "main",
         "playbook": "install.yml",
         "connectionTypes": [
           "ssh"
@@ -536,16 +536,16 @@
       "UNINSTALL": {
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
-        "awxRepo": "https://github.com/Ilgmi/ansible-role-resource-self-description-service",
-        "awxBranch": "dev",
+        "awxRepo": "https://github.com/eclipse-slm/ansible-role-resource-self-description-service",
+        "awxBranch": "0.0.1-SNAPSHOT",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh"]
       },
       "INSTALL": {
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
-        "awxRepo": "https://github.com/Ilgmi/ansible-role-resource-self-description-service",
-        "awxBranch": "dev",
+        "awxRepo": "https://github.com/eclipse-slm/ansible-role-resource-self-description-service",
+        "awxBranch": "0.0.1-SNAPSHOT",
         "playbook": "install.yml",
         "connectionTypes": ["ssh"],
         "configParameters": [

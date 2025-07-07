@@ -150,13 +150,11 @@ public class VaultClient {
             }
 
             case APPLICATION_PROPERTIES -> {
-                LOG.info("Loging type {}", this.authentication);
                 if(this.authentication.equalsIgnoreCase("approle")) {
                     String url = "/auth/approle/login";
 
                     var loginBody = "";
                     try {
-                        LOG.info("Login and create request {}:{}", this.appRoleId, this.appRoleSecretId);
                         loginBody = objectMapper.writeValueAsString(new ApproleLoginRequest(this.appRoleId, this.appRoleSecretId));
                     } catch (JsonProcessingException e) {
                         LOG.error("Vault login failed: " + e.getMessage());
