@@ -85,8 +85,8 @@
 
         <testcontainers.version>1.20.1</testcontainers.version>
         <assertj.version>3.26.3</assertj.version>
+
         
-        <docker.image.registry>ghcr.io/ilgmi</docker.image.registry>
         <docker.image.registry>ghcr.io/eclipse-slm</docker.image.registry>
         <docker.image.skip>false</docker.image.skip>
 
