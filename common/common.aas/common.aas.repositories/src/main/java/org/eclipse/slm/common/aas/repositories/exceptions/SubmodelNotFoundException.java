@@ -9,4 +9,8 @@ public class SubmodelNotFoundException extends RuntimeException {
 	public SubmodelNotFoundException(String aasId, String submodelId) {
 		super("Submodel [id='" + submodelId + "'for AAS [id='" + aasId + "'] not found");
 	}
+
+	public SubmodelNotFoundException(String submodelId) {
+		super("Submodel [id='" + submodelId + "' not found");
+	}
 }

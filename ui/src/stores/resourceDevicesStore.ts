@@ -1,6 +1,5 @@
 import ApiState from '@/api/apiState'
 import {defineStore} from "pinia";
-import {useProviderStore} from "@/stores/providerStore";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import logRequestError from "@/api/restApiHelper";
 import jp from "jsonpath";
@@ -10,15 +9,15 @@ interface ResourceDevicesStoreState{
     apiState: number,
 
     resources: any[],
+    resourceTypes: any[],
     resourceAasDescriptors: any[],
     resourceAASValues: {}
     resourceConnectionTypes: any[],
     locations: any[],
     profiler: any[],
 
-    availableCapabilities: any[],
-
     firmwareUpdateInformationOfResources: {}
+    firmwareUpdateJobsOfResources: {}
 }
 
 export const useResourceDevicesStore = defineStore('resourceDevicesStore', {
@@ -27,36 +26,21 @@ export const useResourceDevicesStore = defineStore('resourceDevicesStore', {
         apiState: ApiState.INIT,
 
         resources: [],
+        resourceTypes: [],
         resourceAasDescriptors: [],
         resourceAASValues: [],
         resourceConnectionTypes: [],
         locations: [],
         profiler: [],
 
-        availableCapabilities: [],
-
         firmwareUpdateInformationOfResources: {},
+        firmwareUpdateJobsOfResources: {}
     }),
     getters: {
-        resourceById: (state) => (id) => {
-            return state.resources.find(resource => resource.id === id)
+        resourceById: (state) => (resourceId) => {
+            return state.resources.find(resource => resource.id === resourceId)
         },
 
-        availableSingleHostCapabilities: (state) => {
-            return state.availableCapabilities.filter(cap => {
-                return cap.cluster === false
-            })
-        },
-        availableSingleHostCapabilitiesNoDefault: (state) => {
-            return state.availableCapabilities.filter(cap => {
-                return cap.clusterMemberTypes === undefined
-            })
-        },
-        availableBaseConfigurationCapabilities: (state) => {
-            return state.availableCapabilities.filter(cap => {
-                return cap.capabilityClass === "BaseConfigurationCapability"
-            })
-        },
         nonClusterResources: (state) => {
             if (state.resources === undefined) {
                 return []
@@ -66,9 +50,39 @@ export const useResourceDevicesStore = defineStore('resourceDevicesStore', {
                 })
             }
         },
+
+        firmwareUpdateInformationOfResource: (state) => (resourceId) => {
+            if (state.firmwareUpdateInformationOfResources[resourceId]) {
+                return state.firmwareUpdateInformationOfResources[resourceId]
+            } else {
+                return {}
+            }
+        },
+
+        firmwareUpdateJobsOfResource: (state) => (resourceId) => {
+            if (state.firmwareUpdateJobsOfResources[resourceId]) {
+                return state.firmwareUpdateJobsOfResources[resourceId]
+            } else {
+                return []
+            }
+        },
     },
 
     actions: {
+        addOrUpdateResource(resource) {
+            if (this.resources === undefined) {
+                this.resources = [];
+            }
+            const index = this.resources.findIndex(r => r.id === resource.id);
+            if (index !== -1) {
+                this.resources = this.resources.filter(r => r.id !== resource.id);
+            }
+            this.resources.push(resource);
+        },
+        deleteResource(resourceId: string) {
+            this.resources = this.resources.filter(resource => resource.id !== resourceId)
+        },
+
         setResources(newResources){
             try {
                 if (this.resources !== undefined) {
@@ -91,6 +105,23 @@ export const useResourceDevicesStore = defineStore('resourceDevicesStore', {
         setResourceMarkedForDelete(resource){
             const filteredRes = this.resources.find(obj => obj.id === resource.id)
             filteredRes.markedForDelete = true
+        },
+
+        async getResourceById (resourceId: string) {
+            return await ResourceManagementClient.resourcesApi.getResource(resourceId)
+                .then(
+                    response => {
+                        if (response.data){
+                            const resource = response.data
+                            this.addOrUpdateResource(resource)
+                            return this.getFirmwareUpdateInformationOfResource(resource.id);
+                        }
+
+                    })
+                .catch(e => {
+                    console.log(e)
+                    this.setResources([]);
+                })
         },
 
         async getResourcesFromBackend () {
@@ -121,6 +152,15 @@ export const useResourceDevicesStore = defineStore('resourceDevicesStore', {
             }));
         },
 
+        getResourceSubmodelByIdShort (resourceId, submodelIdShort) {
+            try {
+                var submodel =this.resourceAASValues[resourceId][submodelIdShort]
+                return submodel
+            } catch (e) {
+                return "N/A"
+            }
+        },
+
         getSubmodelElementValueOfResourceSubmodel (resourceId, submodelIdShort, submodelElementJsonPath) {
             try {
                 var value = jp.value(this.resourceAASValues[resourceId][submodelIdShort]["valuesOnlyMap"], submodelElementJsonPath);
@@ -143,8 +183,21 @@ export const useResourceDevicesStore = defineStore('resourceDevicesStore', {
             }));
         },
 
-        getFirmwareUpdateInformationOfResource (resourceId) {
-            return this.firmwareUpdateInformationOfResources[resourceId]
+        async getFirmwareUpdateInformationOfResource(resourceId: string) {
+            return await ResourceManagementClient.resourcesUpdatesApi.getUpdateInformationOfResource(resourceId).then(
+                    response => {
+                        this.firmwareUpdateInformationOfResources[resourceId] = response.data;
+                    }
+                ).catch(logRequestError)
+        },
+
+        async getFirmwareUpdateJobsOfResource(resourceId: string) {
+            return await ResourceManagementClient.resourcesUpdatesApi.getFirmwareUpdateJobsOfResource(resourceId).then(
+                response => {
+                    this.firmwareUpdateJobsOfResources[resourceId] = response.data;
+                    return response.data;
+                }
+            ).catch(logRequestError)
         },
 
         async getResourceAasDescriptors () {
@@ -184,8 +237,8 @@ export const useResourceDevicesStore = defineStore('resourceDevicesStore', {
                 })
         },
 
-        async getResourceConnectionTypes() {
-            return await ResourceManagementClient.resourcesApi.getResourceConnectionTypes()
+        async getRemoteConnectionTypes() {
+            return await ResourceManagementClient.resourcesApi.getRemoteConnectionTypes()
                 .then(
                     response => {
                         if(response.data){
@@ -199,20 +252,18 @@ export const useResourceDevicesStore = defineStore('resourceDevicesStore', {
                 })
         },
 
-        async getDeploymentCapabilities () {
-            return await ResourceManagementClient.capabilityApi.getCapabilities()
-                .then(response => {
-                    if(response){
-                        const receivedCapabilities = response.data;
-                        if (receivedCapabilities === undefined) {
-                            this.availableCapabilities = []
-                        } else {
-                            // Sort alphabetically
-                            this.availableCapabilities = receivedCapabilities.sort((a, b) => {
-                                return a.name.localeCompare(b.name)
-                            })
+        async getResourceTypes() {
+            return await ResourceManagementClient.resourceTypesApi.getResourceTypes()
+                .then(
+                    response => {
+                        if (response.data){
+                            this.resourceTypes = response.data;
                         }
                     }
+                )
+                .catch(e => {
+                    console.debug(e)
+                    this.profiler = [];
                 })
         },
 
@@ -229,8 +280,7 @@ export const useResourceDevicesStore = defineStore('resourceDevicesStore', {
                 this.getResourceAasValues(),
                 this.getLocations(),
                 this.getProfiler(),
-                this.getResourceConnectionTypes(),
-                this.getDeploymentCapabilities(),
+                this.getRemoteConnectionTypes(),
             ]).then(() => {
                 this.apiState = ApiState.LOADED;
                 console.log("resourceDevicesStore updated")

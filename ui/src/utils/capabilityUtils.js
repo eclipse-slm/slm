@@ -1,11 +1,11 @@
-import { useResourceDevicesStore } from "@/stores/resourceDevicesStore";
+import {useCapabilitiesStore} from "@/stores/capabilitiesStore";
 
 export function useCapabilityUtils() {
-  const resourceDevicesStore = useResourceDevicesStore();
+  const capabilitiesStore = useCapabilitiesStore();
 
   const getCapability = (capabilityId) => {
     try {
-      return resourceDevicesStore.availableSingleHostCapabilitiesNoDefault.find(
+      return capabilitiesStore.availableSingleHostCapabilities.find(
           cap => cap.id === capabilityId
       );
     } catch (e) {
@@ -27,19 +27,12 @@ export function useCapabilityUtils() {
   };
 
   const getCapabilitiesByCapabilityClass = (capabilityClass) => {
-    return resourceDevicesStore.availableSingleHostCapabilitiesNoDefault.filter(shc => shc.capabilityClass === capabilityClass)
-  };
-
-  const isCapabilityInstalledOnResource = (resource, capability) => {
-    if(resource.capabilityServices !== null)
-      return resource.capabilityServices.filter(capService => capService.capability.name === capability.name).length > 0
-    else
-      return false;
+    return capabilitiesStore.availableSingleHostCapabilities.filter(shc => shc.capabilityClass === capabilityClass)
   };
 
   const getUniqueCapabilityClasses = () => {
     return [...new Set(
-        resourceDevicesStore.availableSingleHostCapabilitiesNoDefault.map(shc => shc.capabilityClass)
+        capabilitiesStore.availableSingleHostCapabilities.map(shc => shc.capabilityClass)
     )].sort();
   };
 
@@ -70,13 +63,52 @@ export function useCapabilityUtils() {
       return true;
   };
 
+  const filterDeploymentCapabilityServices = (capabilityServiceIds) => {
+    const deploymentCapabilityServices = [];
+    capabilityServiceIds.forEach(capabilityServiceId => {
+        const capabilityService = capabilitiesStore.capabilityServiceById(capabilityServiceId);
+        const capability = capabilitiesStore.capabilityById(capabilityService.capabilityId);
+
+        if (isDeploymentCapability(capability)) {
+          deploymentCapabilityServices.push(capabilityServiceId);
+        }
+    });
+
+    return deploymentCapabilityServices;
+  };
+
+  const filterConfigurationCapabilityServices = (capabilityServiceIds) => {
+    const configrationCapabilityServices = [];
+    capabilityServiceIds.forEach(capabilityServiceId => {
+      const capabilityService = capabilitiesStore.capabilityServiceById(capabilityServiceId);
+      const capability = capabilitiesStore.capabilityById(capabilityService.capabilityId);
+
+      if (isConfigurationCapability(capability)) {
+        configrationCapabilityServices.push(capabilityServiceId);
+      }
+    });
+
+    return configrationCapabilityServices;
+  };
+
+  const isDeploymentCapability = (capability) => {
+    return capability.capabilityClass === "DeploymentCapability";
+  };
+
+  const isConfigurationCapability = (capability) => {
+    return capability.capabilityClass === "BaseConfigurationCapability";
+  };
+
   return {
     getCapability,
     getParamsOfInstallAction,
     getCapabilitiesByCapabilityClass,
     getUniqueCapabilityClasses,
-    isCapabilityInstalledOnResource,
     isDefineCapabilityDialogRequired,
-    isCapabilitySkipable
+    isCapabilitySkipable,
+    filterDeploymentCapabilityServices,
+    filterConfigurationCapabilityServices,
+    isDeploymentCapability,
+    isConfigurationCapability,
   };
 }

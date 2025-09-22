@@ -10,8 +10,11 @@
       <v-list-item
         v-if="text"
         v-bind="props"
+        :to="(children.length > item.goToChildOnClick) ? children[item.goToChildOnClick].to : undefined"
       >
-        <v-list-item-title>
+        <v-list-item-title
+          @click="onParentClicked(item)"
+        >
           {{ item.title }}
         </v-list-item-title>
       </v-list-item>
@@ -109,6 +112,8 @@ export default {
             return group
           }).join('|')
       },
+      onParentClicked (item) {
+      }
     },
   }
 </script>

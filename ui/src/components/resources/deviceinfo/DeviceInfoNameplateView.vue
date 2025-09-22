@@ -2,6 +2,7 @@
 
 import TextWithLabel from "@/components/base/TextWithLabel.vue";
 import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
+import { ref } from 'vue';
 
 const tooltipDelay = 1000;
 
@@ -13,6 +14,11 @@ const props = defineProps({
 });
 
 const resourceDevicesStore = useResourceDevicesStore();
+
+const nameplateSubmodel = ref(resourceDevicesStore.getResourceSubmodelByIdShort(props.resourceId, 'Nameplate'))
+
+const isNameplateV2 = nameplateSubmodel.value.semanticId === 'https://admin-shell.io/zvei/nameplate/2/0/Nameplate'
+const isNameplateV3 = nameplateSubmodel.value.semanticId === 'https://admin-shell.io/idta/nameplate/3/0/Nameplate'
 
 </script>
 
@@ -65,7 +71,10 @@ const resourceDevicesStore = useResourceDevicesStore();
       <v-col>
         <TextWithLabel
           :label="$t('AAS.SubmodelTemplates.DigitalNameplateV3.Properties.ManufacturerProductType.Name')"
-          :text="resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, 'Nameplate', '$.ManufacturerProductType')"
+          :text="resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, 'Nameplate',
+    isNameplateV3 ? '$.ManufacturerProductType' :
+                         isNameplateV2 ? '$.ManufacturerProductType..en'
+                         : 'N/A')"
           :tooltip="$t('AAS.SubmodelTemplates.DigitalNameplateV3.Properties.ManufacturerProductType.Description')"
           :tooltip-delay="tooltipDelay"
         />
@@ -76,7 +85,10 @@ const resourceDevicesStore = useResourceDevicesStore();
       <v-col cols="4">
         <TextWithLabel
           :label="$t('AAS.SubmodelTemplates.DigitalNameplateV3.Properties.OrderCodeOfManufacturer.Name')"
-          :text="resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, 'Nameplate', '$.OrderCodeOfManufacturer')"
+          :text="resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, 'Nameplate',
+                         isNameplateV3 ? '$.OrderCodeOfManufacturer' :
+                         isNameplateV2 ? '$.OrderCodeOfManufacturer..en'
+                         : 'N/A')"
           :tooltip="$t('AAS.SubmodelTemplates.DigitalNameplateV3.Properties.OrderCodeOfManufacturer.Description')"
           :tooltip-delay="tooltipDelay"
         />
@@ -84,7 +96,10 @@ const resourceDevicesStore = useResourceDevicesStore();
       <v-col cols="4">
         <TextWithLabel
           :label="$t('AAS.SubmodelTemplates.DigitalNameplateV3.Properties.ProductArticleNumberOfManufacturer.Name')"
-          :text="resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, 'Nameplate', '$.ProductArticleNumberOfManufacturer')"
+          :text="resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, 'Nameplate',
+    isNameplateV3 ? '$.ProductArticleNumberOfManufacturer' :
+                         isNameplateV2 ? '$.ProductArticleNumberOfManufacturer..en'
+                         : 'N/A')"
           :tooltip="$t('AAS.SubmodelTemplates.DigitalNameplateV3.Properties.ProductArticleNumberOfManufacturer.Description')"
           :tooltip-delay="tooltipDelay"
         />
@@ -124,7 +139,10 @@ const resourceDevicesStore = useResourceDevicesStore();
       <v-col>
         <TextWithLabel
           :label="$t('AAS.SubmodelTemplates.DigitalNameplateV3.Properties.HardwareVersion.Name')"
-          :text="resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, 'Nameplate', '$.HardwareVersion')"
+          :text="resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, 'Nameplate',
+    isNameplateV3 ? '$.HardwareVersion' :
+                         isNameplateV2 ? '$.HardwareVersion..en'
+                         : 'N/A')"
           :tooltip="$t('AAS.SubmodelTemplates.DigitalNameplateV3.Properties.HardwareVersion.Description')"
           :tooltip-delay="tooltipDelay"
         />
@@ -132,7 +150,10 @@ const resourceDevicesStore = useResourceDevicesStore();
       <v-col>
         <TextWithLabel
           :label="$t('AAS.SubmodelTemplates.DigitalNameplateV3.Properties.FirmwareVersion.Name')"
-          :text="resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, 'Nameplate', '$.FirmwareVersion')"
+          :text="resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, 'Nameplate',
+    isNameplateV3 ? '$.FirmwareVersion' :
+                         isNameplateV2 ? '$.FirmwareVersion..en'
+                         : 'N/A')"
           :tooltip="$t('AAS.SubmodelTemplates.DigitalNameplateV3.Properties.FirmwareVersion.Description')"
           :tooltip-delay="tooltipDelay"
         />
@@ -140,7 +161,10 @@ const resourceDevicesStore = useResourceDevicesStore();
       <v-col>
         <TextWithLabel
           :label="$t('AAS.SubmodelTemplates.DigitalNameplateV3.Properties.SoftwareVersion.Name')"
-          :text="resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, 'Nameplate', '$.SoftwareVersion')"
+          :text="resourceDevicesStore.getSubmodelElementValueOfResourceSubmodel(resourceId, 'Nameplate',
+    isNameplateV3 ? '$.SoftwareVersion' :
+                         isNameplateV2 ? '$.SoftwareVersion..en'
+                         : 'N/A')"
           :tooltip="$t('AAS.SubmodelTemplates.DigitalNameplateV3.Properties.SoftwareVersion.Description')"
           :tooltip-delay="tooltipDelay"
         />

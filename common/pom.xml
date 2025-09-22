@@ -25,6 +25,7 @@
         <module>common.model</module>
         <module>common.minio</module>
         <module>common.messaging</module>
+        <module>common.driver</module>
     </modules>
 
 </project>

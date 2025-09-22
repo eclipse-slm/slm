@@ -62,7 +62,8 @@
     </v-row>
     <v-data-table
       id="table-discovered-resources"
-      v-model="selectedDiscoveredResourceIds"
+      :model-value="props.selectedDiscoveredResourceIds"
+      @update:model-value="val => emit('selectedDiscoveredResourcesChanged', val)"
       :headers="tableHeaders"
       :items="discoveredResources"
       :search="searchDiscoveredResources"
@@ -106,12 +107,15 @@ import {ActionButtonType} from "@/components/base/ActionButtonType";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
 
+const props = defineProps({
+  selectedDiscoveredResourceIds: Array
+});
+
 const emit = defineEmits(['selectedDiscoveredResourcesChanged'])
 
 const discoveryStore = useDiscoveryStore();
 const { discoveredResources, apiState } = storeToRefs(discoveryStore);
 
-const selectedDiscoveredResourceIds = ref([]);
 const searchDiscoveredResources = ref(undefined);
 const showIgnoredResources = ref(false);
 const showOnlyLatestJobsOfDrivers = ref(false);
@@ -128,16 +132,12 @@ const tableHeaders = [
   { title: '', value: 'actions', sortable: false },
 ];
 
-watch(selectedDiscoveredResourceIds, (newVal) => {
-  emit('selectedDiscoveredResourcesChanged', newVal);
-});
-
 const onRowClick = (click, row) => {
   row.toggleSelect({ value: row.item.resultId });
 };
 
 const colorRowItem = (row) => {
-  if (selectedDiscoveredResourceIds.value.includes(row.item.resultId)) {
+  if (props.selectedDiscoveredResourceIds.includes(row.item.resultId)) {
     return { class: 'v-data-table__selected' };
   }
 };

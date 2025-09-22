@@ -44,6 +44,7 @@ import ClustersCreateDialog from "@/components/clusters/dialogs/ClustersCreateDi
 import ResourcesTableClusters from "@/components/resources/ResourcesTableClusters.vue";
 import {useResourceClustersStore} from "@/stores/resourceClustersStore";
 import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
+import {useCapabilitiesStore} from "@/stores/capabilitiesStore";
 
 export default {
   name: 'ClustersOverview',
@@ -56,7 +57,8 @@ export default {
   setup(){
     const resourceClustersStore = useResourceClustersStore();
     const resourceDevicesStore = useResourceDevicesStore();
-    return {resourceClustersStore, resourceDevicesStore}
+    const capabilitiesStore = useCapabilitiesStore();
+    return {resourceClustersStore, resourceDevicesStore, capabilitiesStore}
   },
   data () {
     return {
@@ -67,7 +69,7 @@ export default {
   computed: {
   },
   mounted () {
-    this.resourceDevicesStore.getDeploymentCapabilities();
+    this.capabilitiesStore.getDeploymentCapabilities();
   },
   methods: {
   },

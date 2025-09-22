@@ -1,22 +1,19 @@
 package org.eclipse.slm.service_management.service.rest.service_deployment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.eclipse.slm.common.awx.client.observer.AwxJobExecutor;
-import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
-import org.eclipse.slm.common.awx.client.observer.AwxJobObserverInitializer;
-import org.eclipse.slm.common.awx.client.observer.IAwxJobObserverListener;
+import org.eclipse.slm.common.awx.client.observer.*;
 import org.eclipse.slm.common.awx.model.ExtraVars;
 import org.eclipse.slm.common.consul.client.apis.ConsulServicesApiClient;
-import org.eclipse.slm.common.keycloak.config.KeycloakUtil;
+import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
-import org.eclipse.slm.notification_service.model.*;
-import org.eclipse.slm.notification_service.service.client.NotificationServiceClient;
-import org.eclipse.slm.resource_management.model.actions.ActionType;
-import org.eclipse.slm.resource_management.model.consul.capability.SingleHostCapabilityService;
+import org.eclipse.slm.resource_management.features.capabilities.model.SingleHostCapabilityService;
+import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
 import org.eclipse.slm.resource_management.service.client.handler.ApiException;
 import org.eclipse.slm.service_management.model.exceptions.ServiceOptionNotFoundException;
 import org.eclipse.slm.service_management.model.offerings.codesys.CodesysDeploymentDefinition;
+import org.eclipse.slm.service_management.service.rest.service_instances.ServiceInstanceEventMessageSender;
+import org.eclipse.slm.service_management.service.rest.service_instances.ServiceInstanceEventType;
 import org.eclipse.slm.service_management.service.rest.utils.DockerContainerServiceOfferingOrderUtil;
 import org.eclipse.slm.service_management.model.offerings.ServiceOrder;
 import org.eclipse.slm.service_management.model.offerings.ServiceOfferingVersion;
@@ -45,11 +42,11 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
 
     private final static Logger LOG = LoggerFactory.getLogger(ServiceDeploymentHandler.class);
 
-    private final NotificationServiceClient notificationServiceClient;
+    private final ServiceInstanceEventMessageSender serviceInstanceEventMessageSender;
 
     private final ConsulServicesApiClient consulServicesApiClient;
 
-    private final KeycloakUtil keycloakUtil;
+    private final KeycloakAdminClient keycloakAdminClient;
 
     private final ServiceOrderJpaRepository serviceOrderJpaRepository;
 
@@ -58,17 +55,17 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
 
     public ServiceDeploymentHandler(AwxJobObserverInitializer awxJobObserverInitializer,
                                     AwxJobExecutor awxJobExecutor,
-                                    NotificationServiceClient notificationServiceClient,
                                     ConsulServicesApiClient consulServicesApiClient,
-                                    KeycloakUtil keycloakUtil,
+                                    KeycloakAdminClient keycloakAdminClient,
                                     ResourceManagementApiClientInitializer resourceManagementApiClientInitializer,
                                     ServiceOrderJpaRepository serviceOrderJpaRepository,
-                                    ServiceInstancesConsulClient serviceInstancesConsulClient) {
+                                    ServiceInstancesConsulClient serviceInstancesConsulClient,
+                                    ServiceInstanceEventMessageSender serviceInstanceEventMessageSender) {
         super(resourceManagementApiClientInitializer, serviceInstancesConsulClient, awxJobObserverInitializer, awxJobExecutor);
-        this.notificationServiceClient = notificationServiceClient;
         this.consulServicesApiClient = consulServicesApiClient;
-        this.keycloakUtil = keycloakUtil;
+        this.keycloakAdminClient = keycloakAdminClient;
         this.serviceOrderJpaRepository = serviceOrderJpaRepository;
+        this.serviceInstanceEventMessageSender = serviceInstanceEventMessageSender;
     }
 
     public DeploymentJobRun deployServiceOfferingToResource(
@@ -114,7 +111,6 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                 var extraVars = new ExtraVars(extraVarsMap);
 
                 awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, jwtAuthenticationToken, extraVars, JobGoal.CREATE, this);
-                this.notificationServiceClient.postJobObserver(jwtAuthenticationToken, awxJobObserver);
                 break;
             }
             case KUBERNETES: {
@@ -132,7 +128,6 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                 extraVarsMap = this.addExtraVarsForServiceRepositories(extraVarsMap, serviceOfferingVersion);
 
                 awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, jwtAuthenticationToken, new ExtraVars(extraVarsMap), JobGoal.CREATE, this);
-                this.notificationServiceClient.postJobObserver(jwtAuthenticationToken, awxJobObserver);
                 break;
             }
 
@@ -149,7 +144,6 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                 extraVarsMap = this.addExtraVarsForServiceRepositories(extraVarsMap, serviceOfferingVersion);
 
                 awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, jwtAuthenticationToken, new ExtraVars(extraVarsMap), JobGoal.CREATE, this);
-                this.notificationServiceClient.postJobObserver(jwtAuthenticationToken, awxJobObserver);
             }
             break;
             default:
@@ -307,13 +301,14 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
 
                     // Add role for new service instance in Keycloak
                     var serviceKeycloakRoleName = "service_" + serviceInstance.getId();
-                    this.keycloakUtil.createRealmRoleAndAssignToUser(jwtAuthenticationToken, serviceKeycloakRoleName);
+                    var userId = jwtAuthenticationToken.getToken().getSubject();
+                    this.keycloakAdminClient.createRealmRoleAndAssignToUser(userId, serviceKeycloakRoleName);
 
                     // Add consul service for new service instance
                     this.serviceInstancesConsulClient.registerConsulServiceForServiceInstance(serviceInstance);
 
                     serviceOrder.setServiceOrderResult(ServiceOrderResult.SUCCESSFULL);
-                    this.notificationServiceClient.postNotification(jwtAuthenticationToken, Category.SERVICES, JobTarget.SERVICE, JobGoal.CREATE);
+                    this.serviceInstanceEventMessageSender.sendMessage(serviceInstance, ServiceInstanceEventType.CREATED);
                 }
 
                 default -> {

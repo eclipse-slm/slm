@@ -1,21 +1,15 @@
 package org.eclipse.slm.resource_management.service.initializer;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.eclipse.slm.resource_management.model.capabilities.CapabilityDTOApi;
+import org.eclipse.slm.resource_management.features.capabilities.dto.CapabilityDTOApi;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
-import org.eclipse.slm.resource_management.service.client.handler.ApiException;
 import org.eclipse.slm.resource_management.service.client.handler.CapabilitiesRestControllerApi;
-import org.eclipse.slm.resource_management.service.client.handler.ResourcesRestControllerApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component

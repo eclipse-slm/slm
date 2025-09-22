@@ -40,12 +40,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>resource_management.model</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.slm</groupId>
-            <artifactId>resource_management.service.rest</artifactId>
+            <artifactId>resource_management.service.app</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>

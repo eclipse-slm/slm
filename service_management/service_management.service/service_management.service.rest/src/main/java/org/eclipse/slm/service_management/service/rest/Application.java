@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         "org.eclipse.slm.service_management",
         "org.eclipse.slm.common",
         "org.eclipse.slm.common.parent.service_rest",
-        "org.eclipse.slm.notification_service.service.client",
+        "org.eclipse.slm.notification_service.messaging",
         "org.eclipse.slm.resource_management.service.client"
 })
 @EntityScan(basePackages = {

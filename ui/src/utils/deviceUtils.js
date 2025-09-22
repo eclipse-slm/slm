@@ -49,7 +49,7 @@ class DeviceUtils {
         }
     }
 
-    static getVendor(resourceId) {
+    static getManufacturer(resourceId) {
         const resourceDevicesStore = useResourceDevicesStore();
 
         const paths = [

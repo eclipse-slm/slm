@@ -1,6 +1,6 @@
 package org.eclipse.slm.service_management.service.rest.endpoints;
 
-import org.eclipse.slm.common.keycloak.config.KeycloakUtil;
+import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.service_management.service.rest.utils.MultiTenancyUtil;
 import org.eclipse.slm.service_management.model.users.User;
@@ -25,15 +25,15 @@ public class UsersRestController {
 
     private final ServiceVendorRepository serviceVendorRepository;
 
-    private final KeycloakUtil keycloakUtil;
+    private final KeycloakAdminClient keycloakAdminClient;
 
     @Autowired
     public UsersRestController(
             ServiceVendorRepository serviceVendorRepository,
-            KeycloakUtil keycloakUtil)
+            KeycloakAdminClient keycloakAdminClient)
     {
         this.serviceVendorRepository = serviceVendorRepository;
-        this.keycloakUtil = keycloakUtil;
+        this.keycloakAdminClient = keycloakAdminClient;
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
@@ -42,7 +42,7 @@ public class UsersRestController {
     {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-        var keycloakUserRepresentations = this.keycloakUtil.getUsersOfRealm(KeycloakTokenUtil.getRealm(jwtAuthenticationToken));
+        var keycloakUserRepresentations = this.keycloakAdminClient.getUsersOfRealm(KeycloakTokenUtil.getRealm(jwtAuthenticationToken));
         var users = new ArrayList<User>();
         for (var keycloakUserRepresentation : keycloakUserRepresentations) {
             var user = new User();

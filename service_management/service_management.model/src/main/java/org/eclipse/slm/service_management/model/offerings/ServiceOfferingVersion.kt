@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
 import org.eclipse.slm.common.model.DeploymentType
-import org.eclipse.slm.service_management.model.AbstractBaseEntityUuid
+import org.eclipse.slm.common.model.AbstractBaseEntityUuid
 import org.eclipse.slm.service_management.model.exceptions.ServiceOptionNotFoundException
 import org.eclipse.slm.service_management.model.offerings.options.ServiceOption
 import org.eclipse.slm.service_management.model.offerings.options.ServiceOptionCategory

@@ -24,6 +24,12 @@ services:
       BASYX_CORS_ALLOWEDMETHODS: GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
       MANAGEMENT_INFO_GIT_ENABLED: "false"
+    healthcheck:
+      test: "curl --fail http://localhost:$${SERVER_PORT}$${SERVER_SERVLET_CONTEXTPATH%/}/actuator/health || exit 1"
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
 
   aas-registry:
     image: "eclipsebasyx/aas-registry-log-mongodb:{{ ENV.AAS.BASYX_VERSION }}"
@@ -43,6 +49,12 @@ services:
       SPRING_DATA_MONGODB_URI: "mongodb://{{ ENV.AAS.DATABASE.USERNAME }}:{{ ENV.AAS.DATABASE.PASSWORD }}@{{ ENV.AAS.DATABASE.HOST.INTERNAL }}:{{ ENV.AAS.DATABASE.PORT.INTERNAL }}"
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
       MANAGEMENT_INFO_GIT_ENABLED: "false"
+    healthcheck:
+      test: "curl --fail http://localhost:$${SERVER_PORT}$${SERVER_SERVLET_CONTEXTPATH%/}/actuator/health || exit 1"
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
 
   submodel-registry:
     image: "eclipsebasyx/submodel-registry-log-mongodb:{{ ENV.AAS.BASYX_VERSION }}"
@@ -62,6 +74,12 @@ services:
       SPRING_DATA_MONGODB_URI: "mongodb://{{ ENV.AAS.DATABASE.USERNAME }}:{{ ENV.AAS.DATABASE.PASSWORD }}@{{ ENV.AAS.DATABASE.HOST.INTERNAL }}:{{ ENV.AAS.DATABASE.PORT.INTERNAL }}"
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
       MANAGEMENT_INFO_GIT_ENABLED: "false"
+    healthcheck:
+      test: "curl --fail http://localhost:$${SERVER_PORT}$${SERVER_SERVLET_CONTEXTPATH%/}/actuator/health || exit 1"
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
 
   aas-environment:
     image: "eclipsebasyx/aas-environment:{{ ENV.AAS.BASYX_VERSION }}"
@@ -94,6 +112,12 @@ services:
       default:
         aliases:
           - aas-environment
+    healthcheck:
+      test: "curl --fail http://localhost:$${SERVER_PORT}$${SERVER_SERVLET_CONTEXTPATH%/}/actuator/health || exit 1"
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
 
   aas-gui:
     image: "eclipsebasyx/aas-gui:{{ ENV.AAS.AAS_GUI.VERSION }}"
@@ -148,13 +172,6 @@ services:
       default:
         aliases:
           - "{{ ENV.AAS.AAS_BROKER.HOST.INTERNAL }}"
-    healthcheck:
-      test: [ "CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 20s
-
 volumes:
   aas_database:
   aas_transformer_database:

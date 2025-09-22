@@ -34,7 +34,7 @@ services:
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:8080/auth" ]
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
 
   keycloak-database:
     image: "mariadb:{{ ENV.KEYCLOAK.DATABASE.VERSION }}"

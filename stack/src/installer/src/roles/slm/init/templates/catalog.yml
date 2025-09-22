@@ -26,7 +26,7 @@ services:
         aliases:
           - "{{ ENV.SLM_CATALOG_SERVICE.HOST.INTERNAL }}"
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:10000/swagger-ui/index.html" ]
 

@@ -1,49 +1,39 @@
 <template>
-  <v-dialog
-    v-model="dialogActive"
-    :width="width"
-    @click:outside="$emit('canceled')"
-  >
-    <template #default="{isActive}">
-      <v-card v-if="isActive">
-        <v-toolbar
-          color="primary"
-          theme="dark"
-        >
-          {{ title }}
-        </v-toolbar>
-        <v-card-text class="my-4">
-          <slot name="content">
-            {{ text }}
-          </slot>
-        </v-card-text>
-        <v-card-actions class="justify-center">
-          <v-btn
-            id="button-confirm-dialog"
-            variant="text"
-            @click.native="$emit('canceled')"
-          >
-            {{ cancelButtonLabel }}
-          </v-btn>
+  <CustomDialog
+    v-bind="$props"
+    v-on="$attrs"
+    @canceled="emit('canceled')">
 
-          <v-spacer />
-
-          <v-btn
-            id="button-confirm-dialog"
-            variant="text"
-            :color="attention ? 'error' : ''"
-            @click="$emit('confirmed')"
-          >
-            {{ confirmButtonLabel }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+    <template v-for="(_, name) in $slots" v-slot:[name]="slotProps">
+      <slot v-if="slotProps" :name="name" v-bind="slotProps" />
+      <slot v-else :name="name" />
     </template>
-  </v-dialog>
+
+    <template #actions>
+      <v-btn
+          id="button-confirm-dialog"
+          variant="text"
+          @click.native="$emit('canceled')"
+      >
+        {{ cancelButtonLabel }}
+      </v-btn>
+
+      <v-spacer />
+
+      <v-btn
+          id="button-confirm-dialog"
+          variant="text"
+          :color="attention ? 'error' : ''"
+          @click="$emit('confirmed')"
+      >
+        {{ confirmButtonLabel }}
+      </v-btn>
+    </template>
+  </CustomDialog>
 </template>
 
 <script setup>
-import {ref, toRef, watch} from 'vue';
+import CustomDialog from "@/components/base/CustomDialog.vue";
 
 const emit = defineEmits(['confirmed', 'canceled']);
 
@@ -77,13 +67,4 @@ const props = defineProps({
     default: false
   }
 });
-
-
-const dialogActive = ref(false)
-const showProp = toRef(props,'show'); // react to prop
-
-watch(showProp, (value) => {
-  dialogActive.value = showProp.value;
-});
-
 </script>

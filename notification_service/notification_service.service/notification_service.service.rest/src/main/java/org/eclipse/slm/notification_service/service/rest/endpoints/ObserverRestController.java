@@ -1,8 +1,6 @@
 package org.eclipse.slm.notification_service.service.rest.endpoints;
 
-import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
-import org.eclipse.slm.common.awx.client.observer.AwxJobObserverInitializer;
-import org.eclipse.slm.common.awx.client.observer.IAwxJobObserverListener;
+import org.eclipse.slm.common.awx.client.observer.*;
 import org.eclipse.slm.notification_service.communication.websocket.NotificationWsService;
 import org.eclipse.slm.notification_service.model.*;
 import org.eclipse.slm.notification_service.persistence.api.NotificationRepository;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.net.ssl.SSLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,7 +75,7 @@ public class ObserverRestController implements IAwxJobObserverListener {
             @RequestParam(name="jobId", required = true) int jobId,
             @RequestParam(name="jobTarget", required = true) JobTarget jobTarget,
             @RequestParam(name="jobGoal", required = true) JobGoal jobGoal
-    ) throws SSLException {
+    ) {
 
         var awxJobObserver = this.awxJobObserverInitializer.initNewObserver(jobId, jobTarget, jobGoal, this);
         if (!jobIdToNotifyUsers.containsKey(jobId))
@@ -94,7 +91,7 @@ public class ObserverRestController implements IAwxJobObserverListener {
         {
             for (var userUuid : this.jobIdToNotifyUsers.get(sender.jobId))
             {
-                sendJobChangedNotification(sender.jobId, newState.name(), userUuid);
+                sendJobChangedNotification( new JobStateChange(sender.jobId, newState), userUuid);
             }
         }
         else {
@@ -105,8 +102,8 @@ public class ObserverRestController implements IAwxJobObserverListener {
     @Override
     public void onJobStateFinished(AwxJobObserver sender, JobFinalState finalState) {
         if(this.jobIdToNotifyUsers.containsKey(sender.jobId)) {
-            for (var userUuid : this.jobIdToNotifyUsers.get(sender.jobId)) {
-                sendJobChangedNotification(sender.jobId, finalState.name(), userUuid);
+            for (var userId : this.jobIdToNotifyUsers.get(sender.jobId)) {
+                sendJobChangedNotification(new JobStateChange(sender.jobId, JobState.valueOf(finalState.name())), userId);
             }
 
             this.jobIdToNotifyUsers.remove(sender.jobId);
@@ -116,14 +113,11 @@ public class ObserverRestController implements IAwxJobObserverListener {
         }
     }
 
-    private void sendJobChangedNotification(int jobId, String jobState, String userUuid) {
-        Category category = Category.JOBS;
-        String text = "Job " + jobId + " turned into state '" + jobState + "'";
-        Notification notification = new Notification(category, text, userUuid);
+    private void sendJobChangedNotification(JobStateChange jobStateChange, String userId) {
+
+        var notification = new Notification(userId, NotificationCategory.JOBS, NotificationSubCategory.JOB, NotificationEventType.UPDATED, jobStateChange);
 
         notificationRepository.save(notification);
         notificationWsService.notifyFrontend(notification);
-
-        LOG.info("Created notification for user '" + userUuid + "': " + text);
     }
 }

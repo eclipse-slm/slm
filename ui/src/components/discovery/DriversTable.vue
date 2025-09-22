@@ -1,4 +1,4 @@
-<template>
+1<template>
   <div>
     <v-container fluid>
       <base-material-card>
@@ -12,21 +12,21 @@
         />
 
         <v-card-text v-else>
-          <v-row>
-            <v-row
+          <v-row
               dense
               class="ml-8 mb-8"
               align="center"
-            >
-              <v-text-field
+          >
+            <v-text-field
                 v-model="searchDrivers"
                 label="Search drivers"
                 append-inner-icon="mdi-magnify"
                 clearable
                 variant="underlined"
-              />
-              <v-spacer />
-            </v-row>
+            />
+            <v-spacer />
+          </v-row>
+          <v-row>
             <v-data-table
               id="table-discovered-resources"
               v-model="selectedDiscoveredResourceIds"

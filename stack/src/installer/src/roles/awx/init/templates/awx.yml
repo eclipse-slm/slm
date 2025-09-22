@@ -3,7 +3,6 @@ services:
   awx:
     image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/awx/awx-task:{{ ENV.AWX.VERSION }}"
     user: "0"
-    command: launch_awx.sh
     environment:
       OS: " Operating System: Docker Desktop"
       SDB_HOST: 0.0.0.0
@@ -17,9 +16,7 @@ services:
       DJANGO_SUPERUSER_PASSWORD: password
       UWSGI_MOUNT_PATH: /
       RUN_MIGRATIONS: 1
-    links:
-      - awx-postgres
-      - awx-redis
+      NGINX_INTERNAL_DNS_RESOLVER: "{{ ENV.AWX.NGINX.INTERNAL_DNS_RESOLVER }}"
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -45,7 +42,7 @@ services:
       - "8013:8013"  # http
       - "8053:8043"  # https
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
 
   awx-jwt-authenticator:
     image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/awx-jwt-authenticator:1.1.0-SNAPSHOT"
@@ -70,7 +67,7 @@ services:
         aliases:
           - awx-jwt-authenticator
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
 
   awx-redis:
     image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/awx/redis:{{ ENV.AWX.REDIS_VERSION }}"

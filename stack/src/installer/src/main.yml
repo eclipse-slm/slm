@@ -352,5 +352,13 @@
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_file: /compose/slm.yml
 
+    - name: "Store resulting environment file"
+      include_role:
+        name: common/utils
+        tasks_from: copy_result_compose_env
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_env_file: /compose/.env
+
     - debug:
         msg: "Eclipse Service Lifecycle Management version '{{ ENV.SLM_VERSION }}' successfully installed. Your Consul master token: {{ ENV.CONSUL.MASTER_TOKEN }}"

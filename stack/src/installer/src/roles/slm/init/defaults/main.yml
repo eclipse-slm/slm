@@ -22,8 +22,8 @@ keycloak_clients:
       groups: true
   - client_id: notification_service
     public_client: false
-    service_accounts_enabled: false
-    assign_client_role_to_service_account: false
+    service_accounts_enabled: true
+    assign_client_role_to_service_account: true
     protocol_mappers:
       audience: true
       groups: true

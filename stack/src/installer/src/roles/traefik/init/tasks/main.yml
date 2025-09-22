@@ -5,7 +5,7 @@
   vars:
     _cm_name: "{{ ENV.SLM_HOSTNAME }}"
 
-- name: "Traefik | Configure Consul"
+- name: "Traefik | Add static config to Consul"
   community.general.consul_kv:
     scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
     host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
@@ -14,11 +14,25 @@
     key: "{{ item.key }}"
     value: "{{ item.value }}"
   with_items:
-#    - { key: "traefik/http/routers/dashboard/entryPoints/0", value: "web" }
-#    - { key: "traefik/http/routers/dashboard/rule", value: "Host(`{{ ENV.SLM_HOSTNAME }}`)" }
-#    - { key: "traefik/http/routers/dashboard/service", value: "api@internal" }
     - { key: "traefik/tls/stores/default/defaultCertificate/certFile", value: "/certs/certificate.crt" }
     - { key: "traefik/tls/stores/default/defaultCertificate/keyFile", value: "/certs/certificate.key" }
+
+- block:
+  - set_fact:
+      _traefik_additional_config: {}
+    when: ENV.TRAEFIK.ADDITIONAL_CONFIG is not mapping
+  - set_fact:
+      _traefik_additional_config: "{{ ENV.TRAEFIK.ADDITIONAL_CONFIG | from_yaml }}"
+    when: ENV.TRAEFIK.ADDITIONAL_CONFIG is mapping
+  - name: "Traefik | Add additional config to Consul"
+    community.general.consul_kv:
+      scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+      host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+      port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
+      token: "{{ _consul_token }}"
+      key: "traefik/{{ item.key | replace('.', '/') }}"
+      value: "{{ item.value }}"
+    with_items: "{{ _traefik_additional_config | default({}) | dict2items }}"
 
 - name: "Traefik | Create compose definition from template"
   set_fact:

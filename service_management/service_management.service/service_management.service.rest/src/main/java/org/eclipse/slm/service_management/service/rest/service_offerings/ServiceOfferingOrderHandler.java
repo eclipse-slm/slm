@@ -6,13 +6,12 @@ import org.eclipse.slm.common.consul.client.apis.ConsulNodesApiClient;
 import org.eclipse.slm.common.consul.model.catalog.Node;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.parent.service_rest.controller.SystemVariableHandler;
-import org.eclipse.slm.resource_management.model.capabilities.provider.ServiceHosterFilter;
-import org.eclipse.slm.resource_management.model.consul.capability.CapabilityService;
-import org.eclipse.slm.resource_management.model.consul.capability.MultiHostCapabilityService;
-import org.eclipse.slm.resource_management.model.consul.capability.SingleHostCapabilityService;
-import org.eclipse.slm.resource_management.model.resource.MatchingResourceDTO;
+import org.eclipse.slm.resource_management.common.model.MatchingResourceDTO;
+import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService;
+import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
+import org.eclipse.slm.resource_management.features.capabilities.model.SingleHostCapabilityService;
+import org.eclipse.slm.resource_management.features.providers.ServiceHosterFilter;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
-import org.eclipse.slm.resource_management.service.client.handler.*;
 import org.eclipse.slm.service_management.model.exceptions.ServiceOptionNotFoundException;
 import org.eclipse.slm.service_management.model.offerings.options.DeploymentVariableType;
 import org.eclipse.slm.service_management.service.rest.service_deployment.CapabilityServiceNotFoundException;
@@ -74,7 +73,7 @@ public class ServiceOfferingOrderHandler {
     public void orderServiceOfferingById(UUID serviceOfferingId, UUID serviceOfferingVersionId,
                                          ServiceOrder serviceOrder,
                                          UUID deploymentCapabilityServiceId, JwtAuthenticationToken jwtAuthenticationToken)
-            throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, ApiException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException, ConsulLoginFailedException {
+            throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, org.eclipse.slm.resource_management.service.client.handler.ApiException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException, ConsulLoginFailedException {
         var serviceOffering = this.serviceOfferingHandler.getServiceOfferingById(serviceOfferingId);
         var serviceOfferingVersion = this.serviceOfferingVersionHandler
                 .getServiceOfferingVersionById(serviceOfferingId, serviceOfferingVersionId);
@@ -113,7 +112,7 @@ public class ServiceOfferingOrderHandler {
                                 switch (deploymentVariable) {
                                     case TARGET_RESOURCE_ID -> {
                                         var resourceManagementApiClient = resourceManagementApiClientInitializer.init(jwtAuthenticationToken);
-                                        var capabilityProvidersRestControllerApi = new CapabilityProvidersRestControllerApi(resourceManagementApiClient);
+                                        var capabilityProvidersRestControllerApi = new org.eclipse.slm.resource_management.service.client.handler.CapabilityProvidersRestControllerApi(resourceManagementApiClient);
 
                                         var serviceHosterFilter = new ServiceHosterFilter.Builder()
                                                 .capabilityServiceId(deploymentCapabilityServiceId)
@@ -125,7 +124,7 @@ public class ServiceOfferingOrderHandler {
 
                                     case TARGET_RESOURCE_IP -> {
                                         var resourceManagementApiClient = resourceManagementApiClientInitializer.init(jwtAuthenticationToken);
-                                        var capabilityProvidersRestControllerApi = new CapabilityProvidersRestControllerApi(resourceManagementApiClient);
+                                        var capabilityProvidersRestControllerApi = new org.eclipse.slm.resource_management.service.client.handler.CapabilityProvidersRestControllerApi(resourceManagementApiClient);
 
                                         var serviceHosterFilter = new ServiceHosterFilter.Builder()
                                                 .capabilityServiceId(deploymentCapabilityServiceId)
@@ -149,7 +148,7 @@ public class ServiceOfferingOrderHandler {
     public List<MatchingResourceDTO> getCapabilityServicesMatchingServiceRequirements(UUID serviceOfferingId,
                                                                                       UUID serviceOfferingVersionId,
                                                                                       JwtAuthenticationToken jwtAuthenticationToken)
-            throws ApiException, SSLException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException {
+            throws org.eclipse.slm.resource_management.service.client.handler.ApiException, SSLException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException {
         var serviceOffering = this.serviceOfferingHandler.getServiceOfferingById(serviceOfferingId);
         var serviceOfferingVersion = this.serviceOfferingVersionHandler
                 .getServiceOfferingVersionById(serviceOfferingId, serviceOfferingVersionId);
@@ -157,7 +156,7 @@ public class ServiceOfferingOrderHandler {
         var serviceOfferingDeploymentType = serviceOfferingVersion.getDeploymentDefinition().getDeploymentType();
         var resourceManagementApiClient = resourceManagementApiClientInitializer.init(jwtAuthenticationToken);
 
-        var capabilityProvidersRestControllerApi = new CapabilityProvidersRestControllerApi(resourceManagementApiClient);
+        var capabilityProvidersRestControllerApi = new org.eclipse.slm.resource_management.service.client.handler.CapabilityProvidersRestControllerApi(resourceManagementApiClient);
 
         var serviceHosterFilter = new ServiceHosterFilter.Builder()
                 .supportedDeploymentType(serviceOfferingDeploymentType)
@@ -167,13 +166,18 @@ public class ServiceOfferingOrderHandler {
         serviceHosters = serviceHosters.stream()
                 .filter(sh -> {
                     if (sh.getCapabilityService() instanceof SingleHostCapabilityService) {
-                        var singleHostCapabilityService = (SingleHostCapabilityService)sh.getCapabilityService();
-                        var resourceId = singleHostCapabilityService.getConsulNodeId();
+                        try {
+                            var singleHostCapabilityService = (SingleHostCapabilityService) sh.getCapabilityService();
+                            var resourceId = singleHostCapabilityService.getConsulNodeId();
 
-                        return serviceOfferingVersion.getServiceRequirements()
-                                .stream()
-                                .allMatch(requirementDTO -> serviceOfferingVersionRequirementsHandler
-                                        .isRequirementFulfilledByResource(requirementDTO, resourceId, jwtAuthenticationToken));
+                            return serviceOfferingVersion.getServiceRequirements()
+                                    .stream()
+                                    .allMatch(requirementDTO -> serviceOfferingVersionRequirementsHandler
+                                            .isRequirementFulfilledByResource(requirementDTO, resourceId, jwtAuthenticationToken));
+                        } catch (Exception e) {
+                            LOG.error("Error while checking service requirements for resource '" + ((SingleHostCapabilityService) sh.getCapabilityService()).getConsulNodeId() + "'", e);
+                            return false;
+                        }
                     }
                     else {
                         return true;

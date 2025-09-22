@@ -1,0 +1,43 @@
+{
+  "exp": 1755906974,
+  "iat": 1755870974,
+  "jti": "122b512f-6409-4435-8148-aa5d69d64927",
+  "iss": "https://slm.dev-vm.local/auth/realms/fabos",
+  "aud": [
+    "ui",
+    "account"
+  ],
+  "sub": "2f6aaf66-3131-4793-a3c2-1f79d254acd7",
+  "typ": "Bearer",
+  "azp": "ui",
+  "session_state": "cfdf4cbf-8353-4418-853e-43a126e91431",
+  "acr": "1",
+  "allowed-origins": [
+    "*"
+  ],
+  "realm_access": {
+    "roles": [
+      "resource_7852e7b5-be8d-5be1-9b67-23e09767dbff",
+      "offline_access",
+      "default-roles-fabos",
+      "ssp-user",
+      "uma_authorization",
+      "resource_c799420b-00ee-480c-88c3-71c39a40a51b",
+      "resource_5785130e-fefd-46ff-8239-75bdc46aafce"
+    ]
+  },
+  "resource_access": {
+    "account": {
+      "roles": [
+        "manage-account",
+        "manage-account-links",
+        "view-profile"
+      ]
+    }
+  },
+  "scope": "profile email",
+  "sid": "cfdf4cbf-8353-4418-853e-43a126e91431",
+  "email_verified": false,
+  "groups": [],
+  "preferred_username": "fabos"
+}

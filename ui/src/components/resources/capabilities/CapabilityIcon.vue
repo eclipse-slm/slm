@@ -1,42 +1,44 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import {useCapabilitiesStore} from "@/stores/capabilitiesStore";
+import {CapabilityServiceDTO} from "@/api/resource-management/client";
+import {storeToRefs} from "pinia";
 
-const props = defineProps({
-  capabilityService: {
-    type: Object,
-    required: true,
-  },
-});
+const props = defineProps<{
+  capabilityService: CapabilityServiceDTO
+}>()
 
-const getChipIconByCapabilityService = (status) => {
-  if(status === "READY")
-    return "mdi-check"
+const capabilitiesStore = useCapabilitiesStore();
+const { capabilityById } = storeToRefs(capabilitiesStore);
 
-  if(status === "INSTALL")
-    return "mdi-plus"
-
-  if(status === "UNINSTALL")
-    return "mdi-minus"
-
-  if(status === "UNKNOWN")
-    return "mdi-help"
-
-  if(status === "FAILED")
-    return "mdi-alert-circle-outline"
-}
-
+const chipIcon = computed(() => {
+  switch (props.capabilityService.status) {
+    case 'READY':
+      return 'mdi-check'
+    case 'INSTALL':
+      return 'mdi-plus'
+    case 'UNINSTALL':
+      return 'mdi-minus'
+    case 'UNKNOWN':
+      return 'mdi-help'
+    case 'FAILED':
+      return 'mdi-alert-circle-outline'
+    default:
+      return ''
+  }
+})
 </script>
 
 <template>
-  <v-chip
-    class="ma-1"
-  >
-    <v-icon start>
-      {{ getChipIconByCapabilityService(capabilityService.status) }}
-    </v-icon>
-    {{ capabilityService.capability.name }}
-  </v-chip>
+  <div v-if="capabilityById(props.capabilityService?.capabilityId)?.name">
+    <v-chip class="ma-1">
+      <v-icon start>
+        {{ chipIcon }}
+      </v-icon>
+      {{ capabilityById(props.capabilityService.capabilityId).name }}
+    </v-chip>
+  </div>
 </template>
 
 <style scoped>
-
 </style>

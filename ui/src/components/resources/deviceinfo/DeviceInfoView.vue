@@ -48,8 +48,14 @@
               Firmware
             </v-tab>
 
-            <!-- Submodels -->
+            <!-- Capabilities -->
             <v-tab :value="5">
+              <v-icon>mdi-toolbox</v-icon>
+              Capabilities
+            </v-tab>
+
+            <!-- Submodels -->
+            <v-tab :value="6">
               <v-icon>mdi-adjust</v-icon>
               Submodels
             </v-tab>
@@ -88,9 +94,18 @@
               />
             </v-tabs-window-item>
 
+            <!-- Capabilities -->
+            <v-tabs-window-item
+                :value="5"
+            >
+              <DeviceInfoCapabilitiesView
+                  :resource-id="resource.id"
+              />
+            </v-tabs-window-item>
+
             <!-- Submodels -->
             <v-tabs-window-item
-              :value="5"
+              :value="6"
             >
               <DeviceInfoSubmodelsView
                 :resource-id="resource.id"
@@ -119,6 +134,7 @@ import DeviceInfoNameplateView from "@/components/resources/deviceinfo/DeviceInf
 import DeviceInfoHardwareView from "@/components/resources/deviceinfo/DeviceInfoHardwareView.vue";
 import DeviceInfoCommonView from "@/components/resources/deviceinfo/DeviceInfoCommonView.vue";
 import DeviceInfoFirmwareView from "@/components/resources/deviceinfo/DeviceInfoFirmwareView.vue";
+import DeviceInfoCapabilitiesView from "@/components/resources/deviceinfo/DeviceInfoCapabilitiesView.vue";
 
 const emit = defineEmits(['closed']);
 

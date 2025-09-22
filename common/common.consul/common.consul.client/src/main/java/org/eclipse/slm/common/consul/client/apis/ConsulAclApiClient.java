@@ -113,7 +113,7 @@ public class ConsulAclApiClient extends AbstractConsulApiClient {
         try {
             this.getConsulClient(consulCredential).aclClient().createPolicy( consulPolicy);
         } catch (ConsulException e){
-            LOG.info("A policy with name '" + policy.getName() + "' already exists");
+            LOG.debug("A policy with name '" + policy.getName() + "' already exists");
         } catch (ConsulLoginFailedException e){
             LOG.warn("ACL disabled => Not able to create policy with name '"+policy.getName()+"'");
         } catch(Exception e){
@@ -197,8 +197,7 @@ public class ConsulAclApiClient extends AbstractConsulApiClient {
         try {
             this.getConsulClient(consulCredential).aclClient().createRole(role);
         } catch(ConsulException e){
-            LOG.info("A Role with Name '" + role.getName() + "' already exists");
-            LOG.info(e.getMessage());
+            LOG.debug("A Role with Name '" + role.getName() + "' already exists: ", e);
         } catch (ConsulLoginFailedException e) {
             LOG.warn("ACL disabled => Not able to create role with name '"+role.getName()+"'");
         }

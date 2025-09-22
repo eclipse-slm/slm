@@ -15,7 +15,7 @@ services:
         aliases:
           - vault
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     volumes:
       - vault_config_root:/vault/config/root
       - vault_data:/vault/file

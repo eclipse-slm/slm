@@ -1,5 +1,6 @@
 package org.eclipse.slm.notification_service.communication.websocket;
 
+import org.eclipse.slm.notification_service.model.IEventNotification;
 import org.eclipse.slm.notification_service.model.Notification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +20,16 @@ public class NotificationWsService {
     }
 
     public void notifyFrontend(final Notification notification) {
-        String prefix = simpleMessageTemplate.getUserDestinationPrefix();
+        logger.info("Send notification '" + notification.toString() + "' to user '" + notification.getUserId() + "'");
 
-        logger.info("Send notification '" + notification.getText() + "' to user '" + notification.getOwner() + "'");
+        simpleMessageTemplate.convertAndSendToUser(notification.getUserId(), "/topic/notifications", notification);
+        simpleMessageTemplate.convertAndSend("/topic/notifications/"+notification.getUserId(), notification);
+    }
 
-        simpleMessageTemplate.convertAndSendToUser(notification.getOwner(), "/topic/notifications", notification);
-        simpleMessageTemplate.convertAndSend("/topic/notifications/"+notification.getOwner(), notification);
+    public void notifyFrontend(final IEventNotification eventNotification) {
+        logger.info("Send notification '" + eventNotification.toString() + "' to user '" + eventNotification.getUserId() + "'");
+
+        simpleMessageTemplate.convertAndSendToUser(eventNotification.getUserId(), "/topic/notifications", eventNotification);
+        simpleMessageTemplate.convertAndSend("/topic/notifications/"+eventNotification.getUserId(), eventNotification);
     }
 }

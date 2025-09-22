@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class MethodNotImplementedException extends RuntimeException {
 
 	public MethodNotImplementedException() {
-		super("Method not implemented or supported for this submodel");
+		super("Method not implemented or supported for this shell or submodel");
 	}
 }

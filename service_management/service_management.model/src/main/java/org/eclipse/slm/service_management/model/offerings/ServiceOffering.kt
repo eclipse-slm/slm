@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import jakarta.persistence.*
-import org.eclipse.slm.service_management.model.AbstractBaseEntityUuid
+import org.eclipse.slm.common.model.AbstractBaseEntityUuid
 import org.eclipse.slm.service_management.model.utils.ByteArrayDeserializer
 import org.eclipse.slm.service_management.model.vendors.ServiceVendor
 import org.slf4j.Logger

@@ -40,7 +40,7 @@ public class SubmodelServiceClient {
     public static SubmodelServiceClient FromSubmodelDescriptor(SubmodelDescriptor submodelDescriptor, JwtAuthenticationToken jwtAuthenticationToken) {
         var submodelEndpoint = submodelDescriptor.getEndpoints().get(0).getProtocolInformation().getHref();
 
-        if (submodelEndpoint.contains("/submodel")) {
+        if (submodelEndpoint.endsWith("/submodel")) {
             var regExPattern = Pattern.compile("(.*/submodel)$");
             var matcher = regExPattern.matcher(submodelEndpoint);
             var matchesFound = matcher.find();

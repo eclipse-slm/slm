@@ -28,7 +28,7 @@ services:
         aliases:
           - "{{ ENV.MONITORING.PROMETHEUS.HOST.INTERNAL }}"
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     ports:
       - "{{ ENV.MONITORING.PROMETHEUS.PORT.EXTERNAL }}:{{ ENV.MONITORING.PROMETHEUS.PORT.INTERNAL }}"
     healthcheck:

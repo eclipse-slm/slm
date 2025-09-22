@@ -12,8 +12,10 @@ services:
       default:
         aliases:
           - ui
+    cap_add:
+      - CAP_NET_BIND_SERVICE
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     environment:
       KEYCLOAK_URL: "{{ keycloak.url.external_without_port }}"
       AWX_URL: "{{ awx.url.external }}"
@@ -54,7 +56,7 @@ services:
         aliases:
           - "{{ ENV.RESOURCE_MANAGEMENT.HOST.INTERNAL }}"
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:9010/swagger-ui/index.html" ]
 
@@ -100,7 +102,7 @@ services:
       KEYCLOAK_PASSWORD: "{{ keycloak_config['default_user_password'] }}"
       CONSUL_ACLTOKEN: "{{ app_configs['resource_management']['consul']['acl-token'] }}"
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
 
   service-management:
     image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm/service-management:{{ ENV.SLM_VERSION }}"
@@ -137,7 +139,7 @@ services:
         aliases:
           - "{{ ENV.SERVICE_MANAGEMENT.HOST.INTERNAL }}"
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:9020/swagger-ui/index.html" ]
 
@@ -150,7 +152,7 @@ services:
         max-file: "{{ ENV.LOGGING_MAX_FILE }}"
         max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     environment:
       SERVICEMANAGEMENT_URL: "{{ service_management.url.internal }}"
       SERVICEMANAGEMENT_INITDIRECTORIES: "{{ ENV.SERVICE_MANAGEMENT.INITIALIZATION_LOCAL_DIRECTORIES }}"
@@ -212,7 +214,7 @@ services:
         aliases:
           - "{{ ENV.NOTIFICATION_SERVICE.HOST.INTERNAL }}"
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:9001/swagger-ui/index.html" ]
 
@@ -263,14 +265,15 @@ services:
       AAS_SUBMODELREGISTRY_URL: "{{ aas.submodel_registry.url.internal }}"
       AAS_SUBMODELREPOSITORY_URL: "{{ aas.submodel_repository.url.internal }}"
       AAS_CONCEPTDESCRIPTIONSREPOSITORY_URL: "{{ aas.concept_description_repository.url.internal }}"
-      IRS_URL: "{{ irs.url.internal }}"
+      IRS_URL_INTERNAL: "{{ irs.url.internal }}"
+      IRS_URL_EXTERNAL: "{{ irs.url.proxy }}"
       KEYCLOAK_AUTHSERVERURL: "{{ keycloak.url.external }}"
     networks:
       default:
         aliases:
           - "{{ ENV.INFORMATION_SERVICE.HOST.INTERNAL }}"
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:9002/swagger-ui/index.html" ]
 

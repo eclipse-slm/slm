@@ -13,7 +13,7 @@
           Scale Resource  <strong>{{ selectedClusterForScale.name }}</strong>
         </v-toolbar>
         <v-card-text>
-          Do your really want to scale this resource {{ action }}?
+          Do your want to scale this resource {{ action }}?
         </v-card-text>
         <v-card-actions>
           <v-btn

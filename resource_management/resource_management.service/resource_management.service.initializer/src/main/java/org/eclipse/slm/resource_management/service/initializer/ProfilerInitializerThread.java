@@ -1,6 +1,6 @@
 package org.eclipse.slm.resource_management.service.initializer;
 
-import org.eclipse.slm.resource_management.model.profiler.ProfilerDTOApi;
+import org.eclipse.slm.resource_management.features.profiler.ProfilerDTOApi;
 import org.eclipse.slm.resource_management.service.client.handler.ApiException;
 import org.eclipse.slm.resource_management.service.client.handler.ProfilerRestControllerApi;
 import org.slf4j.Logger;

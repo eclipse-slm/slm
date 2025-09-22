@@ -3,9 +3,8 @@ package org.eclipse.slm.service_management.model.vendors
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.Lob
 import jakarta.persistence.Table
-import org.eclipse.slm.service_management.model.AbstractBaseEntityUuid
+import org.eclipse.slm.common.model.AbstractBaseEntityUuid
 import java.util.*
 
 @Entity

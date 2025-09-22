@@ -12,6 +12,10 @@ export default defineConfig(({ mode }) => {
             host: '0.0.0.0',
             allowedHosts: ['slm.local'],
             port: 8080,
+            https: {
+                key: 'certs/cert.key',
+                cert: 'certs/cert.crt',
+            },
             proxy: {
                 '/notification-service': {
                     target: `${env.VITE_APP_NOTIFICATION_SERVICE_URL}`,

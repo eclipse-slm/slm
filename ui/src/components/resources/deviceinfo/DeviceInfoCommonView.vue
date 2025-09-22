@@ -3,11 +3,14 @@ import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
 import { useClipboard } from '@vueuse/core'
 import {onMounted, ref} from "vue";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
-import {BasicResource} from "@/api/resource-management/client";
 import ProgressCircular from "@/components/base/ProgressCircular.vue";
 import RowWithLabel from "@/components/base/RowWithLabel.vue";
 import {useToast} from 'vue-toast-notification';
 import DeviceUtils from '@/utils/deviceUtils';
+import RemoteAccessDialog from "@/components/resources/remoteaccess/RemoteAccessDialog.vue";
+import {RemoteAccessDTO, ResourceDTO} from "@/api/resource-management/client";
+import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
+import logRequestError from "@/api/restApiHelper";
 
 const props = defineProps({
   resourceId: {
@@ -19,27 +22,55 @@ const props = defineProps({
 const resourceDevicesStore = useResourceDevicesStore();
 const $toast = useToast();
 
-const resource = ref<BasicResource|undefined>(undefined)
-
+const resource = ref<ResourceDTO|undefined>(undefined)
+const remoteAccess = ref<RemoteAccessDTO[]>([])
+const showRemoteAccessCreateOrUpdateDialog = ref(false)
+const showRemoteAccessDeleteDialog = ref(false)
 const showPassword = ref(false);
+
 
 const loading = ref(true);
 const loadData = () => {
-  // Get aas descriptor
+  // Get resource
   ResourceManagementClient.resourcesApi.getResource(props.resourceId).then(response => {
     resource.value = response.data
+    // Load remote access
+    const promises = (resource.value?.remoteAccessIds ?? []).map(remoteAccessId =>
+        ResourceManagementClient.resourcesApi.getRemoteAccessOfResourceById(resource.value!.id, remoteAccessId)
+    );
+    Promise.all(promises).then(responses => {
+      remoteAccess.value = responses.map(r => r.data);
+    }).finally(() => {
+      loading.value = false
+    });
+
   }).catch((e) => {
     resource.value = undefined;
-
-  }).finally(() => {
     loading.value = false
   })
 }
 
+const onRemoteAccessCreateOrEditDialogConfirmed = () => {
+  showRemoteAccessCreateOrUpdateDialog.value = false
+  loadData()
+}
+
+const onDeleteRemoteAccessDialogConfirmed = (remoteAccessId: string) => {
+  ResourceManagementClient.resourcesApi.deleteRemoteAccessOfResourceById(resource.value!.id, remoteAccessId).then(() => {
+    loadData()
+    showRemoteAccessDeleteDialog.value = false
+    $toast.info("Remote access deleted")
+  }).catch((e) => {
+    logRequestError(e)
+    $toast.error("Failed to delete remote access")
+  })
+}
+
 const { copy, isSupported } = useClipboard()
-const copyPassword = () => {
-  if (resource.value?.remoteAccessService?.credential?.password !== undefined) {
-    copy(resource.value.remoteAccessService.credential.password)
+const copyPassword = (remoteAccessId) => {
+  const selectedRemoteAccess = remoteAccess.value.find(ra => ra.id === remoteAccessId);
+  if (selectedRemoteAccess?.credential?.password !== undefined) {
+    copy(selectedRemoteAccess?.credential.password)
     $toast.info(`Password copied to clipboard`)
   }
   else {
@@ -65,7 +96,7 @@ onMounted(() => {
       />
       <RowWithLabel
         label="Vendor"
-        :text="DeviceUtils.getVendor(resourceId)"
+        :text="DeviceUtils.getManufacturer(resourceId)"
       />
       <RowWithLabel
         label="Resource Id"
@@ -87,8 +118,19 @@ onMounted(() => {
         label="Remote Access"
       >
         <template #content>
-          <div v-if="resource.remoteAccessService === undefined">
-            Not available
+          <div v-if="!resource?.remoteAccessAvailable">
+            <v-btn color="primary" @click="showRemoteAccessCreateOrUpdateDialog = true">
+              <v-icon color="white">
+                mdi-plus
+              </v-icon>
+            </v-btn>
+            <RemoteAccessDialog
+                :show="showRemoteAccessCreateOrUpdateDialog"
+                :resource-id="resourceId"
+                width="35%"
+                @canceled="showRemoteAccessCreateOrUpdateDialog = false"
+                @confirmed="onRemoteAccessCreateOrEditDialogConfirmed"
+            />
           </div>
           <div v-else>
             <v-expansion-panels
@@ -97,17 +139,45 @@ onMounted(() => {
               :model-value="0"
             >
               <v-expansion-panel
-                :title="resource.remoteAccessService.connectionType"
-                expand
+                  v-for="(item, idx) in remoteAccess"
+                  :key="item.id || idx"
+                  :title="item.connectionType"
+                  expand
               >
+                <template #title>
+                  <v-row align="center" no-gutters>
+                    <v-col cols="11">
+                    <span class="ml-2">{{ item.connectionType }}</span>
+                    </v-col>
+                    <v-col cols="1">
+                      <v-btn
+                          color="error"
+                          @click.stop="showRemoteAccessDeleteDialog = true"
+                      >
+                        <v-icon
+                            icon="mdi-trash-can"
+                            color="white"
+                        />
+                      </v-btn>
+                      <confirm-dialog
+                          :show="showRemoteAccessDeleteDialog"
+                          title="Delete remote access"
+                          :text="`Do you want to delete remote access '${item.connectionType}'?`"
+                          confirm-button-label="Delete"
+                          @canceled="showRemoteAccessDeleteDialog = false"
+                          @confirmed="onDeleteRemoteAccessDialogConfirmed(item.id)"
+                      ></confirm-dialog>
+                    </v-col>
+                  </v-row>
+                </template>
                 <template #text>
                   <RowWithLabel
                     label="Port"
-                    :text="resource.remoteAccessService.Port"
+                    :text="item.connectionPort"
                   />
                   <RowWithLabel
                     label="Username"
-                    :text="resource.remoteAccessService.credential.username"
+                    :text="item.credential.username"
                   />
                   <RowWithLabel
                     label="Password"
@@ -116,7 +186,7 @@ onMounted(() => {
                       <v-row>
                         <v-col cols="8">
                           <div v-if="showPassword">
-                            {{ resource.remoteAccessService.credential.password }}
+                            {{ item.credential.password }}
                           </div>
                           <div v-else>
                             ••••••••
@@ -139,7 +209,7 @@ onMounted(() => {
                         >
                           <v-btn
                             color="info"
-                            @click="copyPassword"
+                            @click="copyPassword(item.id)"
                           >
                             <v-icon icon="mdi-content-copy" />
                           </v-btn>

@@ -8,24 +8,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @ClientEndpoint
 public class AwxJobEndpoint extends Endpoint implements MessageHandler.Partial<String> {
 
-
     public final static Logger LOG = LoggerFactory.getLogger(AwxJobObserverInitializer.class);
 
-    HashSet<AwxJobObserver> awxJobObservers = new HashSet<>();
-    ObjectMapper objectMapper = new ObjectMapper();
+    private Set<AwxJobObserver> awxJobObservers = new CopyOnWriteArraySet<>();
+    private ObjectMapper objectMapper = new ObjectMapper();
     private Session session;
     private final String xrfToken;
 
     public AwxJobEndpoint(String xrfToken) {
         this.xrfToken = xrfToken;
     }
-
 
     public void registerObserver(AwxJobObserver awxJobObserver) {
         this.awxJobObservers.add(awxJobObserver);
@@ -51,7 +50,7 @@ public class AwxJobEndpoint extends Endpoint implements MessageHandler.Partial<S
 
 
         } catch (IOException e) {
-            LOG.error("Could not connect to AWX server.");
+            LOG.error("Failed to open WebSocket connection to AWX server", e);
         }
     }
 
@@ -70,13 +69,13 @@ public class AwxJobEndpoint extends Endpoint implements MessageHandler.Partial<S
                 }
             }
         } catch (Exception e) {
-            LOG.error("Mapping error of AWX Server");
+            LOG.error("Could not handle message from AWX server: " + messagePart, e);
         }
     }
 
     @Override
     public void onError(Session session, Throwable cause) {
-        LOG.error("Connection Error");
+        LOG.error("WebSocket error occurred", cause);
     }
 
 

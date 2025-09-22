@@ -1,3 +1,114 @@
+<script setup>
+import { ref, computed, watch, onMounted } from 'vue';
+import { useResourceDevicesStore } from "@/stores/resourceDevicesStore";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
+import CapabilitiesButton from "@/components/resources/capabilities/CapabilitiesButton.vue";
+import CapabilityIcon from "@/components/resources/capabilities/CapabilityIcon.vue";
+import {storeToRefs} from "pinia";
+import FirmwareUpdateVersion from "@/components/updates/FirmwareUpdateVersion.vue";
+import ApiState from "@/api/apiState";
+import DeviceUtils from '@/utils/deviceUtils';
+import {useCapabilitiesStore} from "@/stores/capabilitiesStore";
+import {useToast} from "vue-toast-notification";
+import ResourcesDeleteDialog from "@/components/resources/ResourcesDeleteDialog.vue";
+import {useCapabilityUtils} from "@/utils/capabilityUtils";
+
+const emit = defineEmits(['resourceClicked']);
+
+const $toast = useToast();
+
+const capabilityUtils = useCapabilityUtils()
+
+const resourceDevicesStore = useResourceDevicesStore();
+const {resources} = storeToRefs(resourceDevicesStore);
+const capabilitiesStore = useCapabilitiesStore();
+const { capabilityServiceById } = storeToRefs(capabilitiesStore);
+
+const tableHeaders = [
+  { title: "Product", key: "product", width: "20%" },
+  { title: "Manufacturer", key: "manufacturer", width: "20%" },
+  { title: 'Capabilities', key: 'deploymentCapabilityServices', value: 'deploymentCapabilityServices', width: "10%" },
+  { title: 'Configurations', key: 'configurationCapabilityServices', value: 'configurationCapabilityServices', width: "10%" },
+  { title: 'Hostname', key: 'hostname', value: 'hostname', width: "10%" },
+  { title: 'IP', key: 'ip', value: 'ip', width: "5%" },
+  { title: 'Location', key: 'location.name', value: 'location.name', width: "10%"},
+  { title: 'Firmware', key: 'firmware', width: "10%" },
+  { title: 'Actions', value: 'actions', sortable: false, width: "5%" },
+];
+
+const groupBy = ref([]);
+const sortBy = ref([{ key: 'product', order: 'asc' }]);
+const filterResourcesByLocations = ref([]);
+const searchResources = ref(undefined);
+const apiState = computed(() => resourceDevicesStore.apiState);
+
+const selectedResourcesIds = ref([])
+
+const showResourcesDeleteDialog = ref(false);
+
+const filteredResources = computed(() => {
+  if (filterResourcesByLocations.value.length === 0) {
+    return resources.value
+  }
+
+  return resources.value.filter(r => {
+    if (r.location == null)
+      return false;
+
+    return filterResourcesByLocations.value.includes(r.location.id);
+  });
+});
+
+
+const locations = computed(() => resourceDevicesStore.locations);
+const profiler = computed(() => resourceDevicesStore.profiler);
+
+onMounted(() => {
+  resourceDevicesStore.getResourceAasValues();
+});
+
+const setSelectedResource = (event, { item, section }) => {
+  emit('resourceClicked', item, section);
+};
+
+const getLocationNameForGroupHeader = (items) => {
+  if (items[0].location === null)
+    return "no location";
+
+  return items[0].location.name;
+};
+
+const resourcesHaveLocations = () => {
+  const locationNames = [...new Set(
+      resources.value.map(r => {
+        if (r.location == null)
+          return '';
+        else
+          return r.location.name;
+      })
+  )];
+  const hasLocations = locationNames.length > 0;
+
+  if (!hasLocations)
+    groupBy.value = null;
+
+  return hasLocations;
+};
+
+const runProfiler = () => {
+  ResourceManagementClient.profilerApi.runProfiler1().then().catch(logRequestError);
+  $toast.info('Started Profiler for all devices.');
+};
+
+const colorRowItem = (row) => {
+  if (selectedResourcesIds.value.includes(row.item.id)) {
+    return { class: 'v-data-table__selected' };
+  }
+};
+
+</script>
+
 <template>
   <v-container fluid>
     <v-row
@@ -94,20 +205,40 @@
             </template>
             <span>Run all available <a href="https://eclipse-slm.github.io/slm/docs/usage/profiler/">profilers</a> on all devices</span>
           </v-tooltip>
+          <v-btn
+              :disabled="selectedResourcesIds.length === 0"
+              class="mx-4"
+              color="secondary"
+              @click="showResourcesDeleteDialog = true"
+          >
+            <v-icon
+                icon="mdi-delete"
+                color="white"
+            />
+            <ResourcesDeleteDialog
+              :show="showResourcesDeleteDialog"
+              :resource-ids="selectedResourcesIds"
+              @completed="showResourcesDeleteDialog = false; selectedResourcesIds = [];"
+              @canceled="showResourcesDeleteDialog = false"
+            ></ResourcesDeleteDialog>
+          </v-btn>
         </v-row>
       </v-col>
     </v-row>
 
     <v-data-table
       id="resource-table-devices"
+      :model-value="selectedResourcesIds"
+      @update:model-value="val => selectedResourcesIds = val"
       :headers="tableHeaders"
       :items="filteredResources"
       :search="searchResources"
       :sort-by.sync="sortBy"
-      :row-props="rowClass"
       item-key="id"
       :items-per-page="25"
       :loading="apiState === ApiState.LOADING || apiState === ApiState.UPDATING"
+      show-select
+      :row-props="colorRowItem"
       @click:row="setSelectedResource"
     >
       <template #group.header="{items, isOpen, toggle}">
@@ -127,27 +258,49 @@
         </div>
       </template>
 
-      <template #item.vendor="{ item }">
+      <template #item.manufacturer="{ item }">
         <div>
-          {{ DeviceUtils.getVendor(item.id) }}
+          {{ DeviceUtils.getManufacturer(item.id) }}
         </div>
       </template>
 
-      <template #item.capabilityServices="{ item }">
+      <template #item.deploymentCapabilityServices="{ item }">
+        <v-row>
+          <v-tooltip
+            v-for="capabilityServiceId in capabilityUtils.filterDeploymentCapabilityServices(item.capabilityServiceIds)"
+            :key="capabilityServiceId"
+            location="top"
+          >
+            <template #activator="{ props }">
+              <CapabilityIcon
+                  v-if="capabilityServiceById(capabilityServiceId)"
+                  v-bind="props"
+                  :capability-service="capabilityServiceById(capabilityServiceId)"
+              />
+            </template>
+            <span>Status: {{ capabilityServiceById(capabilityServiceId)?.status }}</span>
+          </v-tooltip>
+        </v-row>
+      </template>
+
+      <template #item.configurationCapabilityServices="{ item }">
+      <v-row>
         <v-tooltip
-          v-for="capabilityService in getDeploymentCapabilityServices(item.capabilityServices)"
-          :key="capabilityService.capability.name"
-          location="top"
+            v-for="capabilityServiceId in capabilityUtils.filterConfigurationCapabilityServices(item.capabilityServiceIds)"
+            :key="capabilityServiceId"
+            location="top"
         >
           <template #activator="{ props }">
             <CapabilityIcon
-              v-bind="props"
-              :capability-service="capabilityService"
+                v-if="capabilityServiceById(capabilityServiceId)"
+                v-bind="props"
+                :capability-service="capabilityServiceById(capabilityServiceId)"
             />
           </template>
-          <span>Status: {{ capabilityService.status }}</span>
+          <span>Status: {{ capabilityServiceById(capabilityServiceId)?.status }}</span>
         </v-tooltip>
-      </template>
+      </v-row>
+    </template>
 
       <template #item.firmware="{ item }">
         <FirmwareUpdateVersion
@@ -161,146 +314,18 @@
         #item.actions="{ item }"
       >
         <v-row
-          v-if="!item.markedForDelete"
           class="ma-2"
         >
-          <CapabilitiesButton :resource="item" />
-          <v-btn
-            :disabled="item.clusterMember"
-            color="error"
-            class="mx-2"
-            size="small"
-            @click.stop="resourceToDelete = item"
-          >
-            <v-icon icon="mdi-delete" />
-          </v-btn>
+          <CapabilitiesButton :resourceId="item.id" />
         </v-row>
       </template>
     </v-data-table>
-    <confirm-dialog
-      :show="resourceToDelete != null"
-      :title="'Delete resource ' + (resourceToDelete == null ? '' : resourceToDelete.hostname)"
-      text="Do you really want to delete this resource?"
-      :attention="true"
-      @confirmed="deleteResource(resourceToDelete)"
-      @canceled="resourceToDelete = null"
-    />
+
   </v-container>
 </template>
 
-<script setup>
-import { ref, computed, watch, onMounted } from 'vue';
-import ConfirmDialog from '@/components/base/ConfirmDialog';
-import { useResourceDevicesStore } from "@/stores/resourceDevicesStore";
-import ResourceManagementClient from "@/api/resource-management/resource-management-client";
-import logRequestError from "@/api/restApiHelper";
-import CapabilitiesButton from "@/components/resources/capabilities/CapabilitiesButton.vue";
-import CapabilityIcon from "@/components/resources/capabilities/CapabilityIcon.vue";
-import {storeToRefs} from "pinia";
-import FirmwareUpdateVersion from "@/components/updates/FirmwareUpdateVersion.vue";
-import ApiState from "@/api/apiState";
-import DeviceUtils from '@/utils/deviceUtils';
-
-
-const emit = defineEmits(['resource-selected']);
-
-const resourceDevicesStore = useResourceDevicesStore();
-const {resources} = storeToRefs(resourceDevicesStore);
-
-const tableHeaders = [
-  { title: "Product", key: "product", width: "20%" },
-  { title: "Vendor", key: "vendor", width: "20%" },
-  { title: 'Capabilities', key: 'capabilityServices', value: 'capabilityServices', width: "10%" },
-  { title: 'Hostname', key: 'hostname', value: 'hostname', width: "10%" },
-  { title: 'IP', key: 'ip', value: 'ip', width: "10%" },
-  { title: 'Location', key: 'location.name', value: 'location.name', width: "10%"},
-  { title: 'Firmware', key: 'firmware', width: "10%" },
-  { title: 'Actions', value: 'actions', sortable: false, width: "10%" },
-];
-
-const groupBy = ref([]);
-const sortBy = ref([{ key: 'product', order: 'asc' }]);
-const resourceToDelete = ref(null);
-const filterResourcesByLocations = ref([]);
-const searchResources = ref(undefined);
-const apiState = computed(() => resourceDevicesStore.apiState);
-
-const filteredResources = computed(() => {
-  if (filterResourcesByLocations.value.length === 0) {
-    return resources.value
-  }
-
-  return resources.value.filter(r => {
-    if (r.location == null)
-      return false;
-
-    return filterResourcesByLocations.value.includes(r.location.id);
-  });
-});
-
-
-const locations = computed(() => resourceDevicesStore.locations);
-const profiler = computed(() => resourceDevicesStore.profiler);
-
-onMounted(() => {
-  resourceDevicesStore.getResourceAasValues();
-});
-
-const getDeploymentCapabilityServices = (capabilityServices) => {
-  return capabilityServices.filter(cs => cs.capability.capabilityClass !== "BaseConfigurationCapability");
-};
-
-const deleteResource = (resource) => {
-  const resourceId = resource.id;
-  ResourceManagementClient.resourcesApi.deleteResource(resourceId).then();
-  resourceDevicesStore.setResourceMarkedForDelete(resource);
-  resourceToDelete.value = null;
-};
-
-const setSelectedResource = (event, { item, section }) => {
-  emit('resource-selected', item, section);
-};
-
-const rowClass = (resource) => {
-  return {
-    class: {
-      'text-grey text--lighten-1 row-pointer': resource.markedForDelete,
-      'row-pointer': resource.markedForDelete
-    }
-  };
-};
-
-const getLocationNameForGroupHeader = (items) => {
-  if (items[0].location === null)
-    return "no location";
-
-  return items[0].location.name;
-};
-
-const resourcesHaveLocations = () => {
-  const locationNames = [...new Set(
-    resources.value.map(r => {
-      if (r.location == null)
-        return '';
-      else
-        return r.location.name;
-    })
-  )];
-  const hasLocations = locationNames.length > 0;
-
-  if (!hasLocations)
-    groupBy.value = null;
-
-  return hasLocations;
-};
-
-const runProfiler = () => {
-  ResourceManagementClient.profilerApi.runProfiler1().then().catch(logRequestError);
-  this.$toast.info('Started Profiler for all devices.');
-};
-
-</script>
-
-<style scoped>
-
+<style>
+tr.v-data-table__selected {
+  background: rgb(var(--v-theme-secondary), 0.05) !important;
+}
 </style>

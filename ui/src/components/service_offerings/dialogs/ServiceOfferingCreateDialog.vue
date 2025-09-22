@@ -35,9 +35,6 @@
         </v-row>
       </v-container>
     </template>
-    <template #actions>
-      <div />
-    </template>
   </custom-dialog>
 </template>
 

@@ -91,13 +91,6 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.slm</groupId>
-            <artifactId>notification_service.model</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
         <!-- To write basic websockets against -->
         <dependency>
             <groupId>jakarta.websocket</groupId>

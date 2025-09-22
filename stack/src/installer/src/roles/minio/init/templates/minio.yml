@@ -23,7 +23,7 @@ services:
         aliases:
           - "{{ ENV.MINIO.HOST.INTERNAL }}"
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
 
 volumes:
   minio_data:

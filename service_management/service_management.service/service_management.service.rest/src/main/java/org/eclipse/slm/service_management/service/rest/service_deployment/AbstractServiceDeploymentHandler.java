@@ -1,20 +1,14 @@
 package org.eclipse.slm.service_management.service.rest.service_deployment;
 
 import org.eclipse.slm.common.awx.client.AwxCredential;
-import org.eclipse.slm.common.awx.client.observer.AwxJobExecutor;
-import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
-import org.eclipse.slm.common.awx.client.observer.AwxJobObserverInitializer;
-import org.eclipse.slm.common.awx.client.observer.IAwxJobObserverListener;
+import org.eclipse.slm.common.awx.client.observer.*;
 import org.eclipse.slm.common.awx.model.ExtraVars;
-import org.eclipse.slm.notification_service.model.JobGoal;
-import org.eclipse.slm.notification_service.model.JobTarget;
-import org.eclipse.slm.resource_management.model.capabilities.Capability;
-import org.eclipse.slm.resource_management.model.actions.AwxAction;
-import org.eclipse.slm.resource_management.model.actions.ActionType;
-import org.eclipse.slm.resource_management.model.capabilities.provider.ServiceHoster;
-import org.eclipse.slm.resource_management.model.capabilities.provider.ServiceHosterFilter;
+import org.eclipse.slm.resource_management.features.capabilities.model.Capability;
+import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType;
+import org.eclipse.slm.resource_management.features.capabilities.model.awx.AwxAction;
+import org.eclipse.slm.resource_management.features.providers.ServiceHoster;
+import org.eclipse.slm.resource_management.features.providers.ServiceHosterFilter;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
-import org.eclipse.slm.resource_management.service.client.handler.*;
 import org.eclipse.slm.service_management.service.rest.service_instances.ServiceInstancesConsulClient;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
@@ -74,9 +68,9 @@ public class AbstractServiceDeploymentHandler {
 
     protected ServiceHoster getServiceHoster(
             JwtAuthenticationToken jwtAuthenticationToken, UUID deploymentCapabilityServiceId)
-            throws SSLException, ApiException, CapabilityServiceNotFoundException, ApiException {
+            throws SSLException, CapabilityServiceNotFoundException, org.eclipse.slm.resource_management.service.client.handler.ApiException {
         var resourceManagementApiClient = resourceManagementApiClientInitializer.init(jwtAuthenticationToken);
-        var capabilityProvidersRestControllerApi = new CapabilityProvidersRestControllerApi(resourceManagementApiClient);
+        var capabilityProvidersRestControllerApi = new org.eclipse.slm.resource_management.service.client.handler.CapabilityProvidersRestControllerApi(resourceManagementApiClient);
 
         var serviceHosterFilter = new ServiceHosterFilter.Builder()
                 .capabilityServiceId(deploymentCapabilityServiceId)

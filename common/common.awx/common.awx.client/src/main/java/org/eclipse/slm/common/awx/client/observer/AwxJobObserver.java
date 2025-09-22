@@ -1,9 +1,5 @@
 package org.eclipse.slm.common.awx.client.observer;
 
-import org.eclipse.slm.notification_service.model.JobFinalState;
-import org.eclipse.slm.notification_service.model.JobGoal;
-import org.eclipse.slm.notification_service.model.JobState;
-import org.eclipse.slm.notification_service.model.JobTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +53,6 @@ public class AwxJobObserver {
     }
 
     public void check(int jobId, String jobStatusString) {
-
         if (this.jobId == jobId) {
             if (finalStates.contains(jobStatusString)) {
                 var finalState = JobFinalState.valueOf(jobStatusString.toUpperCase());
@@ -81,14 +76,14 @@ public class AwxJobObserver {
     }
 
     public void fireOnJobStateChanged(JobState newState) {
-        for (var listener : this.jobObserverListeners) {
+        for (var listener : new ArrayList<>(this.jobObserverListeners)) {
             listener.onJobStateChanged(this, newState);
         }
     }
 
     public void fireOnJobFinished(JobFinalState finalState) {
         this.stopListenToEndpoint();
-        for (var listener : this.jobObserverListeners) {
+        for (var listener : new ArrayList<>(this.jobObserverListeners)) {
             listener.onJobStateFinished(this, finalState);
         }
     }

@@ -1,0 +1,116 @@
+// Artefact update interface
+// This is the interface for pushing and pulling
+// artefacts to and from drivers.
+// The driver is responsible for the actual
+// transfer of the artefact to the target device.
+
+syntax = "proto3";
+
+package factory_x.artefact_update.v1;
+
+service ArtefactUpdateApi {
+  // Push an artefact to a driver
+  rpc PushArtefact(stream ArtefactChunk) returns (stream ArtefactMessage) {}
+
+  // Load an artefact from a driver
+  rpc PullArtefact(ArtefactMetaData) returns (stream ArtefactChunk) {}
+
+  // Two-stage update of firmware or other software
+  rpc PrepareUpdate(stream ArtefactChunk) returns (stream ArtefactMessage) {}
+  rpc ActivateUpdate(stream ArtefactChunk) returns (stream ArtefactMessage) {}
+
+  // generic interface to simplify code reuse
+  //rpc PerformArtefactOperation(stream ArtefactChunk) returns (stream ArtefactOperationMessage) {}
+}
+
+message ArtefactChunk {
+  oneof data {
+    ArtefactMetaData metadata = 1; // first packet for PushArtefact, PrepareUpdate, and ActivateUpdate
+    bytes file_content = 2; // regular artefact packets
+    ArtefactOperationStatus status = 3; // only for PullArtefact
+  }
+}
+
+message ArtefactMetaData {
+  JobIdentifier job_identifier = 1;
+  ArtefactIdentifier artefact_identifier = 2;
+  ArtefactCredentials artefact_credentials = 3;
+  DeviceIdentifier device_identifier = 4;
+  DeviceCredentials device_credentials = 5;
+}
+
+// enum OperationType {
+//   JT_ARTEFACT_PULL = 0;
+//   JT_ARTEFACT_PUSH = 1;
+//   JT_UPDATE_PREPARE = 2;
+//   JT_UPDATE_ACTIVATE = 3;
+// }
+
+message JobIdentifier {
+  string job_id = 1;
+  //OperationType operation_type = 2;
+}
+
+enum ArtefactType {
+  AT_FIRMWARE = 0;
+  AT_SOFTWARE = 1;
+  AT_BACKUP = 2;
+  AT_CONFIGURATION = 3;
+  AT_LOGFILE = 4;
+}
+
+message ArtefactIdentifier { ArtefactType type = 1; }
+
+message ArtefactCredentials {
+  string credential_type = 1;
+  bytes credentials = 2;
+}
+
+message DeviceIdentifier { bytes blob = 1; }
+
+message DeviceCredentials {
+  string credential_type = 1;
+  bytes credentials = 2;
+}
+
+enum ArtefactOperationState {
+  AOS_OK = 0;
+  AOS_ERROR_FAIL = 1;
+  AOS_ERROR_IDENTITY_CHECK_FAIL = 2;
+  AOS_ERROR_INCOMPATIBLE = 3;
+  AOS_ERROR_NOT_SUPPORTED = 4;
+  // TBD ...
+}
+
+enum ArtefactOperationPhase {
+  AOP_UNSPECIFIED = 0;
+  AOP_PREPARE = 1;
+  AOP_DOWNLOAD = 2;
+  AOP_INSTALLATION = 3;
+  AOP_ACTIVATION = 4;
+  AOP_ARCHIVE = 5;
+  AOP_UPLOAD = 6;
+  // TBD ...
+}
+
+message ArtefactOperationStatus {
+  ArtefactOperationPhase phase = 1;
+  ArtefactOperationState state = 2;
+  string message = 3;
+  uint32 progress = 4; // in percent
+}
+
+enum ArtefactOperationRequestType {
+  AORT_ARTEFACT_TRANSMISSION = 0;
+}
+
+message ArtefactOperationRequest {
+  ArtefactOperationRequestType type = 1;
+}
+
+message ArtefactMessage {
+  oneof message {
+    ArtefactOperationStatus status = 1;
+    ArtefactOperationRequest request = 2;
+  }
+}

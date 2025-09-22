@@ -83,25 +83,36 @@ export const useServiceOfferingsStore = defineStore('serviceOfferingStore', {
 
         setDeploymentTypes (deploymentTypeValues) {
             this.serviceOfferingDeploymentTypes = []
-            deploymentTypeValues.forEach((deploymentType) => {
-                switch (deploymentType) {
-                    case 'DOCKER_CONTAINER':
-                        this.serviceOfferingDeploymentTypes.push({ value: deploymentType, prettyName: 'Docker Container' })
-                        break
-                    case 'DOCKER_COMPOSE':
-                        this.serviceOfferingDeploymentTypes.push({ value: deploymentType, prettyName: 'Docker Compose' })
-                        break
-                    case 'KUBERNETES':
-                        this.serviceOfferingDeploymentTypes.push({ value: deploymentType, prettyName: 'Kubernetes' })
-                        break
-                    case 'CODESYS':
-                        this.serviceOfferingDeploymentTypes.push({ value: deploymentType, prettyName: 'Codesys' })
-                        break
-                    default:
-                        this.serviceOfferingDeploymentTypes.push({ value: deploymentType, prettyName: deploymentType })
-                        break
-                }
-            })
+            if (Array.isArray(deploymentTypeValues)) {
+                deploymentTypeValues.forEach((deploymentType) => {
+                    switch (deploymentType) {
+                        case 'DOCKER_CONTAINER':
+                            this.serviceOfferingDeploymentTypes.push({
+                                value: deploymentType,
+                                prettyName: 'Docker Container'
+                            })
+                            break
+                        case 'DOCKER_COMPOSE':
+                            this.serviceOfferingDeploymentTypes.push({
+                                value: deploymentType,
+                                prettyName: 'Docker Compose'
+                            })
+                            break
+                        case 'KUBERNETES':
+                            this.serviceOfferingDeploymentTypes.push({value: deploymentType, prettyName: 'Kubernetes'})
+                            break
+                        case 'CODESYS':
+                            this.serviceOfferingDeploymentTypes.push({value: deploymentType, prettyName: 'Codesys'})
+                            break
+                        default:
+                            this.serviceOfferingDeploymentTypes.push({
+                                value: deploymentType,
+                                prettyName: deploymentType
+                            })
+                            break
+                    }
+                })
+            }
         },
 
         async getVariables () {

@@ -1,4 +1,4 @@
-FROM openjdk:18.0.2.1-jdk-slim-buster
+FROM openjdk:19-jdk-slim-bullseye
 MAINTAINER Matthias Schneider (matthias.schneider@ipa.fraunhofer.de)
 
 ENV CONSUL_SCHEME="http" \

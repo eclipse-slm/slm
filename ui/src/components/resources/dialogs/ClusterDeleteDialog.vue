@@ -16,7 +16,7 @@
           v-if="serviceInstancesForCluster.length === 0"
           class="mt-2"
         >
-          Do your really want to delete '{{ cluster.clusterType }}' cluster '{{ cluster.name }}'?
+          Do you want to delete '{{ cluster.clusterType }}' cluster '{{ cluster.name }}'?
         </v-card-text>
         <v-card-text v-else>
           <v-alert

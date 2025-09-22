@@ -2,7 +2,7 @@ package org.eclipse.slm.service_management.service.rest.aas.serviceofferingversi
 
 import org.eclipse.digitaltwin.aas4j.v3.model.*;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.*;
-import org.eclipse.slm.common.aas.repositories.SubmodelUtils;
+import org.eclipse.slm.common.aas.repositories.submodels.SubmodelUtils;
 import org.eclipse.slm.service_management.model.offerings.ServiceOfferingVersion;
 
 import java.util.ArrayList;

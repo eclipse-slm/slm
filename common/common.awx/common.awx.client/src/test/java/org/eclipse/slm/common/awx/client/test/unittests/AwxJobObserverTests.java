@@ -1,11 +1,6 @@
 package org.eclipse.slm.common.awx.client.test.unittests;
 
-import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
-import org.eclipse.slm.common.awx.client.observer.IAwxJobObserverListener;
-import org.eclipse.slm.notification_service.model.JobFinalState;
-import org.eclipse.slm.notification_service.model.JobGoal;
-import org.eclipse.slm.notification_service.model.JobState;
-import org.eclipse.slm.notification_service.model.JobTarget;
+import org.eclipse.slm.common.awx.client.observer.*;
 import org.junit.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

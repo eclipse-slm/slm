@@ -44,7 +44,7 @@
               v-if="notifications_unread.length > 0"
               variant="outlined"
               prepend-icon="mdi-email-open-outline"
-              @click="notificationStore.markAsRead()"
+              @click="notificationStore.markAllAsRead()"
             >
               Mark all
             </v-btn>
@@ -80,74 +80,74 @@
         <template
           #item.date="{item}"
         >
-          {{ getFormatedDate(item.date) }}
+          {{ getFormatedDate(item.timestamp) }}
+        </template>
+
+        <template
+          #item.text="{item}"
+        >
+          {{ getNotificationText(item) }}
         </template>
       </v-data-table>
     </base-material-card>
   </div>
 </template>
 
-<script>
-import {useNotificationStore} from "@/stores/notificationStore";
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useNotificationStore } from '@/stores/notificationStore'
+import NotificationTextGenerator from '@/utils/notificationTextGenerator'
 
-export default {
-    name: 'NotificationsOverview',
-    components: {},
-    setup(){
-      const notificationStore = useNotificationStore();
-      return {notificationStore}
-    },
-    data: function () {
-      return {
-        sortBy: ['id'],
-        sortDesc: true,
-        filterRead: null,
-      }
-    },
-    computed: {
-      notifications () {
-        return this.notificationStore.notifications
-      },
-      notifications_unread () {
-        return this.notificationStore.notifications_unread
-      },
-      DataTableHeaders () {
-        return [
-          {
-            value: 'read',
-            filter: value => {
-              if (this.filterRead === null) return true
-              return value === this.filterRead
-            },
-          },
-          { title: 'ID', value: 'id', sortable: true },
-          { title: 'Category', value: 'category', sortable: true },
-          { title: 'Date', value: 'date', sortable: true },
-          { title: 'Text', value: 'text', sortable: false },
-        ]
-      },
-    },
-    methods: {
-      getFormatedDate (time) {
-        const options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }
-        const location = 'de-DE'
+const { t } = useI18n()
+const notificationStore = useNotificationStore()
 
-        if (time !== null) {
-          return new Date(time).toLocaleDateString(location, options)
-        } else {
-          return ''
-        }
-      },
-      filter (value) {
-        if (this.filterRead === value) {
-          this.filterRead = null
-        } else {
-          this.filterRead = value
-        }
-      },
+const sortBy = ref(['id'])
+const sortDesc = ref(true)
+const filterRead = ref(null)
+
+const notifications = computed(() => notificationStore.notifications)
+const notifications_unread = computed(() => notificationStore.notifications_unread)
+
+const DataTableHeaders = computed(() => [
+  {
+    value: 'read',
+    filter: value => {
+      if (filterRead.value === null) return true
+      return value === filterRead.value
     },
+  },
+  { title: 'ID', value: 'id', sortable: true },
+  { title: 'Category', value: 'category', sortable: true },
+  { title: 'Sub Category', value: 'subCategory', sortable: true },
+  { title: 'Event Type', value: 'eventType', sortable: true },
+  { title: 'Date', value: 'timestamp', sortable: true },
+  { title: 'Text', value: 'text', sortable: false },
+])
+
+function getFormatedDate(time) {
+  const options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }
+  const location = 'de-DE'
+  if (time !== null) {
+    return new Date(time).toLocaleDateString(location, options)
+  } else {
+    return ''
   }
+}
 
+function getNotificationText(item) {
+  return NotificationTextGenerator.generateLocalizedText(item, t)
+}
+
+function filter(value) {
+  if (filterRead.value === value) {
+    filterRead.value = null
+  } else {
+    filterRead.value = value
+  }
+}
 </script>
 
-<style></style>
+<style>
+
+</style>

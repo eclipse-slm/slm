@@ -38,7 +38,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>common.messaging.resources</artifactId>
+            <artifactId>common.messaging</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -46,6 +46,12 @@
             <groupId>org.eclipse.slm</groupId>
             <artifactId>common.aas.clients</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>resource_management.common</artifactId>
+            <version>1.4.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

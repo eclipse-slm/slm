@@ -6,7 +6,7 @@
 
     <artifactId>common.messaging</artifactId>
     <version>${revision}</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <parent>
         <groupId>org.eclipse.slm</groupId>
@@ -14,8 +14,21 @@
         <version>${revision}</version>
     </parent>
 
-    <modules>
-        <module>common.messaging.resources</module>
-    </modules>
+    <dependencies>
+        <!-- Spring !-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+        <!-- Map Struct !-->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

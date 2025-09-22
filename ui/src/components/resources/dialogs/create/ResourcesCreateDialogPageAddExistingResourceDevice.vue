@@ -240,7 +240,7 @@ export default {
     },
     mounted() {
       this.$emit('title-changed', 'Add existing host resource')
-      this.resourceDevicesStore.getResourceConnectionTypes();
+      this.resourceDevicesStore.getRemoteConnectionTypes();
     },
     methods: {
       updateConnectionPort(connectionTypeName) {
@@ -248,7 +248,7 @@ export default {
           return ct.name === connectionTypeName
         });
 
-        if(connectionType !== undefined)
+        if (connectionType !== undefined)
           this.remoteAccess.connectionPort = connectionType.defaultPort
       },
       clearForm () {

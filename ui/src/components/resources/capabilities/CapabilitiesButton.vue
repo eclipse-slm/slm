@@ -1,26 +1,34 @@
 <script setup lang="ts">
 
-import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import logRequestError from "@/api/restApiHelper";
 import {useCapabilityUtils} from "@/utils/capabilityUtils";
 import CapabilityParamsDialog from "@/components/resources/capabilities/CapabilityParamsDialog.vue";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
+import {useCapabilitiesStore} from "@/stores/capabilitiesStore";
+import {storeToRefs} from "pinia";
+import {useToast} from "vue-toast-notification";
+import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
 
 const emit = defineEmits(['closed']);
 
 const props = defineProps({
-  resource: {
-    type: Object,
+  resourceId: {
+    type: String,
     required: true
   }
 })
+
+const $toast = useToast();
 
 const selectedCapabilityId = ref(undefined)
 const selectedSkipInstall = ref(false)
 const showCapabilityParamsDialog = ref(false)
 
 const resourceDevicesStore = useResourceDevicesStore();
+const { resourceById } = storeToRefs(resourceDevicesStore);
+const capabilitiesStore = useCapabilitiesStore();
+const { availableSingleHostCapabilities, isCapabilityInstalledOnResource } = storeToRefs(capabilitiesStore);
 const capabilityUtils = useCapabilityUtils();
 
 const insertWhiteSpaceInCamelCase = (string) => {
@@ -28,15 +36,23 @@ const insertWhiteSpaceInCamelCase = (string) => {
 }
 
 const addCapability = (capabilityId, skipInstall, configParameterMap) => {
-  ResourceManagementClient.capabilityApi.installCapabilityOnSingleHost(props.resource.id, capabilityId, configParameterMap, skipInstall)
+  console.log(props.resourceId)
+  ResourceManagementClient.capabilityApi.installCapabilityOnSingleHost(props.resourceId, capabilityId, configParameterMap, skipInstall)
       .then()
-      .catch(logRequestError)
+      .catch((e) => {
+        logRequestError(e);
+        $toast.error(`Failed to install capability '${capabilitiesStore.capabilityById(capabilityId).name}' on device '${resourceById.value(props.resourceId).hostname}'`);
+      });
 }
 
 const removeCapability = (capabilityId) => {
-  ResourceManagementClient.capabilityApi.removeCapabilityFromSingleHost(props.resource.id, capabilityId)
-      .then().catch(logRequestError);
-
+  console.log(props.resourceId)
+  ResourceManagementClient.capabilityApi.removeCapabilityFromSingleHost(props.resourceId, capabilityId)
+      .then()
+      .catch((e) => {
+        logRequestError(e);
+        $toast.error(`Failed to uninstall capability '${capabilitiesStore.capabilityById(capabilityId).name}' on device '${resourceById.value(props.resourceId).hostname}'`);
+      });
 }
 
 const onInstallButtonClicked = (capabilityId, skipInstall) => {
@@ -69,7 +85,7 @@ const onCapabilityParamsDialogConfirmed = (capabilityParametersMap) => {
           color="info"
           size="small"
           v-bind="props"
-          :disabled="resource.clusterMember || resourceDevicesStore.availableSingleHostCapabilitiesNoDefault.length === 0"
+          :disabled="resourceById(props.resourceId)?.clusterMember || availableSingleHostCapabilities.length === 0"
         >
           <v-icon
             color="white"
@@ -93,8 +109,8 @@ const onCapabilityParamsDialogConfirmed = (capabilityParametersMap) => {
             <v-btn-toggle>
               <!-- Install Button -->
               <v-btn
-                v-if="!capabilityUtils.isCapabilityInstalledOnResource(resource,capability)"
-                :disabled="resource.remoteAccessService == null"
+                v-if="!isCapabilityInstalledOnResource(resourceById(props.resourceId), capability.id)"
+                :disabled="!resourceById(props.resourceId).remoteAccessAvailable"
                 size="small"
                 base-color="info"
                 variant="flat"
@@ -105,7 +121,7 @@ const onCapabilityParamsDialogConfirmed = (capabilityParametersMap) => {
               </v-btn>
               <!-- Skip Install Button -->
               <v-btn
-                v-if="!capabilityUtils.isCapabilityInstalledOnResource(resource,capability) && capabilityUtils.isCapabilitySkipable(capability)"
+                v-if="!isCapabilityInstalledOnResource(resourceById(props.resourceId), capability.id) && capabilityUtils.isCapabilitySkipable(capability)"
                 base-color="info"
                 variant="flat"
                 size="small"
@@ -115,7 +131,7 @@ const onCapabilityParamsDialogConfirmed = (capabilityParametersMap) => {
               </v-btn>
               <!-- Uninstall Button -->
               <v-btn
-                v-if="capabilityUtils.isCapabilityInstalledOnResource(resource, capability)"
+                v-if="isCapabilityInstalledOnResource(resourceById(props.resourceId), capability.id)"
                 base-color="error"
                 size="small"
                 variant="flat"
@@ -133,7 +149,7 @@ const onCapabilityParamsDialogConfirmed = (capabilityParametersMap) => {
     <capability-params-dialog
       :show="showCapabilityParamsDialog"
       :capability-id="selectedCapabilityId"
-      :resource-id="resource.id"
+      :resource-id="props.resourceId"
       :skip-install="selectedSkipInstall"
       @confirmed="onCapabilityParamsDialogConfirmed"
       @canceled="onCapabilityParamsDialogCanceled"

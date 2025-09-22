@@ -828,7 +828,7 @@ paths:
       tags:
       - resources-rest-controller
       summary: Get available remote connection types
-      operationId: getResourceConnectionTypes
+      operationId: getRemoteConnectionTypes
       parameters:
       - name: Realm
         in: header

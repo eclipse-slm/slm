@@ -2,19 +2,18 @@ package org.eclipse.slm.notification_service.service.rest.endpoints;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.eclipse.slm.notification_service.communication.websocket.NotificationWsService;
-import org.eclipse.slm.notification_service.model.Category;
-import org.eclipse.slm.notification_service.model.JobGoal;
-import org.eclipse.slm.notification_service.model.JobTarget;
-import org.eclipse.slm.notification_service.model.Notification;
+import org.eclipse.slm.notification_service.model.*;
 import org.eclipse.slm.notification_service.persistence.api.NotificationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -35,22 +34,11 @@ public class NotificationRestController {
     }
 
     @RequestMapping(value = "/notification", method = RequestMethod.POST)
-    @Operation(summary = "Create new notifications")
-    public void createNotification(
-            @RequestParam(name = "category", required = true) Category category,
-            @RequestParam(name="jobTarget", required = true) JobTarget jobTarget,
-            @RequestParam(name="jobGoal", required = true) JobGoal jobGoal,
-            @RequestParam(name="text", required = false, defaultValue = "") String text
-    ) {
-        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        if (text.isEmpty()) {
-            text = jobTarget.name().toLowerCase() + " has been " + jobGoal.toString().toLowerCase();
-        }
-        var notification = new Notification(category, jobTarget, jobGoal, text, jwtAuthenticationToken.getToken().getSubject());
-
+    @Operation(summary = "Create new notification")
+    public void createNotification(@RequestBody Notification notification) {
         notificationRepository.save(notification);
         notificationWsService.notifyFrontend(notification);
-        LOG.info("Create new notification: " + notification);
+        LOG.info("Createed new notification: " + notification);
     }
 
     @RequestMapping(value = "/notifications", method = RequestMethod.GET)
@@ -59,11 +47,11 @@ public class NotificationRestController {
             @RequestParam(name = "isRead", required = false) Boolean isRead
     ) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        String userUuid = jwtAuthenticationToken.getToken().getSubject();
+        String userId = jwtAuthenticationToken.getToken().getSubject();
         if(isRead == null) {
-            return notificationRepository.findByOwner(userUuid);
+            return notificationRepository.findByUserId(userId);
         } else {
-            return notificationRepository.findByIsReadAndOwner(isRead, userUuid);
+            return notificationRepository.findByIsReadAndUserId(isRead, userId);
         }
     }
 
@@ -71,10 +59,22 @@ public class NotificationRestController {
     @Operation(summary = "Set read property of notifications")
     public void setReadOfNotifications(
             @RequestParam(name = "read") boolean read,
-            @RequestBody List<Notification> notifications
+            @RequestBody List<Long> notificationIds
     ) {
-        notifications.forEach(n -> n.setRead(read));
+        var notifications = new ArrayList<Notification>();
+        for (var notificationId : notificationIds) {
+                notificationRepository.findById(notificationId).ifPresent(notification -> {
+                notification.setRead(read);
+                notifications.add(notification);
+            });
+        }
 
         notificationRepository.saveAll(notifications);
+    }
+
+    @RequestMapping(value = "/notifications/event-notification-model", method = RequestMethod.GET)
+    @Operation(summary = "Get event notification model")
+    public ResponseEntity<EventNotificationModel> getEventNotificationModel() {
+        return ResponseEntity.ok(null);
     }
 }

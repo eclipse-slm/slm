@@ -1,6 +1,6 @@
 package org.eclipse.slm.service_management.service.rest.service_deployment;
 
-import org.eclipse.slm.resource_management.model.consul.capability.CapabilityService;
+import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

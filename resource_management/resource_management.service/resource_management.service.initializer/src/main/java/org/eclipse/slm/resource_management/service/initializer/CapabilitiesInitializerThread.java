@@ -1,6 +1,6 @@
 package org.eclipse.slm.resource_management.service.initializer;
 
-import org.eclipse.slm.resource_management.model.capabilities.CapabilityDTOApi;
+import org.eclipse.slm.resource_management.features.capabilities.dto.CapabilityDTOApi;
 import org.eclipse.slm.resource_management.service.client.handler.ApiException;
 import org.eclipse.slm.resource_management.service.client.handler.CapabilitiesRestControllerApi;
 import org.slf4j.Logger;

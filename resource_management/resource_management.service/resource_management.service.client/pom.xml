@@ -15,6 +15,7 @@
     </parent>
 
     <dependencies>
+        <!-- Spring !-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-commons</artifactId>
@@ -104,13 +105,19 @@
         <!-- Shared Modules !-->
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>resource_management.model</artifactId>
+            <artifactId>common.utils.keycloak</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>common.utils.keycloak</artifactId>
+            <artifactId>resource_management.service.app</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>resource_management.features.capabilities</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -150,28 +157,31 @@
                             <generateModels>false</generateModels>
 
                             <importMappings>
-                                <importMapping>BasicResource=${project.groupId}.resource_management.model.resource.BasicResource</importMapping>
-                                <importMapping>Location=${project.groupId}.resource_management.model.resource.Location</importMapping>
-                                <importMapping>ClusterCreateRequest=${project.groupId}.resource_management.model.cluster.ClusterCreateRequest</importMapping>
-                                <importMapping>Capability=${project.groupId}.resource_management.model.capabilities.Capability</importMapping>
-                                <importMapping>CapabilityService=${project.groupId}.resource_management.model.consul.capability.CapabilityService</importMapping>
-                                <importMapping>CapabilityDTOApi=${project.groupId}.resource_management.model.capabilities.CapabilityDTOApi</importMapping>
-                                <importMapping>CapabilityFilter=${project.groupId}.resource_management.model.capabilities.CapabilityFilter</importMapping>
-                                <importMapping>CapabilityType=${project.groupId}.resource_management.model.capabilities.CapabilityType</importMapping>
+                                <importMapping>BasicResource=${project.groupId}.resource_management.common.resources.BasicResource</importMapping>
+                                <importMapping>Location=${project.groupId}.resource_management.common.location.Location</importMapping>
+                                <importMapping>ConnectionType=${project.groupId}.resource_management.common.remote_access.ConnectionType</importMapping>
+                                <importMapping>ConnectionTypeDTO=${project.groupId}.resource_management.common.remote_access.ConnectionTypeDTO</importMapping>
+
+                                <importMapping>ClusterCreateRequest=${project.groupId}.resource_management.features.capabilities.clusters.model.ClusterCreateRequest</importMapping>
+                                <importMapping>Capability=${project.groupId}.resource_management.features.capabilities.model.Capability</importMapping>
+                                <importMapping>CapabilityService=${project.groupId}.resource_management.features.capabilities.model.CapabilityService</importMapping>
+                                <importMapping>CapabilityDTOApi=${project.groupId}.resource_management.features.capabilities.dto.CapabilityDTOApi</importMapping>
+                                <importMapping>CapabilityFilter=${project.groupId}.resource_management.features.capabilities.model.CapabilityFilter</importMapping>
+                                <importMapping>CapabilityType=${project.groupId}.resource_management.features.capabilities.model.CapabilityType</importMapping>
+                                <importMapping>Cluster=${project.groupId}.resource_management.features.capabilities.clusters.model.Cluster</importMapping>
+                                <importMapping>DeploymentCapability=${project.groupId}.resource_management.features.capabilities.model.DeploymentCapability</importMapping>
+                                <importMapping>DeploymentCapabilityDTOApi=${project.groupId}.resource_management.features.capabilities.model.DeploymentCapabilityDTOApi</importMapping>
+                                <importMapping>VirtualizationCapability=${project.groupId}.resource_management.features.capabilities.model.VirtualizationCapability</importMapping>
+                                <importMapping>VirtualizationCapabilityDTOApi=${project.groupId}.resource_management.features.capabilities.model.VirtualizationCapabilityDTOApi</importMapping>
+                                <importMapping>VirtualResourceProvider=${project.groupId}.resource_management.features.providers.VirtualResourceProvider</importMapping>
+
                                 <importMapping>CatalogService=${project.groupId}.common.consul.model.catalog.CatalogService</importMapping>
-                                <importMapping>Cluster=${project.groupId}.resource_management.model.cluster.Cluster</importMapping>
-                                <importMapping>DeploymentCapability=${project.groupId}.resource_management.model.capabilities.DeploymentCapability</importMapping>
-                                <importMapping>DeploymentCapabilityDTOApi=${project.groupId}.resource_management.model.capabilities.DeploymentCapabilityDTOApi</importMapping>
-                                <importMapping>VirtualizationCapability=${project.groupId}.resource_management.model.capabilities.VirtualizationCapability</importMapping>
-                                <importMapping>VirtualizationCapabilityDTOApi=${project.groupId}.resource_management.model.capabilities.VirtualizationCapabilityDTOApi</importMapping>
-                                <importMapping>VirtualResourceProvider=${project.groupId}.resource_management.model.capabilities.provider.VirtualResourceProvider</importMapping>
-                                <importMapping>ClusterCreateRequest=${project.groupId}.resource_management.model.cluster.ClusterCreateRequest</importMapping>
-                                <importMapping>ServiceHoster=${project.groupId}.resource_management.model.capabilities.provider.ServiceHoster</importMapping>
-                                <importMapping>ServiceHosterFilter=${project.groupId}.resource_management.model.capabilities.provider.ServiceHosterFilter</importMapping>
-                                <importMapping>ConnectionType=${project.groupId}.resource_management.model.resource.ConnectionType</importMapping>
-                                <importMapping>ConnectionTypeDTO=${project.groupId}.resource_management.model.resource.ConnectionTypeDTO</importMapping>
-                                <importMapping>Profiler=${project.groupId}.resource_management.model.profiler.Profiler</importMapping>
-                                <importMapping>ProfilerDTOApi=${project.groupId}.resource_management.model.profiler.ProfilerDTOApi</importMapping>
+
+                                <importMapping>ServiceHoster=${project.groupId}.resource_management.features.providers.ServiceHoster</importMapping>
+                                <importMapping>ServiceHosterFilter=${project.groupId}.resource_management.features.providers.ServiceHosterFilter</importMapping>
+
+                                <importMapping>Profiler=${project.groupId}.resource_management.features.profiler.Profiler</importMapping>
+                                <importMapping>ProfilerDTOApi=${project.groupId}.resource_management.features.profiler.ProfilerDTOApi</importMapping>
                             </importMappings>
                         </configuration>
                     </execution>

@@ -17,7 +17,7 @@ services:
         aliases:
           - slm-catalog
     extra_hosts:
-      - "${SLM_HOSTNAME}:172.17.0.1"
+      - "${SLM_HOSTNAME}:host-gateway"
     volumes:
       - slm-catalog-database_config:/app/database/config
     healthcheck:

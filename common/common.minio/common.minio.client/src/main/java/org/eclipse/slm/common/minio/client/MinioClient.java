@@ -2,6 +2,7 @@ package org.eclipse.slm.common.minio.client;
 
 import io.minio.*;
 import io.minio.errors.MinioException;
+import io.minio.messages.Item;
 import jakarta.annotation.PostConstruct;
 import org.eclipse.slm.common.minio.model.BucketName;
 import org.eclipse.slm.common.minio.model.ObjectName;
@@ -17,35 +18,36 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class MinioClient {
 
-    private static final Logger log = LoggerFactory.getLogger(MinioClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MinioClient.class);
 
-
-    private final String url;
-
-    @Value("${minio.access-key}")
-    private String accessKey;
-    @Value("${minio.secret-key}")
-    private String secretKey;
-
+    private final String minioUrl;
+    private final String accessKey;
+    private final String secretKey;
 
     private io.minio.MinioClient minioClient;
 
     public MinioClient(
             @Value("${minio.scheme}") String scheme,
             @Value("${minio.host}") String host,
-            @Value("${minio.port}") int port
+            @Value("${minio.port}") int port,
+            @Value("${minio.access-key}") String accessKey,
+            @Value("${minio.secret-key}") String secretKey
     ) {
-        this.url = scheme + "://" + host + ":" + port;
+        this.accessKey = accessKey;
+        this.secretKey = secretKey;
+        this.minioUrl = scheme + "://" + host + ":" + port;
     }
 
     @PostConstruct
     public void init() {
         this.minioClient = io.minio.MinioClient.builder()
-                .endpoint(this.url)
+                .endpoint(this.minioUrl)
                 .credentials(this.accessKey, this.secretKey)
                 .build();
     }
@@ -54,11 +56,10 @@ public class MinioClient {
         try {
             return minioClient.bucketExists(BucketExistsArgs.builder().bucket(name).build());
         } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {
-            log.error("Bucket with name \""+name+"\" not found",e);
+            LOG.debug("Bucket with name '" + name + "' not found: ", e);
             return false;
         }
     }
-
 
     public void createBucket(String name) throws MinioBucketCreateException, MinioBucketNameException {
         createBucket(BucketName.withName(name));
@@ -68,7 +69,7 @@ public class MinioClient {
         try {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName.getName()).build());
         } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {
-            log.error("Bucket with name \""+bucketName+"\" could not be created",e);
+            LOG.error("Bucket with name '" + bucketName + "' could not be created: ", e);
             throw new MinioBucketCreateException(bucketName.getName());
         }
     }
@@ -87,7 +88,7 @@ public class MinioClient {
                     .filename(file.getAbsolutePath())
                     .build());
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-            log.error("Object with name \""+objectName+"\" could not be uploaded to bucket \""+bucketName+"\" ",e);
+            LOG.debug("Object with name '" + objectName + "' could not be uploaded to bucket '" + bucketName + "': ", e);
             throw new MinioUploadException(bucketName.getName(), objectName.getName());
         }
     }
@@ -111,7 +112,7 @@ public class MinioClient {
                     .build()
             );
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-            log.error("Object with name \""+objectName+"\" could not be uploaded to bucket \""+bucketName+"\" ",e);
+            LOG.error("Object with name '" + objectName + "' could not be uploaded to bucket '" + bucketName + "' ",e);
             throw new MinioUploadException(bucketName.getName(), objectName.getName());
         }
     }
@@ -127,7 +128,7 @@ public class MinioClient {
                     .object(objectName).build());
             return true;
         } catch (Exception e) {
-            log.error("Object with name \""+objectName+"\" could not be found in bucket \""+bucketName+"\" ",e);
+            LOG.debug("Object with name '" + objectName + "' not found in bucket '" + bucketName + "': ", e);
             return false;
         }
     }
@@ -140,7 +141,7 @@ public class MinioClient {
                         .build())) {
             return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (Exception e) {
-            log.error("Object with name \""+objectName+"\" could not be found in bucket \""+bucketName+"\" ",e);
+            LOG.error("Object with name '" + objectName + "' not found in bucket '" + bucketName + "': ", e);
             return "";
         }
     }
@@ -153,7 +154,7 @@ public class MinioClient {
                     .build()
             );
         } catch (Exception e) {
-            log.error("Object with name \""+objectName+"\" could not be removed from bucket \""+bucketName+"\" ",e);
+            LOG.error("Object with name '" + objectName + "' could not be removed from bucket '" + bucketName + "': ", e);
             throw new MinioRemoveObjectException(objectName.getName());
         }
     }
@@ -170,7 +171,7 @@ public class MinioClient {
                     .build()
             );
         } catch (Exception e) {
-            log.error("Object with name \""+objectName+"\" could not be removed from bucket \""+bucketName+"\" ",e);
+            LOG.error("Object with name '" + objectName + "' could not be removed from bucket '" + bucketName + "': ", e);
             throw new Exception(objectName.getName());
         }
     }
@@ -179,5 +180,26 @@ public class MinioClient {
         return getObject(BucketName.withName(bucketName), ObjectName.withName(objectName));
     }
 
+    public List<Item> getObjectsOfPath(String bucketName, String objectsPath) {
+        var listObjectsArgs = ListObjectsArgs.builder()
+                .bucket(bucketName)
+                .prefix(objectsPath)
+                .recursive(true)
+                .build();
+        var listObjectsResult = minioClient.listObjects(listObjectsArgs);
+
+        var items = new ArrayList<Item>();
+        for (Result<Item> itemResult : listObjectsResult) {
+            try {
+                var item = itemResult.get();
+                items.add(item);
+                LOG.debug("Found object: " + item.objectName() + " in bucket: " + bucketName);
+            } catch (Exception e) {
+                LOG.error("Error while listing objects in bucket '" + bucketName + "': ", e);
+            }
+        }
+
+        return items;
+    }
 
 }

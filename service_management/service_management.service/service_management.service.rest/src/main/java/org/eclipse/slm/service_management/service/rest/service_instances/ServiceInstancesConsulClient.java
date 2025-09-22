@@ -21,6 +21,17 @@ public class ServiceInstancesConsulClient {
     private final ConsulServicesApiClient consulServicesApiClient;
     private final ConsulGenericServicesClient consulGenericServicesClient;
 
+    public static final String POLICY_SERVICE_INSTANCE_PREFIX = "service_";
+    public static final String KEYCLOAK_ROLE_SERVICE_INSTANCE_PREFIX = "service_";
+
+    public static String getServiceInstancePolicyName(UUID serviceInstanceId) {
+        return POLICY_SERVICE_INSTANCE_PREFIX + serviceInstanceId;
+    }
+
+    public static String getServiceInstanceKeycloakRoleName(UUID serviceInstanceId) {
+        return KEYCLOAK_ROLE_SERVICE_INSTANCE_PREFIX + serviceInstanceId;
+    }
+
     public ServiceInstancesConsulClient(
             ConsulServicesApiClient consulServicesApiClient,
             ConsulGenericServicesClient consulGenericServicesClient

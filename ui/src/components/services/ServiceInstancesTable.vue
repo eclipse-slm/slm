@@ -189,7 +189,7 @@
       v-if="serviceVersionChange.dialog"
       :show="serviceVersionChange.dialog"
       :title="`Change version of service instance '${serviceVersionChange.serviceInstance.id}'?`"
-      :text="`Do you really want to change to version '${serviceVersionChange.targetServiceVersion.version}'?`"
+      :text="`Do you want to change to version '${serviceVersionChange.targetServiceVersion.version}'?`"
       @canceled="serviceVersionChange.dialog = false"
       @confirmed="onServiceInstanceVersionChangedConfirmed"
     />

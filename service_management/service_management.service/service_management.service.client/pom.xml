@@ -91,11 +91,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.slm</groupId>
-            <artifactId>resource_management.model</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
         </dependency>
@@ -137,7 +132,7 @@
                                 <typeMapping>ServiceVendorDeveloper=${project.groupId}.service_management.model.vendors.ServiceVendorDeveloper</typeMapping>
                             </typeMappings>
                             <importMappings>
-                                <importMapping>BasicResource=${project.groupId}.resource_management.model.resource.BasicResource</importMapping>
+                                <importMapping>BasicResource=${project.groupId}.resource_management.common.resources.BasicResource</importMapping>
 
                                 <importMapping>User=${project.groupId}.service_management.model.users.User</importMapping>
 
@@ -164,7 +159,7 @@
 
                                 <importMapping>ServiceInstance=org.eclipse.slm.service_management.model.services.ServiceInstance</importMapping>
 
-                                <importMapping>MatchingResourceDTO=org.eclipse.slm.resource_management.model.resource.MatchingResourceDTO</importMapping>
+                                <importMapping>MatchingResourceDTO=org.eclipse.slm.resource_management.common.model.MatchingResourceDTO</importMapping>
                             </importMappings>
                         </configuration>
                     </execution>

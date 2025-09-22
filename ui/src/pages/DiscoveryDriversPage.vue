@@ -4,17 +4,11 @@
     fluid
     tag="section"
   >
-    <div
-      v-if="apiState === ApiState.LOADING || apiState === ApiState.INIT || apiState === ApiState.UPDATING"
-      class="text-center"
-    >
-      <ProgressCircular />
-    </div>
     <div v-if="apiState === ApiState.ERROR">
       Error
     </div>
 
-    <div v-if="apiState === ApiState.LOADED">
+    <div v-else>
       <DriversTable
         :drivers="drivers"
       />

@@ -22,7 +22,7 @@ services:
     volumes:
       - consul_data:/consul/data
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:8500" ]
 
@@ -38,7 +38,7 @@ services:
       CONSUL_HTTP_ADDR: consul:8500
       CONSUL_HTTP_TOKEN: "{{ ENV.CONSUL.MASTER_TOKEN }}"
     extra_hosts:
-      - "{{ ENV.SLM_HOSTNAME }}:172.17.0.1"
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
 
 volumes:
   consul_data:

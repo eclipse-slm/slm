@@ -48,15 +48,25 @@ const routes = [
         component: () => import('@/pages/DiscoveryInboxPage.vue'),
       },
       {
+        name: 'Discovery Jobs',
+        path: '/discovery/jobs',
+        component: () => import('@/pages/DiscoveryJobsPage.vue'),
+      },
+      {
         name: 'Discovery Drivers',
         path: '/discovery/drivers',
         component: () => import('@/pages/DiscoveryDriversPage.vue'),
       },
       // Resources
       {
-        name: 'Resources',
-        path: '/resources',
-        component: () => import('@/pages/ResourcesPage.vue'),
+        name: 'Resource Instances',
+        path: '/resources/instances',
+        component: () => import('@/pages/ResourceInstancesPage.vue'),
+      },
+      {
+        name: 'Resource Types',
+        path: '/resources/types',
+        component: () => import('@/pages/ResourceTypesPage.vue'),
       },
       // Clusters
       {

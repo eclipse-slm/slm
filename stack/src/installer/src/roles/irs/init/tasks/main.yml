@@ -86,3 +86,9 @@
       port: "{{ ENV.IRS.PORT.INTERNAL }}"
       additional_tags:
         - "irs"
+
+- name: "Store resulting compose file"
+  template:
+    src: "irs.yml"
+    dest: "{{ _store_compose_file }}"
+  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)

@@ -1,37 +1,64 @@
+<script setup>
+import {toRef, defineProps, defineEmits, ref, watch} from 'vue';
+
+const emit = defineEmits(['canceled']);
+
+const props = defineProps({
+  show: {
+    type: Boolean,
+    default: false
+  },
+  closeButtonVisible: {
+    type: Boolean,
+    default: true
+  },
+  title: {
+    type: String,
+    default: 'Custom dialog title'
+  },
+  text: {
+    type: String,
+    default: 'Custom dialog text'
+  },
+  width: {
+    type: String,
+    default: '400'
+  },
+  hideActions: {
+    type: Boolean,
+    default: false
+  }
+});
+
+const dialogActive = ref(false)
+const showProp = toRef(props,'show'); // react to prop
+
+watch(showProp, (value) => {
+  dialogActive.value = showProp.value;
+});
+</script>
+
 <template>
   <v-dialog
-    v-model="isActive"
-    :width="width"
-    @click:outside="$emit('canceled')"
+      v-model="dialogActive"
+      :width="width"
+      @click:outside="emit('canceled')"
   >
     <template #default="{}">
-      <v-card v-if="isActive">
-        <v-toolbar
-          color="primary"
-          theme="dark"
-        >
+      <v-card v-if="dialogActive">
+        <v-toolbar color="primary" theme="dark">
           <slot name="header">
-            <v-row
-              align="center"
-              justify="center"
-            >
-              <v-col cols="11">
-                <div class="font-weight-light">
-                  {{ title }}
-                </div>
-              </v-col>
-              <v-spacer />
-              <v-col
-                v-if="closeButtonVisible"
-                cols="1"
-              >
-                <v-btn
-                  @click="$emit('canceled')"
-                >
-                  <v-icon icon="mdi-close" />
-                </v-btn>
-              </v-col>
-            </v-row>
+            <div class="dialog-toolbar">
+              <div class="font-weight-light">
+                {{ title }}
+              </div>
+              <v-btn
+                  v-if="closeButtonVisible"
+                  @click="emit('canceled')"
+                  icon="mdi-close"
+                  class="close-btn"
+              />
+            </div>
           </slot>
         </v-toolbar>
         <v-card-text>
@@ -39,64 +66,23 @@
             {{ text }}
           </slot>
         </v-card-text>
-        <v-card-actions class="justify-center">
-          <slot name="actions">
-            <v-spacer />
-
-            <v-btn
-              id="confirm-dialog-button-yes"
-              color="error"
-              @click="$emit('confirmed')"
-            >
-              Yes
-            </v-btn>
-
-            <v-btn
-              id="confirm-dialog-button-no"
-              color="info"
-              @click.native="$emit('canceled')"
-            >
-              No
-            </v-btn>
-          </slot>
+        <v-card-actions class="justify-center" v-if="!hideActions">
+          <slot name="actions"></slot>
         </v-card-actions>
       </v-card>
     </template>
   </v-dialog>
 </template>
 
-<script>
-import {toRef} from "vue";
-
-export default {
-    name: 'CustomDialog',
-    props: {
-      show: {
-        default: false,
-        type: Boolean
-      },
-      closeButtonVisible: {
-        default: true,
-        type: Boolean
-      },
-      title: {
-        default: 'Custom dialog title',
-        type: String
-      },
-      text: {
-        default: 'Custom dialog text',
-        type: String
-      },
-      width: {
-        default: '400',
-        type: String
-      }
-    },
-    setup(props){
-      const isActive = toRef(props, 'show')
-      return{
-        isActive
-      }
-    }
-  }
-</script>
+<style scoped>
+.dialog-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+}
+.close-btn {
+  margin-left: auto;
+}
+</style>

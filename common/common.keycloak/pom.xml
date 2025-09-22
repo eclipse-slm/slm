@@ -17,6 +17,7 @@
     <modules>
         <module>common.keycloak.config</module>
         <module>common.keycloak.model</module>
+        <module>common.keycloak.client</module>
     </modules>
 
 </project>

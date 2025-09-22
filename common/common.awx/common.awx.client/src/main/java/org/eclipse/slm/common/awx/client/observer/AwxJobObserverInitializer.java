@@ -2,17 +2,12 @@ package org.eclipse.slm.common.awx.client.observer;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.websocket.DeploymentException;
-import org.eclipse.slm.notification_service.model.JobGoal;
-import org.eclipse.slm.notification_service.model.JobTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.net.ssl.SSLException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 @Component
 public class AwxJobObserverInitializer {

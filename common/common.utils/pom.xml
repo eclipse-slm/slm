@@ -16,6 +16,7 @@
     </parent>
 
     <modules>
+        <module>common.utils.general</module>
         <module>common.utils.objectmapper</module>
         <module>common.utils.keycloak</module>
         <module>common.utils.files</module>

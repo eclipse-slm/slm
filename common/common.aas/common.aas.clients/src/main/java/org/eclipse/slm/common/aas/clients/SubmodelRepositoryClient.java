@@ -40,24 +40,6 @@ public class SubmodelRepositoryClient {
         this.connectedSubmodelRepository = new ConnectedSubmodelRepository(submodelRepositoryUrl, submodelRepositoryApi);
     }
 
-    public static SubmodelRepositoryClient FromSubmodelDescriptor(SubmodelDescriptor submodelDescriptor, JwtAuthenticationToken jwtAuthenticationToken) {
-        var submodelEndpoint = submodelDescriptor.getEndpoints().get(0).getProtocolInformation().getHref();
-
-        if (submodelEndpoint.contains("/submodels/")) {
-            var regExPattern = Pattern.compile("(.*)/submodels");
-            var matcher = regExPattern.matcher(submodelEndpoint);
-            var matchesFound = matcher.find();
-            if (matchesFound) {
-                var submodelRepositoryBaseUrl = matcher.group(1);
-                var submodelRepositoryClient = new SubmodelRepositoryClient(submodelRepositoryBaseUrl, jwtAuthenticationToken);
-
-                return submodelRepositoryClient;
-            }
-        }
-
-        throw new IllegalArgumentException("Submodel endpoint '" + submodelEndpoint + "' not valid for submodel repository");
-    }
-
     public List<Submodel> getAllSubmodels() throws DeserializationException {
         WebClient webClient = WebClient.create();
         var responseBody = webClient.get()

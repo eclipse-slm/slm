@@ -14,6 +14,11 @@
     </parent>
 
     <dependencies>
+        <!-- Spring !-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
         <!-- File !-->
         <dependency>
             <groupId>commons-io</groupId>

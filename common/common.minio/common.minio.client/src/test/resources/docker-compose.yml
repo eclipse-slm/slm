@@ -20,4 +20,4 @@ services:
         aliases:
           - 'minio'
     extra_hosts:
-      - "${SLM_HOSTNAME}:172.17.0.1"
+      - "${SLM_HOSTNAME}:host-gateway"

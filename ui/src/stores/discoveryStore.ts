@@ -2,11 +2,13 @@ import ApiState from '@/api/apiState'
 import {defineStore} from "pinia";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import logRequestError from "@/api/restApiHelper";
+import {DiscoveryJob} from "@/api/resource-management/client";
 
 interface DiscoveryStoreState{
     apiState: number,
     drivers: any[],
     discoveredResources: any[],
+    discoveryJobs: DiscoveryJob[],
 }
 
 export const useDiscoveryStore = defineStore('discoveryStore', {
@@ -16,9 +18,17 @@ export const useDiscoveryStore = defineStore('discoveryStore', {
         apiState: ApiState.INIT,
         drivers: [],
         discoveredResources: [],
+        discoveryJobs: [],
     }),
 
     getters: {
+        discoveredResourceByResultId: (state) => (resultId) => {
+            return state.discoveredResources.find(discoveredResource => discoveredResource.resultId === resultId)
+        },
+
+        discoveryJobById: (state) => (discoveryJobId): DiscoveryJob | undefined => {
+            return state.discoveryJobs.find(discoveryJob => discoveryJob.id === discoveryJobId)
+        },
     },
 
     actions: {
@@ -45,6 +55,15 @@ export const useDiscoveryStore = defineStore('discoveryStore', {
             ).catch(logRequestError)
         },
 
+        async getDiscoveryJobs () {
+
+            return await ResourceManagementClient.discoveryApi.getDiscoveryJobs().then(
+                response => {
+                    this.discoveryJobs = response.data;
+                }
+            ).catch(logRequestError)
+        },
+
         async updateStore () {
             if (this.apiState === ApiState.INIT) {
                 this.apiState = ApiState.LOADING;
@@ -55,6 +74,7 @@ export const useDiscoveryStore = defineStore('discoveryStore', {
             return Promise.all([
                 this.getDrivers(),
                 this.getDiscoveredResources(),
+                this.getDiscoveryJobs(),
             ]).then(() => {
                 this.apiState = ApiState.LOADED;
                 console.log("discoveryStore updated")

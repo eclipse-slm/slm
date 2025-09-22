@@ -13,7 +13,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
-import org.eclipse.slm.common.parent.service_rest.config.CustomJwtDecoder;
+import org.eclipse.slm.common.utils.keycloak.CustomJwtDecoder;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;

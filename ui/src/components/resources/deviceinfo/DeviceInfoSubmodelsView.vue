@@ -80,7 +80,7 @@
     <confirm-dialog
       :show="submodelToDelete !== undefined"
       :title="'Delete submodel ' + (submodelToDelete == null ? '' : submodelToDelete.idShort)"
-      text="Do you really want to delete this submodel?"
+      text="Do you want to delete this submodel?"
       @confirmed="deleteSubmodel(submodelToDelete)"
       @canceled="submodelToDelete = null"
     />

@@ -5,7 +5,6 @@ services:
 
   awx:
     image: ghcr.io/eclipse-slm/awx/awx-task:22.7.0
-    command: launch_awx.sh
     hostname: awxweb
     environment:
       OS: " Operating System: Docker Desktop"

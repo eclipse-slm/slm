@@ -1,89 +1,107 @@
 package org.eclipse.slm.notification_service.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.persistence.*;
+import org.eclipse.slm.common.model.AbstractBaseEntityLong;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.Date;
+import java.util.Map;
 
 @Entity
-public class Notification {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    long id;
-    Category category;
-    JobTarget target;
-    JobGoal goal;
-    String text;
-    String owner;
-    Boolean isRead = false;
-    Date date = new Date();
+public class Notification extends AbstractBaseEntityLong {
+
+    private String userId;
+
+    private Date timestamp = new Date();
+
+    private NotificationCategory category;
+
+    private NotificationSubCategory subCategory;
+
+    private NotificationEventType eventType;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "LONGTEXT")
+    private Map<String, Object> payload;
+
+    private Boolean isRead = false;
 
     public Notification() {
     }
 
-    public Notification(Category category, String text, String owner) {
+    public Notification(String userId, NotificationCategory category, NotificationSubCategory subCategory, NotificationEventType eventType, Object payload) {
+        this.userId = userId;
+        this.timestamp = new Date();
         this.category = category;
-        this.text = text;
-        this.owner = owner;
+        this.subCategory = subCategory;
+        this.eventType = eventType;
+        this.payload = convertPayload(payload);
     }
 
-    public Notification(Category category, JobTarget jobTarget, JobGoal goal, String text, String owner) {
+    public Notification(String userId, Date timestamp, NotificationCategory category, NotificationSubCategory subCategory, NotificationEventType eventType, Object payload) {
+        this.userId = userId;
+        this.timestamp = timestamp;
         this.category = category;
-        this.target = jobTarget;
-        this.goal = goal;
-        this.text = text;
-        this.owner = owner;
+        this.subCategory = subCategory;
+        this.eventType = eventType;
+        this.payload = convertPayload(payload);
     }
 
-    public Notification(long id, Category category, String text, String owner, Boolean isRead) {
-        this.id = id;
-        this.category = category;
-        this.text = text;
-        this.owner = owner;
-        this.isRead = isRead;
+    public String getUserId() {
+        return userId;
     }
 
-    public Notification(long id, Category category, String text, String owner, Boolean isRead, Date date) {
-        this.id = id;
-        this.category = category;
-        this.text = text;
-        this.owner = owner;
-        this.isRead = isRead;
-        this.date = date;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
-    public long getId() {
-        return id;
+    public Date getTimestamp() {
+        return timestamp;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 
-    public Category getCategory() {
+    public NotificationCategory getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(NotificationCategory category) {
         this.category = category;
     }
 
-    public String getText() {
-        return text;
+    public NotificationSubCategory getSubCategory() {
+        return subCategory;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setSubCategory(NotificationSubCategory subCategory) {
+        this.subCategory = subCategory;
     }
 
-    public String getOwner() {
-        return owner;
+    public NotificationEventType getEventType() {
+        return eventType;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setEventType(NotificationEventType eventType) {
+        this.eventType = eventType;
+    }
+
+    public Object getPayload() {
+        return payload;
+    }
+
+    public void setPayload(Map<String, Object> payload) {
+        this.payload = payload;
+    }
+
+    @Hidden
+    public void setPayload(Object payload) {
+        this.payload = convertPayload(payload);
     }
 
     public Boolean getRead() {
@@ -94,41 +112,20 @@ public class Notification {
         isRead = read;
     }
 
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public JobTarget getTarget() {
-        return target;
-    }
-
-    public void setTarget(JobTarget target) {
-        this.target = target;
-    }
-
-    public JobGoal getGoal() {
-        return goal;
-    }
-
-    public void setGoal(JobGoal goal) {
-        this.goal = goal;
+    private Map<String, Object> convertPayload(Object payload) {
+        var objectMapper = new ObjectMapper();
+        return objectMapper.convertValue(payload, new TypeReference<Map<String, Object>>() {});
     }
 
     @Override
     public String toString() {
         return "Notification{" +
-                "id=" + this.id +
+                "id=" + this.getId() +
                 ", category=" + this.category +
-                ", target=" + this.target +
-                ", goal=" + this.goal +
-                ", text='" + this.text + '\'' +
-                ", owner='" + this.owner + '\'' +
-                ", isRead=" + this.isRead +
-                ", date=" + this.date +
+                ", subCategory=" + this.subCategory +
+                ", eventType=" + this.eventType +
+                ", userId='" + this.userId + '\'' +
+                ", timestamp=" + this.timestamp +
                 '}';
     }
 }

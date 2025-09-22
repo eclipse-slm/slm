@@ -1,10 +1,14 @@
 package org.eclipse.slm.common.aas.clients;
 
+import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
+
+import java.util.regex.Pattern;
 
 @Component
 public class SubmodelRepositoryClientFactory {
@@ -51,5 +55,28 @@ public class SubmodelRepositoryClientFactory {
         var submodelRepositoryClient = new SubmodelRepositoryClient(submodelRepositoryUrl);
         return submodelRepositoryClient;
     }
+
+    public static SubmodelRepositoryClient FromSubmodelDescriptor(SubmodelDescriptor submodelDescriptor) {
+        return SubmodelRepositoryClientFactory.FromSubmodelDescriptor(submodelDescriptor, null);
+    }
+
+    public static SubmodelRepositoryClient FromSubmodelDescriptor(SubmodelDescriptor submodelDescriptor, JwtAuthenticationToken jwtAuthenticationToken) {
+        var submodelEndpoint = submodelDescriptor.getEndpoints().get(0).getProtocolInformation().getHref();
+
+        if (submodelEndpoint.contains("/submodels/")) {
+            var regExPattern = Pattern.compile("(.*)/submodels");
+            var matcher = regExPattern.matcher(submodelEndpoint);
+            var matchesFound = matcher.find();
+            if (matchesFound) {
+                var submodelRepositoryBaseUrl = matcher.group(1);
+                var submodelRepositoryClient = new SubmodelRepositoryClient(submodelRepositoryBaseUrl, jwtAuthenticationToken);
+
+                return submodelRepositoryClient;
+            }
+        }
+
+        throw new IllegalArgumentException("Submodel endpoint '" + submodelEndpoint + "' not valid for submodel repository");
+    }
+
 
 }

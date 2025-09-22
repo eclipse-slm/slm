@@ -8,6 +8,18 @@ import logRequestError from "@/api/restApiHelper";
 import {useDiscoveryStore} from "@/stores/discoveryStore";
 import ApiState from "@/api/apiState";
 import {useToast} from "vue-toast-notification";
+import {
+  CapabilityJobEventNotification,
+  EventNotification,
+  EventType, FirmwareUpdateJobEventNotification,
+  Notification,
+  NotificationCategory,
+  NotificationSubCategory, EVENTCLASS, ResourceEventNotification, ResourceEventType
+} from "@/api/notification-service/client";
+import NotificationTextGenerator from "@/utils/notificationTextGenerator";
+import i18n from '@/utils/i18n';
+import {Resource} from "@/api/resource-management/client";
+import {useCapabilitiesStore} from "@/stores/capabilitiesStore";
 
 export interface NotificationStoreState {
   apiState: number,
@@ -34,49 +46,88 @@ export const useNotificationStore = defineStore('notificationStore', {
         this.notifications = response.data;
       }).catch(logRequestError);
     },
+    addNotification (notification: Notification) {
+      this.notifications.push(notification)
+    },
 
-    processIncomingNotification (notification: any) {
+    processIncomingNotification (eventNotification: EventNotification) {
+      console.log(eventNotification)
+
       const $toast = useToast();
+      // this.addNotification(notification)
 
-      this.getNotifications();
-
-      if (notification.category !== undefined) {
-        $toast.info(notification.text)
-        const resourceDevicesStore = useResourceDevicesStore();
-        const resourceClustersStore = useResourceClustersStore();
-        const serviceInstancesStore = useServiceInstancesStore();
-        const discoveryStore = useDiscoveryStore();
-        switch (notification.category) {
-          case 'JOBS':
-            const jobsStore = useJobsStore();
-
-            jobsStore.updateStore();
-            resourceDevicesStore.updateStore();
-            resourceClustersStore.updateStore();
-            serviceInstancesStore.updateStore();
-            break
-          case 'RESOURCES':
-            if (notification.target === 'DISCOVERY') {
-              discoveryStore.updateDiscoveryStore();
+      switch (eventNotification.type) {
+        case EVENTCLASS.ResourceEvent: {
+          const resourceDevicesStore = useResourceDevicesStore();
+          const resourceEventNotification = eventNotification  as unknown as ResourceEventNotification;
+          console.log(resourceEventNotification)
+          switch (resourceEventNotification.eventType) {
+            case ResourceEventType.Created: {
+              resourceDevicesStore.addOrUpdateResource(resourceEventNotification.resource);
+              break;
             }
-            else {
+            case ResourceEventType.Updated: {
+              resourceDevicesStore.addOrUpdateResource(resourceEventNotification.resource);
+              break;
+            }
+            case ResourceEventType.Deleted: {
+              resourceDevicesStore.deleteResource(resourceEventNotification.resource.id)
+              break;
+            }
+            default: {
               resourceDevicesStore.updateStore();
-              resourceClustersStore.updateStore();
+              break;
             }
-            break
-          case 'SERVICES':
-            serviceInstancesStore.updateStore();
-          case 'PROJECTS':
-            serviceInstancesStore.updateStore();
-            break
-          default:
-            console.debug(`Update ${notification.category} store`)
-            break
+          }
+          $toast.info(NotificationTextGenerator.generateLocalizedText(eventNotification, i18n.global))
+          break;
+        }
+
+        case EVENTCLASS.CapabilityJobEvent: {
+          const capabilityJobEventNotification = eventNotification  as unknown as CapabilityJobEventNotification;
+
+          const capabilitiesStore = useCapabilitiesStore();
+          const resourceDevicesStore = useResourceDevicesStore();
+          capabilitiesStore.updateStore().then(() => {
+            resourceDevicesStore.getResourceById(capabilityJobEventNotification.capabilityJob.resourceId).then(() => {
+              $toast.info(NotificationTextGenerator.generateLocalizedText(eventNotification, i18n.global))
+            })
+          })
+          break;
+        }
+
+        case EVENTCLASS.DiscoveryEvent: {
+          const discoveryStore = useDiscoveryStore();
+          discoveryStore.updateDiscoveryStore();
+          $toast.info(NotificationTextGenerator.generateLocalizedText(eventNotification, i18n.global))
+          break;
+        }
+
+        case EVENTCLASS.FirmwareUpdateJobEvent: {
+          const resourceDevicesStore = useResourceDevicesStore();
+          const firmwareUpdateJobEventNotification = eventNotification  as unknown as FirmwareUpdateJobEventNotification;
+          resourceDevicesStore.getFirmwareUpdateInformationOfResource(firmwareUpdateJobEventNotification.firmwareUpdateJob.resourceId);
+          resourceDevicesStore.getFirmwareUpdateJobsOfResource(firmwareUpdateJobEventNotification.firmwareUpdateJob.resourceId)
+          $toast.info(NotificationTextGenerator.generateLocalizedText(eventNotification, i18n.global))
+          break;
+        }
+
+        case EVENTCLASS.ServiceInstanceEvent: {
+          const serviceInstancesStore = useServiceInstancesStore();
+          serviceInstancesStore.updateStore();
+          $toast.info(NotificationTextGenerator.generateLocalizedText(eventNotification, i18n.global))
+        }
+
+        default: {
+          console.debug("Unknown event notification type: ", eventNotification.type);
+          break;
         }
       }
     },
-    markAsRead () {
-      NotificationServiceClient.api.setReadOfNotifications(true, this.notifications_unread)
+
+    markAllAsRead () {
+      const unreadNotificationIds = this.notifications_unread.map((note) => note.id);
+      NotificationServiceClient.api.setReadOfNotifications(true, unreadNotificationIds)
           .then(response => {
         this.updateStore();
       }).catch(logRequestError)

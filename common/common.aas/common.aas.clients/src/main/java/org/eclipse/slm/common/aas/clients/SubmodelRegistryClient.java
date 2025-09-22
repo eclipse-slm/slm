@@ -65,6 +65,46 @@ public class SubmodelRegistryClient {
         }
     }
 
+    public List<org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor> findSubmodelDescriptorsWithSemanticIds(List<String> semanticIds) {
+        List<org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor> submodelDescriptors = new ArrayList<>();
+        try {
+            var allSubmodelDescriptors = this.submodelRegistryApi.getAllSubmodelDescriptors(Integer.MAX_VALUE, null).getResult();
+            var submodelDescriptorsWithSemanticId = allSubmodelDescriptors.stream()
+                    .filter(smd -> {
+                                if (smd.getSemanticId() != null) {
+                                    return semanticIds.contains(smd.getSemanticId().getKeys().get(0).getValue());
+                                } else {
+                                    return false;
+                                }
+                            })
+                    .toList();
+
+            var convertedSubmodelDescriptors = submodelDescriptorsWithSemanticId.stream()
+                    .map(SubmodelRegistryClient::convertSubmodelDescriptor)
+                    .collect(Collectors.toList());
+
+            return convertedSubmodelDescriptors;
+        } catch (ApiException e) {
+            if (e.getCode() != 404) {
+                LOG.error(e.getMessage());
+            }
+            return submodelDescriptors;
+        }
+    }
+
+    public void createOrUpdateSubmodelDescriptor(org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor submodelDescriptor) throws ApiException {
+        var convertedSubmodelDescriptor = SubmodelRegistryClient.convertSubmodelDescriptor(submodelDescriptor);
+        try {
+            this.submodelRegistryApi.postSubmodelDescriptor(convertedSubmodelDescriptor);
+        } catch (ApiException e) {
+            if (e.getCode() == 409) {
+                this.submodelRegistryApi.putSubmodelDescriptorById(submodelDescriptor.getId(), convertedSubmodelDescriptor);
+            } else {
+                throw e;
+            }
+        }
+    }
+
     public void registerSubmodel(String submodelUrl, String smId, String smIdShort, String semanticId) throws ApiException {
         var endpoints = new ArrayList<Endpoint>();
         var endpoint = new Endpoint();
@@ -112,6 +152,22 @@ public class SubmodelRegistryClient {
 
             var registryModelJson = aasJsonSerializer.write(submodelDescriptor);
             var convertedSubmodelDescriptor = aasJsonDeserializer.read(registryModelJson, DefaultSubmodelDescriptor.class);
+
+            return convertedSubmodelDescriptor;
+        } catch (SerializationException e) {
+            throw new RuntimeException(e);
+        } catch (DeserializationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static SubmodelDescriptor convertSubmodelDescriptor(org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor submodelDescriptor) {
+        try {
+            var aasJsonSerializer = new JsonSerializer();
+            var aasJsonDeserializer = new JsonDeserializer();
+
+            var registryModelJson = aasJsonSerializer.write(submodelDescriptor);
+            var convertedSubmodelDescriptor = aasJsonDeserializer.read(registryModelJson, SubmodelDescriptor.class);
 
             return convertedSubmodelDescriptor;
         } catch (SerializationException e) {

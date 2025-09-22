@@ -10,6 +10,6 @@ services:
       - CONSUL_HOST=${CONSUL_HOST}
       - CONSUL_PORT=${CONSUL_Port}
     extra_hosts:
-      - "${SLM_HOSTNAME}:172.17.0.1"
+      - "${SLM_HOSTNAME}:host-gateway"
     volumes:
       - "${LOCAL_PROJECT_PATH}:/project"

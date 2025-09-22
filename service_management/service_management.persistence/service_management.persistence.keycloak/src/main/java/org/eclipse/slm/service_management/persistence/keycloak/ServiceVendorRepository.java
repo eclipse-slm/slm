@@ -1,7 +1,7 @@
 package org.eclipse.slm.service_management.persistence.keycloak;
 
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakGroupNotFoundException;
-import org.eclipse.slm.common.keycloak.config.KeycloakUtil;
+import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakUserNotFoundException;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendor;
@@ -23,13 +23,13 @@ public class ServiceVendorRepository {
 
     private final ServiceVendorJpaRepository serviceVendorJpaRepository;
 
-    private final KeycloakUtil keycloakUtil;
+    private final KeycloakAdminClient keycloakAdminClient;
 
     @Autowired
     public ServiceVendorRepository(ServiceVendorJpaRepository serviceVendorJpaRepository,
-                                   KeycloakUtil keycloakUtil) {
+                                   KeycloakAdminClient keycloakAdminClient) {
         this.serviceVendorJpaRepository = serviceVendorJpaRepository;
-        this.keycloakUtil = keycloakUtil;
+        this.keycloakAdminClient = keycloakAdminClient;
     }
 
     public List<ServiceVendor> getServiceVendors() {
@@ -55,7 +55,7 @@ public class ServiceVendorRepository {
     private ServiceVendor createServiceVendor(ServiceVendor serviceVendor, String keycloakRealm) {
         var keycloakGroupName = serviceVendor.getKeycloakGroupName();
         var groupAttributes = new HashMap<String, List<String>>();
-        this.keycloakUtil.createGroup(
+        this.keycloakAdminClient.createGroup(
                 keycloakRealm,
                 keycloakGroupName,
                 groupAttributes);
@@ -91,7 +91,7 @@ public class ServiceVendorRepository {
         else {
             var serviceVendor = serviceVendorOptional.get();
             this.serviceVendorJpaRepository.delete(serviceVendor);
-            this.keycloakUtil.deleteGroup(
+            this.keycloakAdminClient.deleteGroup(
                     keycloakRealm,
                     serviceVendor.getKeycloakGroupName());
         }
@@ -101,7 +101,7 @@ public class ServiceVendorRepository {
             throws KeycloakGroupNotFoundException, ServiceVendorNotFoundException {
         var serviceVendorOptional = this.serviceVendorJpaRepository.findById(serviceVendorId);
         if (serviceVendorOptional.isPresent()) {
-            var usersOfServiceVendorKeycloakGroup = this.keycloakUtil.getUsersOfGroup(
+            var usersOfServiceVendorKeycloakGroup = this.keycloakAdminClient.getUsersOfGroup(
                     keycloakRealm,
                     serviceVendorOptional.get().getKeycloakGroupName());
 
@@ -128,7 +128,7 @@ public class ServiceVendorRepository {
             throws KeycloakUserNotFoundException, KeycloakGroupNotFoundException, ServiceVendorNotFoundException {
         var serviceVendorOptional = this.serviceVendorJpaRepository.findById(serviceVendorId);
         if (serviceVendorOptional.isPresent()) {
-            this.keycloakUtil.assignUserToGroup(
+            this.keycloakAdminClient.assignUserToGroup(
                     keycloakRealm,
                     serviceVendorOptional.get().getKeycloakGroupName(),
                     userId);
@@ -142,7 +142,7 @@ public class ServiceVendorRepository {
             throws ServiceVendorNotFoundException, KeycloakUserNotFoundException, KeycloakGroupNotFoundException {
         var serviceVendorOptional = this.serviceVendorJpaRepository.findById(serviceVendorId);
         if (serviceVendorOptional.isPresent()) {
-            this.keycloakUtil.removeUserFromGroup(
+            this.keycloakAdminClient.removeUserFromGroup(
                     keycloakRealm,
                     serviceVendorOptional.get().getKeycloakGroupName(),
                     userId);

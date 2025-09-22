@@ -67,6 +67,21 @@ public class AasRegistryClient {
         }
     }
 
+    public void createOrUpdateShellDescriptor(AssetAdministrationShellDescriptor aasDescriptor) throws ApiException {
+        var convertedAasDescriptor = AasRegistryClient.convertAasDescriptor(aasDescriptor);
+        try {
+            this.aasRegistryApi.postAssetAdministrationShellDescriptor(convertedAasDescriptor);
+        }
+        catch (ApiException e) {
+            if (e.getCode() == 409) {
+                this.aasRegistryApi.putAssetAdministrationShellDescriptorById(aasDescriptor.getId(), convertedAasDescriptor);
+            }
+            else {
+                throw e;
+            }
+        }
+    }
+
     public void addSubmodelDescriptorToAas(String aasId, SubmodelDescriptor submodelDescriptor) throws ApiException {
         var endpoints = new ArrayList<org.eclipse.digitaltwin.basyx.aasregistry.client.model.Endpoint>();
         var endpoint = new org.eclipse.digitaltwin.basyx.aasregistry.client.model.Endpoint();
@@ -106,6 +121,23 @@ public class AasRegistryClient {
 
             var registryModelJson = aasJsonSerializer.write(aasDescriptor);
             var convertedAasDescriptor = aasJsonDeserializer.read(registryModelJson, DefaultAssetAdministrationShellDescriptor.class);
+
+            return convertedAasDescriptor;
+        } catch (SerializationException e) {
+            throw new RuntimeException(e);
+        } catch (DeserializationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static org.eclipse.digitaltwin.basyx.aasregistry.client.model.AssetAdministrationShellDescriptor convertAasDescriptor(
+            org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShellDescriptor aasDescriptor) {
+        try {
+            var aasJsonSerializer = new JsonSerializer();
+            var aasJsonDeserializer = new JsonDeserializer();
+
+            var registryModelJson = aasJsonSerializer.write(aasDescriptor);
+            var convertedAasDescriptor = aasJsonDeserializer.read(registryModelJson, org.eclipse.digitaltwin.basyx.aasregistry.client.model.AssetAdministrationShellDescriptor.class);
 
             return convertedAasDescriptor;
         } catch (SerializationException e) {

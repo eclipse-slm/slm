@@ -19,6 +19,7 @@
         <module>notification_service.model</module>
         <module>notification_service.persistence</module>
         <module>notification_service.communication</module>
+        <module>notification_service.messaging</module>
     </modules>
 
 </project>

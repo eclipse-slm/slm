@@ -35,12 +35,13 @@ import {useNotificationStore} from "@/stores/notificationStore";
 import {useJobsStore} from "@/stores/jobsStore";
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import * as yup from "yup";
-import {createI18n} from "vue-i18n";
+import i18nInstance from '@/utils/i18n'
 import {de, en} from "vuetify/locale";
 import yupValidateIPv4 from "@/utils/yup.custom";
 import {VueKeycloakInstance} from "@dsb-norge/vue-keycloak-js/dist/types";
 import {useEnvStore} from "@/stores/environmentStore";
 import updateToken from "@/utils/updateToken";
+import {useCapabilitiesStore} from "@/stores/capabilitiesStore";
 
 console.log("App Mode: " + import.meta.env.MODE)
 
@@ -99,6 +100,8 @@ app.use(VueKeycloakJs, {
         resourceDevicesStore.updateStore();
         const resourceClustersStore = useResourceClustersStore();
         resourceClustersStore.updateStore();
+        const capabilitiesStore = useCapabilitiesStore();
+        capabilitiesStore.updateStore();
         const discoveryStore = useDiscoveryStore();
         discoveryStore.updateStore();
         const notificationStore = useNotificationStore();
@@ -167,19 +170,11 @@ const messages = {
     },
 };
 
-const i18n = createI18n({
-    globalInjection: true,
-    legacy: false,
-    locale: envStore.i18nLocale,
-    fallbackLocale: envStore.i18nLocaleFallback,
-    silentTranslationWarn: true,
-    messages
-});
 
-app.use(i18n);
+app.use(i18nInstance);
 
 app.use(VueToast,{
-    position: 'bottom',
+    position: 'bottom-right',
     duration: 5000,
     dismissible: true,}
 );

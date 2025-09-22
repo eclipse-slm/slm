@@ -8,6 +8,8 @@ module.exports = {
     'plugin:vuetify/base',
     'plugin:vue/recommended',
     'plugin:vuetify/recommended',
+    'plugin:vue/vue3-recommended',
+    '@vue/typescript/recommended'
   ],
   rules: {
     'no-console': 'off',

@@ -3,14 +3,13 @@ package org.eclipse.slm.service_management.service.rest.service_deployment;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import org.eclipse.slm.common.awx.client.observer.JobFinalState;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.client.apis.ConsulServicesApiClient;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
-import org.eclipse.slm.common.keycloak.config.KeycloakUtil;
+import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.awx.client.observer.AwxJobExecutor;
 import org.eclipse.slm.common.awx.client.observer.AwxJobObserverInitializer;
-import org.eclipse.slm.notification_service.model.JobFinalState;
-import org.eclipse.slm.notification_service.service.client.NotificationServiceClient;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
 import org.eclipse.slm.resource_management.service.client.handler.ApiClient;
 import org.eclipse.slm.resource_management.service.client.handler.ApiException;
@@ -21,6 +20,7 @@ import org.eclipse.slm.service_management.model.offerings.ServiceOfferingVersion
 import org.eclipse.slm.service_management.model.offerings.docker.container.DockerContainerDeploymentDefinition;
 import org.eclipse.slm.service_management.model.offerings.exceptions.InvalidServiceOfferingDefinitionException;
 import org.eclipse.slm.service_management.persistence.api.ServiceOrderJpaRepository;
+import org.eclipse.slm.service_management.service.rest.service_instances.ServiceInstanceEventMessageSender;
 import org.eclipse.slm.service_management.service.rest.service_instances.ServiceInstancesConsulClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -64,13 +64,13 @@ public class ServiceDeploymentHandlerTest {
     private AwxJobExecutor awxJobExecutor;
 
     @Mock
-    private NotificationServiceClient notificationServiceClient;
+    private ServiceInstanceEventMessageSender serviceInstanceEventMessageSender;
 
     @Mock
     private ConsulServicesApiClient consulServicesApiClient;
 
     @Mock
-    private KeycloakUtil keycloakUtil;
+    private KeycloakAdminClient keycloakAdminClient;
 
     @Mock
     private ResourceManagementApiClientInitializer resourceManagementApiClientInitializer;
@@ -157,13 +157,14 @@ public class ServiceDeploymentHandlerTest {
                                         """)));
 
         this.serviceDeploymentHandler = new ServiceDeploymentHandler(
-                awxJobObserverInitializer, awxJobExecutor,
-                notificationServiceClient,
+                awxJobObserverInitializer,
+                awxJobExecutor,
                 consulServicesApiClient,
-                keycloakUtil,
+                keycloakAdminClient,
                 resourceManagementApiClientInitializer,
                 serviceOrderJpaRepository,
-                serviceInstancesConsulClient);
+                serviceInstancesConsulClient,
+                serviceInstanceEventMessageSender);
     }
 
     @Test
@@ -184,7 +185,7 @@ public class ServiceDeploymentHandlerTest {
         var serviceId = deploymentJobRun.getServiceInstance().getId();
 
         this.serviceDeploymentHandler.onJobStateFinished(deploymentJobRun.getAwxJobObserver(), JobFinalState.SUCCESSFUL);
-        verify(this.keycloakUtil).createRealmRoleAndAssignToUser(
+        verify(this.keycloakAdminClient).createRealmRoleAndAssignToUser(
                 argThat(jwtAuthenticationToken -> jwtAuthenticationToken.equals(this.jwtAuthenticationToken)),
                 argThat(roleName -> roleName.startsWith("service_")));
 

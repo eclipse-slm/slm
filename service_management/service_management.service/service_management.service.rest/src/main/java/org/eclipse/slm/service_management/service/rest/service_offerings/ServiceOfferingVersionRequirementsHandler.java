@@ -4,7 +4,7 @@ import org.eclipse.digitaltwin.aas4j.v3.model.Property;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection;
 import org.eclipse.slm.common.aas.clients.*;
-import org.eclipse.slm.resource_management.model.resource.ResourceAas;
+import org.eclipse.slm.resource_management.common.aas.ResourceAas;
 import org.eclipse.slm.service_management.model.offerings.RequirementLogicType;
 import org.eclipse.slm.service_management.model.offerings.RequirementProperty;
 import org.eclipse.slm.service_management.model.offerings.ServiceRequirement;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 @Component
 public class ServiceOfferingVersionRequirementsHandler {
@@ -45,14 +44,12 @@ public class ServiceOfferingVersionRequirementsHandler {
             var submodelEndpoint = submodelDescriptor.get().getEndpoints().get(0).getProtocolInformation().getHref();
 
             if (submodelEndpoint.contains("/submodels/")) {
-                var scopedSubmodelRepositoryClient = SubmodelRepositoryClient.FromSubmodelDescriptor(submodelDescriptor.get(), jwtAuthenticationToken);
+                var scopedSubmodelRepositoryClient = SubmodelRepositoryClientFactory.FromSubmodelDescriptor(submodelDescriptor.get(), jwtAuthenticationToken);
                 var submodel = scopedSubmodelRepositoryClient.getSubmodel(submodelDescriptor.get().getId());
                 if (submodel != null) {
                     resourceSubmodels.add(submodel);
                 }
-            }
-
-            if (submodelEndpoint.contains("/submodel")) {
+            } else if (submodelEndpoint.endsWith("/submodel")) {
                 var submodelServiceClient = SubmodelServiceClient.FromSubmodelDescriptor(submodelDescriptor.get(), jwtAuthenticationToken);
                 var submodelOptional = submodelServiceClient.getSubmodel();
                 submodelOptional.ifPresent(resourceSubmodels::add);
