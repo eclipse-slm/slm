@@ -1,8 +1,8 @@
-FROM vault:1.11.11
+FROM hashicorp/vault:1.20.3
 
 RUN apk update && \
     apk upgrade && \
-    apk add bash curl jq
+    apk add bash curl jq ca-certificates
 
 COPY config.json /etc/vault.d/
 COPY startup.sh /opt/vault/startup.sh
