@@ -1,0 +1,13 @@
+vault_config:
+  pki_intermediate_ca:
+    name: "pki_int_slm"
+    role_name: "traefik"
+    allowed_domains: "{{ ENV.SLM_HOSTNAME }}"
+    allow_any_name: false
+    ttl: "1d"
+    max_ttl: "90d"
+  approle:
+    name: "traefik"
+    policies:
+        - name: "traefik"
+          policy: "\npath \"pki_int_slm/*\" {  capabilities = [ \"read\" , \"create\", \"update\"  ]}"

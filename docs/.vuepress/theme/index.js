@@ -21,8 +21,8 @@ module.exports = {
       },
       vault: {
         version: {
-          full: '1.11.11',
-          api: 'v1.11.x'
+          full: '1.20.3',
+          api: 'v1.20.x'
         }
       },
       basyx: {

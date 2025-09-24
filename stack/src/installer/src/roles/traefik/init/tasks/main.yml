@@ -1,21 +1,24 @@
-- name: "Traefik | Generate self-signed certificate or import existing certificate"
+- name: "Create Vault app role for Traefik"
   include_role:
-    name: cert
-    tasks_from: generate_or_import_certificate
+    name: vault/client
+    tasks_from: create_approle_with_policies
   vars:
-    _cm_name: "{{ ENV.SLM_HOSTNAME }}"
+    _vault_token: "{{ vault_root_token }}"
+    _approle_name: "{{ vault_config.approle.name }}"
+    _approle_policies: "{{ vault_config.approle.policies }}"
 
-- name: "Traefik | Add static config to Consul"
-  community.general.consul_kv:
-    scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
-    host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
-    port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
-    token: "{{ _consul_token }}"
-    key: "{{ item.key }}"
-    value: "{{ item.value }}"
-  with_items:
-    - { key: "traefik/tls/stores/default/defaultCertificate/certFile", value: "/certs/certificate.crt" }
-    - { key: "traefik/tls/stores/default/defaultCertificate/keyFile", value: "/certs/certificate.key" }
+- name: "Create role name for Vault PKI intermediate CA"
+  include_role:
+    name: vault/client
+    tasks_from: ca/create_role_name
+  vars:
+    _vault_token: "{{ vault_root_token }}"
+    _pki_name: "{{ vault_config.pki_intermediate_ca.name }}"
+    _role_name: "{{ vault_config.pki_intermediate_ca.role_name }}"
+    _allowed_domains: "{{ vault_config.pki_intermediate_ca.allowed_domains }}"
+    _allow_any_name: "{{ vault_config.pki_intermediate_ca.allow_any_name }}"
+    _ttl: "{{ vault_config.pki_intermediate_ca.ttl }}"
+    _max_ttl: "{{ vault_config.pki_intermediate_ca.max_ttl }}"
 
 - block:
   - set_fact:

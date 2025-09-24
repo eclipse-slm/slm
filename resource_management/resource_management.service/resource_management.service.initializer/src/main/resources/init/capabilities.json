@@ -537,7 +537,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
         "awxRepo": "https://github.com/eclipse-slm/ansible-role-resource-self-description-service",
-        "awxBranch": "0.0.1-SNAPSHOT",
+        "awxBranch": "main",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh"]
       },
@@ -545,66 +545,10 @@
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
         "awxRepo": "https://github.com/eclipse-slm/ansible-role-resource-self-description-service",
-        "awxBranch": "0.0.1-SNAPSHOT",
+        "awxBranch": "main",
         "playbook": "install.yml",
         "connectionTypes": ["ssh"],
         "configParameters": [
-          {
-            "name": "slm_host_name",
-            "prettyName": "SLM Host",
-            "description": "",
-            "valueType": "STRING",
-            "requiredType": "SKIP",
-            "secret": false
-          },
-          {
-            "name": "slm_host_ip",
-            "prettyName": "SLM Host IP",
-            "description": "",
-            "valueType": "STRING",
-            "requiredType": "SKIP",
-            "secret": false
-          },
-          {
-            "name": "consul",
-            "prettyName": "Consul IP",
-            "description": "",
-            "valueType": "STRING",
-            "requiredType": "SKIP",
-            "secret": false
-          },
-          {
-            "name": "aas_registry",
-            "prettyName": "AAS Registry IP",
-            "description": "",
-            "valueType": "STRING",
-            "requiredType": "SKIP",
-            "secret": false
-          },
-          {
-            "name": "aas_repository",
-            "prettyName": "AAS Repository IP",
-            "description": "",
-            "valueType": "STRING",
-            "requiredType": "SKIP",
-            "secret": false
-          },
-          {
-            "name": "submodel_registry",
-            "prettyName": "AAS Submodel Registry IP",
-            "description": "",
-            "valueType": "STRING",
-            "requiredType": "SKIP",
-            "secret": false
-          },
-          {
-            "name": "submodel_repository",
-            "prettyName": "Own Submodel Repository IP",
-            "description": "",
-            "valueType": "STRING",
-            "requiredType": "SKIP",
-            "secret": false
-          }
         ]
       }
     },

@@ -104,7 +104,7 @@ vault_approles:
   - name: awx
     policies:
       - name: "awx"
-        policy: "path \"resources/*\" { capabilities = [\"read\", \"list\", \"create\", \"update\"] } \npath \"service-repositories/*\" { capabilities = [\"read\", \"list\"] } \npath \"pki*\" {  capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\", \"patch\" ]}"
+        policy: "path \"resources/*\" { capabilities = [\"read\", \"list\", \"create\", \"update\"] } \npath \"service-repositories/*\" { capabilities = [\"read\", \"list\"] } \npath \"pki_int_resource*\" {  capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\", \"patch\" ]}"
 
 awx_jwt_authenticator:
   keycloak_client:

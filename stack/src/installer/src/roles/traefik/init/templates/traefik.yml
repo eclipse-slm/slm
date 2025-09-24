@@ -13,9 +13,12 @@ services:
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
 
+      - "--providers.file.directory=/certs/"
+      - "--providers.file.watch=true"
+
       - "--providers.consulCatalog.defaultRule=PathPrefix({{ '`/{{ .Name }}`' }})"
       - "--providers.consulCatalog.constraints=Tag(`exposed`)"
-      - "--providers.consulcatalog.strictChecks=passing,warning,critical"
+      - "--providers.consulCatalog.strictChecks=passing,warning,critical"
       - "--providers.consulCatalog.endpoint.address={{ ENV.CONSUL.HOST.INTERNAL }}:{{ ENV.CONSUL.PORT.INTERNAL }}"
       - "--providers.consulCatalog.endpoint.scheme={{ ENV.CONSUL.SCHEME.INTERNAL }}"
       - "--providers.consulCatalog.endpoint.token={{ _consul_token }}"
@@ -24,7 +27,9 @@ services:
       - "--providers.consul.token={{ _consul_token }}"
       - "--providers.consul.endpoints=http://{{ ENV.CONSUL.HOST.INTERNAL }}:{{ ENV.CONSUL.PORT.INTERNAL }}"
     environment:
-      CONSUL_TOKEN: "{{ _consul_token }}"
+      SLM_HOSTNAME: "{{ ENV.SLM_HOSTNAME }}"
+      VAULT_APP_ROLE_ROLE_ID: "{{ app_configs['traefik']['vault']['app-role']['role-id'] }}"
+      VAULT_APP_ROLE_SECRET_ID: "{{ app_configs['traefik']['vault']['app-role']['secret-id'] }}"
     networks:
       default:
     ports:

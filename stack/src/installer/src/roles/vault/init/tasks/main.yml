@@ -3,10 +3,6 @@
   assert:
     that:
       - (vault.url.internal is defined) and (vault.url.internal|length > 0)           # URL of the Vault instance
-      - (ENV.CONSUL.SCHEME.INTERNAL is defined) and (ENV.CONSUL.SCHEME.INTERNAL|length > 0)   # Scheme of the Consul instance
-      - (ENV.CONSUL.HOST.INTERNAL is defined) and (ENV.CONSUL.HOST.INTERNAL|length > 0)       # Host of the Consul instance
-      - (ENV.CONSUL.PORT.INTERNAL is defined)                                    # Port of the Consul instance
-      - (_consul_token is defined) and (_consul_token|length > 0)   # Token to authenticate with Consul
 
 - set_fact:
     _app_name: vault
@@ -24,6 +20,11 @@
       state: present
       pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
     register: vault_compose_start_output
+  - name: "Store resulting compose file"
+    template:
+      src: "vault.yml"
+      dest: "{{ _store_compose_file }}"
+    when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
   - name: "Wait for Vault ('{{ vault.url.internal }}') being up"
     uri:
       url: "{{ vault.url.internal }}/v1/sys/health"
@@ -57,42 +58,19 @@
     vars:
       _vault_token: "{{ vault_root_token }}"
 
-- name: "Store config"
-  block:
-  - set_fact:
-      vault_config_consul:
-  - import_role:
-      name: consul/client
-      tasks_from: create_or_add_config
-    vars:
-      _config:
-        scheme: "{{ ENV.VAULT.SCHEME.INTERNAL }}"
-        host: "{{ ENV.VAULT.HOST.INTERNAL }}"
-        port: "{{ ENV.VAULT.PORT.INTERNAL }}"
-        tokens:
-          root: "{{ vault_root_token }}"
-
-- name: "Register Vault instance at Consul (discovery server)"
-  include_role:
-    name: consul/client
-    tasks_from: register_service
-  vars:
-    _service_name: vault
-    _service_port: "{{ ENV.VAULT.PORT.INTERNAL }}"
-    _service_address: "{{ ENV.VAULT.HOST.INTERNAL }}"
-    _http: "{{ vault.url.internal }}/v1/sys/health"
-    _additional_tags:
-      - "vault"
-
-- name: "Create root certificate"
+- name: "Create root certificate authority (CA)"
   include_role:
     name: vault/client
     tasks_from: ca/create_root_certificate_authority
   vars:
     _vault_token: "{{ vault_root_token }}"
-    _host: "{{ SLM_HOSTNAME }}"
+    _pki_name: "slm"
+    _common_name: "{{ ENV.VAULT.ROOT_CA.COMMON_NAME }}"
     _issuer_name: "{{ ENV.VAULT.ROOT_CA.ISSUER_NAME }}"
-    _roles_name: "{{ ENV.VAULT.ROOT_CA.ROLES_NAME }}"
+    _organization: "{{ ENV.VAULT.ROOT_CA.ORGANIZATION }}"
+    _country: "{{ ENV.VAULT.ROOT_CA.COUNTRY }}"
+    _ttl:  "{{ ENV.VAULT.ROOT_CA.TTL }}"
+    _role_name: "{{ ENV.VAULT.ROOT_CA.ROLE_NAME }}"
 
 - name: "Create intermediate ca"
   include_role:
@@ -100,19 +78,13 @@
     tasks_from: ca/create_intermediate_ca
   vars:
     _vault_token: "{{ vault_root_token }}"
-    _host: "{{ SLM_HOSTNAME }}"
-    _organization: "Eclipse SLM"
-    _country: "DE"
+    _root_pki_name: "pki_root_slm"
+    _pki_name: "slm"
+    _common_name: "{{ ENV.VAULT.INTERMEDIATE_CA.COMMON_NAME }}"
+    _issuer_name: "{{ ENV.VAULT.INTERMEDIATE_CA.ISSUER_NAME }}"
+    _organization: "{{ ENV.VAULT.INTERMEDIATE_CA.ORGANIZATION }}"
+    _country:  "{{ ENV.VAULT.INTERMEDIATE_CA.COUNTRY }}"
+    _ttl:  "{{ ENV.VAULT.INTERMEDIATE_CA.TTL }}"
 
-- name: "Create role name"
-  include_role:
-    name: vault/client
-    tasks_from: ca/create_role_name
-  vars:
-    _vault_token: "{{ vault_root_token }}"
-    _host: "{{ SLM_HOSTNAME }}"
-    _role_name: "{{ SLM_HOSTNAME }}"
-    _allowed_domains: "{{ SLM_HOSTNAME }}"
-    _allow_any_name: "true"
 ### Outputs
 # - vault_root_token

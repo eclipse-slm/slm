@@ -14,6 +14,7 @@ Set in your current shell the environment variable `SLM_HOSTNAME` to the hostnam
 started. E.g.:
 ```sh
 export SLM_HOSTNAME=myhost.local
+export SLM_IP=172.17.0.1
 ```
 ::: warning ATTENTION
 **Use lowercase for the hostname to avoid case problems (e.g. with token authentication)**
@@ -26,6 +27,7 @@ docker run \
   --name eclipse-slm-installer \
   --pull=always \
   --env SLM_HOSTNAME=$SLM_HOSTNAME \
+  --env SLM_IP=$SLM_IP \
   --volume /var/run/docker.sock:/var/run/docker.sock \
   --add-host $SLM_HOSTNAME:host-gateway \
   ghcr.io/eclipse-slm/slm/installer:1.4.0-SNAPSHOT

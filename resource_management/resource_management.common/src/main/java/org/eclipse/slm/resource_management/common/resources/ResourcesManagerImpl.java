@@ -181,7 +181,7 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
             resource = this.resourcesConsulClient.addResource(resource);
 
             this.resourcesVaultClient.initResourceKV(resourceId);
-            this.resourcesVaultClient.createIntermediateCertificate(resource.getId(), resource.getIp(), resource.getHostname());
+            this.resourcesVaultClient.createIntermediateCertificateAuthority(resource.getId(), resource.getIp(), resource.getHostname());
 
             this.resourcesAasHandler.createResourceAasAndSubmodels(resource, digitalNameplateV3);
 
@@ -212,8 +212,7 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
             this.keycloakAdminClient.deleteRealmRoles(realmRolesToDelete);
             this.resourcesConsulClient.deleteResource(new ConsulCredential(), resource);
             this.resourcesVaultClient.removeSecretsForResource(new VaultCredential(), resource.getId());
-            this.resourcesVaultClient.removeIntermediateCertificate(resource.getId());
-
+            this.resourcesVaultClient.removeIntermediateCertificateAuthority(resource.getId());
 
             this.resourceEventMessageSender.sendMessage(resource, ResourceEventType.DELETED);
             this.applicationEventPublisher.publishEvent(new ResourceEvent(this, resourceId, ResourceEvent.Operation.DELETE));
