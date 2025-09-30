@@ -7,6 +7,7 @@ import org.eclipse.digitaltwin.basyx.core.pagination.PaginationInfo;
 import org.eclipse.digitaltwin.basyx.core.pagination.PaginationSupport;
 import org.eclipse.slm.common.aas.clients.*;
 import org.eclipse.slm.common.aas.clients.exceptions.ShellNotFoundException;
+import org.eclipse.slm.common.aas.clients.exceptions.SubmodelRuntimeException;
 import org.eclipse.slm.common.aas.repositories.submodels.AbstractSubmodelRepository;
 import org.eclipse.slm.common.aas.repositories.api.submodels.GetSubmodelsValueOnlyResult;
 import org.eclipse.slm.common.aas.repositories.api.submodels.SubmodelValueOnly;
@@ -74,7 +75,7 @@ public class ResourcesSubmodelRepository extends AbstractSubmodelRepository {
                         }
                     });
                 }
-            } catch (ElementDoesNotExistException | IllegalArgumentException e) {
+            } catch (ElementDoesNotExistException | IllegalArgumentException | SubmodelRuntimeException e) {
                 LOG.info(e.getMessage());
             }
         }

@@ -61,9 +61,15 @@ public class ResourceTypesManager {
         var nameplateSubmodels = new ArrayList<Submodel>();
         for (var nameplateSubmodelDescriptor : nameplateSubmodelDescriptors) {
             var submodelRepositoryClient = SubmodelRepositoryClientFactory.FromSubmodelDescriptor(nameplateSubmodelDescriptor);
-            var nameplateSubmodel = submodelRepositoryClient.getSubmodel(nameplateSubmodelDescriptor.getId());
-            if (nameplateSubmodel != null) {
-                nameplateSubmodels.add(nameplateSubmodel);
+            try {
+                var nameplateSubmodel = submodelRepositoryClient.getSubmodel(nameplateSubmodelDescriptor.getId());
+                if (nameplateSubmodel != null) {
+                    nameplateSubmodels.add(nameplateSubmodel);
+                }
+            }
+            catch (Exception e) {
+                LOG.error("Error fetching nameplate submodel with id '" + nameplateSubmodelDescriptor.getId() + "': " + e.getMessage());
+                LOG.debug("Stacktrace: ", e);
             }
         }
 
