@@ -1,0 +1,121 @@
+- name: "Assert inputs of 'vault/client | ca/create_intermediate_ca.yml'"
+  assert:
+    that:
+      - (vault.url.internal is defined) and (vault.url.internal|length > 0)
+      - (_vault_token is defined) and (_vault_token|length > 0)
+      - (_pki_name is defined) and (_pki_name|length > 0)
+      - (_common_name is defined) and (_common_name|length > 0)
+      - (_ttl is defined) and (_ttl|length > 0)
+      - (_root_pki_name is defined) and (_root_pki_name|length > 0)
+      # Optional
+      # - _issuer_name
+      # - _country
+      # - _organization
+      # - _alt_names
+    fail_msg: "Variable must be defined and not empty"
+
+- set_fact:
+    pki_name_full: "pki_int_{{ _pki_name }}"
+
+- name: "Vault | PKI Intermediate CA | Check if pki secrets engine already exists"
+  uri:
+    url: "{{ vault.url.internal }}/v1/sys/mounts/{{ pki_name_full }}"
+    validate_certs: no
+    method: GET
+    headers:
+      Authorization: "Bearer {{ _vault_token }}"
+    status_code: 200, 400
+    body_format: json
+    body:
+      type: "pki"
+  register: pki
+
+- block:
+    - name: "Vault | PKI Intermediate CA | Enable the pki secrets engine at {{ pki_name_full }} path."
+      uri:
+        url: "{{ vault.url.internal }}/v1/sys/mounts/{{ pki_name_full }}"
+        validate_certs: no
+        method: POST
+        headers:
+          Authorization: "Bearer {{ _vault_token }}"
+        status_code: 200, 204
+        body_format: json
+        body:
+          type: "pki"
+
+    - name: "Vault | PKI Intermediate CA | Tune the {{ pki_name_full }} secrets engine to issue certificates with a maximum time-to-live (TTL) of {{ _ttl }}."
+      uri:
+        url: "{{ vault.url.internal }}/v1/sys/mounts/{{ pki_name_full }}/tune"
+        validate_certs: no
+        method: POST
+        headers:
+          Authorization: "Bearer {{ _vault_token }}"
+        status_code: 200, 204
+        body_format: json
+        body:
+          max_lease_ttl: "{{ _ttl }}"
+
+    - name: "Vault | PKI Intermediate CA | Generate an intermediate certificate using the /{{ pki_name_full }}/intermediate/generate/internal endpoint"
+      uri:
+        url: "{{ vault.url.internal }}/v1/{{ pki_name_full }}/intermediate/generate/internal"
+        validate_certs: no
+        method: POST
+        headers:
+          Authorization: "Bearer {{ _vault_token }}"
+        status_code: 200, 204
+        body_format: json
+        body:
+          common_name: "{{ _common_name }}"
+          alt_names: "{{ _alt_names | default('') }}"
+          issuer_name: "{{ _issuer_name | default('') }}"
+          organization: "{{ _organization | default('') }}"
+          country: "{{ _country | default('') }}"
+          use_common_name_for_san: true
+          ttl: "{{ _ttl }}"
+      register: intermediate_ca
+
+    - name: "Vault | PKI Intermediate CA | Assert intermediate ca"
+      assert:
+        that:
+          - (intermediate_ca is defined) and (intermediate_ca|length > 0) and (intermediate_ca.json.data.csr is defined) and (intermediate_ca.json.data.csr |length > 0)
+        fail_msg: "Intermediate CA must be created"
+
+
+    - name: "Vault | PKI Intermediate CA | Sign the intermediate certificate with the root CA private key"
+      uri:
+        url: "{{ vault.url.internal }}/v1/{{ _root_pki_name }}/root/sign-intermediate"
+        validate_certs: no
+        method: POST
+        headers:
+          Authorization: "Bearer {{ _vault_token }}"
+        status_code: 200, 204
+        body_format: json
+        body:
+          csr: "{{ intermediate_ca.json.data.csr }}"
+          format: "pem_bundle"
+          ttl: "{{ _ttl }}"
+      register: intermediate_cert
+
+    - name: "Vault | PKI Intermediate CA | Assert intermediate_cert"
+      assert:
+        that:
+          - (intermediate_cert is defined) and (intermediate_cert|length > 0) and (intermediate_cert.json.data.certificate is defined) and (intermediate_cert.json.data.certificate |length > 0)
+        fail_msg: "intermediate_cert must be created"
+
+    - name: "Vault | PKI Intermediate CA | Submit the signed certificate."
+      uri:
+        url: "{{ vault.url.internal }}/v1/{{ pki_name_full }}/intermediate/set-signed"
+        validate_certs: no
+        method: POST
+        headers:
+          Authorization: "Bearer {{ _vault_token }}"
+        status_code: 200, 204
+        body_format: json
+        body:
+          certificate: "{{ intermediate_cert.json.data.certificate }}"
+          format: "pem_bundle"
+          ttl: "{{ _ttl }}"
+
+  when: pki.status != 200
+
+

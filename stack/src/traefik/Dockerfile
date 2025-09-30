@@ -1,20 +1,24 @@
 FROM traefik:v3.3.4
 
-ENV CONSUL_URL="http://consul:8500" \
-    CONSUL_TOKEN="your-consul-token"
+ENV SLM_HOSTNAME="your-slm-hostname" \
+    VAULT_APP_ROLE_ROLE_ID="your-vault-app-role-role-id" \
+    VAULT_APP_ROLE_SECRET_ID="your-vault-app-role-secret-id"
 
-ARG CONSUL_VERSION=1.20.5
+ARG VAULT_VERSION=1.20.3
 
-RUN apk --no-cache add curl
-
-RUN curl -sSLo /tmp/consul.zip https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip && \
-    unzip /tmp/consul.zip -d /bin && \
-    rm /tmp/consul.zip
-
+# Install APK packages
+RUN apk --no-cache add curl nano
+# Install Vault
+RUN curl -sSLo /tmp/vault.zip https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip && \
+    unzip -o /tmp/vault.zip -d /bin && \
+    rm /tmp/vault.zip
+# Copy config for Vault Agent
+ADD vault vault
+# Configure Entrypoint
 ADD configuration-entrypoint.sh /configuration-entrypoint.sh
 RUN chmod +x /configuration-entrypoint.sh
-
-RUN mkdir -p /certs
+# Copy config for certs
+ADD certs certs
 
 ENTRYPOINT ["/configuration-entrypoint.sh"]
 CMD ["traefik"]

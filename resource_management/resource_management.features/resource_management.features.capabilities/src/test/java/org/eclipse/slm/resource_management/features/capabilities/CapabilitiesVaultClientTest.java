@@ -60,7 +60,7 @@ public class CapabilitiesVaultClientTest {
     private CapabilityJpaRepository capabilityJpaRepository;
 
     @Container
-    static GenericContainer<?> vaultDockerContainer = new GenericContainer<>(DockerImageName.parse("vault:"+ ClusterHandlerITConfig.VAULT_VERSION))
+    static GenericContainer<?> vaultDockerContainer = new GenericContainer<>(DockerImageName.parse("hashicorp/vault:"+ ClusterHandlerITConfig.VAULT_VERSION))
             .withExposedPorts(CapabilitiesVaultClientTestConfig.VAULT_PORT)
             .withEnv("VAULT_DEV_ROOT_TOKEN_ID", CapabilitiesVaultClientTestConfig.VAULT_TOKEN)
             .waitingFor(new HostPortWaitStrategy());

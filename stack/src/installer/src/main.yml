@@ -40,6 +40,7 @@
   pre_tasks:
     - set_fact:
         SLM_HOSTNAME: "{{ lookup('ansible.builtin.env', 'SLM_HOSTNAME') }}"
+        SLM_IP: "{{ lookup('ansible.builtin.env', 'SLM_IP') }}"
     - name: "Import config from env.yml"
       include_vars:
         file: "/env/env.yml"
@@ -184,7 +185,7 @@
               consul_internal: "{{ consul.url.internal }}"
               consul _external: "{{ consul.url.external }}"
               vault_internal: "{{ vault.url.internal }}"
-              vault _external: "{{ vault.url.external }}"
+              vault_external: "{{ vault.url.external }}"
               keycloak_internal: "{{ keycloak.url.internal }}"
               keycloak_external: "{{ keycloak.url.external }}"
               aas_aas_discovery_internal: "{{ aas.aas_discovery.url.internal }}"
@@ -237,6 +238,12 @@
           name: eclipse-slm-installer-helper-1
           state: absent
 
+    - name: "Start Vault"
+      include_role:
+        name: vault/init
+      vars:
+        _store_compose_file: /compose/vault.yml
+
     - name: "Start Consul"
       include_role:
         name: consul/init
@@ -250,6 +257,7 @@
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_file: /compose/traefik.yml
+        _vault_root_token: "{{ vault_root_token }}"
 
     - name: "Start Keycloak"
       include_role:
@@ -258,18 +266,19 @@
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_file: /compose/keycloak.yml
 
+    - name: "Init Vault after Keycloak available"
+      include_role:
+        name: vault/init
+        tasks_from: init_after_keycloak.yml
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _vault_root_token: "{{ vault_root_token }}"
+
     - name: "Init Consul"
       include_role:
         name: consul/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-
-    - name: "Start Vault"
-      include_role:
-        name: vault/init
-      vars:
-        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_file: /compose/vault.yml
 
     - name: "Start RabbitMQ"
       include_role:

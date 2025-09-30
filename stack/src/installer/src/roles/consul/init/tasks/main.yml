@@ -32,7 +32,6 @@
       Description: FabOS Keycloak Instance
       Config:
         OIDCDiscoveryURL: "{{ keycloak.url.external_without_port }}/realms/{{ ENV.KEYCLOAK.REALM }}"
-        OIDCDiscoveryCACert: "{{ oidc_discovery_crt }}"
         ClaimMappings:
           given_name: first_name
           family_name: last_name
@@ -53,8 +52,10 @@
       body_format: json
       body:
         Node: "SLM"
-        Address: "{{ SLM_HOSTNAME }}"
+        Address: "{{ ENV.SLM_HOSTNAME }}"
         NodeMeta:
+          slm_hostname: "{{ ENV.SLM_HOSTNAME }}"
+          slm_ip: "{{ ENV.SLM_IP }}"
           catalog_service_url: "{{ catalog_service.url.proxy }}"
           notification_service_url: "{{ notification_service.url.proxy }}"
           information_service_url: "{{ information_service.url.proxy }}"

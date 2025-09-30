@@ -93,6 +93,7 @@
 
         <testcontainers.version>1.20.1</testcontainers.version>
         <assertj.version>3.26.3</assertj.version>
+
         
         <docker.image.registry>ghcr.io/eclipse-slm</docker.image.registry>
         <docker.image.skip>false</docker.image.skip>
@@ -415,6 +416,12 @@
                         </execution>
                     </executions>
                 </plugin>
+                <!-- Deploy !-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${maven.plugin.apache.deploy.version}</version>
+                </plugin>
                 <!-- Docker Image !-->
                 <plugin>
                     <groupId>com.spotify</groupId>
@@ -472,7 +479,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>${maven.plugin.apache.deploy.version}</version>
                 <configuration>
                     <skip>true</skip>
                 </configuration>
@@ -709,5 +715,13 @@
             </plugin>
         </plugins>
     </reporting>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/eclipse-slm/slm</url>
+        </repository>
+    </distributionManagement>
 
 </project>

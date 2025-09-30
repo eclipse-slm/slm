@@ -39,7 +39,6 @@
     body_format: json
     body:
       oidc_discovery_url: "{{ _oidc_discovery_url }}"
-      oidc_discovery_ca_pem: "{{ oidc_discovery_crt }}"
       oidc_client_id: "{{ oidc_client_id | default('') }}"
       bound_issuer: "{{ bound_issuer | default('') }}"
     status_code: 204

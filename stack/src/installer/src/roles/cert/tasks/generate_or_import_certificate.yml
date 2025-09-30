@@ -6,7 +6,7 @@
       - (ENV.CONSUL.HOST.INTERNAL is defined) and (ENV.CONSUL.HOST.INTERNAL|length > 0)       # Host of the Consul instance
       - (ENV.CONSUL.PORT.INTERNAL is defined)                                             # Port of the Consul instance
       - (_consul_token is defined) and (_consul_token|length > 0)                     # Token to authenticate with Consul
-      - (_common_name is defined) and (_common_name|length > 0)                       # Common Name used for the certificate
+      - (_cm_name is defined) and (_cm_name|length > 0)                       # Common Name used for the certificate
 
 - set_fact:
     __consul_kv_path_crt: certs/traefik/crt
@@ -54,24 +54,22 @@
 
 - name: "Generate self-signed certificate"
   block:
-  - name: "Create private key"
-    community.crypto.openssl_privatekey_pipe:
-      type: RSA
-    register: privatekey_output
-  - name: "Generate an OpenSSL Certificate Signing Request"
-    community.crypto.openssl_csr_pipe:
-      privatekey_content: "{{ privatekey_output.privatekey }}"
-      common_name: "{{ _common_name }}"
-      use_common_name_for_san: true
-      country_name: DE
-      organization_name: Eclipse SLM
-    register: csr_output
-  - name: "Create simple self-signed certificate"
-    community.crypto.x509_certificate_pipe:
-      privatekey_content: "{{ privatekey_output.privatekey }}"
-      csr_content: "{{ csr_output.csr }}"
-      provider: selfsigned
-    register: certificate_output
+  - name: "Create Certificates"
+    include_role:
+      name: vault/client
+      tasks_from: ca/request_ca
+    vars:
+      _vault_token: "{{ vault_root_token }}"
+      _common_name: "{{ _cm_name }}"
+      _pki: "pki_int_{{ _cm_name }}"
+      _pki_role: "{{ _cm_name }}"
+  - set_fact:
+      certificate_output:
+        certificate: "{{ certificates.certificate }}"
+      privatekey_output:
+        privatekey: "{{ certificates.private_key }}"
+      csr_output:
+        csr: "{{ certificates.issuing_ca }}"
   - debug:
       msg: "Certificate and private key were generated"
   when: generate_cert == true

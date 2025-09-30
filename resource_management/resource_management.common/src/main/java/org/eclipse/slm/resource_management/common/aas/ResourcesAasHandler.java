@@ -147,7 +147,7 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
                     platformResourcesSubmodelUrl,
                     platformResourcesSubmodelId,
                     platformResourcesSubmodelId,
-                    null);
+                    "");
 
             // Create submodel DeviceInfo
             var deviceInfoSubmodelId =  DeviceInfoSubmodel.SUBMODEL_ID_SHORT + "-" + resource.getId();

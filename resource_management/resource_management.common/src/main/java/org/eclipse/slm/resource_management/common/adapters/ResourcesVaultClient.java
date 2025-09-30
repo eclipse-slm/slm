@@ -6,6 +6,7 @@ import org.eclipse.slm.common.vault.client.VaultCredential;
 import org.eclipse.slm.common.vault.client.VaultCredentialType;
 import org.eclipse.slm.common.vault.model.KvPath;
 import org.eclipse.slm.resource_management.common.remote_access.*;
+import org.eclipse.slm.common.vault.model.exceptions.CertificateAuthorityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -20,7 +21,13 @@ public class ResourcesVaultClient {
 
     public final static String VAULT_POLICY_PREFIX = "policy_resource_";
 
+    public final static String VAULT_SLM_ROOT_PKI_NAME = "pki_root_slm";
+
     private final VaultClient vaultClient;
+
+    public static String getIntermediatePkiNameOfResource(UUID resourceId) {
+        return "resource-" + resourceId;
+    }
 
     public ResourcesVaultClient(VaultClient vaultClient) {
         this.vaultClient = vaultClient;
@@ -179,4 +186,38 @@ public class ResourcesVaultClient {
 
         this.vaultClient.removeSecretFromKvEngine(vaultCredential, resourceVaultPath.getSecretEngine(), resourceVaultPath.getPath());
     }
+
+    public void createIntermediateCertificateAuthority(UUID resourceId, String resourceIp, String resourceHostname) {
+        var credential = new VaultCredential();
+        try {
+            var domains = new ArrayList<String>();
+
+            if (resourceHostname != null) {
+                domains.add(resourceHostname);
+            }
+            if ((resourceIp != null)) {
+                domains.add(resourceIp);
+            }
+
+            var pkiName = ResourcesVaultClient.getIntermediatePkiNameOfResource(resourceId);
+            var commonName = "Resource '" + resourceId + "' Intermediate CA";
+            var issuerName = "resource-" + resourceId + "-intermediate-ca";
+            var roleName = "resource";
+            this.vaultClient.addIntermediateCA(credential, pkiName, commonName, issuerName, ResourcesVaultClient.VAULT_SLM_ROOT_PKI_NAME);
+            this.vaultClient.createIntermediateRole(credential, pkiName, domains, roleName);
+        } catch (Exception e) {
+            LOG.error("Could not create Intermediate Certificate for Resource \"{}\"", resourceId, e);
+        }
+    }
+
+    public void removeIntermediateCertificateAuthority(UUID resourceId) {
+        var credential = new VaultCredential();
+        try {
+            var pkiName = ResourcesVaultClient.getIntermediatePkiNameOfResource(resourceId);
+            this.vaultClient.disableIntermediateCA(credential, pkiName);
+        }catch (CertificateAuthorityException e) {
+            LOG.info("Could not delete Intermediate Certificate for resource '{}'", resourceId);
+        }
+    }
+
 }

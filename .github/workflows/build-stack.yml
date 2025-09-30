@@ -22,6 +22,7 @@ jobs:
           - aas-broker
           - aas-gui
           - keycloak
+          - consul
           - vault
           - prometheus
           - traefik

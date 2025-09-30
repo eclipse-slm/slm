@@ -76,7 +76,7 @@ public class ServiceRepositoriesRestControllerIT extends AbstractRestControllerI
     private ServiceRepositoryHandler serviceRepositoryHandler;
 
     @Container
-    private final GenericContainer<?> vaultContainer = new GenericContainer<>(DockerImageName.parse("vault:1.11.0"))
+    private final GenericContainer<?> vaultContainer = new GenericContainer<>(DockerImageName.parse("hashicorp/vault:1.20.3"))
         .withExposedPorts(8200)
         .withEnv("VAULT_DEV_ROOT_TOKEN_ID", "myroot");
 

@@ -1,22 +1,24 @@
 #!/bin/sh
 
-echo "[ Configuring Traefik... ]"
+echo "[ Configuring Vault Agent... ]"
+if [ -n "$VAULT_APP_ROLE_ROLE_ID" ]; then
+  echo "$VAULT_APP_ROLE_ROLE_ID" > /vault/role_id
+else
+  echo "ERROR: Environment variable '$VAULT_APP_ROLE_ROLE_ID' not set or empty!"
+  exit 1
+fi
 
-mkdir -p /certs
+if [ -n "$VAULT_APP_ROLE_SECRET_ID" ]; then
+  echo "$VAULT_APP_ROLE_SECRET_ID" > /vault/secret_id
+else
+  echo "ERROR: Environment variable 'VAULT_APP_ROLE_SECRET_ID' not set or empty!"
+  exit 1
+fi
 
-export CONSUL_HTTP_ADDR=$CONSUL_URL
-export CONSUL_HTTP_TOKEN=$CONSUL_TOKEN
-
-# Wait until Consul is running
-until [ "$(curl -m 5 -s -k --location --request GET "$CONSUL_HTTP_ADDR/v1/status/leader")" = '"172.17.0.1:8300"' ]; do
-  echo "Consul is unavailable -> sleeping"
-  sleep 1
-done
-
-consul kv get certs/traefik/crt > /certs/certificate.crt
-consul kv get certs/traefik/key > /certs/certificate.key
+echo "[ Starting Vault Agent... ]"
+vault agent -config=/vault/vault_agent.hcl &
+sleep 5 # Give Vault Agent some time to start and get certificates
 
 echo "[ Starting Traefik... ]"
-
 # Forwarding to the base entrypoint
 exec traefik "$@"

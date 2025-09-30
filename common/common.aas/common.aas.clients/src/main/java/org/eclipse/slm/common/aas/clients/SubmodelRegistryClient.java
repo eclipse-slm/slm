@@ -5,6 +5,8 @@ import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.SerializationException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonDeserializer;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonSerializer;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultKey;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultReference;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodelDescriptor;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.api.SubmodelRegistryApi;
@@ -106,6 +108,18 @@ public class SubmodelRegistryClient {
     }
 
     public void registerSubmodel(String submodelUrl, String smId, String smIdShort, String semanticId) throws ApiException {
+        var semanticIdRef = new DefaultReference.Builder()
+                .type(org.eclipse.digitaltwin.aas4j.v3.model.ReferenceTypes.EXTERNAL_REFERENCE)
+                .keys(new DefaultKey.Builder()
+                        .type(org.eclipse.digitaltwin.aas4j.v3.model.KeyTypes.SUBMODEL)
+                        .value(semanticId)
+                        .build()
+                ).build();
+
+        this.registerSubmodel(submodelUrl, smId, smIdShort, semanticIdRef);
+    }
+
+    public void registerSubmodel(String submodelUrl, String smId, String smIdShort, org.eclipse.digitaltwin.aas4j.v3.model.Reference semanticId) throws ApiException {
         var endpoints = new ArrayList<Endpoint>();
         var endpoint = new Endpoint();
         endpoint.setInterface("SUBMODEL-3.0");
@@ -119,14 +133,16 @@ public class SubmodelRegistryClient {
         submodelDescriptor.setId(smId);
         submodelDescriptor.setIdShort(smIdShort);
         submodelDescriptor.setEndpoints(endpoints);
-        if (semanticId != null) {
-            var semanticIdRef = new Reference();
-            semanticIdRef.setType(ReferenceTypes.EXTERNALREFERENCE);
-            var semanticIdKey = new Key();
-            semanticIdKey.setType(KeyTypes.GLOBALREFERENCE);
-            semanticIdKey.setValue(semanticId);
-            semanticIdRef.addKeysItem(semanticIdKey);
-            submodelDescriptor.setSemanticId(semanticIdRef);
+
+        var aasJsonSerializer = new JsonSerializer();
+        var aasJsonDeserializer = new JsonDeserializer();
+
+        try {
+            var registryModelJson = aasJsonSerializer.write(semanticId);
+            var convertedSemanticId = aasJsonDeserializer.read(registryModelJson, Reference.class);
+            submodelDescriptor.setSemanticId(convertedSemanticId);
+        } catch (SerializationException | DeserializationException e) {
+            throw new RuntimeException(e);
         }
 
         try {
@@ -140,6 +156,7 @@ public class SubmodelRegistryClient {
             }
         }
     }
+
 
     public void unregisterSubmodel(String submodelId) throws ApiException {
         this.submodelRegistryApi.deleteSubmodelDescriptorById(submodelId);

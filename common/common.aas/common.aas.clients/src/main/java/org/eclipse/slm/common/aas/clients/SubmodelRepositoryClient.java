@@ -12,6 +12,8 @@ import org.eclipse.digitaltwin.basyx.submodelrepository.client.ConnectedSubmodel
 import org.eclipse.digitaltwin.basyx.submodelrepository.client.internal.SubmodelRepositoryApi;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelValueOnly;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.exception.ValueMapperNotFoundException;
+import org.eclipse.slm.common.aas.clients.exceptions.SubmodelRuntimeException;
+import org.eclipse.slm.common.aas.repositories.exceptions.SubmodelNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -54,13 +56,12 @@ public class SubmodelRepositoryClient {
         return submodels;
     }
 
-    public Submodel getSubmodel(String submodelId) {
+    public Submodel getSubmodel(String submodelId) throws SubmodelRuntimeException {
         try {
             var submodel = this.connectedSubmodelRepository.getSubmodel(submodelId);
             return submodel;
         } catch (Exception e) {
-            LOG.error("Error while fetching submodel with id '{}': {}", submodelId, e);
-            return null;
+            throw new SubmodelRuntimeException("Error while fetching submodel with id '" + submodelId + "': " + e.getMessage());
         }
     }
 

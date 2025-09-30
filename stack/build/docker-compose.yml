@@ -16,6 +16,10 @@ services:
     image: ${DOCKER_IMAGE_REGISTRY}/aas/gui:${AAS_GUI_VERSION}
     build: ../src/aas-gui
 
+  consul:
+    image: ${DOCKER_IMAGE_REGISTRY}/consul:${CONSUL_VERSION}
+    build: ../src/consul
+
   keycloak:
     image: ${DOCKER_IMAGE_REGISTRY}/keycloak:${KEYCLOAK_VERSION}
     build: ../src/keycloak/keycloak

@@ -25,8 +25,8 @@ awx_credential_types:
         - consul_token
     injectors:
       env:
-        CONSUL_TOKEN: "{{ _awx_consul_token }}"
-        CONSUL_URL: "{{ consul.url.internal }}"
+        CONSUL_TOKEN: "{% raw %}{{ consul_token }}{% endraw %}"
+        CONSUL_URL: "{% raw %}{{ consul_url }}{% endraw %}"
   - name: HashiCorp Vault
     inputs:
       fields:
@@ -51,9 +51,9 @@ awx_credential_types:
         - vault_approle_secret_id
     injectors:
       env:
-        VAULT_URL: "{{ vault.url.internal }}"
-        VAULT_APPROLE_ROLE_ID: "{{ app_configs.awx.vault['app-role']['role-id'] }}"
-        VAULT_APPROLE_SECRET_ID: "{{ app_configs.awx.vault['app-role']['secret-id'] }}"
+        VAULT_URL: "{% raw %}{{ vault_url }}{% endraw %}"
+        VAULT_APPROLE_ROLE_ID: "{% raw %}{{ vault_approle_role_id }}{% endraw %}"
+        VAULT_APPROLE_SECRET_ID: "{% raw %}{{ vault_approle_secret_id }}{% endraw %}"
   - name: Minio
     inputs:
       fields:
@@ -77,9 +77,9 @@ awx_credential_types:
         - minio_secret_key
     injectors:
       env:
-        MINIO_URL: "{{ minio.url.api.internal }}"
-        MINIO_ACCESS_KEY: "{{ app_configs.awx.minio['access-key'] }}"
-        MINIO_SECRET_KEY: "{{ app_configs.awx.minio['secret-key'] }}"
+        MINIO_URL: "{% raw %}{{ minio_url }}{% endraw %}"
+        MINIO_ACCESS_KEY: "{% raw %}{{ minio_access_key }}{% endraw %}"
+        MINIO_SECRET_KEY: "{% raw %}{{ minio_secret_key }}{% endraw %}"
 
 awx_credentials:
   - name: Consul
@@ -90,7 +90,7 @@ awx_credentials:
   - name: HashiCorp Vault
     credential_type: HashiCorp Vault
     inputs:
-      vault_url: "http://vault:8200"
+      vault_url: "{{ vault.url.external }}"
       vault_approle_role_id: "{{ app_configs.awx.vault['app-role']['role-id']}}"
       vault_approle_secret_id: "{{ app_configs.awx.vault['app-role']['secret-id'] }}"
   - name: Minio
@@ -104,7 +104,7 @@ vault_approles:
   - name: awx
     policies:
       - name: "awx"
-        policy: "path \"resources/*\" { capabilities = [\"read\", \"list\", \"create\", \"update\"] } \npath \"service-repositories/*\" { capabilities = [\"read\", \"list\"] }"
+        policy: "path \"resources/*\" { capabilities = [\"read\", \"list\", \"create\", \"update\"] } \npath \"service-repositories/*\" { capabilities = [\"read\", \"list\"] } \npath \"pki_int_resource*\" {  capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\", \"patch\" ]}"
 
 awx_jwt_authenticator:
   keycloak_client:

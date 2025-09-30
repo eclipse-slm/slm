@@ -5,6 +5,7 @@ services:
     image: ghcr.io/eclipse-slm/slm/installer:${SLM_VERSION}
     environment:
       SLM_HOSTNAME: ${SLM_HOSTNAME}
+      SLM_IP: ${SLM_IP}
       DEPLOYMENT_HOST_HOSTNAME: ${DEPLOYMENT_HOST_HOSTNAME}
       DEPLOYMENT_HOST_USER: ${DEPLOYMENT_HOST_USER}
       DEPLOYMENT_HOST_PASSWORD: ${DEPLOYMENT_HOST_PASSWORD}
