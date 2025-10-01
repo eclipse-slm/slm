@@ -13,6 +13,7 @@ services:
       - keycloak-database
     environment:
       KC_HOSTNAME: "{{ ENV.KEYCLOAK.HOST.EXTERNAL }}"
+      KC_HEALTH_ENABLED: "true"
       KC_DB_HOST: "{{ keycloak_config.database.host }}"
       KC_DB_URL_HOST: "{{ keycloak_config.database.url_host }}"
       KC_DB_SCHEMA: "{{ keycloak_config.database.schema }}"
@@ -32,7 +33,7 @@ services:
         aliases:
           - "{{ ENV.KEYCLOAK.HOST.INTERNAL }}"
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:8080/auth" ]
+      test: [ "CMD", "curl", "http://localhost:9000/health/ready" ]
     extra_hosts:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
 
@@ -56,7 +57,12 @@ services:
       MARIADB_PASSWORD: "{{ keycloak_config.database.password }}"
       MARIADB_DATABASE: "{{ keycloak_config.database.schema }}"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "--silent"]
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      start_period: 30s
+      start_interval: 10s
+      interval: 1m
+      timeout: 5s
+      retries: 3
 
 volumes:
   keycloak-database_data:
