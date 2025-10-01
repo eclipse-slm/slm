@@ -52,8 +52,25 @@ jobs:
               "id": "ghcr.io",
               "username": "${{github.actor}}",
               "password": "${{secrets.GITHUB_TOKEN}}"
+            },
+            {
+              "id": "github-maven",
+              "username": "${{github.actor}}",
+              "password": "${{secrets.GITHUB_TOKEN}}"
             }
           ]'
+      - name: Delete old Mavenpackages
+        if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
+        uses: SmartsquareGmbH/delete-old-packages@v0.8.1
+        continue-on-error: true
+        with:
+          organization: eclipse-slm
+          type: maven
+          keep: 0
+          names: |
+            org.eclipse.slm.common.aas
+            org.eclipse.slm.common.aas.clients
+            org.eclipse.slm.common.aas.repositories
       - name: Build '${{ matrix.build.type }}' with Maven and push Docker Images
         if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
         run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' deploy
