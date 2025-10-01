@@ -1,4 +1,4 @@
-FROM quay.io/keycloak/keycloak:19.0.3
+FROM quay.io/keycloak/keycloak:26.4.0
 
 ENV KC_DB_HOST=keycloak-database \
     KC_DB_URL_HOST=keycloak-database \
@@ -15,4 +15,4 @@ COPY themes/fabos /opt/keycloak/themes/fabos
 
 USER 1000
 
-CMD ["start-dev", "--db mariadb", "--transaction-xa-enabled=false", "--health-enabled=true"]
+CMD ["start-dev", "--db=mariadb", "--transaction-xa-enabled=false", "--health-enabled=true"]

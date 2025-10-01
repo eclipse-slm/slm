@@ -1,6 +1,7 @@
 package org.eclipse.slm.common.keycloak.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.core.Response;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakGroupNotFoundException;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakUserNotFoundException;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
@@ -172,7 +173,7 @@ public class KeycloakAdminClient {
         newGroup.setName(groupName);
         newGroup.setAttributes(attributes);
         try {
-            var response = realmResource.groups().add(newGroup);
+            Response response = realmResource.groups().add(newGroup);
             if (response.getStatus() != 201) {
                 var objectMapper = new ObjectMapper();
                 LOG.error("Error creating Kyylcoak group '" + groupName + "': " + objectMapper.writeValueAsString(response));
