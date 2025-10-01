@@ -86,5 +86,22 @@
     _country:  "{{ ENV.VAULT.INTERMEDIATE_CA.COUNTRY }}"
     _ttl:  "{{ ENV.VAULT.INTERMEDIATE_CA.TTL }}"
 
+- block:
+  - name: "Restart Vault container to use and trust newly created root CA"
+    delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+    community.docker.docker_container:
+      name: "{{ vault_compose_start_output.images | community.general.json_query(query) | first }}"
+      restart : "true"
+    vars:
+      query: "[?Repository.contains(@, 'vault')].ContainerName"
+  - name: "Wait for Vault ('{{ vault.url.internal }}') being up"
+    uri:
+      url: "{{ vault.url.internal }}/v1/sys/health"
+      status_code: 200
+    register: result
+    until: result.status == 200
+    retries: 120
+    delay: 3
+
 ### Outputs
 # - vault_root_token
