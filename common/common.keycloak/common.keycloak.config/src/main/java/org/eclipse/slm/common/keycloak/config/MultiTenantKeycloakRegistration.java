@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.eclipse.slm.common.keycloak.config.jwt.IssuerProperties;
 import org.eclipse.slm.common.keycloak.config.jwt.MisconfigurationException;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -16,9 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 
-import javax.ws.rs.client.ClientBuilder;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -141,20 +143,34 @@ public class MultiTenantKeycloakRegistration {
         realms.add(realm);
         LOG.info("Client configuration initialized for realm '{}'", realm);
 
-        Keycloak keycloak = KeycloakBuilder.builder()
-                .serverUrl(keycloakOidcConfig.getAuthServerUrl())
-                .realm(realm)
-                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-                .clientId(keycloakOidcConfig.getResource())
-                .clientSecret(keycloakOidcConfig.getCredentials().getSecret())
-                .resteasyClient(new ResteasyClientBuilderImpl()
-                        .disableTrustManager()
-                        .build())
-                .build();
+        try {
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() { return null; }
+                    public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) { }
+                    public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) { }
+                }
+            };
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
 
+            Keycloak keycloak = KeycloakBuilder.builder()
+                    .serverUrl(keycloakOidcConfig.getAuthServerUrl())
+                    .realm(realm)
+                    .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                    .clientId(keycloakOidcConfig.getResource())
+                    .clientSecret(keycloakOidcConfig.getCredentials().getSecret())
+                    .resteasyClient(ResteasyClientBuilder.newBuilder()
+                            .sslContext(sslContext)
+                            .build())
+                    .build();
 
-        var realmResource = keycloak.realm(realm);
-        this.realmResourceMap.put(realm,  realmResource);
+            var realmResource = keycloak.realm(realm);
+            this.realmResourceMap.put(realm,  realmResource);
+        } catch (Exception e) {
+            throw new RuntimeException("Fehler beim Initialisieren des Keycloak-Clients mit unsicherem TrustManager", e);
+        }
+
 
         var issuerProperties = new IssuerProperties();
         try {

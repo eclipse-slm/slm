@@ -101,7 +101,7 @@ public class ClusterHandlerITDev {
 
     //region TestContainer
     @Container
-    static KeycloakContainer keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:19.0.3")
+    static KeycloakContainer keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:26.4.0")
             .withExposedPorts(8080)
             .withAdminUsername("admin")
             .withAdminPassword("password")

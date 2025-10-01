@@ -15,7 +15,7 @@ module.exports = {
       },
       keycloak: {
         version: {
-          full: '19.0.3',
+          full: '26.4.0',
           api: '18.0'
         }
       },

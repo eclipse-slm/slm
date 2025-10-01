@@ -17,6 +17,9 @@ keycloak_realm_roles:
 
 keycloak_default_user:
   username: fabos
+  firstName: Eclipse
+  lastName: SLM
+  email: info@fab-os.org
   enabled: true
   credentials:
     - type: password
