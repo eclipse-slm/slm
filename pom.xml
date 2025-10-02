@@ -76,7 +76,7 @@
         <apache.httpcomponents-client5.version>5.3.1</apache.httpcomponents-client5.version>
         <netty.version>4.1.73.Final</netty.version>
         <reactor.netty.version>1.0.15</reactor.netty.version>
-        <jgit.version>6.2.0.202206071550-r</jgit.version>
+        <jgit.version>7.3.0.202506031305-r</jgit.version>
         <basyx.version>2.0.0-milestone-07</basyx.version>
         <aas.aas4j.version>1.0.2</aas.aas4j.version>
         <minio.version>8.5.7</minio.version>
