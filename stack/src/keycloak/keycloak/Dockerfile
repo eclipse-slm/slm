@@ -7,6 +7,8 @@ ENV KC_DB_HOST=keycloak-database \
     KC_DB_PASSWORD=password \
     KEYCLOAK_ADMIN=admin \
     KEYCLOAK_ADMIN_PASSWORD=password \
+    KC_HEALTH_ENABLED=true \
+    KC_HTTP_MANAGEMENT_PORT=9000 \
     KC_HTTP_RELATIVE_PATH=/auth
 
 USER 0
@@ -15,4 +17,4 @@ COPY themes/fabos /opt/keycloak/themes/fabos
 
 USER 1000
 
-CMD ["start-dev", "--db=mariadb", "--transaction-xa-enabled=false", "--health-enabled=true"]
+CMD ["start-dev", "--db=mariadb", "--transaction-xa-enabled=false"]

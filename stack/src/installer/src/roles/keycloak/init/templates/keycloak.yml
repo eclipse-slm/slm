@@ -13,7 +13,6 @@ services:
       - keycloak-database
     environment:
       KC_HOSTNAME: "{{ ENV.KEYCLOAK.HOST.EXTERNAL }}"
-      KC_HEALTH_ENABLED: "true"
       KC_DB_HOST: "{{ keycloak_config.database.host }}"
       KC_DB_URL_HOST: "{{ keycloak_config.database.url_host }}"
       KC_DB_SCHEMA: "{{ keycloak_config.database.schema }}"
@@ -33,10 +32,21 @@ services:
         aliases:
           - "{{ ENV.KEYCLOAK.HOST.INTERNAL }}"
     healthcheck:
-      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000; echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost:9000\r\nConnection: close\r\n\r\n' >&3;cat <&3 | grep -q '\"status\": \"UP\"' && exit 0 || exit 1" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test: [
+        "CMD-SHELL",
+        "exec 3<>/dev/tcp/localhost/9000; \
+           echo -en 'GET /health/ready' >&3; \
+           # Give the server a moment to respond, then search for 'UP'
+           if timeout 3 cat <&3 | grep -m 1 'UP'; then \
+             exec 3<&-; exec 3>&-; exit 0; \
+           else \
+             exec 3<&-; exec 3>&-; exit 1; \
+           fi"
+      ]
+      start_period: 10s
+      interval: 5s
+      timeout: 2s
+      retries: 20
     extra_hosts:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
 
