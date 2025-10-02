@@ -146,8 +146,7 @@ jobs:
       image: maven:3.9-eclipse-temurin-19-focal
       volumes:
         - /tmp/.m2:/root/.m2
-      extra_hosts:
-        - "${{ github.ref_name == 'develop' && 'develop.staging.slm.local' || 'main.staging.slm.local' }}:${{ github.ref_name == 'develop' && '10.17.165.36' || '10.17.166.74' }}"
+      options: "--add-host=${{ github.ref_name == 'develop' && 'develop.staging.slm.local' || 'main.staging.slm.local' }}:${{ github.ref_name == 'develop' && '10.17.165.36' || '10.17.166.74' }}"
     strategy:
       matrix:
         tests: [
