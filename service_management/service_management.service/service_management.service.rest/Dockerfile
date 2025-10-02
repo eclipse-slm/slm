@@ -1,4 +1,4 @@
-FROM openjdk:19-jdk-slim-bullseye
+FROM openjdk:21-jdk-slim-bookworm
 MAINTAINER Matthias Schneider (matthias.schneider@ipa.fraunhofer.de)
 
 ENV CONSUL_SCHEME="http" \

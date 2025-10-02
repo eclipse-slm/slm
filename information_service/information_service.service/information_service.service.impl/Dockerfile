@@ -1,4 +1,4 @@
-FROM openjdk:19-jdk-slim-bullseye
+FROM openjdk:21-jdk-slim-bookworm
 
 ENV CONSUL_SCHEME="http" \
     CONSUL_HOST="consul" \

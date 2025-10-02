@@ -1,4 +1,4 @@
-FROM openjdk:19-jdk-slim-bullseye
+FROM openjdk:21-jdk-slim-bookworm
 
 ENV RESOURCEMANAGEMENT_URL="http://resource-management:9010" \
     RESOURCEMANAGEMENT_INITDIRECTORIES="/init/" \
