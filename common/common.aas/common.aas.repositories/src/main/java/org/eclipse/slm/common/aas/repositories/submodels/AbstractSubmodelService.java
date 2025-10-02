@@ -90,12 +90,12 @@ public abstract class AbstractSubmodelService implements SubmodelService {
     }
 
     @Override
-    public File getFileByPath(String idShortPath) throws ElementDoesNotExistException, ElementNotAFileException, FileDoesNotExistException {
+    public void setFileValue(String idShortPath, String fileName, String contentType, InputStream inputStream) throws ElementDoesNotExistException, ElementNotAFileException {
         throw new MethodNotImplementedException();
     }
 
     @Override
-    public void setFileValue(String idShortPath, String fileName, InputStream inputStream) throws ElementDoesNotExistException, ElementNotAFileException {
+    public File getFileByPath(String idShortPath) throws ElementDoesNotExistException, ElementNotAFileException, FileDoesNotExistException {
         throw new MethodNotImplementedException();
     }
 
