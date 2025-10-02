@@ -6,7 +6,7 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
-import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
+import com.github.dockerjava.zerodep.ZerodepDockerHttpClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,30 +24,41 @@ public class DockerStackTests {
     private static final Logger LOG = LoggerFactory.getLogger(DockerStackTests.class);
 
     private HashMap<String, String> stackContainersExpectedStatesMap = new HashMap<>() {{
-        put("aas-broker", "running");
+        put("aas-broker", "healthy");
         put("aas-database", "healthy");
+        put("aas-discovery", "healthy");
+        put("aas-environment", "healthy");
         put("aas-gui", "running");
-        put("aas-registry", "running");
-        put("aas-environment", "running");
+        put("aas-registry", "healthy");
+        put("awx", "running");
         put("awx-jwt-authenticator", "healthy");
         put("awx-postgres", "healthy");
-        put("awx-redis-init", "exited");
         put("awx-redis", "healthy");
-        put("awx", "running");
+        put("awx-redis-init", "exited");
+        put("catalog", "healthy");
+        put("catalog-database", "healthy");
         put("consul", "healthy");
-//        put("consul-esm", "running");
+        put("consul-esm", "running");
+        put("driver-registry", "running");
+        put("information-service", "healthy");
+        put("irs-api", "running");
+        put("irs-db", "running");
+        put("irs-gc", "running");
+        put("irs-poller", "running");
         put("keycloak", "healthy");
         put("keycloak-database", "healthy");
+        put("minio", "healthy");
         put("monitoring-prometheus-aas", "running");
-        put("notification-service-database", "healthy");
         put("notification-service", "healthy");
+        put("notification-service-database", "healthy");
         put("prometheus", "healthy");
-        put("resource-management-database", "healthy");
-//        put("resource-management-init", "exited");
+        put("rabbitmq", "healthy");
         put("resource-management", "healthy");
-        put("service-management-database", "healthy");
-        put("service-management-init", "exited");
+        put("resource-management-database", "healthy");
         put("service-management", "healthy");
+        put("service-management-database", "healthy");
+        put("submodel-registry", "healthy");
+        put("traefik", "healthy");
         put("ui", "running");
         put("vault", "healthy");
     }};
@@ -60,7 +71,7 @@ public class DockerStackTests {
         var dockerClientConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withDockerHost(TestConfig.DOCKER_HOST)
                 .build();
-        var httpClient = new ApacheDockerHttpClient.Builder()
+        var httpClient = new ZerodepDockerHttpClient.Builder()
                 .dockerHost(dockerClientConfig.getDockerHost())
                 .sslConfig(dockerClientConfig.getSSLConfig())
                 .maxConnections(100)

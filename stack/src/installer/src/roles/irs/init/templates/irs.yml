@@ -72,8 +72,3 @@ services:
       COUCHDB_USER: "{{ ENV.IRS.DATABASE.USERNAME }}"
       COUCHDB_PASSWORD: "{{ app_configs.irs.database.password }}"
     cpus: "1.0"
-    healthcheck:
-      test: [ "CMD", "curl", "-s", "http://localhost:{{ ENV.IRS.DATABASE.PORT.INTERNAL }}/_up", "|", "grep", "'\"status\":\"ok\"'", "||", "exit", "1" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3

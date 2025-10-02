@@ -22,6 +22,12 @@ services:
       default:
         aliases:
           - "{{ ENV.MINIO.HOST.INTERNAL }}"
+    healthcheck:
+      test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/9000' || exit 1
+      interval: 5s
+      retries: 1
+      start_period: 5s
+      timeout: 5s
     extra_hosts:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
 
