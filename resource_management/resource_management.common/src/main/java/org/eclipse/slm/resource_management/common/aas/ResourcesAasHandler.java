@@ -1,8 +1,8 @@
 package org.eclipse.slm.resource_management.common.aas;
 
-import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
-import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShellDescriptor;
-import org.eclipse.digitaltwin.aas4j.v3.model.KeyTypes;
+import org.eclipse.digitaltwin.aas4j.v3.model.*;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultKey;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultReference;
 import org.eclipse.digitaltwin.basyx.http.Base64UrlEncodedIdentifier;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException;
 import org.eclipse.slm.common.aas.clients.*;
@@ -24,6 +24,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.annotation.PostConstruct;
+
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -46,6 +48,18 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
     private final String monitoringServiceUrl;
 
     private final String externalUrl;
+
+    public static final String SUBMODEL_PLATFORM_RESOURCES_ID_SHORT = "PlatformResources";
+    public static final String SEMANTIC_ID_PLATFORM_RESOURCES_VALUE = "https://eclipse.dev/slm/aas/sm/PlatformResources";
+
+    public static final Reference SEMANTIC_ID_PLATFORM_RESOURCES = new DefaultReference.Builder()
+            .type(ReferenceTypes.EXTERNAL_REFERENCE)
+            .keys(Collections.singletonList(
+            new DefaultKey.Builder()
+                            .value(SEMANTIC_ID_PLATFORM_RESOURCES_VALUE)
+                            .type(KeyTypes.GLOBAL_REFERENCE)
+                            .build()))
+            .build();
 
 
     public ResourcesAasHandler(AasRegistryClientFactory aasRegistryClientFactory,
@@ -140,14 +154,14 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
             }
 
             // Create submodel PlatformResources
-            var platformResourcesSubmodelId = "PlatformResources-" + resource.getId();
+            var platformResourcesSubmodelId = SUBMODEL_PLATFORM_RESOURCES_ID_SHORT + "-" + resource.getId();
             var platformResourcesSubmodelUrl = this.monitoringServiceUrl + "/" + resource.getId() + "/submodel";
             this.aasRepositoryClient.addSubmodelReferenceToAas(resourceAAS.getId(), platformResourcesSubmodelId);
             this.submodelRegistryClient.registerSubmodel(
                     platformResourcesSubmodelUrl,
                     platformResourcesSubmodelId,
                     platformResourcesSubmodelId,
-                    "");
+                    ResourcesAasHandler.SEMANTIC_ID_PLATFORM_RESOURCES);
 
             // Create submodel DeviceInfo
             var deviceInfoSubmodelId =  DeviceInfoSubmodel.SUBMODEL_ID_SHORT + "-" + resource.getId();

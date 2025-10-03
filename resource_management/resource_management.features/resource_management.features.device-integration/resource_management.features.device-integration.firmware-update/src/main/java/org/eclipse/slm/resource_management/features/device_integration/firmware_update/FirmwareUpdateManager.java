@@ -145,7 +145,7 @@ public class FirmwareUpdateManager {
             var softwareNameplateSubmodelDescriptor = this.submodelRegistryClient.findSubmodelDescriptor(softwareNameplateId);
             if (softwareNameplateSubmodelDescriptor.isPresent()) {
                 var scopedSubmodelRepositoryClient = SubmodelRepositoryClientFactory.FromSubmodelDescriptor(softwareNameplateSubmodelDescriptor.get());
-                var softwareNameplateSubmodel = scopedSubmodelRepositoryClient.getSubmodel(softwareNameplateSubmodelDescriptor.get().getId());
+                var softwareNameplateSubmodel = scopedSubmodelRepositoryClient.getSubmodelOrThrow(softwareNameplateSubmodelDescriptor.get().getId());
 
                 softwareNameplateSubmodels.add(softwareNameplateSubmodel);
             }
@@ -193,7 +193,7 @@ public class FirmwareUpdateManager {
 
         var submodelRepositoryClient = SubmodelRepositoryClientFactory.FromSubmodelDescriptor(softwareNameplateOptional.get(), jwtAuthenticationToken);
 
-        var softwareNameplateSubmodel = submodelRepositoryClient.getSubmodel(softwareNameplateId);
+        var softwareNameplateSubmodel = submodelRepositoryClient.getSubmodelOrThrow(softwareNameplateId);
         softwareNameplateSubmodel.getSubmodelElements().stream()
                 .filter(se -> se.getIdShort().equals("SoftwareNameplateType"))
                 .findAny()
@@ -238,7 +238,7 @@ public class FirmwareUpdateManager {
                         if (semanticId.equals("https://admin-shell.io/idta/SoftwareNameplate/1/0")) {
                             try {
                                 var submodelRepositoryClient = SubmodelRepositoryClientFactory.FromSubmodelDescriptor(submodelDescriptor, jwtAuthenticationToken);
-                                var submodel = submodelRepositoryClient.getSubmodel(submodelDescriptor.getId());
+                                var submodel = submodelRepositoryClient.getSubmodelOrThrow(submodelDescriptor.getId());
                                 if (submodel != null) {
                                     softwareNameplateSubmodels.add(submodel);
                                 }

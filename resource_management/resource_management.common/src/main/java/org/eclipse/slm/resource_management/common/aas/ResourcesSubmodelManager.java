@@ -78,7 +78,7 @@ public class ResourcesSubmodelManager {
             var submodelId = submodel.getId() + "-" + resourceId;
             submodel.setId(submodelId);
             try {
-                if (this.submodelRepositoryClient.getSubmodel(submodelId) != null) {
+                if (this.submodelRepositoryClient.getSubmodel(submodelId).isPresent()) {
                     try {
                         LOG.debug("Submodel with id '" + submodelId + "' already exists, deleting it");
                         this.submodelRepositoryClient.deleteSubmodel(submodelId);

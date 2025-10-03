@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonDeserializer;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
-import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 import org.eclipse.digitaltwin.basyx.core.exceptions.CollidingIdentifierException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
@@ -20,7 +19,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Optional;
 
 public class SubmodelRepositoryClient {
 
@@ -56,11 +55,27 @@ public class SubmodelRepositoryClient {
         return submodels;
     }
 
-    public Submodel getSubmodel(String submodelId) throws SubmodelRuntimeException {
+    public Optional<Submodel> getSubmodel(String submodelId) {
+        try {
+            var submodel = this.getSubmodelOrThrow(submodelId);
+            return Optional.of(submodel);
+        } catch (SubmodelNotFoundException e) {
+            // Expected exception, nothing to do
+        } catch (Exception e) {
+            LOG.debug("Error while fetching submodel with id '" + submodelId + "': " + e.getMessage(), e);
+        }
+
+        return Optional.empty();
+    }
+
+    public Submodel getSubmodelOrThrow(String submodelId) throws SubmodelNotFoundException, SubmodelRuntimeException {
         try {
             var submodel = this.connectedSubmodelRepository.getSubmodel(submodelId);
             return submodel;
-        } catch (Exception e) {
+        } catch (ElementDoesNotExistException e) {
+            throw new SubmodelNotFoundException("Submodel with id '" + submodelId + "' not found.");
+        }
+        catch (Exception e) {
             throw new SubmodelRuntimeException("Error while fetching submodel with id '" + submodelId + "': " + e.getMessage());
         }
     }

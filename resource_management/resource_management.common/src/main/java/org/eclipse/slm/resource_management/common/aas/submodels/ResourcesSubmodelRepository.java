@@ -12,7 +12,6 @@ import org.eclipse.slm.common.aas.repositories.submodels.AbstractSubmodelReposit
 import org.eclipse.slm.common.aas.repositories.api.submodels.GetSubmodelsValueOnlyResult;
 import org.eclipse.slm.common.aas.repositories.api.submodels.SubmodelValueOnly;
 import org.eclipse.slm.resource_management.common.aas.submodels.deviceinfo.DeviceInfoSubmodelServiceFactory;
-import org.modelmapper.internal.bytebuddy.pool.TypePool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +66,7 @@ public class ResourcesSubmodelRepository extends AbstractSubmodelRepository {
                         var submodelEndpoint = submodelDescriptor.getEndpoints().get(0).getProtocolInformation().getHref();
                         if (submodelEndpoint.contains("/submodels/")) {
                             var scopedSubmodelRepositoryClient = SubmodelRepositoryClientFactory.FromSubmodelDescriptor(submodelDescriptor, null);
-                            var submodel = scopedSubmodelRepositoryClient.getSubmodel(submodelDescriptor.getId());
+                            var submodel = scopedSubmodelRepositoryClient.getSubmodelOrThrow(submodelDescriptor.getId());
                             remoteSubmodels.add(submodel);
                         }
                         if (submodelEndpoint.endsWith("/submodel")) {

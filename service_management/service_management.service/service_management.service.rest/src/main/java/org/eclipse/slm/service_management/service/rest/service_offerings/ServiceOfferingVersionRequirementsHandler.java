@@ -40,12 +40,22 @@ public class ServiceOfferingVersionRequirementsHandler {
 
         var resourceSubmodels = new ArrayList<Submodel>();
         for (var submodelRef: resourceAas.getSubmodels()) {
-            var submodelDescriptor = this.submodelRegistryClient.findSubmodelDescriptor(submodelRef.getKeys().get(0).getValue());
+            if (submodelRef.getKeys().isEmpty()) {
+                LOG.debug("No submodel ref keys found, skipping for requirements check: {}", submodelRef);
+                continue;
+            }
+            var submodelId = submodelRef.getKeys().get(0).getValue();
+            var submodelDescriptor = this.submodelRegistryClient.findSubmodelDescriptor(submodelId);
+            if (submodelDescriptor.isEmpty()) {
+                LOG.debug("Submodel descriptor '{}' not found, skipping for requirements check", submodelId);
+                continue;
+            }
+
             var submodelEndpoint = submodelDescriptor.get().getEndpoints().get(0).getProtocolInformation().getHref();
 
             if (submodelEndpoint.contains("/submodels/")) {
                 var scopedSubmodelRepositoryClient = SubmodelRepositoryClientFactory.FromSubmodelDescriptor(submodelDescriptor.get(), jwtAuthenticationToken);
-                var submodel = scopedSubmodelRepositoryClient.getSubmodel(submodelDescriptor.get().getId());
+                var submodel = scopedSubmodelRepositoryClient.getSubmodelOrThrow(submodelDescriptor.get().getId());
                 if (submodel != null) {
                     resourceSubmodels.add(submodel);
                 }
