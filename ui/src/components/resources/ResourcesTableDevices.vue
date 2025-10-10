@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useResourceDevicesStore } from "@/stores/resourceDevicesStore";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import logRequestError from "@/api/restApiHelper";
@@ -265,7 +265,7 @@ const colorRowItem = (row) => {
       </template>
 
       <template #item.deploymentCapabilityServices="{ item }">
-        <v-row>
+        <div>
           <v-tooltip
             v-for="capabilityServiceId in capabilityUtils.filterDeploymentCapabilityServices(item.capabilityServiceIds)"
             :key="capabilityServiceId"
@@ -280,11 +280,11 @@ const colorRowItem = (row) => {
             </template>
             <span>Status: {{ capabilityServiceById(capabilityServiceId)?.status }}</span>
           </v-tooltip>
-        </v-row>
+        </div>
       </template>
 
       <template #item.configurationCapabilityServices="{ item }">
-      <v-row>
+      <div>
         <v-tooltip
             v-for="capabilityServiceId in capabilityUtils.filterConfigurationCapabilityServices(item.capabilityServiceIds)"
             :key="capabilityServiceId"
@@ -299,7 +299,7 @@ const colorRowItem = (row) => {
           </template>
           <span>Status: {{ capabilityServiceById(capabilityServiceId)?.status }}</span>
         </v-tooltip>
-      </v-row>
+      </div>
     </template>
 
       <template #item.firmware="{ item }">
