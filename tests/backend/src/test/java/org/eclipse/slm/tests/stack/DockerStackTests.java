@@ -41,10 +41,6 @@ public class DockerStackTests {
         put("consul-esm", "running");
         put("driver-registry", "running");
         put("information-service", "healthy");
-        put("irs-api", "running");
-        put("irs-db", "running");
-        put("irs-gc", "running");
-        put("irs-poller", "running");
         put("keycloak", "healthy");
         put("keycloak-database", "healthy");
         put("minio", "healthy");
