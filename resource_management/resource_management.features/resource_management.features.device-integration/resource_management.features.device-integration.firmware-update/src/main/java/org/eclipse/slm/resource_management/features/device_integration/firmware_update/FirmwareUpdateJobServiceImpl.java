@@ -2,6 +2,8 @@ package org.eclipse.slm.resource_management.features.device_integration.firmware
 
 import org.eclipse.slm.common.model.exceptions.EventNotAcceptedException;
 import org.eclipse.slm.common.utils.files.FilesUtil;
+import org.eclipse.slm.resource_management.common.resources.ResourceDTO;
+import org.eclipse.slm.resource_management.common.resources.ResourceEventInternalListener;
 import org.eclipse.slm.resource_management.common.resources.ResourcesManager;
 import org.eclipse.slm.resource_management.features.device_integration.common.discovery.driver.DriverRegistryClient;
 import org.eclipse.slm.resource_management.features.device_integration.firmware_update.driver.FirmwareUpdateDriverClientFactory;
@@ -28,7 +30,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class FirmwareUpdateJobServiceImpl implements FirmwareUpdateJobService, FirmwareUpdateJobStateMachineListener, FirmwareUpdateJobListener {
+public class FirmwareUpdateJobServiceImpl implements FirmwareUpdateJobService, FirmwareUpdateJobStateMachineListener, FirmwareUpdateJobListener, ResourceEventInternalListener {
 
     private final static Logger LOG = LoggerFactory.getLogger(FirmwareUpdateJobServiceImpl.class);
 
@@ -276,4 +278,25 @@ public class FirmwareUpdateJobServiceImpl implements FirmwareUpdateJobService, F
         this.firmwareUpdateJobJpaRepository.save(firmwareUpdateJob);
     }
     //endregion FirmwareUpdateJobListener
+
+    //region ResourceEventInternalListener
+    @Override
+    public void onResourceCreated(ResourceDTO resourceDTO) {
+        // Nothing to do
+    }
+
+    @Override
+    public void onResourceUpdated(ResourceDTO resourceDTO) {
+        // Nothing to do
+    }
+
+    @Override
+    public void onResourceDeleted(ResourceDTO resourceDTO) {
+        // Cleanup firmware update jobs of deleted resource
+        var firmwareUpdateJobs = this.firmwareUpdateJobJpaRepository.findByResourceIdOrderByCreatedAtDesc(resourceDTO.getId());
+        this.firmwareUpdateJobJpaRepository.deleteAllById(
+                firmwareUpdateJobs.stream().map(FirmwareUpdateJob::getId).toList()
+        );
+    }
+    //endregion ResourceEventInternalListener
 }
