@@ -210,6 +210,15 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
                             }
                         }
                     }
+                    // If submodel descriptor was not found try to delete submodel in the default submodel repository
+                    else {
+                        try {
+                            this.submodelRepositoryClient.deleteSubmodel(submodelId);
+                        }
+                        catch (Exception e) {
+                            LOG.debug("Unable to cleanup submodel [id='" + submodelId + "'] in default submodel repository: " + e.getMessage(), e);
+                        }
+                    }
                 }
             }
             this.aasRepositoryClient.deleteAAS(resourceAasId);
