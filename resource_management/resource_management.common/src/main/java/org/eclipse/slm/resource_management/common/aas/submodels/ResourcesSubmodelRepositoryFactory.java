@@ -1,6 +1,9 @@
 package org.eclipse.slm.resource_management.common.aas.submodels;
 
-import org.eclipse.slm.common.aas.clients.*;
+import org.eclipse.slm.common.aas.clients.shellregistry.AasRegistryClientFactory;
+import org.eclipse.slm.common.aas.clients.shellrepository.AasRepositoryClientFactory;
+import org.eclipse.slm.common.aas.clients.submodelregistry.SubmodelRegistryClientFactory;
+import org.eclipse.slm.common.aas.clients.submodelrepository.SubmodelRepositoryClientFactory;
 import org.eclipse.slm.common.aas.repositories.submodels.SubmodelRepositoryFactory;
 import org.eclipse.slm.resource_management.common.aas.submodels.deviceinfo.DeviceInfoSubmodelServiceFactory;
 import org.springframework.stereotype.Component;

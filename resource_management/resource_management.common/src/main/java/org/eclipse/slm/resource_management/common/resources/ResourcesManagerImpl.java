@@ -1,6 +1,6 @@
 package org.eclipse.slm.resource_management.common.resources;
 
-import org.eclipse.slm.common.aas.clients.exceptions.ShellNotFoundException;
+import org.eclipse.slm.common.aas.model.shellrepository.exceptions.ShellNotFoundException;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;

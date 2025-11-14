@@ -83,7 +83,7 @@ public interface AasRepositoryHTTPApi {
 	})
 	@RequestMapping(value = "/shells/{aasIdentifier}", produces = { "application/json" }, method = RequestMethod.GET)
 	ResponseEntity<AssetAdministrationShell> getAssetAdministrationShellById(
-			@Parameter(in = ParameterIn.PATH, description = "The Asset Administration Shell’s unique id (UTF8-BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("aasIdentifier") Base64UrlEncodedIdentifier aasIdentifier);
+			@Parameter(in = ParameterIn.PATH, description = "The Asset Administration Shell’s unique id (UTF8-BASE64-URL-encoded)", required = true, schema = @Schema()) @PathVariable("aasIdentifier") String aasIdentifier);
 
 	@Operation(summary = "Creates a new Asset Administration Shell", description = "")
 	@ApiResponses(value = {

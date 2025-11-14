@@ -6,7 +6,15 @@ import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultReference;
 import org.eclipse.digitaltwin.basyx.http.Base64UrlEncodedIdentifier;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException;
 import org.eclipse.slm.common.aas.clients.*;
-import org.eclipse.slm.common.aas.clients.exceptions.ShellNotFoundException;
+import org.eclipse.slm.common.aas.model.shellrepository.exceptions.ShellNotFoundException;
+import org.eclipse.slm.common.aas.clients.shellregistry.AasRegistryClient;
+import org.eclipse.slm.common.aas.clients.shellregistry.AasRegistryClientFactory;
+import org.eclipse.slm.common.aas.clients.shellrepository.AasRepositoryClient;
+import org.eclipse.slm.common.aas.clients.shellrepository.AasRepositoryClientFactory;
+import org.eclipse.slm.common.aas.clients.submodelregistry.SubmodelRegistryClient;
+import org.eclipse.slm.common.aas.clients.submodelregistry.SubmodelRegistryClientFactory;
+import org.eclipse.slm.common.aas.clients.submodelrepository.SubmodelRepositoryClient;
+import org.eclipse.slm.common.aas.clients.submodelrepository.SubmodelRepositoryClientFactory;
 import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.aas.submodels.ResourcesSubmodelRepositoryHTTPApiController;
@@ -100,7 +108,7 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
             var aasDescriptorOptional = this.aasRegistryClient.getAasDescriptor(
                     ResourceAas.createAasIdFromResourceId(resourceId));
             return aasDescriptorOptional;
-        } catch (org.eclipse.digitaltwin.basyx.aasregistry.client.ApiException e) {
+        } catch (Exception e) {
             LOG.error(e.getMessage());
             return Optional.empty();
         }

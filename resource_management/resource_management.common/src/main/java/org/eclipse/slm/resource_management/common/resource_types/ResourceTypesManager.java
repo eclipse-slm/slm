@@ -4,6 +4,14 @@ import org.eclipse.digitaltwin.aas4j.v3.model.MultiLanguageProperty;
 import org.eclipse.digitaltwin.aas4j.v3.model.Property;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.slm.common.aas.clients.*;
+import org.eclipse.slm.common.aas.clients.shellregistry.AasRegistryClient;
+import org.eclipse.slm.common.aas.clients.shellregistry.AasRegistryClientFactory;
+import org.eclipse.slm.common.aas.clients.shellrepository.AasRepositoryClientFactory;
+import org.eclipse.slm.common.aas.clients.submodelregistry.SubmodelRegistryClient;
+import org.eclipse.slm.common.aas.clients.submodelregistry.SubmodelRegistryClientFactory;
+import org.eclipse.slm.common.aas.clients.submodelrepository.SubmodelRepositoryClientFactory;
+import org.eclipse.slm.common.aas.clients.utils.SubmodelUtils;
+import org.eclipse.slm.common.aas.model.shellregistry.requests.GetAllShellDescriptorsFilter;
 import org.eclipse.slm.resource_management.common.aas.ResourceAas;
 import org.eclipse.slm.resource_management.common.resources.ResourceType;
 import org.slf4j.Logger;
@@ -34,10 +42,11 @@ public class ResourceTypesManager {
                 IDTASubmodelTemplates.NAMEPLATE_V2_SUBMODEL_SEMANTIC_ID,
                 IDTASubmodelTemplates.NAMEPLATE_V3_SUBMODEL_SEMANTIC_ID
         );
-        var shellDescriptors = aasRegistryClient.getAllShellDescriptors();
+        //TODO: Implement paging when large number of shells exist
+        var getShellDescriptorsResult = aasRegistryClient.getAllShellDescriptors(GetAllShellDescriptorsFilter.builder().build());
         var submodelIdToShellId = new HashMap<String, String>();
         var shellIdToSubmodelIds = new HashMap<String, List<String>>();
-        for (var shellDescriptor : shellDescriptors) {
+        for (var shellDescriptor : getShellDescriptorsResult.getResult()) {
             if (!shellDescriptor.getId().startsWith("Resource_")) {
                 continue;
             }

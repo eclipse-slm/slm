@@ -7,8 +7,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShellDescriptor;
 import org.eclipse.digitaltwin.basyx.http.Base64UrlEncodedIdentifier;
-import org.eclipse.slm.common.aas.clients.*;
-import org.eclipse.slm.common.aas.clients.exceptions.ShellNotFoundException;
+import org.eclipse.slm.common.aas.model.shellregistry.requests.GetAllShellDescriptorsFilter;
+import org.eclipse.slm.common.aas.model.shellrepository.exceptions.ShellNotFoundException;
+import org.eclipse.slm.common.aas.clients.shellregistry.AasRegistryClient;
+import org.eclipse.slm.common.aas.clients.shellregistry.AasRegistryClientFactory;
+import org.eclipse.slm.common.aas.clients.shellrepository.AasRepositoryClient;
+import org.eclipse.slm.common.aas.clients.shellrepository.AasRepositoryClientFactory;
+import org.eclipse.slm.common.aas.clients.submodelregistry.SubmodelRegistryClient;
+import org.eclipse.slm.common.aas.clients.submodelregistry.SubmodelRegistryClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -48,9 +54,10 @@ public class SubmodelTemplatesRestController {
         var semanticId = smTemplateSemanticIdBase64Encoded.getIdentifier();
         List<Map<String, String>> submodelTemplateInstances = new ArrayList<>();
 
-        var allAASDescriptors = this.aasRegistryClient.getAllShellDescriptors();
+        //TODO: Implement paging when large number of shells exist
+        var getShellDescriptorsResult = this.aasRegistryClient.getAllShellDescriptors(GetAllShellDescriptorsFilter.builder().build());
         var submodelIdToAasDescriptor = new HashMap<String, AssetAdministrationShellDescriptor>();
-        for (var aasDescriptor : allAASDescriptors) {
+        for (var aasDescriptor : getShellDescriptorsResult.getResult()) {
             var aasOptional = aasRepositoryClient.getAas(aasDescriptor.getId());
             if (aasOptional.isEmpty()) {
                 LOG.error("AAS with ID {} not found", aasDescriptor.getId());

@@ -1,7 +1,10 @@
 package org.eclipse.slm.resource_management.features.metrics;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.eclipse.slm.common.aas.clients.*;
+import org.eclipse.slm.common.aas.clients.auth.JwtAuthenticationTokenAuthRequestInterceptor;
+import org.eclipse.slm.common.aas.clients.submodelregistry.SubmodelRegistryClient;
+import org.eclipse.slm.common.aas.clients.submodelregistry.SubmodelRegistryClientFactory;
+import org.eclipse.slm.common.aas.clients.submodelservice.SubmodelServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +48,7 @@ public class MetricsRestController {
                 if (endpoints.size() > 0) {
                     var submodelEndpoint = endpoints.get(0);
                     var submodelServiceEndpointUrl = submodelEndpoint.getProtocolInformation().getHref();
-                    var submodelServiceClient = new SubmodelServiceClient(submodelServiceEndpointUrl, jwtAuthenticationToken);
+                    var submodelServiceClient = new SubmodelServiceClient(submodelServiceEndpointUrl, new JwtAuthenticationTokenAuthRequestInterceptor(jwtAuthenticationToken));
                     var submodelValues = submodelServiceClient.getSubmodelValues();
 
                     return ResponseEntity.ok(submodelValues);
