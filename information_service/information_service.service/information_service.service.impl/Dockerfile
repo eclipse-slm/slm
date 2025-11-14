@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk-slim-bookworm
+FROM eclipse-temurin:21-jdk-noble
 
 ENV CONSUL_SCHEME="http" \
     CONSUL_HOST="consul" \

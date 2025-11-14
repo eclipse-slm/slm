@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk-slim-bookworm
+FROM eclipse-temurin:21-jdk-noble
 MAINTAINER Matthias Schneider (matthias.schneider@ipa.fraunhofer.de)
 
 ENV KEYCLOAK_CONFIG_TENANTS_CONFIGPATH="/app/keycloak" \

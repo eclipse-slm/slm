@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk-slim-bookworm
+FROM eclipse-temurin:21-jdk-noble
 
 ENV RESOURCEMANAGEMENT_URL="http://resource-management:9010" \
     RESOURCEMANAGEMENT_INITDIRECTORIES="/init/" \

@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk-slim-bookworm
+FROM eclipse-temurin:21-jdk-noble
 MAINTAINER Matthias Schneider (matthias.schneider@ipa.fraunhofer.de)
 
 ENV SERVICEMANAGEMENT_URL="http://service-management:9020"\
