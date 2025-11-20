@@ -14,7 +14,6 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.time.Duration;
 import java.util.List;
 
 public class ClientUtils {

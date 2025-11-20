@@ -57,9 +57,15 @@ public class AasRepositoryClientFactory {
             LOG.debug("Discovery client is not available. Using aas repository URL from application properties: " + aasRepositoryUrl);
         }
 
-        var aasRepositoryClient = new AasRepositoryClient(aasRepositoryUrl, new JwtAuthenticationTokenAuthRequestInterceptor(jwtAuthenticationToken));
-        return aasRepositoryClient;
+        if (jwtAuthenticationToken == null) {
+            var aasRepositoryClient = new AasRepositoryClient(aasRepositoryUrl);
+            return  aasRepositoryClient;
+        } else {
+            var aasRepositoryClient = new AasRepositoryClient(aasRepositoryUrl, new JwtAuthenticationTokenAuthRequestInterceptor(jwtAuthenticationToken));
+            return aasRepositoryClient;
+        }
     }
+
 
     public static AasRepositoryClient FromShellDescriptor(AssetAdministrationShellDescriptor shellDescriptor) {
         var shellEndpoint = shellDescriptor.getEndpoints().get(0).getProtocolInformation().getHref();
