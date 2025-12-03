@@ -1,8 +1,6 @@
 package org.eclipse.slm.common.aas.clients.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.RequestInterceptor;
-import feign.RequestTemplate;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -10,28 +8,28 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-public class OAuth2AuthFeignRequestInterceptor implements RequestInterceptor {
+public class OAuth2AuthRequestInterceptor extends AuthRequestInterceptor {
     private final String tokenUrl;
     private final String clientId;
     private final String clientSecret;
     private String accessToken;
     private long expiresAt;
 
-    public OAuth2AuthFeignRequestInterceptor(String tokenUrl, String clientId, String clientSecret) {
+    public OAuth2AuthRequestInterceptor(String tokenUrl, String clientId, String clientSecret) {
         this.tokenUrl = tokenUrl;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
     }
 
     @Override
-    public void apply(RequestTemplate template) {
+    public String getAuthorizationHeaderValue() {
         try {
             if (accessToken == null || System.currentTimeMillis() > expiresAt) {
                 fetchToken();
             }
-            template.header("Authorization", "Bearer " + accessToken);
+            return "Bearer " + accessToken;
         } catch (Exception e) {
-            throw new RuntimeException("OAuth2 Token konnte nicht abgerufen werden: " + e.getMessage(), e);
+            throw new RuntimeException("Failed ot get OAuth2 Token" + e.getMessage(), e);
         }
     }
 

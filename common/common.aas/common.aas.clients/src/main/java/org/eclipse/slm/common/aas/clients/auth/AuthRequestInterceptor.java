@@ -1,7 +1,15 @@
 package org.eclipse.slm.common.aas.clients.auth;
 
-public interface AuthRequestInterceptor {
+import feign.RequestInterceptor;
+import feign.RequestTemplate;
 
-    String getAuthorizationHeaderValue();
+public abstract class AuthRequestInterceptor implements RequestInterceptor {
+
+    @Override
+    public void apply(RequestTemplate requestTemplate) {
+        requestTemplate.header("Authorization", this.getAuthorizationHeaderValue());
+    }
+
+    public abstract String getAuthorizationHeaderValue();
 
 }

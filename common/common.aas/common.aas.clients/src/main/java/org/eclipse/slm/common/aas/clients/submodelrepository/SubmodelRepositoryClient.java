@@ -1,6 +1,7 @@
 package org.eclipse.slm.common.aas.clients.submodelrepository;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import feign.RequestInterceptor;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonDeserializer;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
@@ -12,14 +13,17 @@ import org.eclipse.digitaltwin.basyx.submodelrepository.client.internal.Submodel
 import org.eclipse.digitaltwin.basyx.submodelservice.value.SubmodelValueOnly;
 import org.eclipse.digitaltwin.basyx.submodelservice.value.exception.ValueMapperNotFoundException;
 import org.eclipse.slm.common.aas.clients.auth.AuthRequestInterceptor;
+import org.eclipse.slm.common.aas.clients.base.FeignClientFactory;
 import org.eclipse.slm.common.aas.model.shellrepository.exceptions.SubmodelRuntimeException;
 import org.eclipse.slm.common.aas.clients.utils.ClientUtils;
+import org.eclipse.slm.common.aas.model.submodelrepository.responses.SubmodelQueryResult;
 import org.eclipse.slm.common.aas.repositories.exceptions.SubmodelNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class SubmodelRepositoryClient {
@@ -29,6 +33,8 @@ public class SubmodelRepositoryClient {
     private final String submodelRepositoryUrl;
 
     private final ConnectedSubmodelRepository connectedSubmodelRepository;
+
+    private final SubmodelRepositoryQueryApiClient submodelRepositoryQueryApiClient;
 
     public SubmodelRepositoryClient(String submodelRepositoryUrl) {
         this(submodelRepositoryUrl, null);
@@ -40,6 +46,8 @@ public class SubmodelRepositoryClient {
         var submodelRepositoryApi = new SubmodelRepositoryApi(apiClient);
 
         this.connectedSubmodelRepository = new ConnectedSubmodelRepository(submodelRepositoryUrl, submodelRepositoryApi);
+
+        this.submodelRepositoryQueryApiClient = FeignClientFactory.createClient(SubmodelRepositoryQueryApiClient.class, submodelRepositoryUrl, authRequestInterceptor);
     }
 
     public List<Submodel> getAllSubmodels() throws DeserializationException {
@@ -130,7 +138,13 @@ public class SubmodelRepositoryClient {
         }
     }
 
+    public SubmodelQueryResult querySubmodel(int limit, String cursor, Map<String, Object> query) {
+        return this.submodelRepositoryQueryApiClient.querySubmodel(limit, cursor, query);
+    }
+
     public String getSubmodelRepositoryUrl() {
         return submodelRepositoryUrl;
     }
+
+
 }

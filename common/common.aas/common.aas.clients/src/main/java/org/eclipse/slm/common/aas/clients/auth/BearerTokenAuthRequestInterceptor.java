@@ -1,6 +1,6 @@
 package org.eclipse.slm.common.aas.clients.auth;
 
-public class BearerTokenAuthRequestInterceptor implements AuthRequestInterceptor {
+public class BearerTokenAuthRequestInterceptor extends AuthRequestInterceptor {
 
     private final String bearerToken;
 

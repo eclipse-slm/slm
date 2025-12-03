@@ -9,10 +9,18 @@ public class PagedResultPagingMetadata {
 	@JsonProperty("cursor")
 	private String cursor = null;
 
+    @JsonProperty("resultType")
+    private String resultType = null;
+
 	public PagedResultPagingMetadata cursor(String cursor) {
 		this.cursor = cursor;
 		return this;
 	}
+
+    public PagedResultPagingMetadata resultType(String resultType) {
+        this.resultType = resultType;
+        return this;
+    }
 
 	public String getCursor() {
 		return cursor;

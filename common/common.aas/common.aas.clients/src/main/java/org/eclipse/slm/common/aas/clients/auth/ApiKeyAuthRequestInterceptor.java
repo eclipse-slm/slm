@@ -1,7 +1,6 @@
 package org.eclipse.slm.common.aas.clients.auth;
 
-public class ApiKeyAuthRequestInterceptor implements AuthRequestInterceptor {
-
+public class ApiKeyAuthRequestInterceptor extends AuthRequestInterceptor {
     private final String apiKey;
 
     public ApiKeyAuthRequestInterceptor(String apiKey) {
@@ -13,3 +12,4 @@ public class ApiKeyAuthRequestInterceptor implements AuthRequestInterceptor {
         return apiKey;
     }
 }
+

@@ -4,6 +4,7 @@ import feign.RequestInterceptor;
 import org.apache.logging.log4j.util.Base64Util;
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShellDescriptor;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor;
+import org.eclipse.slm.common.aas.clients.auth.AuthRequestInterceptor;
 import org.eclipse.slm.common.aas.clients.base.FeignClientFactory;
 import org.eclipse.slm.common.aas.clients.base.FeignResponseException;
 import org.eclipse.slm.common.aas.model.shellregistry.exceptions.ShellDescriptorNotFoundException;
@@ -22,8 +23,8 @@ public class AasRegistryClient {
 
     private final AasRegistryApiClient aasRegistryApiClient;
 
-    public AasRegistryClient(String aasRegistryUrl, RequestInterceptor requestInterceptor) {
-        this.aasRegistryApiClient = FeignClientFactory.createClient(AasRegistryApiClient.class, aasRegistryUrl, requestInterceptor);
+    public AasRegistryClient(String aasRegistryUrl, AuthRequestInterceptor authRequestInterceptor) {
+        this.aasRegistryApiClient = FeignClientFactory.createClient(AasRegistryApiClient.class, aasRegistryUrl, authRequestInterceptor);
     }
 
     public GetAssetAdministrationShellDescriptorsResult getAllShellDescriptors(GetAllShellDescriptorsFilter filter) {
