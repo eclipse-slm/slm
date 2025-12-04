@@ -4,8 +4,8 @@ import org.eclipse.digitaltwin.aas4j.v3.model.*;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultKey;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultReference;
 import org.eclipse.digitaltwin.basyx.http.Base64UrlEncodedIdentifier;
-import org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException;
 import org.eclipse.slm.common.aas.clients.*;
+import org.eclipse.slm.common.aas.clients.base.FeignResponseException;
 import org.eclipse.slm.common.aas.model.shellrepository.exceptions.ShellNotFoundException;
 import org.eclipse.slm.common.aas.clients.shellregistry.AasRegistryClient;
 import org.eclipse.slm.common.aas.clients.shellregistry.AasRegistryClientFactory;
@@ -184,7 +184,7 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
                     DeviceInfoSubmodel.SEMANTIC_ID_VALUE);
 
         }
-        catch (ApiException e) {
+        catch (FeignResponseException e) {
             LOG.error("Unable to create AAS and submodels for resource [id='" + resource.getId() + "']: " + e.getMessage());
         }
     }
@@ -213,7 +213,7 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
                         else {
                             try {
                                 this.submodelRegistryClient.unregisterSubmodel(submodelId);
-                            } catch (ApiException e) {
+                            } catch (FeignResponseException e) {
                                 LOG.error("Unable to unregister submodel [id='" + submodelId + "']: " + e.getMessage());
                             }
                         }

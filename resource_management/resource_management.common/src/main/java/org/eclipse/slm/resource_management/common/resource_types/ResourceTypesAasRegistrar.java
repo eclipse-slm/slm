@@ -49,7 +49,7 @@ public class ResourceTypesAasRegistrar {
     }
 
     @PostConstruct
-    public void registerShellsAndSubmodels() throws ApiException, org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException {
+    public void registerShellsAndSubmodels() {
 
         // Register Resource Types AAS
         var resourceTypesAas = resourceTypesAasFactory.createAas("");

@@ -2,7 +2,7 @@ package org.eclipse.slm.service_management.service.rest.aas;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.KeyTypes;
 import org.eclipse.digitaltwin.basyx.http.Base64UrlEncodedIdentifier;
-import org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException;
+import org.eclipse.slm.common.aas.clients.base.FeignResponseException;
 import org.eclipse.slm.common.aas.clients.shellregistry.AasRegistryClient;
 import org.eclipse.slm.common.aas.clients.shellregistry.AasRegistryClientFactory;
 import org.eclipse.slm.common.aas.clients.shellrepository.AasRepositoryClient;
@@ -109,7 +109,7 @@ public class AasHandler implements ApplicationListener<ServiceOfferingVersionEve
                     RequirementsSubmodel.getSubmodelIdShortForServiceOfferingVersion(serviceOfferingVersion),
                     RequirementsSubmodel.SEMANTIC_ID_VALUE);
         }
-        catch (ApiException e) {
+        catch (FeignResponseException e) {
             LOG.error("Unable to create AAS and submodels for ServiceOfferingVersion [id='" + serviceOfferingVersion.getId() + "']: " + e.getMessage());
         }
     }
@@ -137,7 +137,7 @@ public class AasHandler implements ApplicationListener<ServiceOfferingVersionEve
             }
             this.aasRepositoryClient.deleteAAS(serviceOfferingVersionAasId);
 
-        } catch (ApiException e) {
+        } catch (FeignResponseException e) {
             throw new RuntimeException(e);
         }
     }

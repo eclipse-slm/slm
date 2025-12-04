@@ -60,7 +60,7 @@ public class ResourceEventMessageListener extends GenericMessageListener<Resourc
         this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
 
         this.irsAasRepositoryClient = new AasRepositoryClient(this.irsUrlInternal + "/api/shell_repo");
-        this.irsSubmodelRegistryClient = new SubmodelRegistryClient(this.irsUrlInternal + "/api/submodel_registry");
+        this.irsSubmodelRegistryClient = new SubmodelRegistryClient(this.irsUrlInternal + "/api/submodel_registry", null);
     }
 
     @Override
