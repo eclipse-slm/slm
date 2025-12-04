@@ -65,7 +65,7 @@ public class ResourcesSubmodelManager {
         var submodelRefs = aas.getSubmodels();
         for (var submodelRef : submodelRefs) {
             var submodelId = submodelRef.getKeys().get(0).getValue();
-            var submodelDescriptorOptional = this.submodelRegistryClient.findSubmodelDescriptor(submodelId);
+            var submodelDescriptorOptional = this.submodelRegistryClient.getSubmodelDescriptor(submodelId);
 
             if (submodelDescriptorOptional.isPresent()) {
                 submodelDescriptors.add(submodelDescriptorOptional.get());

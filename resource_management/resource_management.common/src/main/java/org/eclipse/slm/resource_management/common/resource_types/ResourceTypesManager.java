@@ -118,7 +118,7 @@ public class ResourceTypesManager {
                             var submodelIds = shellIdToSubmodelIds.get(shellId);
                             var softwareNameplateIds = new ArrayList<String>();
                             for (var submodelId : submodelIds) {
-                                var optionalSubmodelDescriptor = this.submodelRegistryClient.findSubmodelDescriptor(submodelId);
+                                var optionalSubmodelDescriptor = this.submodelRegistryClient.getSubmodelDescriptor(submodelId);
                                 if (optionalSubmodelDescriptor.isPresent()) {
                                     var semanticId = optionalSubmodelDescriptor.get().getSemanticId();
                                     if (semanticId != null) {

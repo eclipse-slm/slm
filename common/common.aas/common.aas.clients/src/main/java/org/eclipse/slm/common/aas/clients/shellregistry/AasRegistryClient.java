@@ -1,6 +1,5 @@
 package org.eclipse.slm.common.aas.clients.shellregistry;
 
-import feign.RequestInterceptor;
 import org.apache.logging.log4j.util.Base64Util;
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShellDescriptor;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor;
@@ -8,7 +7,7 @@ import org.eclipse.slm.common.aas.clients.auth.AuthRequestInterceptor;
 import org.eclipse.slm.common.aas.clients.base.FeignClientFactory;
 import org.eclipse.slm.common.aas.clients.base.FeignResponseException;
 import org.eclipse.slm.common.aas.model.shellregistry.exceptions.ShellDescriptorNotFoundException;
-import org.eclipse.slm.common.aas.model.shellregistry.exceptions.SubmodellDescriptorNotFoundException;
+import org.eclipse.slm.common.aas.model.shellregistry.exceptions.SubmodelDescriptorNotFoundException;
 import org.eclipse.slm.common.aas.model.shellregistry.requests.GetAllShellDescriptorsFilter;
 import org.eclipse.slm.common.aas.model.shellregistry.respones.GetAssetAdministrationShellDescriptorsResult;
 import org.eclipse.slm.common.aas.model.shellregistry.respones.GetSubmodelDescriptorsResult;
@@ -152,7 +151,7 @@ public class AasRegistryClient {
             var shellDescriptor = this.getSubmodelDescriptorOrThrow(aasId, submodelId);
 
             return Optional.of(shellDescriptor);
-        } catch (SubmodellDescriptorNotFoundException e) {
+        } catch (SubmodelDescriptorNotFoundException e) {
             return Optional.empty();
         } catch (Exception e) {
             LOG.error("Error while getting Submodel Descriptor with id '{}' of AAS '{}': {}", submodelId, aasId, e.getMessage());
@@ -160,20 +159,20 @@ public class AasRegistryClient {
         }
     }
 
-    public SubmodelDescriptor getSubmodelDescriptorOrThrow(String aasId, String submodelId) throws SubmodellDescriptorNotFoundException {
+    public SubmodelDescriptor getSubmodelDescriptorOrThrow(String aasId, String submodelId) throws SubmodelDescriptorNotFoundException {
         try {
             var aasIdEncoded = Base64Util.encode(aasId);
             var submodelIdEncoded = Base64Util.encode(submodelId);
             var submodelDescriptor = this.aasRegistryApiClient.getSubmodelDescriptorById(aasIdEncoded, submodelIdEncoded);
 
             if (submodelDescriptor == null) {
-                throw new SubmodellDescriptorNotFoundException(aasId, submodelId);
+                throw new SubmodelDescriptorNotFoundException(aasId, submodelId);
             } else {
                 return submodelDescriptor;
             }
         } catch (FeignResponseException e) {
             if (e.getStatusCode() == 404) {
-                throw new SubmodellDescriptorNotFoundException(aasId, submodelId);
+                throw new SubmodelDescriptorNotFoundException(aasId, submodelId);
             }
             throw e;
         }

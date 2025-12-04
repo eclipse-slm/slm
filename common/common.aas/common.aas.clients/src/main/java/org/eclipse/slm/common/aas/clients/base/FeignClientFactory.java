@@ -12,10 +12,15 @@ public class FeignClientFactory {
 
     public static <T> T createClient(Class<T> clientClass, String baseUrl, AuthRequestInterceptor authRequestInterceptor) {
         Decoder decoder = (response, type) -> {
+            String body = "";
             try {
-                return new JsonDeserializer().read(response.body().asInputStream(), (Class<?>) type);
+                body = new String(response.body().asInputStream().readAllBytes());;
+                return new JsonDeserializer().read(body, (Class<?>) type);
             } catch (IOException | DeserializationException e) {
-                throw new RuntimeException(e);
+                if (e instanceof DeserializationException) {
+                    throw new RuntimeException("DeserializationException: " + e.getMessage() + ", Response Body: " + body, e);
+                }
+                throw new RuntimeException();
             }
         };
 

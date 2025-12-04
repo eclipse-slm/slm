@@ -1,76 +1,64 @@
 package org.eclipse.slm.common.aas.clients.submodelregistry;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.util.Base64Util;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.SerializationException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonDeserializer;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonSerializer;
-import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultKey;
-import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultReference;
-import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodelDescriptor;
-import org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException;
-import org.eclipse.digitaltwin.basyx.submodelregistry.client.api.SubmodelRegistryApi;
-import org.eclipse.digitaltwin.basyx.submodelregistry.client.model.*;
+import org.eclipse.digitaltwin.aas4j.v3.model.*;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.*;
+import org.eclipse.slm.common.aas.clients.auth.AuthRequestInterceptor;
+import org.eclipse.slm.common.aas.clients.base.FeignClientFactory;
+import org.eclipse.slm.common.aas.clients.base.FeignResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.http.HttpClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class SubmodelRegistryClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(SubmodelRegistryClient.class);
 
-    private SubmodelRegistryApi submodelRegistryApi;
+    private final SubmodelRegistryApiClient submodelRegistryApiClient;
 
-    public SubmodelRegistryClient(String submodelRegistryUrl) {
-        var objectMapper = new ObjectMapper();
-        var submodelRegistryApiClient = new org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiClient(HttpClient.newBuilder(), objectMapper, submodelRegistryUrl);
-        this.submodelRegistryApi = new SubmodelRegistryApi(submodelRegistryApiClient);
+    public SubmodelRegistryClient(String submodelRegistryUrl, AuthRequestInterceptor authRequestInterceptor) {
+        this.submodelRegistryApiClient = FeignClientFactory.createClient(SubmodelRegistryApiClient.class, submodelRegistryUrl, authRequestInterceptor);
     }
 
-    public SubmodelRegistryClient(SubmodelRegistryApi submodelRegistryApi) {
-        this.submodelRegistryApi = submodelRegistryApi;
-    }
-
-    public List<org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor> getAllSubmodelDescriptors() {
-        List<org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor> submodelDescriptors = new ArrayList<>();
+    public List<SubmodelDescriptor> getAllSubmodelDescriptors() {
+        List<SubmodelDescriptor> submodelDescriptors = new ArrayList<>();
         try {
-            var result = this.submodelRegistryApi.getAllSubmodelDescriptors(Integer.MAX_VALUE, null);
-            submodelDescriptors = result.getResult().stream()
-                    .map(SubmodelRegistryClient::convertSubmodelDescriptor)
-                    .collect(Collectors.toList());
+            var result = this.submodelRegistryApiClient.getAllSubmodelDescriptors(Integer.MAX_VALUE, null);
+            submodelDescriptors = result.getResult();
 
             return submodelDescriptors;
-        } catch (ApiException e) {
-            if (e.getCode() != 404) {
+        } catch (FeignResponseException e) {
+            if (e.getStatusCode() != 404) {
                 LOG.error(e.getMessage());
             }
             return submodelDescriptors;
         }
     }
 
-    public Optional<org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor> findSubmodelDescriptor(String submodelId) {
-        SubmodelDescriptor submodelDescriptor = null;
+    public Optional<SubmodelDescriptor> getSubmodelDescriptor(String submodelId) {
+        var submodelIdEncoded = Base64Util.encode(submodelId);
         try {
-            submodelDescriptor = this.submodelRegistryApi.getSubmodelDescriptorById(submodelId);
-            var convertedSubmodelDescriptor = SubmodelRegistryClient.convertSubmodelDescriptor(submodelDescriptor);
-            return Optional.of(convertedSubmodelDescriptor);
-        } catch (ApiException e) {
-            if (e.getCode() != 404) {
+            var submodelDescriptor = this.submodelRegistryApiClient.getSubmodelDescriptorById(submodelIdEncoded);
+            return Optional.of(submodelDescriptor);
+        } catch (FeignResponseException e) {
+            if (e.getStatusCode() != 404) {
                 LOG.error(e.getMessage());
             }
             return Optional.empty();
         }
     }
 
-    public List<org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor> findSubmodelDescriptorsWithSemanticIds(List<String> semanticIds) {
-        List<org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor> submodelDescriptors = new ArrayList<>();
+    public List<SubmodelDescriptor> findSubmodelDescriptorsWithSemanticIds(List<String> semanticIds) {
+        List<SubmodelDescriptor> submodelDescriptors = new ArrayList<>();
         try {
-            var allSubmodelDescriptors = this.submodelRegistryApi.getAllSubmodelDescriptors(Integer.MAX_VALUE, null).getResult();
+            var allSubmodelDescriptors = this.submodelRegistryApiClient.getAllSubmodelDescriptors(Integer.MAX_VALUE, null).getResult();
             var submodelDescriptorsWithSemanticId = allSubmodelDescriptors.stream()
                     .filter(smd -> {
                                 if (smd.getSemanticId() != null) {
@@ -81,37 +69,33 @@ public class SubmodelRegistryClient {
                             })
                     .toList();
 
-            var convertedSubmodelDescriptors = submodelDescriptorsWithSemanticId.stream()
-                    .map(SubmodelRegistryClient::convertSubmodelDescriptor)
-                    .collect(Collectors.toList());
-
-            return convertedSubmodelDescriptors;
-        } catch (ApiException e) {
-            if (e.getCode() != 404) {
+            return submodelDescriptorsWithSemanticId;
+        } catch (FeignResponseException e) {
+            if (e.getStatusCode() != 404) {
                 LOG.error(e.getMessage());
             }
             return submodelDescriptors;
         }
     }
 
-    public void createOrUpdateSubmodelDescriptor(org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor submodelDescriptor) throws ApiException {
-        var convertedSubmodelDescriptor = SubmodelRegistryClient.convertSubmodelDescriptor(submodelDescriptor);
+    public void createOrUpdateSubmodelDescriptor(SubmodelDescriptor submodelDescriptor) {
         try {
-            this.submodelRegistryApi.postSubmodelDescriptor(convertedSubmodelDescriptor);
-        } catch (ApiException e) {
-            if (e.getCode() == 409) {
-                this.submodelRegistryApi.putSubmodelDescriptorById(submodelDescriptor.getId(), convertedSubmodelDescriptor);
+            this.submodelRegistryApiClient.postSubmodelDescriptor(submodelDescriptor);
+        } catch (FeignResponseException e) {
+            if (e.getStatusCode() == 409) {
+                var submodelIdEncoded = Base64Util.encode(submodelDescriptor.getId());
+                this.submodelRegistryApiClient.putSubmodelDescriptorById(submodelIdEncoded, submodelDescriptor);
             } else {
                 throw e;
             }
         }
     }
 
-    public void registerSubmodel(String submodelUrl, String smId, String smIdShort, String semanticId) throws ApiException {
+    public void registerSubmodel(String submodelUrl, String smId, String smIdShort, String semanticId) {
         var semanticIdRef = new DefaultReference.Builder()
-                .type(org.eclipse.digitaltwin.aas4j.v3.model.ReferenceTypes.EXTERNAL_REFERENCE)
+                .type(ReferenceTypes.EXTERNAL_REFERENCE)
                 .keys(new DefaultKey.Builder()
-                        .type(org.eclipse.digitaltwin.aas4j.v3.model.KeyTypes.SUBMODEL)
+                        .type(KeyTypes.SUBMODEL)
                         .value(semanticId)
                         .build()
                 ).build();
@@ -119,37 +103,29 @@ public class SubmodelRegistryClient {
         this.registerSubmodel(submodelUrl, smId, smIdShort, semanticIdRef);
     }
 
-    public void registerSubmodel(String submodelUrl, String smId, String smIdShort, org.eclipse.digitaltwin.aas4j.v3.model.Reference semanticId) throws ApiException {
+    public void registerSubmodel(String submodelUrl, String smId, String smIdShort, Reference semanticId) {
         var endpoints = new ArrayList<Endpoint>();
-        var endpoint = new Endpoint();
-        endpoint.setInterface("SUBMODEL-3.0");
-        var protocolInformation = new org.eclipse.digitaltwin.basyx.submodelregistry.client.model.ProtocolInformation();
+        var endpoint = new DefaultEndpoint();
+        endpoint.set_interface("SUBMODEL-3.0");
+        var protocolInformation = new DefaultProtocolInformation();
         protocolInformation.setEndpointProtocol("http");
         protocolInformation.setHref(submodelUrl);
         endpoint.setProtocolInformation(protocolInformation);
         endpoints.add(endpoint);
 
-        var submodelDescriptor = new SubmodelDescriptor();
+        var submodelDescriptor = new DefaultSubmodelDescriptor();
         submodelDescriptor.setId(smId);
         submodelDescriptor.setIdShort(smIdShort);
         submodelDescriptor.setEndpoints(endpoints);
+        submodelDescriptor.setSemanticId(semanticId);
 
-        var aasJsonSerializer = new JsonSerializer();
-        var aasJsonDeserializer = new JsonDeserializer();
-
-        try {
-            var registryModelJson = aasJsonSerializer.write(semanticId);
-            var convertedSemanticId = aasJsonDeserializer.read(registryModelJson, Reference.class);
-            submodelDescriptor.setSemanticId(convertedSemanticId);
-        } catch (SerializationException | DeserializationException e) {
-            throw new RuntimeException(e);
-        }
+        var submodelIdEncoded = Base64Util.encode(smId);
 
         try {
-            this.submodelRegistryApi.postSubmodelDescriptor(submodelDescriptor);
-        } catch (ApiException e) {
-            if (e.getCode() == 409) {
-                this.submodelRegistryApi.putSubmodelDescriptorById(submodelDescriptor.getId(), submodelDescriptor);
+            this.submodelRegistryApiClient.postSubmodelDescriptor(submodelDescriptor);
+        } catch (FeignResponseException e) {
+            if (e.getStatusCode() == 409) {
+                this.submodelRegistryApiClient.putSubmodelDescriptorById(submodelIdEncoded, submodelDescriptor);
             }
             else {
                 throw e;
@@ -158,39 +134,8 @@ public class SubmodelRegistryClient {
     }
 
 
-    public void unregisterSubmodel(String submodelId) throws ApiException {
-        this.submodelRegistryApi.deleteSubmodelDescriptorById(submodelId);
-    }
-
-    public static org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor convertSubmodelDescriptor(SubmodelDescriptor submodelDescriptor) {
-        try {
-            var aasJsonSerializer = new JsonSerializer();
-            var aasJsonDeserializer = new JsonDeserializer();
-
-            var registryModelJson = aasJsonSerializer.write(submodelDescriptor);
-            var convertedSubmodelDescriptor = aasJsonDeserializer.read(registryModelJson, DefaultSubmodelDescriptor.class);
-
-            return convertedSubmodelDescriptor;
-        } catch (SerializationException e) {
-            throw new RuntimeException(e);
-        } catch (DeserializationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static SubmodelDescriptor convertSubmodelDescriptor(org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor submodelDescriptor) {
-        try {
-            var aasJsonSerializer = new JsonSerializer();
-            var aasJsonDeserializer = new JsonDeserializer();
-
-            var registryModelJson = aasJsonSerializer.write(submodelDescriptor);
-            var convertedSubmodelDescriptor = aasJsonDeserializer.read(registryModelJson, SubmodelDescriptor.class);
-
-            return convertedSubmodelDescriptor;
-        } catch (SerializationException e) {
-            throw new RuntimeException(e);
-        } catch (DeserializationException e) {
-            throw new RuntimeException(e);
-        }
+    public void unregisterSubmodel(String submodelId) {
+        var submodelIdEncoded = Base64Util.encode(submodelId);
+        this.submodelRegistryApiClient.deleteSubmodelDescriptorById(submodelIdEncoded);
     }
 }

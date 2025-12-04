@@ -41,7 +41,7 @@ public class MetricsRestController {
         Map<String, Object> monitoringValues = new HashMap<>();
         try {
             var submodelId = "PlatformResources-" + resourceId;
-            var platformResourcesSubmodelDescriptorOptional = this.submodelRegistryClient.findSubmodelDescriptor(submodelId);
+            var platformResourcesSubmodelDescriptorOptional = this.submodelRegistryClient.getSubmodelDescriptor(submodelId);
 
             if (platformResourcesSubmodelDescriptorOptional.isPresent()) {
                 var endpoints = platformResourcesSubmodelDescriptorOptional.get().getEndpoints();

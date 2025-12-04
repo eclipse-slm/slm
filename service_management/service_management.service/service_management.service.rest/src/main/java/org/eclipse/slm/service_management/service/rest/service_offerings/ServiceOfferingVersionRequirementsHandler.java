@@ -50,7 +50,7 @@ public class ServiceOfferingVersionRequirementsHandler {
                 continue;
             }
             var submodelId = submodelRef.getKeys().get(0).getValue();
-            var submodelDescriptor = this.submodelRegistryClient.findSubmodelDescriptor(submodelId);
+            var submodelDescriptor = this.submodelRegistryClient.getSubmodelDescriptor(submodelId);
             if (submodelDescriptor.isEmpty()) {
                 LOG.debug("Submodel descriptor '{}' not found, skipping for requirements check", submodelId);
                 continue;

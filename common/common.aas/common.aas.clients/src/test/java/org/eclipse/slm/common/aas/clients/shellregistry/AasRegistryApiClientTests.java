@@ -6,7 +6,7 @@ import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultEndpoint;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProtocolInformation;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodelDescriptor;
 import org.eclipse.slm.common.aas.model.shellregistry.exceptions.ShellDescriptorNotFoundException;
-import org.eclipse.slm.common.aas.model.shellregistry.exceptions.SubmodellDescriptorNotFoundException;
+import org.eclipse.slm.common.aas.model.shellregistry.exceptions.SubmodelDescriptorNotFoundException;
 import org.eclipse.slm.common.aas.model.shellregistry.requests.GetAllShellDescriptorsFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -229,7 +229,7 @@ public class AasRegistryApiClientTests {
 
             assertThatThrownBy(() -> {
                 aasRegistryClient.getSubmodelDescriptorOrThrow(aasId, submodelId);
-            }).isInstanceOf(SubmodellDescriptorNotFoundException.class);
+            }).isInstanceOf(SubmodelDescriptorNotFoundException.class);
         }
     }
 

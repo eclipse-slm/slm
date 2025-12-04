@@ -21,7 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("")
 @Tag(name = "Submodel Repository API")
 @ApiResponses(value = {
-        @ApiResponse(responseCode = "default", description = "Default error handling for unmentioned status codes", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Result.class)))
+        @ApiResponse(responseCode = "default", description = "Default error handling for unmentioned status codes",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = Result.class)))
 })
 public interface SubmodelRepositoryQueryApi {
 
@@ -44,7 +45,7 @@ public interface SubmodelRepositoryQueryApi {
                                        @RequestParam(value = "limit", required = false, defaultValue = "100") Integer limit,
                                        @Parameter(in = ParameterIn.QUERY, description = "A server-generated identifier retrieved from pagingMetadata " +
                                                "that specifies from which position the result listing should continue", schema = @Schema()) @Valid
-                                       @RequestParam(value = "cursor", required = false) String base64UrlEncodedCursor,
+                                       @RequestParam(value = "cursor", required = false) String cursorBase64UrlEncoded,
                                        @Parameter(in = ParameterIn.DEFAULT, description = "Query object", required = true, schema = @Schema()) @Valid
                                        @RequestBody String query
     );

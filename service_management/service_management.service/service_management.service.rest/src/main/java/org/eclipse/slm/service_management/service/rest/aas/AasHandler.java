@@ -124,7 +124,7 @@ public class AasHandler implements ApplicationListener<ServiceOfferingVersionEve
                 if (submodelRef.getKeys().get(0).getType().equals(KeyTypes.SUBMODEL)) {
                     var submodelId = submodelRef.getKeys().get(0).getValue();
 
-                    var submodelDescriptorOptional = this.submodelRegistryClient.findSubmodelDescriptor(submodelId);
+                    var submodelDescriptorOptional = this.submodelRegistryClient.getSubmodelDescriptor(submodelId);
                     if (submodelDescriptorOptional.isPresent()) {
                         var endpoint = submodelDescriptorOptional.get().getEndpoints().get(0).getProtocolInformation().getHref();
 

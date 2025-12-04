@@ -146,7 +146,7 @@ public class FirmwareUpdateManager {
 
         var softwareNameplateSubmodels = new ArrayList<Submodel>();
         for (var softwareNameplateId : resourceType.getSoftwareNameplateIds()) {
-            var softwareNameplateSubmodelDescriptor = this.submodelRegistryClient.findSubmodelDescriptor(softwareNameplateId);
+            var softwareNameplateSubmodelDescriptor = this.submodelRegistryClient.getSubmodelDescriptor(softwareNameplateId);
             if (softwareNameplateSubmodelDescriptor.isPresent()) {
                 var scopedSubmodelRepositoryClient = SubmodelRepositoryClientFactory.FromSubmodelDescriptor(softwareNameplateSubmodelDescriptor.get());
                 var softwareNameplateSubmodel = scopedSubmodelRepositoryClient.getSubmodelOrThrow(softwareNameplateSubmodelDescriptor.get().getId());
@@ -189,7 +189,7 @@ public class FirmwareUpdateManager {
     }
 
     public void downloadFirmwareUpdateFileFromVendor(String softwareNameplateId, JwtAuthenticationToken jwtAuthenticationToken) {
-        var softwareNameplateOptional = this.submodelRegistryClient.findSubmodelDescriptor(softwareNameplateId);
+        var softwareNameplateOptional = this.submodelRegistryClient.getSubmodelDescriptor(softwareNameplateId);
         if (softwareNameplateOptional.isEmpty()) {
             LOG.error("Software nameplate with ID {} not found", softwareNameplateId);
             throw new SubmodelNotFoundException(softwareNameplateId);
@@ -234,7 +234,7 @@ public class FirmwareUpdateManager {
         for (var submodelRef : resourceAas.getSubmodels()) {
             var submodelId = submodelRef.getKeys().get(0).getValue();
 
-            this.submodelRegistryClient.findSubmodelDescriptor(submodelId).ifPresent(submodelDescriptor -> {
+            this.submodelRegistryClient.getSubmodelDescriptor(submodelId).ifPresent(submodelDescriptor -> {
                 if (submodelDescriptor.getSemanticId() != null) {
                     if (!submodelDescriptor.getSemanticId().getKeys().isEmpty()) {
                         var semanticId = submodelDescriptor.getSemanticId().getKeys().get(0).getValue();

@@ -48,7 +48,7 @@ public class SubmodelRegistryClientFactory {
             LOG.debug("Discovery client is not available. Using submodel registry URL from application properties: " + submodelRegistryUrl);
         }
 
-        var submodelRegistryClient = new SubmodelRegistryClient(submodelRegistryUrl);
+        var submodelRegistryClient = new SubmodelRegistryClient(submodelRegistryUrl, null);
         return submodelRegistryClient;
     }
 }

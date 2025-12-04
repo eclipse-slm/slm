@@ -69,7 +69,7 @@ public class ResourcesSubmodelRepository extends AbstractSubmodelRepository {
 
             try {
                 if (!localSubmodelIds.contains(submodelId)) {
-                    this.submodelRegistryClient.findSubmodelDescriptor(submodelId).ifPresent(submodelDescriptor -> {
+                    this.submodelRegistryClient.getSubmodelDescriptor(submodelId).ifPresent(submodelDescriptor -> {
                         var submodelEndpoint = submodelDescriptor.getEndpoints().get(0).getProtocolInformation().getHref();
                         if (submodelEndpoint.contains("/submodels/")) {
                             var scopedSubmodelRepositoryClient = SubmodelRepositoryClientFactory.FromSubmodelDescriptor(submodelDescriptor, null);
@@ -116,7 +116,7 @@ public class ResourcesSubmodelRepository extends AbstractSubmodelRepository {
 
             try {
                 if (!localSubmodelIds.contains(submodelId)) {
-                    this.submodelRegistryClient.findSubmodelDescriptor(submodelId).ifPresent(submodelDescriptor -> {
+                    this.submodelRegistryClient.getSubmodelDescriptor(submodelId).ifPresent(submodelDescriptor -> {
                         var submodelEndpoint = submodelDescriptor.getEndpoints().get(0).getProtocolInformation().getHref();
                         if (submodelEndpoint.contains("/submodels/")) {
                             var scopedSubmodelRepositoryClient = SubmodelRepositoryClientFactory.FromSubmodelDescriptor(submodelDescriptor, null);

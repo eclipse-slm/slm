@@ -140,7 +140,7 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
             var digitalNameplateSubmodelExists = new AtomicBoolean(false);
             for (var submodelRef : resourceAAS.getSubmodels()) {
                 var submodelId = submodelRef.getKeys().get(0).getValue();
-                var optionalSubmodelDescriptor = this.submodelRegistryClient.findSubmodelDescriptor(submodelId);
+                var optionalSubmodelDescriptor = this.submodelRegistryClient.getSubmodelDescriptor(submodelId);
                 optionalSubmodelDescriptor.ifPresent(submodelDescriptor -> {
                     if (submodelDescriptor.getSemanticId() != null) {
                         var semanticId = submodelDescriptor.getSemanticId().getKeys().get(0).getValue();
@@ -203,7 +203,7 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
                 if (submodelRef.getKeys().get(0).getType().equals(KeyTypes.SUBMODEL)) {
                     var submodelId = submodelRef.getKeys().get(0).getValue();
 
-                    var submodelDescriptorOptional = this.submodelRegistryClient.findSubmodelDescriptor(submodelId);
+                    var submodelDescriptorOptional = this.submodelRegistryClient.getSubmodelDescriptor(submodelId);
                     if (submodelDescriptorOptional.isPresent()) {
                         var endpoint = submodelDescriptorOptional.get().getEndpoints().get(0).getProtocolInformation().getHref();
 

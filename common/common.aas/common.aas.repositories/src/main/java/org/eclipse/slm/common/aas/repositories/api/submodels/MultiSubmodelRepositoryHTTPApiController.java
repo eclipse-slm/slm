@@ -36,14 +36,14 @@ public abstract class MultiSubmodelRepositoryHTTPApiController implements MultiS
     }
 
     @Override
-    public ResponseEntity<PagedResult> getAllSubmodels(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier semanticId, String idShort, Integer limit, Base64UrlEncodedCursor cursor, String level, String extent) {
+    public ResponseEntity<PagedResult> getAllSubmodels(Base64UrlEncodedIdentifier aasId, Base64UrlEncodedIdentifier semanticId, String idShort, Integer limit, Base64UrlEncodedCursor cursorBase64UrlEncoded, String level, String extent) {
         if (limit == null) {
             limit = 100;
         }
 
         String decodedCursor = "";
-        if (cursor != null) {
-            decodedCursor = cursor.getDecodedCursor();
+        if (cursorBase64UrlEncoded != null) {
+            decodedCursor = cursorBase64UrlEncoded.getDecodedCursor();
         }
 
         PaginationInfo pInfo = new PaginationInfo(limit, decodedCursor);

@@ -86,7 +86,7 @@ public class ResourceEventMessageListener extends GenericMessageListener<Resourc
             for (var submodelRef : resourceAas.getSubmodels()) {
                 var submodelRefKey = submodelRef.getKeys().get(0);
                 if (submodelRefKey.getType().equals(KeyTypes.SUBMODEL)) {
-                    var submodelDescriptor = submodelRegistryClient.findSubmodelDescriptor(submodelRefKey.getValue());
+                    var submodelDescriptor = submodelRegistryClient.getSubmodelDescriptor(submodelRefKey.getValue());
 
                     if (submodelDescriptor.isPresent()) {
                         if (submodelDescriptor.get().getSemanticId() == null) {
@@ -143,7 +143,7 @@ public class ResourceEventMessageListener extends GenericMessageListener<Resourc
                 shell.getSubmodels().forEach(submodelRef -> {
                     var submodelRefKey = submodelRef.getKeys().get(0);
                     if (submodelRefKey.getType().equals(KeyTypes.SUBMODEL)) {
-                        var submodelDescriptorOptional = irsSubmodelRegistryClient.findSubmodelDescriptor(submodelRefKey.getValue());
+                        var submodelDescriptorOptional = irsSubmodelRegistryClient.getSubmodelDescriptor(submodelRefKey.getValue());
                         if (submodelDescriptorOptional.isPresent()) {
                             var submodelDescriptor = submodelDescriptorOptional.get();
                             receivedSubmodelDescriptors.add(submodelDescriptor);
