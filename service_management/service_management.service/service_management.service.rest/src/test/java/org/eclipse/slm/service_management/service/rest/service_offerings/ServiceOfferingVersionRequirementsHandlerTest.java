@@ -30,8 +30,8 @@ public class ServiceOfferingVersionRequirementsHandlerTest {
 
     @BeforeEach
     public void ServiceOfferingVersionRequirementsHandlerTest() {
-        var aasRepositoryClientFactory = new AasRepositoryClientFactory(null, null);
-        var submodelRegistryClientFactory = new SubmodelRegistryClientFactory(null, null);
+        var aasRepositoryClientFactory = new AasRepositoryClientFactory("http://localhost:8081", null);
+        var submodelRegistryClientFactory = new SubmodelRegistryClientFactory("http://localhost:8083", null);
         this.serviceOfferingVersionRequirementsHandler = new ServiceOfferingVersionRequirementsHandler(aasRepositoryClientFactory, submodelRegistryClientFactory);
     }
 

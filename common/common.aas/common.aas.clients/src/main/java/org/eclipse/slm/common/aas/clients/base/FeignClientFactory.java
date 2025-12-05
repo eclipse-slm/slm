@@ -11,6 +11,10 @@ import java.io.IOException;
 public class FeignClientFactory {
 
     public static <T> T createClient(Class<T> clientClass, String baseUrl, AuthRequestInterceptor authRequestInterceptor) {
+        if (baseUrl == null || baseUrl.isBlank()) {
+            throw new IllegalArgumentException("baseUrl must not be null or empty");
+        }
+
         Decoder decoder = (response, type) -> {
             String body = "";
             try {
