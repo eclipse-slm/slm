@@ -15,7 +15,8 @@
     </parent>
 
     <modules>
-        <module>common.parent.service_rest</module>
+        <module>common.parent.service</module>
+        <module>common.parent.client</module>
     </modules>
 
 </project>
