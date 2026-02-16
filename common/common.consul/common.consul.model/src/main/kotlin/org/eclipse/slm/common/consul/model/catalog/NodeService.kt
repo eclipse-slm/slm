@@ -1,51 +1,45 @@
 package org.eclipse.slm.common.consul.model.catalog
 
-class NodeService
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
+import java.util.UUID
+
+/** NodeService represents a service running on a Consul node.
+ *
+ * For more information see <a href="https://developer.hashicorp.com/consul/api-docs/catalog#sample-response-5">Consul API docs</a>.
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+open class NodeService(
+
+    /** The unique ID of the service */
+    @field:JsonProperty("ID")
+    var id: UUID,
+
+    /** The name of the service */
+    @field:JsonProperty("Service")
+    open val serviceName: String = "",
+
+    /** The address of the service */
+    @field:JsonProperty("TaggedAddresses")
+    open val taggedAddresses: TaggedAddresses? = null,
+
+    /** The list of tags associated with the service */
+    @field:JsonProperty("Tags")
+    open val tags: List<String>? = ArrayList(),
+
+    /** User-defined metadata key/value pairs for the service */
+    @field:JsonProperty("Meta")
+    open val meta: Map<String, String>? = HashMap(),
+
+    /** The port on which the service is running */
+    @field:JsonProperty("Port")
+    var port: Int? = null,
+
+    /** <ENTERPRISE FEATURE> Specifies the namespace of the service. */
+    @field:JsonProperty("Namespace")
+    val namespace: String? = null,
+)
 {
-        var ID: String = ""
-        var Service: String = ""
-        var Tags: List<String> = ArrayList<String>()
-        var Address: String = ""
-        var Meta: Map<String, String> = HashMap<String, String>()
-        var Port: Int = 0
-        var Weights: Map<String, Int> =  HashMap<String, Int>()
-        var EnableTagOverride: Boolean = false
-        var Proxy: Map<String, Any> = HashMap<String, Any>()
-        var Connect: Any? = null
-        var CreateIndex: Int = 0
-        var ModifyIndex: Int = 0
-
-        constructor(){}
-        constructor(
-                ID: String,
-                Service: String,
-                Tags: List<String>,
-                Address: String,
-                Meta: Map<String, String>,
-                Port: Int,
-                Weights: Map<String, Int>,
-                EnableTagOverride: Boolean,
-                Proxy: Map<String, Any>,
-                Connect: Any?,
-                CreateIndex: Int,
-                ModifyIndex: Int
-        ) {
-                this.ID = ID
-                this.Service = Service
-                this.Tags = Tags
-                this.Address = Address
-                this.Meta = Meta
-                this.Port = Port
-                this.Weights = Weights
-                this.EnableTagOverride = EnableTagOverride
-                this.Proxy = Proxy
-                this.Connect = Connect
-                this.CreateIndex = CreateIndex
-                this.ModifyIndex = ModifyIndex
-        }
-
-
-        override fun toString(): String {
-                return "NodeService [ID='${ID}', Service='${Service}']";
-        }
 }
