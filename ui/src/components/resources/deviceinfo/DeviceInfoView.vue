@@ -42,20 +42,26 @@
               Hardware
             </v-tab>
 
-            <!-- Firmware -->
+            <!-- Credentials -->
             <v-tab :value="4">
+              <v-icon>mdi-lock-outline</v-icon>
+              Credentials
+            </v-tab>
+
+            <!-- Firmware -->
+            <v-tab :value="5">
               <v-icon>mdi-cellphone-arrow-down</v-icon>
               Firmware
             </v-tab>
 
             <!-- Capabilities -->
-            <v-tab :value="5">
+            <v-tab :value="6">
               <v-icon>mdi-toolbox</v-icon>
               Capabilities
             </v-tab>
 
             <!-- Submodels -->
-            <v-tab :value="6">
+            <v-tab :value="7">
               <v-icon>mdi-adjust</v-icon>
               Submodels
             </v-tab>
@@ -85,9 +91,18 @@
               />
             </v-tabs-window-item>
 
+            <!-- Credentials -->
+            <v-tabs-window-item
+                :value="4"
+            >
+              <DeviceInfoCredentialsView
+                  :resource-id="resource.id"
+              />
+            </v-tabs-window-item>
+
             <!-- Firmware -->
             <v-tabs-window-item
-              :value="4"
+              :value="5"
             >
               <DeviceInfoFirmwareView
                 :resource-id="resource.id"
@@ -96,7 +111,7 @@
 
             <!-- Capabilities -->
             <v-tabs-window-item
-                :value="5"
+                :value="6"
             >
               <DeviceInfoCapabilitiesView
                   :resource-id="resource.id"
@@ -105,7 +120,7 @@
 
             <!-- Submodels -->
             <v-tabs-window-item
-              :value="6"
+              :value="7"
             >
               <DeviceInfoSubmodelsView
                 :resource-id="resource.id"
@@ -128,13 +143,14 @@
 </template>
 
 <script setup>
-import {computed, ref, watch} from 'vue';
+import {ref, watch} from 'vue';
 import DeviceInfoSubmodelsView from "@/components/resources/deviceinfo/DeviceInfoSubmodelsView.vue";
 import DeviceInfoNameplateView from "@/components/resources/deviceinfo/DeviceInfoNameplateView.vue";
 import DeviceInfoHardwareView from "@/components/resources/deviceinfo/DeviceInfoHardwareView.vue";
-import DeviceInfoCommonView from "@/components/resources/deviceinfo/DeviceInfoCommonView.vue";
-import DeviceInfoFirmwareView from "@/components/resources/deviceinfo/DeviceInfoFirmwareView.vue";
+import DeviceInfoCommonView from "@/components/resources/deviceinfo/common/DeviceInfoCommonView.vue";
+import DeviceInfoFirmwareView from "@/components/resources/deviceinfo/firmware/DeviceInfoFirmwareView.vue";
 import DeviceInfoCapabilitiesView from "@/components/resources/deviceinfo/DeviceInfoCapabilitiesView.vue";
+import DeviceInfoCredentialsView from "@/components/resources/deviceinfo/DeviceInfoCredentialsView.vue";
 
 const emit = defineEmits(['closed']);
 

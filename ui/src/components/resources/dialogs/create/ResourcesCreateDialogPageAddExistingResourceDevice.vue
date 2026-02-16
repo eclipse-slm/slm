@@ -180,7 +180,7 @@
   </ValidationForm>
 </template>
 
-<script>
+<script lang="ts">
 
 import ResourcesCreateDialogPage from "@/components/resources/dialogs/create/ResourcesCreateDialogPage";
 
@@ -189,6 +189,14 @@ import * as yup from 'yup';
 import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import logRequestError from "@/api/restApiHelper";
+import {useUserStore} from "@/stores/userStore";
+import {
+  ResourceCredentialScope,
+  RemoteAccessCreateDTO,
+  CredentialDataUsernamePassword,
+  CredentialDataType,
+  ResourceCredential
+} from "@/api/resource-management/client";
 
 
 export default {
@@ -202,8 +210,9 @@ export default {
       const ip_required = yup.string().ipv4();
 
       const resourceDevicesStore = useResourceDevicesStore();
+      const userStore = useUserStore();
 
-      return {string_required, ip_required, resourceDevicesStore}
+      return {string_required, ip_required, resourceDevicesStore, userStore}
     },
     data () {
       return {
@@ -273,7 +282,8 @@ export default {
         ResourceManagementClient.resourcesApi.addExistingResource({
           resourceHostname: this.resourceHostname,
           resourceIp: this.resourceIp,
-          digitalNameplateV3: {}
+          digitalNameplateV3: {},
+          fullPathOwnerGroupId: this.userStore.fullPathUserGroupId
         }).then(
           response => {
             if (response.status === 201) {
@@ -286,12 +296,24 @@ export default {
               }
 
               if (this.remoteAccess.available) {
-                ResourceManagementClient.resourcesApi.setRemoteAccessOfResource(
+                const credentialData: CredentialDataUsernamePassword = {
+                  credentialDataType: CredentialDataType.UsernamePassword,
+                  username: this.remoteAccess.username,
+                  password: this.remoteAccess.password
+                }
+                const credential: ResourceCredential = {
+                  scopes: ResourceCredentialScope.RemoteAccess,
+                  data: credentialData,
+                };
+                const remoteAccessCreateDTO: RemoteAccessCreateDTO = {
+                  fullPathOwnerGroupId: this.userStore.fullPathUserGroupId,
+                  credential: credential,
+                  connectionType: this.remoteAccess.connectionType,
+                  connectionPort: this.remoteAccess.connectionPort
+                };
+                ResourceManagementClient.resourcesApi.addRemoteAccessForResource(
                     resourceId,
-                    this.remoteAccess.connectionType,
-                    this.remoteAccess.username,
-                    this.remoteAccess.password,
-                    this.remoteAccess.connectionPort
+                    remoteAccessCreateDTO
                 ).then().catch(logRequestError);
               }
 

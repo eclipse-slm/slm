@@ -9,11 +9,11 @@ RUN apt update && apt install wget unzip
 RUN wget https://releases.hashicorp.com/consul-template/0.32.0/consul-template_0.32.0_linux_amd64.zip && \
     unzip consul-template_0.32.0_linux_amd64.zip
 # Install npm dependencies
-RUN npm install --loglevel "error"
+RUN npm install --loglevel "warn"
 # Copy project files
 COPY . .
 # Build the application and remove node_modules
-RUN npm run build --loglevel "error" && rm -rf node_modules
+RUN npm run build --loglevel "warn"
 
 # Production Stage
 FROM nginx:mainline-alpine-slim AS production-stage
@@ -23,7 +23,8 @@ EXPOSE 80
 ENV APP_VERSION="1.4.0-SNAPSHOT" \
     I18N_LOCALE="en" \
     I18N_LOCALE_FALLBACK="en" \
-    NOTIFICATION_SERVICE_URL="http://notification-service:9001/" \
+    PLATFORM_MANAGEMENT_URL="http://resource-management:9001/" \
+    NOTIFICATION_SERVICE_URL="http://notification-service:9002/" \
     RESOURCE_MANAGEMENT_URL="http://resource-management:9010/" \
     SERVICE_MANAGEMENT_URL="http://service-management:9020/" \
     CATALOG_SERVICE_URL="http://catalog:10000/" \

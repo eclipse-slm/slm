@@ -25,6 +25,12 @@ export default defineConfig(({ mode }) => {
                     ws: true,
                     rewriteWsOrigin: true,
                 },
+                '/platform-management': {
+                    target: `${env.VITE_APP_PLATFORM_MANAGEMENT_URL}`,
+                    rewrite: (path) => path.replace(/^\/platform-management/, ''),
+                    changeOrigin: true,
+                    secure: false,
+                },
                 '/resource-management': {
                     target: `${env.VITE_APP_RESOURCE_MANAGEMENT_URL}`,
                     rewrite: (path) => path.replace(/^\/resource-management/, ''),

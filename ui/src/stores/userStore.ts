@@ -19,6 +19,9 @@ export const useUserStore = defineStore('userStore', {
         userId: (state) => {
             return state.userInfo?.sub
         },
+        fullPathUserGroupId: (state) => {
+            return `/users/${state.userInfo?.sub}`
+        },
         userName: (state) => {
             return state.userInfo.preferred_username
         },

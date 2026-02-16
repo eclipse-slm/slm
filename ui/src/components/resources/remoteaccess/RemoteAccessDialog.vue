@@ -1,14 +1,23 @@
 <script setup lang="ts">
 
 import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
-import * as yup from "yup";
 import {storeToRefs} from "pinia";
 import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
-import {toRef} from "vue";
-import {Field, Form} from "vee-validate";
+import {ref, toRef, computed, watch} from "vue";
+import {useField} from "vee-validate";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import logRequestError from "@/api/restApiHelper";
 import {useToast} from "vue-toast-notification";
+import {
+  ResourceCredentialScope,
+  RemoteAccessCreateDTO,
+  ConnectionType
+} from "@/api/resource-management/client";
+import {useUserStore} from "@/stores/userStore";
+import CredentialForm from "@/components/credentials/CredentialForm.vue";
+import {CredentialFormData} from "@/components/credentials/types";
+import PlatformManagementClient from '@/api/platform-management/platform-management-client';
+import { Credential, CredentialCreateRequest, CredentialDataType } from '@/api/platform-management/client';
 
 const props = defineProps({
   show: {
@@ -27,150 +36,213 @@ const $toast = useToast();
 
 const active = toRef(props, 'show');
 
-const string_required = yup.string().required();
-
+// Stores
+const userStore = useUserStore();
 const resourceDevicesStores = useResourceDevicesStore();
 const { resourceConnectionTypes } = storeToRefs(resourceDevicesStores);
 
-const remoteAccess = {
-  connectionType: resourceConnectionTypes.value[0]?.name,
-  connectionPort: resourceConnectionTypes.value[0]?.defaultPort,
-  username: '',
-  password: ''
-}
-
-const updateConnectionPort = (connectionTypeName: string) => {
-  console.log(connectionTypeName)
-  let connectionType = resourceConnectionTypes.value.find(ct => {
-    return ct.name === connectionTypeName
-  });
-
-  if(connectionType !== undefined)
-    remoteAccess.connectionPort = connectionType.defaultPort
-}
-
-const onConfirmClicked = () => {
-  ResourceManagementClient.resourcesApi.setRemoteAccessOfResource(
-      props.resourceId,
-      remoteAccess.connectionType,
-      remoteAccess.username,
-      remoteAccess.password,
-      remoteAccess.connectionPort
-  ).then(() => {
-    $toast.info("Remote access successfully added")
-    clearForm()
-    emit('confirmed')
+// Credential Form
+const credentialFormRef = ref<any | null>(null);
+const credentialFormData = ref<CredentialFormData | undefined>(undefined);
+const remoteAccessUsername = ref('');
+const showRemoteAccessUsername = computed(() => {
+  const formData = credentialFormData.value;
+  if (!formData) {
+    return false;
   }
-  ).catch((e) => {
-    $toast.error("Error adding remote access")
-    logRequestError(e)
-  })
+  if (formData.useExisting) {
+    return formData.existingCredentialDataType === CredentialDataType.KeyPair;
+  }
+  return formData.data?.credentialDataType === CredentialDataType.KeyPair;
+});
+
+watch(showRemoteAccessUsername, (value) => {
+  if (!value) {
+    remoteAccessUsername.value = '';
+    remoteAccessUsernameField.value = '';
+  } else {
+    remoteAccessUsernameField.value = remoteAccessUsername.value;
+  }
+});
+watch(remoteAccessUsername, (value) => {
+  remoteAccessUsernameField.value = value;
+});
+
+// Vee-Validate fields
+const { value: connectionTypeField, errorMessage: connectionTypeError } = useField<string>('connectionType', (v: any) => v ? true : 'Connection Type is required');
+const { value: connectionPortField, errorMessage: connectionPortError } = useField<number | string>('connectionPort', (v: any) => {
+   if (v === undefined || v === null || v === '') return 'Connection Port is required';
+   const n = Number(v);
+   if (isNaN(n) || n < 1 || n > 65535) return 'Port must be a number between 1 and 65535';
+   return true;
+ });
+const { value: remoteAccessUsernameField, errorMessage: remoteAccessUsernameError } = useField<string>(
+  'remoteAccessUsername',
+  (v: any) => {
+    if (!showRemoteAccessUsername.value) return true;
+    return v ? true : 'Username is required';
+  }
+);
+
+// Initialize field values with defaults
+ connectionTypeField.value = resourceConnectionTypes.value[0]?.name
+ connectionPortField.value = resourceConnectionTypes.value[0]?.defaultPort;
+
+// Validation state
+const credentialFormValid = ref(false);
+const otherFieldsValid = computed(() => {
+  const baseValid = !connectionTypeError.value && !connectionPortError.value && !!connectionTypeField.value && connectionPortField.value !== '' && connectionPortField.value !== undefined;
+  const usernameValid = !showRemoteAccessUsername.value || (!!remoteAccessUsernameField.value && !remoteAccessUsernameError.value);
+  return baseValid && usernameValid;
+});
+const formValid = computed(() => credentialFormValid.value && otherFieldsValid.value);
+
+async function createCredentialForRemoteAccess() {
+  if (!credentialFormData.value?.data) {
+    throw new Error('Credential data missing');
+  }
+  const credentialId = globalThis.crypto?.randomUUID?.();
+  if (!credentialId) {
+    throw new Error('Unable to generate credential id');
+  }
+
+  const request: CredentialCreateRequest = {
+    entityLinks: [],
+    fullPathOwnerGroupId: userStore.fullPathUserGroupId,
+    credential: {
+      id: credentialId,
+      scopesRaw: [ResourceCredentialScope.RemoteAccess],
+      data: credentialFormData.value.data,
+    } as Credential,
+  } as CredentialCreateRequest;
+
+  await PlatformManagementClient.credentialsApi.createOrUpdateCredential(credentialId, request);
+  return credentialId;
 }
+
+async function addRemoteAccessWithCredentialId(credentialId: string) {
+   const remoteAccessCreateDTO = {
+     fullPathOwnerGroupId: userStore.fullPathUserGroupId,
+     credentialId: credentialId,
+     username: showRemoteAccessUsername.value ? remoteAccessUsername.value : undefined,
+     connectionType: connectionTypeField.value as ConnectionType,
+     connectionPort: connectionPortField.value as number,
+   } as RemoteAccessCreateDTO as any;
+
+   return ResourceManagementClient.resourcesApi.addRemoteAccessForResource(
+     props.resourceId,
+     remoteAccessCreateDTO
+   );
+}
+
+const confirmLoading = ref(false);
+
+const onConfirmClicked = async () => {
+  if (confirmLoading.value) {
+    return;
+  }
+  confirmLoading.value = true;
+  try {
+    if (!credentialFormData.value?.isFormValid) {
+      $toast.error('Credential form is not valid');
+      return;
+    }
+
+    if (credentialFormData.value.useExisting) {
+      const existingId = credentialFormData.value.existingCredentialId;
+      if (!existingId) {
+        $toast.error('Existing credential is required');
+        return;
+      }
+      await addRemoteAccessWithCredentialId(existingId);
+    } else {
+      const createdCredentialId = await createCredentialForRemoteAccess();
+      await addRemoteAccessWithCredentialId(createdCredentialId);
+    }
+
+    $toast.info("Remote access successfully added");
+    clearForm();
+    emit('confirmed');
+  } catch (e) {
+    $toast.error("Error adding remote access");
+    logRequestError(e);
+  } finally {
+    confirmLoading.value = false;
+  }
+};
 
 const clearForm = () => {
-  remoteAccess.connectionType = resourceConnectionTypes.value[0]?.name
-  remoteAccess.connectionPort = resourceConnectionTypes.value[0]?.defaultPort
-  remoteAccess.username = ''
-  remoteAccess.password = ''
+   connectionTypeField.value = resourceConnectionTypes.value[0]?.name
+   connectionPortField.value = resourceConnectionTypes.value[0]?.defaultPort
+   remoteAccessUsername.value = ''
+   remoteAccessUsernameField.value = ''
+   credentialFormData.value = undefined
+   credentialFormRef.value?.clearForm?.();
 }
 
+const onCredentialFormChanged = (formData: CredentialFormData) => {
+  credentialFormData.value = formData;
+  credentialFormValid.value = !!formData?.isFormValid;
+}
 </script>
 
 <template>
-  <Form
-      ref="observer"
-      v-slot="{ meta, handleSubmit, validate }"
-  >
   <confirm-dialog
       :show="active"
       title="Add remote access"
       cancel-button-label="Cancel"
       confirm-button-label="Add"
       width="30%"
+      :confirmButtonDisabled="!formValid"
+      :confirm-loading="confirmLoading"
       @canceled="clearForm(); $emit('canceled');"
-      @confirmed="!meta.valid ? validate() : handleSubmit(onConfirmClicked)"
+      @confirmed="onConfirmClicked"
   >
     <template #content>
       <v-row>
         <v-col cols="9">
-          <Field
-              v-slot="{ errors, field }"
-              v-model="remoteAccess.connectionType"
-              name="Resource Connection"
-              :rules="string_required"
-          >
             <v-select
                 id="resource-select-connection-type"
-                v-bind="field"
+                v-model="connectionTypeField"
                 required
                 label="Connection Type"
                 prepend-icon="mdi-connection"
                 :items="resourceConnectionTypes"
                 item-title="prettyName"
                 item-value="name"
-                :error-messages="errors"
                 persistent-placeholder
-
-                @update:modelValue="updateConnectionPort"
+                :error-messages="connectionTypeError"
             />
-          </Field>
         </v-col>
         <v-col cols="3">
-          <Field
-              v-slot="{ errors, field }"
-              v-model="remoteAccess.connectionPort"
-              name="Connection Port"
-              :rules="string_required"
-          >
             <v-text-field
-                v-bind="field"
+                v-model="connectionPortField"
                 type="number"
                 required
                 label="Connection Port"
                 prepend-icon="mdi-counter"
                 persistent-placeholder
-                :error-messages="errors"
+                :error-messages="connectionPortError"
             />
-          </Field>
         </v-col>
       </v-row>
-      <Field
-          v-slot="{ errors, field }"
-          v-model="remoteAccess.username"
-          name="Username"
-          :rules="string_required"
-      >
-        <v-text-field
-            id="resource-create-text-field-username"
-            v-bind="field"
-            autocomplete="username"
-            label="Username"
-            required
-            prepend-icon="mdi-account"
-            :error-messages="errors"
-            :model-value="remoteAccess.username"
-        />
-      </Field>
-      <Field
-          v-slot="{ errors, field }"
-          v-model="remoteAccess.password"
-          name="Password"
-          :rules="string_required"
-      >
-        <v-text-field
-            id="resource-create-text-field-password"
-            v-bind="field"
-            autocomplete="current-password"
-            label="Password"
-            type="password"
-            required
-            prepend-icon="mdi-lock"
-            :error-messages="errors"
-        />
-      </Field>
+
+      <v-text-field
+        v-if="showRemoteAccessUsername"
+        v-model="remoteAccessUsername"
+        label="Username"
+        prepend-icon="mdi-account"
+        :error="!!remoteAccessUsernameError"
+        :error-messages="remoteAccessUsernameError"
+      />
+
+      <CredentialForm
+        ref="credentialFormRef"
+        :allow-existing="true"
+        @changed="onCredentialFormChanged"
+      />
     </template>
   </confirm-dialog>
-  </Form>
 </template>
 
 <style scoped>

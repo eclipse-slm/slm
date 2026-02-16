@@ -61,12 +61,12 @@ watch(showProp, (value) => {
             </div>
           </slot>
         </v-toolbar>
-        <v-card-text>
-          <slot name="content">
-            {{ text }}
-          </slot>
+        <v-card-text class="mt-8 mx-4">
+            <slot name="content">
+              {{ text }}
+            </slot>
         </v-card-text>
-        <v-card-actions class="justify-center" v-if="!hideActions">
+        <v-card-actions class="justify-center ma-4" v-if="!hideActions">
           <slot name="actions"></slot>
         </v-card-actions>
       </v-card>

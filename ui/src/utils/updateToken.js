@@ -8,11 +8,11 @@ export default async function () {
                 return refreshed;
             } else {
                 console.error('Token refresh failed ');
-                this.$keycloak.logoutFn();
+                globals.$keycloak.logoutFn();
             }
         }).catch((error) => {
             console.error('Token refresh failed ', error);
-            this.$keycloak.logoutFn();
+            globals.$keycloak.logoutFn();
         });
     }
 }
