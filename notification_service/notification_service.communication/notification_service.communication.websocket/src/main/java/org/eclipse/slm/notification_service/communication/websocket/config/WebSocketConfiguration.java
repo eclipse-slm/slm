@@ -17,7 +17,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
 
-    public final static Logger LOG = LoggerFactory.getLogger(WebSocketConfiguration.class);
+    private final static Logger LOG = LoggerFactory.getLogger(WebSocketConfiguration.class);
 
     private final AuthorizationSocketInterceptor authorizationSocketInterceptor;
 
