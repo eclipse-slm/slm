@@ -9,8 +9,16 @@ keycloak_realms:
 
 keycloak_realm: fabos
 
+keycloak_groups_top_level:
+  - name: users
+    description: "Parent group for all users"
+    realmRoles:
+      - slm-user
+  - name: userGroups
+    description: "Parent group for all user groups"
+
 keycloak_realm_roles:
-  - name: ssp-user
+  - name: slm-user
     isDefault: true
   - name: slm-admin
     isDefault: false
@@ -25,4 +33,4 @@ keycloak_default_user:
     - type: password
       value: password
       temporary: false
-  realmRoles: [ "ssp-user", "slm-admin" ]
+  realmRoles: [ "slm-user", "slm-admin" ]

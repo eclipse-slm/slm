@@ -66,5 +66,5 @@
         email: email
       allowed_redirect_uris:
         - "*"
-      groups_claim: "/realm_access/roles"
+      groups_claim: "groups"
     status_code: 200,204

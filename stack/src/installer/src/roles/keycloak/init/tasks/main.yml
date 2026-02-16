@@ -160,6 +160,16 @@
       _keycloak_realm_role: "{{ item }}"
     with_items: "{{ keycloak_realm_roles }}"
 
+  - name: "Create groups"
+    include_role:
+      name: "keycloak/client"
+      tasks_from: groups/create_group.yml
+    vars:
+      _keycloak_access_token: "{{ keycloak_access_token }}"
+      _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
+      _keycloak_group: "{{ item }}"
+    with_items: "{{ keycloak_groups_top_level }}"
+
   - name: "Create users"
     import_tasks: create_users.yml
 

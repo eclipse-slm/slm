@@ -1,4 +1,5 @@
 FROM traefik:v3.3.4
+MAINTAINER Matthias Schneider (matthias.schneider@ipa.fraunhofer.de)
 
 ENV SLM_HOSTNAME="your-slm-hostname" \
     VAULT_APP_ROLE_ROLE_ID="your-vault-app-role-role-id" \

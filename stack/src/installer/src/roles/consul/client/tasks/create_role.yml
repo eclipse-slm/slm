@@ -1,0 +1,45 @@
+### Inputs
+- name: "Assert inputs of 'consul/client | create_role.yml'"
+  assert:
+    that:
+      - (ENV.CONSUL.SCHEME.INTERNAL is defined) and (ENV.CONSUL.SCHEME.INTERNAL|length > 0)     # Scheme of the Consul instance
+      - (ENV.CONSUL.HOST.INTERNAL is defined) and (ENV.CONSUL.HOST.INTERNAL|length > 0)         # Host of the Consul instance
+      - (ENV.CONSUL.PORT.INTERNAL is defined)                                                   # Port of the Consul instance
+      - (_consul_token is defined) and (_consul_token|length > 0)                               # Token to authenticate with Consul
+      - (_role_name is defined) and (_role_name|length > 0)                                     # Name of the role that should be created
+      - (_policies is defined) and (_policies|length > 0)                                       # Policies that should be created and assigned to the role.
+      - (_binding_rule is defined) and (_binding_rule|length > 0)                               # Binding rule that should be created for the role
+
+- name: "Create policies"
+  community.general.consul_policy:
+    scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+    host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+    port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
+    token: "{{ _consul_token }}"
+    name: "{{ policy_item.name }}"
+    rules: "{{ policy_item.rules }}"
+  loop: "{{ _policies }}"
+  loop_control:
+    loop_var: policy_item
+
+- name: "Create Consul role '{{ _role_name }}'"
+  community.general.consul_role:
+    scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+    host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+    port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
+    token: "{{ _consul_token }}"
+    name: "{{ _role_name }}"
+    policies: "{{ _policies | json_query('[].{name: name}') }}"
+
+- name: "Create a binding rule for role '{{ _role_name }}' and auth method 'keycloak'"
+  community.general.consul_binding_rule:
+    scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+    host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+    port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
+    token: "{{ _consul_token }}"
+    name: "{{ _binding_rule.name }}"
+    description: "{{ _binding_rule.description }}"
+    auth_method: keycloak
+    bind_type: role
+    bind_name: "{{ _role_name }}"
+    selector: "{{ _binding_rule.selector }}"

@@ -12,6 +12,13 @@
     database_user_username: "{{ item.database_user_username }}"
     database_schema: "{{ item.app_name }}"
   with_items:
+    - app_name: platform_management
+      database_host: "{{ ENV.PLATFORM_MANAGEMENT.DATABASE.HOST.INTERNAL }}"
+      database_port: "{{ ENV.PLATFORM_MANAGEMENT.DATABASE.PORT.INTERNAL }}"
+      scheme: "{{ ENV.PLATFORM_MANAGEMENT.SCHEME.INTERNAL }}"
+      host: "{{ ENV.PLATFORM_MANAGEMENT.HOST.INTERNAL }}"
+      port: "{{ ENV.PLATFORM_MANAGEMENT.PORT.INTERNAL | int }}"
+      consul_app_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
     - app_name: service_management
       database_host: "{{ ENV.SERVICE_MANAGEMENT.DATABASE.HOST.INTERNAL }}"
       database_port: "{{ ENV.SERVICE_MANAGEMENT.DATABASE.PORT.INTERNAL }}"
@@ -69,6 +76,7 @@
   include_role:
     name: keycloak/client
     tasks_from: authentication/get_admin_access_token.yml
+
 - name: "Create Keycloak clients"
   include_role:
     name: "keycloak/client"
@@ -77,6 +85,17 @@
     _keycloak_access_token: "{{ keycloak_access_token }}"
     _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
     _keycloak_client: "{{ item }}"
+  loop: "{{ keycloak_clients }}"
+
+- name: "Create Consul role for Keycloak clients"
+  include_role:
+    name: consul/client
+    tasks_from: create_role
+  vars:
+    _role_name: "{{ item.consul_role.name }}"
+    _policies: "{{ item.consul_role.policies }}"
+    _binding_rule: "{{ item.consul_role.binding_rule }}"
+  when: item.consul_role is defined
   loop: "{{ keycloak_clients }}"
 
 - name: "Create Vault app roles"
@@ -147,7 +166,4 @@
     src: "catalog.yml"
     dest: "{{ _store_compose_file }}_catalog"
   when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
-
-
-
 

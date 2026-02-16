@@ -6,6 +6,13 @@ keycloak_clients:
     protocol_mappers:
       audience: true
       groups: true
+  - client_id: platform_management
+    public_client: false
+    service_accounts_enabled: true
+    assign_client_role_to_service_account: true
+    protocol_mappers:
+      audience: true
+      groups: true
   - client_id: resource_management
     public_client: false
     service_accounts_enabled: true
@@ -13,6 +20,22 @@ keycloak_clients:
     protocol_mappers:
       audience: true
       groups: true
+    consul_role:
+      name: "resource_management"
+      policies:
+        - name: "resource_management"
+          rules: |-
+            node_prefix "" {
+              policy = "write"
+            }
+            service_prefix "" {
+              policy = "write"
+            }
+      binding_rule:
+        name: "resource_management"
+        description: "Binding rule for resource_management role that binds resource_management Keycloak client (service account)"
+        selector: "value.client_id == \"resource_management\""
+
   - client_id: service_management
     public_client: false
     service_accounts_enabled: true
@@ -20,6 +43,22 @@ keycloak_clients:
     protocol_mappers:
       audience: true
       groups: true
+    consul_role:
+      name: "service_management"
+      policies:
+        - name: "service_management"
+          rules: |-
+            node_prefix "" {
+              policy = "write"
+            }
+            service_prefix "" {
+              policy = "write"
+            }
+      binding_rule:
+        name: "service_management"
+        description: "Binding rule for service_management role that binds service_management Keycloak client (service account)"
+        selector: "value.client_id == \"service_management\""
+
   - client_id: notification_service
     public_client: false
     service_accounts_enabled: true
@@ -37,16 +76,22 @@ keycloak_clients:
 
 vault_config:
   approles:
+    - name: "platform_management"
+      policies:
+        - name: "platform_management"
+          policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] }  \npath \"sys/mounts/*\" { capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\"] } \npath \"sys/mounts\" { capabilities = [ \"read\", \"list\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
     - name: "resource_management"
       policies:
         - name: "resource_management"
-          policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] }  \npath \"sys/mounts/*\" { capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\"] } \npath \"sys/mounts\" { capabilities = [ \"read\", \"list\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"resources/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"pki*\" {  capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\", \"patch\" ]}"
+          policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] }  \npath \"sys/mounts/*\" { capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\"] } \npath \"sys/mounts\" { capabilities = [ \"read\", \"list\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"resources/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"pki*\" {  capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\", \"patch\" ]} \npath \"credentials/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"capabilities/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
     - name: "service_management"
       policies:
         - name: "service_management"
-          policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"services/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"service-repositories/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
+          policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"services/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"service-repositories/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"credentials/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
   kv_secret_engines:
     - "awx_jwt_authenticator"
+    - "credentials"
+    - "capabilities"
     - "resources"
     - "services"
     - "service-repositories"
