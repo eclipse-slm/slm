@@ -7,7 +7,7 @@ application:
 ### Deployment
 deployment:
   scheme: "http"
-  hostname: slm.dev-vm.local
+  hostname: localhost
   port: 9001
   path: "/platform-management"
   url: ${deployment.scheme}://${deployment.hostname}:${deployment.port}${deployment.path}
@@ -125,7 +125,7 @@ keycloak:
 consul:
   service:
     name: platform-management
-    address: slm.local
+    address: localhost
     port: ${server.port}
   scheme: http
   host: consul

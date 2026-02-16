@@ -9,7 +9,7 @@ info:
     email: "matthias.schneider@ipa.fraunhofer.de"
   version: "1.4.0-SNAPSHOT"
 servers:
-- url: "http://slm.local:9002/notification-service"
+- url: "http://localhost:9002/notification-service"
   description: "Generated server url"
 security:
 - bearer_auth: []
@@ -629,9 +629,9 @@ components:
       description: "Oauth2 flow"
       flows:
         authorizationCode:
-          authorizationUrl: "https://slm.dev-vm.local/auth/realms/fabos/protocol/openid-connect/auth"
-          tokenUrl: "https://slm.dev-vm.local/auth/realms/fabos/protocol/openid-connect/token"
-          refreshUrl: "https://slm.dev-vm.local/auth/realms/fabos/protocol/openid-connect/token"
+          authorizationUrl: "https://localhost/auth/realms/fabos/protocol/openid-connect/auth"
+          tokenUrl: "https://localhost/auth/realms/fabos/protocol/openid-connect/token"
+          refreshUrl: "https://localhost/auth/realms/fabos/protocol/openid-connect/token"
           scopes: {}
     bearer_auth:
       type: "http"

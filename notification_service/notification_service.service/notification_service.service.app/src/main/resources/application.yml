@@ -6,9 +6,9 @@ application:
 
 ### Deployment
 deployment:
-  scheme: "https"
-  hostname: slm.dev-vm.local
-  port: 443
+  scheme: "http"
+  hostname: localhost
+  port: 9002
   path: "/notification-service"
   url: ${deployment.scheme}://${deployment.hostname}:${deployment.port}${deployment.path}
 

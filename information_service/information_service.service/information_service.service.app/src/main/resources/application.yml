@@ -6,9 +6,9 @@ application:
 
 ### Deployment
 deployment:
-  scheme: "https"
-  hostname: slm.dev-vm.local
-  port: 443
+  scheme: "http"
+  hostname: localhost
+  port: 9003
   path: "/information-service"
   url: ${deployment.scheme}://${deployment.hostname}:${deployment.port}${deployment.path}
 
@@ -123,8 +123,8 @@ irs:
     internal: http
     external: https
   host:
-    internal: slm.dev-vm.local
-    external: slm.dev-vm.local
+    internal: localhost
+    external: localhost
   port:
     internal: 3001
     external: 443

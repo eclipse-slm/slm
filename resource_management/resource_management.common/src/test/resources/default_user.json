@@ -2,7 +2,7 @@
   "exp": 1755906974,
   "iat": 1755870974,
   "jti": "122b512f-6409-4435-8148-aa5d69d64927",
-  "iss": "https://slm.dev-vm.local/auth/realms/fabos",
+  "iss": "https://localhost/auth/realms/fabos",
   "aud": [
     "ui",
     "account"
