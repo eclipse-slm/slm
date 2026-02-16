@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class ProfilerJpaRepositoryTest {
-    public final static Logger LOG = LoggerFactory.getLogger(ProfilerJpaRepositoryTest.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ProfilerJpaRepositoryTest.class);
 
     @Autowired
     private ProfilerJpaRepository profilerJpaRepository;

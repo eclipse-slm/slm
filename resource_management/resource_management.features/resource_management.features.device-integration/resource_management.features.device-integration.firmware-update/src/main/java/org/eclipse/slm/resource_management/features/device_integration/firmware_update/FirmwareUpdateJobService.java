@@ -9,7 +9,7 @@ public interface FirmwareUpdateJobService {
 
     public List<FirmwareUpdateJob> getFirmwareUpdateJobsOfResource(UUID resourceId);
 
-    void initFirmwareUpdate(UUID resourceId, String softwareNameplateId, String userId) throws Exception;
+    void initFirmwareUpdate(UUID resourceId, String softwareNameplateId, String userId, String accessToken) throws Exception;
 
     void activateFirmwareUpdate(UUID firmwareUpdateJobId) throws Exception;
 

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import org.eclipse.slm.resource_management.common.remote_access.ConnectionType
-import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityHealthCheck
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityType
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.Action
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType
@@ -17,7 +16,6 @@ import java.util.UUID
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "capabilityClass")
 @JsonSubTypes(
     JsonSubTypes.Type(value = DeploymentCapabilityDTOApi::class, name = "DeploymentCapability"),
-    JsonSubTypes.Type(value = VirtualizationCapabilityDTOApi::class, name = "VirtualizationCapability"),
     JsonSubTypes.Type(value = BaseConfigurationCapabilityDTOApi::class, name = "BaseConfigurationCapability")
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -35,10 +33,6 @@ abstract class CapabilityDTOApi(id: UUID? = null, capabilityClass: String) {
     open var type: List<CapabilityType> = ArrayList()
 
     open var actions: Map<ActionType, Action> = HashMap()
-
-    open var healthCheck: CapabilityHealthCheck? = null
-
-//    open var clusterMemberTypes: List<ClusterMemberType> = ArrayList()
 
     open var connection: ConnectionType? = null
 

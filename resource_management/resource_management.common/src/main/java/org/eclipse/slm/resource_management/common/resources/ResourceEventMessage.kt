@@ -7,9 +7,9 @@ import java.io.Serializable
 
 class ResourceEventMessage @JsonCreator constructor(
 
-    @JsonProperty("resource") val resource: ResourceDTO?,
+    @field:JsonProperty("resource") val resource: ResourceDTO?,
 
-    @JsonProperty("eventType") eventType: ResourceEventType?
+    @field:JsonProperty("eventType") eventType: ResourceEventType?
 
 ) : AbstractEventMessage<ResourceEventType>(EXCHANGE_NAME, ROUTING_KEY_PREFIX, eventType), Serializable {
 

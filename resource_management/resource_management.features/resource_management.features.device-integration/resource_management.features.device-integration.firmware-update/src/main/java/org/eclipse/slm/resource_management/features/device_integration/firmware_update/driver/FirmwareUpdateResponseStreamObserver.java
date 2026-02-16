@@ -17,7 +17,7 @@ import static org.eclipse.slm.resource_management.features.device_integration.fi
 
 public class FirmwareUpdateResponseStreamObserver implements StreamObserver<ArtefactUpdate.ArtefactMessage> {
 
-    public final static Logger LOG = LoggerFactory.getLogger(FirmwareUpdateResponseStreamObserver.class);
+    private final static Logger LOG = LoggerFactory.getLogger(FirmwareUpdateResponseStreamObserver.class);
 
     private final DriverInfo driverInfo;
 

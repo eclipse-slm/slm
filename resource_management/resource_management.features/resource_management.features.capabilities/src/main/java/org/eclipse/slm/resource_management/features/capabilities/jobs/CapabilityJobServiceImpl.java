@@ -1,16 +1,16 @@
 package org.eclipse.slm.resource_management.features.capabilities.jobs;
 
 import jakarta.annotation.PostConstruct;
-import org.eclipse.slm.common.consul.client.ConsulCredential;
+
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.model.exceptions.EventNotAcceptedException;
-import org.eclipse.slm.common.vault.client.VaultCredential;
+import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.resources.ResourceDTO;
 import org.eclipse.slm.resource_management.common.resources.ResourceEventInternalListener;
 import org.eclipse.slm.resource_management.common.resources.ResourcesManager;
-import org.eclipse.slm.resource_management.features.capabilities.CapabilitiesService;
+import org.eclipse.slm.resource_management.features.capabilities.CapabilitiesManager;
 import org.eclipse.slm.resource_management.features.capabilities.exceptions.CapabilityRuntimeException;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityServiceStatus;
@@ -35,7 +35,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
 
     private final ResourcesManager resourcesManager;
 
-    private final CapabilitiesService capabilitiesService;
+    private final CapabilitiesManager capabilitiesService;
 
     private final CapabilityJobExecutorFactory capabilityJobExecutorFactory;
 
@@ -52,7 +52,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
     private final Map<UUID, JwtAuthenticationToken> capabilityJobIdToJwtAuthToken = new HashMap<>();
 
     public CapabilityJobServiceImpl(ResourcesManager resourcesManager,
-                                    CapabilitiesService capabilitiesService,
+                                    CapabilitiesManager capabilitiesService,
                                     CapabilityJobExecutorFactory capabilityJobExecutorFactory,
                                     CapabilityJobJpaRepository capabilityJobJpaRepository,
                                     CapabilityJobStateMachineFactory capabilityJobStateMachineFactory,
@@ -97,10 +97,17 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
     }
 
     @Override
-    public void initCapabilityJob(JwtAuthenticationToken jwtAuthenticationToken, UUID resourceId, UUID capabilityId, boolean skipInstall, Map<String, String> configParameters, boolean force) throws Exception {
+    public void initCapabilityJob(JwtAuthenticationToken jwtAuthenticationToken,
+                                  UUID resourceId,
+                                  UUID capabilityId,
+                                  boolean skipInstall,
+                                  Map<String, String> configParameters,
+                                  boolean force,
+                                  String fullPathOwnerGroupId) throws Exception {
         try {
             // Check if resource exists
-            var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId);
+            var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
+            var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, accessToken);
             // Check if capability exists
             var capability = this.capabilitiesService.getCapabilityByIdOrThrow(capabilityId);
             // Check if capability is already installed on resource
@@ -132,19 +139,18 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
                 capabilityServiceStatus = CapabilityServiceStatus.READY;
             }
             var newCapabilityService = this.singleHostCapabilitiesConsulClient.addSingleHostCapabilityToNode(
-                    new ConsulCredential(),
                     capability,
                     resourceId,
                     capabilityServiceStatus,
                     skipInstall,
-                    configParameters
+                    configParameters,
+                    fullPathOwnerGroupId
             );
             // Create Keycloak role for capability service and assign it to users of resource
             this.singleHostCapabilitiesVaultClient.addSingleHostCapabilityServiceSecrets(
-                    new VaultCredential(),
                     newCapabilityService,
-                    resourceId,
-                    configParameters
+                    configParameters,
+                    fullPathOwnerGroupId
             );
             // Create and store capability job
             var capabilityJob = new CapabilityJob(UUID.randomUUID(), resourceId, capabilityId, skipInstall);
@@ -203,7 +209,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
         capabilityService.setStatus(newCapabilityServiceStatus);
 
         singleHostCapabilitiesConsulClient.updateCapabilityService(
-                new ConsulCredential(),
+                
                 resourceId,
                 capabilityService
         );
@@ -237,10 +243,9 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
             var capabilityService = this.singleHostCapabilitiesConsulClient.getCapabilityServiceOfResourceByCapabilityId(capabilityId, capabilityJob.getResourceId());
             // If capability service is managed, skip install and remove capability service from node
             if (capabilityService.getManaged()) {
-                this.singleHostCapabilitiesConsulClient.removeSingleHostCapabilityFromNode(new ConsulCredential(), capability, capabilityJob.getResourceId());
+                this.singleHostCapabilitiesConsulClient.removeSingleHostCapabilityFromNode( capability, capabilityJob.getResourceId());
 
-                var keycloakRealmRoleName = singleHostCapabilitiesVaultClient.deleteSingleHostCapabilityServiceSecrets(new VaultCredential(), capabilityJob.getResourceId(), capabilityService);
-                this.keycloakAdminClient.deleteRealmRole(keycloakRealmRoleName);
+                singleHostCapabilitiesVaultClient.deleteSingleHostCapabilityServiceSecrets(capabilityService.getId());
             }
 
             var capabilityJobExecutor = this.capabilityJobExecutorFactory.create(capabilityJob, capabilityService, this);
@@ -299,16 +304,8 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
             return;
         }
 
-        this.singleHostCapabilitiesVaultClient.deleteSingleHostCapabilityServiceSecrets(
-                new VaultCredential(),
-                resourceId,
-                capabilityService
-        );
-
-        this.singleHostCapabilitiesConsulClient.removeSingleHostCapabilityFromNode(
-                new ConsulCredential(),
-                capabilityService.getCapability(),
-                resourceId);
+        this.singleHostCapabilitiesVaultClient.deleteSingleHostCapabilityServiceSecrets(capabilityService.getId());
+        this.singleHostCapabilitiesConsulClient.removeSingleHostCapabilityFromNode( capabilityService.getCapability(), resourceId);
     }
 
     //region CapabilityJobStateMachineListener

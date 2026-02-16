@@ -1,21 +1,21 @@
 package org.eclipse.slm.resource_management.common.remote_access;
 
-import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.model.catalog.NodeService;
-import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
-import org.eclipse.slm.common.vault.client.VaultCredential;
-import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;
-import org.eclipse.slm.resource_management.common.adapters.ResourcesVaultClient;
+import org.eclipse.slm.common.credentials.model.CredentialDataType;
+import org.eclipse.slm.common.credentials.model.CredentialDataUsernamePasswordReadDTO;
+import org.eclipse.slm.common.credentials.model.CredentialEntityLinkCreateDTO;
+import org.eclipse.slm.common.restclient.feign.FeignResponseException;
+import org.eclipse.slm.resource_management.common.adapters.RemoteAccessConsulClient;
+import org.eclipse.slm.resource_management.common.adapters.RemoteAccessConsulClientFactory;
+import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialEntityType;
+import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialScope;
+import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialsManager;
 import org.eclipse.slm.resource_management.common.resources.ResourceUpdatedListener;
-import org.eclipse.slm.resource_management.common.resources.ResourcesManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -23,143 +23,149 @@ public class RemoteAccessManagerImpl implements RemoteAccessManager {
 
     private final static Logger LOG = LoggerFactory.getLogger(RemoteAccessManagerImpl.class);
 
-    private final KeycloakAdminClient keycloakAdminClient;
+    private final RemoteAccessConsulClientFactory remoteAccessConsulClientFactory;
+    private final RemoteAccessConsulClient remoteAccessConsulAdminClient;
 
-    private final ResourcesConsulClient resourcesConsulClient;
-
-    private final ResourcesVaultClient resourcesVaultClient;
+    private final ResourceCredentialsManager resourceCredentialsManager;
 
     private final List<ResourceUpdatedListener> resourceUpdatedListeners = new ArrayList<>();
 
-    public RemoteAccessManagerImpl(KeycloakAdminClient keycloakAdminClient,
-                                   ResourcesConsulClient resourcesConsulClient,
-                                   ResourcesVaultClient resourcesVaultClient) {
-        this.keycloakAdminClient = keycloakAdminClient;
-        this.resourcesConsulClient = resourcesConsulClient;
-        this.resourcesVaultClient = resourcesVaultClient;
+    public RemoteAccessManagerImpl(RemoteAccessConsulClientFactory remoteAccessConsulClientFactory,
+                                   ResourceCredentialsManager resourceCredentialsManager) {
+        this.remoteAccessConsulClientFactory = remoteAccessConsulClientFactory;
+        this.remoteAccessConsulAdminClient = remoteAccessConsulClientFactory.createAdminClient();
+        this.resourceCredentialsManager = resourceCredentialsManager;
     }
 
-    public List<UUID> getRemoteAccessServiceIdsOfResource(UUID resourceId) {
+    @Override
+    public List<RemoteAccessDTOReadMinimal> getRemoteAccessesOfResource(UUID resourceId, String jwtAccessToken) {
+        try {
+            var remoteAccessConsulClient = this.remoteAccessConsulClientFactory.create(jwtAccessToken);
+            var remoteAccesses = remoteAccessConsulClient.getRemoteAccesses(resourceId);
+
+            return remoteAccesses;
+
+        } catch (Exception e) {
+            throw new RemoteAccessRuntimeException("Error while retrieving remote access services of resource '" + resourceId + "': " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<UUID> getRemoteAccessIdsOfResource(UUID resourceId, String jwtAccessToken) {
         var remoteAccessServiceIds = new ArrayList<UUID>();
 
         try {
-            var consulCredential = new ConsulCredential();
+            var remoteAccesses = this.getRemoteAccessesOfResource(resourceId, jwtAccessToken);
 
-            Optional<NodeService> optionalNodeService = resourcesConsulClient.getRemoteAccessServiceOfResourceAsNodeService(
-                    consulCredential,
-                    resourceId
-            );
-            if (optionalNodeService.isEmpty())
-                return remoteAccessServiceIds;
-
-            var serviceId = UUID.fromString(optionalNodeService.get().getID());
-            remoteAccessServiceIds.add(serviceId);
+            for (var remoteAccess : remoteAccesses) {
+                remoteAccessServiceIds.add(remoteAccess.getId());
+            }
 
         } catch (Exception e) {
-            LOG.error("Error while retrieving remote access services of resource '{}': {}", resourceId, e.getMessage(), e);
-            throw new RemoteAccessRuntimeException("Error while retrieving remote access services of resource '" + resourceId + "': " + e.getMessage());
+            throw new RemoteAccessRuntimeException("Error while retrieving remote access services of resource '" + resourceId + "': " + e.getMessage(), e);
         }
 
         return remoteAccessServiceIds;
     }
 
-    public RemoteAccessDTO getRemoteAccessService(UUID resourceId, UUID remoteAccessId, JwtAuthenticationToken jwtAuthenticationToken) {
+    @Override
+    public RemoteAccessDTOReadFull getRemoteAccessByIdOrThrow(UUID resourceId, UUID remoteAccessId, String jwtAccessToken)
+            throws RemoteAccessRuntimeException {
         try {
-            var consulCredential = new ConsulCredential(jwtAuthenticationToken);
+            var remoteAccessConsulClient = this.remoteAccessConsulClientFactory.create(jwtAccessToken);
+            var remoteAccessOptional = remoteAccessConsulClient.getRemoteAccessById(resourceId, remoteAccessId);
 
-            Optional<NodeService> optionalNodeService = resourcesConsulClient.getRemoteAccessServiceOfResourceAsNodeService(
-                    consulCredential,
-                    resourceId
-            );
-            if (optionalNodeService.isEmpty())
-                throw new RemoteAccessNotFoundException("Remote access service '" + remoteAccessId + "' not found for resource: " + resourceId);
+            if (remoteAccessOptional.isEmpty()) {
+                throw new RemoteAccessNotFoundException(remoteAccessId, resourceId);
+            }
+            var remoteAccessDTOReadMinimal = remoteAccessOptional.get();
 
-            var serviceId = UUID.fromString(optionalNodeService.get().getID());
-
-            if (!serviceId.equals(remoteAccessId)) {
-                throw new RemoteAccessNotFoundException("Remote access service '" + remoteAccessId + "' not found for resource: " + resourceId);
+            var remoteAccessCredential = this.resourceCredentialsManager.getCredentialByIdForCurrentUser(remoteAccessDTOReadMinimal.getCredentialId(), jwtAccessToken);
+            var username = remoteAccessDTOReadMinimal.getUsername();
+            if (remoteAccessCredential.getData().getCredentialDataType().equals(CredentialDataType.USERNAME_PASSWORD)) {
+                username = ((CredentialDataUsernamePasswordReadDTO) remoteAccessCredential.getData()).getUsername();
             }
 
-            var connectionTypes = resourcesConsulClient.getConnectionTypesOfRemoteAccessService(
-                    consulCredential,
-                    serviceId
+            var remoteAccessDTOReadFull = new RemoteAccessDTOReadFull(
+                    remoteAccessDTOReadMinimal.getId(),
+                    remoteAccessCredential,
+                    username,
+                    remoteAccessDTOReadMinimal.getConnectionPort(),
+                    remoteAccessDTOReadMinimal.getConnectionType()
             );
-            var credentialClasses = resourcesConsulClient.getCredentialClassesOfRemoteAccessService(
-                    consulCredential,
-                    serviceId
-            );
 
-            if (credentialClasses.size() > 0 && connectionTypes.size() > 0) {
-                Credential credential = resourcesVaultClient.getCredentialOfRemoteAccessService(
-                        jwtAuthenticationToken,
-                        resourceId,
-                        remoteAccessId,
-                        credentialClasses.get(0)
-                );
-                var remoteAccessConsulService = new RemoteAccessConsulService(
-                        optionalNodeService.get(),
-                        connectionTypes.get(0),
-                        credential
-                );
-
-                var remoteAccessDTO = RemoteAccessMapper.INSTANCE.toDto(remoteAccessConsulService);
-
-                return remoteAccessDTO;
-            }
+            return remoteAccessDTOReadFull;
         } catch (Exception e) {
-            throw new RemoteAccessRuntimeException("Error while retrieving remote access services of resource '" + resourceId + "': " + e.getMessage());
+            throw new RemoteAccessRuntimeException("Error while retrieving remote access services of resource '" + resourceId + "': " + e.getMessage(), e);
         }
-
-        return null;
     }
 
-    public void deleteRemoteAccess(UUID resourceId, UUID remoteAccessId) {
+    @Override
+    public void deleteRemoteAccessById(UUID resourceId, UUID remoteAccessId, String jwtAccessToken, boolean deleteCredentialIfOrphaned) {
         try {
-            this.resourcesVaultClient.removeSecretsOfRemoteAccessService(new VaultCredential(), resourceId, remoteAccessId);
-            this.resourcesConsulClient.removeConnectionService(resourceId, remoteAccessId);
+            var remoteAccess = this.getRemoteAccessByIdOrThrow(resourceId, remoteAccessId, jwtAccessToken);
+            try {
+                var credential = this.resourceCredentialsManager.getCredentialByIdForCurrentUser(remoteAccess.getCredential().getId(), jwtAccessToken);
+                var hasOtherScopes = credential.getScopes().stream().anyMatch(scope -> !ResourceCredentialScope.REMOTE_ACCESS.equals(scope));
+
+                this.resourceCredentialsManager.removeCredentialScopes(remoteAccess.getCredential().getId(),
+                        List.of(ResourceCredentialScope.REMOTE_ACCESS.name()),
+                        jwtAccessToken);
+                this.resourceCredentialsManager.deleteCredentialEntityLink(
+                        remoteAccess.getCredential().getId(),
+                        ResourceCredentialEntityType.REMOTE_ACCESS,
+                        remoteAccessId,
+                        false,
+                        jwtAccessToken);
+
+                if (!hasOtherScopes) {
+                    this.resourceCredentialsManager.deleteCredentialEntityLink(
+                            remoteAccess.getCredential().getId(),
+                            ResourceCredentialEntityType.RESOURCE,
+                            resourceId,
+                            deleteCredentialIfOrphaned,
+                            jwtAccessToken);
+                }
+            } catch (FeignResponseException e) {
+                LOG.warn("Failed to delete or unlink credential of remote access service '{}': {}", remoteAccessId, e.getMessage());
+            }
+            this.remoteAccessConsulAdminClient.removeRemoteAccess(resourceId, remoteAccessId);
             for (var listener : this.resourceUpdatedListeners) {
-                listener.onResourceUpdated(resourceId);
+                listener.onResourceUpdated(resourceId, jwtAccessToken);
             }
             LOG.info("Deleted remote access service '{}' of resource '{}'", remoteAccessId, resourceId);
         } catch (Exception e) {
-            LOG.error("Error while deleting remote access service: {}", e.getMessage(), e);
-            throw new RemoteAccessRuntimeException("Error while deleting remote access service: " + e.getMessage());
+            if (e instanceof RemoteAccessNotFoundException) {
+                throw (RemoteAccessNotFoundException) e;
+            }
+            throw new RemoteAccessRuntimeException("Error while deleting remote access service: " + e.getMessage(), e);
         }
     }
 
-    public RemoteAccessDTO addUsernamePasswordRemoteAccessService(
-            String ownerUserId,
-            UUID resourceId,
-            ConnectionType connectionType,
-            int connectionPort,
-            String username,
-            String password
-    ) {
+    @Override
+    public RemoteAccessDTOReadFull addRemoteAccessForResource(UUID resourceId, RemoteAccessCreateDTO remoteAccess, String jwtAccessToken) {
         try {
-            var credential = new CredentialUsernamePassword(username, password);
-
-            this.resourcesConsulClient.setResourceConnectionType(resourceId, connectionType);
-            var remoteAccessService = this.resourcesConsulClient.addConnectionService(
-                    connectionType,
-                    connectionPort,
-                    resourceId,
-                    credential);
-
-            this.resourcesVaultClient.addSecretsForConnectionService(resourceId, remoteAccessService);
+            var remoteAccessCreated = this.remoteAccessConsulAdminClient.addRemoteAccess(remoteAccess, resourceId);
+            var credentialEntityLinks = List.of(
+                    new CredentialEntityLinkCreateDTO(ResourceCredentialEntityType.RESOURCE.toString(), resourceId.toString()),
+                    new CredentialEntityLinkCreateDTO(ResourceCredentialEntityType.REMOTE_ACCESS.toString(), remoteAccessCreated.getId().toString())
+            );
+            this.resourceCredentialsManager.addEntityLinksToCredential(remoteAccess.getCredentialId(), credentialEntityLinks, jwtAccessToken);
 
             for (var listener : this.resourceUpdatedListeners) {
-                listener.onResourceUpdated(resourceId);
+                listener.onResourceUpdated(resourceId,jwtAccessToken);
             }
 
-            LOG.info("Added remote access '{}' for resource '{}'", remoteAccessService.getId(), resourceId);
+            LOG.info("Added remote access '{}' for resource '{}'", remoteAccessCreated.getId(), resourceId);
+            var remoteAccessCreatedFull = this.getRemoteAccessByIdOrThrow(resourceId, remoteAccessCreated.getId(), jwtAccessToken);
 
-            return RemoteAccessMapper.INSTANCE.toDto(remoteAccessService);
+            return remoteAccessCreatedFull;
         } catch (Exception ex) {
-            LOG.error("Error while adding remote access service: {}", ex.getMessage(), ex);
-            throw new RemoteAccessRuntimeException("Error while adding remote access service: " + ex.getMessage());
+            throw new RemoteAccessRuntimeException("Error while adding remote access service: " + ex.getMessage(), ex);
         }
     }
 
+    @Override
     public void registerResourceUpdatedListener(ResourceUpdatedListener resourceUpdatedListener) {
         this.resourceUpdatedListeners.add(resourceUpdatedListener);
     }

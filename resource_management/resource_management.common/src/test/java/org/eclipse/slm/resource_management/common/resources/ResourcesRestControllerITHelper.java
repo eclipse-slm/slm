@@ -3,7 +3,6 @@ package org.eclipse.slm.resource_management.common.resources;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.kotlin.KotlinModule;
-import org.eclipse.slm.resource_management.common.remote_access.CredentialUsernamePassword;
 import org.eclipse.slm.resource_management.common.test_utils.AuthorizationHeaderRequestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -28,7 +27,7 @@ public class ResourcesRestControllerITHelper {
     private AuthorizationHeaderRequestFactory authorizationHeaderRequestFactory;
 
     public ResourceDTO getResource(UUID resourceId) throws Exception {
-        var path = ResourcesRestControllerConfig.BASE_PATH + "/" + resourceId;
+        var path = ResourcesRestApiConfig.BASE_PATH + "/" + resourceId;
 
         var responseContent = mockMvc.perform(
                         get(path)
@@ -46,7 +45,7 @@ public class ResourcesRestControllerITHelper {
     }
 
     public List<ResourceDTO> getResources() throws Exception {
-        var path = ResourcesRestControllerConfig.BASE_PATH;
+        var path = ResourcesRestApiConfig.BASE_PATH;
 
         var responseContent = mockMvc.perform(
                         get(path)
@@ -61,54 +60,6 @@ public class ResourcesRestControllerITHelper {
         var resources = objectMapper.readValue(responseContent, new TypeReference<List<ResourceDTO>>(){});
 
         return resources;
-    }
-
-    public String addExistingResource(
-            String project,
-            CredentialUsernamePassword credentialUsernamePassword,
-            BasicResource resource,
-            boolean checkResource,
-            ResultMatcher resultMatcher
-    ) throws Exception {
-        return this.addExistingResource(
-                project,
-                credentialUsernamePassword,
-                resource.getHostname(),
-                resource.getIp(),
-                checkResource,
-                resultMatcher
-        );
-    }
-
-    public String addExistingResource(
-            String project,
-            CredentialUsernamePassword credentialUsernamePassword,
-            String resourceHostname,
-            String resourceIp,
-            boolean checkResource,
-            ResultMatcher resultMatcher
-    ) throws Exception {
-        var path = ResourcesRestControllerConfig.BASE_PATH + "/";
-
-        var response = mockMvc.perform(
-                        put(path)
-                                .queryParam("project", project)
-                                .queryParam("resourceUsername", credentialUsernamePassword.getUsername())
-                                .queryParam("resourcePassword", credentialUsernamePassword.getPassword())
-                                .queryParam("resourceHostname", resourceHostname)
-                                .queryParam("resourceIp", resourceIp)
-                                .queryParam("checkResource", checkResource ? "true" : "false")
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(resultMatcher)
-                .andReturn().getResponse();
-
-        var responseBody = response.getContentAsString();
-        if (response.getStatus() == 201) {
-            return responseBody.substring(1, responseBody.length() - 1);
-        }
-        else {
-            return responseBody;
-        }
     }
 
     public static BasicResource getTestResource() {

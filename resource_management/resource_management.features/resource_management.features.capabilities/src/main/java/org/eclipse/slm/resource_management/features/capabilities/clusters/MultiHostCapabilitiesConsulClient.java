@@ -1,9 +1,10 @@
 package org.eclipse.slm.resource_management.features.capabilities.clusters;
 
-import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.client.apis.*;
-import org.eclipse.slm.common.consul.model.acl.BindingRule;
-import org.eclipse.slm.common.consul.model.catalog.CatalogService;
+
+import org.eclipse.slm.common.consul.client.*;
+import org.eclipse.slm.common.consul.model.acl.bindingrules.BindingRule;
+import org.eclipse.slm.common.consul.model.catalog.CatalogRegistration;
+import org.eclipse.slm.common.consul.model.catalog.Service;
 import org.eclipse.slm.common.consul.model.catalog.Node;
 import org.eclipse.slm.common.consul.model.catalog.NodeService;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
@@ -24,88 +25,71 @@ import java.util.stream.Collectors;
 public class MultiHostCapabilitiesConsulClient {
 
     private final static Logger LOG = LoggerFactory.getLogger(MultiHostCapabilitiesConsulClient.class);
-    private final CapabilityUtil capabilityUtil;
-    private final ConsulServicesApiClient consulServicesApiClient;
-    private final ConsulGenericServicesClient consulGenericServicesClient;
-    private final CapabilityJpaRepository capabilityJpaRepository;
-    private final ConsulNodesApiClient consulNodesApiClient;
-    private final ConsulAclApiClient consulAclApiClient;
-    private final ConsulGenericNodeRemoveClient consulGenericNodeRemoveClient;
 
+    private final ConsulClientFactory consulClientFactory;
+    private final ConsulClient consulAdminClient;
+
+    private final CapabilityJpaRepository capabilityJpaRepository;
 
     public MultiHostCapabilitiesConsulClient(
-            CapabilityJpaRepository capabilityJpaRepository,
-            ConsulNodesApiClient consulNodesApiClient,
-            ConsulServicesApiClient consulServicesApiClient,
-            ConsulGenericServicesClient consulGenericServicesClient,
-            ConsulAclApiClient consulAclApiClient,
-            ConsulGenericNodeRemoveClient consulGenericNodeRemoveClient,
-            CapabilityUtil capabilityUtil
+            ConsulClientFactory consulClientFactory,
+            CapabilityJpaRepository capabilityJpaRepository
     ) {
+        this.consulClientFactory = consulClientFactory;
+        this.consulAdminClient = consulClientFactory.createAdminClient();
         this.capabilityJpaRepository = capabilityJpaRepository;
-        this.consulNodesApiClient = consulNodesApiClient;
-        this.consulServicesApiClient = consulServicesApiClient;
-        this.consulGenericServicesClient = consulGenericServicesClient;
-        this.consulAclApiClient = consulAclApiClient;
-        this.consulGenericNodeRemoveClient = consulGenericNodeRemoveClient;
-        this.capabilityUtil = capabilityUtil;
     }
 
     //region GET Functions
-    public List<MultiHostCapabilityService> getMultiHostCapabilitiesServicesOfUser(
-            ConsulCredential consulCredential
-    ) throws ConsulLoginFailedException {
-        Map<String, List<String>> filteredServices = capabilityUtil.getCapabilityServiceNamesAndTagsMapByTag(
-                consulCredential,
-                MultiHostCapabilityService.class.getSimpleName()
-        );
+    public List<MultiHostCapabilityService> getMultiHostCapabilitiesServicesOfUser() throws ConsulLoginFailedException {
+//        Map<String, List<String>> filteredServices = capabilityUtil.getCapabilityServiceNamesAndTagsMapByTag(
+//
+//                MultiHostCapabilityService.class.getSimpleName()
+//        );
+
+        Map<String, List<String>> filteredServices = new HashMap<>();
 
         List<MultiHostCapabilityService> multiHostCapabilityServices = new ArrayList<>();
 
         for(String serviceName : filteredServices.keySet()) {
 
             // get nodes with service matching the serviceName
-            Optional<List<CatalogService>> servicesOptional = consulServicesApiClient.getServiceByName(
-                    consulCredential,
+            Optional<List<Service>> servicesOptional = this.consulAdminClient.services().getServiceByName(
+                    
                     serviceName
             );
 
             // get MHCS "main"/"dummy" node (representing the cluster)
-            Optional<CatalogService> serviceOptional = servicesOptional.get().stream().filter(catalogService -> catalogService.getNode().equals(serviceName)).findFirst();
+            Optional<Service> serviceOptional = servicesOptional.get().stream().filter(catalogService -> catalogService.getNodeName().equals(serviceName)).findFirst();
 
             if(serviceOptional.isPresent()) {
-                multiHostCapabilityServices.add(createMultiHostCapabilityServiceFromConsulService(serviceOptional.get(), consulCredential));
+                multiHostCapabilityServices.add(createMultiHostCapabilityServiceFromConsulService(serviceOptional.get()));
             } else {
                 // as a fallback, get first service matching the serviceName
-                CatalogService service = servicesOptional.get().get(0);
-                multiHostCapabilityServices.add(createMultiHostCapabilityServiceFromConsulService(service, consulCredential));
+                Service service = servicesOptional.get().get(0);
+                multiHostCapabilityServices.add(createMultiHostCapabilityServiceFromConsulService(service));
             }
         }
 
         return multiHostCapabilityServices;
     }
 
-    public MultiHostCapabilityService createMultiHostCapabilityServiceFromConsulService(CatalogService service, ConsulCredential consulCredential) throws ConsulLoginFailedException {
+    public MultiHostCapabilityService createMultiHostCapabilityServiceFromConsulService(Service service) throws ConsulLoginFailedException {
 
         // find capability of MHCS
         UUID capabilityId = UUID.fromString(service.getServiceMeta().get(CapabilityService.META_KEY_CAPABILITY_ID));
         Optional<Capability> capabilityOptional = capabilityJpaRepository.findById(capabilityId);
 
         if(capabilityOptional.isPresent()) {
-            UUID serviceId = UUID.fromString(service.getServiceId());
-            Map<UUID, String> memberMapping = capabilityUtil.getMemberMappingOfMultiHostCapabilityService(
-                    consulCredential,
-                    capabilityOptional.get(),
-                    serviceId
-            );
+            var serviceId = service.getServiceId();
+//            Map<UUID, String> memberMapping = capabilityUtil.getMemberMappingOfMultiHostCapabilityService(
+//                    capabilityOptional.get(),
+//                    serviceId
+//            );
 
             // create MHCS object
-            MultiHostCapabilityService mhcs = new MultiHostCapabilityService(
-                    capabilityOptional.get(),
-                    memberMapping,
-                    serviceId
-            );
-
+//            var mhcs = new MultiHostCapabilityService(capabilityOptional.get(), memberMapping, serviceId, "");
+            MultiHostCapabilityService mhcs = null;
             //section enrich MHCS with data from node meta-data and service meta-data (from cluster "dummy" node)
             Map<String, String> serviceMeta = service.getServiceMeta();
             Boolean isManaged;
@@ -143,7 +127,7 @@ public class MultiHostCapabilitiesConsulClient {
                     // add meta data entries from consul service as map to mhcs.customMeta but skip already available entries
                     mhcs.setCustomMeta((Map<String, String>) serviceMeta.entrySet()
                             .stream()
-                            .filter(stringStringEntry -> !mhcs.getServiceMeta().containsKey(stringStringEntry.getKey()))
+                            .filter(stringStringEntry -> !mhcs.getMeta().containsKey(stringStringEntry.getKey()))
                             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y, LinkedHashMap::new)));
 
                 }
@@ -161,11 +145,11 @@ public class MultiHostCapabilitiesConsulClient {
     }
 
     public List<MultiHostCapabilityService> getMultiHostCapabilityServicesOfResource(
-            ConsulCredential consulCredential,
+            
             UUID resourceId
     ) throws ConsulLoginFailedException {
-        List<NodeService> nodesServices = consulServicesApiClient.getNodeServicesByNodeId(
-                new ConsulCredential(),
+        List<NodeService> nodesServices = this.consulAdminClient.services().getNodeServicesByNodeId(
+                
                 resourceId
         );
         List<NodeService> filteredNodeService = new ArrayList<>();
@@ -178,7 +162,7 @@ public class MultiHostCapabilitiesConsulClient {
 
         for(NodeService nodeService : filteredNodeService) {
             Optional<MultiHostCapabilityService> mhcs =
-                    getMultiHostCapabilityServiceOfUser(consulCredential, UUID.fromString(nodeService.getID()));
+                    getMultiHostCapabilityServiceOfUser(nodeService.getId());
 
             if(mhcs.isPresent())
                 multiHostCapabilityServicesOfResource.add(mhcs.get());
@@ -188,21 +172,21 @@ public class MultiHostCapabilitiesConsulClient {
     }
 
     public Optional<MultiHostCapabilityService> getMultiHostCapabilityServiceOfUser(
-            ConsulCredential consulCredential,
+            
             UUID consulServiceUuid
     ) throws ConsulLoginFailedException {
-        List<MultiHostCapabilityService> services = getMultiHostCapabilitiesServicesOfUser(consulCredential);
+        List<MultiHostCapabilityService> services = getMultiHostCapabilitiesServicesOfUser();
 
         return services.stream()
                 .filter(service -> service.getId().equals(consulServiceUuid))
                 .findFirst();
     }
 
-    public List<CatalogService> getNodesOfMultiHostCapabilityService(
-            ConsulCredential consulCredential,
+    public List<Service> getNodesOfMultiHostCapabilityService(
+            
             String serviceName
-    ) throws ConsulLoginFailedException {
-        Map<String, List<String>> services = this.consulServicesApiClient.getServices(consulCredential);
+    ) {
+        Map<String, List<String>> services = this.consulAdminClient.services().getServices();
 
         List<String> clusterServiceNames = services.entrySet()
                 .stream()
@@ -211,8 +195,8 @@ public class MultiHostCapabilitiesConsulClient {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 
-        var consulServices = this.consulServicesApiClient.getServicesByName(
-                consulCredential,
+        var consulServices = this.consulAdminClient.services().getServicesByName(
+                
                 clusterServiceNames
         );
 
@@ -220,17 +204,17 @@ public class MultiHostCapabilitiesConsulClient {
     }
 
     public List<Node> getNodesOfMultiHostCapabilityService(
-            ConsulCredential consulCredential,
+            
             UUID serviceId
     ) throws ConsulLoginFailedException {
         Optional<MultiHostCapabilityService> optionalService = getMultiHostCapabilityServiceOfUser(
-                consulCredential,
+                
                 serviceId
         );
 
         if(optionalService.isPresent())
             return getNodesOfMultiHostCapabilityService(
-                    consulCredential,
+                    
                     optionalService.get()
             );
         else
@@ -238,7 +222,7 @@ public class MultiHostCapabilitiesConsulClient {
     }
 
     private List<Node> getNodesOfMultiHostCapabilityService(
-            ConsulCredential consulCredential,
+            
             MultiHostCapabilityService multiHostCapabilityService
     ) {
         var nodes = new ArrayList<Node>();
@@ -249,10 +233,7 @@ public class MultiHostCapabilitiesConsulClient {
                 .forEach(nodeId -> {
                     Optional<Node> node = null;
                     try {
-                        node = consulNodesApiClient.getNodeById(
-                                consulCredential,
-                                nodeId
-                        );
+                        node = this.consulAdminClient.nodes().getNodeById(nodeId);
                     } catch (ConsulLoginFailedException e) {
                         e.printStackTrace();
                     }
@@ -267,80 +248,71 @@ public class MultiHostCapabilitiesConsulClient {
 
     //region ADD Functions
     public void addMultiHostCapabilityService(
-            ConsulCredential consulCredential,
+            
             MultiHostCapabilityService multiHostCapabilityService
-    ) throws ConsulLoginFailedException {
+    ) {
         multiHostCapabilityService.getMemberMapping()
                 .keySet()
                 .stream()
                 .forEach(nodeId -> {
-                    try {
-                        this.consulGenericServicesClient.registerService(
-                                consulCredential,
-                                nodeId,
-                                multiHostCapabilityService.getService(),
-                                multiHostCapabilityService.getId(),
-                                Optional.empty(),
-                                multiHostCapabilityService.getTagsByNodeId(nodeId),
-                                multiHostCapabilityService.getServiceMetaByNodeId(nodeId)
-                        );
-                    } catch (ConsulLoginFailedException e) {
-                        e.printStackTrace();
-                    }
+                    var serviceRegistration = CatalogRegistration.Service.builder(multiHostCapabilityService.getServiceName())
+                            .id(multiHostCapabilityService.getId())
+                            .port(null)
+                            .tags(multiHostCapabilityService.getTagsByNodeId(nodeId))
+                            .meta(multiHostCapabilityService.getServiceMetaByNodeId(nodeId))
+                            .build();
+
+                    this.consulAdminClient.services().registerService(nodeId, serviceRegistration);
                 });
     }
 
-    public void updateMultiHostCapabilityService(
-            ConsulCredential consulCredential,
-            MultiHostCapabilityService newMultiHostCapabilityService
-    ) throws ConsulLoginFailedException {
-        addMultiHostCapabilityService(consulCredential, newMultiHostCapabilityService);
+    public void updateMultiHostCapabilityService(MultiHostCapabilityService newMultiHostCapabilityService) {
+        this.addMultiHostCapabilityService(newMultiHostCapabilityService);
     }
     //endregion
 
     //region DELETE Functions
     public void removeMultiHostCapabilityService(
-            ConsulCredential consulCredential,
+            
             UUID serviceId
     ) throws ConsulLoginFailedException {
-        Optional<MultiHostCapabilityService> service = getMultiHostCapabilityServiceOfUser(consulCredential, serviceId);
+        Optional<MultiHostCapabilityService> service = getMultiHostCapabilityServiceOfUser(serviceId);
 
         if(service.isPresent())
             removeMultiHostCapabilityService(
-                    consulCredential,
+                    
                     service.get()
             );
     }
 
     private void removeMultiHostCapabilityService(
-            ConsulCredential consulCredential,
+            
             MultiHostCapabilityService multiHostCapabilityService
     ) {
         try {
-            var consulNodeOptional = this.consulNodesApiClient.getNodeById(
-                    consulCredential,
+            var consulNodeOptional = this.consulAdminClient.nodes().getNodeById(
+                    
                     multiHostCapabilityService.getId()
             );
             if (consulNodeOptional.isPresent()) {
 
                 // delete dummy node first
                 var consulNode = consulNodeOptional.get();
-//                this.consulNodesApiClient.deleteNode(consulCredential, consulNode.getNode());
-                this.consulGenericNodeRemoveClient.removeNode(consulCredential, consulNode.getNode());
+//                this.consulNodesApiClient.deleteNode(consulNode.getNode());
+                this.consulAdminClient.nodes().deleteNodeById(consulNode.getId());
 
                 // remove read rule from policy
-                this.consulAclApiClient.removeReadRuleFromPolicy(
-                        consulCredential,
+                this.consulAdminClient.acl().removeReadRuleFromPolicy(
                         "resource_" + multiHostCapabilityService.getId(),
                         "service",
-                        multiHostCapabilityService.getService()
+                        multiHostCapabilityService.getServiceName()
                 );
 
                 // remove policy
                 var policyName = "resource_" + multiHostCapabilityService.getId();
-                var policy = this.consulAclApiClient.getPolicyByName(consulCredential, policyName);
+                var policy = this.consulAdminClient.acl().getPolicyByNameOrThrow(policyName);
                 if (policy != null) {
-                    this.consulAclApiClient.deletePolicyById(consulCredential, policy.getId());
+                    this.consulAdminClient.acl().deletePolicyById(policy.getId());
                 } else {
                     LOG.error("Unable to delete Consul policy for cluster resource with id '" + multiHostCapabilityService.getId()
                             + "', policy with name '" + policyName + "'not found");
@@ -348,21 +320,21 @@ public class MultiHostCapabilitiesConsulClient {
 
                 // remove role
                 var roleName = "resource_" + multiHostCapabilityService.getId();
-                var role = this.consulAclApiClient.getRoleByName(consulCredential, roleName);
+                var role = this.consulAdminClient.acl().getRoleByName(roleName);
                 if (role != null) {
-                    this.consulAclApiClient.deleteRoleById(consulCredential, role.getId());
+                    this.consulAdminClient.acl().deleteRoleById(role.getId());
                 } else {
                     LOG.error("Unable to delete Consul role for cluster resource with id '" + multiHostCapabilityService.getId()
                             + "', role with name '" + roleName + "'not found");
                 }
 
                 // remove related binding-rules
-                var bindingRules = this.consulAclApiClient.getBindingRules(consulCredential);
+                var bindingRules = this.consulAdminClient.acl().getBindingRules();
                 List<BindingRule> bindingRulesOfResource = bindingRules.stream()
                         .filter(r -> r.getBindName().equals("resource_" + consulNode.getId())).collect(Collectors.toList());
                 if (bindingRulesOfResource.size() > 0) {
                     for (BindingRule bindingRule : bindingRulesOfResource) {
-                        this.consulAclApiClient.deleteBindingRuleById(consulCredential, bindingRule.getId());
+                        this.consulAdminClient.acl().deleteBindingRuleById(bindingRule.getId());
                     }
                 }
                 LOG.info("Cluster resource with id '" + multiHostCapabilityService.getId() + "' successfully deleted in Consul");
@@ -374,41 +346,33 @@ public class MultiHostCapabilitiesConsulClient {
         // if cluster has nodes, perform node actions here
         multiHostCapabilityService.getMemberMapping().keySet()
                 .forEach(k -> {
-                    try {
                         // Remove Capability Service:
-                        this.consulGenericServicesClient.deregisterService(
-                                new ConsulCredential(),
-                                k,
-                                multiHostCapabilityService.getService()
-                        );
+                        this.consulAdminClient.services().removeServiceByName(k, multiHostCapabilityService.getServiceName());
 
                         // Remove Policy to read Service
-                        this.consulAclApiClient.removeReadRuleFromPolicy(
-                                new ConsulCredential(),
-                                "resource_" + k,
-                                "service",
-                                multiHostCapabilityService.getService()
-                        );
+//                        this.consulAclApiClient.removeReadRuleFromPolicy(
+//                                
+//                                "resource_" + k,
+//                                "service",
+//                                multiHostCapabilityService.getService()
+//                        );
 
-                        LOG.info("Successfully removed cluster deployment capability '" + multiHostCapabilityService.getService() + "'" +
+                        LOG.info("Successfully removed cluster deployment capability '" + multiHostCapabilityService.getServiceName() + "'" +
                                 "from resource '" + k + "'");
-                    } catch (ConsulLoginFailedException e) {
-                        LOG.warn("Unable to remove " + multiHostCapabilityService.getService() + " from resource '" + k + "'");
-                    }
                 });
     }
     //endregion
 
     //region SCALE Functions
     public void scaleMultiHostCapabilityService(
-            ConsulCredential consulCredential,
+            
             ScaleOperation scaleOperation,
             UUID serviceId
     ) {
         if (scaleOperation.getClass().equals(ScaleUpOperation.class)) {
             try {
                 scaleUpMultiHostCapabilityService(
-                        consulCredential,
+                        
                         (ScaleUpOperation) scaleOperation,
                         serviceId
                 );
@@ -419,7 +383,7 @@ public class MultiHostCapabilitiesConsulClient {
         } else if (scaleOperation.getClass().equals(ScaleDownOperation.class)) {
             try {
                 scaleDownMultiHostCapabilityService(
-                        consulCredential,
+                        
                         (ScaleDownOperation) scaleOperation,
                         serviceId
                 );
@@ -430,12 +394,12 @@ public class MultiHostCapabilitiesConsulClient {
     }
 
     private void scaleDownMultiHostCapabilityService(
-            ConsulCredential consulCredential,
+            
             ScaleDownOperation scaleDownOperation,
             UUID serviceId
     ) throws ConsulLoginFailedException {
         Optional<MultiHostCapabilityService> optionalMultiHostCapabilityService = getMultiHostCapabilityServiceOfUser(
-                consulCredential,
+                
                 serviceId
         );
 
@@ -446,34 +410,30 @@ public class MultiHostCapabilitiesConsulClient {
 
         MultiHostCapabilityService multiHostCapabilityService = optionalMultiHostCapabilityService.get();
 
-        this.consulGenericServicesClient.deregisterService(
-                new ConsulCredential(),
-                scaleDownOperation.getResourceId(),
-                multiHostCapabilityService.getService()
-        );
-        this.consulAclApiClient.removeReadRuleFromPolicy(
-                new ConsulCredential(),
-                "resource_" + scaleDownOperation.getResourceId(),
-                "service", multiHostCapabilityService.getService()
-        );
+        this.consulAdminClient.services().removeServiceByName(scaleDownOperation.getResourceId(), multiHostCapabilityService.getServiceName());
+//        this.consulAclApiClient.removeReadRuleFromPolicy(
+//                
+//                "resource_" + scaleDownOperation.getResourceId(),
+//                "service", multiHostCapabilityService.getService()
+//        );
     }
 
     private void scaleUpMultiHostCapabilityService(
-            ConsulCredential consulCredential,
+            
             ScaleUpOperation scaleUpOperation,
             UUID serviceId
     ) throws ConsulLoginFailedException {
         Optional<MultiHostCapabilityService> optionalMultiHostCapabilityService = getMultiHostCapabilityServiceOfUser(
-                consulCredential,
+                
                 serviceId
         );
 
         if(optionalMultiHostCapabilityService.isPresent())
-            scaleUpMultiHostCapabilityService(consulCredential, scaleUpOperation, optionalMultiHostCapabilityService.get());
+            scaleUpMultiHostCapabilityService(scaleUpOperation, optionalMultiHostCapabilityService.get());
     }
 
     private void scaleUpMultiHostCapabilityService(
-            ConsulCredential consulCredential,
+            
             ScaleUpOperation scaleUpOperation,
             MultiHostCapabilityService multiHostCapabilityService
     ) throws ConsulLoginFailedException {
@@ -481,34 +441,30 @@ public class MultiHostCapabilitiesConsulClient {
 
         multiHostCapabilityService.applyScaleUp(scaleUpOperation);
 
-        this.consulGenericServicesClient.registerServiceForNodeWithReadAccessViaKeycloakRole(
-                consulCredential,
-                nodeId,
-                multiHostCapabilityService.getService(),
-                multiHostCapabilityService.getId(),
-                Optional.empty(),
-                multiHostCapabilityService.getTagsByNodeId(nodeId),
-                multiHostCapabilityService.getServiceMetaByNodeId(nodeId)
-        );
+//        this.consulAdminClient.services().registerServiceForNodeWithReadAccessViaKeycloakRole(
+//                nodeId,
+//                multiHostCapabilityService.getService(),
+//                multiHostCapabilityService.getId(),
+//                Optional.empty(),
+//                multiHostCapabilityService.getTagsByNodeId(nodeId),
+//                multiHostCapabilityService.getServiceMetaByNodeId(nodeId)
+//        );
     }
     //endregion
 
     //region ACL Functions
-    public void addReadRuleForCapabilityServiceToResourcePolicy(
-            ConsulCredential consulCredential,
-            MultiHostCapabilityService multiHostCapabilityService
-    ) throws ConsulLoginFailedException {
+    public void addReadRuleForCapabilityServiceToResourcePolicy(MultiHostCapabilityService multiHostCapabilityService) {
         for (var memberMappingEntry : multiHostCapabilityService.getMemberMapping().entrySet()) {
             // Add access to cluster member service to rule
-            this.consulAclApiClient.addReadRuleToPolicy(
-                    new ConsulCredential(),
+            this.consulAdminClient.acl().addReadRuleToPolicy(
+                    
                     "resource_" + memberMappingEntry.getKey().toString(),
                     "service",
-                    multiHostCapabilityService.getService()
+                    multiHostCapabilityService.getServiceName()
             );
 
-            this.consulAclApiClient.addReadRuleToPolicy(
-                    new ConsulCredential(),
+            this.consulAdminClient.acl().addReadRuleToPolicy(
+                    
                     "resource_" + memberMappingEntry.getKey().toString(),
                     "key_prefix",
                     String.valueOf(multiHostCapabilityService.getId())

@@ -1,10 +1,10 @@
 #! /bin/bash
 
-# Wait until Resource Management is running
-until curl -m 5 -s -k --location --request GET "$RESOURCEMANAGEMENT_URL/v3/api-docs" > /dev/null; do
-  echo "Resource Management is unavailable -> sleeping"
-  sleep 1
-done
+set -euo pipefail
 
-# Start App
-java -jar -Djava.security.egd=file:/dev/./urandom /app/app.jar
+COMMON_SH="/app/common.sh"
+source "$COMMON_SH"
+
+wait_for_keycloak
+wait_for_resource_management
+start_app

@@ -15,12 +15,12 @@ import org.eclipse.slm.common.aas.clients.submodelregistry.SubmodelRegistryClien
 import org.eclipse.slm.common.aas.clients.submodelregistry.SubmodelRegistryClientFactory;
 import org.eclipse.slm.common.aas.clients.submodelrepository.SubmodelRepositoryClient;
 import org.eclipse.slm.common.aas.clients.submodelrepository.SubmodelRepositoryClientFactory;
-import org.eclipse.slm.common.consul.client.ConsulCredential;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.aas.submodels.ResourcesSubmodelRepositoryHTTPApiController;
 import org.eclipse.slm.resource_management.common.aas.submodels.deviceinfo.DeviceInfoSubmodel;
 import org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplate.DigitalNameplateV3;
 import org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplate.DigitalNameplateV3Submodel;
+import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClientFactory;
 import org.eclipse.slm.resource_management.common.resources.ResourceEvent;
 import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;
 import org.eclipse.slm.resource_management.common.resources.BasicResource;
@@ -51,7 +51,8 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
 
     private final SubmodelRepositoryClient submodelRepositoryClient;
 
-    private final ResourcesConsulClient resourcesConsulClient;
+    private final ResourcesConsulClientFactory resourcesConsulClientFactory;
+    private final ResourcesConsulClient resourcesConsulAdminClient;
 
     private final String monitoringServiceUrl;
 
@@ -74,14 +75,15 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
                                AasRepositoryClientFactory aasRepositoryClientFactory,
                                SubmodelRegistryClientFactory submodelRegistryClientFactory,
                                SubmodelRepositoryClientFactory submodelRepositoryClientFactory,
-                               ResourcesConsulClient resourcesConsulClient,
+                               ResourcesConsulClientFactory resourcesConsulClientFactory,
                                @Value("${monitoring.service.url}") String monitoringServiceUrl,
                                @Value("${deployment.url}") String externalUrl) {
         this.aasRegistryClient = aasRegistryClientFactory.getClient();
         this.aasRepositoryClient = aasRepositoryClientFactory.getClient();
         this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
         this.submodelRepositoryClient = submodelRepositoryClientFactory.getClient();
-        this.resourcesConsulClient = resourcesConsulClient;
+        this.resourcesConsulClientFactory = resourcesConsulClientFactory;
+        this.resourcesConsulAdminClient = resourcesConsulClientFactory.createAdminClient();
         this.monitoringServiceUrl = monitoringServiceUrl;
         this.externalUrl = externalUrl;
     }
@@ -90,7 +92,7 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
     public void init() {
         // Create AAS for all resources
         try {
-            var resources = resourcesConsulClient.getResources(new ConsulCredential());
+            var resources = resourcesConsulAdminClient.getResources();
 
             for (var resource: resources) {
                 var digitalNameplateV3 = new DigitalNameplateV3.Builder("N/A", "N/A", "N/A", "N/A").build();
@@ -230,6 +232,36 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
                 }
             }
             this.aasRepositoryClient.deleteAAS(resourceAasId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateSubmodelElementOfResourceAasSubmodel(UUID resourceId, String submodelIdShort, String submodelElementIdShortPath, SubmodelElement submodelElement) {
+        try {
+            var resourceAASOptional = this.aasRepositoryClient.getAas(ResourceAas.createAasIdFromResourceId(resourceId));
+
+            if (resourceAASOptional.isPresent()) {
+                for (var submodelRef : resourceAASOptional.get().getSubmodels()) {
+                    if (submodelRef.getKeys().get(0).getType().equals(KeyTypes.SUBMODEL)) {
+                        var submodelId = submodelRef.getKeys().get(0).getValue();
+
+                        var submodelDescriptorOptional = this.submodelRegistryClient.getSubmodelDescriptor(submodelId);
+                        if (submodelDescriptorOptional.isPresent()) {
+                            if (submodelDescriptorOptional.get().getIdShort().equals(submodelIdShort)) {
+                                var submodelRepositoryClient = SubmodelRepositoryClientFactory.FromSubmodelDescriptor(submodelDescriptorOptional.get());
+
+                                submodelRepositoryClient.createOrUpdateSubmodelElement(
+                                        submodelDescriptorOptional.get().getId(),
+                                        submodelElementIdShortPath,
+                                        submodelElement);
+                            }
+                        }
+                    }
+                }
+            } else {
+                throw new ShellNotFoundException(ResourceAas.createAasIdFromResourceId(resourceId));
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

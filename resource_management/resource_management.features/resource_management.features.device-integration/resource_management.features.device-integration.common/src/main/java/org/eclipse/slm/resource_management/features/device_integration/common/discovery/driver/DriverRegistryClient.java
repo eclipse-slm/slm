@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 public class DriverRegistryClient {
 
-    public final static Logger LOG = LoggerFactory.getLogger(DriverRegistryClient.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DriverRegistryClient.class);
 
     private final String driverRegistryAddress;
 
@@ -39,7 +39,6 @@ public class DriverRegistryClient {
             channel = ManagedChannelBuilder.forAddress(this.driverRegistryAddress, this.driverRegistryPort)
                     .usePlaintext()
                     .build();
-
 
             var registryQueryRequest = ConnSuiteRegistry.QueryRegisteredServicesRequest.newBuilder().build();
 

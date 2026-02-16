@@ -1,18 +1,13 @@
 package org.eclipse.slm.resource_management.features.capabilities.persistence;
 
-import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.client.apis.ConsulAclApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulHealthApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulNodesApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulServicesApiClient;
-import org.eclipse.slm.common.consul.model.catalog.CatalogService;
+
+import org.eclipse.slm.common.consul.client.ConsulClient;
+import org.eclipse.slm.common.consul.client.ConsulClientFactory;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
-import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;
-import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
-import org.eclipse.slm.resource_management.features.capabilities.CapabilityUtil;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -21,109 +16,81 @@ import java.util.*;
 public class CapabilitiesConsulClient {
     private final static Logger LOG = LoggerFactory.getLogger(CapabilitiesConsulClient.class);
 
-    private final SingleHostCapabilitiesConsulClient singleHostCapabilitiesConsulClient;
+    public static final String CAPABILITY_SERVICE_POLICY_PREFIX = "capability-service_";
 
-    private final ConsulServicesApiClient consulServicesApiClient;
+    public static String getCapabilityServicePolicyName(UUID remoteAccessId) {
+        return CAPABILITY_SERVICE_POLICY_PREFIX + remoteAccessId.toString();
+    }
 
-    private final ConsulNodesApiClient consulNodesApiClient;
-
-    private final ConsulAclApiClient consulAclApiClient;
-
-    private final ConsulHealthApiClient consulHealthApiClient;
-
-    private final ResourcesConsulClient resourcesConsulClient;
+    private final ConsulClient consulAdminClient;
 
     private final CapabilityJpaRepository capabilityJpaRepository;
 
-    private final CapabilityUtil capabilityUtil;
-
-
-    public CapabilitiesConsulClient(
-            SingleHostCapabilitiesConsulClient singleHostCapabilitiesConsulClient,
-            ConsulServicesApiClient consulServicesApiClient,
-            ConsulNodesApiClient consulNodesApiClient,
-            ConsulAclApiClient consulAclApiClient,
-            ConsulHealthApiClient consulHealthApiClient,
-            ResourcesConsulClient resourcesConsulClient,
-            CapabilityJpaRepository capabilityJpaRepository,
-            CapabilityUtil capabilityUtil
-    ) {
-        this.singleHostCapabilitiesConsulClient = singleHostCapabilitiesConsulClient;
-        this.consulServicesApiClient = consulServicesApiClient;
-        this.consulNodesApiClient = consulNodesApiClient;
-        this.consulAclApiClient = consulAclApiClient;
-        this.consulHealthApiClient = consulHealthApiClient;
-        this.resourcesConsulClient = resourcesConsulClient;
-        this.capabilityJpaRepository = capabilityJpaRepository;
-        this.capabilityUtil = capabilityUtil;
+    @Autowired
+    public CapabilitiesConsulClient(ConsulClientFactory consulClientFactory, CapabilityJpaRepository capabilityJpaRepository) {
+        this(consulClientFactory.createAdminClient(), capabilityJpaRepository);
     }
 
-    private List<CapabilityService> getCapabilityServicesByTag(ConsulCredential consulCredential, String tag
-    ) throws ConsulLoginFailedException {
-        Map<String, List<String>> ServiceNamesToTagsMap = capabilityUtil.getCapabilityServiceNamesAndTagsMapByTag(
-                consulCredential,
-                tag
-        );
+    public CapabilitiesConsulClient(ConsulClient consulAdminClient, CapabilityJpaRepository capabilityJpaRepository) {
+        this.consulAdminClient = consulAdminClient;
+        this.capabilityJpaRepository = capabilityJpaRepository;
+    }
 
-        Map<String, List<CatalogService>> serviceNameToCatalogServiceMap = consulServicesApiClient.getServicesByName(
-                consulCredential,
-                ServiceNamesToTagsMap.keySet()
-        );
+    private List<CapabilityService> getCapabilityServicesByTag(String tag) {
+        var serviceNameToServiceTagMap = this.consulAdminClient.services().getServicesByTag(tag);
+        var serviceNameToCatalogServiceMap = this.consulAdminClient.services().getServicesByName(serviceNameToServiceTagMap.keySet());
 
         List<CapabilityService> capabilityServices = new ArrayList<>();
-
         for(var catalogServiceName : serviceNameToCatalogServiceMap.keySet()) {
             var catalogService = serviceNameToCatalogServiceMap.get(catalogServiceName).get(0);
-            capabilityServices.add(capabilityUtil.getCapabilityServiceFromCatalogService(
-                    consulCredential,
-                    catalogService
-            ));
+
+            var capabilityId = UUID.fromString(catalogService.getServiceMeta().get(CapabilityService.META_KEY_CAPABILITY_ID));
+            var capabilityOptional = capabilityJpaRepository.findById(capabilityId);
+            capabilityOptional.ifPresentOrElse((capability) -> {
+                var capabilityService = CapabilityService.createFromCatalogService(catalogService, capability);
+                capabilityServices.add(capabilityService);
+            }, () -> {
+                LOG.error("CapabilityService with ServiceID '{}' references non-existing Capability with ID '{}'", capabilityId, capabilityId);
+            });
         }
 
         return capabilityServices;
     }
 
-    public List<CapabilityService> getCapabilityServices(ConsulCredential consulCredential) throws ConsulLoginFailedException {
-        var capabilityServices = this.getCapabilityServicesByTag(
-                consulCredential,
-                CapabilityService.TAG_CAPABILITY
-        );
+    public List<CapabilityService> getCapabilityServices() {
+        var capabilityServices = this.getCapabilityServicesByTag(CapabilityService.TAG_CAPABILITY);
+        return capabilityServices;
+    }
+
+    public List<CapabilityService> getCapabilityServicesByCapabilityClass(Class capabilityClass) throws ConsulLoginFailedException {
+        var capabilityServices = this.getCapabilityServicesByTag(capabilityClass.getSimpleName());
 
         return capabilityServices;
     }
 
-    public List<CapabilityService> getCapabilityServicesByCapabilityClass(ConsulCredential consulCredential, Class capabilityClass
-    ) throws ConsulLoginFailedException {
-        var capabilityServices = this.getCapabilityServicesByTag(
-                consulCredential,
-                capabilityClass.getSimpleName()
-        );
-
-        return capabilityServices;
-    }
-
-    public List<CapabilityService> getCapabilityServicesOfResource(
-            UUID resourceId
-    ) throws ConsulLoginFailedException, ResourceNotFoundException {
-        var consulCredential = new ConsulCredential();
-
-        var consulNodeOfResourceOptional = this.consulNodesApiClient.getNodeById(consulCredential, resourceId);
-        if (consulNodeOfResourceOptional.isEmpty()) {
-            throw new ResourceNotFoundException(resourceId);
-        }
+    public List<CapabilityService> getCapabilityServicesOfResource(UUID resourceId)  {
+        var node = this.consulAdminClient.nodes().getNodeByIdOrThrow(resourceId);
 
         var capabilityServicesOfResource = new ArrayList<CapabilityService>();
         try {
-            var consulNodeServices = this.consulServicesApiClient.getNodeServicesByNodeId(consulCredential, consulNodeOfResourceOptional.get().getId());
+            var nodesServices = this.consulAdminClient.services().getNodeServicesByNodeId(node.getId());
 
-            var capabilityNodeServices = consulNodeServices
+            var capabilityNodeServices = nodesServices
                     .stream()
-                    .filter(s -> s.getTags().contains(CapabilityService.TAG_CAPABILITY))
+                    .filter(s -> Objects.requireNonNull(s.getTags()).contains(CapabilityService.TAG_CAPABILITY))
                     .toList();
 
             for (var nodeService : capabilityNodeServices) {
-                var capabilityService = this.capabilityUtil.getCapabilityServiceFromNodeService(consulCredential, nodeService);
-                capabilityServicesOfResource.add(capabilityService);
+                var capabilityId = UUID.fromString(nodeService.getMeta().get(CapabilityService.META_KEY_CAPABILITY_ID));
+                var capabilityOptional = capabilityJpaRepository.findById(capabilityId);
+                capabilityOptional.ifPresentOrElse((capability) -> {
+                    var capabilityService = CapabilityService.createFromNodeService(nodeService, resourceId, capability);
+                    capabilityServicesOfResource.add(capabilityService);
+                }, () -> {
+                    LOG.error("CapabilityService with ServiceID '{}' references non-existing Capability with ID '{}'", capabilityId, capabilityId);
+                });
+
+
             }
         } catch (ConsulLoginFailedException e) {
             LOG.error("Unable to get deployment capabilities of resource [id='" + resourceId + "'], because login to " +

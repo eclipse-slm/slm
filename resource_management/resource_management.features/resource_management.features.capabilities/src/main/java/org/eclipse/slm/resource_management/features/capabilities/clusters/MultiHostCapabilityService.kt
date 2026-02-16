@@ -1,7 +1,7 @@
 package org.eclipse.slm.resource_management.features.capabilities.clusters
 
 import com.fasterxml.jackson.annotation.JsonTypeName
-import org.eclipse.slm.common.consul.model.catalog.CatalogNode
+import org.eclipse.slm.common.consul.model.catalog.NodeService
 import org.eclipse.slm.resource_management.features.capabilities.model.Capability
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityServiceStatus
@@ -10,34 +10,16 @@ import java.util.*
 @JsonTypeName("MultiHostCapabilityService")
 class MultiHostCapabilityService : CapabilityService {
 
-    constructor() : super()
     constructor(
-        capability: Capability,
-        memberMapping: MutableMap<UUID, String>,
-        status: CapabilityServiceStatus,
-        managed: Boolean
-    ) : super(capability, status) {
-        this.memberMapping = memberMapping
-        this.managed = managed
-    }
-
-    constructor(
-            capability: Capability,
-            memberMapping: MutableMap<UUID, String>,
-            serviceId: UUID
-    ) : super(capability, serviceId) {
-        this.memberMapping = memberMapping
-    }
-
-    constructor(
-        capability: Capability,
-        memberMapping: MutableMap<UUID, String>,
+        resourceId: UUID,
         serviceId: UUID,
+        capability: Capability,
+        memberMapping: MutableMap<UUID, String>,
         status: CapabilityServiceStatus,
-        managed: Boolean
-    ) : super(capability, serviceId, status) {
+        managed: Boolean,
+        customMetadata: Map<String, String>
+    ) : super(resourceId, serviceId, capability, status, managed, customMetadata) {
         this.memberMapping = memberMapping
-        this.managed = managed
     }
 
     //<NodeID, MemberTypeName>
@@ -56,7 +38,7 @@ class MultiHostCapabilityService : CapabilityService {
     }
 
     fun getServiceMetaByNodeId(nodeId: UUID): HashMap<String, String> {
-        var meta = serviceMeta.toMutableMap()
+        var meta = meta.toMutableMap()
 
         var clusterMemberTypeName = memberMapping!![nodeId]
 
@@ -67,15 +49,13 @@ class MultiHostCapabilityService : CapabilityService {
         return meta as HashMap<String, String>;
     }
 
-    fun getMapOfNodeIdsAndCatalogServices(): HashMap<UUID, CatalogNode.Service> {
-        var consulNodeServiceMap = HashMap<UUID, CatalogNode.Service>();
+    fun getMapOfNodeIdsAndCatalogServices(): HashMap<UUID, NodeService> {
+        var consulNodeServiceMap = HashMap<UUID, NodeService>();
 
         memberMapping!!.forEach{ (key, value) ->
-            val catalogService = CatalogNode.Service(this.id)
-
-            catalogService.service = this.service
-            catalogService.tags = this.getTagsByNodeId(key)
-            catalogService.serviceMeta = this.getServiceMetaByNodeId(key)
+            val catalogService = NodeService(this.id, this.serviceName, this.taggedAddresses,
+                this.getTagsByNodeId(key),
+                this.getServiceMetaByNodeId(key))
 
             consulNodeServiceMap[key] = catalogService
         }

@@ -11,7 +11,7 @@ services:
       KEYCLOAK_DEFAULT_USER_PASSWORD: password
     command: start-dev
   consul:
-    image: consul:1.14
+    image: hashicorp/consul:1.22
     ports:
       - "7500:8500"
     environment:

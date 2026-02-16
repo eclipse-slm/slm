@@ -3,21 +3,21 @@ package org.eclipse.slm.resource_management.features.capabilities.clusters.handl
 import org.eclipse.slm.common.awx.client.AwxCredential;
 import org.eclipse.slm.common.awx.client.observer.*;
 import org.eclipse.slm.common.awx.model.ExtraVars;
-import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.client.apis.ConsulAclApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulNodesApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulServicesApiClient;
+
+import org.eclipse.slm.common.consul.client.ConsulAclClient;
+import org.eclipse.slm.common.consul.client.ConsulClientFactory;
+import org.eclipse.slm.common.consul.client.ConsulNodesClient;
+import org.eclipse.slm.common.consul.client.ConsulServicesClient;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
-import org.eclipse.slm.common.vault.client.VaultClient;
-import org.eclipse.slm.common.vault.client.VaultCredential;
-import org.eclipse.slm.common.vault.model.KvPath;
+import org.eclipse.slm.common.vault.client.VaultClientFactory;
 import org.eclipse.slm.notification_service.messaging.NotificationEventMessage;
 import org.eclipse.slm.notification_service.messaging.NotificationMessageSender;
 import org.eclipse.slm.notification_service.model.NotificationCategory;
 import org.eclipse.slm.notification_service.model.NotificationEventType;
 import org.eclipse.slm.notification_service.model.NotificationSubCategory;
+import org.eclipse.slm.resource_management.common.remote_access.RemoteAccessManager;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilitiesConsulClient;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityServiceStatus;
@@ -41,30 +41,26 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
             NotificationMessageSender notificationMessageSender,
             AwxJobExecutor awxJobExecutor,
             MultiTenantKeycloakRegistration multiTenantKeycloakRegistration,
-            ConsulServicesApiClient consulServicesApiClient,
-            ConsulAclApiClient consulAclApiClient,
-            ConsulNodesApiClient consulNodesApiClient,
+            ConsulClientFactory consulClientFactory,
             CapabilitiesConsulClient capabilitiesConsulClient,
             MultiHostCapabilitiesConsulClient multiHostCapabilitiesConsulClient,
-            KeycloakAdminClient keycloakAdminClient,
             AwxJobObserverInitializer awxJobObserverInitializer,
-            VaultClient vaultClient) {
+            VaultClientFactory vaultClientFactory,
+            RemoteAccessManager remoteAccessManager) {
         super(
                 notificationMessageSender,
                 awxJobExecutor,
                 multiTenantKeycloakRegistration,
-                consulServicesApiClient,
-                consulAclApiClient,
-                consulNodesApiClient,
+                consulClientFactory,
                 capabilitiesConsulClient,
                 multiHostCapabilitiesConsulClient,
-                keycloakAdminClient,
                 awxJobObserverInitializer,
-                vaultClient);
+                vaultClientFactory,
+                remoteAccessManager);
     }
 
     public ClusterJob createClusterJob(JwtAuthenticationToken jwtAuthenticationToken, MultiHostCapabilityService multiHostCapabilityService
-    ) throws SSLException {
+    ) {
         var clusterJob = new ClusterJob(multiHostCapabilityService);
 
         AwxAction uninstallAction =
@@ -73,7 +69,7 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
         Map<String, Object> extraVarsMap = new HashMap<>();
         extraVarsMap.put("resource_id",multiHostCapabilityService.getId().toString());
         extraVarsMap.put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
-        extraVarsMap.put("service_name", multiHostCapabilityService.getService());
+        extraVarsMap.put("service_name", multiHostCapabilityService.getServiceName());
         extraVarsMap.put("supported_connection_types", uninstallAction.getConnectionTypes());
         ExtraVars extraVars = new ExtraVars(extraVarsMap);
 
@@ -101,7 +97,6 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
         this.clusterJobMap.put(clusterJob.getAwxJobObserver(), clusterJob);
         multiHostCapabilityService.setStatus(CapabilityServiceStatus.UNINSTALL);
         multiHostCapabilitiesConsulClient.updateMultiHostCapabilityService(
-                new ConsulCredential(),
                 multiHostCapabilityService
         );
     }
@@ -109,7 +104,6 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
     public void delete(JwtAuthenticationToken jwtAuthenticationToken, UUID consulServiceUuid
     ) throws SSLException, ConsulLoginFailedException {
         Optional<MultiHostCapabilityService> service = multiHostCapabilitiesConsulClient.getMultiHostCapabilityServiceOfUser(
-                new ConsulCredential(jwtAuthenticationToken),
                 consulServiceUuid
         );
 
@@ -137,42 +131,29 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
         }
 
         if (jobGoal.equals(JobGoal.DELETE)) {
-            // Delete Keycloak role
-            this.keycloakAdminClient.deleteRealmRole(multiHostCapabilityService.getService());
-            this.keycloakAdminClient.deleteRealmRole("resource_" + multiHostCapabilityService.getId());
-
             // Remove read access for secret of awx policy
             String resourceId = multiHostCapabilityService.getId().toString();
-            VaultCredential vaultCredential = new VaultCredential();
-            this.vaultClient.removeRuleFromPolicy(
-                    vaultCredential,
+            this.vaultAdminClient.acl().removeRuleFromPolicy(
                     "awx",
                     "resources/data/"+ resourceId
             );
 
             // Delete secret from KV engine
-            KvPath resourceVaultPath = new KvPath("resources", resourceId);
-            this.vaultClient.removeSecretFromKvEngine(
-                    vaultCredential,
-                    resourceVaultPath.getSecretEngine(),
-                    resourceVaultPath.getPath()
-            );
+            this.vaultAdminClient.kv("resources").deleteSecretFromKvEngine(resourceId);
 
             // remove policy
-            this.vaultClient.removePolicy(
-                    vaultCredential,
+            this.vaultAdminClient.acl().deletePolicy(
                     "policy_resource_" + resourceId
             );
             // remove group
-            this.vaultClient.removeGroup(
-                    vaultCredential,
+            this.vaultAdminClient.acl().deleteGroupByName(
                     "group_resource_" + resourceId
             );
 
             // Delete cluster representation in consul
             try {
                 multiHostCapabilitiesConsulClient.removeMultiHostCapabilityService(
-                        new ConsulCredential(),
+                        
                         multiHostCapabilityService.getId()
                 );
             } catch (ConsulLoginFailedException e) {

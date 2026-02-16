@@ -10,7 +10,7 @@ import siemens.connectivitysuite.drvinfo.v1.DriverInfoApiGrpc;
 
 public abstract class AbstractDriverClient {
 
-    public final static Logger LOG = LoggerFactory.getLogger(AbstractDriverClient.class);
+    private final static Logger LOG = LoggerFactory.getLogger(AbstractDriverClient.class);
 
     protected final DriverInfo driverInfo;
 

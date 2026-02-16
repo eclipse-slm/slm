@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class ResourceTypesSubmodelRepository extends AbstractSubmodelRepository {
 
-    public final static Logger LOG = LoggerFactory.getLogger(ResourceTypesSubmodelRepository.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ResourceTypesSubmodelRepository.class);
 
     private final String aasId;
 

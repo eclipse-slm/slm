@@ -2,13 +2,12 @@ package org.eclipse.slm.resource_management.service.initializer;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.eclipse.slm.resource_management.features.profiler.ProfilerDTOApi;
-import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
-import org.eclipse.slm.resource_management.service.client.handler.ProfilerRestControllerApi;
+import org.eclipse.slm.resource_management.service.client.ResourceManagementClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;;
+import jakarta.annotation.PostConstruct;
 import java.io.FileNotFoundException;
 import java.util.List;
 
@@ -17,19 +16,14 @@ public class ProfilerInitializer extends AbstractInitializer {
     private static final Logger LOG = LoggerFactory.getLogger(ProfilerInitializer.class);
     private static final String FILENAME = "profiler";
     private static final String FILE_EXTENSION= ".json";
-    private ProfilerRestControllerApi profilerRestControllerApi;
-    public ProfilerInitializer(
-            FileUtil fileUtil,
-            ResourceManagementApiClientInitializer resourceManagementApiClientInitializer
-    ) {
-        super(fileUtil, resourceManagementApiClientInitializer);
+
+    public ProfilerInitializer(FileUtil fileUtil, ResourceManagementClientFactory resourceManagementClientFactory) {
+        super(fileUtil, resourceManagementClientFactory);
     }
 
 
     @PostConstruct
     public void init() throws FileNotFoundException {
-        this.profilerRestControllerApi = new ProfilerRestControllerApi(this.apiClient);
-
         var files = this.fileUtil.findFiles(
                 this.getInitDirectory(),
                 FILENAME,
@@ -42,18 +36,26 @@ public class ProfilerInitializer extends AbstractInitializer {
         } else {
             var profilerInitFile = files[0];
 
-            List<ProfilerDTOApi> profiler = FileUtil.loadFromFile(
+            List<ProfilerDTOApi> profilers = FileUtil.loadFromFile(
                     profilerInitFile,
                     new TypeReference<List<ProfilerDTOApi>>() {
                     });
 
-            profiler.forEach(p -> {
-                ProfilerInitializerThread thread = new ProfilerInitializerThread(
-                        p,
-                        keycloakRealm,
-                        profilerRestControllerApi
-                );
-                thread.start();
+            profilers.forEach(profiler -> {
+                try {
+                    LOG.info("Creating Profiler '" + profiler.getName() + "'");
+                    var response = this.resourceManagementClient.profiler().createProfiler(profiler);
+
+                    if (response.getStatusCode().is2xxSuccessful()) {
+                        LOG.info("Profiler '" + profiler.getName() + "' successfully created");
+                    } else {
+                        LOG.error("Failed to create profiler '" + profiler.getName() + "'. Received status: " + response.getStatusCode());
+                    }
+
+                }
+                catch (Exception e) {
+                    LOG.error("Error while creating profiler '" + profiler.getName() + "': " + e.getMessage());
+                }
             });
         }
     }

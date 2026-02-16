@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 public class FirmwareUpdateJobStateMachineFactory {
 
-    public final static Logger LOG = LoggerFactory.getLogger(FirmwareUpdateJobStateMachineFactory.class);
+    private final static Logger LOG = LoggerFactory.getLogger(FirmwareUpdateJobStateMachineFactory.class);
 
     private final FirmwareUpdateJobStateMachineInterceptor firmwareUpdateJobStateMachineInterceptor;
 

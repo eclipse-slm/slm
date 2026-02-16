@@ -4,25 +4,25 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 class ActionConfigParameter(
 
-    @JsonProperty("name")
+    @param:JsonProperty("name")
     val name: String,
 
-    @JsonProperty("prettyName")
+    @param:JsonProperty("prettyName")
     val prettyName: String,
 
-    @JsonProperty("description")
+    @param:JsonProperty("description")
     val description: String,
 
-    @JsonProperty("valueType")
+    @param:JsonProperty("valueType")
     val valueType: ActionConfigParameterValueType,
 
-    @JsonProperty("defaultValue")
+    @param:JsonProperty("defaultValue")
     val defaultValue: String?,
 
-    @JsonProperty("requiredType")
+    @param:JsonProperty("requiredType")
     val requiredType: ActionConfigParameterRequiredType,
 
-    @JsonProperty("secret")
+    @param:JsonProperty("secret")
     val secret: Boolean = false,
 ) {
 }

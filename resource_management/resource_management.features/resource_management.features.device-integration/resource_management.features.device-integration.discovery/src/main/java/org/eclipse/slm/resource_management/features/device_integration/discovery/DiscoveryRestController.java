@@ -113,7 +113,7 @@ public class DiscoveryRestController {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         for(var resultId : onboardingRequest.getResultIds()) {
-            this.discoveryService.onboard(jwtAuthenticationToken, resultId);
+            this.discoveryService.onboard(resultId, onboardingRequest.getFullPathOwnerUserGroupId());
         }
 
         return ResponseEntity.ok().build();

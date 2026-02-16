@@ -25,9 +25,10 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ResourcesSubmodelRepository extends AbstractSubmodelRepository {
+public class
+ResourcesSubmodelRepository extends AbstractSubmodelRepository {
 
-    public final static Logger LOG = LoggerFactory.getLogger(ResourcesSubmodelRepository.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ResourcesSubmodelRepository.class);
 
     private final AasRegistryClient aasRegistryClient;
 

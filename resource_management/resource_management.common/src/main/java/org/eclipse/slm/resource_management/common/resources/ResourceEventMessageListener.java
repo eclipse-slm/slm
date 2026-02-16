@@ -13,7 +13,7 @@ import java.util.*;
 @Component
 public class ResourceEventMessageListener extends GenericMessageListener<ResourceEventMessage> {
 
-    public final static Logger LOG = LoggerFactory.getLogger(ResourceEventMessageListener.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ResourceEventMessageListener.class);
 
     private final List<ResourceEventInternalListener> listeners;
 

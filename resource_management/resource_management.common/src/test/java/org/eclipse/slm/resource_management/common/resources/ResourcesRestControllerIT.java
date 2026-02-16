@@ -4,8 +4,8 @@ import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.assertj.core.api.Assertions;
-import org.eclipse.slm.common.consul.client.apis.ConsulAclApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulNodesApiClient;
+import org.eclipse.slm.common.consul.client.ConsulAclClient;
+import org.eclipse.slm.common.consul.client.ConsulNodesClient;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.resource_types.ResourceTypesManager;
@@ -32,6 +32,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -43,8 +44,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         ResourcesRestController.class,
         AuthorizationHeaderRequestFactory.class,
         ResourcesRestControllerITHelper.class,
-        ConsulNodesApiClient.class,
-        ConsulAclApiClient.class,
+        ConsulNodesClient.class,
+        ConsulAclClient.class,
         RestTemplate.class,
         TestUtils.class
 })
@@ -75,9 +76,9 @@ public class ResourcesRestControllerIT {
     @MockBean
     private ResourceTypesManager resourceTypesManager;
     @MockBean
-    private ConsulNodesApiClient consulNodesApiClient;
+    private ConsulNodesClient consulNodesClient;
     @MockBean
-    private ConsulAclApiClient consulAclApiClient;
+    private ConsulAclClient consulAclClient;
 
     @BeforeEach
     public void beforeEach() throws ConsulLoginFailedException {
@@ -98,16 +99,16 @@ public class ResourcesRestControllerIT {
     }
 
     @Nested
-    @DisplayName("Get existing resource (GET " + ResourcesRestControllerConfig.BASE_PATH + "/{resourceId})")
+    @DisplayName("Get existing resource (GET " + ResourcesRestApiConfig.BASE_PATH + "/{resourceId})")
     public  class getResource {
 
         @Test
         @DisplayName("Unauthenticated request")
         public void unauthenticatedRequest() throws Exception {
             var resourceId = UUID.randomUUID();
-            var path = ResourcesRestControllerConfig.BASE_PATH + "/" + resourceId;
+            var path = ResourcesRestApiConfig.BASE_PATH + "/" + resourceId;
 
-            when(resourcesManager.getResourceByIdOrThrow(any(JwtAuthenticationToken.class), eq(resourceId)))
+            when(resourcesManager.getResourceByIdOrThrow(eq(resourceId), anyString()))
                     .thenThrow(new ResourceNotFoundException(resourceId));
 
             mockMvc.perform(
@@ -120,9 +121,9 @@ public class ResourcesRestControllerIT {
         @WithJwt("default_user.json")
         public void noResources() throws Exception {
             var resourceId = UUID.randomUUID();
-            var path = ResourcesRestControllerConfig.BASE_PATH + "/" + resourceId;
+            var path = ResourcesRestApiConfig.BASE_PATH + "/" + resourceId;
 
-            when(resourcesManager.getResourceByIdOrThrow(any(JwtAuthenticationToken.class), eq(resourceId)))
+            when(resourcesManager.getResourceByIdOrThrow(eq(resourceId), anyString()))
                     .thenThrow(new ResourceNotFoundException(resourceId));
 
             mockMvc.perform(
@@ -136,7 +137,7 @@ public class ResourcesRestControllerIT {
         @WithJwt("default_user.json")
         public void resourceExists() throws Exception {
             var testResource = ResourcesRestControllerITHelper.getTestResource();
-            when(resourcesManager.getResourceByIdOrThrow(any(JwtAuthenticationToken.class), eq(testResource.getId())))
+            when(resourcesManager.getResourceByIdOrThrow(eq(testResource.getId()), anyString()))
                     .thenReturn(testResource);
 
             var receivedResource = resourcesRestControllerITHelper.getResource(testResource.getId());
@@ -147,16 +148,16 @@ public class ResourcesRestControllerIT {
     }
 
     @Nested
-    @DisplayName("Get existing resources (GET " + ResourcesRestControllerConfig.BASE_PATH + ")")
+    @DisplayName("Get existing resources (GET " + ResourcesRestApiConfig.BASE_PATH + ")")
     public  class getExistingResources {
 
         @Test
         @DisplayName("Unauthenticated request")
         public void unauthenticatedRequest() throws Exception {
             var resourceId = UUID.randomUUID();
-            var path = ResourcesRestControllerConfig.BASE_PATH;
+            var path = ResourcesRestApiConfig.BASE_PATH;
 
-            when(resourcesManager.getResourceByIdOrThrow(any(JwtAuthenticationToken.class), eq(resourceId)))
+            when(resourcesManager.getResourceByIdOrThrow(eq(resourceId), anyString()))
                     .thenThrow(new ResourceNotFoundException(resourceId));
 
             mockMvc.perform(
@@ -179,7 +180,7 @@ public class ResourcesRestControllerIT {
         public void twoResourcesPresent() throws Exception {
             var testResource1 = ResourcesRestControllerITHelper.getTestResource();
             var testResource2 = ResourcesRestControllerITHelper.getTestResource();
-            when(resourcesManager.getResources(any(JwtAuthenticationToken.class)))
+            when(resourcesManager.getResources(anyString()))
                     .thenReturn(List.of(testResource1, testResource2));
 
             var resources = resourcesRestControllerITHelper.getResources();
@@ -200,14 +201,14 @@ public class ResourcesRestControllerIT {
     }
 
     @Nested
-    @DisplayName("Add new resource (POST " + ResourcesRestControllerConfig.BASE_PATH + "/{resourceId})")
+    @DisplayName("Add new resource (POST " + ResourcesRestApiConfig.BASE_PATH + "/{resourceId})")
     public  class addResource {
 
         @Test
         @DisplayName("Unauthenticated request")
         public void unauthenticatedRequest() throws Exception {
             var resourceId = UUID.randomUUID();
-            var path = ResourcesRestControllerConfig.BASE_PATH + "/" + resourceId;
+            var path = ResourcesRestApiConfig.BASE_PATH + "/" + resourceId;
 
             mockMvc.perform(
                             post(path)
@@ -220,14 +221,14 @@ public class ResourcesRestControllerIT {
         @WithJwt("default_user.json")
         public void addNewResource() throws Exception {
             var testResource = ResourcesRestControllerITHelper.getTestResource();
-            var path = ResourcesRestControllerConfig.BASE_PATH;
+            var path = ResourcesRestApiConfig.BASE_PATH;
             var resourceCreateRequest = new CreateResourceRequest();
             resourceCreateRequest.setResourceHostname(testResource.getHostname());
             resourceCreateRequest.setResourceIp(testResource.getIp());
             var objectMapper = new ObjectMapper();
             var jsonBody = objectMapper.writeValueAsString(resourceCreateRequest);
 
-            var response = mockMvc.perform(
+            mockMvc.perform(
                             post(path)
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
@@ -239,14 +240,14 @@ public class ResourcesRestControllerIT {
 
 
     @Nested
-    @DisplayName("Add or update existing resource (PUT " + ResourcesRestControllerConfig.BASE_PATH + "/{resourceId})")
+    @DisplayName("Add or update existing resource (PUT " + ResourcesRestApiConfig.BASE_PATH + "/{resourceId})")
     public  class addOrUpdateExistingResource {
 
         @Test
         @DisplayName("Unauthenticated request")
         public void unauthenticatedRequest() throws Exception {
             var resourceId = UUID.randomUUID();
-            var path = ResourcesRestControllerConfig.BASE_PATH + "/" + resourceId;
+            var path = ResourcesRestApiConfig.BASE_PATH + "/" + resourceId;
 
             mockMvc.perform(
                             put(path)
@@ -259,14 +260,14 @@ public class ResourcesRestControllerIT {
         @WithJwt("default_user.json")
         public void addExistingResource() throws Exception {
             var testResource = ResourcesRestControllerITHelper.getTestResource();
-            var path = ResourcesRestControllerConfig.BASE_PATH + "/" + testResource.getId();
+            var path = ResourcesRestApiConfig.BASE_PATH + "/" + testResource.getId();
             var resourceCreateRequest = new CreateResourceRequest();
             resourceCreateRequest.setResourceHostname(testResource.getHostname());
             resourceCreateRequest.setResourceIp(testResource.getIp());
             var objectMapper = new ObjectMapper();
             var jsonBody = objectMapper.writeValueAsString(resourceCreateRequest);
 
-            var response = mockMvc.perform(
+            mockMvc.perform(
                             put(path).with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(jsonBody))
@@ -284,7 +285,7 @@ public class ResourcesRestControllerIT {
         @DisplayName("Unauthenticated request")
         public void unauthenticatedRequest() throws Exception {
             var resourceId = UUID.randomUUID();
-            var path = ResourcesRestControllerConfig.BASE_PATH + "/" + resourceId;
+            var path = ResourcesRestApiConfig.BASE_PATH + "/" + resourceId;
 
             mockMvc.perform(
                             delete(path)
@@ -297,9 +298,9 @@ public class ResourcesRestControllerIT {
         @WithJwt("default_user.json")
         public void noResources() throws Exception {
             var resourceId = UUID.randomUUID();
-            var path = ResourcesRestControllerConfig.BASE_PATH + "/" + resourceId;
+            var path = ResourcesRestApiConfig.BASE_PATH + "/" + resourceId;
             doThrow(new ResourceNotFoundException(resourceId))
-                    .when(resourcesManager).deleteResource(any(JwtAuthenticationToken.class), eq(resourceId));
+                    .when(resourcesManager).deleteResource(eq(resourceId), anyString());
 
             mockMvc.perform(
                             delete(path).with(csrf()))
@@ -312,17 +313,17 @@ public class ResourcesRestControllerIT {
         @WithJwt("default_user.json")
         public void resourceExists() throws Exception {
             var testResource = ResourcesRestControllerITHelper.getTestResource();
-            when(resourcesManager.getResources(any(JwtAuthenticationToken.class)))
+            when(resourcesManager.getResources(anyString()))
                     .thenReturn(List.of(testResource));
 
-            var path = ResourcesRestControllerConfig.BASE_PATH + "/" + testResource.getId();
+            var path = ResourcesRestApiConfig.BASE_PATH + "/" + testResource.getId();
             mockMvc.perform(
                         delete(path).with(csrf()))
                     .andExpect(status().isOk());
 
             verify(resourcesManager).deleteResource(
-                    any(JwtAuthenticationToken.class),
-                    eq(testResource.getId())
+                    eq(testResource.getId()),
+                    anyString()
             );
         }
     }

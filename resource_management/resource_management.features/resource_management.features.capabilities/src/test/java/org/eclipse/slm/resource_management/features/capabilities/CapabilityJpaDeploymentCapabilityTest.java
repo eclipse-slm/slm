@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 public class CapabilityJpaDeploymentCapabilityTest {
-    public final static Logger LOG = LoggerFactory.getLogger(CapabilityJpaDeploymentCapabilityTest.class);
+    private final static Logger LOG = LoggerFactory.getLogger(CapabilityJpaDeploymentCapabilityTest.class);
 
     @Autowired
     private CapabilityJpaRepository capabilityJpaRepository;

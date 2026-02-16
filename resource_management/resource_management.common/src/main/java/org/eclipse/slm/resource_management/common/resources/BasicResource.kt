@@ -5,7 +5,7 @@ import java.util.*
 
 class BasicResource
 (
-    @JsonProperty("id")
+    @field:JsonProperty("id")
     var id: UUID
 )
 {

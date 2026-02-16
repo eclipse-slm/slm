@@ -1,15 +1,14 @@
 package org.eclipse.slm.resource_management.features.capabilities.clusters.handler;
 
 import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
-import org.eclipse.slm.common.consul.client.apis.ConsulAclApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulNodesApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulServicesApiClient;
-import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
+import org.eclipse.slm.common.consul.client.*;
 import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
 import org.eclipse.slm.common.awx.client.observer.AwxJobExecutor;
 import org.eclipse.slm.common.awx.client.observer.AwxJobObserverInitializer;
 import org.eclipse.slm.common.vault.client.VaultClient;
+import org.eclipse.slm.common.vault.client.VaultClientFactory;
 import org.eclipse.slm.notification_service.messaging.NotificationMessageSender;
+import org.eclipse.slm.resource_management.common.remote_access.RemoteAccessManager;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilitiesConsulClient;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilitiesConsulClient;
 import org.slf4j.Logger;
@@ -25,23 +24,19 @@ class AbstractClusterFunctions {
 
     protected final NotificationMessageSender notificationMessageSender;
 
-    protected final KeycloakAdminClient keycloakAdminClient;
-
     protected final MultiTenantKeycloakRegistration multiTenantKeycloakRegistration;
 
     protected final AwxJobObserverInitializer awxJobObserverInitializer;
 
     protected final AwxJobExecutor awxJobExecutor;
 
-    protected final ConsulServicesApiClient consulServicesApiClient;
-
-    protected final ConsulAclApiClient consulAclApiClient;
-
-    protected final ConsulNodesApiClient consulNodesApiClient;
+    protected final ConsulClient consulAdminClient;
 
     protected final CapabilitiesConsulClient capabilitiesConsulClient;
 
-    protected final VaultClient vaultClient;
+    protected final VaultClient vaultAdminClient;
+
+    protected final RemoteAccessManager remoteAccessManager;
 
     protected Map<AwxJobObserver, ClusterJob> clusterJobMap = new HashMap<>();
     protected MultiHostCapabilitiesConsulClient multiHostCapabilitiesConsulClient;
@@ -49,24 +44,19 @@ class AbstractClusterFunctions {
     public AbstractClusterFunctions(NotificationMessageSender notificationMessageSender,
                                     AwxJobExecutor awxJobExecutor,
                                     MultiTenantKeycloakRegistration multiTenantKeycloakRegistration,
-                                    ConsulServicesApiClient consulServicesApiClient,
-                                    ConsulAclApiClient consulAclApiClient,
-                                    ConsulNodesApiClient consulNodesApiClient,
+                                    ConsulClientFactory consulClientFactory,
                                     CapabilitiesConsulClient capabilitiesConsulClient,
                                     MultiHostCapabilitiesConsulClient multiHostCapabilitiesConsulClient,
-                                    KeycloakAdminClient keycloakAdminClient,
                                     AwxJobObserverInitializer awxJobObserverInitializer,
-                                    VaultClient vaultClient) {
+                                    VaultClientFactory vaultClientFactory, RemoteAccessManager remoteAccessManager) {
         this.notificationMessageSender = notificationMessageSender;
         this.awxJobExecutor = awxJobExecutor;
         this.multiTenantKeycloakRegistration = multiTenantKeycloakRegistration;
-        this.consulServicesApiClient = consulServicesApiClient;
-        this.consulAclApiClient = consulAclApiClient;
-        this.consulNodesApiClient = consulNodesApiClient;
+        this.consulAdminClient = consulClientFactory.createAdminClient();
         this.capabilitiesConsulClient = capabilitiesConsulClient;
         this.multiHostCapabilitiesConsulClient = multiHostCapabilitiesConsulClient;
-        this.keycloakAdminClient = keycloakAdminClient;
         this.awxJobObserverInitializer = awxJobObserverInitializer;
-        this.vaultClient = vaultClient;
+        this.vaultAdminClient = vaultClientFactory.createAdminClient();
+        this.remoteAccessManager = remoteAccessManager;
     }
 }

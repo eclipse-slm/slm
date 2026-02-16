@@ -1,7 +1,7 @@
 package org.eclipse.slm.resource_management.features.capabilities.clusters.handler;
 
-import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.model.catalog.CatalogService;
+
+import org.eclipse.slm.common.consul.model.catalog.Service;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService;
@@ -36,13 +36,12 @@ public class ClusterHandler {
         this.clusterGetFunctions = clusterGetFunctions;
     }
 
-    public List<Cluster> getClusters(ConsulCredential consulCredential) {
-        return this.clusterGetFunctions.getClusters(consulCredential);
+    public List<Cluster> getClusters() {
+        return this.clusterGetFunctions.getClusters();
     }
 
-    public List<CatalogService> getClusterMembers(ConsulCredential consulCredential, String clusterName)
-            throws ConsulLoginFailedException {
-        return this.clusterGetFunctions.getClusterMembers(consulCredential, clusterName);
+    public List<Service> getClusterMembers(String clusterName) {
+        return this.clusterGetFunctions.getClusterMembers(clusterName);
     }
 
     public ClusterJob create(

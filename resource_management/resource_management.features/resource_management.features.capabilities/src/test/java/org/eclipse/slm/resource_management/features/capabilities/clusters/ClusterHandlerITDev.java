@@ -14,7 +14,6 @@ import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient
 import org.eclipse.slm.resource_management.features.capabilities.clusters.handler.*;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.model.Cluster;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.model.ClusterCreateRequest;
-import org.eclipse.slm.resource_management.features.capabilities.clusters.handler.*;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilityJpaRepository;
 import org.eclipse.slm.resource_management.common.resources.BasicResource;
 import org.apache.http.client.utils.URIBuilder;
@@ -196,7 +195,7 @@ public class ClusterHandlerITDev {
         @BeforeAll
         public static void beforeAll() throws ConsulLoginFailedException, URISyntaxException {
             for(BasicResource basicResource : ClusterHandlerITConfigDockerSwarmCapability.clusterMembers) {
-                resourcesConsulClient.addResource(basicResource);
+                resourcesConsulClient.addResource(basicResource, UUID.randomUUID().toString());
             }
         }
 
@@ -227,7 +226,7 @@ public class ClusterHandlerITDev {
         @Test
         @Order(10)
         public void testGetClusterExpectNoResults() {
-            List<Cluster> clusters = clusterHandler.getClusters(config.consulCredential);
+            List<Cluster> clusters = clusterHandler.getClusters();
 
             assertEquals(0, clusters.size());
         }

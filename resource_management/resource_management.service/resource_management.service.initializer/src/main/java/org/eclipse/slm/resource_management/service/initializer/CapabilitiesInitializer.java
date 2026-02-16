@@ -2,35 +2,33 @@ package org.eclipse.slm.resource_management.service.initializer;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.eclipse.slm.resource_management.features.capabilities.dto.CapabilityDTOApi;
-import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
-import org.eclipse.slm.resource_management.service.client.handler.CapabilitiesRestControllerApi;
+import org.eclipse.slm.resource_management.service.client.ResourceManagementClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;;
+import jakarta.annotation.PostConstruct;
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Component
 public class CapabilitiesInitializer extends AbstractInitializer {
     private static final Logger LOG = LoggerFactory.getLogger(CapabilitiesInitializer.class);
     private static final String FILENAME = "capabilities";
     private static final String FILE_EXTENSION= ".json";
-    private CapabilitiesRestControllerApi capabilitiesRestControllerApi;
 
     public CapabilitiesInitializer(
             FileUtil fileUtil,
-            ResourceManagementApiClientInitializer resourceManagementApiClientInitializer
+            ResourceManagementClientFactory resourceManagementClientFactory
     ) {
-        super(fileUtil, resourceManagementApiClientInitializer);
+        super(fileUtil, resourceManagementClientFactory);
     }
 
 
     @PostConstruct
     public void init() throws FileNotFoundException {
-        this.capabilitiesRestControllerApi = new CapabilitiesRestControllerApi(this.apiClient);
-
         var files = this.fileUtil.findFiles(
                 this.getInitDirectory(),
                 FILENAME,
@@ -47,20 +45,23 @@ public class CapabilitiesInitializer extends AbstractInitializer {
                     capabilitiesInitFile,
                     new TypeReference<List<CapabilityDTOApi>>(){});
 
+            if (capabilities == null) {
+                LOG.error("Failed to load capabilities from file '" + capabilitiesInitFile.getAbsolutePath() + "'. Skipping initialization of capabilities.");
+                return;
+            }
+
             capabilities.forEach(capability -> {
-                CapabilitiesInitializerThread thread = new CapabilitiesInitializerThread(capability, keycloakRealm, capabilitiesRestControllerApi);
-                thread.start();
-                LOG.info("Wait till creation of '"+capability.getName()+"' is finished.");
-
-                while(thread.isAlive()) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                try {
+                    LOG.info("Start creating capability '{}'.", capability.getName());
+                    var response = this.resourceManagementClient.capabilities().createCapability(capability);
+                    if (response.getStatusCode().is2xxSuccessful()) {
+                        LOG.info("Capability '" + capability.getName() + "' created successfully");
+                    } else {
+                        LOG.error("Failed to create capability '" + capability.getName() + "'. Received status: " + response.getStatusCode());
                     }
+                } catch (Exception e) {
+                    LOG.error("Error while creating capability '" + capability.getName() + "':", e);
                 }
-
-                LOG.info("Creation of '"+capability.getName()+"' is finished.");
             });
         }
     }

@@ -14,7 +14,7 @@ import siemens.common.types.v1.CommonVariant;
 
 public class DiscoveryDriverClient extends AbstractDriverClient {
 
-    public final static Logger LOG = LoggerFactory.getLogger(DiscoveryDriverClient.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DiscoveryDriverClient.class);
 
     private final DiscoveryJobRepository discoveryJobRepository;
 

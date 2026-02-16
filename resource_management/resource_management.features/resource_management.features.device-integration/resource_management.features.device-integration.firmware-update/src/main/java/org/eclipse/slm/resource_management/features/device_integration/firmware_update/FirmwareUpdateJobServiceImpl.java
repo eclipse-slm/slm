@@ -68,7 +68,7 @@ public class FirmwareUpdateJobServiceImpl implements FirmwareUpdateJobService, F
     }
 
     @Override
-    public void initFirmwareUpdate(UUID resourceId, String softwareNameplateId, String userId) throws Exception {
+    public void initFirmwareUpdate(UUID resourceId, String softwareNameplateId, String userId, String accessToken) throws Exception {
         // Check if firmware update is already in progress for the resource (by checking the state of the latest job)
         var firmwareUpdateJobsOfResource = this.firmwareUpdateJobJpaRepository.findByResourceIdOrderByCreatedAtDesc(resourceId);
         if (!firmwareUpdateJobsOfResource.isEmpty()
@@ -76,7 +76,7 @@ public class FirmwareUpdateJobServiceImpl implements FirmwareUpdateJobService, F
             throw new FirmwareUpdateAlreadyInProgressException(resourceId);
         }
         // Check if resource exists
-        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId);
+        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, accessToken);
         // Get driver to check if it is available
         var driverId = resource.getDriverId();
         var driverInfo = this.driverRegistryClient.getRegisteredDriver(driverId);

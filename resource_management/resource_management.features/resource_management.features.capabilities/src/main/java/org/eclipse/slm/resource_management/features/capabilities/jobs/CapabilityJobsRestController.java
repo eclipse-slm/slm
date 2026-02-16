@@ -44,12 +44,13 @@ public class CapabilityJobsRestController {
             @PathVariable(name = "resourceId")                                                   UUID resourceId,
             @RequestParam(name = "capabilityId")                                                 UUID capabilityId,
             @RequestParam(name = "skipInstall", required = false, defaultValue = "false")        boolean skipInstall,
-            @RequestParam(name = "forceInstall", required = false, defaultValue = "false")        boolean forceInstall,
+            @RequestParam(name = "forceInstall", required = false, defaultValue = "false")       boolean forceInstall,
+            @RequestParam(name = "fullPathOwnerGroupId", required = true)                        String fullPathOwnerGroupId,
             @RequestBody Map<String, String> configParameters
     ) throws Exception {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-        this.capabilityJobService.initCapabilityJob(jwtAuthenticationToken, resourceId, capabilityId, skipInstall, configParameters, forceInstall);
+        this.capabilityJobService.initCapabilityJob(jwtAuthenticationToken, resourceId, capabilityId, skipInstall, configParameters, forceInstall, fullPathOwnerGroupId);
 
         return ResponseEntity.ok().build();
     }

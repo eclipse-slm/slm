@@ -8,10 +8,10 @@ import java.io.Serializable
 
 class DiscoveryJobEventMessage @JsonCreator constructor(
 
-    @JsonProperty("discoveryJob")
+    @field:JsonProperty("discoveryJob")
     val discoveryJob: DiscoveryJobDTO,
 
-    @JsonProperty("eventType")
+    @field:JsonProperty("eventType")
     val eventType: DiscoveryJobEventType
 
 ) : org.eclipse.slm.common.messaging.AbstractEventMessage<DiscoveryJobEventType>(EXCHANGE_NAME, ROUTING_KEY_PREFIX, DiscoveryJobEventType.CHANGED), Serializable {

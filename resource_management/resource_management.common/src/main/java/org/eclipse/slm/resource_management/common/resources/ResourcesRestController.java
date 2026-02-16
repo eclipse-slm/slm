@@ -1,10 +1,8 @@
 package org.eclipse.slm.resource_management.common.resources;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
-import io.swagger.v3.oas.annotations.Operation;
+import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
-import org.eclipse.slm.resource_management.common.resource_types.ResourceTypesManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,125 +10,113 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
 
 @RestController
-@RequestMapping(ResourcesRestControllerConfig.BASE_PATH)
-@Tag(name = ResourcesRestControllerConfig.TAG)
-public class ResourcesRestController {
+public class ResourcesRestController implements ResourcesRestApi {
 
     private final static Logger LOG = LoggerFactory.getLogger(ResourcesRestController.class);
 
     private final ResourcesManager resourcesManager;
 
     @Autowired
-    public ResourcesRestController(
-            ResourcesManager resourcesManager, ResourceTypesManager resourceTypeSManager
-    ) {
+    public ResourcesRestController(ResourcesManager resourcesManager) {
         this.resourcesManager = resourcesManager;
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    @Operation(summary = "Get all resources")
+    @Override
     public ResponseEntity<List<ResourceDTO>> getResources() throws ResourceNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        var resources = this.resourcesManager.getResources(jwtAuthenticationToken);
+        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
+        var resources = this.resourcesManager.getResources(accessToken);
         var resourceDTOs = ResourceMapper.INSTANCE.toDto(resources);
 
         return ResponseEntity.ok(resourceDTOs);
     }
 
-    @RequestMapping(value = "/{resourceId}", method = RequestMethod.GET)
-    @Operation(summary = "Get resource")
-    public ResponseEntity<ResourceDTO> getResource(
-            @PathVariable(name = "resourceId") UUID resourceId
-    ) throws ResourceNotFoundException {
+    @Override
+    public ResponseEntity<ResourceDTO> getResource(UUID resourceId) throws ResourceNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
 
-        var resource = this.resourcesManager.getResourceByIdOrThrow(
-                jwtAuthenticationToken,
-                resourceId
-        );
+        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, accessToken);
         var resourceDTO = ResourceMapper.INSTANCE.toDto(resource);
 
         return ResponseEntity.ok(resourceDTO);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    @Operation(summary = "Add existing resource")
-    public @ResponseBody ResponseEntity<UUID> addExistingResource(
-            @RequestBody CreateResourceRequest createResourceRequest
-    ) throws ResourceNotFoundException {
+    @Override
+    public ResponseEntity<UUID> addExistingResource(CreateResourceRequest createResourceRequest) throws ResourceNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         UUID resourceId = UUID.randomUUID();
-        this.resourcesManager.addResource(
-                jwtAuthenticationToken,
+        this.resourcesManager.createResource(
                 resourceId,
                 null,
                 createResourceRequest.getResourceHostname(),
                 createResourceRequest.getResourceIp(),
                 null,
                 null,
-                createResourceRequest.getDigitalNameplateV3()
+                createResourceRequest.getDigitalNameplateV3(),
+                createResourceRequest.getFullPathOwnerGroupId()
         );
 
         return new ResponseEntity<>(resourceId, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{resourceId}", method = RequestMethod.PUT)
-    @Operation(summary = "Add existing resource with id")
-    public ResponseEntity addExistingResourceWithId(
-            @PathVariable(name = "resourceId") UUID resourceId,
-            @RequestBody CreateResourceRequest createResourceRequest
-    ) throws  ResourceNotFoundException {
+    @Override
+    public ResponseEntity<Void> addExistingResourceWithId(UUID resourceId, CreateResourceRequest createResourceRequest) throws ResourceNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-        this.resourcesManager.addResource(
-                jwtAuthenticationToken,
+        this.resourcesManager.createResource(
                 resourceId,
                 null,
                 createResourceRequest.getResourceHostname(),
                 createResourceRequest.getResourceIp(),
                 null,
                 null,
-                createResourceRequest.getDigitalNameplateV3()
+                createResourceRequest.getDigitalNameplateV3(),
+                createResourceRequest.getFullPathOwnerGroupId()
         );
 
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{resourceId}", method = RequestMethod.DELETE)
-    @Operation(summary = "Delete resource")
-    public ResponseEntity deleteResource(@PathVariable(name = "resourceId") UUID resourceId) {
+    @Override
+    public ResponseEntity<Void> deleteResource(UUID resourceId) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
 
-        this.resourcesManager.deleteResource(jwtAuthenticationToken, resourceId);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @RequestMapping(value = "/{resourceId}/location", method = RequestMethod.PUT)
-    @Operation(summary = "Set location of resource with id")
-    public @ResponseBody ResponseEntity setLocationOfResource(
-            @PathVariable(name = "resourceId")  UUID resourceId,
-            @RequestParam(name = "locationId", required = false)  UUID locationId) throws ConsulLoginFailedException {
-
-        this.resourcesManager.setLocationOfResource(resourceId, locationId);
+        this.resourcesManager.deleteResource(resourceId, accessToken);
 
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/{resourceId}/connection-parameters", method = RequestMethod.PUT)
-    @Operation(summary = "Set connection parameters of resource with id")
-    public @ResponseBody ResponseEntity setConnectionParametersOfResource(
-            @PathVariable(name = "resourceId")  UUID resourceId,
-            @RequestParam(name = "connectionParameters", required = false)  String connectionParameters) {
+    @Override
+    public ResponseEntity<Void> setLocationOfResource(UUID resourceId, UUID locationId) {
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
 
+        this.resourcesManager.setLocationOfResource(resourceId, locationId, accessToken);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> setConnectionParametersOfResource(UUID resourceId, String connectionParameters) {
         this.resourcesManager.setConnectionParametersOfResource(resourceId, connectionParameters);
 
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> updateResource(UUID resourceId, ResourceUpdateRequest updateResourceRequest) {
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
+
+        this.resourcesManager.updateResource(resourceId, updateResourceRequest, accessToken);
         return ResponseEntity.ok().build();
     }
 }

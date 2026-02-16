@@ -1,5 +1,6 @@
 package org.eclipse.slm.resource_management.features.device_integration.discovery;
 
+import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplate.DigitalNameplateV3;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceRuntimeException;
@@ -133,7 +134,8 @@ public class DiscoveryService implements DiscoveryJobListener {
         discoveredResourceDTO.setResultId(discoveryJob.getId() + ":" + discoveredResourceDTO.getResourceId());
 
         try {
-            var existingResource = resourcesManager.getResourceByIdOrThrow(jwtAuthenticationToken, discoveredResourceDTO.getResourceId());
+            var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
+            var existingResource = resourcesManager.getResourceByIdOrThrow(discoveredResourceDTO.getResourceId(), accessToken);
             if (existingResource != null) {
                 discoveredResourceDTO.setOnboarded(true);
             }
@@ -154,7 +156,7 @@ public class DiscoveryService implements DiscoveryJobListener {
         this.discoveryEventMessageSender.sendMessage(completedDiscoveryJob, DiscoveryJobEventType.CHANGED);
     }
 
-    public void onboard(JwtAuthenticationToken jwtAuthenticationToken, String resultId)
+    public void onboard(String resultId, String fullPathUserGroupId) throws ResourceRuntimeException
     {
         var discoveryJobId = resultId.split(":")[0];
         var resourceIdString = resultId.split(":")[1];
@@ -175,14 +177,16 @@ public class DiscoveryService implements DiscoveryJobListener {
                 );
                 digitalNameplateV3.firmwareVersion(discoveredResource.getFirmwareVersion());
 
-                resourcesManager.addResource(jwtAuthenticationToken,
+                resourcesManager.createResource(
                         discoveredResource.getResourceId(),
                         discoveredResource.getId(),
                         discoveredResource.getIpAddress(),
                         discoveredResource.getIpAddress(),
                         discoveredResource.getFirmwareVersion(),
                         discoveryJob.getDriverId(),
-                        digitalNameplateV3.build());
+                        digitalNameplateV3.build(),
+                        fullPathUserGroupId
+                        );
 
                 resourcesManager.setConnectionParametersOfResource(resourceId, discoveredResource.getConnectionParameters());
             }

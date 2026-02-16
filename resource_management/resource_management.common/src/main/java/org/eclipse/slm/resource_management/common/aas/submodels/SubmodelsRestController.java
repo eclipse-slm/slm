@@ -7,6 +7,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
+import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.common.aas.ResourceAas;
 import org.eclipse.slm.resource_management.common.aas.ResourcesSubmodelManager;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
@@ -45,9 +46,10 @@ public class SubmodelsRestController {
     @Operation(summary = "Get resource submodels")
     public ResponseEntity getResourceSubmodels(
             @PathVariable(name = "resourceId") UUID resourceId
-    ) throws ResourceNotFoundException, ConsulLoginFailedException, JsonProcessingException {
+    ) throws ResourceNotFoundException, ConsulLoginFailedException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        var resource = this.resourcesManager.getResourceByIdOrThrow(jwtAuthenticationToken, resourceId);
+        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
+        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, accessToken);
         return ResponseEntity.ok(resourcesSubmodelManager.getSubmodels(resource));
     }
 
@@ -58,7 +60,8 @@ public class SubmodelsRestController {
             @RequestParam(name = "aasx") MultipartFile aasxFile
     ) throws ResourceNotFoundException, IOException, InvalidFormatException, DeserializationException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        var resource = this.resourcesManager.getResourceByIdOrThrow(jwtAuthenticationToken, resourceId);
+        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
+        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, accessToken);
         var aasxFileInputStream = new BufferedInputStream(aasxFile.getInputStream());
 
         this.resourcesSubmodelManager.addSubmodelsFromAASX(ResourceAas.createAasIdFromResourceId(resource.getId()), aasxFileInputStream);
@@ -73,7 +76,8 @@ public class SubmodelsRestController {
             @PathVariable(name = "submodelIdBase64Encoded") String submodelIdBase64Encoded
     ) throws ResourceNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        var resource = this.resourcesManager.getResourceByIdOrThrow(jwtAuthenticationToken, resourceId);
+        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
+        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, accessToken);
         try {
             var submodelId = new String(Base64.decodeBase64(submodelIdBase64Encoded));
             resourcesSubmodelManager.deleteSubmodel(resource.getId(), submodelId);

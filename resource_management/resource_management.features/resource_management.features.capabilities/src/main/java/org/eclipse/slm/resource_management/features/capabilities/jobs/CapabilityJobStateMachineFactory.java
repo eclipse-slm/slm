@@ -14,7 +14,7 @@ import java.util.List;
 @Service
 public class CapabilityJobStateMachineFactory {
 
-    public final static Logger LOG = LoggerFactory.getLogger(CapabilityJobStateMachineFactory.class);
+    private final static Logger LOG = LoggerFactory.getLogger(CapabilityJobStateMachineFactory.class);
 
     private final CapabilityJobStateMachineInterceptor firmwareUpdateJobStateMachineInterceptor;
 

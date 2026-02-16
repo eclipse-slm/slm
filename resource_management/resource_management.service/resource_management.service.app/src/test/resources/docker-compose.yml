@@ -89,7 +89,7 @@ services:
       VAULT_DEV_ROOT_TOKEN_ID: "myroot"
 
   consul:
-    image: "consul:1.12"
+    image: "hashicorp/consul:1.22"
     environment:
       CONSUL_LOCAL_CONFIG: '{"datacenter": "fabos", "domain": ".fabos", "bind_addr": "0.0.0.0", "retry_join": ["0.0.0.0"], "acl":{"enabled": true, "default_policy": "allow", "tokens":{"master": "myroot"}}}'
 

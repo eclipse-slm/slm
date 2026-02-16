@@ -17,7 +17,7 @@ import java.util.Optional;
 @Service
 public class CapabilityJobStateMachineInterceptor implements StateMachineInterceptor<CapabilityJobState, CapabilityJobEvent> {
 
-    public final static Logger LOG = LoggerFactory.getLogger(CapabilityJobStateMachineInterceptor.class);
+    private final static Logger LOG = LoggerFactory.getLogger(CapabilityJobStateMachineInterceptor.class);
 
     private final CapabilityJobJpaRepository capabilityJobJpaRepository;
 
