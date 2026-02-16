@@ -1,0 +1,22 @@
+- name: "Get root CA cert from Vault"
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/pki_root_slm/cert/ca"
+    method: GET
+    return_content: yes
+    status_code: 200
+  register: vault_ca_response
+
+- name: "Remove SLM root CA cert if it already exists in the Java truststore"
+  community.general.java_cert:
+    cert_alias: "slm-root-ca"
+    keystore_path: "/certs/java/cacerts"
+    keystore_pass: "{{ lookup('ansible.builtin.env', 'LOCAL_JAVA_CA_TRUSTSTORE_PASSWORD') }}"
+    state: absent
+
+- name: "Import SLM root CA cert into Java truststore"
+  community.general.java_cert:
+    cert_alias: "slm-root-ca"
+    keystore_path: "/certs/java/cacerts"
+    keystore_pass: "{{ lookup('ansible.builtin.env', 'LOCAL_JAVA_CA_TRUSTSTORE_PASSWORD') }}"
+    cert_content: "{{ vault_ca_response.json.data.certificate }}"
+    state: present
