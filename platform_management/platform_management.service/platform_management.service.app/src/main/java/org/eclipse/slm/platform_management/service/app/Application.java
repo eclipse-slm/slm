@@ -1,0 +1,78 @@
+package org.eclipse.slm.platform_management.service.app;
+
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.eclipse.digitaltwin.basyx.http.SerializationExtension;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.util.List;
+import java.util.concurrent.Executor;
+
+@SpringBootApplication(scanBasePackages = {
+        "org.eclipse.slm.platform_management",
+        "org.eclipse.slm.common.consul",
+        "org.eclipse.slm.common.keycloak",
+        "org.eclipse.slm.common.parent",
+        "org.eclipse.slm.common.vault",
+        "org.eclipse.slm.common.credentials",
+    }
+//    exclude = {
+//            DataSourceAutoConfiguration.class,
+//            HibernateJpaAutoConfiguration.class,
+//            JpaRepositoriesAutoConfiguration.class
+//    }
+)
+@EntityScan(basePackages = { "org.eclipse.slm.common.credentials" })
+@EnableJpaRepositories(basePackages = "org.eclipse.slm.common.credentials")
+@EnableAsync
+@EnableDiscoveryClient
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+    @Bean
+    public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
+        return args ->{
+        };
+    }
+
+    @Bean
+    public Executor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(2);
+        executor.setQueueCapacity(500);
+        executor.setThreadNamePrefix("SpringAsync-");
+        executor.initialize();
+        return executor;
+    }
+
+    @Bean
+    public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder(List<SerializationExtension> serializationExtensions) {
+        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder()
+                .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .modules(new JavaTimeModule());
+
+        for (SerializationExtension serializationExtension : serializationExtensions) {
+            serializationExtension.extend(builder);
+        }
+
+        return builder;
+    }
+
+}

@@ -29,7 +29,7 @@ catalog:
     database_port: 3306
 
 notification_service:
-  port: 9001
+  port: 9002
   database_version: 10.5
   database_port: 3301
 
@@ -52,7 +52,7 @@ service_management:
   git_check_interval_minutes: 15
 
 consul:
-  version: 1.14.5
+  version: 1.22
   port: 8500
   esm_version: 0.6.1
 

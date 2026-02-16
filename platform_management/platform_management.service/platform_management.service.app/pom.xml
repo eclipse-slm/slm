@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>platform_management.service.app</artifactId>
+    <version>${revision}</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.eclipse.slm</groupId>
+        <artifactId>platform_management.service</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <properties>
+        <docker.image.name>slm/platform-management</docker.image.name>
+        <docker.dockerfile.path>${project.basedir}/target/copied-sources/Dockerfile</docker.dockerfile.path>
+    </properties>
+
+    <dependencies>
+        <!-- Shared Modules !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>service</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Vault !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.vault.client</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Consul !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.consul.client</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Spring Boot !-->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${maven.plugin.codehaus.exec.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>org.eclipse.slm.platform_management.service.app.Application</mainClass>
+                </configuration>
+            </plugin>
+            <!-- Docker Image !-->
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+            </plugin>
+            <!-- Resources !-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
