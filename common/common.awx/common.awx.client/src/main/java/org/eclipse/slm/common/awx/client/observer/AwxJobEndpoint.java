@@ -15,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @ClientEndpoint
 public class AwxJobEndpoint extends Endpoint implements MessageHandler.Partial<String> {
 
-    public final static Logger LOG = LoggerFactory.getLogger(AwxJobObserverInitializer.class);
+    private final static Logger LOG = LoggerFactory.getLogger(AwxJobObserverInitializer.class);
 
     private Set<AwxJobObserver> awxJobObservers = new CopyOnWriteArraySet<>();
     private ObjectMapper objectMapper = new ObjectMapper();

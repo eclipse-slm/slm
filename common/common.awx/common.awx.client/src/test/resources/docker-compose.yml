@@ -1,7 +1,4 @@
-version: '3'
-
 services:
-
 
   awx:
     image: ghcr.io/eclipse-slm/awx/awx-task:22.7.0

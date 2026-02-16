@@ -14,7 +14,7 @@ import javax.net.ssl.SSLException;
 @Component
 public class AwxJobExecutor {
 
-    public final static Logger LOG = LoggerFactory.getLogger(AwxJobExecutor.class);
+    private final static Logger LOG = LoggerFactory.getLogger(AwxJobExecutor.class);
 
     private final AwxClient awxClient;
 
