@@ -9,7 +9,7 @@ info:
     email: "matthias.schneider@ipa.fraunhofer.de"
   version: "1.4.0-SNAPSHOT"
 servers:
-- url: "http://slm.local:9001/notification-service"
+- url: "http://slm.local:9002/notification-service"
   description: "Generated server url"
 security:
 - bearer_auth: []

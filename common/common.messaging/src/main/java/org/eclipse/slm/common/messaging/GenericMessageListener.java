@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public abstract class GenericMessageListener<T extends AbstractEventMessage> implements MessageListener {
 
-    public final static Logger LOG = LoggerFactory.getLogger(GenericMessageListener.class);
+    private final static Logger LOG = LoggerFactory.getLogger(GenericMessageListener.class);
 
     private ConnectionFactory connectionFactory;
 

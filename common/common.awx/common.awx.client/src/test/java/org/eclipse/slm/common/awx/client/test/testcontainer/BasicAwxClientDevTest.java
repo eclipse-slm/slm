@@ -8,7 +8,6 @@ import org.eclipse.slm.common.awx.client.AwxProjectUpdateFailedException;
 import org.eclipse.slm.common.awx.client.observer.*;
 import org.eclipse.slm.common.awx.model.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,6 @@ import org.springframework.boot.test.context.ConfigDataApplicationContextInitial
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -34,7 +32,6 @@ import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
         RestTemplate.class,
         AwxClient.class
@@ -42,38 +39,37 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(initializers = {ConfigDataApplicationContextInitializer.class} )
 @TestPropertySource(properties = { "spring.config.location=classpath:application.yml" })
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class BasicAwxClientDevTesting {
+public class BasicAwxClientDevTest {
 
     //region Variables
-    public final static Logger LOG = LoggerFactory.getLogger(BasicAwxClientDevTesting.class);
-    static final DockerComposeContainer awxContainer;
+    private final static Logger LOG = LoggerFactory.getLogger(BasicAwxClientDevTest.class);
 
+    private static final DockerComposeContainer awxContainer;
     private static int AWX_PORT = 8013;
-    private static int AWX_HTTPS_PORT = 8043;
-    private static String AWX_WEB_SERVICE = "awx";
+    private static String AWX_SERVICE = "awx";
 
     @Autowired
     AwxClient awxClient;
 
     static {
         awxContainer = new DockerComposeContainer(new File("src/test/resources/docker-compose.yml"))
-                .withExposedService(AWX_WEB_SERVICE, AWX_HTTPS_PORT)
-                .withExposedService(AWX_WEB_SERVICE, AWX_PORT,
+                .withExposedService(AWX_SERVICE,AWX_PORT,
                         Wait.forHttp("/#/login").forPort(AWX_PORT).withStartupTimeout(Duration.ofMinutes(5))
                 )
-                .withLocalCompose(true);
+                .withLocalCompose(false);
+
         awxContainer.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> stopContainer()));
     }
+    //endregion
 
     private static void stopContainer() {
         awxContainer.stop();
     }
-    //endregion
 
     @BeforeEach
     public void beforeEach() {
-        awxClient.setAwxPort(awxContainer.getServicePort(AWX_WEB_SERVICE, AWX_PORT));
+        awxClient.setAwxPort(awxContainer.getServicePort(AWX_SERVICE, AWX_PORT));
     }
 
     @Nested
@@ -762,7 +758,6 @@ public class BasicAwxClientDevTesting {
             @Order(42)
             public void runAwxJobTemplateAndObserveTheJobStatus() throws IOException, InterruptedException, DeploymentException {
                 //Make sure default Inventory is available:
-                String port = String.valueOf(awxContainer.getServicePort(AWX_WEB_SERVICE, AWX_HTTPS_PORT));
                 awxClient.createDefaultInventory();
                 AwxWebsocketClient awxWebsocketClient;
                 awxWebsocketClient = new AwxWebsocketClient(awxClient.awxHost, awxClient.awxPort, "admin", "password");
@@ -857,7 +852,7 @@ public class BasicAwxClientDevTesting {
                 private static int jobTemplateIdForSurvey = -1;
 
                 @BeforeEach()
-                private void beforeEach() throws JsonProcessingException {
+                public void beforeEach() throws JsonProcessingException {
                     if(jobTemplateIdForSurvey == -1) {
                         JobTemplate jobTemplateCreated = awxClient.createJobTemplate(
                                 projectId,

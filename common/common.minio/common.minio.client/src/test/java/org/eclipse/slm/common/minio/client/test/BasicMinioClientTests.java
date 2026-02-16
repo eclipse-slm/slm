@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BasicMinioClientTests {
 
     //region Variables
-    public final static Logger LOG = LoggerFactory.getLogger(BasicMinioClientTests.class);
+    private final static Logger LOG = LoggerFactory.getLogger(BasicMinioClientTests.class);
     public final static GenericContainer<?> minioDockerContainer;
     private static int MINIO_PORT = 9000;
     private static int MINIO_API_PORT = 9090;
