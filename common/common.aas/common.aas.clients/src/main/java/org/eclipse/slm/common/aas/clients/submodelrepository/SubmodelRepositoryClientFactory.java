@@ -70,9 +70,12 @@ public class SubmodelRepositoryClientFactory {
             var matchesFound = matcher.find();
             if (matchesFound) {
                 var submodelRepositoryBaseUrl = matcher.group(1);
-                var submodelRepositoryClient = new SubmodelRepositoryClient(submodelRepositoryBaseUrl, new JwtAuthenticationTokenAuthRequestInterceptor(jwtAuthenticationToken));
-
-                return submodelRepositoryClient;
+                if (jwtAuthenticationToken == null) {
+                    return new SubmodelRepositoryClient(submodelRepositoryBaseUrl);
+                }
+                else {
+                    return new SubmodelRepositoryClient(submodelRepositoryBaseUrl, new JwtAuthenticationTokenAuthRequestInterceptor(jwtAuthenticationToken));
+                }
             }
         }
 
