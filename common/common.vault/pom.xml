@@ -16,6 +16,7 @@
     <modules>
         <module>common.vault.client</module>
         <module>common.vault.model</module>
+        <module>common.vault.testing</module>
     </modules>
 
 </project>
