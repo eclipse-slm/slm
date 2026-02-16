@@ -217,7 +217,7 @@ consul:
     address: host.docker.internal
     port: ${server.port}
   scheme: http
-  host: localhost
+  host: consul
   port: 8500
   url: ${consul.scheme}://${consul.host}:${consul.port}
   datacenter: fabos

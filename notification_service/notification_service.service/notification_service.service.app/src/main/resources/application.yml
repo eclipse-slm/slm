@@ -141,4 +141,4 @@ consul:
   host: consul
   port: 8500
   datacenter: fabos
-  acl-token: UJ4aPAWnttlxfzRP3URZPA0b
+  acl-token: your-consul-acl-token

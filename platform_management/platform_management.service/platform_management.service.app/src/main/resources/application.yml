@@ -132,7 +132,7 @@ consul:
   port: 8500
   url: ${consul.scheme}://${consul.host}:${consul.port}
   datacenter: fabos
-  acl-token: UJ4aPAWnttlxfzRP3URZPA0b
+  acl-token: your-consul-acl-token
 
 ### Vault
 vault:
