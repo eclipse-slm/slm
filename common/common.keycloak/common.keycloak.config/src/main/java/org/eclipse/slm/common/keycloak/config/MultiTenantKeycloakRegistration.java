@@ -1,9 +1,11 @@
 package org.eclipse.slm.common.keycloak.config;
 
-import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.kotlin.KotlinModule;
 import jakarta.annotation.PostConstruct;
+import org.eclipse.slm.common.consul.client.ConsulClient;
+import org.eclipse.slm.common.consul.client.ConsulClientFactory;
 import org.eclipse.slm.common.keycloak.config.jwt.IssuerProperties;
 import org.eclipse.slm.common.keycloak.config.jwt.MisconfigurationException;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -15,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLContext;
@@ -55,9 +56,6 @@ public class MultiTenantKeycloakRegistration {
 
     private Optional<ConsulClient> consulClient;
 
-    @Value("${consul.acl-token}")
-    private String consulAclToken;
-
     @Value("${spring.cloud.consul.config.prefix:config}")
     private String consulKVPrefix;
 
@@ -69,15 +67,15 @@ public class MultiTenantKeycloakRegistration {
     /**
      * Instantiates a new Multi tenant keycloak registration.
      *
-     * @param consulClient
+     * @param consulClientFactory
      */
     @Autowired
-    public MultiTenantKeycloakRegistration(@Nullable ConsulClient consulClient) {
-        if (consulClient == null) {
+    public MultiTenantKeycloakRegistration(ConsulClientFactory consulClientFactory) {
+        if (consulClientFactory == null) {
             this.consulClient = Optional.empty();
         }
         else {
-            this.consulClient = Optional.of(consulClient);
+            this.consulClient = Optional.of(consulClientFactory.createAdminClient());
         }
     }
 
@@ -121,11 +119,14 @@ public class MultiTenantKeycloakRegistration {
 
     private void loadKeycloakConfigFromConsul(String keyValuePath) throws IOException {
         if (this.consulClient.isPresent()) {
-            var response = this.consulClient.get().getKVValue(keyValuePath, this.consulAclToken);
-            var value = response.getValue().getDecodedValue();
+            var response = this.consulClient.get().kv().readKey(keyValuePath, false, false, false, null);
+            var value = response.get(0).getDecodedValue();
             value = value.replace("'", "\"");
 
-            var mapper = new ObjectMapper();
+            var mapper = new ObjectMapper()
+                    .registerModule(new KotlinModule.Builder()
+                            .nullIsSameAsDefault(true)
+                            .build());
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             var reader = mapper.readerFor(KeycloakOidcConfig.class);
             var keycloakOidcConfig = reader.readValue(value, KeycloakOidcConfig.class);
@@ -225,5 +226,13 @@ public class MultiTenantKeycloakRegistration {
             throw new MisconfigurationException("Too many authorities mapping properties for %s".formatted(issuerUri.toString()));
         }
         return issuerProperties.get(0);
+    }
+
+    public String getDefaultRealm() {
+        var optionalKeycloakOidcConfig = keycloakOidcConfigs.entrySet().stream().findFirst();
+        if (optionalKeycloakOidcConfig.isPresent()) {
+            return optionalKeycloakOidcConfig.get().getValue().getRealm();
+        }
+        return null;
     }
 }
