@@ -15,7 +15,7 @@
     </parent>
 
     <modules>
-        <module>notification_service.service.rest</module>
+        <module>notification_service.service.app</module>
         <module>notification_service.service.client</module>
     </modules>
 

@@ -60,7 +60,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>service_management.service.rest</artifactId>
+            <artifactId>service_management.service.app</artifactId>
             <version>${revision}</version>
         </dependency>
     </dependencies>

@@ -44,7 +44,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>common.parent.service_rest</artifactId>
+            <artifactId>common.parent.service</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

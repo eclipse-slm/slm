@@ -15,7 +15,7 @@
     </parent>
 
     <modules>
-        <module>service_management.service.rest</module>
+        <module>service_management.service.app</module>
         <module>service_management.service.client</module>
         <module>service_management.service.initializer</module>
     </modules>

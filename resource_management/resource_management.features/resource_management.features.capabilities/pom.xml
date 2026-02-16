@@ -85,7 +85,6 @@
             <artifactId>spring-statemachine-core</artifactId>
             <version>${spring.statemachine.version}</version>
         </dependency>
-        <!-- Testing | Common !-->
         <!-- Testing | REST !-->
         <dependency>
             <groupId>com.c4-soft.springaddons</groupId>
@@ -113,6 +112,24 @@
             <groupId>com.github.dasniko</groupId>
             <artifactId>testcontainers-keycloak</artifactId>
             <version>2.5.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.consul.testing.containers</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.consul.testing.utils</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.vault.testing</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

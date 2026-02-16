@@ -19,6 +19,7 @@
         <module>common.awx</module>
         <module>common.utils</module>
         <module>common.consul</module>
+        <module>common.database</module>
         <module>common.parent</module>
         <module>common.vault</module>
         <module>common.keycloak</module>
@@ -26,6 +27,8 @@
         <module>common.minio</module>
         <module>common.messaging</module>
         <module>common.driver</module>
+        <module>common.credentials</module>
+        <module>common.restclient</module>
     </modules>
 
 </project>
