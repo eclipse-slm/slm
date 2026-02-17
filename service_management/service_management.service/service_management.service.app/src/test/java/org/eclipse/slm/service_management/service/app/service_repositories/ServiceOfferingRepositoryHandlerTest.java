@@ -28,8 +28,6 @@ public class ServiceOfferingRepositoryHandlerTest {
 
     private final static Logger LOG = LoggerFactory.getLogger(ServiceOfferingRepositoryHandlerTest.class);
 
-    private static final String VAULT_TOKEN = "myroot";
-
     private VaultClient vaultAdminClient;
 
     private ServiceRepositoryHandler serviceRepositoryHandler;

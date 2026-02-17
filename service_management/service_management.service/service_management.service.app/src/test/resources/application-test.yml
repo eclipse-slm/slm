@@ -83,7 +83,7 @@ consul:
   host: localhost
   port: 8500
   datacenter: fabos
-  acl-token: myroot
+  acl-token: root
 
 ### Vault
 vault:
@@ -91,4 +91,4 @@ vault:
   host: localhost
   port: 8200
   authentication: TOKEN
-  token: myroot
+  token: root

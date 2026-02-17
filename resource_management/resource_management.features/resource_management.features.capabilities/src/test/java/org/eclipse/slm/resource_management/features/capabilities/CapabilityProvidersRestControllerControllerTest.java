@@ -53,7 +53,7 @@ public class CapabilityProvidersRestControllerControllerTest {
 //    @Container
 //    private final GenericContainer<?> consulDockerContainer = new GenericContainer<>(DockerImageName.parse("consul:1.14"))
 //            .withExposedPorts(CONSUL_PORT)
-//            .withEnv("CONSUL_LOCAL_CONFIG", "{\"datacenter\": \"fabos\", \"domain\": \".fabos\", \"bind_addr\": \"0.0.0.0\", \"retry_join\": [\"0.0.0.0\"], \"acl\":{\"enabled\": true, \"default_policy\": \"allow\", \"tokens\":{\"master\": \"myroot\"}}}");
+//            .withEnv("CONSUL_LOCAL_CONFIG", "{\"datacenter\": \"fabos\", \"domain\": \".fabos\", \"bind_addr\": \"0.0.0.0\", \"retry_join\": [\"0.0.0.0\"], \"acl\":{\"enabled\": true, \"default_policy\": \"allow\", \"tokens\":{\"master\": \"root\"}}}");
 
     @Nested
     @Order(10)

@@ -4,12 +4,9 @@ import org.eclipse.slm.common.restclient.feign.FeignResponseException;
 import org.eclipse.slm.common.vault.client.auth.VaultAuthentication;
 import org.eclipse.slm.common.vault.client.exceptions.VaultKvSecretsNotFoundException;
 import org.eclipse.slm.common.vault.client.exceptions.VaultRuntimeException;
-import org.eclipse.slm.common.vault.model.kv.KvMetadataCreateRequest;
+import org.eclipse.slm.common.vault.model.kv.*;
 import org.eclipse.slm.common.vault.model.mounts.SecretsEngine;
 import org.eclipse.slm.common.vault.model.mounts.KvSecretsEngineOptions;
-import org.eclipse.slm.common.vault.model.kv.KvSecretsCreateRequest;
-import org.eclipse.slm.common.vault.model.kv.KvSecrets;
-import org.eclipse.slm.common.vault.model.kv.KvSubkeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +20,24 @@ public class VaultClientKv extends AbstractVaultClient {
     protected VaultClientKv(String vaultUrl, VaultAuthentication vaultAuthentication, String secretsEngineName) throws VaultRuntimeException {
         super(vaultUrl, vaultAuthentication);
         this.secretsEngineName = secretsEngineName;
+    }
+
+    public List<String> listSecretKeysOfPath(String kvPath) {
+        try {
+            var response = this.vaultApiClientKv.listSecretKeysOfPath(this.secretsEngineName, kvPath);
+            var keysObj = response.getData().get("keys");
+            if (keysObj instanceof List) {
+                return (List<String>) keysObj;
+            }
+            else {
+                throw new VaultRuntimeException("Unexpected response format when listing secret keys of path '" + kvPath + "' in secrets engine '" + this.secretsEngineName + "'. Expected 'keys' to be a list, but got: " + keysObj);
+            }
+        } catch (FeignResponseException e) {
+            if (e.getStatusCode() == 404) {
+                return List.of();
+            }
+            throw new VaultRuntimeException("Error listing secret keys of path '' in secrets engine '" + this.secretsEngineName + "'. Status code: " + e.getStatusCode() + ", message: " + e.getMessage(), e);
+        }
     }
 
     public void createKvSecretEngine() {
@@ -43,7 +58,7 @@ public class VaultClientKv extends AbstractVaultClient {
 
     public KvSubkeys getSecretKeysOfPath(String kvPath) {
         try {
-            var response = this.vaultApiClientKv.getSecretSubkeys(this.secretsEngineName, kvPath, null, null);
+            var response = this.vaultApiClientKv.getSecretSubkeys(this.secretsEngineName, kvPath, null, 0);
 
             return response.getData();
         } catch (FeignResponseException e) {
@@ -79,6 +94,15 @@ public class VaultClientKv extends AbstractVaultClient {
             this.vaultApiClientKv.addSecretToKvEngine(this.secretsEngineName, kvPath, new KvSecretsCreateRequest(secrets));
         } catch (FeignResponseException e) {
             throw new VaultRuntimeException("Error adding secrets to kvPath '" + kvPath + "' in secrets engine '" + this.secretsEngineName + "'. Status code: " + e.getStatusCode() + ", message: " + e.getMessage(), e);
+        }
+    }
+
+    public KvSecretsMetadata getMetadataOfSecret(String kvPath) {
+        try {
+            var secretsMetadata = this.vaultApiClientKv.getMetadataOfSecret(this.secretsEngineName, kvPath);
+            return secretsMetadata;
+        } catch (FeignResponseException e) {
+            throw new VaultRuntimeException("Error getting metadata of kvPath '" + kvPath + "' in secrets engine '" + this.secretsEngineName + "'. Status code: " + e.getStatusCode() + ", message: " + e.getMessage(), e);
         }
     }
 

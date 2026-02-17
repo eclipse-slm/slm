@@ -69,7 +69,7 @@
         <migbase.version>2.2</migbase.version>
         <joda-time.version>2.12.7</joda-time.version>
         <mariadb.client.version>3.4.1</mariadb.client.version>
-        <model.mapper.version>2.4.5</model.mapper.version>
+        <model.mapper.version>3.2.6</model.mapper.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <github.docker.java.version>3.2.13</github.docker.java.version>
         <apache.commons.version>3.12.0</apache.commons.version>

@@ -124,22 +124,44 @@ public class VaultClientKvTest {
     @Nested
     @Order(32)
     class GetSecretKeysOfPathRecursive {
-//        @Test
-//        void shouldReturnAllKeysRecursively() {
-//            // Simuliere verschachtelte Keys
-//            Map<String, Object> data1 = new HashMap<>();
-//            data1.put("keys", Arrays.asList("folder1/", "key1"));
-//            var response1 = mock(VaultApiClientKv.ListResponse.class);
-//            when(response1.getData()).thenReturn(data1);
-//            Map<String, Object> data2 = new HashMap<>();
-//            data2.put("keys", Arrays.asList("key2"));
-//            var response2 = mock(VaultApiClientKv.ListResponse.class);
-//            when(response2.getData()).thenReturn(data2);
-//            when(vaultApiClientKv.listSecretKeysOfPath(secretsEngineName, "root")).thenReturn(response1);
-//            when(vaultApiClientKv.listSecretKeysOfPath(secretsEngineName, "root/folder1")).thenReturn(response2);
-//            List<String> result = vaultClientKv.getSecretKeysOfPathRecursive("root");
-//            assertThat(result).containsExactly("root/folder1/key2", "root/key1");
-//        }
+        @Test
+        void shouldReturnAllKeysRecursively() {
+            // Arrange
+            var nestedSecretTopLevel = "my";
+            var nestedSecretSecondLevel = nestedSecretTopLevel + "/nested";
+            var nestedSecretPath1 = nestedSecretSecondLevel + "/secret1";
+            var nestedSecretPath2 = nestedSecretSecondLevel + "/secret2";
+            vaultAdminClient.kv(secretsEngineName).addSecretsToKvEngine(nestedSecretPath1, testSecrets);
+            vaultAdminClient.kv(secretsEngineName).addSecretsToKvEngine(nestedSecretPath2, testSecrets);
+
+            var resultTopLevel = vaultAdminClient.kv(secretsEngineName).listSecretKeysOfPath(nestedSecretTopLevel);
+            assertThat(resultTopLevel).containsExactly("nested/");
+            var resultSecondLevel = vaultAdminClient.kv(secretsEngineName).listSecretKeysOfPath(nestedSecretSecondLevel);
+            assertThat(resultSecondLevel).containsExactly("secret1", "secret2");
+        }
+    }
+
+    @Nested
+    @Order(33)
+    class GetSecretSubkeys {
+        @Test
+        void shouldReturnSubkeysForExistingSecret() {
+            // Arrange
+            var secretPath = "my/secret1";
+            vaultAdminClient.kv(secretsEngineName).addSecretsToKvEngine(secretPath, testSecrets);
+            // Act
+            var subkeys = vaultAdminClient.kv(secretsEngineName).getSecretKeysOfPath(secretPath);
+            // Assert
+            assertThat(subkeys.getData().keySet()).contains("username", "password");
+        }
+
+        @Test
+        void shouldReturnEmptyForNonExistingPath() {
+            // Act & Assert
+            assertThatThrownBy(() -> {
+                vaultAdminClient.kv(secretsEngineName).getSecretKeysOfPath("does/not/exist");
+            }).isInstanceOf(VaultKvSecretsNotFoundException.class);
+        }
     }
 
     @Nested
@@ -173,5 +195,14 @@ public class VaultClientKvTest {
                 vaultAdminClient.kv(secretsEngineName).getSecretsOfPathOrThrow(testSecretsPath);
             }).isInstanceOf(VaultKvSecretsNotFoundException.class);
         }
+
+        @Test
+        void shouldNotFailWhenDeletingNonExistingMetadata() {
+            // Act & Assert
+            assertThatCode(() -> vaultAdminClient.kv(secretsEngineName).deleteSecretFromKvEngine("does/not/exist"))
+                    .doesNotThrowAnyException();
+        }
     }
+
+
 }

@@ -44,9 +44,9 @@ public class ServiceRepositoryHandler {
      * @throws ServiceRepositoryNotFound Thrown when a {@link ServiceRepository} is not found.
      */
     public List<ServiceRepository> getRepositoriesOfServiceVendor(UUID serviceVendorId) throws ServiceRepositoryNotFound {
-        var repositoryKvSubkeys = vaultAdminClient.kv(VAULT_SECRET_ENGINE_NAME).getSecretKeysOfPath("vendor_" + serviceVendorId);
+        var repositoryKvSubkeys = vaultAdminClient.kv(VAULT_SECRET_ENGINE_NAME).listSecretKeysOfPath("vendor_" + serviceVendorId);
         var serviceRepositories = new ArrayList<ServiceRepository>();
-        for (var repositoryIdString : repositoryKvSubkeys.getData().keySet()) {
+        for (var repositoryIdString : repositoryKvSubkeys) {
             var repositoryId = UUID.fromString(repositoryIdString);
             var serviceRepository = this.getServiceRepository(serviceVendorId, repositoryId);
             serviceRepositories.add(serviceRepository);

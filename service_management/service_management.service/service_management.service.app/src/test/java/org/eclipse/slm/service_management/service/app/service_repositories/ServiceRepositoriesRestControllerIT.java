@@ -22,8 +22,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.vault.core.VaultOperations;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -41,8 +42,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     classes = {
         ServiceRepositoriesRestController.class,
         ServiceRepositoryHandler.class,
-        VaultClient.class,
-        VaultOperations.class
     }
 )
 @AutoConfigureMockMvc
@@ -75,6 +74,11 @@ public class ServiceRepositoriesRestControllerIT extends AbstractRestControllerI
 
     @Container
     private static final VaultTestContainer vaultContainer = new VaultTestContainer();
+
+    @DynamicPropertySource
+    static void registerVaultProperties(DynamicPropertyRegistry registry) {
+        registry.add("vault.url", vaultContainer::getVaultUrl);
+    }
 
     private static final String VAULT_SECRET_ENGINE_NAME = "service-repositories";
     private VaultClient vaultAdminClient;

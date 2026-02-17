@@ -5,10 +5,7 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 import org.eclipse.slm.common.vault.model.VaultApiResponse;
-import org.eclipse.slm.common.vault.model.kv.KvMetadataCreateRequest;
-import org.eclipse.slm.common.vault.model.kv.KvSecretsCreateRequest;
-import org.eclipse.slm.common.vault.model.kv.KvSecrets;
-import org.eclipse.slm.common.vault.model.kv.KvSubkeys;
+import org.eclipse.slm.common.vault.model.kv.*;
 
 import java.util.Map;
 
@@ -45,6 +42,13 @@ public interface VaultApiClientKv {
             @Param("kvPath") String kvPath,
             KvSecretsCreateRequest secretsCreateRequest
     );
+
+    // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#read-secret-metadata
+    @RequestLine("GET /{secretsEngineName}/metadata/{kvPath}")
+    @Headers("Content-Type: application/json")
+    KvSecretsMetadata getMetadataOfSecret(
+            @Param("secretsEngineName") String secretsEngineName,
+            @Param("kvPath") String kvPath);
 
     // https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2#create-update-metadata
     @RequestLine("POST /{secretsEngineName}/metadata/{kvPath}")

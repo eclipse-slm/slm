@@ -6,4 +6,4 @@ services:
       ports:
        - "8500:8500"
       environment:
-        CONSUL_LOCAL_CONFIG: '{"datacenter": "fabos", "domain": ".fabos", "bind_addr": "0.0.0.0", "retry_join": ["0.0.0.0"], "acl":{"enabled": true, "default_policy": "allow", "tokens":{"master": "myroot"}}}'
+        CONSUL_LOCAL_CONFIG: '{"datacenter": "fabos", "domain": ".fabos", "bind_addr": "0.0.0.0", "retry_join": ["0.0.0.0"], "acl":{"enabled": true, "default_policy": "allow", "tokens":{"master": "root"}}}'

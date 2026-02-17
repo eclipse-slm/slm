@@ -97,7 +97,7 @@
 //        Integer vaultPort = ResourcesManagerITDevConfig.dockerCompose.getServicePort(ResourcesManagerITDevConfig.VAULT_SERVICE_NAME, ResourcesManagerITDevConfig.VAULT_PORT);
 //
 //        var vaultUrl = "http://localhost:" + vaultPort;
-//        var vaultAdminClient = new VaultClient(vaultUrl, new VaultTokenAuthentication("myroot"))
+//        var vaultAdminClient = new VaultClient(vaultUrl, new VaultTokenAuthentication("root"))
 //        // Add KV Secret Engine (if not exists)
 //        vaultAdminClient.kv("resources").createKvSecretEngine();
 //        // Add Policy for managing the created KV Secret Engine
