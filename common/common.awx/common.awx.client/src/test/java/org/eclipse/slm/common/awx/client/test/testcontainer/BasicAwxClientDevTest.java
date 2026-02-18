@@ -39,7 +39,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(initializers = {ConfigDataApplicationContextInitializer.class} )
 @TestPropertySource(properties = { "spring.config.location=classpath:application.yml" })
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Disabled
 public class BasicAwxClientDevTest {
 
     //region Variables

@@ -32,7 +32,6 @@ import static org.junit.Assert.assertEquals;
 @ContextConfiguration(initializers = {ConfigDataApplicationContextInitializer.class} )
 @TestPropertySource(properties = { "spring.config.location=classpath:application.yml" })
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Disabled
 public class AwxClientCapabilityTest {
 
     //region Variables
