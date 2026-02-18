@@ -51,11 +51,6 @@
         <!-- Shared Modules !-->
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>service</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.slm</groupId>
             <artifactId>common.consul.client</artifactId>
             <version>${project.version}</version>
         </dependency>
