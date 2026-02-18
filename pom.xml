@@ -19,7 +19,6 @@
         <module>notification_service</module>
         <module>information_service</module>
         <module>catalog</module>
-        <module>coverage</module>
     </modules>
 
     <profiles>
@@ -45,8 +44,9 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <maven.plugin.surefire.version>3.5.0</maven.plugin.surefire.version>
-        <maven.plugin.failsafe.version>3.5.0</maven.plugin.failsafe.version>
+        <maven.plugin.surefire.version>3.5.4</maven.plugin.surefire.version>
+        <maven.plugin.surefire-report.version>3.5.4</maven.plugin.surefire-report.version>
+        <maven.plugin.failsafe.version>3.5.4</maven.plugin.failsafe.version>
         <maven.plugin.docker.fabric8.version>0.48.1</maven.plugin.docker.fabric8.version>
         <maven.plugin.swagger-codegen.version>3.0.24</maven.plugin.swagger-codegen.version>
         <maven.plugin.spring.boot.version>${spring.boot.version}</maven.plugin.spring.boot.version>
@@ -54,7 +54,8 @@
         <maven.plugin.apache.deploy.version>3.1.3</maven.plugin.apache.deploy.version>
         <maven.plugin.apache.resources.version>3.2.0</maven.plugin.apache.resources.version>
         <maven.plugin.codehaus.exec.version>3.5.0</maven.plugin.codehaus.exec.version>
-        <maven.plugin.jacoco.version>0.8.12</maven.plugin.jacoco.version>
+        <maven.plugin.jacoco.version>0.8.14</maven.plugin.jacoco.version>
+        <maven.plugin.coveralls.version>5.0.0</maven.plugin.coveralls.version>
         <maven.plugin.openapi-generator.version>7.8.0</maven.plugin.openapi-generator.version>
         <maven.plugin.deploy.version>3.1.3</maven.plugin.deploy.version>
 
@@ -103,7 +104,7 @@
         <docker.image.registry>ghcr.io/eclipse-slm</docker.image.registry>
         <docker.image.skip>false</docker.image.skip>
 
-        <jacoco.version>0.8.12</jacoco.version>
+        <jacoco.version>0.8.14</jacoco.version>
     </properties>
 
     <dependencyManagement>
@@ -321,12 +322,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.openpojo</groupId>
-            <artifactId>openpojo</artifactId>
-            <version>${maven.plugin.jacoco.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>${assertj.version}</version>
@@ -376,12 +371,6 @@
 
         <pluginManagement>
             <plugins>
-                <!-- Testing !-->
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${maven.plugin.jacoco.version}</version>
-                </plugin>
                 <!-- Spring Boot !-->
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
@@ -476,6 +465,12 @@
                         </execution>
                     </executions>
                 </plugin>
+                <!-- Code Coverage | Jacoco !-->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${maven.plugin.jacoco.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -495,8 +490,6 @@
                 <version>${maven.plugin.surefire.version}</version>
                 <configuration>
                     <argLine>${surefireArgLine}</argLine>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <reportsDirectory>${project.build.directory}/test-reports</reportsDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -514,23 +507,39 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <!-- Reports | Maven Surefire !-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>${maven.plugin.surefire-report.version}</version>
                 <configuration>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <reportsDirectory>${project.build.directory}/test-reports</reportsDirectory>
+                    <aggregate>true</aggregate>
+                    <reportsDirectories>
+                        <reportsDirectory>${project.build.directory}/test-reports</reportsDirectory>
+                    </reportsDirectories>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>surefire-report</id>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>report-only</goal>
+                            <goal>failsafe-report-only</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.12.1</version>
             </plugin>
-            <!-- to generate code coverage -->
+            <!-- Code Coverage | Generate using Jacoco -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${maven.plugin.jacoco.version}</version>
                 <executions>
-                    <!-- set arg line property for surefire -->
                     <execution>
                         <id>prepare-agent</id>
                         <goals>
@@ -538,9 +547,11 @@
                         </goals>
                         <configuration>
                             <propertyName>surefireArgLine</propertyName>
+                            <excludes>
+                                <exclude>**/generated-sources/**</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
-                    <!-- set arg line property for failsafe -->
                     <execution>
                         <id>prepare-agent-integration</id>
                         <goals>
@@ -548,27 +559,48 @@
                         </goals>
                         <configuration>
                             <propertyName>failsafeArgLine</propertyName>
+                            <excludes>
+                                <exclude>**/generated-sources/**</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-            <!-- to push to coveralls -->
+            <!-- Code Coverage | Jacoco Report Aggregation !-->
             <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <version>4.3.0</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>javax.xml.bind</groupId>
-                        <artifactId>jaxb-api</artifactId>
-                        <version>2.3.1</version>
-                    </dependency>
-                </dependencies>
+                <groupId>io.github.olamy.maven.plugins</groupId>
+                <artifactId>jacoco-aggregator-maven-plugin</artifactId>
+                <version>1.0.4</version>
                 <configuration>
-                    <jacocoReports>coverage/target/site/jacoco-aggregate-ut/jacoco.xml</jacocoReports>
+                    <excludes>
+
+                        <exclude>siemens/**</exclude>       <!-- Exclude code generated from protobuf files in common.driver from coverage report -->
+                        <exclude>factory_x/**</exclude>     <!-- Exclude code generated from protobuf files in common.driver  from coverage report -->
+                        <exclude>**/*MapperImpl*</exclude>  <!-- Exclude generated mapper implementations of MapStruct !-->
+                        <exclude>org/eclipse/slm/service_management/service/client/**</exclude>
+                        <exclude>org/eclipse/slm/service_management/model/**</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
-            <!-- Compilation: Kotlin !-->
+            <!-- Code Coverage | Push to coveralls -->
+            <plugin>
+                <groupId>com.github.hazendaz.maven</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>${maven.plugin.coveralls.version}</version>
+                <configuration>
+                    <jacocoReports>
+                        <jacocoReport>${project.build.directory}/site/jacoco-aggregate/jacoco.xml</jacocoReport>
+                    </jacocoReports>
+                    <scanForSources>true</scanForSources>
+                    <sourceDirectories>
+                        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+                        <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+                        <sourceDirectory>${project.basedir}/src/target/generated-sources</sourceDirectory>
+                        <sourceDirectory>**/kotlin/*</sourceDirectory>
+                    </sourceDirectories>
+                </configuration>
+            </plugin>
+            <!-- Compilation | Kotlin !-->
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
@@ -605,14 +637,13 @@
                     <jvmTarget>${java.version}</jvmTarget>
                 </configuration>
             </plugin>
-            <!-- Compilation: Java !-->
+            <!-- Compilation | Java !-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.plugin.apache.compiler.version}</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>${java.version}</release>
                     <compilerArgument>-Xlint:unchecked</compilerArgument>
                     <annotationProcessorPaths>
                         <path>
@@ -676,50 +707,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.9</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>index</report>
-                            <report>summary</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.0.0-M9</version>
-                <configuration>
-                    <aggregate>true</aggregate>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jxr-plugin</artifactId>
-                <version>3.3.0</version>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${maven.plugin.jacoco.version}</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <!-- select non-aggregate reports -->
-                            <report>report-aggregate</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-        </plugins>
-    </reporting>
 
     <distributionManagement>
         <repository>
