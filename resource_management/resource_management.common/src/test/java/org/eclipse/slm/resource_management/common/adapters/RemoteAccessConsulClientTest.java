@@ -6,7 +6,6 @@ import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException
 import org.eclipse.slm.common.consul.model.exceptions.ConsulPolicyNotFoundException;
 import org.eclipse.slm.common.consul.testing.containers.ConsulTestContainer;
 import org.eclipse.slm.common.consul.testing.utils.ConsulTestClientFactory;
-import org.eclipse.slm.resource_management.common.remote_access.ConnectionType;
 import org.junit.jupiter.api.*;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;

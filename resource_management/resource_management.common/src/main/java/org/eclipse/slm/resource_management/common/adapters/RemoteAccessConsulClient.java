@@ -1,8 +1,7 @@
 package org.eclipse.slm.resource_management.common.adapters;
 
 import org.eclipse.slm.common.consul.client.ConsulClient;
-import org.eclipse.slm.common.consul.client.ConsulClientFactory;
-import org.eclipse.slm.common.consul.model.acl.Policy;
+import org.eclipse.slm.common.consul.model.acl.policies.Policy;
 import org.eclipse.slm.resource_management.common.remote_access.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +70,7 @@ public class RemoteAccessConsulClient {
 
         var filteredRemoteAccessOptional = remoteAccesses.stream()
                 .filter(remoteAccess -> remoteAccess.getId().toString().equals(remoteAccessId.toString()))
-                .findFirst();;
+                .findFirst();
 
         return filteredRemoteAccessOptional;
     }

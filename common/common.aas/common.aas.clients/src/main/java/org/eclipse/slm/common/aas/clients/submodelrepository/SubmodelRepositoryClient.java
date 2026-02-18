@@ -1,7 +1,6 @@
 package org.eclipse.slm.common.aas.clients.submodelrepository;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import feign.RequestInterceptor;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonDeserializer;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;

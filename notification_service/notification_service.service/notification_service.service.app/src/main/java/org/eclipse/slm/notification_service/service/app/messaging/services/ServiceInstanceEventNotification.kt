@@ -1,7 +1,7 @@
-package org.eclipse.slm.notification_service.service.app.messaging.resources
+package org.eclipse.slm.notification_service.service.app.messaging.services
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.slm.notification_service.model.EventNotification
+import org.eclipse.slm.notification_service.service.app.messaging.EventNotification
 import org.eclipse.slm.notification_service.model.EventType
 import org.eclipse.slm.service_management.model.services.ServiceInstance
 import java.util.*

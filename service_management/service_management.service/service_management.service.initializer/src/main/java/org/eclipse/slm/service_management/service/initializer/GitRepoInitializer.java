@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 public class GitRepoInitializer {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Application.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GitRepoInitializer.class);
 
     @Value("#{'${service-management.git-repos.clone-directory}'}")
     private String gitRepoCloneDirectory;

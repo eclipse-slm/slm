@@ -1,6 +1,6 @@
-package org.eclipse.slm.notification_service.model.resources
+package org.eclipse.slm.notification_service.service.app.messaging.resources
 
-import org.eclipse.slm.notification_service.model.EventNotification
+import org.eclipse.slm.notification_service.service.app.messaging.EventNotification
 import org.eclipse.slm.notification_service.model.EventType
 import org.eclipse.slm.resource_management.features.device_integration.discovery.dto.DiscoveryJobDTO
 import java.util.Date

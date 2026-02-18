@@ -13,8 +13,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static org.eclipse.slm.resource_management.features.device_integration.firmware_update.driver.FirmwareUpdateDriverClient.FIRMWARE_FILE_CHUNK_SIZE;
-
 public class FirmwareUpdateResponseStreamObserver implements StreamObserver<ArtefactUpdate.ArtefactMessage> {
 
     private final static Logger LOG = LoggerFactory.getLogger(FirmwareUpdateResponseStreamObserver.class);

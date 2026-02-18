@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.slm.common.credentials.CredentialsManager;
 import org.eclipse.slm.common.credentials.model.CredentialReadDTO;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
-import org.eclipse.slm.platform_management.service.api.CredentialCreateRequest;
+import org.eclipse.slm.platform_management.service.api.credentials.CredentialCreateRequest;
 import org.eclipse.slm.platform_management.service.api.credentials.CredentialManagementRestApi;
 import org.eclipse.slm.platform_management.service.api.credentials.CredentialManagementRestApiConfig;
 import org.slf4j.Logger;

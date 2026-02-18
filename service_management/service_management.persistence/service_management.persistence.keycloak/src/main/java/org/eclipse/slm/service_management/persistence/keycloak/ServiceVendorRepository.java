@@ -34,7 +34,7 @@ public class ServiceVendorRepository {
     }
 
     public List<ServiceVendor> getServiceVendors() {
-        var serviceVendors = serviceVendorJpaRepository.findAll();;
+        var serviceVendors = serviceVendorJpaRepository.findAll();
         return serviceVendors;
     }
 

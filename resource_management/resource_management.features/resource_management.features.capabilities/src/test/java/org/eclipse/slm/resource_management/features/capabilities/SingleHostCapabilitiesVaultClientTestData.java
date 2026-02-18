@@ -47,7 +47,7 @@ public class SingleHostCapabilitiesVaultClientTestData {
             CapabilityServiceStatus.READY,
             false,
             configParameters
-    );;
+    );
 
     static {
         singleHostCapability.setName(name);

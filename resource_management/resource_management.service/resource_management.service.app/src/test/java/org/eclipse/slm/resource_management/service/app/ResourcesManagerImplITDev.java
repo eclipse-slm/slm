@@ -7,7 +7,7 @@
 //import org.eclipse.slm.common.consul.client.ConsulNodesClient;
 //import org.eclipse.slm.common.consul.client.ConsulServicesClient;
 //import org.eclipse.slm.common.consul.model.acl.Policy;
-//import org.eclipse.slm.common.consul.model.acl.Role;
+//import org.eclipse.slm.common.consul.model.acl.roles.Role;
 //import org.eclipse.slm.common.consul.model.catalog.Node;
 //import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 //import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;

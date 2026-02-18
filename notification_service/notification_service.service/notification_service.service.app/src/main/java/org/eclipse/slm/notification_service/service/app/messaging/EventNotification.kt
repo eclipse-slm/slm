@@ -1,17 +1,18 @@
-package org.eclipse.slm.notification_service.model
+package org.eclipse.slm.notification_service.service.app.messaging
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import org.eclipse.slm.notification_service.model.EventNotification.Companion.CAPABILITY_JOB_EVENT_CLASS
-import org.eclipse.slm.notification_service.model.EventNotification.Companion.DISCOVERY_EVENT_CLASS
-import org.eclipse.slm.notification_service.model.EventNotification.Companion.FIRMWARE_UPDATE_JOB_EVENT_CLASS
-import org.eclipse.slm.notification_service.model.EventNotification.Companion.RESOURCE_EVENT_CLASS
-import org.eclipse.slm.notification_service.model.EventNotification.Companion.SERVICE_INSTANCE_EVENT_CLASS
-import org.eclipse.slm.notification_service.model.resources.DiscoveryJobEventNotification
+import org.eclipse.slm.notification_service.model.IEventNotification
+import org.eclipse.slm.notification_service.service.app.messaging.EventNotification.Companion.CAPABILITY_JOB_EVENT_CLASS
+import org.eclipse.slm.notification_service.service.app.messaging.EventNotification.Companion.DISCOVERY_EVENT_CLASS
+import org.eclipse.slm.notification_service.service.app.messaging.EventNotification.Companion.FIRMWARE_UPDATE_JOB_EVENT_CLASS
+import org.eclipse.slm.notification_service.service.app.messaging.EventNotification.Companion.RESOURCE_EVENT_CLASS
+import org.eclipse.slm.notification_service.service.app.messaging.EventNotification.Companion.SERVICE_INSTANCE_EVENT_CLASS
+import org.eclipse.slm.notification_service.service.app.messaging.resources.DiscoveryJobEventNotification
 import org.eclipse.slm.notification_service.service.app.messaging.resources.CapabilityJobEventNotification
 import org.eclipse.slm.notification_service.service.app.messaging.resources.FirmwareUpdateJobEventNotification
 import org.eclipse.slm.notification_service.service.app.messaging.resources.ResourceEventNotification
-import org.eclipse.slm.notification_service.service.app.messaging.resources.ServiceInstanceEventNotification
+import org.eclipse.slm.notification_service.service.app.messaging.services.ServiceInstanceEventNotification
 import java.util.*
 
 @JsonTypeInfo(

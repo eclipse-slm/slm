@@ -4,7 +4,7 @@ import feign.Body;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import org.eclipse.slm.common.vault.model.Group;
+import org.eclipse.slm.common.vault.model.acl.Group;
 import org.eclipse.slm.common.vault.model.VaultApiResponse;
 import org.eclipse.slm.common.vault.model.auth.JwtGroupAliasCreateRequest;
 

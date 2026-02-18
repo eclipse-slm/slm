@@ -3,9 +3,9 @@ package org.eclipse.slm.common.consul.client.apis;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import org.eclipse.slm.common.consul.model.acl.Policy;
-import org.eclipse.slm.common.consul.model.acl.PolicyCreateRequest;
-import org.eclipse.slm.common.consul.model.acl.PolicyUpdateRequest;
+import org.eclipse.slm.common.consul.model.acl.policies.Policy;
+import org.eclipse.slm.common.consul.model.acl.policies.PolicyCreateRequest;
+import org.eclipse.slm.common.consul.model.acl.policies.PolicyUpdateRequest;
 
 import java.util.List;
 

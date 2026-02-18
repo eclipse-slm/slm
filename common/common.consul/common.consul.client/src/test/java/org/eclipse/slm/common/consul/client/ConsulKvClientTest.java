@@ -2,7 +2,6 @@ package org.eclipse.slm.common.consul.client;
 
 import org.eclipse.slm.common.consul.client.testutils.ConsulTestClientFactory;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulKvEntryNotFoundException;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulRuntimeException;
 import org.eclipse.slm.common.consul.model.kv.KeyValueData;
 import org.eclipse.slm.common.consul.testing.containers.ConsulTestContainer;
 import org.junit.jupiter.api.*;

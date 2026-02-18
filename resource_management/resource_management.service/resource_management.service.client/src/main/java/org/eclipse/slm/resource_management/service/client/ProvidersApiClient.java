@@ -1,10 +1,8 @@
 package org.eclipse.slm.resource_management.service.client;
 
 import org.eclipse.slm.resource_management.common.api.ResourceManagementApiConfig;
-import org.eclipse.slm.resource_management.features.capabilities.CapabilitiesRestApi;
 import org.eclipse.slm.resource_management.features.capabilities.providers.ProvidersRestApi;
 import org.eclipse.slm.resource_management.features.capabilities.providers.ProvidersRestApiConfig;
-import org.eclipse.slm.resource_management.features.profiler.ProfilerRestApiConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 
 @FeignClient(

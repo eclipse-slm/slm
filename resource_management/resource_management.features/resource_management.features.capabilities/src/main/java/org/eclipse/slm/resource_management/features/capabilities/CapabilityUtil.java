@@ -1,22 +1,15 @@
 package org.eclipse.slm.resource_management.features.capabilities;
 
 
-import org.eclipse.slm.common.consul.client.ConsulClient;
-import org.eclipse.slm.common.consul.client.ConsulClientFactory;
 import org.eclipse.slm.common.consul.model.catalog.Service;
 import org.eclipse.slm.common.consul.model.catalog.NodeService;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
-import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.*;
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionConfigParameter;
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionConfigParameterValueType;
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType;
-import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilityJpaRepository;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.model.ClusterMemberType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

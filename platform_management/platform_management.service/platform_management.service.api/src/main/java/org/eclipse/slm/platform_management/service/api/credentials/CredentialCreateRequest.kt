@@ -1,4 +1,4 @@
-package org.eclipse.slm.platform_management.service.api
+package org.eclipse.slm.platform_management.service.api.credentials
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.eclipse.slm.common.credentials.model.Credential

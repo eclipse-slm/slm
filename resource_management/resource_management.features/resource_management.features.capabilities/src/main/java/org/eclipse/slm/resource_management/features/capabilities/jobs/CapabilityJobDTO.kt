@@ -1,8 +1,6 @@
-package org.eclipse.slm.resource_management.features.capabilities.dto
+package org.eclipse.slm.resource_management.features.capabilities.jobs
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import org.eclipse.slm.resource_management.features.capabilities.jobs.CapabilityJobState
-import org.eclipse.slm.resource_management.features.capabilities.jobs.CapabilityJobStateTransition
 import java.util.Date
 import java.util.UUID
 

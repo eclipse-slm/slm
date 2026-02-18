@@ -1,10 +1,10 @@
 package org.eclipse.slm.common.consul.client.utils;
 
-import org.eclipse.slm.common.consul.model.acl.Policy;
-import org.eclipse.slm.common.consul.model.acl.PolicyCreateRequest;
-import org.eclipse.slm.common.consul.model.acl.PolicyUpdateRequest;
-import org.eclipse.slm.common.consul.model.acl.Role;
-import org.eclipse.slm.common.consul.model.acl.RoleUpdateRequest;
+import org.eclipse.slm.common.consul.model.acl.policies.Policy;
+import org.eclipse.slm.common.consul.model.acl.policies.PolicyCreateRequest;
+import org.eclipse.slm.common.consul.model.acl.policies.PolicyUpdateRequest;
+import org.eclipse.slm.common.consul.model.acl.roles.Role;
+import org.eclipse.slm.common.consul.model.acl.roles.RoleUpdateRequest;
 import org.eclipse.slm.common.consul.model.catalog.CatalogRegistration;
 import org.eclipse.slm.common.consul.model.catalog.Node;
 import org.junit.jupiter.api.DisplayName;

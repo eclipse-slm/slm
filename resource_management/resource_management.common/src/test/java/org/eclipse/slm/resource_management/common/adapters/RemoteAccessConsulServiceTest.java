@@ -1,7 +1,6 @@
 package org.eclipse.slm.resource_management.common.adapters;
 
 import org.eclipse.slm.common.consul.model.catalog.NodeService;
-import org.eclipse.slm.common.credentials.model.CommonCredentialScope;
 import org.eclipse.slm.resource_management.common.remote_access.ConnectionType;
 import org.eclipse.slm.resource_management.common.remote_access.RemoteAccessCreateDTO;
 import org.junit.jupiter.api.DisplayName;

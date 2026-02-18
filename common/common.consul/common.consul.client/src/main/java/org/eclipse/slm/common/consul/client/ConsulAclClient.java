@@ -2,9 +2,12 @@ package org.eclipse.slm.common.consul.client;
 
 import org.eclipse.slm.common.consul.client.auth.ConsulAuthentication;
 import org.eclipse.slm.common.consul.client.utils.ConsulMapper;
-import org.eclipse.slm.common.consul.model.acl.*;
 import org.eclipse.slm.common.consul.model.acl.authmethods.AuthMethodRequest;
 import org.eclipse.slm.common.consul.model.acl.bindingrules.BindingRule;
+import org.eclipse.slm.common.consul.model.acl.policies.Policy;
+import org.eclipse.slm.common.consul.model.acl.roles.PolicyLink;
+import org.eclipse.slm.common.consul.model.acl.roles.Role;
+import org.eclipse.slm.common.consul.model.acl.roles.RoleCreateRequest;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulRoleNotFoundException;
 import org.eclipse.slm.common.restclient.feign.FeignResponseException;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulPolicyNotFoundException;

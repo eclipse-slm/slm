@@ -1,7 +1,6 @@
 package org.eclipse.slm.resource_management.common.resource_types;
 
 import jakarta.annotation.PostConstruct;
-import org.eclipse.digitaltwin.basyx.aasregistry.client.ApiException;
 import org.eclipse.digitaltwin.basyx.core.pagination.PaginationInfo;
 import org.eclipse.slm.common.aas.clients.shellregistry.AasRegistryClient;
 import org.eclipse.slm.common.aas.clients.shellregistry.AasRegistryClientFactory;

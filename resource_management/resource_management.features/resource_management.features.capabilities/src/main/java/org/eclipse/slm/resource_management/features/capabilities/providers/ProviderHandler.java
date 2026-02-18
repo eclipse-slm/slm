@@ -4,7 +4,6 @@ package org.eclipse.slm.resource_management.features.capabilities.providers;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilitiesConsulClient;
-import org.eclipse.slm.resource_management.features.providers.Provider;
 
 import java.util.ArrayList;
 import java.util.List;

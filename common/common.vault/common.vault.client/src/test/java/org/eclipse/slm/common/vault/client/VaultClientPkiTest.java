@@ -4,18 +4,11 @@ import org.eclipse.slm.common.restclient.feign.FeignClientFactory;
 import org.eclipse.slm.common.restclient.feign.auth.BearerTokenAuthRequestInterceptor;
 import org.eclipse.slm.common.vault.client.apiclients.VaultApiClientPki;
 import org.eclipse.slm.common.vault.client.apiclients.VaultApiClientSys;
-import org.eclipse.slm.common.vault.client.exceptions.VaultKvSecretsNotFoundException;
-import org.eclipse.slm.common.vault.model.mounts.SecretsEngine;
-import org.eclipse.slm.common.vault.model.pki.GenerateCACertRequest;
 import org.junit.jupiter.api.*;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

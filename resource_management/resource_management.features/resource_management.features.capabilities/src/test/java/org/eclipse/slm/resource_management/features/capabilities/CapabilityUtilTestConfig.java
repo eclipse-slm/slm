@@ -5,7 +5,6 @@ import org.eclipse.slm.resource_management.features.capabilities.model.Capabilit
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityType;
 import org.eclipse.slm.resource_management.features.capabilities.model.DeploymentCapability;
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.*;
-import org.eclipse.slm.resource_management.features.capabilities.model.actions.*;
 import org.eclipse.slm.resource_management.features.capabilities.model.awx.AwxAction;
 
 import java.util.Arrays;

@@ -273,7 +273,7 @@ public class DcTransferAppTest {
             );
 
             System.out.println("Wait for order to be finished.");
-            Thread.sleep(10000);;
+            Thread.sleep(10000);
         }
 
         // Check if Pre-/PostOrder Count diffs
@@ -338,7 +338,7 @@ public class DcTransferAppTest {
             );
 
             System.out.println("Wait for undeploy to be finished.");
-            Thread.sleep(10000);;
+            Thread.sleep(10000);
         }
 
         given().spec(requestSpecification)

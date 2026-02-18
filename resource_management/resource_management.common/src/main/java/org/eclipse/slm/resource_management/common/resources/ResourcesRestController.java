@@ -1,6 +1,5 @@
 package org.eclipse.slm.resource_management.common.resources;
 
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.slf4j.Logger;

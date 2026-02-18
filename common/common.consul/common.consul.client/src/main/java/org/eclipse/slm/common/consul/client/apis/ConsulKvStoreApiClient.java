@@ -3,8 +3,6 @@ package org.eclipse.slm.common.consul.client.apis;
 import feign.Body;
 import feign.Param;
 import feign.RequestLine;
-import org.eclipse.slm.common.consul.client.auth.ConsulLoginRequest;
-import org.eclipse.slm.common.consul.client.auth.ConsulLoginResponse;
 import org.eclipse.slm.common.consul.model.kv.KeyValueData;
 
 import java.util.List;

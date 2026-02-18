@@ -20,7 +20,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.InstanceOfAssertFactories.MAP;
 
 @ExtendWith(MockitoExtension.class)
 @Testcontainers

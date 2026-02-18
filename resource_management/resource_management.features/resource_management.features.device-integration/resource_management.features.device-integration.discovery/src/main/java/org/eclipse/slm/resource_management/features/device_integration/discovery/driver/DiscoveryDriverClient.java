@@ -4,8 +4,6 @@ import com.google.protobuf.ByteString;
 import org.eclipse.slm.resource_management.features.device_integration.common.discovery.driver.DriverInfo;
 import org.eclipse.slm.resource_management.features.device_integration.discovery.model.*;
 import org.eclipse.slm.resource_management.features.device_integration.common.discovery.driver.AbstractDriverClient;
-import org.eclipse.slm.resource_management.features.device_integration.discovery.model.DiscoveryJob;
-import org.eclipse.slm.resource_management.features.device_integration.discovery.model.DiscoveryRequest;
 import org.eclipse.slm.resource_management.features.device_integration.discovery.persistence.DiscoveryJobRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

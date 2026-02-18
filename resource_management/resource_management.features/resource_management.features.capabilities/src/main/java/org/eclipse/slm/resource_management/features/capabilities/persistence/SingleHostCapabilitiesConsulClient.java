@@ -2,7 +2,7 @@ package org.eclipse.slm.resource_management.features.capabilities.persistence;
 
 
 import org.eclipse.slm.common.consul.client.*;
-import org.eclipse.slm.common.consul.model.acl.Policy;
+import org.eclipse.slm.common.consul.model.acl.policies.Policy;
 import org.eclipse.slm.common.consul.model.catalog.CatalogRegistration;
 import org.eclipse.slm.common.consul.model.catalog.NodeService;
 import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;

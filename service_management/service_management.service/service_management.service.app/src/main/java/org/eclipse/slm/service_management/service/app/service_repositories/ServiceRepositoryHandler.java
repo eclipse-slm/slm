@@ -2,7 +2,6 @@ package org.eclipse.slm.service_management.service.app.service_repositories;
 
 import org.eclipse.slm.common.vault.client.VaultClient;
 import org.eclipse.slm.common.vault.client.VaultClientFactory;
-import org.eclipse.slm.common.vault.model.exceptions.KvValueNotFound;
 import org.eclipse.slm.service_management.model.service_repositories.ServiceRepository;
 import org.eclipse.slm.service_management.model.service_repositories.ServiceRepositoryType;
 import org.slf4j.Logger;

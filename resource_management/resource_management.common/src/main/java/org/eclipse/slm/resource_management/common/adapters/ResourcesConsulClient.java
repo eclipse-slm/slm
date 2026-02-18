@@ -2,9 +2,8 @@ package org.eclipse.slm.resource_management.common.adapters;
 
 
 import org.eclipse.slm.common.consul.client.ConsulClient;
-import org.eclipse.slm.common.consul.client.ConsulClientFactory;
 import org.eclipse.slm.common.consul.client.ConsulServicesClient;
-import org.eclipse.slm.common.consul.model.acl.Policy;
+import org.eclipse.slm.common.consul.model.acl.policies.Policy;
 import org.eclipse.slm.common.consul.model.catalog.Node;
 import org.eclipse.slm.common.consul.model.catalog.NodeService;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
@@ -15,7 +14,6 @@ import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundExc
 import org.eclipse.slm.resource_management.common.resources.BasicResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.function.Predicate;

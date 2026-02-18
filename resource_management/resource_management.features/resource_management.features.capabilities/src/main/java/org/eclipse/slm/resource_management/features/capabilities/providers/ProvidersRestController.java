@@ -2,8 +2,6 @@ package org.eclipse.slm.resource_management.features.capabilities.providers;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
-import org.eclipse.slm.resource_management.features.providers.ServiceHoster;
-import org.eclipse.slm.resource_management.features.providers.ServiceHosterFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;

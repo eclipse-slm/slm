@@ -1,9 +1,9 @@
 package org.eclipse.slm.common.consul.client;
 
 import org.eclipse.slm.common.consul.client.testutils.ConsulTestClientFactory;
-import org.eclipse.slm.common.consul.model.acl.Policy;
-import org.eclipse.slm.common.consul.model.acl.PolicyLink;
-import org.eclipse.slm.common.consul.model.acl.Role;
+import org.eclipse.slm.common.consul.model.acl.policies.Policy;
+import org.eclipse.slm.common.consul.model.acl.roles.PolicyLink;
+import org.eclipse.slm.common.consul.model.acl.roles.Role;
 import org.eclipse.slm.common.consul.model.acl.authmethods.AuthMethodRequest;
 import org.eclipse.slm.common.consul.model.acl.authmethods.JwtAuthMethodConfig;
 import org.eclipse.slm.common.consul.model.acl.bindingrules.BindingRule;

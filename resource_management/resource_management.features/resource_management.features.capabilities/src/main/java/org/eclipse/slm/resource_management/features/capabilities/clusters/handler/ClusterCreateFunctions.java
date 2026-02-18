@@ -5,7 +5,7 @@ import org.eclipse.slm.common.awx.client.observer.*;
 import org.eclipse.slm.common.awx.model.ExtraVars;
 
 import org.eclipse.slm.common.consul.client.ConsulClientFactory;
-import org.eclipse.slm.common.consul.model.acl.Policy;
+import org.eclipse.slm.common.consul.model.acl.policies.Policy;
 import org.eclipse.slm.common.consul.model.catalog.CatalogRegistration;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
@@ -32,10 +32,8 @@ import org.eclipse.slm.resource_management.features.capabilities.model.awx.AwxAc
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilitiesConsulClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 
 import javax.net.ssl.SSLException;
 import java.io.StringReader;

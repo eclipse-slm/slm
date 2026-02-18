@@ -39,7 +39,7 @@ public abstract class GenericMessageListener<T extends AbstractEventMessage> imp
     @PostConstruct
     public void init()  throws Exception  {
         var queueName = this.exchangeName + "." + this.routingKeyAllEvents + "@" +this.nameOfReceivingService;
-        var queue = new Queue(queueName, false);;
+        var queue = new Queue(queueName, false);
 
         var amqpAdmin = new RabbitAdmin(rabbitTemplate.getConnectionFactory());
         amqpAdmin.declareQueue(queue);

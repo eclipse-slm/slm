@@ -2,8 +2,6 @@ package org.eclipse.slm.resource_management.features.capabilities.jobs;
 
 import org.eclipse.slm.common.awx.client.observer.AwxJobExecutor;
 import org.eclipse.slm.common.awx.client.observer.AwxJobObserverInitializer;
-import org.eclipse.slm.resource_management.features.capabilities.CapabilitiesManager;
-import org.eclipse.slm.resource_management.features.capabilities.CapabilityUtil;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.SingleHostCapabilitiesConsulClient;
 import org.springframework.beans.factory.annotation.Value;

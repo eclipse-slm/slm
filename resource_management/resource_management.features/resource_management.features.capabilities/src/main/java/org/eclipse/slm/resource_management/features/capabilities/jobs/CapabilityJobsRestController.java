@@ -2,7 +2,6 @@ package org.eclipse.slm.resource_management.features.capabilities.jobs;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.eclipse.slm.resource_management.features.capabilities.dto.CapabilityJobDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

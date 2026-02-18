@@ -1,7 +1,6 @@
 package org.eclipse.slm.resource_management.features.capabilities.jobs;
 
 import java.util.EnumSet;
-import java.util.List;
 
 public enum CapabilityJobState {
     CREATED,

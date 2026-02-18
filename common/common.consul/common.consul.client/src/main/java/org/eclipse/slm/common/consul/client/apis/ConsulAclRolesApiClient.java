@@ -3,9 +3,9 @@ package org.eclipse.slm.common.consul.client.apis;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import org.eclipse.slm.common.consul.model.acl.Role;
-import org.eclipse.slm.common.consul.model.acl.RoleCreateRequest;
-import org.eclipse.slm.common.consul.model.acl.RoleUpdateRequest;
+import org.eclipse.slm.common.consul.model.acl.roles.Role;
+import org.eclipse.slm.common.consul.model.acl.roles.RoleCreateRequest;
+import org.eclipse.slm.common.consul.model.acl.roles.RoleUpdateRequest;
 
 import java.util.List;
 

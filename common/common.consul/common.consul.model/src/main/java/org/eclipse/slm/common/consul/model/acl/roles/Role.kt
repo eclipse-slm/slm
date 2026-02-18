@@ -1,4 +1,4 @@
-package org.eclipse.slm.common.consul.model.acl
+package org.eclipse.slm.common.consul.model.acl.roles
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude

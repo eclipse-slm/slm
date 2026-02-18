@@ -1,6 +1,5 @@
 package org.eclipse.slm.notification_service.service.app.messaging.services;
 
-import org.eclipse.slm.notification_service.service.app.messaging.resources.ServiceInstanceEventNotification;
 import org.eclipse.slm.service_management.service.app.service_instances.ServiceInstanceEventMessage;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

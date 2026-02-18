@@ -7,8 +7,6 @@ import org.eclipse.slm.resource_management.features.capabilities.model.Capabilit
 import org.eclipse.slm.resource_management.features.capabilities.model.DeploymentCapability;
 import org.eclipse.slm.resource_management.features.capabilities.model.SingleHostCapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilitiesConsulClient;
-import org.eclipse.slm.resource_management.features.providers.ServiceHoster;
-import org.eclipse.slm.resource_management.features.providers.ServiceHosterFilter;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

@@ -3,7 +3,7 @@ package org.eclipse.slm.service_management.service.app.service_instances;
 
 import org.eclipse.slm.common.consul.client.ConsulClient;
 import org.eclipse.slm.common.consul.client.ConsulClientFactory;
-import org.eclipse.slm.common.consul.model.acl.Policy;
+import org.eclipse.slm.common.consul.model.acl.policies.Policy;
 import org.eclipse.slm.common.consul.model.catalog.CatalogRegistration;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.service_management.model.services.ServiceInstance;

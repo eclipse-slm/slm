@@ -4,12 +4,8 @@ import org.eclipse.slm.common.awx.client.AwxCredential;
 import org.eclipse.slm.common.awx.client.observer.*;
 import org.eclipse.slm.common.awx.model.ExtraVars;
 
-import org.eclipse.slm.common.consul.client.ConsulAclClient;
 import org.eclipse.slm.common.consul.client.ConsulClientFactory;
-import org.eclipse.slm.common.consul.client.ConsulNodesClient;
-import org.eclipse.slm.common.consul.client.ConsulServicesClient;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
-import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
 import org.eclipse.slm.common.vault.client.VaultClientFactory;
 import org.eclipse.slm.notification_service.messaging.NotificationEventMessage;

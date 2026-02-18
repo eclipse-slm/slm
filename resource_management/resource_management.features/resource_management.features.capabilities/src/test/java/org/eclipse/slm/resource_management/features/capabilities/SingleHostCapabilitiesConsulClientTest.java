@@ -2,7 +2,7 @@ package org.eclipse.slm.resource_management.features.capabilities;
 
 
 import org.eclipse.slm.common.consul.client.ConsulClient;
-import org.eclipse.slm.common.consul.model.acl.PolicyLink;
+import org.eclipse.slm.common.consul.model.acl.roles.PolicyLink;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulPolicyNotFoundException;
 import org.eclipse.slm.common.consul.testing.containers.ConsulTestContainer;

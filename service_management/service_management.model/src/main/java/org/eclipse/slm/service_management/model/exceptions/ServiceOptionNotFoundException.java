@@ -1,6 +1,5 @@
 package org.eclipse.slm.service_management.model.exceptions;
 
-import org.eclipse.slm.service_management.model.offerings.ServiceOffering;
 import org.eclipse.slm.service_management.model.offerings.ServiceOfferingVersion;
 import org.eclipse.slm.service_management.model.offerings.options.ServiceOptionValue;
 

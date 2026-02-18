@@ -3,7 +3,7 @@ package org.eclipse.slm.resource_management.features.importer;
 import org.eclipse.slm.common.credentials.model.Credential;
 import org.eclipse.slm.common.credentials.model.CredentialDataUsernamePassword;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
-import org.eclipse.slm.platform_management.service.api.CredentialCreateRequest;
+import org.eclipse.slm.platform_management.service.api.credentials.CredentialCreateRequest;
 import org.eclipse.slm.platform_management.service.client.PlatformManagementClientFactory;
 import org.eclipse.slm.resource_management.common.aas.ResourceAas;
 import org.eclipse.slm.resource_management.common.aas.ResourcesSubmodelManager;

@@ -3,7 +3,6 @@ package org.eclipse.slm.platform_management.service.api.credentials;
 import io.swagger.v3.oas.annotations.Operation;
 import org.eclipse.slm.common.credentials.model.CredentialEntityLinkCreateDTO;
 import org.eclipse.slm.common.credentials.model.CredentialReadDTO;
-import org.eclipse.slm.platform_management.service.api.CredentialCreateRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -9,8 +9,6 @@ import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class CapabilityJobStateMachineFactory {
 

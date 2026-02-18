@@ -9,7 +9,7 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface CapabilityMapper {
 
-    public static final CapabilityMapper INSTANCE = Mappers.getMapper(CapabilityMapper.class);
+    CapabilityMapper INSTANCE = Mappers.getMapper(CapabilityMapper.class);
 
     DeploymentCapabilityDTOApi toDto(DeploymentCapability source);
     BaseConfigurationCapabilityDTOApi toDto(BaseConfigurationCapability source);

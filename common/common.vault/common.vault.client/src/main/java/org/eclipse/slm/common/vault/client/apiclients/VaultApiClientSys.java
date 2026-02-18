@@ -1,8 +1,8 @@
 package org.eclipse.slm.common.vault.client.apiclients;
 
 import feign.*;
-import org.eclipse.slm.common.vault.model.Mount;
-import org.eclipse.slm.common.vault.model.Policy;
+import org.eclipse.slm.common.vault.model.mounts.Mount;
+import org.eclipse.slm.common.vault.model.acl.Policy;
 import org.eclipse.slm.common.vault.model.mounts.SecretsEngine;
 import org.eclipse.slm.common.vault.model.VaultApiResponse;
 import org.eclipse.slm.common.vault.model.auth.AuthMethod;

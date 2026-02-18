@@ -1,7 +1,6 @@
 package org.eclipse.slm.resource_management.common.remote_access;
 
 import org.eclipse.slm.resource_management.common.resources.ResourceUpdatedListener;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.List;
 import java.util.UUID;

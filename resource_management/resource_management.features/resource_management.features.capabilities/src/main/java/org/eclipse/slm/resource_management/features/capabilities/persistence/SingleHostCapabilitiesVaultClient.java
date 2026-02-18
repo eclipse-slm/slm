@@ -28,7 +28,7 @@ public class SingleHostCapabilitiesVaultClient {
     }
 
     public SingleHostCapabilitiesVaultClient(VaultClient vaultClient) {
-        this.vaultAdminClient = vaultClient;;
+        this.vaultAdminClient = vaultClient;
     }
 
     public static String getCapabilityServicePolicyName(UUID capabilityServiceId) {

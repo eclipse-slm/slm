@@ -11,7 +11,7 @@ import org.eclipse.slm.resource_management.common.model.MatchingResourceDTO;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.SingleHostCapabilityService;
-import org.eclipse.slm.resource_management.features.providers.ServiceHosterFilter;
+import org.eclipse.slm.resource_management.features.capabilities.providers.ServiceHosterFilter;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementClientFactory;
 import org.eclipse.slm.service_management.model.exceptions.ServiceOptionNotFoundException;
 import org.eclipse.slm.service_management.model.offerings.options.DeploymentVariableType;

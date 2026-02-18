@@ -4,7 +4,6 @@ package org.eclipse.slm.resource_management.features.capabilities;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulNodeNotFoundException;
 import org.eclipse.slm.common.consul.testing.containers.ConsulTestContainer;
 import org.eclipse.slm.common.consul.testing.utils.ConsulTestClientFactory;
-import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilitiesConsulClient;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilityJpaRepository;
 import org.junit.jupiter.api.*;

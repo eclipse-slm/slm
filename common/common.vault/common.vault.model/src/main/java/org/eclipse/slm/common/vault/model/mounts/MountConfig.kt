@@ -1,4 +1,4 @@
-package org.eclipse.slm.common.vault.model
+package org.eclipse.slm.common.vault.model.mounts
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude

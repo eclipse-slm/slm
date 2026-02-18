@@ -1,10 +1,7 @@
 package org.eclipse.slm.common.utils.objectmapper;
 
 import org.modelmapper.*;
-import org.modelmapper.config.Configuration;
 import org.modelmapper.convention.MatchingStrategies;
-import org.modelmapper.convention.NamingConventions;
-import org.modelmapper.spi.MappingContext;
 
 import java.util.*;
 import java.util.stream.Collectors;

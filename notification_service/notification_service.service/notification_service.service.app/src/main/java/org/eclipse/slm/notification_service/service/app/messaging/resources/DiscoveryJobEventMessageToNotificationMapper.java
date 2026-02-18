@@ -1,6 +1,5 @@
 package org.eclipse.slm.notification_service.service.app.messaging.resources;
 
-import org.eclipse.slm.notification_service.model.resources.DiscoveryJobEventNotification;
 import org.eclipse.slm.resource_management.features.device_integration.discovery.messaging.DiscoveryJobEventMessage;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

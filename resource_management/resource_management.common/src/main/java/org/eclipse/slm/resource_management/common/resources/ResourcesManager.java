@@ -4,7 +4,6 @@ import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException
 import org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplate.DigitalNameplateV3;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceRuntimeException;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.List;
 import java.util.Optional;

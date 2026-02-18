@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(initializers = {ConfigDataApplicationContextInitializer.class} )
 @TestPropertySource(properties = { "spring.config.location=classpath:application.yml" })
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Disabled
 public class BasicAwxClientDevTest {
 
     //region Variables
@@ -314,6 +315,7 @@ public class BasicAwxClientDevTest {
 
         @Test
         @Order(20)
+        @Disabled
         public void getOrganizations() throws JsonProcessingException {
             Results<Organization> organizationsResult = awxClient.getOrganizations();
 

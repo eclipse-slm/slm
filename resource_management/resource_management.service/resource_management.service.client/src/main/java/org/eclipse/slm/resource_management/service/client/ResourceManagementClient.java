@@ -2,7 +2,6 @@ package org.eclipse.slm.resource_management.service.client;
 
 import org.eclipse.slm.common.parent.client.AbstractApiClient;
 import org.eclipse.slm.common.restclient.feign.auth.AuthRequestInterceptor;
-import org.eclipse.slm.platform_management.service.api.credentials.CredentialManagementRestApiConfig;
 import org.eclipse.slm.resource_management.features.capabilities.CapabilitiesRestApiConfig;
 import org.eclipse.slm.resource_management.features.capabilities.providers.ProvidersRestApiConfig;
 import org.eclipse.slm.resource_management.features.profiler.ProfilerRestApiConfig;

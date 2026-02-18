@@ -6,7 +6,6 @@ import org.eclipse.slm.common.messaging.GenericMessageListener;
 import org.eclipse.slm.notification_service.communication.websocket.NotificationWsService;
 import org.eclipse.slm.notification_service.persistence.api.NotificationRepository;
 import org.eclipse.slm.service_management.service.app.service_instances.ServiceInstanceEventMessage;
-import org.eclipse.slm.service_management.service.app.service_instances.ServiceInstancesConsulClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;

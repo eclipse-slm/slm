@@ -6,7 +6,6 @@ import org.eclipse.slm.common.awx.client.observer.*;
 import org.eclipse.slm.common.awx.model.*;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
-import org.eclipse.slm.resource_management.features.capabilities.CapabilitiesManager;
 import org.eclipse.slm.resource_management.features.capabilities.CapabilityUtil;
 import org.eclipse.slm.resource_management.features.capabilities.exceptions.CapabilityRuntimeException;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;

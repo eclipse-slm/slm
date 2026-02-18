@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface FirmwareUpdateJobService {
 
-    public List<FirmwareUpdateJob> getFirmwareUpdateJobsOfResource(UUID resourceId);
+    List<FirmwareUpdateJob> getFirmwareUpdateJobsOfResource(UUID resourceId);
 
     void initFirmwareUpdate(UUID resourceId, String softwareNameplateId, String userId, String accessToken) throws Exception;
 
