@@ -496,6 +496,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven.plugin.failsafe.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <api.version>1.44</api.version> <!-- Fix for https://github.com/testcontainers/testcontainers-java/issues/11212 !-->
+                    </systemPropertyVariables>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
