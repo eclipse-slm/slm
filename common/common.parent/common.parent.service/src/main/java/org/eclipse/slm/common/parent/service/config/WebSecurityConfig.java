@@ -1,4 +1,4 @@
-package org.eclipse.slm.common.parent.service_rest.config;
+package org.eclipse.slm.common.parent.service.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.ArrayUtils;

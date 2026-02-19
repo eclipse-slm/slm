@@ -42,8 +42,8 @@
         </dependency>
         <!-- Keycloak !-->
         <dependency>
-            <artifactId>keycloak-admin-client</artifactId>
             <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-admin-client</artifactId>
             <version>${keycloak.version}</version>
         </dependency>
         <dependency>

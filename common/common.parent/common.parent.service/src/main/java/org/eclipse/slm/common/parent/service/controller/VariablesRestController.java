@@ -1,4 +1,4 @@
-package org.eclipse.slm.common.parent.service_rest.controller;
+package org.eclipse.slm.common.parent.service.controller;
 
 import org.eclipse.slm.common.model.SystemVariable;
 import io.swagger.v3.oas.annotations.Operation;

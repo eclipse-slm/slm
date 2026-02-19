@@ -3,6 +3,8 @@ package org.eclipse.slm.service_management.service.app.service_instances;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.eclipse.slm.common.consul.client.ConsulClient;
+import org.eclipse.slm.common.consul.client.ConsulClientFactory;
 import org.eclipse.slm.common.consul.client.ConsulServicesClient;
 import org.eclipse.slm.common.consul.model.catalog.Service;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
@@ -41,7 +43,9 @@ public class ServiceInstancesHandler {
 
     private final static Logger LOG = LoggerFactory.getLogger(ServiceInstancesHandler.class);
 
-    private final ConsulServicesClient consulServicesClient;
+    private final ConsulClientFactory consulClientFactory;
+
+    private final ConsulClient consulAdminClient;
 
     private final ServiceUndeploymentHandler serviceUndeploymentHandler;
 
@@ -57,13 +61,12 @@ public class ServiceInstancesHandler {
 
     private final ServiceInstanceGroupJpaRepository serviceInstanceGroupJpaRepository;
 
-    private final ObjectMapper objectMapper;
-
-    public ServiceInstancesHandler(ConsulServicesClient consulServicesClient,
+    public ServiceInstancesHandler(ConsulClientFactory consulClientFactory,
                                    ServiceUndeploymentHandler serviceUndeploymentHandler,
                                    ServiceUpdateHandler serviceUpdateHandler, ServiceOfferingVersionHandler serviceOfferingVersionHandler,
                                    ServiceOfferingHandler serviceOfferingHandler, ServiceOrderJpaRepository serviceOrderJpaRepository, ServiceInstancesConsulClient serviceInstancesConsulClient, ServiceInstanceGroupJpaRepository serviceInstanceGroupJpaRepository, ObjectMapper objectMapper) {
-        this.consulServicesClient = consulServicesClient;
+        this.consulClientFactory = consulClientFactory;
+        this.consulAdminClient = consulClientFactory.createAdminClient();
         this.serviceUndeploymentHandler = serviceUndeploymentHandler;
         this.serviceUpdateHandler = serviceUpdateHandler;
         this.serviceOfferingVersionHandler = serviceOfferingVersionHandler;
@@ -71,11 +74,10 @@ public class ServiceInstancesHandler {
         this.serviceOrderJpaRepository = serviceOrderJpaRepository;
         this.serviceInstancesConsulClient = serviceInstancesConsulClient;
         this.serviceInstanceGroupJpaRepository = serviceInstanceGroupJpaRepository;
-        this.objectMapper = objectMapper;
     }
 
     public List<ServiceInstance> getServiceInstancesOfUser(JwtAuthenticationToken jwtAuthenticationToken) throws ConsulLoginFailedException {
-        Map<String,List<String>> allCatalogServicesOfUser = this.consulServicesClient.getServices(
+        Map<String,List<String>> allCatalogServicesOfUser = this.consulAdminClient.services().getServices(
                 
         );
 
@@ -83,7 +85,7 @@ public class ServiceInstancesHandler {
                 .filter(entry -> entry.getValue().contains("service"))
                 .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
 
-        var deployedServicesWithDetails = this.consulServicesClient
+        var deployedServicesWithDetails = this.consulAdminClient.services()
                 .getServicesByName( deployedServicesOfUser.keySet());
         var serviceInstances = new ArrayList<ServiceInstance>();
         for (var consulService : deployedServicesWithDetails.values())
@@ -100,7 +102,7 @@ public class ServiceInstancesHandler {
     public ServiceInstance getServiceInstanceOfUser(UUID serviceInstanceId, JwtAuthenticationToken jwtAuthenticationToken)
             throws ConsulLoginFailedException, ServiceInstanceNotFoundException {
 
-        var consulCatalogServiceOptional = this.consulServicesClient.getServiceById(
+        var consulCatalogServiceOptional = this.consulAdminClient.services().getServiceById(
                  serviceInstanceId
         );
 
@@ -116,7 +118,7 @@ public class ServiceInstancesHandler {
     public void deleteServiceInstanceOfUser(UUID serviceInstanceId, JwtAuthenticationToken jwtAuthenticationToken)
             throws ConsulLoginFailedException, ServiceInstanceNotFoundException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, SSLException, CapabilityServiceNotFoundException {
 
-        var optionalConsulService = this.consulServicesClient
+        var optionalConsulService = this.consulAdminClient.services()
                 .getServiceByName( "service_" + serviceInstanceId);
 
         if (optionalConsulService.isPresent()) {

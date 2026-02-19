@@ -1,4 +1,4 @@
-package org.eclipse.slm.common.parent.service_rest.config;
+package org.eclipse.slm.common.parent.service.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

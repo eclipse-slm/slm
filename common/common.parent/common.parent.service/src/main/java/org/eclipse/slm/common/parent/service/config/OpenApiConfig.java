@@ -1,4 +1,4 @@
-package org.eclipse.slm.common.parent.service_rest.config;
+package org.eclipse.slm.common.parent.service.config;
 
 import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
 import io.swagger.v3.oas.models.Components;

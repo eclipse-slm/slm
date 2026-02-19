@@ -5,7 +5,7 @@ import org.eclipse.slm.common.consul.client.ConsulClient;
 import org.eclipse.slm.common.consul.client.ConsulClientFactory;
 import org.eclipse.slm.common.consul.model.catalog.Node;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
-import org.eclipse.slm.common.parent.service_rest.controller.SystemVariableHandler;
+import org.eclipse.slm.common.parent.service.controller.SystemVariableHandler;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.common.model.MatchingResourceDTO;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService;

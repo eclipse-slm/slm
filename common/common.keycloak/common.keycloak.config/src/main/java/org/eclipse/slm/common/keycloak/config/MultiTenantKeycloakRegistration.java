@@ -144,27 +144,13 @@ public class MultiTenantKeycloakRegistration {
         realms.add(realm);
         LOG.info("Client configuration initialized for realm '{}'", realm);
 
-        try {
-            TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() { return null; }
-                    public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) { }
-                    public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) { }
-                }
-            };
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-
-            Keycloak keycloak = KeycloakBuilder.builder()
+        try (Keycloak keycloak = KeycloakBuilder.builder()
                     .serverUrl(keycloakOidcConfig.getAuthServerUrl())
                     .realm(realm)
                     .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
                     .clientId(keycloakOidcConfig.getResource())
                     .clientSecret(keycloakOidcConfig.getCredentials().getSecret())
-                    .resteasyClient(ResteasyClientBuilder.newBuilder()
-                            .sslContext(sslContext)
-                            .build())
-                    .build();
+                .build()) {
 
             var realmResource = keycloak.realm(realm);
             this.realmResourceMap.put(realm,  realmResource);
