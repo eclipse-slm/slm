@@ -4,7 +4,6 @@ import {useToast} from "vue-toast-notification";
 import {CredentialDataType} from "@/api/platform-management/client";
 import {debounce} from "chart.js/helpers";
 import {CredentialFormData, KeyPairData, UsernamePasswordData} from "@/components/credentials/types";
-import { defineExpose } from 'vue';
 import { useForm, useField } from 'vee-validate';
 import PlatformManagementClient from '@/api/platform-management/platform-management-client'
 import type { CredentialReadDTO } from '@/api/platform-management/client'

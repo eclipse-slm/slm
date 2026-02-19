@@ -1,5 +1,5 @@
 <script setup>
-import {toRef, defineProps, defineEmits, ref, watch} from 'vue';
+import {toRef, ref, watch} from 'vue';
 
 const emit = defineEmits(['canceled']);
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import RowWithLabel from "@/components/base/RowWithLabel.vue";
-import { defineProps, computed } from 'vue'
+import { computed } from 'vue'
 import {CredentialDataType} from "@/api/platform-management/client";
 import {useToast} from "vue-toast-notification";
 import {useClipboard} from "@vueuse/core";
