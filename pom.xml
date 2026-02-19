@@ -581,12 +581,11 @@
                 <version>1.0.4</version>
                 <configuration>
                     <excludes>
-
                         <exclude>siemens/**</exclude>       <!-- Exclude code generated from protobuf files in common.driver from coverage report -->
                         <exclude>factory_x/**</exclude>     <!-- Exclude code generated from protobuf files in common.driver  from coverage report -->
                         <exclude>**/*MapperImpl*</exclude>  <!-- Exclude generated mapper implementations of MapStruct !-->
-                        <exclude>org/eclipse/slm/service_management/service/client/**</exclude>
-                        <exclude>org/eclipse/slm/service_management/model/**</exclude>
+                        <exclude>org/eclipse/slm/service_management/service/client/**</exclude> <!-- Exclude auto-generated client code -->
+                        <exclude>org/eclipse/slm/service_management/model/**</exclude>          <!-- Exclude auto-generated client code -->
                     </excludes>
                 </configuration>
             </plugin>
