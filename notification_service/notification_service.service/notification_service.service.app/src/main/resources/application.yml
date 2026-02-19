@@ -140,5 +140,6 @@ consul:
   scheme: http
   host: consul
   port: 8500
+  url: ${consul.scheme}://${consul.host}:${consul.port}
   datacenter: fabos
   acl-token: your-consul-acl-token

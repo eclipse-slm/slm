@@ -82,4 +82,4 @@ start_app() {
   java -jar -Djava.security.egd=file:/dev/./urandom /app/app.jar
 }
 
-}###endregion Methods
+###endregion Methods
