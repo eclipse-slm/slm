@@ -29,7 +29,13 @@ import_root_ca() {
   mkdir -p /vault
   curl -s http://vault:8200/v1/pki_root_slm/cert/ca | jq -r .data.certificate > "$ca_file"
 
-  # Import CA (only if changed)
+  # Delete existing alias if it exists
+  if keytool -list -cacerts -storepass "$keystore_pass" -alias "$alias_name" > /dev/null 2>&1; then
+    echo "Alias $alias_name already exists in keystore, deleting it first..."
+    keytool -delete -cacerts -storepass "$keystore_pass" -alias "$alias_name"
+  fi
+
+  # Import CA
   keytool -importcert \
     -alias "$alias_name" \
     -cacerts \
@@ -37,7 +43,7 @@ import_root_ca() {
     -file "$ca_file" \
     -noprompt
 
-  echo "SLM root CA imported to Java keystore"
+  echo "SLM root CA successfully imported to Java keystore with alias $alias_name"
 }
 
 wait_for_consul() {
