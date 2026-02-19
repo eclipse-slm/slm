@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.kotlin.KotlinModule;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.eclipse.slm.common.consul.client.ConsulClient;
 import org.eclipse.slm.common.consul.client.ConsulClientFactory;
 import org.eclipse.slm.common.keycloak.config.jwt.IssuerProperties;
@@ -52,7 +53,7 @@ public class MultiTenantKeycloakRegistration {
 
     private Map<String, File> oidcConfigFiles;
 
-    private Map<String, RealmResource> realmResourceMap = new HashMap<>();
+    private Map<String, Keycloak> keycloakClientMap = new HashMap<>();
 
     private Optional<ConsulClient> consulClient;
 
@@ -144,20 +145,18 @@ public class MultiTenantKeycloakRegistration {
         realms.add(realm);
         LOG.info("Client configuration initialized for realm '{}'", realm);
 
-        try (Keycloak keycloak = KeycloakBuilder.builder()
-                    .serverUrl(keycloakOidcConfig.getAuthServerUrl())
-                    .realm(realm)
-                    .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-                    .clientId(keycloakOidcConfig.getResource())
-                    .clientSecret(keycloakOidcConfig.getCredentials().getSecret())
-                .build()) {
-
-            var realmResource = keycloak.realm(realm);
-            this.realmResourceMap.put(realm,  realmResource);
+        try {
+            Keycloak keycloak = KeycloakBuilder.builder()
+                .serverUrl(keycloakOidcConfig.getAuthServerUrl())
+                .realm(realm)
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                .clientId(keycloakOidcConfig.getResource())
+                .clientSecret(keycloakOidcConfig.getCredentials().getSecret())
+                .build();
+            this.keycloakClientMap.put(realm, keycloak);
         } catch (Exception e) {
-            throw new RuntimeException("Fehler beim Initialisieren des Keycloak-Clients mit unsicherem TrustManager", e);
+            throw new RuntimeException("Error initializing Keycloak client for realm '" + realm + "'", e);
         }
-
 
         var issuerProperties = new IssuerProperties();
         try {
@@ -191,8 +190,11 @@ public class MultiTenantKeycloakRegistration {
     }
 
     public RealmResource getRealmResource(String realmName) {
-        RealmResource realm = realmResourceMap.get(realmName);
-        return realmResourceMap.get(realmName);
+        Keycloak keycloak = keycloakClientMap.get(realmName);
+        if (keycloak == null) {
+            throw new IllegalStateException("No Keycloak client for realm: " + realmName);
+        }
+        return keycloak.realm(realmName);
     }
 
     public List<IssuerProperties> getIssuers() {
@@ -220,5 +222,16 @@ public class MultiTenantKeycloakRegistration {
             return optionalKeycloakOidcConfig.get().getValue().getRealm();
         }
         return null;
+    }
+
+    @PreDestroy
+    public void closeKeycloakClients() {
+        for (Keycloak keycloak : keycloakClientMap.values()) {
+            try {
+                keycloak.close();
+            } catch (Exception e) {
+                LOG.warn("Error closing Keycloak client", e);
+            }
+        }
     }
 }
