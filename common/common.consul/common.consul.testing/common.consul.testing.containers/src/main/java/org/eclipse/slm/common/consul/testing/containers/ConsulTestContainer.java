@@ -4,7 +4,7 @@ import org.testcontainers.containers.GenericContainer;
 
 public class ConsulTestContainer extends GenericContainer<ConsulTestContainer> {
 
-    private final static String CONSUL_IMAGE = "hashicorp/consul:1.22";
+    private final static String CONSUL_IMAGE = "hashicorp/consul:1.22.4";
     private final static String CONSUL_ROOT_TOKEN = "root";
     private final static String CONSUL_DATACENTER = "dc1";
     private final static String CONSUL_SCHEME = "http";

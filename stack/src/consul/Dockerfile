@@ -1,4 +1,4 @@
-FROM hashicorp/consul:1.22
+FROM hashicorp/consul:1.22.4
 
 ADD custom-entrypoint.sh /usr/local/bin/custom-entrypoint.sh
 RUN chmod +x /usr/local/bin/custom-entrypoint.sh

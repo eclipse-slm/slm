@@ -5,7 +5,7 @@ import org.testcontainers.containers.GenericContainer;
 
 public class VaultTestContainer extends GenericContainer<VaultTestContainer> {
 
-    private static final String VAULT_IMAGE = "hashicorp/vault:1.20.3";
+    private static final String VAULT_IMAGE = "hashicorp/vault:1.21.2";
     private static final String VAULT_ROOT_TOKEN = "root";
     private static final int VAULT_PORT = 8200;
 

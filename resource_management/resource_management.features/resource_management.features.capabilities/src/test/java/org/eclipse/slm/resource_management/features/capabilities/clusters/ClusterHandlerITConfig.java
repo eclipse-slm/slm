@@ -38,7 +38,7 @@ public class ClusterHandlerITConfig {
     //endregion
 
     //region Vault Properties
-    public static String VAULT_VERSION = "1.20.3";
+    public static String VAULT_VERSION = "1.21.2";
     public static String VAULT_HOST = "localhost";
     public static int VAULT_PORT = 8200;
     public static String VAULT_TOKEN = "root";
