@@ -2,6 +2,7 @@ package org.eclipse.slm.resource_management.features.device_integration.discover
 
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplate.DigitalNameplateV3;
+import org.eclipse.slm.resource_management.common.exceptions.ResourceDefinitionException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceRuntimeException;
 import org.eclipse.slm.resource_management.common.resources.ResourcesManager;
@@ -156,8 +157,7 @@ public class DiscoveryService implements DiscoveryJobListener {
         this.discoveryEventMessageSender.sendMessage(completedDiscoveryJob, DiscoveryJobEventType.CHANGED);
     }
 
-    public void onboard(String resultId, String fullPathUserGroupId) throws ResourceRuntimeException
-    {
+    public void onboard(String resultId, String fullPathUserGroupId) throws ResourceRuntimeException, ResourceDefinitionException {
         var discoveryJobId = resultId.split(":")[0];
         var resourceIdString = resultId.split(":")[1];
         var resourceId = UUID.fromString(resourceIdString);

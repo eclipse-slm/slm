@@ -16,8 +16,11 @@ export type CredentialData = UsernamePasswordData | KeyPairData;
 
 export interface CredentialFormData {
     isFormValid: boolean;
-    data?: CredentialData;
-    useExisting?: boolean;
-    existingCredentialId?: string;
-    existingCredentialDataType?: CredentialDataType;
+    formData: {
+        credentialName?: string;
+        data?: CredentialData;
+        useExisting?: boolean;
+        existingCredentialId?: string;
+        existingCredentialDataType?: CredentialDataType;
+    };
 }

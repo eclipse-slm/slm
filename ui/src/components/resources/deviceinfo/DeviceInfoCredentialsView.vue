@@ -27,6 +27,7 @@ const scopeOptions = [ResourceCredentialScope.RemoteAccess, ResourceCredentialSc
 const selectedCredentialIds = ref<string[]>([]);
 
 const tableHeaders = [
+  { title: 'Name', value: 'name' },
   { title: 'Type', value: 'data.credentialDataType' },
   { title: 'Scopes', value: 'scopes' },
   { title: 'ID', value: 'id' },
@@ -142,6 +143,9 @@ const filteredCredentials = computed(() => {
           @update:model-value="val => selectedCredentialIds = val"
           show-select
         >
+          <template #item.name="{ item }">
+            <span>{{ item.name || '-' }}</span>
+          </template>
           <template #item.scopes="{ item }">
             <v-chip-group>
               <v-chip
@@ -164,6 +168,7 @@ const filteredCredentials = computed(() => {
                    <v-card-text>
                     <credential-display
                       :credential="item"
+                      hide-name
                     />
                    </v-card-text>
                  </v-card>
@@ -198,4 +203,3 @@ pre {
 }
 
 </style>
-

@@ -47,9 +47,10 @@
           :section="selectedSection"
           @closed="selectedResource = null"
         />
-        <resources-create-dialog
+        <DeviceCreateDialog
           :show="showCreateDialog"
           @canceled="showCreateDialog = false"
+          @confirmed="showCreateDialog = false"
         />
         <v-fab
           :active="!showCreateButton"
@@ -71,13 +72,11 @@ import {computed, onMounted, ref} from 'vue';
 import ApiState from '@/api/apiState';
 import { useResourceDevicesStore } from "@/stores/resourceDevicesStore";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-import ResourcesCreateDialog from "@/components/resources/dialogs/create/ResourcesCreateDialog.vue";
+import DeviceCreateDialog from "@/components/resources/dialogs/DeviceCreateDialog.vue";
 import DeviceInfoView from "@/components/resources/deviceinfo/DeviceInfoView.vue";
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import ResourcesTableDevices from "@/components/resources/ResourcesTableDevices.vue";
 import {useCapabilitiesStore} from "@/stores/capabilitiesStore";
-import ResourceManagementClient from "@/api/resource-management/resource-management-client";
-import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
 
 const resourceDevicesStore = useResourceDevicesStore();
 const capabilitiesStore = useCapabilitiesStore();

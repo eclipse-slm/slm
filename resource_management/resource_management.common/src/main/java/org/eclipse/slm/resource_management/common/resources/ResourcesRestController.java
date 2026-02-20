@@ -1,6 +1,7 @@
 package org.eclipse.slm.resource_management.common.resources;
 
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
+import org.eclipse.slm.resource_management.common.exceptions.ResourceDefinitionException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ public class ResourcesRestController implements ResourcesRestApi {
     }
 
     @Override
-    public ResponseEntity<UUID> addExistingResource(CreateResourceRequest createResourceRequest) throws ResourceNotFoundException {
+    public ResponseEntity<UUID> addExistingResource(CreateResourceRequest createResourceRequest) throws ResourceNotFoundException, ResourceDefinitionException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         UUID resourceId = UUID.randomUUID();
@@ -66,7 +67,7 @@ public class ResourcesRestController implements ResourcesRestApi {
     }
 
     @Override
-    public ResponseEntity<Void> addExistingResourceWithId(UUID resourceId, CreateResourceRequest createResourceRequest) throws ResourceNotFoundException {
+    public ResponseEntity<Void> addExistingResourceWithId(UUID resourceId, CreateResourceRequest createResourceRequest) throws ResourceNotFoundException, ResourceDefinitionException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         this.resourcesManager.createResource(

@@ -7,7 +7,7 @@ import logRequestError from '@/api/restApiHelper';
 import { useUserStore } from '@/stores/userStore';
 import { Credential, CredentialCreateRequest } from '@/api/platform-management/client';
 import CredentialForm from '@/components/credentials/CredentialForm.vue';
-import { CredentialFormData } from '@/components/credentials/types';
+import { CredentialFormData } from '@/components/credentials/CredentialTypes';
 
 const $toast = useToast();
 
@@ -29,7 +29,6 @@ watch(() => props.show, (v) => { dialogActive.value = v; });
 const userStore = useUserStore();
 
 // Credential form child
-const credentialFormRef = ref<any | null>(null);
 const credentialFormData = ref<CredentialFormData | undefined>(undefined);
 
 const submitting = ref(false);
@@ -44,14 +43,13 @@ function clearForm() {
   credentialFormData.value = undefined;
   apiError.value = null;
   submitting.value = false;
-  credentialFormRef.value?.clearForm?.();
 }
 
 async function onSubmit() {
   apiError.value = null;
   submitting.value = true;
 
-  if (!credentialFormData.value?.isFormValid || !credentialFormData.value.data) {
+  if (!credentialFormData.value?.isFormValid || !credentialFormData.value.formData.data) {
     apiError.value = 'Form is not valid';
     submitting.value = false;
     return;
@@ -62,9 +60,10 @@ async function onSubmit() {
     entityLinks: props.entityLinks,
     fullPathOwnerGroupId: userStore.fullPathUserGroupId,
     credential: {
-      ...(credentialId ? { id: credentialId } : {}),
+      id: credentialId,
+      name: credentialFormData.value.formData.credentialName,
       scopesRaw: props.scopes,
-      data: credentialFormData.value.data,
+      data: credentialFormData.value.formData.data,
     } as Credential,
   } as CredentialCreateRequest;
 
@@ -85,10 +84,6 @@ function onCancel() {
   dialogActive.value = false;
   clearForm();
 }
-
-function onCredentialFormChanged(formData: CredentialFormData) {
-  credentialFormData.value = formData;
-}
 </script>
 
 <template>
@@ -99,9 +94,8 @@ function onCredentialFormChanged(formData: CredentialFormData) {
 
         <!-- Credential input -->
         <CredentialForm
-          ref="credentialFormRef"
+          v-model="credentialFormData"
           :allow-existing="false"
-          @changed="onCredentialFormChanged"
         />
       </div>
     </template>

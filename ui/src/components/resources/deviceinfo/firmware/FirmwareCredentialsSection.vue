@@ -6,11 +6,11 @@ import ProgressCircular from "@/components/base/ProgressCircular.vue";
 import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
 import CredentialDisplay from "@/components/credentials/CredentialDisplay.vue";
 import CredentialForm from "@/components/credentials/CredentialForm.vue";
+import { CredentialFormData } from "@/components/credentials/CredentialTypes";
 import PlatformManagementClient from "@/api/platform-management/platform-management-client";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import { ResourceCredentialScope } from "@/api/resource-management/client";
 import type {CredentialCreateRequest, CredentialReadDTO} from "@/api/platform-management/client";
-import type { CredentialFormData } from "@/components/credentials/types";
 import {useUserStore} from "@/stores/userStore";
 import { SectionState, type SectionStateChangeEvent } from "@/components/resources/deviceinfo/firmware/sectionState";
 
@@ -31,7 +31,7 @@ const firmwareCredentials = ref<CredentialReadDTO[]>([]);
 const showDeleteCredentialDialog = ref(false);
 const credentialToDeleteId = ref<string | null>(null);
 const showCredentialDialog = ref(false);
-const credentialFormData = ref<CredentialFormData | null>(null);
+const credentialFormData = ref<CredentialFormData>({ isFormValid: false, formData: {} });
 const submittingCredential = ref(false);
 const deleteCredentialIfOrphaned = ref(false);
 const deleteCredentialLoading = ref(false);
@@ -125,10 +125,10 @@ async function handleCredentialSubmission() {
 
   submittingCredential.value = true;
   try {
-    if (credentialFormData.value.useExisting && credentialFormData.value.existingCredentialId) {
+    if (credentialFormData.value.formData.useExisting && credentialFormData.value.formData.existingCredentialId) {
       // Assign existing credential
-      await assignFirmwareUpdateCredential(credentialFormData.value.existingCredentialId);
-    } else if (credentialFormData.value.data) {
+      await assignFirmwareUpdateCredential(credentialFormData.value.formData.existingCredentialId);
+    } else if (credentialFormData.value.formData.data) {
       // Create new credential and assign
       const credentialId = globalThis.crypto?.randomUUID?.();
       if (!credentialId) {
@@ -137,8 +137,9 @@ async function handleCredentialSubmission() {
       const credentialCreateRequest = {
         credential: {
           id: credentialId,
+          name: credentialFormData.value.formData.credentialName,
           scopesRaw: [ResourceCredentialScope.FirmwareUpdate],
-          data: credentialFormData.value.data,
+          data: credentialFormData.value.formData.data,
         },
         entityLinks: [{
           entityId: props.resourceId,
@@ -161,12 +162,7 @@ async function handleCredentialSubmission() {
 }
 
 function openCredentialDialog() {
-  credentialFormData.value = {
-    isFormValid: false,
-    useExisting: false,
-    existingCredentialId: undefined,
-    data: undefined,
-  };
+  credentialFormData.value = { isFormValid: false, formData: {} };
   showCredentialDialog.value = true;
 }
 </script>
@@ -222,6 +218,7 @@ function openCredentialDialog() {
   >
     <template #content>
       <CredentialForm
+        v-model="credentialFormData"
         :allow-existing="true"
         @changed="credentialFormData = $event"
       />

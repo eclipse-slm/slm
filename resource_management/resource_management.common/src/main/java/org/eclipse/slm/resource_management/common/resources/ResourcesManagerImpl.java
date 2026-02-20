@@ -10,6 +10,7 @@ import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient
 import org.eclipse.slm.resource_management.common.adapters.ResourcesVaultClient;
 import org.eclipse.slm.resource_management.common.aas.ResourcesAasHandler;
 import org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplate.DigitalNameplateV3;
+import org.eclipse.slm.resource_management.common.exceptions.ResourceDefinitionException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceRuntimeException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.ports.ICapabilitiesManager;
@@ -135,8 +136,15 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
             String driverId,
             DigitalNameplateV3 digitalNameplateV3,
             String fullPathOwnerGroupId
-    ) throws ResourceNotFoundException, ResourceRuntimeException {
+    ) throws ResourceNotFoundException, ResourceRuntimeException, ResourceDefinitionException {
         try {
+            if (resourceHostname == null || resourceHostname.isEmpty()) {
+                throw new ResourceDefinitionException("Resource hostname cannot be null or empty");
+            }
+            if (resourceIp == null || resourceIp.isEmpty()) {
+                throw new ResourceDefinitionException("Resource IP cannot be null or empty");
+            }
+
             if (driverId == null) {
                 driverId = "N/A";
             }

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import {useToast} from "vue-toast-notification";
 import {CredentialDataType} from "@/api/platform-management/client";
 import {debounce} from "chart.js/helpers";
-import {CredentialFormData, KeyPairData, UsernamePasswordData} from "@/components/credentials/types";
+import {CredentialFormData, KeyPairData, UsernamePasswordData} from "@/components/credentials/CredentialTypes";
 import { useForm, useField } from 'vee-validate';
 import PlatformManagementClient from '@/api/platform-management/platform-management-client'
 import type { CredentialReadDTO } from '@/api/platform-management/client'
@@ -11,12 +11,27 @@ import CredentialDisplay from '@/components/credentials/CredentialDisplay.vue'
 
 const $toast = useToast();
 
-const emit = defineEmits<{ (e: 'changed', formData: CredentialFormData ) : void }>();
+const emit = defineEmits<{ (e: 'update:modelValue', value: CredentialFormData): void }>();
+const props = defineProps({
+  modelValue: { type: Object as () => CredentialFormData, required: false },
+  allowExisting: { type: Boolean, default: false },
+});
 
 // vee-validate form + fields
 const { validate } = useForm();
 
+const credentialNameRule = (v: any) => {
+  if (credentialDataTypeVal.value && credentialDataTypeVal.value !== USE_EXISTING_VALUE) {
+    return v ? true : 'Credential Name is required';
+  }
+  return true;
+};
+const { value: credentialNameVal, errorMessage: credentialNameError } = useField<string>('credentialName', credentialNameRule);
+
+const USE_EXISTING_VALUE = 'USE_EXISTING';
+type CredentialTypeOption = { title: string, value: string };
 const { value: credentialDataTypeVal, errorMessage: credentialDataTypeError } = useField<string | undefined>('credentialDataType', (v: any) => v ? true : 'Credential Type is required');
+
 const { value: usernameVal, errorMessage: usernameError } = useField<string>('username', (v: any) => {
   if (credentialDataTypeVal.value === CredentialDataType.UsernamePassword) return v ? true : 'Username is required';
   return true;
@@ -38,28 +53,31 @@ const { value: existingCredentialIdVal, errorMessage: existingCredentialIdError 
   return true;
 });
 
-// keep credential options
-const props = defineProps({
-  allowExisting: { type: Boolean, default: false },
-});
-const USE_EXISTING_VALUE = 'USE_EXISTING';
 const credentialTypeOptions = computed(() => {
-  const options = [
-    { title: 'Username / Password', value: CredentialDataType.UsernamePassword },
-    { title: 'Key Pair', value: CredentialDataType.KeyPair },
+  const options: CredentialTypeOption[] = [
+    {
+      title: 'Username / Password',
+      value: CredentialDataType.UsernamePassword
+    },
+    {
+      title: 'Key Pair',
+      value: CredentialDataType.KeyPair
+    }
   ];
   if (props.allowExisting) {
-    options.push({ title: 'Use existing credential', value: USE_EXISTING_VALUE });
+    options.push({
+      title: 'Use existing credential',
+      value: USE_EXISTING_VALUE,
+    });
   }
   return options;
 });
 
-// keep file names and showPassword local refs
 const showPassword = ref(false);
 const publicKeyFileName = ref<string | null>(null);
 const privateKeyFileName = ref<string | null>(null);
 
-const existingCredentials = ref<CredentialReadDTO[]>([]);
+const existingCredentials = ref<CredentialReadDTO[]>([])
 const existingCredentialsLoading = ref(false);
 const existingCredentialsError = ref<string | null>(null);
 
@@ -67,10 +85,11 @@ const existingCredentialOptions = computed(() => {
   return existingCredentials.value.map((credential) => {
     const type = credential.data?.credentialDataType;
     const username = (credential.data as any)?.username;
+    const name = credential.name;
     const typeLabel = type === CredentialDataType.UsernamePassword ? 'Username / Password' : 'Key Pair';
     const detail = username ? ` - ${username}` : '';
     return {
-      title: `${typeLabel}${detail} (${credential.id})`,
+      title: `${name ? name + ' | ' : ''}${typeLabel}${detail} (${credential.id})`,
       value: credential.id,
     };
   });
@@ -81,20 +100,30 @@ const selectedExistingCredential = computed(() => {
 });
 
 const emitDebounced = debounce(() => {
-  // run vee-validate validation and then emit structured payload
   validate().then((validationResult) => {
       const formData = createFormData(validationResult.valid);
-      emit('changed', formData);
+      emit('update:modelValue', formData);
   })
 }, 300);
 
-// Watcher fuer relevante Felder
-watch([credentialDataTypeVal, usernameVal, passwordVal, publicKeyVal, privateKeyVal, existingCredentialIdVal], () => {
+watch([
+  credentialDataTypeVal, usernameVal, passwordVal, publicKeyVal, privateKeyVal, existingCredentialIdVal, credentialNameVal
+], () => {
   emitDebounced();
 });
 
+onMounted(() => {
+  if (props.allowExisting) {
+    loadExistingCredentials();
+  }
+});
+
 watch(credentialDataTypeVal, (value) => {
-  if (value === USE_EXISTING_VALUE && props.allowExisting) {
+  if (
+    value === USE_EXISTING_VALUE &&
+    props.allowExisting &&
+    existingCredentials.value.length === 0
+  ) {
     loadExistingCredentials();
   }
   if (value !== USE_EXISTING_VALUE) {
@@ -144,7 +173,6 @@ function onPrivateKeyFileChange(file: File | null) {
   reader.readAsText(file);
 }
 
-// Vuetify v-file-input can emit File | File[] | null; provide wrappers that accept that signature
 function onPublicKeyFileChangeWrapper(files: File | File[] | null) {
   let file: File | null = files && Array.isArray(files) ? files[0] ?? null : (files as File | null);
   onPublicKeyFileChange(file);
@@ -170,6 +198,7 @@ async function loadExistingCredentials() {
 
 function clearForm() {
   credentialDataTypeVal.value = undefined;
+  credentialNameVal.value = '';
   usernameVal.value = '';
   passwordVal.value = '';
   publicKeyVal.value = '';
@@ -180,36 +209,57 @@ function clearForm() {
   existingCredentialsError.value = null;
 }
 
-// expose clear and getter to parent
 defineExpose({ clearForm, createFormData });
 
 function createFormData(isFormValid: boolean): CredentialFormData {
-  let credentialFormData = {
-    isFormValid: isFormValid,
-  } as CredentialFormData;
+  let formData = {
+    credentialName: credentialNameVal.value,
+  } as CredentialFormData['formData'];
 
   if (credentialDataTypeVal.value === USE_EXISTING_VALUE) {
-    credentialFormData.useExisting = true;
-    credentialFormData.existingCredentialId = existingCredentialIdVal.value;
-    credentialFormData.existingCredentialDataType = selectedExistingCredential.value?.data?.credentialDataType;
-    return credentialFormData;
+    formData.useExisting = true;
+    formData.existingCredentialId = existingCredentialIdVal.value;
+    formData.existingCredentialDataType = selectedExistingCredential.value?.data?.credentialDataType;
+    return {
+      isFormValid,
+      formData
+    };
   }
 
   if (credentialDataTypeVal.value === CredentialDataType.UsernamePassword) {
-    credentialFormData.data = {
+    formData.data = {
       credentialDataType: credentialDataTypeVal.value,
       username: usernameVal.value,
       password: passwordVal.value,
     } as UsernamePasswordData
   } else if (credentialDataTypeVal.value === CredentialDataType.KeyPair) {
-    credentialFormData.data = {
+    formData.data = {
       credentialDataType: credentialDataTypeVal.value,
       publicKey: publicKeyVal.value,
       privateKey: privateKeyVal.value,
     } as KeyPairData
   }
 
-  return credentialFormData;
+  return {
+    isFormValid,
+    formData
+  };
+}
+
+function customCredentialFilter(item: any, queryText: string, itemText: string) {
+  const lowerQuery = queryText.toLowerCase();
+  const credential = existingCredentials.value.find(c => c.id === item.value);
+  if (!credential) return false;
+  const name = credential.name?.toLowerCase() || '';
+  const type = (credential.data?.credentialDataType || '').toLowerCase();
+  const username = (credential.data as any)?.username?.toLowerCase() || '';
+  const id = credential.id?.toLowerCase() || '';
+  return (
+    name.includes(lowerQuery) ||
+    type.includes(lowerQuery) ||
+    username.includes(lowerQuery) ||
+    id.includes(lowerQuery)
+  );
 }
 </script>
 
@@ -228,12 +278,28 @@ function createFormData(isFormValid: boolean): CredentialFormData {
       :error-messages="credentialDataTypeError"
     />
 
+    <v-text-field
+      v-if="credentialDataTypeVal && credentialDataTypeVal !== USE_EXISTING_VALUE"
+      v-model="credentialNameVal"
+      label="Credential Name"
+      :error="!!credentialNameError"
+      :error-messages="credentialNameError"
+      class="mb-2"
+    />
+
+    <div v-if="credentialDataTypeVal === USE_EXISTING_VALUE && selectedExistingCredential">
+      <div class="mb-2">
+        <span class="text-caption">Credential Name:</span>
+        <span class="font-weight-bold ml-1">{{ (selectedExistingCredential.data as any)?.name ?? '-' }}</span>
+      </div>
+    </div>
+
     <div v-if="credentialDataTypeVal === USE_EXISTING_VALUE">
       <v-alert v-if="existingCredentialsError" type="error" variant="tonal" class="mb-2">
         {{ existingCredentialsError }}
       </v-alert>
 
-      <v-select
+      <v-autocomplete
         v-model="existingCredentialIdVal"
         :items="existingCredentialOptions"
         item-title="title"
@@ -244,6 +310,8 @@ function createFormData(isFormValid: boolean): CredentialFormData {
         :loading="existingCredentialsLoading"
         :error="!!existingCredentialIdError"
         :error-messages="existingCredentialIdError"
+        :filter="customCredentialFilter"
+        clearable
       />
 
       <div v-if="selectedExistingCredential" class="mt-2">

@@ -2,6 +2,7 @@ package org.eclipse.slm.resource_management.common.resources;
 
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplate.DigitalNameplateV3;
+import org.eclipse.slm.resource_management.common.exceptions.ResourceDefinitionException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceRuntimeException;
 
@@ -26,7 +27,7 @@ public interface ResourcesManager {
             String driverId,
             DigitalNameplateV3 digitalNameplateV3,
             String fullPathOwnerGroupId
-    ) throws ResourceNotFoundException, ResourceRuntimeException;
+    ) throws ResourceNotFoundException, ResourceRuntimeException, ResourceDefinitionException;
 
     void deleteResource(UUID resourceId, String jwtAccessToken) throws ResourceNotFoundException, ResourceRuntimeException;
 

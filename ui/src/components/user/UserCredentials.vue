@@ -20,6 +20,7 @@ const searchQuery = ref('')
 const showCreateDialog = ref(false)
 
 const tableHeaders = [
+  { title: 'Name', value: 'name' },
   { title: 'Type', value: 'data.credentialDataType' },
   { title: 'Scopes', value: 'scopes' },
   { title: 'ID', value: 'id' },
@@ -64,7 +65,8 @@ const filteredCredentials = computed(() => {
     const type = (c.data as any)?.credentialDataType?.toString().toLowerCase() ?? ''
     const username = (c.data as any)?.username?.toString().toLowerCase() ?? ''
     const id = c.id?.toString().toLowerCase() ?? ''
-    return [scopes, type, username, id].some((value) => value.includes(query))
+    const name = (c.name as any)?.toString().toLowerCase() ?? ''
+    return [scopes, type, username, id, name].some((value) => value.includes(query))
   })
 })
 
@@ -171,6 +173,9 @@ const confirmDeleteLoading = computed(() => deletingId.value !== null)
             show-expand
             class="elevation-1"
           >
+            <template #item.data.name="{ item }">
+              <span>{{ (item as any).data?.credentialName || '-' }}</span>
+            </template>
             <template #item.scopes="{ item }">
               <v-chip-group>
                 <v-chip

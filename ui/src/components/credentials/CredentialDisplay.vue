@@ -7,6 +7,7 @@ import {useClipboard} from "@vueuse/core";
 
 const props = defineProps({
   credential: { type: Object, required: true },
+  hideName: { type: Boolean, default: false },
 })
 
 const $toast = useToast();
@@ -22,6 +23,12 @@ const copyToClipboard = (content) => {
 
 <template>
   <div>
+    <!-- CREDENTIAL NAME -->
+    <RowWithLabel
+      v-if="!props.hideName"
+      label="Name"
+      :text="props.credential?.name ?? '-'"
+    />
     <!-- USERNAME / PASSWORD -->
     <div v-if="credentialDataType === CredentialDataType.UsernamePassword">
       <RowWithLabel

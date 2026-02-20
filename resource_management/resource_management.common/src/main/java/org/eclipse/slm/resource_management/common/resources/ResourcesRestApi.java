@@ -3,6 +3,7 @@ package org.eclipse.slm.resource_management.common.resources;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
+import org.eclipse.slm.resource_management.common.exceptions.ResourceDefinitionException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,14 +33,14 @@ public interface ResourcesRestApi {
     @Operation(summary = "Add existing resource")
     ResponseEntity<UUID> addExistingResource(
             @RequestBody CreateResourceRequest createResourceRequest
-    ) throws ResourceNotFoundException;
+    ) throws ResourceNotFoundException, ResourceDefinitionException;
 
     @RequestMapping(value = "/{resourceId}", method = RequestMethod.PUT)
     @Operation(summary = "Add existing resource with id")
     ResponseEntity<Void> addExistingResourceWithId(
             @PathVariable(name = "resourceId") UUID resourceId,
             @RequestBody CreateResourceRequest createResourceRequest
-    ) throws ResourceNotFoundException;
+    ) throws ResourceNotFoundException, ResourceDefinitionException;
 
     @RequestMapping(value = "/{resourceId}", method = RequestMethod.DELETE)
     @Operation(summary = "Delete resource")

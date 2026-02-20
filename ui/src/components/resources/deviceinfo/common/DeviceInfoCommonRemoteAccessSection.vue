@@ -199,6 +199,7 @@ loadData();
                 <credential-display
                   v-if="item.credential"
                   :credential="item.credential"
+                  :hide-name="true"
                 />
               </template>
             </v-expansion-panel>
