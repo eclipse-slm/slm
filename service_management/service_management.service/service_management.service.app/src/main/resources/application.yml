@@ -151,6 +151,7 @@ vault:
   scheme: http
   host: localhost
   port: 8200
+  url: ${vault.scheme}://${vault.host}:${vault.port}
   authentication: APPROLE
 #  token: your-secret-token
   app-role:
