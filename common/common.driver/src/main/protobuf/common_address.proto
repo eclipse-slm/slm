@@ -108,13 +108,13 @@ message Destination {
 // This is a workaround for "repeated oneof" in protobuf. See https://github.com/protocolbuffers/protobuf/issues/2592
 message NodeAddress {
   oneof type {
-    // A json string containing the datapoint address according to the
-    // path $defs/connection_datapoint/address in the base schema
-    // 'https://siemens.com/connectivity_suite/schemas/base/1.0.0/config.json'
-    // specialized for the specific schema given by the schema uri of the connection
-    string datapoint_json = 1;
+      // A json string containing the datapoint address according to the
+      // path $defs/connection_datapoint/address in the base schema
+      // 'https://siemens.com/connectivity_suite/schemas/base/1.0.0/config.json'
+      // specialized for the specific schema given by the schema uri of the connection
+      string datapoint_json = 1;
 
-    // should work for any browse server
-    BrowsePath browse_path = 2;
+      // should work for any browse server
+      BrowsePath browse_path = 2;
   }
 }

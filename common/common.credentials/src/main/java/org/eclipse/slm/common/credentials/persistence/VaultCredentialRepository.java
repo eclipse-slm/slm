@@ -6,6 +6,7 @@ import org.eclipse.slm.common.credentials.exceptions.CredentialNotFoundException
 import org.eclipse.slm.common.credentials.exceptions.CredentialRuntimeException;
 import org.eclipse.slm.common.credentials.model.*;
 import org.eclipse.slm.common.vault.client.VaultClient;
+import org.eclipse.slm.common.vault.client.exceptions.VaultGroupNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,6 +169,27 @@ public class VaultCredentialRepository implements CredentialRepository {
         } catch (Exception e) {
             throw new CredentialRuntimeException("Failed to update credential scopes for id '" + credentialId + "'.", e);
         }
+    }
+
+    @Override
+    public boolean hasGroupReadAccessToCredential(UUID credentialId, String groupId) {
+        try {
+            var vaultGroup = this.vaultClient.acl().getGroupByName(groupId);
+            if (vaultGroup == null || vaultGroup.getPolicies() == null) {
+                return false;
+            }
+
+            for (var policyName : vaultGroup.getPolicies()) {
+                if (policyName.equals(VaultCredentialRepository.getCredentialPolicyNameById(credentialId))) {
+                    return true;
+                }
+            }
+        } catch (VaultGroupNotFoundException e) {
+            LOG.debug("Group with id '{}' not found in Vault. Assuming no access to credential '{}'.", groupId, credentialId);
+            return  false;
+        }
+        
+        return false;
     }
     //endregion CredentialRepository
 

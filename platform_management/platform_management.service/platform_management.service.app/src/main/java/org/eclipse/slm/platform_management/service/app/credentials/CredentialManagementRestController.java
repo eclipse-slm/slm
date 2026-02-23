@@ -2,6 +2,7 @@ package org.eclipse.slm.platform_management.service.app.credentials;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.slm.common.credentials.CredentialsManager;
+import org.eclipse.slm.common.credentials.model.CredentialData;
 import org.eclipse.slm.common.credentials.model.CredentialReadDTO;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.platform_management.service.api.credentials.CredentialCreateRequest;
@@ -34,8 +35,14 @@ public class CredentialManagementRestController implements CredentialManagementR
     public ResponseEntity<CredentialReadDTO> getCredentialById(UUID credentialId) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var userAccessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-        var credential = this.credentialsManager.getCredentialByIdForCurrentUser(credentialId, userAccessToken);
+        var credential = this.credentialsManager.getCredentialByIdForUser(credentialId, userAccessToken);
         return ResponseEntity.ok(credential);
+    }
+
+    @Override
+    public ResponseEntity<CredentialData> getCredentialDataById(UUID credentialId, String impersonatedGroupId) {
+        var credentialData = this.credentialsManager.getCredentialDataById(credentialId, impersonatedGroupId);
+        return ResponseEntity.ok(credentialData);
     }
 
     @Override
@@ -73,7 +80,7 @@ public class CredentialManagementRestController implements CredentialManagementR
     public ResponseEntity<List<CredentialReadDTO>> getCredentialsOfEntity(String entityId, String entityType) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var userAccessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-        var credentials = this.credentialsManager.getCredentialsOfEntityForCurrentUser(entityId, entityType, userAccessToken);
+        var credentials = this.credentialsManager.getCredentialsOfEntityForUser(entityId, entityType, userAccessToken);
         return ResponseEntity.ok(credentials);
     }
 
@@ -84,7 +91,7 @@ public class CredentialManagementRestController implements CredentialManagementR
         if (jwtAuthenticationToken.getToken().getClaims().get("groups") instanceof List<?> groupsClaimList) {
             @SuppressWarnings("unchecked")
             var userGroups = (List<String>) groupsClaimList;
-            var credentials = this.credentialsManager.getAllCredentialsForCurrentUser(userGroups, userAccessToken);
+            var credentials = this.credentialsManager.getAllCredentialsForUser(userGroups, userAccessToken);
             return ResponseEntity.ok(credentials);
         } else {
             throw new IllegalStateException("User groups claim is missing or invalid in the JWT token");
@@ -96,7 +103,7 @@ public class CredentialManagementRestController implements CredentialManagementR
     public ResponseEntity<Void> linkCredentialToEntity(UUID credentialId, org.eclipse.slm.common.credentials.model.CredentialEntityLinkCreateDTO entityLink) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var userAccessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-        this.credentialsManager.getCredentialByIdForCurrentUser(credentialId, userAccessToken);
+        this.credentialsManager.getCredentialByIdForUser(credentialId, userAccessToken);
         this.credentialsManager.linkCredentialToEntity(credentialId, entityLink);
         return ResponseEntity.ok().build();
     }
@@ -105,7 +112,7 @@ public class CredentialManagementRestController implements CredentialManagementR
     public ResponseEntity<Void> deleteCredentialEntityLink(UUID credentialId, String entityType, String entityId, boolean deleteIfOrphaned) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var userAccessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-        this.credentialsManager.getCredentialByIdForCurrentUser(credentialId, userAccessToken);
+        this.credentialsManager.getCredentialByIdForUser(credentialId, userAccessToken);
         this.credentialsManager.deleteCredentialEntityLink(credentialId, entityType, entityId, deleteIfOrphaned);
         return ResponseEntity.ok().build();
     }
@@ -114,7 +121,7 @@ public class CredentialManagementRestController implements CredentialManagementR
     public ResponseEntity<Void> addCredentialScopes(UUID credentialId, List<String> scopes) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var userAccessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-        this.credentialsManager.getCredentialByIdForCurrentUser(credentialId, userAccessToken);
+        this.credentialsManager.getCredentialByIdForUser(credentialId, userAccessToken);
         this.credentialsManager.addCredentialScopes(credentialId, scopes);
         return ResponseEntity.ok().build();
     }
@@ -123,7 +130,7 @@ public class CredentialManagementRestController implements CredentialManagementR
     public ResponseEntity<Void> removeCredentialScopes(UUID credentialId, List<String> scopes) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var userAccessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-        this.credentialsManager.getCredentialByIdForCurrentUser(credentialId, userAccessToken);
+        this.credentialsManager.getCredentialByIdForUser(credentialId, userAccessToken);
         this.credentialsManager.removeCredentialScopes(credentialId, scopes);
         return ResponseEntity.ok().build();
     }

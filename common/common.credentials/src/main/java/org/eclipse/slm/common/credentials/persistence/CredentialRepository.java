@@ -44,4 +44,11 @@ public interface CredentialRepository {
      */
     void updateCredentialScopes(UUID credentialId, java.util.List<String> scopes);
 
+    /**
+     * Check if a user has read access to a Credential.
+     * @param credentialId The UUID of the Credential
+     * @param userId The ID of the user to check access for
+     * @return true if the user has read access to the Credential, false otherwise
+     */
+    boolean hasGroupReadAccessToCredential(UUID credentialId, String userId);
 }

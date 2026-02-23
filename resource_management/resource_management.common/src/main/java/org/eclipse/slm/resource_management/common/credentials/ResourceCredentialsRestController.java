@@ -33,7 +33,7 @@ public class ResourceCredentialsRestController {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var userAccessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
 
-        var resourceCredentials = this.resourceCredentialsManager.getCredentialByIdForCurrentUser(credentialId, userAccessToken);
+        var resourceCredentials = this.resourceCredentialsManager.getCredentialByIdForUser(credentialId, userAccessToken);
         return ResponseEntity.ok(resourceCredentials);
     }
 
@@ -43,7 +43,7 @@ public class ResourceCredentialsRestController {
             @PathVariable(name = "resourceId") UUID resourceId) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var userAccessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-        var resourceCredentials = this.resourceCredentialsManager.getCredentialsOfResourceForCurrentUser(resourceId, userAccessToken);
+        var resourceCredentials = this.resourceCredentialsManager.getCredentialsOfResourceForUser(resourceId, userAccessToken);
         return ResponseEntity.ok(resourceCredentials);
     }
 }

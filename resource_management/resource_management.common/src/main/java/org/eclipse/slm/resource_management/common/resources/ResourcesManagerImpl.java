@@ -107,7 +107,10 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
             var resource = this.addDetailsToResource(optionalResource.get(), jwtAccessToken);
 
             return resource;
-        } catch (Exception e) {
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        }
+        catch (Exception e) {
             throw new ResourceRuntimeException("Failed to get resource by id: " + resourceId + " - " + e.getMessage(), e);
         }
     }

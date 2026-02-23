@@ -70,7 +70,14 @@ public class ConsulAclClient extends AbstractConsulClient {
             var createdPolicy = this.consulAclPoliciesRulesApiClient.createPolicy(null, policyCreateRequest);
             return createdPolicy;
         } catch (FeignResponseException e){
-            throw new ConsulRuntimeException("Error creating policy " + policy.getName(), e);
+            if (e.getStatusCode() == 500 && e.getMessage().contains("A Policy with Name") && e.getMessage().contains("already exists")) {
+                LOG.debug("Policy with name '{}' already exists, nothing to do. Trying to get existing policy.", policy.getName());
+                var existingPolicy = this.consulAclPoliciesRulesApiClient.readPolicyByName(policy.getName(), null, null);
+                return existingPolicy;
+            }
+            else {
+                throw new ConsulRuntimeException("Error creating policy " + policy.getName(), e);
+            }
         }
     }
 

@@ -19,6 +19,15 @@ public class PlatformManagementClient extends AbstractApiClient {
         this.credentialsClient = this.buildFeignClient(PlatformManagementCredentialsClient.class, credentialsApiBaseUrl);
     }
 
+    public PlatformManagementClient (String platformManagementBaseUrl,
+                                     ObjectFactory<HttpMessageConverters> messageConverters,
+                                     AuthRequestInterceptor authRequestInterceptor,
+                                     PlatformManagementCredentialsClient platformManagementCredentialsClient) {
+        super(platformManagementBaseUrl, messageConverters, authRequestInterceptor);
+        
+        this.credentialsClient = platformManagementCredentialsClient;
+    }
+
     public PlatformManagementCredentialsClient credentials() {
         return credentialsClient;
     }

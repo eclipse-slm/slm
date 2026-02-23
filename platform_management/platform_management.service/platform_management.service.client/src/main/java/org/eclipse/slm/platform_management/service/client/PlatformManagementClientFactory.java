@@ -15,9 +15,15 @@ public class PlatformManagementClientFactory {
 
     private final String platformManagementConsulServiceName = "platform-management";
 
-    public PlatformManagementClientFactory(LoadBalancerClient loadBalancerClient, ObjectFactory<HttpMessageConverters> messageConverters) {
+    private final PlatformManagementCredentialsClient platformManagementAdminClient;
+
+    public PlatformManagementClientFactory(LoadBalancerClient loadBalancerClient,
+                                           ObjectFactory<HttpMessageConverters> messageConverters,
+                                           PlatformManagementCredentialsClient platformManagementAdminClient) {
         this.loadBalancerClient = loadBalancerClient;
         this.messageConverters = messageConverters;
+
+        this.platformManagementAdminClient = platformManagementAdminClient;
     }
 
     /**
@@ -38,6 +44,20 @@ public class PlatformManagementClientFactory {
         var authRequestInterceptor = new BearerTokenAuthRequestInterceptor(bearerToken);
 
         var client = new PlatformManagementClient(platformManagementBaseUrl, messageConverters, authRequestInterceptor);
+        return client;
+    }
+
+    /** Create a PlatformManagementClient for admin purposes. The base URL and the AuthRequestInterceptor is not relevant as the admin client uses
+     * the Feign client created via Spring.
+     *
+     * @return PlatformManagementClient instance for admin purposes
+     */
+    public PlatformManagementClient createAdminClient() {
+        var platformManagementBaseUrl = "should-not-be-used-for-admin-client";
+        var authRequestInterceptor = new BearerTokenAuthRequestInterceptor("should-not-be-used-for-admin-client");
+
+        var client = new PlatformManagementClient(platformManagementBaseUrl, messageConverters, authRequestInterceptor,
+                this.platformManagementAdminClient);
         return client;
     }
 

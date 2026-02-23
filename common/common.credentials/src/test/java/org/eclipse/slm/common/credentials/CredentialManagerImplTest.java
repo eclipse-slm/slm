@@ -100,7 +100,7 @@ class CredentialManagerImplTest {
             var credential = newUserPassCredential();
             vaultCredentialRepository.saveCredential(credential, KeycloakTestContainer.TEST_USER1_GROUP_ID);
 
-            var result = credentialManager.getCredentialByIdForCurrentUser(credential.getId(), keycloakContainer.getTestRealmAccessTokenForUser1());
+            var result = credentialManager.getCredentialByIdForUser(credential.getId(), keycloakContainer.getTestRealmAccessTokenForUser1());
 
             // Top-level DTO has id and scopes; the actual credential data is nested in `data`
             assertThat(result).isNotNull();
@@ -119,7 +119,7 @@ class CredentialManagerImplTest {
         void throwsWhenCredentialMissing() {
             var missingId = UUID.randomUUID();
 
-            assertThatThrownBy(() -> credentialManager.getCredentialByIdForCurrentUser(missingId, keycloakContainer.getTestRealmAccessTokenForUser1()))
+            assertThatThrownBy(() -> credentialManager.getCredentialByIdForUser(missingId, keycloakContainer.getTestRealmAccessTokenForUser1()))
                     .isInstanceOf(CredentialPermissionDeniedException.class)
                     .hasMessageContaining(missingId.toString());
         }

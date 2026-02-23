@@ -2,10 +2,11 @@ package org.eclipse.slm.resource_management.common.credentials;
 
 import org.eclipse.slm.common.credentials.exceptions.CredentialRuntimeException;
 import org.eclipse.slm.common.credentials.model.Credential;
+import org.eclipse.slm.common.credentials.model.CredentialData;
 import org.eclipse.slm.common.credentials.model.CredentialEntityLinkCreateDTO;
 import org.eclipse.slm.common.restclient.feign.FeignResponseException;
 import org.eclipse.slm.platform_management.service.api.credentials.CredentialCreateRequest;
-import org.eclipse.slm.platform_management.service.client.PlatformManagementCredentialsClient;
+import org.eclipse.slm.platform_management.service.client.PlatformManagementClient;
 import org.eclipse.slm.platform_management.service.client.PlatformManagementClientFactory;
 import org.springframework.stereotype.Component;
 
@@ -16,17 +17,16 @@ import java.util.UUID;
 @Component
 public class ResourceCredentialsManager {
 
-    private final PlatformManagementCredentialsClient platformManagementAdminClient;
+    private final PlatformManagementClient platformManagementAdminClient;
 
     private final PlatformManagementClientFactory platformManagementClientFactory;
 
-    public ResourceCredentialsManager(PlatformManagementCredentialsClient platformManagementAdminClient,
-                                      PlatformManagementClientFactory platformManagementClientFactory) {
-        this.platformManagementAdminClient = platformManagementAdminClient;
+    public ResourceCredentialsManager(PlatformManagementClientFactory platformManagementClientFactory) {
         this.platformManagementClientFactory = platformManagementClientFactory;
+        this.platformManagementAdminClient = platformManagementClientFactory.createAdminClient();
     }
 
-    public ResourceCredentialReadDTO getCredentialByIdForCurrentUser(UUID credentialId, String userAccessToken) {
+    public ResourceCredentialReadDTO getCredentialByIdForUser(UUID credentialId, String userAccessToken) {
         var platformManagementUserClient = platformManagementClientFactory.create(userAccessToken);
 
         try {
@@ -41,9 +41,24 @@ public class ResourceCredentialsManager {
         }
     }
 
-    public List<ResourceCredentialReadDTO> getCredentialsOfResourceForCurrentUser(UUID resourceId, String userAccessToken) {
-        var platformManagementUserClient = platformManagementClientFactory.create(userAccessToken);
+    public List<ResourceCredentialReadDTO> getCredentialsOfResource(UUID resourceId) {
+        try {
+            var response = platformManagementAdminClient.credentials().getCredentialsOfEntity(resourceId.toString(), ResourceCredentialEntityType.RESOURCE.toString());
+            var resourceCredentialReadDTOs = new ArrayList<ResourceCredentialReadDTO>();
+            for (var credentialReadDTO : response.getBody()) {
+                var resourceCredentialReadDTO = new ResourceCredentialReadDTO(credentialReadDTO.getId(), credentialReadDTO.getName(),
+                        credentialReadDTO.getScopesRaw(), credentialReadDTO.getData());
+                resourceCredentialReadDTOs.add(resourceCredentialReadDTO);
+            }
 
+            return resourceCredentialReadDTOs;
+        } catch (FeignResponseException e) {
+            throw new CredentialRuntimeException("Error retrieving credentials for resource '" + resourceId + "': " + e.getMessage(), e);
+        }
+    }
+
+    public List<ResourceCredentialReadDTO> getCredentialsOfResourceForUser(UUID resourceId, String userAccessToken) {
+        var platformManagementUserClient = platformManagementClientFactory.create(userAccessToken);
         try {
             var response = platformManagementUserClient.credentials().getCredentialsOfEntity(resourceId.toString(), ResourceCredentialEntityType.RESOURCE.toString());
             var resourceCredentialReadDTOs = new ArrayList<ResourceCredentialReadDTO>();
@@ -59,9 +74,19 @@ public class ResourceCredentialsManager {
         }
     }
 
+    public CredentialData getCredentialDataById(UUID credentialId, String impersonatedGroupId) {
+        try {
+            var response = this.platformManagementAdminClient.credentials().getCredentialDataById(credentialId, impersonatedGroupId);
+            var credentialData = response.getBody();
+            return credentialData;
+        } catch (FeignResponseException e) {
+            throw new CredentialRuntimeException("Error retrieving credential data for credential '" + credentialId + "': " + e.getMessage(), e);
+        }
+    }
+
     public void createOrUpdateCredential(Credential credential, List<CredentialEntityLinkCreateDTO> credentialEntityLinks, String fullPathOwnerGroupId) {
         var credentialCreateRequest = new CredentialCreateRequest(credentialEntityLinks, credential, fullPathOwnerGroupId);
-        var response = this.platformManagementAdminClient.createOrUpdateCredential(credential.getId(), credentialCreateRequest);
+        var response = this.platformManagementAdminClient.credentials().createOrUpdateCredential(credential.getId(), credentialCreateRequest);
 
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Error creating credential: " + response.getStatusCode() + " - " + response.getBody());

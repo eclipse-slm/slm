@@ -444,7 +444,7 @@ public class FirmwareUpdateManager {
     }
 
     public void unassignFirmwareUpdateCredentialFromResource(UUID resourceId, UUID credentialId, String userAccessToken, boolean deleteIfOrphaned) {
-        var credential = resourceCredentialsManager.getCredentialByIdForCurrentUser(credentialId, userAccessToken);
+        var credential = resourceCredentialsManager.getCredentialByIdForUser(credentialId, userAccessToken);
         var hasOtherScopes = credential.getScopes().stream().anyMatch(scope -> !ResourceCredentialScope.FIRMWARE_UPDATE.equals(scope));
 
         resourceCredentialsManager.removeCredentialScopes(

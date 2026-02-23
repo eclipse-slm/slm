@@ -1,9 +1,11 @@
 package org.eclipse.slm.platform_management.service.api.credentials;
 
 import io.swagger.v3.oas.annotations.Operation;
+import org.eclipse.slm.common.credentials.model.CredentialData;
 import org.eclipse.slm.common.credentials.model.CredentialEntityLinkCreateDTO;
 import org.eclipse.slm.common.credentials.model.CredentialReadDTO;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +17,15 @@ public interface CredentialManagementRestApi {
     @Operation(summary = "Get credential by id")
     @ResponseBody ResponseEntity<CredentialReadDTO> getCredentialById(
             @PathVariable(name = "credentialId") UUID credentialId);
+
+    @RequestMapping(value = "/{credentialId}/data", method = RequestMethod.GET)
+    @Operation(summary = "Get credential data by id")
+//    @PreAuthorize("hasRole('resource-management')")
+    @PreAuthorize("authentication.tokenAttributes['client_id'] == 'resource_management'")
+    @ResponseBody ResponseEntity<CredentialData> getCredentialDataById(
+            @PathVariable(name = "credentialId") UUID credentialId,
+            @RequestParam(name = "impersonatedGroupId") String impersonatedGroupId
+            );
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     @Operation(summary = "Create credential")

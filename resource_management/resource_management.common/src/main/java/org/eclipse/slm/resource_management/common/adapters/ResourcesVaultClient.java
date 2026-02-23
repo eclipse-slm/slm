@@ -57,10 +57,11 @@ public class ResourcesVaultClient {
     }
 
     public void removeSecretsForResource(UUID resourceId) {
-        var secretKeys = vaultAdminClient.kv(ResourcesVaultClient.VAULT_SECRET_ENGINE_NAME).getSecretKeysOfPath(resourceId.toString());
-        for (var secretKey : secretKeys.getData().keySet()) {
-            vaultAdminClient.kv(ResourcesVaultClient.VAULT_SECRET_ENGINE_NAME).deleteSecretFromKvEngine(secretKey);
+        var secretKeys = vaultAdminClient.kv(ResourcesVaultClient.VAULT_SECRET_ENGINE_NAME).listSecretKeysOfPath(resourceId.toString());
+        for (var secretKey : secretKeys) {
+            vaultAdminClient.kv(ResourcesVaultClient.VAULT_SECRET_ENGINE_NAME).deleteSecretFromKvEngine(resourceId + "/" + secretKey);
         }
+        vaultAdminClient.kv(ResourcesVaultClient.VAULT_SECRET_ENGINE_NAME).deleteSecretFromKvEngine(resourceId.toString());
         this.vaultAdminClient.acl().deletePolicy(ResourcesVaultClient.getResourcePolicyName(resourceId));
     }
 

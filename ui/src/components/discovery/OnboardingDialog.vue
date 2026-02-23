@@ -24,11 +24,12 @@
 </template>
 
 <script setup lang="ts">
-import { toRef, computed } from "vue";
+import {toRef, computed, PropType} from "vue";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
 import {useDiscoveryStore} from "@/stores/discoveryStore";
 import {storeToRefs} from "pinia";
 import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
+import {useUserStore} from "@/stores/userStore";
 
 const props = defineProps({
   show: {
@@ -36,13 +37,14 @@ const props = defineProps({
     default: false
   },
   discoveredResourcesResultIds: {
-    type: Array,
+    type: Array as PropType<string[]>,
     default: () => []
   }
 });
 
 const emit = defineEmits(['canceled', 'completed']);
 
+const userStore = useUserStore();
 const discoveryStore = useDiscoveryStore();
 const { discoveredResourceByResultId } = storeToRefs(discoveryStore);
 
@@ -67,7 +69,12 @@ function closeDialog() {
 
 function onConfirmButtonClicked() {
   ResourceManagementClient.discoveryApi
-      .onboardDiscoveredResources({ 'resultIds': props.discoveredResourcesResultIds })
+      .onboardDiscoveredResources(
+          {
+            resultIds: props.discoveredResourcesResultIds,
+            fullPathOwnerUserGroupId: userStore.fullPathUserGroupId,
+      }
+      )
       .then(() => {
         emit('completed');
       });

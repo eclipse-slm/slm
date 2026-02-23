@@ -99,7 +99,7 @@ class RemoteAccessManagerImplIT {
             var username = "testuser";
             var credentialId = UUID.randomUUID();
             var testResourceCredential = getResourceCredential(credentialId);
-            doReturn(testResourceCredential).when(resourceCredentialsManager).getCredentialByIdForCurrentUser(credentialId, accessToken);
+            doReturn(testResourceCredential).when(resourceCredentialsManager).getCredentialByIdForUser(credentialId, accessToken);
             var remoteAccessCreateDTO = new RemoteAccessCreateDTO(KeycloakTestContainer.TEST_USER1_GROUP_ID, credentialId, username, 22, ConnectionType.ssh);
 
             // Act
@@ -141,7 +141,7 @@ class RemoteAccessManagerImplIT {
             var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
             var credentialId = UUID.randomUUID();
             var testResourceCredential = getResourceCredential(credentialId);
-            doReturn(testResourceCredential).when(resourceCredentialsManager).getCredentialByIdForCurrentUser(credentialId, accessToken);
+            doReturn(testResourceCredential).when(resourceCredentialsManager).getCredentialByIdForUser(credentialId, accessToken);
             var remoteAccessCreateDTO = new RemoteAccessCreateDTO(
                     KeycloakTestContainer.TEST_USER1_GROUP_ID,
                     credentialId,
@@ -185,8 +185,8 @@ class RemoteAccessManagerImplIT {
             var credentialId2 = UUID.randomUUID();
             var testResourceCredential1 = getResourceCredential(credentialId1);
             var testResourceCredential2 = getResourceCredential(credentialId2);
-            doReturn(testResourceCredential1).when(resourceCredentialsManager).getCredentialByIdForCurrentUser(credentialId1, accessToken);
-            doReturn(testResourceCredential2).when(resourceCredentialsManager).getCredentialByIdForCurrentUser(credentialId2, accessToken);
+            doReturn(testResourceCredential1).when(resourceCredentialsManager).getCredentialByIdForUser(credentialId1, accessToken);
+            doReturn(testResourceCredential2).when(resourceCredentialsManager).getCredentialByIdForUser(credentialId2, accessToken);
             var remoteAccessCreateDTO1 = new RemoteAccessCreateDTO(
                     KeycloakTestContainer.TEST_USER1_GROUP_ID,
                     credentialId1,
@@ -239,7 +239,7 @@ class RemoteAccessManagerImplIT {
             var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
             var credentialId = UUID.randomUUID();
             var testResourceCredential = getResourceCredential(credentialId);
-            doReturn(testResourceCredential).when(resourceCredentialsManager).getCredentialByIdForCurrentUser(credentialId, accessToken);
+            doReturn(testResourceCredential).when(resourceCredentialsManager).getCredentialByIdForUser(credentialId, accessToken);
             var remoteAccessCreateDTO = new RemoteAccessCreateDTO(
                     KeycloakTestContainer.TEST_USER1_GROUP_ID,
                     credentialId,

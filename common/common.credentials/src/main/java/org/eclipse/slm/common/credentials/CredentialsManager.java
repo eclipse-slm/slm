@@ -1,6 +1,8 @@
 package org.eclipse.slm.common.credentials;
 import org.eclipse.slm.common.credentials.exceptions.CredentialNotFoundException;
+import org.eclipse.slm.common.credentials.exceptions.CredentialPermissionDeniedException;
 import org.eclipse.slm.common.credentials.model.Credential;
+import org.eclipse.slm.common.credentials.model.CredentialData;
 import org.eclipse.slm.common.credentials.model.CredentialEntityLinkCreateDTO;
 import org.eclipse.slm.common.credentials.model.CredentialReadDTO;
 
@@ -10,33 +12,34 @@ import java.util.UUID;
 public interface CredentialsManager {
 
     /**
-     * Retrieve all credentials for the current user authenticated by the given JWT token.
+     * Retrieve all credentials for the user authenticated by the given JWT token.
      *
-     * @param userGroups The user groups list of the current user.
-     * @param jwt The JWT token of the current user.
-     * @return A list of CredentialReadDTOs representing all credentials for the current user.
+     * @param userGroups The user groups list of the user.
+     * @param jwt The JWT token of the user.
+     * @return A list of CredentialReadDTOs representing all credentials for the user.
      */
-    List<CredentialReadDTO> getAllCredentialsForCurrentUser(List<String> userGroups, String jwt);
+    List<CredentialReadDTO> getAllCredentialsForUser(List<String> userGroups, String jwt);
 
     /**
-     * Retrieve a specific credential by its ID for the current user authenticated by the given JWT token.
+     * Retrieve a specific credential by its ID for the user authenticated by the given JWT token.
      *
      * @param credentialId The UUID of the credential to retrieve.
-     * @param jwt The JWT token of the current user.
+     * @param jwt The JWT token of the user.
      * @return The CredentialReadDTO representing the requested credential.
      */
-    CredentialReadDTO getCredentialByIdForCurrentUser(UUID credentialId, String jwt) throws CredentialNotFoundException;
+    CredentialReadDTO getCredentialByIdForUser(UUID credentialId, String jwt) throws CredentialNotFoundException, CredentialPermissionDeniedException;
 
+    CredentialData getCredentialDataById(UUID credentialId, String impersonatedGroupId) throws CredentialNotFoundException, CredentialPermissionDeniedException;
 
     /**
-     * Retrieve all credentials linked to a specific entity for the current user authenticated by the given JWT token.
+     * Retrieve all credentials linked to a specific entity for the user authenticated by the given JWT token.
      *
      * @param entityId The ID of the entity whose credentials should be retrieved.
      * @param entityType The type of the entity whose credentials should be retrieved.
-     * @param jwt The JWT token of the current user.
+     * @param jwt The JWT token of the user.
      * @return A list of CredentialReadDTOs representing the credentials linked to the specified entity.
      */
-    List<CredentialReadDTO> getCredentialsOfEntityForCurrentUser(String entityId, String entityType, String jwt);
+    List<CredentialReadDTO> getCredentialsOfEntityForUser(String entityId, String entityType, String jwt);
 
     /**
      * Create a new credential and link it to a specific entity.
@@ -57,7 +60,7 @@ public interface CredentialsManager {
     /** Delete a credential by its ID for the user authenticated by the given access token.
      *
      * @param credentialId The UUID of the credential to delete.
-     * @param accessToken The access token of the current user.
+     * @param accessToken The access token of the user.
      */
     void deleteCredentialForUser(UUID credentialId, String accessToken);
 

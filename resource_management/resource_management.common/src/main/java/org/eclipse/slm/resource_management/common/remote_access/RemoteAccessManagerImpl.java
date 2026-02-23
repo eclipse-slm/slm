@@ -80,7 +80,7 @@ public class RemoteAccessManagerImpl implements RemoteAccessManager {
             }
             var remoteAccessDTOReadMinimal = remoteAccessOptional.get();
 
-            var remoteAccessCredential = this.resourceCredentialsManager.getCredentialByIdForCurrentUser(remoteAccessDTOReadMinimal.getCredentialId(), jwtAccessToken);
+            var remoteAccessCredential = this.resourceCredentialsManager.getCredentialByIdForUser(remoteAccessDTOReadMinimal.getCredentialId(), jwtAccessToken);
             var username = remoteAccessDTOReadMinimal.getUsername();
             if (remoteAccessCredential.getData().getCredentialDataType().equals(CredentialDataType.USERNAME_PASSWORD)) {
                 username = ((CredentialDataUsernamePasswordReadDTO) remoteAccessCredential.getData()).getUsername();
@@ -105,7 +105,7 @@ public class RemoteAccessManagerImpl implements RemoteAccessManager {
         try {
             var remoteAccess = this.getRemoteAccessByIdOrThrow(resourceId, remoteAccessId, jwtAccessToken);
             try {
-                var credential = this.resourceCredentialsManager.getCredentialByIdForCurrentUser(remoteAccess.getCredential().getId(), jwtAccessToken);
+                var credential = this.resourceCredentialsManager.getCredentialByIdForUser(remoteAccess.getCredential().getId(), jwtAccessToken);
                 var hasOtherScopes = credential.getScopes().stream().anyMatch(scope -> !ResourceCredentialScope.REMOTE_ACCESS.equals(scope));
 
                 this.resourceCredentialsManager.removeCredentialScopes(remoteAccess.getCredential().getId(),

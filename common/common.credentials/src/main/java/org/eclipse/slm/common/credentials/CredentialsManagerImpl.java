@@ -2,10 +2,7 @@ package org.eclipse.slm.common.credentials;
 
 import org.eclipse.slm.common.credentials.exceptions.CredentialNotFoundException;
 import org.eclipse.slm.common.credentials.exceptions.CredentialPermissionDeniedException;
-import org.eclipse.slm.common.credentials.model.Credential;
-import org.eclipse.slm.common.credentials.model.CredentialEntityLinkCreateDTO;
-import org.eclipse.slm.common.credentials.model.CredentialMapper;
-import org.eclipse.slm.common.credentials.model.CredentialReadDTO;
+import org.eclipse.slm.common.credentials.model.*;
 import org.eclipse.slm.common.credentials.persistence.CredentialEntityLink;
 import org.eclipse.slm.common.credentials.persistence.CredentialLinkJpaRepository;
 import org.eclipse.slm.common.credentials.persistence.VaultCredentialRepository;
@@ -39,7 +36,7 @@ public class CredentialsManagerImpl implements CredentialsManager {
     }
 
     @Override
-    public List<CredentialReadDTO> getAllCredentialsForCurrentUser(List<String> userGroups, String jwtAccessToken) {
+    public List<CredentialReadDTO> getAllCredentialsForUser(List<String> userGroups, String jwtAccessToken) {
         var userCredentials = new ArrayList<CredentialReadDTO>();
         for (var userGroup : userGroups) {
             var entityCredentialLinks = this.credentialLinkJpaRepository.findByEntityIdAndEntityType(userGroup, USER_GROUP_ENTITY_TYPE);
@@ -47,19 +44,18 @@ public class CredentialsManagerImpl implements CredentialsManager {
             for (var link : entityCredentialLinks) {
                 var credentialId = link.getCredentialId();
                 try {
-                    var credentialReadDTO = this.getCredentialByIdForCurrentUser(credentialId, jwtAccessToken);
+                    var credentialReadDTO = this.getCredentialByIdForUser(credentialId, jwtAccessToken);
                     userCredentials.add(credentialReadDTO);
                 } catch (CredentialNotFoundException | CredentialPermissionDeniedException e) {
                     // Skip credentials that cannot be accessed
                 }
             }
         }
-
         return userCredentials;
     }
 
     @Override
-    public CredentialReadDTO getCredentialByIdForCurrentUser(UUID credentialId, String jwtAccessToken)
+    public CredentialReadDTO getCredentialByIdForUser(UUID credentialId, String jwtAccessToken)
             throws CredentialNotFoundException, CredentialPermissionDeniedException {
         try {
             var vaultAuthentication = new VaultJwtAuthentication(vaultClientFactory.getVaultUrl(), jwtAccessToken);
@@ -77,13 +73,29 @@ public class CredentialsManagerImpl implements CredentialsManager {
     }
 
     @Override
-    public List<CredentialReadDTO> getCredentialsOfEntityForCurrentUser(String entityId, String entityType, String jwt) {
+    public CredentialData getCredentialDataById(UUID credentialId, String impersonatedGroupId) throws CredentialNotFoundException, CredentialPermissionDeniedException {
+        try {
+            var vaultCredentialRepository = new VaultCredentialRepository(vaultClientFactory.createAdminClient());
+            var credential = vaultCredentialRepository.findCredential(credentialId).orElseThrow(() -> new CredentialNotFoundException(credentialId));
+
+            if (!vaultCredentialRepository.hasGroupReadAccessToCredential(credentialId, impersonatedGroupId)) {
+                throw new CredentialPermissionDeniedException("Access denied for credential with id '" + credentialId + "' or credential was not found");
+            }
+
+            return credential.getData();
+        } catch (VaultPermissionDeniedException e) {
+            throw new CredentialPermissionDeniedException("Access denied for credential with id '" + credentialId + "' or credential was not found", e);
+        }
+    }
+
+    @Override
+    public List<CredentialReadDTO> getCredentialsOfEntityForUser(String entityId, String entityType, String jwt) {
         var entityCredentialLinks = this.credentialLinkJpaRepository.findByEntityIdAndEntityType(entityId.toString(), entityType);
         var entityCredentials = new ArrayList<CredentialReadDTO>();
         for (var link : entityCredentialLinks) {
             var credentialId = link.getCredentialId();
             try {
-                var credentialReadDTO = this.getCredentialByIdForCurrentUser(credentialId, jwt);
+                var credentialReadDTO = this.getCredentialByIdForUser(credentialId, jwt);
                 entityCredentials.add(credentialReadDTO);
             } catch (CredentialNotFoundException | CredentialPermissionDeniedException e) {
                 // Skip credentials that cannot be accessed
@@ -128,7 +140,7 @@ public class CredentialsManagerImpl implements CredentialsManager {
     @Override
     public void deleteCredentialForUser(UUID credentialId, String jwtAccessToken) {
         // Check if user has access to the credential
-        this.getCredentialByIdForCurrentUser(credentialId, jwtAccessToken);
+        this.getCredentialByIdForUser(credentialId, jwtAccessToken);
         // If no exception was thrown, the user has access and we can delete the credential
         this.deleteCredential(credentialId);
     }
