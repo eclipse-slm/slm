@@ -16,7 +16,7 @@ public class SubmodelRepositoryClientFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(SubmodelRepositoryClientFactory.class);
 
-    private final static String SUBMODEL_REPOSITORY_DISCOVERY_INSTANCE_ID = "submodel-repositoryyy";
+    private final static String SUBMODEL_REPOSITORY_DISCOVERY_INSTANCE_ID = "submodel-repository";
 
     private final String submodelRepositoryUrlApplicationProperties;
 
