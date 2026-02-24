@@ -59,8 +59,8 @@
       user_claim: sub
       bound_audiences:
         - "ui"
-        - "resource-management"
-        - "service-management"
+        - "resource_management"
+        - "service_management"
       claim_mappings:
         preferred_username: username
         email: email

@@ -105,26 +105,38 @@ const firmwareUpdateJobLogMessages = computed(() => (firmwareUpdateJobId: string
                 </v-timeline-item>
               </v-timeline>
 
-              <v-row class="align-center mb-2">
-                <span class="mr-2">Log</span>
-                <v-icon
-                  style="cursor: pointer;"
-                  @click="toggleLogCollapse(item.id)"
-                  size="small"
-                >
-                  {{ !logCollapsedStates[item.id] ? "mdi-chevron-down" : "mdi-chevron-up" }}
-                </v-icon>
-              </v-row>
-              <v-expand-transition>
-                <div v-show="logCollapsedStates[item.id]">
-                  <VCodeBlock
-                    :code="firmwareUpdateJobLogMessages(item.id)"
-                    prismjs
-                    lang="html"
-                    theme="coy"
-                  />
-                </div>
+              <v-divider></v-divider>
+              <RowWithLabel
+                  v-if="item.failureReason"
+                label="Failure Reason"
+                :text="item.failureReason || 'N/A'"
+              ></RowWithLabel>
+
+              <RowWithLabel
+                label="Driver Log"
+              >
+                <template #content>
+                  <span v-if="!logCollapsedStates[item.id]">Show</span>
+                  <span v-else>Hide</span>
+                  <v-icon
+                    style="cursor: pointer;"
+                    @click="toggleLogCollapse(item.id)"
+                    size="small"
+                  >
+                    {{ !logCollapsedStates[item.id] ? "mdi-chevron-down" : "mdi-chevron-up" }}
+                  </v-icon>
+                <v-expand-transition>
+                  <div v-show="logCollapsedStates[item.id]">
+                    <VCodeBlock
+                      :code="firmwareUpdateJobLogMessages(item.id)"
+                      prismjs
+                      lang="html"
+                      theme="coy"
+                    />
+                  </div>
               </v-expand-transition>
+                </template>
+              </RowWithLabel>
             </div>
             <div v-else>
               No state transitions

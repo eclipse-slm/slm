@@ -16,9 +16,6 @@
   retries: 120
   delay: 3
 
-- debug:
-    var: oidc_discovery_crt
-
 - name: "Consul Init | Create auth method for Keycloak"
   uri:
     url: "{{ consul.url.internal }}/v1/acl/auth-method"

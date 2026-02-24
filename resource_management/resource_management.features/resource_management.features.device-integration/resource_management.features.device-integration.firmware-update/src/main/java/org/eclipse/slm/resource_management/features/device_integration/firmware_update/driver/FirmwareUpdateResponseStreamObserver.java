@@ -108,11 +108,10 @@ public class FirmwareUpdateResponseStreamObserver implements StreamObserver<Arte
 
     @Override
     public void onError(Throwable throwable) {
-        LOG.error("Error during update job '{}' for driver '{}'", this.firmwareUpdateJobId, this.driverInfo, throwable);
+        LOG.debug("Error during update job '{}' for driver '{}'", this.firmwareUpdateJobId, this.driverInfo, throwable);
 
-        var errorMessage = "Error during update job '" + this.firmwareUpdateJobId + "' for driver '" + this.driverInfo + "': " + throwable.getMessage();
         for (var listener : listeners) {
-            listener.onUpdateFailed(this.firmwareUpdateJobId, errorMessage);
+            listener.onUpdateFailed(this.firmwareUpdateJobId, throwable);
         }
 
         this.channel.shutdown();

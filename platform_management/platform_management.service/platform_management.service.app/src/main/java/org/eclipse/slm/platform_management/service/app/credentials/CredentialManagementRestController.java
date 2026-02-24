@@ -11,6 +11,7 @@ import org.eclipse.slm.platform_management.service.api.credentials.CredentialMan
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +41,9 @@ public class CredentialManagementRestController implements CredentialManagementR
     }
 
     @Override
+    @PreAuthorize("authentication.tokenAttributes['client_id'] == 'resource_management'")
     public ResponseEntity<CredentialData> getCredentialDataById(UUID credentialId, String impersonatedGroupId) {
+        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var credentialData = this.credentialsManager.getCredentialDataById(credentialId, impersonatedGroupId);
         return ResponseEntity.ok(credentialData);
     }

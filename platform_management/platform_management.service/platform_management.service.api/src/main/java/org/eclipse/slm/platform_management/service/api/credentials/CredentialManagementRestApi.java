@@ -20,8 +20,6 @@ public interface CredentialManagementRestApi {
 
     @RequestMapping(value = "/{credentialId}/data", method = RequestMethod.GET)
     @Operation(summary = "Get credential data by id")
-//    @PreAuthorize("hasRole('resource-management')")
-    @PreAuthorize("authentication.tokenAttributes['client_id'] == 'resource_management'")
     @ResponseBody ResponseEntity<CredentialData> getCredentialDataById(
             @PathVariable(name = "credentialId") UUID credentialId,
             @RequestParam(name = "impersonatedGroupId") String impersonatedGroupId

@@ -8,6 +8,8 @@ import org.eclipse.slm.common.restclient.feign.FeignResponseException;
 import org.eclipse.slm.platform_management.service.api.credentials.CredentialCreateRequest;
 import org.eclipse.slm.platform_management.service.client.PlatformManagementClient;
 import org.eclipse.slm.platform_management.service.client.PlatformManagementClientFactory;
+import org.eclipse.slm.platform_management.service.client.PlatformManagementCredentialsClient;
+import org.springframework.security.authorization.ObservationAuthorizationManager;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -74,13 +76,16 @@ public class ResourceCredentialsManager {
         }
     }
 
-    public CredentialData getCredentialDataById(UUID credentialId, String impersonatedGroupId) {
+    public CredentialData getCredentialDataByIdForImpersonatedUser(UUID credentialId, String impersonatedUserId) {
         try {
-            var response = this.platformManagementAdminClient.credentials().getCredentialDataById(credentialId, impersonatedGroupId);
+            var response = this.platformManagementAdminClient.credentials().getCredentialDataById(credentialId, "/users/" + impersonatedUserId);
             var credentialData = response.getBody();
+
             return credentialData;
         } catch (FeignResponseException e) {
             throw new CredentialRuntimeException("Error retrieving credential data for credential '" + credentialId + "': " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new CredentialRuntimeException("Unexpected error retrieving credential data for credential '" + credentialId + "': " + e.getMessage(), e);
         }
     }
 

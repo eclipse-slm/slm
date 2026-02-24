@@ -9,7 +9,7 @@ public interface FirmwareUpdateJobListener {
 
     void onUpdateActivated(UUID firmwareUpdateJobId);
 
-    void onUpdateFailed(UUID firmwareUpdateJobId, String errorMessage);
+    void onUpdateFailed(UUID firmwareUpdateJobId, Throwable error);
 
     void onUpdateMessage(UUID firmwareUpdateJobId, Date timestamp, String message, String phase, int progress);
 

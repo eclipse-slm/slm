@@ -15,15 +15,15 @@ public class PlatformManagementClientFactory {
 
     private final String platformManagementConsulServiceName = "platform-management";
 
-    private final PlatformManagementCredentialsClient platformManagementAdminClient;
+    private final PlatformManagementCredentialsClient platformManagementCredentialsClient;
 
     public PlatformManagementClientFactory(LoadBalancerClient loadBalancerClient,
                                            ObjectFactory<HttpMessageConverters> messageConverters,
-                                           PlatformManagementCredentialsClient platformManagementAdminClient) {
+                                           PlatformManagementCredentialsClient platformManagementCredentialsClient) {
         this.loadBalancerClient = loadBalancerClient;
         this.messageConverters = messageConverters;
 
-        this.platformManagementAdminClient = platformManagementAdminClient;
+        this.platformManagementCredentialsClient = platformManagementCredentialsClient;
     }
 
     /**
@@ -57,7 +57,7 @@ public class PlatformManagementClientFactory {
         var authRequestInterceptor = new BearerTokenAuthRequestInterceptor("should-not-be-used-for-admin-client");
 
         var client = new PlatformManagementClient(platformManagementBaseUrl, messageConverters, authRequestInterceptor,
-                this.platformManagementAdminClient);
+                this.platformManagementCredentialsClient);
         return client;
     }
 
