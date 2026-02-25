@@ -62,8 +62,15 @@ public class AuthorizationSocketInterceptor implements ChannelInterceptor {
                 }
                 case DISCONNECT -> {
                     var jwtAuthenticationToken = (JwtAuthenticationToken) accessor.getUser();
-                    var jwt = jwtAuthenticationToken.getToken();
-                    LOG.info("User " + jwt.getClaims().get("preferred_username") + " [id='" + jwt.getSubject() + "'] disconnected from websocket interface");
+                    if (jwtAuthenticationToken != null) {
+                        var jwt = jwtAuthenticationToken.getToken();
+                        if (jwt != null) {
+                            LOG.info("User " + jwt.getClaims().get("preferred_username") + " [id='" + jwt.getSubject() + "'] disconnected from websocket interface");
+                        }
+                    }
+                    else {
+                        LOG.info("An unauthenticated user disconnected from websocket interface");
+                    }
                 }
             }
         }

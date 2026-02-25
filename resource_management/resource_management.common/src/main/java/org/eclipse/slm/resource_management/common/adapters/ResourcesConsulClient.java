@@ -23,16 +23,11 @@ public class ResourcesConsulClient {
     private final static Logger LOG = LoggerFactory.getLogger(ResourcesConsulClient.class);
 
     public static final String POLICY_RESOURCE_PREFIX = "resource_";
-    public static final String KEYCLOAK_ROLE_RESOURCE_PREFIX = "resource_";
 
     private final ConsulClient consulClient;
 
     public static String getResourcePolicyName(UUID resourceId) {
         return POLICY_RESOURCE_PREFIX + resourceId;
-    }
-
-    public static String getResourceKeycloakRoleName(UUID resourceId) {
-        return KEYCLOAK_ROLE_RESOURCE_PREFIX + resourceId;
     }
 
     public ResourcesConsulClient(ConsulClient consulClient) {

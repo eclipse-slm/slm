@@ -5,6 +5,7 @@ import org.eclipse.slm.common.messaging.AbstractEventMessage;
 import org.eclipse.slm.common.messaging.GenericMessageListener;
 import org.eclipse.slm.notification_service.communication.websocket.NotificationWsService;
 import org.eclipse.slm.notification_service.persistence.api.NotificationRepository;
+import org.eclipse.slm.notification_service.service.app.messaging.UserUtils;
 import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;
 import org.eclipse.slm.resource_management.features.device_integration.firmware_update.messaging.FirmwareUpdateJobEventMessage;
 import org.slf4j.Logger;
@@ -20,32 +21,22 @@ public class FirmwareUpdateJobEventMessageListener extends GenericMessageListene
 
     private final static Logger LOG = LoggerFactory.getLogger(FirmwareUpdateJobEventMessageListener.class);
 
-    private final KeycloakAdminClient keycloakAdminClient;
+    private final UserUtils userUtils;
 
     private final NotificationRepository notificationRepository;
 
     private final NotificationWsService notificationWsService;
 
-    private final Map<UUID, List<String>> resourceIdToUserIdsCache = new HashMap<>();
-
     protected FirmwareUpdateJobEventMessageListener(ConnectionFactory connectionFactory,
                                                     RabbitTemplate rabbitTemplate,
-                                                    KeycloakAdminClient keycloakAdminClient,
+                                                    UserUtils userUtils,
                                                     NotificationRepository notificationRepository,
                                                     NotificationWsService notificationWsService) {
         super(FirmwareUpdateJobEventMessage.EXCHANGE_NAME, AbstractEventMessage.getRoutingKeyAllEvents(FirmwareUpdateJobEventMessage.ROUTING_KEY_PREFIX),
                 connectionFactory, rabbitTemplate);
-        this.keycloakAdminClient = keycloakAdminClient;
+        this.userUtils = userUtils;
         this.notificationRepository = notificationRepository;
         this.notificationWsService = notificationWsService;
-
-        var realmRoles = this.keycloakAdminClient.getAllRolesOfRealm();
-        for (var role : realmRoles) {
-            if (role.getName().startsWith("resource_")) {
-                var resourceId = UUID.fromString(role.getName().substring("resource_".length()));
-                this.resourceIdToUserIdsCache.put(resourceId, this.keycloakAdminClient.getUserIdsAssignedToRole(role.getName()));
-            }
-        }
     }
 
     @Override
@@ -54,8 +45,8 @@ public class FirmwareUpdateJobEventMessageListener extends GenericMessageListene
             var firmwareUpdateJob = eventMessage.getFirmwareUpdateJob();
             var resourceId = firmwareUpdateJob.getResourceId();
 
-            var roleName = ResourcesConsulClient.getResourcePolicyName(resourceId);
-            var userIds = this.keycloakAdminClient.getUserIdsAssignedToRole(roleName);
+            var resourceConsulPolicyName = ResourcesConsulClient.getResourcePolicyName(resourceId);
+            var userIds = this.userUtils.getUserIdsAssociatedToPolicy(resourceConsulPolicyName);
 
             for (var userId : userIds) {
                 var timestamp = new Date();

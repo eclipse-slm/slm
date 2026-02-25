@@ -27,7 +27,8 @@ public class DiscoveryJobEventMessageListener extends GenericMessageListener<Dis
 
     protected DiscoveryJobEventMessageListener(ConnectionFactory connectionFactory,
                                                RabbitTemplate rabbitTemplate,
-                                               KeycloakAdminClient keycloakAdminClient, NotificationRepository notificationRepository,
+                                               KeycloakAdminClient keycloakAdminClient,
+                                               NotificationRepository notificationRepository,
                                                NotificationWsService notificationWsService) {
         super(DiscoveryJobEventMessage.EXCHANGE_NAME, AbstractEventMessage.getRoutingKeyAllEvents(DiscoveryJobEventMessage.ROUTING_KEY_PREFIX),
                 connectionFactory, rabbitTemplate);

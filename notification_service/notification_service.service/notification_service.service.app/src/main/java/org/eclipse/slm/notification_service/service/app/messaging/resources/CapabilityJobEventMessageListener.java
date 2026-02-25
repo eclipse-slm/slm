@@ -5,6 +5,7 @@ import org.eclipse.slm.common.messaging.AbstractEventMessage;
 import org.eclipse.slm.common.messaging.GenericMessageListener;
 import org.eclipse.slm.notification_service.communication.websocket.NotificationWsService;
 import org.eclipse.slm.notification_service.persistence.api.NotificationRepository;
+import org.eclipse.slm.notification_service.service.app.messaging.UserUtils;
 import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;
 import org.eclipse.slm.resource_management.features.capabilities.jobs.messaging.CapabilityJobEventMessage;
 import org.slf4j.Logger;
@@ -20,7 +21,7 @@ public class CapabilityJobEventMessageListener extends GenericMessageListener<Ca
 
     private final static Logger LOG = LoggerFactory.getLogger(CapabilityJobEventMessageListener.class);
 
-    private final KeycloakAdminClient keycloakAdminClient;
+    private final UserUtils userUtils;
 
     private final NotificationRepository notificationRepository;
 
@@ -28,12 +29,12 @@ public class CapabilityJobEventMessageListener extends GenericMessageListener<Ca
 
     protected CapabilityJobEventMessageListener(ConnectionFactory connectionFactory,
                                                 RabbitTemplate rabbitTemplate,
-                                                KeycloakAdminClient keycloakAdminClient,
+                                                UserUtils userUtils,
                                                 NotificationRepository notificationRepository,
                                                 NotificationWsService notificationWsService) {
         super(CapabilityJobEventMessage.EXCHANGE_NAME, AbstractEventMessage.getRoutingKeyAllEvents(CapabilityJobEventMessage.ROUTING_KEY_PREFIX),
                 connectionFactory, rabbitTemplate);
-        this.keycloakAdminClient = keycloakAdminClient;
+        this.userUtils = userUtils;
         this.notificationRepository = notificationRepository;
         this.notificationWsService = notificationWsService;
     }
@@ -44,8 +45,8 @@ public class CapabilityJobEventMessageListener extends GenericMessageListener<Ca
             var capabilityJob = eventMessage.getCapabilityJob();
             var resourceId = capabilityJob.getResourceId();
 
-            var roleName = ResourcesConsulClient.getResourcePolicyName(resourceId);
-            var userIds = this.keycloakAdminClient.getUserIdsAssignedToRole(roleName);
+            var resourceConsulPolicyName = ResourcesConsulClient.getResourcePolicyName(resourceId);
+            var userIds = this.userUtils.getUserIdsAssociatedToPolicy(resourceConsulPolicyName);
 
             for (var userId : userIds) {
                 var timestamp = new Date();
