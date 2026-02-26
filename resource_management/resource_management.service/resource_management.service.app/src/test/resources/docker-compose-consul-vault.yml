@@ -2,7 +2,7 @@ version: '3'
 
 services:
   consul:
-      image: "hashicorp/consul:1.22.4"
+      image: "hashicorp/consul:1.22.3"
 #      ports:
 #        - "9500:8500"
       environment:
