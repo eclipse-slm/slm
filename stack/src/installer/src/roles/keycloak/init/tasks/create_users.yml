@@ -18,7 +18,7 @@
       status_code: 201, 409
     register: output_post_user
     changed_when: output_post_user.status == 201
-  - name: "Get details of 'keycloak_default_user.username'"
+  - name: "Get details of '{{ keycloak_default_user.username }}'"
     uri:
       url: "{{ keycloak.url.external }}/admin/realms/{{ ENV.KEYCLOAK.REALM }}/users?search={{ keycloak_default_user.username }}"
       validate_certs: no

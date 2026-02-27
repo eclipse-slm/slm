@@ -12,10 +12,10 @@ keycloak_realm: fabos
 keycloak_groups_top_level:
   - name: users
     description: "Parent group for all users"
-    realmRoles:
-      - slm-user
   - name: userGroups
     description: "Parent group for all user groups"
+  - name: backendServices
+    description: "Parent group for all backend services"
 
 keycloak_realm_roles:
   - name: slm-user

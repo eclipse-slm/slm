@@ -26,9 +26,6 @@
   set_fact:
     base_url: "{{ vault.url.internal }}/v1/auth/{{ _mount_auth_path }}"
 
-- debug:
-    var: _oidc_discovery_url
-
 - name: "Create config for auth path '{{ _mount_auth_path }}'"
   uri:
     url: "{{ base_url }}/config"

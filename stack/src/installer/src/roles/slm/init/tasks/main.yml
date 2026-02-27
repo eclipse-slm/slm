@@ -77,15 +77,9 @@
     name: keycloak/client
     tasks_from: authentication/get_admin_access_token.yml
 
-- name: "Create Keycloak clients"
-  include_role:
-    name: "keycloak/client"
-    tasks_from: clients/create_client.yml
-  vars:
-    _keycloak_access_token: "{{ keycloak_access_token }}"
-    _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
-    _keycloak_client: "{{ item }}"
-  loop: "{{ keycloak_clients }}"
+- name: "Configure Keycloak"
+  include_tasks:
+    file: "configure_keycloak.yml"
 
 - name: "Create Consul role for Keycloak clients"
   include_role:
@@ -98,24 +92,9 @@
   when: item.consul_role is defined
   loop: "{{ keycloak_clients }}"
 
-- name: "Create Vault app roles"
-  include_role:
-    name: vault/client
-    tasks_from: create_approle_with_policies
-  vars:
-    _vault_token: "{{ vault_root_token }}"
-    _approle_name: "{{ item.name }}"
-    _approle_policies: "{{ item.policies }}"
-  loop: "{{ vault_config.approles }}"
-
-- name: "Create Vault secret engine for AWX JWT Authenticator"
-  include_role:
-    name: vault/client
-    tasks_from: create_kv_secret_engine
-  vars:
-    _vault_token: "{{ vault_root_token }}"
-    _kv_secret_engine_name: "{{ item }}"
-  loop: "{{ vault_config.kv_secret_engines }}"
+- name: "Configure Vault"
+  include_tasks:
+    file: "configure_vault.yml"
 
 - name: "Start internal SLM components"
   block:
@@ -166,4 +145,3 @@
     src: "catalog.yml"
     dest: "{{ _store_compose_file }}_catalog"
   when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
-

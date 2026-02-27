@@ -6,6 +6,7 @@ keycloak_clients:
     protocol_mappers:
       audience: true
       groups: true
+    create_backend_service_group: false
   - client_id: platform_management
     public_client: false
     service_accounts_enabled: true
@@ -13,6 +14,7 @@ keycloak_clients:
     protocol_mappers:
       audience: true
       groups: true
+    create_backend_service_group: true
   - client_id: resource_management
     public_client: false
     service_accounts_enabled: true
@@ -20,6 +22,7 @@ keycloak_clients:
     protocol_mappers:
       audience: true
       groups: true
+    create_backend_service_group: true
     consul_role:
       name: "resource_management"
       policies:
@@ -43,6 +46,7 @@ keycloak_clients:
     protocol_mappers:
       audience: true
       groups: true
+    create_backend_service_group: true
     consul_role:
       name: "service_management"
       policies:
@@ -66,6 +70,7 @@ keycloak_clients:
     protocol_mappers:
       audience: true
       groups: true
+    create_backend_service_group: true
   - client_id: resource_self_description_services
     public_client: false
     service_accounts_enabled: false
@@ -73,21 +78,40 @@ keycloak_clients:
     protocol_mappers:
       audience: true
       groups: true
+    create_backend_service_group: false
 
 vault_config:
+  jwt_auth_method_name: "jwt"
+  policies:
+    - name: "platform_management"
+      policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] }  \npath \"sys/mounts/*\" { capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\"] } \npath \"sys/mounts\" { capabilities = [ \"read\", \"list\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"credentials/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"capabilities/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
+    - name: "resource_management"
+      policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] }  \npath \"sys/mounts/*\" { capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\"] } \npath \"sys/mounts\" { capabilities = [ \"read\", \"list\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"resources/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"pki*\" {  capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\", \"patch\" ]} \npath \"credentials/*\" { capabilities = [\"read\", \"list\"] }"
+    - name: "service_management"
+      policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"services/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"service-repositories/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"credentials/*\" { capabilities = [\"read\", \"list\"] }"
+  groups:
+    - name: "platform_management"
+      policies:
+        - "platform_management"
+      group_alias: "/backendServices/platform_management"
+    - name: "resource_management"
+      policies:
+        - "resource_management"
+      group_alias: "/backendServices/resource_management"
+    - name: "service_management"
+      policies:
+        - "service_management"
+      group_alias: "/backendServices/service_management"
   approles:
     - name: "platform_management"
       policies:
-        - name: "platform_management"
-          policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] }  \npath \"sys/mounts/*\" { capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\"] } \npath \"sys/mounts\" { capabilities = [ \"read\", \"list\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"credentials/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"capabilities/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] }"
+        - "platform_management"
     - name: "resource_management"
       policies:
-        - name: "resource_management"
-          policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] }  \npath \"sys/mounts/*\" { capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\"] } \npath \"sys/mounts\" { capabilities = [ \"read\", \"list\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"resources/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"pki*\" {  capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\", \"patch\" ]} \npath \"credentials/*\" { capabilities = [\"read\", \"list\"] }"
+        - "resource_management"
     - name: "service_management"
       policies:
-        - name: "service_management"
-          policy: "\npath \"sys/policy/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"sys/auth\" { capabilities = [\"read\"] } \npath \"/identity/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"services/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"service-repositories/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"] } \npath \"credentials/*\" { capabilities = [\"read\", \"list\"] }"
+        - "service_management"
   kv_secret_engines:
     - "awx_jwt_authenticator"
     - "credentials"

@@ -37,4 +37,3 @@
     body:
       token_policies: "{{ token_policies | join(',') }}"
   register: output_approle_policies
-  no_log: true
