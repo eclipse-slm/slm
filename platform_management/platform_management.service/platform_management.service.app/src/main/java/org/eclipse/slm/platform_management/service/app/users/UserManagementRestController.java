@@ -2,6 +2,7 @@ package org.eclipse.slm.platform_management.service.app.users;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +19,8 @@ public class UserManagementRestController implements UserManagementRestApi {
 
     @Override
     public ResponseEntity<Void> createUser(UserCreateRequest userCreateRequest) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
         this.userManager.createUser(userCreateRequest);
         return ResponseEntity.ok().build();
     }

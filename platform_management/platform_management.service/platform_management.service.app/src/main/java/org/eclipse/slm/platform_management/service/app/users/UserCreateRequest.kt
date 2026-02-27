@@ -4,22 +4,22 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class UserCreateRequest(
 
-    @field:JsonProperty("username")
+    @param:JsonProperty("username")
     val username: String,
 
-    @field:JsonProperty("firstName")
+    @param:JsonProperty("firstName")
     val firstName: String,
 
-    @field:JsonProperty("lastName")
+    @param:JsonProperty("lastName")
     val lastName: String,
 
-    @field:JsonProperty("password")
+    @param:JsonProperty("password")
     val password: String,
 
-    @field:JsonProperty("isPasswordTemporary")
+    @param:JsonProperty("isPasswordTemporary")
     val isPasswordTemporary: Boolean = false,
 
-    @field:JsonProperty("email")
+    @param:JsonProperty("email")
     val email: String,
 
     )

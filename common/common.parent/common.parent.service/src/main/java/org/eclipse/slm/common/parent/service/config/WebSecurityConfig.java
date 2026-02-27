@@ -22,6 +22,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.oauth2.server.resource.authentication.JwtIssuerAuthenticationManagerResolver;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -42,6 +43,8 @@ public class WebSecurityConfig {
 
     private final MultiTenantKeycloakRegistration multiTenantKeycloakRegistration;
 
+    private final ApiKeyAuthFilter apiKeyAuthFilter;
+
     private static final String[] STATIC_AUTH_WHITELIST = {
             // -- Swagger UI v3 (OpenAPI)
             "/v3/api-docs/**",
@@ -50,8 +53,9 @@ public class WebSecurityConfig {
             "/actuator/health"
     };
 
-    public WebSecurityConfig(MultiTenantKeycloakRegistration multiTenantKeycloakRegistration) {
+    public WebSecurityConfig(MultiTenantKeycloakRegistration multiTenantKeycloakRegistration, ApiKeyAuthFilter apiKeyAuthFilter) {
         this.multiTenantKeycloakRegistration = multiTenantKeycloakRegistration;
+        this.apiKeyAuthFilter = apiKeyAuthFilter;
     }
 
     @Bean
@@ -92,9 +96,14 @@ public class WebSecurityConfig {
         // @formatter:off
         var authWhiteList = (String[])ArrayUtils.addAll(configuredAuthWhiteList, STATIC_AUTH_WHITELIST);
 
-        http.authorizeHttpRequests(requests -> requests
-                .requestMatchers(Stream.of(authWhiteList).map(AntPathRequestMatcher::new).toArray(AntPathRequestMatcher[]::new)).permitAll()
-                .anyRequest().authenticated());
+        if (this.apiKeyAuthFilter.isApiKeyAuthEnabled()) {
+            http.addFilterBefore(this.apiKeyAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        }
+
+        http
+            .authorizeHttpRequests(requests -> requests
+            .requestMatchers(Stream.of(authWhiteList).map(AntPathRequestMatcher::new).toArray(AntPathRequestMatcher[]::new)).permitAll()
+            .anyRequest().authenticated());
         // @formatter:on
 
         return http.build();
