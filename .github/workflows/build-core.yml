@@ -181,7 +181,7 @@ jobs:
     if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
     runs-on: self-hosted
     container:
-      image: maven:3.9-eclipse-temurin-19-focal
+      image: maven:3.9-eclipse-temurin-21-noble
     strategy:
       matrix:
         tests: [
