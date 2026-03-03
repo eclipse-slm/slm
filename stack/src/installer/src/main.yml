@@ -342,6 +342,7 @@
         name: slm/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _vault_token: "{{ vault_root_token }}"
         _store_compose_file: /compose/slm.yml
 
     - name: "Store resulting environment file"
