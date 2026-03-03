@@ -13,8 +13,7 @@ services:
       - CONSUL_PORT=${CONSUL_Port}
       - LOCAL_JAVA_CA_TRUSTSTORE_PASSWORD=${LOCAL_JAVA_CA_TRUSTSTORE_PASSWORD}
     extra_hosts:
-#      - "${SLM_HOSTNAME}:host-gateway"
-      - "${SLM_HOSTNAME}:10.17.165.210"
+      - "${SLM_HOSTNAME}:${SLM_IP}"
     volumes:
       - "${LOCAL_PROJECT_PATH}:/project"
       - "${LOCAL_JAVA_CA_TRUSTSTORE}:/certs/java/cacerts"
