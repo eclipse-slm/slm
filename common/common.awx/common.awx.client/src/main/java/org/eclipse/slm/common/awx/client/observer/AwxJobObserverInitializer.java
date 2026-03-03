@@ -12,7 +12,7 @@ import java.io.IOException;
 @Component
 public class AwxJobObserverInitializer {
 
-    public final static Logger LOG = LoggerFactory.getLogger(AwxJobObserverInitializer.class);
+    private final static Logger LOG = LoggerFactory.getLogger(AwxJobObserverInitializer.class);
     private final int pollingInterval;
 
     private String awxHost;

@@ -11,7 +11,7 @@ import java.util.HashMap;
 @Component
 public class ServiceManagementApiClientInitializer {
 
-    public final static Logger LOG = LoggerFactory.getLogger(ServiceManagementApiClientInitializer.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ServiceManagementApiClientInitializer.class);
 
     private String serviceManagementUrl;
 

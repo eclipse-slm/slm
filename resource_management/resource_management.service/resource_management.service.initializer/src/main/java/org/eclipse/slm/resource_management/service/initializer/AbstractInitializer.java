@@ -1,25 +1,25 @@
 package org.eclipse.slm.resource_management.service.initializer;
 
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
-import org.eclipse.slm.resource_management.service.client.ResourceManagementApiClientInitializer;
-import org.eclipse.slm.resource_management.service.client.handler.ApiClient;
+import org.eclipse.slm.resource_management.service.client.ResourceManagementClient;
+import org.eclipse.slm.resource_management.service.client.ResourceManagementClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;;
+import javax.annotation.PostConstruct;
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
 
-@Component
 public abstract class AbstractInitializer {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractInitializer.class);
 
     protected final FileUtil fileUtil;
 
-    protected final ResourceManagementApiClientInitializer resourceManagementApiClientInitializer;
+    protected final ResourceManagementClientFactory resourceManagementClientFactory;
+
+    protected ResourceManagementClient resourceManagementClient;
 
     @Value("${resource-management.init-directories:init/}")
     private String resourceManagementInitDirectoryPathConfig;
@@ -36,22 +36,21 @@ public abstract class AbstractInitializer {
     @Value("${keycloak.password}")
     protected String keycloakPassword;
 
-    protected ApiClient apiClient;
 
-    public AbstractInitializer(FileUtil fileUtil, ResourceManagementApiClientInitializer resourceManagementApiClientInitializer) {
+    public AbstractInitializer(FileUtil fileUtil, ResourceManagementClientFactory resourceManagementClientFactory) {
         this.fileUtil = fileUtil;
-        this.resourceManagementApiClientInitializer = resourceManagementApiClientInitializer;
+        this.resourceManagementClientFactory = resourceManagementClientFactory;
     }
 
     @PostConstruct
-    private void initApiClient() {
+    private void initResourceManagementClient() {
         var keycloakAccessToken = KeycloakTokenUtil.getAccessTokenFromKeycloakInstance(
                 this.keycloakAuthServerUrl,
                 this.keycloakRealm,
                 this.keycloakUsername,
                 this.keycloakPassword
         );
-        this.apiClient = resourceManagementApiClientInitializer.init(keycloakAccessToken);
+        this.resourceManagementClient = resourceManagementClientFactory.create(keycloakAccessToken);
     }
 
     protected String getInitDirectory() throws FileNotFoundException {

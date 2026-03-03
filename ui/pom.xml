@@ -16,20 +16,42 @@
 
     <properties>
         <docker.image.name>slm/ui</docker.image.name>
+        <docker.dockerfile.path>${project.basedir}/Dockerfile</docker.dockerfile.path>
     </properties>
 
     <build>
         <plugins>
             <!-- Docker Image !-->
             <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>dockerfile-maven-plugin</artifactId>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
             </plugin>
+            <!--  OpenAPI Generator | Backend REST Client Generation !-->
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <version>${maven.plugin.openapi-generator.version}</version>
                 <executions>
+                    <execution>
+                        <id>platform-management-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+
+                            <generatorName>typescript-axios</generatorName>
+                            <inputSpec>${project.basedir}/../platform_management/platform_management.service/platform_management.service.client/src/main/resources/api-docs-for-ui.yaml</inputSpec>
+                            <output>${project.basedir}/src/api/platform-management/client</output>
+                            <generateModels>true</generateModels>
+                            <generateSupportingFiles>true</generateSupportingFiles>
+                            <additionalProperties>
+                                <supportsES6>true</supportsES6>
+                                <interfacePrefix>PlatformManagement</interfacePrefix>
+
+                            </additionalProperties>
+                            <serverVariableOverrides>basePath=/platform-management/</serverVariableOverrides>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>resource-management-client</id>
                         <goals>

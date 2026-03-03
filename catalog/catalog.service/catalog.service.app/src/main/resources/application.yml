@@ -106,7 +106,7 @@ consul:
     address: host.docker.internal
     port: ${server.port}
   scheme: http
-  host: localhost
+  host: consul
   port: 8500
   datacenter: fabos
   acl-token: your-consul-acl-token

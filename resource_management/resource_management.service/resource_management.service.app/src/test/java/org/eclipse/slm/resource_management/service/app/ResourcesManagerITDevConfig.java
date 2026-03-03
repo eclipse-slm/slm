@@ -1,9 +1,7 @@
 package org.eclipse.slm.resource_management.service.app;
 
-import org.eclipse.slm.common.consul.client.ConsulCredential;
+
 import org.eclipse.slm.common.model.DeploymentType;
-import org.eclipse.slm.common.vault.client.VaultCredential;
-import org.eclipse.slm.common.vault.client.VaultCredentialType;
 import org.eclipse.slm.resource_management.common.remote_access.ConnectionType;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityType;
 import org.eclipse.slm.resource_management.features.capabilities.model.DeploymentCapability;
@@ -28,8 +26,6 @@ public class ResourcesManagerITDevConfig {
     public final static String VAULT_SERVICE_NAME = "vault";
     public final static DockerComposeContainer dockerCompose;
     public final static File dockerComposeFile = new File("src/test/resources/docker-compose-consul-vault.yml");
-    public static final ConsulCredential cCred = new ConsulCredential();
-    public static final VaultCredential vCred = new VaultCredential(VaultCredentialType.APPLICATION_PROPERTIES);
     public static DeploymentCapability dockerDeploymentCapability = new DeploymentCapability();
     public static AccessToken accessToken = new AccessToken();
     public static String keycloakSubject = "9141256b-3094-47f1-b1f6-11016c59cd2b";

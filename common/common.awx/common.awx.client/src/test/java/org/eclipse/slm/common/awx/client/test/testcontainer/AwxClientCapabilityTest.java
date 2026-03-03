@@ -5,7 +5,6 @@ import org.eclipse.slm.common.awx.client.AwxClient;
 import org.eclipse.slm.common.awx.client.AwxProjectUpdateFailedException;
 import org.eclipse.slm.common.awx.model.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -40,14 +38,14 @@ public class AwxClientCapabilityTest {
     static final DockerComposeContainer awxContainer;
 
     private static int AWX_PORT = 8013;
-    private static String AWX_WEB_SERVICE = "awx";
+    private static String AWX_SERVICE = "awx";
 
     @Autowired
     AwxClient awxClient;
 
     static {
         awxContainer = new DockerComposeContainer(new File("src/test/resources/docker-compose.yml"))
-                .withExposedService(AWX_WEB_SERVICE,AWX_PORT,
+                .withExposedService(AWX_SERVICE,AWX_PORT,
                         Wait.forHttp("/#/login").forPort(AWX_PORT).withStartupTimeout(Duration.ofMinutes(5))
                 )
                 .withLocalCompose(false);
@@ -63,14 +61,14 @@ public class AwxClientCapabilityTest {
 
     @BeforeEach
     public void beforeEach() {
-        awxClient.setAwxPort(awxContainer.getServicePort(AWX_WEB_SERVICE, AWX_PORT));
+        awxClient.setAwxPort(awxContainer.getServicePort(AWX_SERVICE, AWX_PORT));
     }
 
     @Nested
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     public class testCapabilityAwxMethods {
         //region Variables
-        public final static Logger LOG = LoggerFactory.getLogger(testCapabilityAwxMethods.class);
+        private final static Logger LOG = LoggerFactory.getLogger(testCapabilityAwxMethods.class);
         public static AwxClient staticAwxClient;
         List<String> jobTemplateCredentialNames = List.of("Consul", "HashiCorp Vault");
         String repo = "https://github.com/FabOS-AI/fabos-slm-dc-dummy";

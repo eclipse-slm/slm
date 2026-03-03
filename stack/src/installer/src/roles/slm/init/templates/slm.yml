@@ -1,5 +1,57 @@
 services:
 
+  platform-management:
+    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm/platform-management:{{ ENV.SLM_VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
+    environment:
+      DEPLOYMENT_URL: "{{ platform_management.url.proxy }}"
+      CONSUL_SCHEME: "{{ app_configs['platform_management']['consul']['scheme'] }}"
+      CONSUL_HOST: "{{ app_configs['platform_management']['consul']['host'] }}"
+      CONSUL_PORT: "{{ app_configs['platform_management']['consul']['port'] }}"
+      CONSUL_ACLTOKEN: "{{ app_configs['platform_management']['consul']['acl-token'] }}"
+      CONSUL_SERVICE_ADDRESS: "{{ ENV.PLATFORM_MANAGEMENT.HOST.INTERNAL }}"
+      CONSUL_SERVICE_PORT: "{{ ENV.PLATFORM_MANAGEMENT.PORT.INTERNAL }}"
+      MONITORING_SERVICE_URL: "{{ monitoring_service.url.proxy }}"
+    ports:
+      - "{{ ENV.PLATFORM_MANAGEMENT.PORT.EXTERNAL }}:{{ ENV.PLATFORM_MANAGEMENT.PORT.INTERNAL }}"
+    networks:
+      default:
+        aliases:
+          - "{{ ENV.PLATFORM_MANAGEMENT.HOST.INTERNAL }}"
+    extra_hosts:
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:9001/swagger-ui/index.html" ]
+
+  platform-management-database:
+    image: "mariadb:{{ ENV.RESOURCE_MANAGEMENT.DATABASE.VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
+    ports:
+      - "{{ ENV.PLATFORM_MANAGEMENT.DATABASE.PORT.EXTERNAL }}:{{ ENV.PLATFORM_MANAGEMENT.DATABASE.PORT.INTERNAL }}"
+    networks:
+      default:
+        aliases:
+          - "{{ ENV.PLATFORM_MANAGEMENT.DATABASE.HOST.INTERNAL }}"
+    environment:
+      MARIADB_ROOT_PASSWORD: "{{ app_configs['platform_management']['database']['root_password'] }}"
+      MARIADB_USER: "{{ app_configs['platform_management']['database']['username'] }}"
+      MARIADB_PASSWORD: "{{ app_configs['platform_management']['database']['password'] }}"
+      MARIADB_DATABASE: "{{ app_configs['platform_management']['database']['schema'] }}"
+    volumes:
+      - platform-management-database_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+
   ui:
     image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm/ui:{{ ENV.SLM_VERSION }}"
     restart: unless-stopped
@@ -22,6 +74,7 @@ services:
       BASYX_AAS_GUI_URL: "{{ aas.aas_gui.url.proxy }}"
       CONSUL_TOKEN: "{{ app_configs['resource_management']['consul']['acl-token'] }}"
       NOTIFICATION_SERVICE_URL: "{{ notification_service.url.proxy }}"
+      PLATFORM_MANAGEMENT_URL: "{{ platform_management.url.proxy }}"
       RESOURCE_MANAGEMENT_URL: "{{ resource_management.url.proxy }}"
       SERVICE_MANAGEMENT_URL: "{{ service_management.url.proxy }}"
       CATALOG_SERVICE_URL: "{{ catalog_service.url.proxy }}"
@@ -48,7 +101,6 @@ services:
       AAS_SUBMODELREPOSITORY_URL: "{{ aas.submodel_repository.url.internal }}"
       AAS_CONCEPTDESCRIPTIONSREPOSITORY_URL: "{{ aas.concept_description_repository.url.internal }}"
       MONITORING_SERVICE_URL: "{{ monitoring_service.url.proxy }}"
-      SERVER_MAXHTTPHEADERSIZE: "{{ ENV.SERVER_MAXHTTPHEADERSIZE }}"
     ports:
       - "{{ ENV.RESOURCE_MANAGEMENT.PORT.EXTERNAL }}:{{ ENV.RESOURCE_MANAGEMENT.PORT.INTERNAL }}"
     networks:
@@ -131,7 +183,6 @@ services:
       AAS_SUBMODELREPOSITORY_URL: "{{ aas.submodel_repository.url.internal }}"
       AAS_CONCEPTDESCRIPTIONSREPOSITORY_URL: "{{ aas.concept_description_repository.url.internal }}"
       SERVICEMANAGEMENT_URL: "{{ service_management.url.internal }}"
-      SERVER_MAXHTTPHEADERSIZE: "{{ ENV.SERVER_MAXHTTPHEADERSIZE }}"
     ports:
       - "{{ ENV.SERVICE_MANAGEMENT.PORT.EXTERNAL }}:{{ ENV.SERVICE_MANAGEMENT.PORT.INTERNAL }}"
     networks:
@@ -216,7 +267,7 @@ services:
     extra_hosts:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:9001/swagger-ui/index.html" ]
+      test: [ "CMD", "curl", "http://localhost:9002/swagger-ui/index.html" ]
 
   notification-service-database:
     image: "mariadb:{{ ENV.NOTIFICATION_SERVICE.DATABASE.VERSION }}"
@@ -275,10 +326,11 @@ services:
     extra_hosts:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:9002/swagger-ui/index.html" ]
+      test: [ "CMD", "curl", "http://localhost:9003/swagger-ui/index.html" ]
 
 volumes:
   notification-service-database_data:
+  platform-management-database_data:
   resource-management-database_data:
   service-management-database_data:
 

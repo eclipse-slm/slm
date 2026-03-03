@@ -6,4 +6,5 @@ class CreateResourceRequest() {
     var resourceHostname: String? = null
     var resourceIp: String? = null
     var digitalNameplateV3: DigitalNameplateV3?  = null
+    var fullPathOwnerGroupId: String? = null
 }

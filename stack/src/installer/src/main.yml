@@ -88,6 +88,11 @@
                 internal: "{{ ENV.IRS.SCHEME.INTERNAL }}://{{ ENV.IRS.HOST.INTERNAL }}:{{ ENV.IRS.PORT.INTERNAL }}{{ ENV.IRS.PATH.INTERNAL }}"
                 external: "{{ ENV.IRS.SCHEME.EXTERNAL }}://{{ ENV.IRS.HOST.EXTERNAL }}:{{ ENV.IRS.PORT.EXTERNAL }}{{ ENV.IRS.PATH.EXTERNAL }}"
                 proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.IRS.PATH.EXTERNAL }}"
+            platform_management:
+              url:
+                internal: "{{ ENV.PLATFORM_MANAGEMENT.SCHEME.INTERNAL }}://{{ ENV.PLATFORM_MANAGEMENT.HOST.INTERNAL }}:{{ ENV.PLATFORM_MANAGEMENT.PORT.INTERNAL }}{{ ENV.PLATFORM_MANAGEMENT.PATH.INTERNAL }}"
+                external: "{{ ENV.PLATFORM_MANAGEMENT.SCHEME.EXTERNAL }}://{{ ENV.PLATFORM_MANAGEMENT.HOST.EXTERNAL }}:{{ ENV.PLATFORM_MANAGEMENT.PORT.EXTERNAL }}{{ ENV.PLATFORM_MANAGEMENT.PATH.EXTERNAL }}"
+                proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.PLATFORM_MANAGEMENT.PATH.EXTERNAL }}"
             resource_management:
               url:
                 internal: "{{ ENV.RESOURCE_MANAGEMENT.SCHEME.INTERNAL }}://{{ ENV.RESOURCE_MANAGEMENT.HOST.INTERNAL }}:{{ ENV.RESOURCE_MANAGEMENT.PORT.INTERNAL }}{{ ENV.RESOURCE_MANAGEMENT.PATH.INTERNAL }}"
@@ -337,6 +342,7 @@
         name: slm/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _vault_token: "{{ vault_root_token }}"
         _store_compose_file: /compose/slm.yml
 
     - name: "Store resulting environment file"

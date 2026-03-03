@@ -32,15 +32,6 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-oauth2-jose</artifactId>
         </dependency>
-        <!-- Http Client !-->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents.client5</groupId>
-            <artifactId>httpclient5</artifactId>
-        </dependency>
         <!-- Jackson !-->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -56,34 +47,36 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
         </dependency>
-        <!-- Logging !-->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.consul.testing.containers</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
-        <!-- Shared Modules !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.keycloak.testing</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- REST Client !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.restclient</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Model Mapping !-->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+        <!-- Consul Model !-->
         <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>common.consul.model</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- Consule Client API !-->
-        <dependency>
-            <groupId>org.fab-os.consul</groupId>
-            <artifactId>consul-client</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.modelmapper</groupId>
-            <artifactId>modelmapper</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>31.1-jre</version>
-            <scope>compile</scope>
-        </dependency>
+
     </dependencies>
 
 

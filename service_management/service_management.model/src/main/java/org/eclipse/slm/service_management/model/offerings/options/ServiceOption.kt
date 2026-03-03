@@ -7,34 +7,34 @@ import java.io.Serializable
 
 open class ServiceOption (
 
-    @JsonProperty("relation")
+    @param:JsonProperty("relation")
     var relation: String,
 
-    @JsonProperty("key")
+    @param:JsonProperty("key")
     var key: String,
 
-    @JsonProperty("name")
+    @param:JsonProperty("name")
     var name: String,
 
-    @JsonProperty("description")
+    @param:JsonProperty("description")
     var description: String,
 
-    @JsonProperty("optionType")
+    @param:JsonProperty("optionType")
     var optionType: ServiceOptionType,
 
-    @JsonProperty("defaultValue")
+    @param:JsonProperty("defaultValue")
     var defaultValue: Any?,
 
-    @JsonProperty("valueType")
+    @param:JsonProperty("valueType")
     var valueType: ServiceOptionValueType,
 
-    @JsonProperty("valueOptions", required = false)
+    @param:JsonProperty("valueOptions", required = false)
     var valueOptions: List<String>? = listOf(),
 
-    @JsonProperty("required")
+    @param:JsonProperty("required")
     var required: Boolean,
 
-    @JsonProperty("editable")
+    @param:JsonProperty("editable")
     var editable: Boolean,
 
     ): Serializable {

@@ -3,23 +3,19 @@ package org.eclipse.slm.resource_management.features.capabilities.clusters.handl
 import org.eclipse.slm.common.awx.client.AwxCredential;
 import org.eclipse.slm.common.awx.client.observer.*;
 import org.eclipse.slm.common.awx.model.ExtraVars;
-import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.client.apis.ConsulAclApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulNodesApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulServicesApiClient;
-import org.eclipse.slm.common.consul.model.catalog.NodeService;
+
+import org.eclipse.slm.common.consul.client.ConsulClientFactory;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
-import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
-import org.eclipse.slm.common.vault.client.VaultClient;
+import org.eclipse.slm.common.vault.client.VaultClientFactory;
 import org.eclipse.slm.notification_service.messaging.NotificationEventMessage;
 import org.eclipse.slm.notification_service.messaging.NotificationMessageSender;
 import org.eclipse.slm.notification_service.model.NotificationCategory;
 import org.eclipse.slm.notification_service.model.NotificationEventType;
 import org.eclipse.slm.notification_service.model.NotificationSubCategory;
-import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
+import org.eclipse.slm.resource_management.common.remote_access.RemoteAccessManager;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.*;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.model.ClusterMemberType;
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType;
@@ -27,7 +23,6 @@ import org.eclipse.slm.resource_management.features.capabilities.model.awx.AwxAc
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilitiesConsulClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
@@ -39,33 +34,26 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
 
     private final static Logger LOG = LoggerFactory.getLogger(ClusterScaleFunctions.class);
 
-    @Autowired
-    protected ResourcesConsulClient resourcesConsulClient;
-
     public ClusterScaleFunctions(
             NotificationMessageSender notificationMessageSender,
             AwxJobExecutor awxJobExecutor,
             MultiTenantKeycloakRegistration multiTenantKeycloakRegistration,
-            ConsulServicesApiClient consulServicesApiClient,
-            ConsulAclApiClient consulAclApiClient,
-            ConsulNodesApiClient consulNodesApiClient,
+            ConsulClientFactory consulClientFactory,
             CapabilitiesConsulClient capabilitiesConsulClient,
             MultiHostCapabilitiesConsulClient multiHostCapabilitiesConsulClient,
-            KeycloakAdminClient keycloakAdminClient,
             AwxJobObserverInitializer awxJobObserverInitializer,
-            VaultClient vaultClient) {
+            VaultClientFactory vaultClientFactory,
+            RemoteAccessManager remoteAccessManager) {
         super(
                 notificationMessageSender,
                 awxJobExecutor,
                 multiTenantKeycloakRegistration,
-                consulServicesApiClient,
-                consulAclApiClient,
-                consulNodesApiClient,
+                consulClientFactory,
                 capabilitiesConsulClient,
                 multiHostCapabilitiesConsulClient,
-                keycloakAdminClient,
                 awxJobObserverInitializer,
-                vaultClient);
+                vaultClientFactory,
+                remoteAccessManager);
     }
 
     //TODO: Make one function for scaleUp/scaleDown because scaleUp/Down almost identical
@@ -75,7 +63,7 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
             UUID resourceId
     ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException {
         Optional<MultiHostCapabilityService> serviceOptional = multiHostCapabilitiesConsulClient.getMultiHostCapabilityServiceOfUser(
-                new ConsulCredential(jwtAuthenticationToken),
+                
                 consulServiceUuid
         );
 
@@ -97,16 +85,16 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
         JobTarget jobTarget = JobTarget.RESOURCE;
         JobGoal jobGoal = JobGoal.MODIFY;
 
-        Optional<NodeService> resourceToAddAsSerivce = this.resourcesConsulClient.getRemoteAccessServiceOfResourceAsNodeService(new ConsulCredential(), resourceId);
-
-        if (!resourceToAddAsSerivce.isPresent()){
-            LOG.error("Could not find RemoteAccessService for resource (id='" + resourceId + "') in order to add it to cluster ('" + service.getService() + "'). Aborting!");
+        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
+        var remoteAccessesOfResource = this.remoteAccessManager.getRemoteAccessesOfResource(resourceId, accessToken);
+        if (remoteAccessesOfResource.isEmpty()){
+            LOG.error("Could not find RemoteAccessService for resource (id='" + resourceId + "') in order to add it to cluster ('" + service.getServiceName() + "'). Aborting!");
             throw new ResourceNotFoundException(resourceId);
         }
 
         Map<String, Object> extraVarsMap = new HashMap<>();
-        extraVarsMap.put("resource_service_id", service.getService());
-        extraVarsMap.put("resource_to_add_service_id", resourceToAddAsSerivce.get().getService());
+        extraVarsMap.put("resource_service_id", service.getServiceName());
+        extraVarsMap.put("resource_to_add_service_id", remoteAccessesOfResource.get(0).getId());
         extraVarsMap.put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
         extraVarsMap.put("supported_connection_types", scaleUpAction.getConnectionTypes());
         ExtraVars extraVars = new ExtraVars(extraVarsMap);
@@ -140,7 +128,7 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
         JobTarget jobTarget = JobTarget.RESOURCE;
         JobGoal jobGoal = JobGoal.MODIFY;
         Optional<MultiHostCapabilityService> serviceOptional = multiHostCapabilitiesConsulClient.getMultiHostCapabilityServiceOfUser(
-                new ConsulCredential(jwtAuthenticationToken),
+                
                 consulServiceUuid
         );
 
@@ -150,16 +138,16 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
         MultiHostCapabilityService service = serviceOptional.get();
         AwxAction scaleDownAction = (AwxAction) service.getCapability().getActions().get(ActionType.SCALE_DOWN);
 
-        Optional<NodeService> resourceToAddAsSerivce = this.resourcesConsulClient.getRemoteAccessServiceOfResourceAsNodeService(new ConsulCredential(), resourceId);
-
-        if (!resourceToAddAsSerivce.isPresent()){
-            LOG.error("Could not find RemoteAccessService for resource (id='" + resourceId + "') in order to remove it from cluster ('" + service.getService() + "'). Aborting!");
+        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
+        var remoteAccessesOfResource = this.remoteAccessManager.getRemoteAccessesOfResource(resourceId, accessToken);
+        if (remoteAccessesOfResource.isEmpty()){
+            LOG.error("Could not find RemoteAccessService for resource (id='" + resourceId + "') in order to remove it from cluster ('" + service.getServiceName() + "'). Aborting!");
             throw new ResourceNotFoundException(resourceId);
         }
 
         Map<String, Object> extraVarsMap = new HashMap<>();
-        extraVarsMap.put("resource_service_id", service.getService());
-        extraVarsMap.put("resource_to_add_service_id", resourceToAddAsSerivce.get().getService());
+        extraVarsMap.put("resource_service_id", service.getServiceName());
+        extraVarsMap.put("resource_to_add_service_id", remoteAccessesOfResource.get(0).getId());
         extraVarsMap.put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
         extraVarsMap.put("supported_connection_types", scaleDownAction.getConnectionTypes());
         ExtraVars extraVars = new ExtraVars(extraVarsMap);
@@ -204,7 +192,7 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
             Class<? extends ScaleOperation> scaleClass = scaleOperation.getClass();
 
             multiHostCapabilitiesConsulClient.scaleMultiHostCapabilityService(
-                    new ConsulCredential(),
+                    
                     scaleOperation,
                     multiHostCapabilityService.getId()
             );

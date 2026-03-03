@@ -3,7 +3,9 @@ package org.eclipse.slm.service_management.persistence.keycloak;
 import com.c4_soft.springaddons.security.oauth2.test.annotations.*;
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakGroupNotFoundException;
+import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakGroupRuntimeException;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakUserNotFoundException;
+import org.eclipse.slm.service_management.model.exceptions.ServiceVendorRuntimeException;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendor;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendorDeveloper;
 import org.eclipse.slm.service_management.model.vendors.exceptions.ServiceVendorNotFoundException;
@@ -31,8 +33,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @DataJpaTest
@@ -189,15 +189,13 @@ public class ServiceVendorRepositoryTest {
 
         @Test
         @DisplayName("Vendor exists")
-        public void vendorExists() throws ServiceVendorNotFoundException, KeycloakGroupNotFoundException {
+        public void vendorExists() throws ServiceVendorNotFoundException, KeycloakGroupNotFoundException, KeycloakGroupRuntimeException, ServiceVendorRuntimeException {
             var serviceVendorId = UUID.randomUUID();
             var storedServiceVendor = addTestServiceVendorInDatabase(serviceVendorId);
 
             serviceVendorRepository.deleteServiceVendorById(serviceVendorId, "fabos");
 
-            verify(keycloakAdminClient).deleteGroup(
-                    argThat(realm -> realm.equals("fabos")),
-                    argThat(groupName -> groupName.equals(storedServiceVendor.getKeycloakGroupName())));
+            verify(keycloakAdminClient).deleteGroup(argThat(groupName -> groupName.equals(storedServiceVendor.getKeycloakGroupName())));
         }
     }
 

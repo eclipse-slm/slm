@@ -4,6 +4,6 @@ import java.util.UUID;
 
 public interface ResourceUpdatedListener {
 
-    void onResourceUpdated(UUID resourceId);
+    void onResourceUpdated(UUID resourceId, String jwtAccessToken);
 
 }

@@ -16,7 +16,7 @@ public class SubmodelRepositoryClientFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(SubmodelRepositoryClientFactory.class);
 
-    private final static String SUBMODEL_REPOSITORY_DISCOVERY_INSTANCE_ID = "submodel-repositoryyy";
+    private final static String SUBMODEL_REPOSITORY_DISCOVERY_INSTANCE_ID = "submodel-repository";
 
     private final String submodelRepositoryUrlApplicationProperties;
 
@@ -70,9 +70,12 @@ public class SubmodelRepositoryClientFactory {
             var matchesFound = matcher.find();
             if (matchesFound) {
                 var submodelRepositoryBaseUrl = matcher.group(1);
-                var submodelRepositoryClient = new SubmodelRepositoryClient(submodelRepositoryBaseUrl, new JwtAuthenticationTokenAuthRequestInterceptor(jwtAuthenticationToken));
-
-                return submodelRepositoryClient;
+                if (jwtAuthenticationToken == null) {
+                    return new SubmodelRepositoryClient(submodelRepositoryBaseUrl);
+                }
+                else {
+                    return new SubmodelRepositoryClient(submodelRepositoryBaseUrl, new JwtAuthenticationTokenAuthRequestInterceptor(jwtAuthenticationToken));
+                }
             }
         }
 

@@ -24,6 +24,7 @@ printf "%-38s %s\n" "APP_VERSION:" "$APP_VERSION"
 printf "%-38s %s\n" "I18N_LOCALE:" "$I18N_LOCALE"
 printf "%-38s %s\n" "I18N_LOCALE_FALLBACK:" "$I18N_LOCALE_FALLBACK"
 printf "%-38s %s\n" "NOTIFICATION_SERVICE_URL:" "$NOTIFICATION_SERVICE_URL"
+printf "%-38s %s\n" "PLATFORM_MANAGEMENT_URL:" "$PLATFORM_MANAGEMENT_URL"
 printf "%-38s %s\n" "RESOURCE_MANAGEMENT_URL:" "$RESOURCE_MANAGEMENT_URL"
 printf "%-38s %s\n" "SERVICE_MANAGEMENT_URL:" "$SERVICE_MANAGEMENT_URL"
 printf "%-38s %s\n" "CATALOG_SERVICE_URL:" "$CATALOG_SERVICE_URL"
@@ -39,6 +40,7 @@ find /usr/share/nginx/html -type f \( -name '*.js' -o -name '*.html' -o -name '*
     -e "s|/__ENV_I18N_LOCALE__PLACEHOLDER__/|$I18N_LOCALE|g" \
     -e "s|/__ENV_I18N_LOCALE_FALLBACK__PLACEHOLDER__/|$I18N_LOCALE_FALLBACK|g" \
     -e "s|/__ENV_NOTIFICATION_SERVICE_URL__PLACEHOLDER__/|$NOTIFICATION_SERVICE_URL|g" \
+    -e "s|/__ENV_PLATFORM_MANAGEMENT_URL__PLACEHOLDER__/|$PLATFORM_MANAGEMENT_URL|g" \
     -e "s|/__ENV_RESOURCE_MANAGEMENT_URL__PLACEHOLDER__/|$RESOURCE_MANAGEMENT_URL|g" \
     -e "s|/__ENV_SERVICE_MANAGEMENT_URL__PLACEHOLDER__/|$SERVICE_MANAGEMENT_URL|g" \
     -e "s|/__ENV_CATALOG_SERVICE_URL__PLACEHOLDER__/|$CATALOG_SERVICE_URL|g" \
@@ -59,6 +61,12 @@ done
 # Wait until Notification Service is running
 until curl -m 5 -s -k --location --request GET "$NOTIFICATION_SERVICE_URL/v3/api-docs" > /dev/null; do
   echo "Notification Service is unavailable -> sleeping"
+  sleep 1
+done
+
+# Wait until Platform Management is running
+until curl -m 5 -s -k --location --request GET "$PLATFORM_MANAGEMENT_URL/v3/api-docs" > /dev/null; do
+  echo "Platform Management is unavailable -> sleeping"
   sleep 1
 done
 

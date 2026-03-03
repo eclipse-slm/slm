@@ -1,29 +1,29 @@
 package org.eclipse.slm.common.keycloak.config
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 
-class KeycloakOidcConfig(
+class KeycloakOidcConfig @JsonCreator constructor(
 
-    @JsonProperty("realm")
+    @field:JsonProperty("realm")
     val realm: String,
 
-    @JsonProperty("auth-server-url")
+    @field:JsonProperty("auth-server-url")
     val authServerUrl: String,
 
-    @JsonProperty("ssl-required")
+    @field:JsonProperty("ssl-required")
     val sslRequired: String,
 
-    @JsonProperty("resource")
+    @field:JsonProperty("resource")
     val resource: String,
 
-    @JsonProperty("credentials")
+    @field:JsonProperty("credentials")
     val credentials: KeycloakOidcConfigCredentials,
 
-    @JsonProperty("confidential-port")
+    @field:JsonProperty("confidential-port")
     val confidentialPort: Int
 
 ) {
-
     val authServerUrlIncludingRealm: String = this.authServerUrl + "realms/" + this.realm;
 
     val tokenServerUrl: String = this.authServerUrlIncludingRealm + "/protocol/openid-connect/token"

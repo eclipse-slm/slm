@@ -1,14 +1,12 @@
 package org.eclipse.slm.resource_management.features.capabilities.providers;
 
-import org.eclipse.slm.common.consul.client.ConsulCredential;
+
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.DeploymentCapability;
 import org.eclipse.slm.resource_management.features.capabilities.model.SingleHostCapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilitiesConsulClient;
-import org.eclipse.slm.resource_management.features.providers.ServiceHoster;
-import org.eclipse.slm.resource_management.features.providers.ServiceHosterFilter;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -26,12 +24,12 @@ public class ServiceHosterHandler extends ProviderHandler {
         );
     }
     public List<ServiceHoster> getServiceHosters(
-            ConsulCredential consulCredential,
+            
             Optional<ServiceHosterFilter> filter) throws ConsulLoginFailedException {
         List<ServiceHoster> serviceHosterList = new ArrayList<>();
 
         List<CapabilityService> deploymentCapabilityServices = capabilitiesConsulClient.getCapabilityServicesByCapabilityClass(
-                consulCredential,
+                
                 DeploymentCapability.class
         );
 

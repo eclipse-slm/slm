@@ -95,7 +95,7 @@
       },
       {
         "id": "638c3532-9a08-478d-9f0f-60869afce93c",
-        "name": "ssp-user",
+        "name": "slm-user",
         "description": "",
         "composite": false,
         "clientRole": false,
@@ -376,7 +376,7 @@
         },
         {
           "id": "619524c1-8cc8-4cb3-b6d7-ebdf0b708936",
-          "name": "ssp-user",
+          "name": "slm-user",
           "composite": false,
           "clientRole": true,
           "containerId": "bc87bbf6-1c58-47f7-9b6a-d72f2be9b33c",
@@ -2540,7 +2540,7 @@
         "account": [
           "view-profile",
           "manage-account",
-          "ssp-user",
+          "slm-user",
           "slm-admin"
         ]
       }

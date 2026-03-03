@@ -22,9 +22,6 @@ import org.eclipse.slm.common.aas.repositories.api.submodels.SubmodelValueOnly;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RequestMapping("")
 @ApiResponses(value = {

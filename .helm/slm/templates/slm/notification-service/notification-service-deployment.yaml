@@ -20,7 +20,7 @@ spec:
           image: ghcr.io/eclipse-slm/slm/notification-service:{{ .Values.version }}
           imagePullPolicy: Always
           ports:
-            - containerPort: 9001
+            - containerPort: 9002
           env:
             - name: KEYCLOAK_AUTHSERVERURL
               value: http://keycloak:{{.Values.keycloak.port}}/auth
@@ -29,7 +29,7 @@ spec:
             - name: VAULT_PORT
               value: "8200"
             - name: NOTIFICATION_SERVICE_PORT
-              value: "9001"
+              value: "9002"
             - name: AWX_HOST
               value: "awx-web"
             - name: AWX_PORT
@@ -46,7 +46,7 @@ spec:
 
           livenessProbe:
             httpGet:
-              port: 9001
+              port: 9002
               path: /swagger-ui/index.html
             initialDelaySeconds: 180
             periodSeconds: 90

@@ -1,10 +1,11 @@
 FROM traefik:v3.3.4
+MAINTAINER Matthias Schneider (matthias.schneider@ipa.fraunhofer.de)
 
 ENV SLM_HOSTNAME="your-slm-hostname" \
     VAULT_APP_ROLE_ROLE_ID="your-vault-app-role-role-id" \
     VAULT_APP_ROLE_SECRET_ID="your-vault-app-role-secret-id"
 
-ARG VAULT_VERSION=1.20.3
+ARG VAULT_VERSION=1.21.2
 
 # Install APK packages
 RUN apk --no-cache add curl nano

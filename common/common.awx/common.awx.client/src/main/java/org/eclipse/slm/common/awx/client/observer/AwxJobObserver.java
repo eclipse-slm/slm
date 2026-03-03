@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AwxJobObserver {
-    public final static Logger LOG = LoggerFactory.getLogger(AwxJobObserver.class);
+    private final static Logger LOG = LoggerFactory.getLogger(AwxJobObserver.class);
 
     public int jobId;
     public JobTarget jobTarget;

@@ -12,7 +12,7 @@ import java.util.UUID;
 @Component
 public class LocationHandler {
 
-    private final static Logger LOG = LoggerFactory.getLogger(LocationRestController.class);
+    private final static Logger LOG = LoggerFactory.getLogger(LocationHandler.class);
 
     private final LocationJpaRepository locationJpaRepository;
 

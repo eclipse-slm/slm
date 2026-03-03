@@ -16,9 +16,16 @@
 
     <properties>
         <docker.image.name>slm/resource-management</docker.image.name>
+        <docker.dockerfile.path>${project.basedir}/target/copied-sources/Dockerfile</docker.dockerfile.path>
     </properties>
 
     <dependencies>
+        <!-- Jackson !-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-kotlin</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
         <!-- Features !-->
         <dependency>
             <groupId>org.eclipse.slm</groupId>
@@ -65,7 +72,7 @@
         <!-- Shared Modules !-->
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>common.parent.service_rest</artifactId>
+            <artifactId>common.parent.service</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -157,67 +164,21 @@
             <artifactId>testcontainers</artifactId>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.c4-soft.springaddons</groupId>-->
-<!--            <artifactId>spring-addons-oauth2-test</artifactId>-->
-<!--            <version>${springaddons-c4-soft.version}</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.epages</groupId>-->
-<!--            <artifactId>restdocs-api-spec-restassured</artifactId>-->
-<!--            <version>0.16.2</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.testcontainers</groupId>-->
-<!--            <artifactId>testcontainers</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.testcontainers</groupId>-->
-<!--            <artifactId>junit-jupiter</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.testcontainers</groupId>-->
-<!--            <artifactId>mariadb</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.github.docker-java</groupId>-->
-<!--            <artifactId>docker-java-transport-zerodep</artifactId>-->
-<!--            <version>${github.docker.java.version}</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.h2database</groupId>-->
-<!--            <artifactId>h2</artifactId>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.github.dasniko</groupId>-->
-<!--            <artifactId>testcontainers-keycloak</artifactId>-->
-<!--            <version>2.5.0</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.github.tomakehurst</groupId>-->
-<!--            <artifactId>wiremock</artifactId>-->
-<!--            <version>2.27.2</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.cloud</groupId>-->
-<!--            <artifactId>spring-cloud-contract-wiremock</artifactId>-->
-<!--            <version>${spring-cloud-contract-wiremock.version}</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
-
         <!-- Utils !-->
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
             <version>1.7</version>
         </dependency>
+        <!-- Platform Management Service Client !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>platform_management.service.client</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <!-- Spring Boot !-->
@@ -237,13 +198,18 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>org.eclipse.slm.resource_management.org.eclipse.slm.resource_management.service.rest.Application</mainClass>
+                    <mainClass>org.eclipse.slm.resource_management.service.app.Application</mainClass>
                 </configuration>
             </plugin>
             <!-- Docker Image !-->
             <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>dockerfile-maven-plugin</artifactId>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+            </plugin>
+            <!-- Resources !-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

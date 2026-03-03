@@ -1,4 +1,4 @@
-FROM hashicorp/vault:1.20.3
+FROM hashicorp/vault:1.21.2
 
 RUN apk update && \
     apk upgrade && \

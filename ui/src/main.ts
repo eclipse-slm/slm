@@ -87,27 +87,34 @@ app.use(VueKeycloakJs, {
 
         // Update stores
         const userStore = useUserStore();
-        userStore.updateStore();
         const catalogStore = useCatalogStore();
-        catalogStore.updateStore();
         const serviceOfferingsStore = useServiceOfferingsStore();
-        serviceOfferingsStore.updateStore();
         const serviceInstancesStore = useServiceInstancesStore();
-        serviceInstancesStore.updateStore();
         const providerStore = useProviderStore();
-        providerStore.updateStore();
         const resourceDevicesStore = useResourceDevicesStore();
-        resourceDevicesStore.updateStore();
         const resourceClustersStore = useResourceClustersStore();
-        resourceClustersStore.updateStore();
         const capabilitiesStore = useCapabilitiesStore();
-        capabilitiesStore.updateStore();
         const discoveryStore = useDiscoveryStore();
-        discoveryStore.updateStore();
         const notificationStore = useNotificationStore();
-        notificationStore.updateStore();
         const jobsStore = useJobsStore();
-        jobsStore.updateStore();
+
+        Promise.all([
+            userStore.updateStore(),
+            catalogStore.updateStore(),
+            serviceOfferingsStore.updateStore(),
+            serviceInstancesStore.updateStore(),
+            providerStore.updateStore(),
+            resourceDevicesStore.updateStore(),
+            resourceClustersStore.updateStore(),
+            capabilitiesStore.updateStore(),
+            discoveryStore.updateStore(),
+            notificationStore.updateStore(),
+            jobsStore.updateStore(),
+        ]).then(() => {
+            console.log('All stores loaded successfully');
+        }).catch((err) => {
+            console.error('Error loading stores:', err);
+        });
     },
 });
 

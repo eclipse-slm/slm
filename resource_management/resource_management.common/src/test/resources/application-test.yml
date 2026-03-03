@@ -21,13 +21,3 @@ spring:
     url: jdbc:tc:mariadb:10.5:///mariadb://${database.schema}?createDatabaseIfNotExist=true&serverTimezone=UTC
     username: ${database.username}
     password: ${database.password}
-
-
-### Consul
-consul:
-  scheme: http
-  host: localhost
-  port: 8500
-  datacenter: fabos
-  skipAcl: true
-  acl-token: myroot

@@ -15,7 +15,7 @@
     </parent>
 
     <modules>
-        <module>information_service.service.impl</module>
+        <module>information_service.service.app</module>
     </modules>
 
 </project>

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.get;
-import static io.restassured.RestAssured.given;
 
 @DisplayName("Consul")
 public class ConsulTests {

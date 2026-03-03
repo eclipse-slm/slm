@@ -217,6 +217,7 @@
 import {useTheme} from "vuetify";
 import {useNotificationStore} from "@/stores/notificationStore";
 import {useStore} from "@/stores/store";
+import {globals} from "@/main";
 
 export default {
     name: 'DashboardCoreAppBar',
@@ -268,7 +269,7 @@ export default {
           id: 'logout-button',
           icon: 'mdi-logout',
           click () {
-            this.$keycloak.logoutFn()
+            globals.$keycloak.logoutFn()
           },
         },
       ],

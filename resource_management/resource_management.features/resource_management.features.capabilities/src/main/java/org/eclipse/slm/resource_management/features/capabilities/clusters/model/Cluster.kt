@@ -17,22 +17,9 @@ class Cluster {
     var capabilityService: MultiHostCapabilityService? = null
     var managed: Boolean = false
 
-    constructor(multiHostCapabilityService: MultiHostCapabilityService, nodes: List<Node>) {
-        this.id = multiHostCapabilityService.id
-        this.name = multiHostCapabilityService.service
-        this.clusterType = multiHostCapabilityService.capability!!.name
-        this.memberMapping = multiHostCapabilityService.memberMapping!!
-        this.clusterMemberTypes = multiHostCapabilityService.capability!!.clusterMemberTypes
-        this.nodes = nodes
-        this.managed = multiHostCapabilityService.managed
-
-        this.capabilityService = multiHostCapabilityService
-        this.metaData = capabilityService!!.serviceMeta
-    }
-
     constructor(multiHostCapabilityService: MultiHostCapabilityService, nodes: List<Node>, metaData: Map<String, String>) {
         this.id = multiHostCapabilityService.id
-        this.name = multiHostCapabilityService.service
+        this.name = multiHostCapabilityService.serviceName
         this.clusterType = multiHostCapabilityService.capability!!.name
         this.memberMapping = multiHostCapabilityService.memberMapping!!
         this.clusterMemberTypes = multiHostCapabilityService.capability!!.clusterMemberTypes
@@ -40,7 +27,7 @@ class Cluster {
         this.managed = multiHostCapabilityService.managed
 
         this.capabilityService = multiHostCapabilityService
-        this.metaData = capabilityService!!.serviceMeta + metaData
+        this.metaData = capabilityService!!.meta + metaData
     }
 
     constructor() {

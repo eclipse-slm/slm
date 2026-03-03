@@ -17,15 +17,12 @@ import org.springframework.test.context.event.annotation.BeforeTestExecution;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BasicMinioClientTests {
 
     //region Variables
-    public final static Logger LOG = LoggerFactory.getLogger(BasicMinioClientTests.class);
+    private final static Logger LOG = LoggerFactory.getLogger(BasicMinioClientTests.class);
     public final static GenericContainer<?> minioDockerContainer;
     private static int MINIO_PORT = 9000;
     private static int MINIO_API_PORT = 9090;

@@ -75,6 +75,7 @@ spring:
         instance-id: ${consul.service.name}
         metadata:
           version: ${application.version}
+        query-passing: false
       config:
         enabled: true
         fail-fast: true
@@ -122,7 +123,7 @@ resource-management:
 notification-service:
   scheme: "http"
   host: "localhost"
-  port: 9001
+  port: 9002
   path: "/notification-service"
   url: ${notification-service.scheme}://${notification-service.host}:${notification-service.port}${notification-service.path}
 
@@ -151,6 +152,7 @@ vault:
   scheme: http
   host: localhost
   port: 8200
+  url: ${vault.scheme}://${vault.host}:${vault.port}
   authentication: APPROLE
   #  token: your-secret-token
   app-role:
@@ -215,8 +217,9 @@ consul:
     address: host.docker.internal
     port: ${server.port}
   scheme: http
-  host: localhost
+  host: consul
   port: 8500
+  url: ${consul.scheme}://${consul.host}:${consul.port}
   datacenter: fabos
   acl-token: your-consul-acl-token
 

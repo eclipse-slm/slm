@@ -4,8 +4,6 @@ import com.google.protobuf.ByteString;
 import org.eclipse.slm.resource_management.features.device_integration.common.discovery.driver.DriverInfo;
 import org.eclipse.slm.resource_management.features.device_integration.discovery.model.*;
 import org.eclipse.slm.resource_management.features.device_integration.common.discovery.driver.AbstractDriverClient;
-import org.eclipse.slm.resource_management.features.device_integration.discovery.model.DiscoveryJob;
-import org.eclipse.slm.resource_management.features.device_integration.discovery.model.DiscoveryRequest;
 import org.eclipse.slm.resource_management.features.device_integration.discovery.persistence.DiscoveryJobRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +12,7 @@ import siemens.common.types.v1.CommonVariant;
 
 public class DiscoveryDriverClient extends AbstractDriverClient {
 
-    public final static Logger LOG = LoggerFactory.getLogger(DiscoveryDriverClient.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DiscoveryDriverClient.class);
 
     private final DiscoveryJobRepository discoveryJobRepository;
 

@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @Tag(name = "Submodel Templates")
 public class SubmodelTemplatesRestController {
 
-    public final static Logger LOG = LoggerFactory.getLogger(SubmodelTemplatesRestController.class);
+    private final static Logger LOG = LoggerFactory.getLogger(SubmodelTemplatesRestController.class);
 
     private final AasRegistryClient aasRegistryClient;
 

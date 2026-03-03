@@ -11,6 +11,7 @@ export const useEnvStore = defineStore('envStore', () => {
     const _i18nLocaleFallback = ref(import.meta.env.VITE_APP_I18N_LOCALE_FALLBACK || (isProduction ? '/__ENV_I18N_LOCALE_FALLBACK__PLACEHOLDER__/' : ''));
 
     const _notificationServiceUrl = ref(import.meta.env.VITE_APP_NOTIFICATION_SERVICE_URL || (isProduction ? '/__ENV_NOTIFICATION_SERVICE_URL__PLACEHOLDER__/' : ''));
+    const _platformManagementUrl = ref(import.meta.env.VITE_APP_PLATFORM_MANAGEMENT_URL || (isProduction ? '/__ENV_PLATFORM_MANAGEMENT_URL__PLACEHOLDER__/' : ''));
     const _resourceManagementUrl = ref(import.meta.env.VITE_APP_RESOURCE_MANAGEMENT_URL || (isProduction ? '/__ENV_RESOURCE_MANAGEMENT_URL__PLACEHOLDER__/' : ''));
     const _serviceManagementUrl = ref(import.meta.env.VITE_APP_SERVICE_MANAGEMENT_URL || (isProduction ? '/__ENV_SERVICE_MANAGEMENT_URL__PLACEHOLDER__/' : ''));
     const _catalogServiceUrl = ref(import.meta.env.VITE_APP_CATALOG_SERVICE_URL || (isProduction ? '/__ENV_CATALOG_SERVICE_URL__PLACEHOLDER__/' : ''));
@@ -30,6 +31,7 @@ export const useEnvStore = defineStore('envStore', () => {
     const i18nLocaleFallback = computed(() => _i18nLocaleFallback.value);
 
     const notificationServiceUrl = computed(() => _notificationServiceUrl.value);
+    const platformManagementUrl = computed(() => _platformManagementUrl.value);
     const resourceManagementUrl = computed(() => _resourceManagementUrl.value);
     const serviceManagementUrl = computed(() => _serviceManagementUrl.value);
     const catalogServiceUrl = computed(() => _catalogServiceUrl.value);

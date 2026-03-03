@@ -9,6 +9,7 @@ import {useCapabilitiesStore} from "@/stores/capabilitiesStore";
 import {storeToRefs} from "pinia";
 import {useToast} from "vue-toast-notification";
 import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
+import {useUserStore} from "@/stores/userStore";
 
 const emit = defineEmits(['closed']);
 
@@ -25,6 +26,7 @@ const selectedCapabilityId = ref(undefined)
 const selectedSkipInstall = ref(false)
 const showCapabilityParamsDialog = ref(false)
 
+const userStore = useUserStore();
 const resourceDevicesStore = useResourceDevicesStore();
 const { resourceById } = storeToRefs(resourceDevicesStore);
 const capabilitiesStore = useCapabilitiesStore();
@@ -37,7 +39,7 @@ const insertWhiteSpaceInCamelCase = (string) => {
 
 const addCapability = (capabilityId, skipInstall, configParameterMap) => {
   console.log(props.resourceId)
-  ResourceManagementClient.capabilityApi.installCapabilityOnSingleHost(props.resourceId, capabilityId, configParameterMap, skipInstall)
+  ResourceManagementClient.capabilityApi.installCapabilityOnSingleHost(props.resourceId, capabilityId, userStore.fullPathUserGroupId, configParameterMap, skipInstall)
       .then()
       .catch((e) => {
         logRequestError(e);

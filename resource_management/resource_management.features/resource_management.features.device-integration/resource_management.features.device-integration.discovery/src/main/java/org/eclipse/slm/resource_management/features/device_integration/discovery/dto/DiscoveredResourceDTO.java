@@ -157,13 +157,13 @@ public class DiscoveredResourceDTO {
 
         private String id;
         private UUID resourceId;
-        private String name = "N/A";;
-        private String serialNumber = "N/A";;
-        private String manufacturerName = "N/A";;
-        private String productName = "N/A";;
-        private String ipAddress = "N/A";;
-        private String macAddress = "N/A";;
-        private String firmwareVersion = "N/A";;
+        private String name = "N/A";
+        private String serialNumber = "N/A";
+        private String manufacturerName = "N/A";
+        private String productName = "N/A";
+        private String ipAddress = "N/A";
+        private String macAddress = "N/A";
+        private String firmwareVersion = "N/A";
         private boolean ignored = false;
         private UUID discoveryJobId;
         private String resultId;

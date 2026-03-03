@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public abstract class GenericMessageSender<T extends AbstractEventMessage> {
 
-    public final static Logger LOG = LoggerFactory.getLogger(GenericMessageSender.class);
+    private final static Logger LOG = LoggerFactory.getLogger(GenericMessageSender.class);
 
     private final RabbitTemplate rabbitTemplate;
 

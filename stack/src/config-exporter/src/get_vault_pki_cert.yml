@@ -1,0 +1,33 @@
+### Inputs
+- name: "Assert inputs of 'consul/client | create_role.yml'"
+  assert:
+    that:
+      - (_vault_url is defined) and (_vault_url|length > 0)                   # URL of the Vault server
+      - (_vault_token is defined) and (_vault_token|length > 0)               # Authentication token for Vault
+      - (_vault_pki_path is defined) and (_vault_pki_path|length > 0)         # PKI engine mount point in Vault (e.g., "pki")
+      - (_vault_pki_role is defined) and (_vault_pki_role|length > 0)         # Name of the Vault PKI role to use for certificate issuance
+      - (_common_name is defined) and (_common_name|length > 0)               # Common name (CN) for the certificate (e.g., domain name)
+      - (_cert_ttl is defined) and (_cert_ttl|length > 0)                     # Time-to-live for the certificate (e.g., "8760h" for 1 year)
+      - (_certificate_dest is defined) and (_certificate_dest|length > 0)     # Destination file path for the issued certificate
+      - (_key_dest is defined) and (_key_dest|length > 0)                     # Destination file path for the issued private key
+
+- name: Issue certificate from Vault PKI
+  community.hashi_vault.vault_pki_generate_certificate :
+    url: "{{ _vault_url }}"
+    token: "{{ _vault_token }}"
+    engine_mount_point: "{{ _vault_pki_path }}"
+    role_name: "{{ _vault_pki_role }}"
+    common_name: "{{ _common_name }}"
+    ttl: "{{ _cert_ttl }}"
+  register: vault_cert
+
+- name: Write certificate to file
+  copy:
+    content: "{{ vault_cert.data.data.certificate }}"
+    dest: "{{ _certificate_dest }}"
+
+- name: Write private key to file
+  copy:
+    content: "{{ vault_cert.data.data.private_key }}"
+    dest: "{{ _key_dest }}"
+

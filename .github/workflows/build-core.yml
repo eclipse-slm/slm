@@ -20,9 +20,9 @@ jobs:
       contents: read
       packages: write
     env:
-      MAVEN_CLI_OPTS: "-T 8 -s ci/ci_maven_settings.xml --batch-mode --errors --fail-at-end --show-version --no-transfer-progress -DinstallAtEnd=true -DdeployAtEnd=true"
+      MAVEN_CLI_OPTS: "-s ci/ci_maven_settings.xml --batch-mode --errors --fail-at-end --show-version --no-transfer-progress -DinstallAtEnd=true -DdeployAtEnd=true"
       MAVEN_PROFILES: ""
-      COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+      COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
     strategy:
       matrix:
         build: [
@@ -37,10 +37,10 @@ jobs:
         ]
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 19
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: '19'
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
       - uses: s4u/maven-settings-action@v2.8.0
@@ -78,11 +78,11 @@ jobs:
         if: github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')
         run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' verify
       - name: Build Coveralls Report
-        if: ${{ env.COVERALLS_TOKEN != '' && matrix.build.type == 'backend' && (github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')) }}
-        run: mvn jacoco:report coveralls:report  -DrepoToken=$COVERALLS_TOKEN
+        if: ${{ env.COVERALLS_REPO_TOKEN != '' && matrix.build.type == 'backend' && (github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')) }}
+        run: mvn jacoco-aggregator:report-aggregate-all coveralls:report -DrepoToken=$COVERALLS_REPO_TOKEN
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       - name: Log test output on failure
         if: failure() || cancelled()
         run: find . -type f -path "*test-reports/*-output.txt" -exec tail -n +1 {} +

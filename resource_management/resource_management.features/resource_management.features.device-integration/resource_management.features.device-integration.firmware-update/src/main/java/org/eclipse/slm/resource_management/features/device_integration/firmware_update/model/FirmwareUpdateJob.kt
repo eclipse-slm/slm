@@ -48,6 +48,9 @@ class FirmwareUpdateJob(id: UUID? = null,
     @JdbcTypeCode(SqlTypes.JSON)
     var logMessages: MutableList<String> = mutableListOf()
 
+    @Column(name = "failure_reason", nullable = true)
+    var failureReason: FirmwareUpdateJobFailureReason? = null
+
     protected constructor()
     : this(null, null, null, null, null)
 

@@ -5,10 +5,10 @@ import java.util.UUID
 
 class ResourceType(
 
-    @JsonProperty("typeName")
+    @field:JsonProperty("typeName")
     var typeName: String,
 
-    @JsonProperty("manufacturerName")
+    @field:JsonProperty("manufacturerName")
     var manufacturerName: String
 ) {
 

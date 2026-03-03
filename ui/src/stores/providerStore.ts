@@ -22,14 +22,6 @@ export const useProviderStore = defineStore('providerStore', {
   },
 
   actions: {
-    async getVirtualResourceProviders () {
-      return await ResourceManagementClient.capabilityProvidersApi.getVirtualResourceProviders()
-          .then(response => {
-            if(response.data){
-              this.virtualResourceProviders = response.data;
-            }
-          }).catch(logRequestError)
-    },
     async getServiceHosters () {
       return await ResourceManagementClient.capabilityProvidersApi.getServiceHosters()
           .then(response => {
@@ -46,7 +38,6 @@ export const useProviderStore = defineStore('providerStore', {
       }
 
       return Promise.all([
-        this.getVirtualResourceProviders(),
         this.getServiceHosters()
       ]).then(() => {
         this.apiState = ApiState.LOADED;

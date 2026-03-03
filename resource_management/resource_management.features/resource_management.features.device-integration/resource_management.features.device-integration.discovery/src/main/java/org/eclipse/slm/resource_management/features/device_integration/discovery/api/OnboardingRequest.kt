@@ -2,4 +2,5 @@ package org.eclipse.slm.resource_management.features.device_integration.discover
 
 class OnboardingRequest {
     var resultIds: MutableList<String?>? = null
+    var fullPathOwnerUserGroupId: String? = null
 }

@@ -50,7 +50,7 @@ Version: {{ $var.basyx.version.gui }} \
 The web interface of the BaSyx/Fraunhofer [AAS GUI](https://github.com/eclipse-basyx/basyx-applications/tree/main/aas-gui) is reachable under `http://<<your-slm-host>>:3000`.
 
 ### Notification Service
-The REST API of the Service Registry is reachable under the following URL `http://<<your-slm-host>>:9001`. API documentation is available via Swagger `http://<<your-slm-host>>:9001/swagger-ui/index.html`. When requests are made via the Swagger UI, an Authorization is required via the "Authorize" button. If spring_oauth is used, it will redirect to the Keycloak login page.
+The REST API of the Service Registry is reachable under the following URL `http://<<your-slm-host>>:9002`. API documentation is available via Swagger `http://<<your-slm-host>>:9002/swagger-ui/index.html`. When requests are made via the Swagger UI, an Authorization is required via the "Authorize" button. If spring_oauth is used, it will redirect to the Keycloak login page.
 
 ### Resource Registry
 The REST API of the Service Registry is reachable under the following URL `http://<<your-slm-host>>:9010`. API documentation is available via Swagger `http://<<your-slm-host>>:9010/swagger-ui/index.html`. When requests are made via the Swagger UI, an Authorization is required via the "Authorize" button. If spring_oauth is used, it will redirect to the Keycloak login page.

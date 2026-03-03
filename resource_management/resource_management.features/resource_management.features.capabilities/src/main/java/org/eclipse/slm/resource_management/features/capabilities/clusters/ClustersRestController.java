@@ -1,26 +1,20 @@
 package org.eclipse.slm.resource_management.features.capabilities.clusters;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.model.catalog.CatalogService;
+
+import org.eclipse.slm.common.consul.model.catalog.Service;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
-import org.eclipse.slm.resource_management.common.resources.ResourcesManager;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.dto.CapabilityDTOApi;
-import org.eclipse.slm.resource_management.features.capabilities.dto.DeploymentCapabilityDTOApi;
 import org.eclipse.slm.resource_management.features.capabilities.model.Capability;
+import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityMapper;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityServiceStatus;
-import org.eclipse.slm.resource_management.features.capabilities.model.DeploymentCapability;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilityJpaRepository;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.model.Cluster;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.model.ClusterCreateRequest;
-import org.eclipse.slm.common.awx.client.observer.AwxJobExecutor;
-import org.eclipse.slm.common.vault.client.VaultClient;
-import org.eclipse.slm.notification_service.messaging.NotificationMessageSender;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.handler.ClusterHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.commons.lang3.NotImplementedException;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,36 +32,17 @@ import java.util.stream.Collectors;
 @Tag(name = "Clusters")
 public class ClustersRestController {
     private final static Logger LOG = LoggerFactory.getLogger(ClustersRestController.class);
-    private final ResourcesManager resourcesManager;
+
     private final ClusterHandler clusterHandler;
-    private final AwxJobExecutor awxJobExecutor;
-    private final NotificationMessageSender notificationMessageSender;
-    private final VaultClient vaultClient;
-    @Autowired
-    private CapabilityJpaRepository capabilityJpaRepository;
-    private ModelMapper modelMapper = new ModelMapper();
+
+    private final CapabilityJpaRepository capabilityJpaRepository;
 
     @Autowired
     public ClustersRestController(
-            ResourcesManager resourcesManager,
-            ClusterHandler clusterHandler,
-            AwxJobExecutor awxJobExecutor,
-            NotificationMessageSender notificationMessageSender,
-            VaultClient vaultClient
+            ClusterHandler clusterHandler, CapabilityJpaRepository capabilityJpaRepository
     ) {
-        this.resourcesManager = resourcesManager;
         this.clusterHandler = clusterHandler;
-        this.awxJobExecutor = awxJobExecutor;
-        this.notificationMessageSender = notificationMessageSender;
-        this.vaultClient = vaultClient;
-
-        // DTO >>> Entity
-        modelMapper.typeMap(DeploymentCapabilityDTOApi.class, Capability.class)
-                .setProvider(provisionRequest -> modelMapper.map(provisionRequest.getSource(), DeploymentCapability.class));
-
-        // Entity >>> DTO
-        modelMapper.typeMap(DeploymentCapability.class, CapabilityDTOApi.class)
-                .setProvider(provisionRequest -> modelMapper.map(provisionRequest.getSource(), DeploymentCapabilityDTOApi.class));
+        this.capabilityJpaRepository = capabilityJpaRepository;
     }
 
     @RequestMapping(value = "/types", method = RequestMethod.GET)
@@ -77,12 +52,12 @@ public class ClustersRestController {
 
         capabilityList = capabilityList
                 .stream()
-                .filter(c -> c.getClusterMemberTypes().size() > 0)
-                .collect(Collectors.toList());
+                .filter(c -> !c.getClusterMemberTypes().isEmpty())
+                .toList();
 
         List<CapabilityDTOApi> capabilityDTOApiList = capabilityList
                 .stream()
-                .map(cap -> modelMapper.map(cap, CapabilityDTOApi.class))
+                .map(CapabilityMapper.INSTANCE::toDto)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(capabilityDTOApiList);
@@ -93,7 +68,7 @@ public class ClustersRestController {
     public @ResponseBody
     List<Cluster> getClusterResources() throws NotImplementedException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        return clusterHandler.getClusters(new ConsulCredential(jwtAuthenticationToken));
+        return clusterHandler.getClusters();
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
@@ -106,10 +81,13 @@ public class ClustersRestController {
 
         if(clusterCapability.isPresent()) {
             MultiHostCapabilityService multiHostCapabilityService = new MultiHostCapabilityService(
+                    UUID.randomUUID(),
+                    UUID.randomUUID(),
                     clusterCapability.get(),
                     clusterCreateRequest.getClusterMembers(),
                     CapabilityServiceStatus.INSTALL,
-                    clusterCreateRequest.getSkipInstall()
+                    clusterCreateRequest.getSkipInstall(),
+                    new HashMap<>()
             );
 
             clusterHandler.create(
@@ -135,11 +113,11 @@ public class ClustersRestController {
     //TODO: Use ClusterUUID instead
     @RequestMapping(value = "/{clusterName}/members", method = RequestMethod.GET)
     @Operation(summary = "Get members of cluster")
-    public List<CatalogService> getClusterMembers(
+    public List<Service> getClusterMembers(
             @PathVariable(name = "clusterName") String clusterName
     ) throws ConsulLoginFailedException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        var clusterNodes = this.clusterHandler.getClusterMembers(new ConsulCredential(jwtAuthenticationToken), clusterName);
+        var clusterNodes = this.clusterHandler.getClusterMembers( clusterName);
 
         return clusterNodes;
     }

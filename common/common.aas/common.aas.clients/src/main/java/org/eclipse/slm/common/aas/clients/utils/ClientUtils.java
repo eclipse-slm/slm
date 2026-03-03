@@ -54,9 +54,12 @@ public class ClientUtils {
     public static HttpClient.Builder getHttpClientBuilder() throws NoSuchAlgorithmException, KeyManagementException {
         var sslContext = SSLContext.getInstance("TLS");
 
+        var sslParams = new SSLParameters(); sslParams.setEndpointIdentificationAlgorithm("");
+
         sslContext.init(null, List.of(ClientUtils.INSECURE_TRUST_MANAGER).toArray(TrustManager[]::new), new SecureRandom());
         var clientBuilder = HttpClient.newBuilder()
-                .sslContext(sslContext);
+                .sslContext(sslContext)
+                .sslParameters(sslParams);
 
         return clientBuilder;
     }

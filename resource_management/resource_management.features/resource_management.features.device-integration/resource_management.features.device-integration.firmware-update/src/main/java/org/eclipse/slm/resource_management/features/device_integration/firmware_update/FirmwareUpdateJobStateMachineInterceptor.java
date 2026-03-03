@@ -21,7 +21,7 @@ import java.util.Optional;
 @Service
 public class FirmwareUpdateJobStateMachineInterceptor implements StateMachineInterceptor<FirmwareUpdateJobState, FirmwareUpdateJobEvent> {
 
-    public final static Logger LOG = LoggerFactory.getLogger(FirmwareUpdateJobStateMachineInterceptor.class);
+    private final static Logger LOG = LoggerFactory.getLogger(FirmwareUpdateJobStateMachineInterceptor.class);
 
     private final FirmwareUpdateJobJpaRepository firmwareUpdateJobJpaRepository;
 

@@ -75,7 +75,7 @@ consul:
   port: 8500
   datacenter: fabos
   skipAcl: true
-  acl-token: myroot
+  acl-token: root
 
 ### Vault
 vault:
@@ -83,7 +83,7 @@ vault:
   host: localhost
   port: 7777
   authentication: TOKEN
-  token: myroot
+  token: root
   app-role:
     role-id: resource-management
     secret-id: 48a319fa-f100-9b27-afa7-676809ba29fd

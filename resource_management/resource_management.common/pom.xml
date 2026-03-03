@@ -87,7 +87,20 @@
         <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>common.keycloak.client</artifactId>
-            <version>1.4.0-SNAPSHOT</version>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.credentials</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Platform Management Service Client !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>platform_management.service.client</artifactId>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <!-- Testing | Spring !-->
@@ -116,6 +129,31 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>mariadb</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.consul.testing.containers</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.consul.testing.utils</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.vault.testing</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.keycloak.testing</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

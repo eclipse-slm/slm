@@ -17,6 +17,7 @@
     <modules>
         <module>common.consul.client</module>
         <module>common.consul.model</module>
+        <module>common.consul.testing</module>
     </modules>
 
 </project>

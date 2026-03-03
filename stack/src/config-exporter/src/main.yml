@@ -7,8 +7,8 @@
     - name: "Load common config"
       set_fact:
         CONFIGURE_CORE_PROJECT: "{{ lookup('env', 'CONFIGURE_CORE_PROJECT') }}"
-#        target_host: "{{ lookup('env', 'SLM_HOSTNAME') }}"
         LOCAL_HOSTNAME: "{{ lookup('env', 'LOCAL_HOSTNAME') }}"
+        SLM_HOSTNAME: "{{ lookup('env', 'SLM_HOSTNAME') }}"
 
     - name: "Load Consul config"
       set_fact:
@@ -16,10 +16,6 @@
         consul_host: "{{ lookup('env', 'CONSUL_HOST') }}"
         consul_port: "{{ lookup('env', 'CONSUL_PORT') }}"
         consul_token: "{{ lookup('env', 'CONSUL_TOKEN') }}"
-
-    - name: retrieving a KV from a remote cluster on non default port
-      ansible.builtin.debug:
-        msg: "{{ lookup('community.general.consul_kv', 'config/resource_management/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) }}"
 
     - name: "Get meta data of SLM node from Consul"
       include_tasks: get_consul_node_meta.yml
@@ -35,6 +31,8 @@
         awx_config: "{{ lookup('community.general.consul_kv', 'config/awx/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         consul_config: "{{ lookup('community.general.consul_kv', 'config/consul/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         vault_config: "{{ lookup('community.general.consul_kv', 'config/vault/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        platform_management_config: "{{ lookup('community.general.consul_kv', 'config/platform_management/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+        platform_management_keycloak_config: "{{ lookup('community.general.consul_kv', 'config/platform_management/keycloak', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         resource_management_config: "{{ lookup('community.general.consul_kv', 'config/resource_management/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         resource_management_keycloak_config: "{{ lookup('community.general.consul_kv', 'config/resource_management/keycloak', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         service_management_config: "{{ lookup('community.general.consul_kv', 'config/service_management/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
@@ -46,6 +44,12 @@
         catalog_service_config: "{{ lookup('community.general.consul_kv', 'config/catalog_service/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         monitoring_config: "{{ lookup('community.general.consul_kv', 'config/monitoring/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         minio_config: "{{ lookup('community.general.consul_kv', 'config/minio/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
+#
+    - name: "Trust SLM root CA"
+      include_tasks: trust_slm_root_ca.yml
+      vars:
+        vault_url: "{{ vault_config.scheme }}://{{ vault_config.host }}:{{ vault_config.port }}"
+
 
     - set_fact:
         service_urls: {}
@@ -55,6 +59,7 @@
       vars:
         _service_name: "{{ item.service_name }}"
       loop:
+        - service_name: "platform-management"
         - service_name: "resource-management"
         - service_name: "service-management"
         - service_name: "notification-service"
@@ -96,15 +101,17 @@
       loop_control:
         loop_var: module
       loop:
-        - application_yml_file: /project/notification_service/notification_service.service/notification_service.service.rest/src/main/resources/application.yml
+        - application_yml_file: /project/notification_service/notification_service.service/notification_service.service.app/src/main/resources/application.yml
           app_config: "{{ notification_service_config }}"
-        - application_yml_file: /project/information_service/information_service.service/information_service.service.impl/src/main/resources/application.yml
+        - application_yml_file: /project/information_service/information_service.service/information_service.service.app/src/main/resources/application.yml
           app_config: "{{ information_service_config }}"
+        - application_yml_file: /project/platform_management/platform_management.service/platform_management.service.app/src/main/resources/application.yml
+          app_config: "{{ platform_management_config }}"
         - application_yml_file: /project/resource_management/resource_management.service/resource_management.service.app/src/main/resources/application.yml
           app_config: "{{ resource_management_config }}"
         - application_yml_file: /project/resource_management/resource_management.service/resource_management.service.initializer/src/main/resources/application.yml
           app_config: "{{ service_management_config }}"
-        - application_yml_file: /project/service_management/service_management.service/service_management.service.rest/src/main/resources/application.yml
+        - application_yml_file: /project/service_management/service_management.service/service_management.service.app/src/main/resources/application.yml
           app_config: "{{ service_management_config }}"
         - application_yml_file: /project/service_management/service_management.service/service_management.service.initializer/src/main/resources/application.yml
           app_config: "{{ service_management_config }}"
@@ -120,17 +127,17 @@
           dest: /project/ui/.env.development
       when: CONFIGURE_CORE_PROJECT|default(false)|bool == true
 
-    - name: "Copy Traefik certificate"
-      block:
-        - file:
-            path: /project/ui/certs
-            state: directory
-        - copy:
-              content: "{{ item.content }}"
-              dest: "{{ item.dest }}"
-          with_items:
-            - content: "{{ traefik_certificate_crt }}"
-              dest: /project/ui/certs/cert.crt
-            - content: "{{ traefik_certificate_key }}"
-              dest: /project/ui/certs/cert.key
-          when: CONFIGURE_CORE_PROJECT|default(false)|bool == true
+    - name: "Generate certificate for UI"
+      include_tasks: get_vault_pki_cert.yml
+      vars:
+        _vault_url: "{{ SLM_NODE_META.vault_url }}"
+        _vault_token: "{{ vault_config.tokens.root }}"
+        _vault_pki_role: "traefik"
+        _vault_pki_path: "pki_int_slm"
+        _common_name: "{{ SLM_HOSTNAME }}"
+        _cert_ttl: "8760h"
+        _key_dest: "/project/ui/certs/cert.key"
+        _certificate_dest: "/project/ui/certs/cert.crt"
+      when: CONFIGURE_CORE_PROJECT|default(false)|bool == true
+
+

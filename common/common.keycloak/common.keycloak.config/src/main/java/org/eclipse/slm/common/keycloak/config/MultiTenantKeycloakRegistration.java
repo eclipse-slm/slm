@@ -1,9 +1,12 @@
 package org.eclipse.slm.common.keycloak.config;
 
-import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.kotlin.KotlinModule;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import org.eclipse.slm.common.consul.client.ConsulClient;
+import org.eclipse.slm.common.consul.client.ConsulClientFactory;
 import org.eclipse.slm.common.keycloak.config.jwt.IssuerProperties;
 import org.eclipse.slm.common.keycloak.config.jwt.MisconfigurationException;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -15,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLContext;
@@ -51,12 +53,9 @@ public class MultiTenantKeycloakRegistration {
 
     private Map<String, File> oidcConfigFiles;
 
-    private Map<String, RealmResource> realmResourceMap = new HashMap<>();
+    private Map<String, Keycloak> keycloakClientMap = new HashMap<>();
 
     private Optional<ConsulClient> consulClient;
-
-    @Value("${consul.acl-token}")
-    private String consulAclToken;
 
     @Value("${spring.cloud.consul.config.prefix:config}")
     private String consulKVPrefix;
@@ -69,15 +68,15 @@ public class MultiTenantKeycloakRegistration {
     /**
      * Instantiates a new Multi tenant keycloak registration.
      *
-     * @param consulClient
+     * @param consulClientFactory
      */
     @Autowired
-    public MultiTenantKeycloakRegistration(@Nullable ConsulClient consulClient) {
-        if (consulClient == null) {
+    public MultiTenantKeycloakRegistration(ConsulClientFactory consulClientFactory) {
+        if (consulClientFactory == null) {
             this.consulClient = Optional.empty();
         }
         else {
-            this.consulClient = Optional.of(consulClient);
+            this.consulClient = Optional.of(consulClientFactory.createAdminClient());
         }
     }
 
@@ -121,11 +120,14 @@ public class MultiTenantKeycloakRegistration {
 
     private void loadKeycloakConfigFromConsul(String keyValuePath) throws IOException {
         if (this.consulClient.isPresent()) {
-            var response = this.consulClient.get().getKVValue(keyValuePath, this.consulAclToken);
-            var value = response.getValue().getDecodedValue();
+            var response = this.consulClient.get().kv().readKey(keyValuePath, false, false, false, null);
+            var value = response.get(0).getDecodedValue();
             value = value.replace("'", "\"");
 
-            var mapper = new ObjectMapper();
+            var mapper = new ObjectMapper()
+                    .registerModule(new KotlinModule.Builder()
+                            .nullIsSameAsDefault(true)
+                            .build());
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             var reader = mapper.readerFor(KeycloakOidcConfig.class);
             var keycloakOidcConfig = reader.readValue(value, KeycloakOidcConfig.class);
@@ -144,33 +146,17 @@ public class MultiTenantKeycloakRegistration {
         LOG.info("Client configuration initialized for realm '{}'", realm);
 
         try {
-            TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() { return null; }
-                    public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) { }
-                    public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) { }
-                }
-            };
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-
             Keycloak keycloak = KeycloakBuilder.builder()
-                    .serverUrl(keycloakOidcConfig.getAuthServerUrl())
-                    .realm(realm)
-                    .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-                    .clientId(keycloakOidcConfig.getResource())
-                    .clientSecret(keycloakOidcConfig.getCredentials().getSecret())
-                    .resteasyClient(ResteasyClientBuilder.newBuilder()
-                            .sslContext(sslContext)
-                            .build())
-                    .build();
-
-            var realmResource = keycloak.realm(realm);
-            this.realmResourceMap.put(realm,  realmResource);
+                .serverUrl(keycloakOidcConfig.getAuthServerUrl())
+                .realm(realm)
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                .clientId(keycloakOidcConfig.getResource())
+                .clientSecret(keycloakOidcConfig.getCredentials().getSecret())
+                .build();
+            this.keycloakClientMap.put(realm, keycloak);
         } catch (Exception e) {
-            throw new RuntimeException("Fehler beim Initialisieren des Keycloak-Clients mit unsicherem TrustManager", e);
+            throw new RuntimeException("Error initializing Keycloak client for realm '" + realm + "'", e);
         }
-
 
         var issuerProperties = new IssuerProperties();
         try {
@@ -204,8 +190,11 @@ public class MultiTenantKeycloakRegistration {
     }
 
     public RealmResource getRealmResource(String realmName) {
-        RealmResource realm = realmResourceMap.get(realmName);
-        return realmResourceMap.get(realmName);
+        Keycloak keycloak = keycloakClientMap.get(realmName);
+        if (keycloak == null) {
+            throw new IllegalStateException("No Keycloak client for realm: " + realmName);
+        }
+        return keycloak.realm(realmName);
     }
 
     public List<IssuerProperties> getIssuers() {
@@ -225,5 +214,24 @@ public class MultiTenantKeycloakRegistration {
             throw new MisconfigurationException("Too many authorities mapping properties for %s".formatted(issuerUri.toString()));
         }
         return issuerProperties.get(0);
+    }
+
+    public String getDefaultRealm() {
+        var optionalKeycloakOidcConfig = keycloakOidcConfigs.entrySet().stream().findFirst();
+        if (optionalKeycloakOidcConfig.isPresent()) {
+            return optionalKeycloakOidcConfig.get().getValue().getRealm();
+        }
+        return null;
+    }
+
+    @PreDestroy
+    public void closeKeycloakClients() {
+        for (Keycloak keycloak : keycloakClientMap.values()) {
+            try {
+                keycloak.close();
+            } catch (Exception e) {
+                LOG.warn("Error closing Keycloak client", e);
+            }
+        }
     }
 }

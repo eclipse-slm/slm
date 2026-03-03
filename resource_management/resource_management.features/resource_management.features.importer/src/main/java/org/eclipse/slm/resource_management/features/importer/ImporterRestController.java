@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "Importer")
 public class ImporterRestController {
 
-    public final static Logger LOG = LoggerFactory.getLogger(ImporterRestController.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ImporterRestController.class);
 
     private final ImporterService importerService;
 
@@ -27,12 +27,13 @@ public class ImporterRestController {
     @RequestMapping(value = "/resources", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, method = RequestMethod.POST)
     @Operation(summary = "Import resources from file")
     public ResponseEntity<Void> importFromFile(
-            @RequestParam(name = "file") MultipartFile importFile
+            @RequestParam(name = "file") MultipartFile importFile,
+            @RequestParam(name = "fullPathOwnerGroupId") String fullPathOwnerGroupId
     ) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         var importDefinition = this.importerService.getImportDefinition(importFile);
-        this.importerService.importDevices(jwtAuthenticationToken, importDefinition);
+        this.importerService.importDevices(jwtAuthenticationToken, importDefinition, fullPathOwnerGroupId);
         this.importerService.importAasxFiles(jwtAuthenticationToken, importDefinition);
 
         return ResponseEntity.ok().build();
@@ -42,12 +43,13 @@ public class ImporterRestController {
     @Operation(summary = "Import capabilities from file")
     public ResponseEntity<Void> importCapabilitiesFromFile(
             @RequestParam(name = "file") MultipartFile importFile,
-            @RequestParam(name = "forceInstall", required = false, defaultValue = "false") boolean forceInstall
+            @RequestParam(name = "forceInstall", required = false, defaultValue = "false") boolean forceInstall,
+            @RequestParam(name = "fullPathOwnerGroupId") String fullPathOwnerGroupId
     ) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         var importDefinition = this.importerService.getImportDefinition(importFile);
-        this.importerService.importCapabilities(jwtAuthenticationToken, importDefinition, forceInstall);
+        this.importerService.importCapabilities(jwtAuthenticationToken, importDefinition, forceInstall, fullPathOwnerGroupId);
 
         return ResponseEntity.ok().build();
     }

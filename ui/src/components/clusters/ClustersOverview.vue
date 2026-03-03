@@ -69,7 +69,6 @@ export default {
   computed: {
   },
   mounted () {
-    this.capabilitiesStore.getDeploymentCapabilities();
   },
   methods: {
   },

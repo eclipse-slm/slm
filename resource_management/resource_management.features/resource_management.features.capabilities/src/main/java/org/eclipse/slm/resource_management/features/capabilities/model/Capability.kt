@@ -19,7 +19,6 @@ import java.util.*
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "capabilityClass")
 @JsonSubTypes(
     JsonSubTypes.Type(value = DeploymentCapability::class,      name = "DeploymentCapability"),
-    JsonSubTypes.Type(value = VirtualizationCapability::class,  name = "VirtualizationCapability"),
     JsonSubTypes.Type(value = BaseConfigurationCapability::class,  name = "BaseConfigurationCapability")
 )
 
@@ -53,10 +52,6 @@ abstract class Capability(id: UUID? = null) {
     @Column(name = "cluster_member_types", columnDefinition = "LONGTEXT")
     @JdbcTypeCode(SqlTypes.JSON)
     open var clusterMemberTypes: List<ClusterMemberType> = ArrayList()
-
-    @Column(name = "health_check")
-    @JdbcTypeCode(SqlTypes.JSON)
-    open var healthCheck: CapabilityHealthCheck? = null
 
     @Column(name = "connection")
     open var connection: ConnectionType? = null

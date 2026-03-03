@@ -86,7 +86,7 @@ management:
 notification-service:
   scheme: "http"
   host: "localhost"
-  port: 9001
+  port: 9002
 
 ### Keycloak
 keycloak:

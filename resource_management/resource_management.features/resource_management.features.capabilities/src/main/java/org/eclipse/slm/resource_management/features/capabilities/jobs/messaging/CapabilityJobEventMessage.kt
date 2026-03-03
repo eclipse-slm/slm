@@ -2,13 +2,12 @@ package org.eclipse.slm.resource_management.features.capabilities.jobs.messaging
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.eclipse.slm.common.messaging.AbstractEventMessage
-import org.eclipse.slm.resource_management.features.capabilities.dto.CapabilityJobDTO
+import org.eclipse.slm.resource_management.features.capabilities.jobs.CapabilityJobDTO
 import java.io.Serializable
 
 class CapabilityJobEventMessage @JsonCreator constructor(
 
-    @JsonProperty("capabilityJob") val capabilityJob: CapabilityJobDTO?
+    @field:JsonProperty("capabilityJob") val capabilityJob: CapabilityJobDTO?
 
 ) :
     org.eclipse.slm.common.messaging.AbstractEventMessage<CapabilityJobEventType>(EXCHANGE_NAME, ROUTING_KEY_PREFIX, CapabilityJobEventType.CHANGED), Serializable {

@@ -9,7 +9,7 @@ import java.util.List;
 
 public class DriverInfoDriverClient extends AbstractDriverClient {
 
-    public final static Logger LOG = LoggerFactory.getLogger(DriverInfoDriverClient.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DriverInfoDriverClient.class);
 
     public DriverInfoDriverClient(DriverInfo driverInfo) {
         super(driverInfo);

@@ -1,7 +1,10 @@
 package org.eclipse.slm.resource_management.features.device_integration.firmware_update;
 
+import org.eclipse.slm.common.credentials.model.CredentialData;
 import org.eclipse.slm.common.model.exceptions.EventNotAcceptedException;
 import org.eclipse.slm.common.utils.files.FilesUtil;
+import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialScope;
+import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialsManager;
 import org.eclipse.slm.resource_management.common.resources.ResourceDTO;
 import org.eclipse.slm.resource_management.common.resources.ResourceEventInternalListener;
 import org.eclipse.slm.resource_management.common.resources.ResourcesManager;
@@ -12,6 +15,7 @@ import org.eclipse.slm.resource_management.features.device_integration.firmware_
 import org.eclipse.slm.resource_management.features.device_integration.firmware_update.exceptions.FirmwareUpdateJobNotFoundException;
 import org.eclipse.slm.resource_management.features.device_integration.firmware_update.model.FirmwareUpdateJobEvent;
 import org.eclipse.slm.resource_management.features.device_integration.firmware_update.model.FirmwareUpdateJob;
+import org.eclipse.slm.resource_management.features.device_integration.firmware_update.model.FirmwareUpdateJobFailureReason;
 import org.eclipse.slm.resource_management.features.device_integration.firmware_update.model.FirmwareUpdateJobState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,17 +50,21 @@ public class FirmwareUpdateJobServiceImpl implements FirmwareUpdateJobService, F
 
     private final DriverRegistryClient driverRegistryClient;
 
+    private final ResourceCredentialsManager resourceCredentialsManager;
+
     public FirmwareUpdateJobServiceImpl(FirmwareUpdateJobJpaRepository firmwareUpdateJobJpaRepository,
                                         FirmwareUpdateJobStateMachineFactory firmwareUpdateJobStateMachineFactory,
                                         ResourcesManager resourcesManager, FirmwareUpdateManager firmwareUpdateManager,
                                         FirmwareUpdateDriverClientFactory firmwareUpdateDriverClientFactory,
-                                        DriverRegistryClient driverRegistryClient) {
+                                        DriverRegistryClient driverRegistryClient,
+                                        ResourceCredentialsManager resourceCredentialsManager) {
         this.firmwareUpdateJobJpaRepository = firmwareUpdateJobJpaRepository;
         this.firmwareUpdateJobStateMachineFactory = firmwareUpdateJobStateMachineFactory;
         this.resourcesManager = resourcesManager;
         this.firmwareUpdateManager = firmwareUpdateManager;
         this.firmwareUpdateDriverClientFactory = firmwareUpdateDriverClientFactory;
         this.driverRegistryClient = driverRegistryClient;
+        this.resourceCredentialsManager = resourceCredentialsManager;
     }
 
     //region FirmwareUpdateJobService
@@ -68,7 +76,7 @@ public class FirmwareUpdateJobServiceImpl implements FirmwareUpdateJobService, F
     }
 
     @Override
-    public void initFirmwareUpdate(UUID resourceId, String softwareNameplateId, String userId) throws Exception {
+    public void initFirmwareUpdate(UUID resourceId, String softwareNameplateId, String userId, String accessToken) throws Exception {
         // Check if firmware update is already in progress for the resource (by checking the state of the latest job)
         var firmwareUpdateJobsOfResource = this.firmwareUpdateJobJpaRepository.findByResourceIdOrderByCreatedAtDesc(resourceId);
         if (!firmwareUpdateJobsOfResource.isEmpty()
@@ -76,7 +84,7 @@ public class FirmwareUpdateJobServiceImpl implements FirmwareUpdateJobService, F
             throw new FirmwareUpdateAlreadyInProgressException(resourceId);
         }
         // Check if resource exists
-        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId);
+        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, accessToken);
         // Get driver to check if it is available
         var driverId = resource.getDriverId();
         var driverInfo = this.driverRegistryClient.getRegisteredDriver(driverId);
@@ -108,14 +116,27 @@ public class FirmwareUpdateJobServiceImpl implements FirmwareUpdateJobService, F
     private void triggerFirmwareUpdatePreparation(FirmwareUpdateJob firmwareUpdateJob) {
         try {
             var driverInfo = this.driverRegistryClient.getRegisteredDriver(firmwareUpdateJob.getDriverId());
-            var updateDriverClient = firmwareUpdateDriverClientFactory.createDriverClient(driverInfo);
+            var updateDriverClient = this.firmwareUpdateDriverClientFactory.createDriverClient(driverInfo);
 
-            var updateFileInputStream = firmwareUpdateManager.getFirstUpdateFileOfSoftwareNameplate(firmwareUpdateJob.getSoftwareNameplateId(), null);
+            var updateFileInputStream = this.firmwareUpdateManager.getFirstUpdateFileOfSoftwareNameplate(firmwareUpdateJob.getSoftwareNameplateId(), null);
             var updateFileBytes = FilesUtil.inputStreamToByteArray(updateFileInputStream);
 
-            var connectionParameters = resourcesManager.getConnectionParametersOfResource(firmwareUpdateJob.getResourceId());
+            var connectionParameters = this.resourcesManager.getConnectionParametersOfResource(firmwareUpdateJob.getResourceId());
 
-            updateDriverClient.prepareFirmwareUpdate(firmwareUpdateJob.getId(), connectionParameters, updateFileBytes, this);
+            // Check if resource has credentials for firmware update and get credential data
+            CredentialData credentialData = null;
+            var resourceCredentials = this.resourceCredentialsManager.getCredentialsOfResource(firmwareUpdateJob.getResourceId());
+            if (resourceCredentials != null) {
+                var optionalFirmwareUpdateCredential = resourceCredentials.stream().filter(
+                        cred -> cred.getScopes().contains(ResourceCredentialScope.FIRMWARE_UPDATE)
+                ).findFirst();
+
+                if (optionalFirmwareUpdateCredential.isPresent()) {
+                    credentialData = this.resourceCredentialsManager.getCredentialDataByIdForImpersonatedUser(optionalFirmwareUpdateCredential.get().getId(), firmwareUpdateJob.getUserId());
+                }
+            }
+
+            updateDriverClient.prepareFirmwareUpdate(firmwareUpdateJob.getId(), connectionParameters, updateFileBytes, credentialData, this);
             LOG.debug("State | Entry: PREPARING | Firmware update preparation started");
         } catch (Exception e) {
             LOG.error("Error during firmware update preparation for job {}: {}", firmwareUpdateJob.getId(), e.getMessage(), e);
@@ -133,7 +154,20 @@ public class FirmwareUpdateJobServiceImpl implements FirmwareUpdateJobService, F
 
             var connectionParameters = resourcesManager.getConnectionParametersOfResource(firmwareUpdateJob.getResourceId());
 
-            updateDriverClient.activateFirmwareUpdate(firmwareUpdateJob.getId(), connectionParameters, updateFileBytes, this);
+            // Check if resource has credentials for firmware update and get credential data
+            CredentialData credentialData = null;
+            var resourceCredentials = this.resourceCredentialsManager.getCredentialsOfResource(firmwareUpdateJob.getResourceId());
+            if (resourceCredentials != null) {
+                var optionalFirmwareUpdateCredential = resourceCredentials.stream().filter(
+                        cred -> cred.getScopes().contains(ResourceCredentialScope.FIRMWARE_UPDATE)
+                ).findFirst();
+
+                if (optionalFirmwareUpdateCredential.isPresent()) {
+                    credentialData = this.resourceCredentialsManager.getCredentialDataByIdForImpersonatedUser(optionalFirmwareUpdateCredential.get().getId(), firmwareUpdateJob.getUserId());
+                }
+            }
+
+            updateDriverClient.activateFirmwareUpdate(firmwareUpdateJob.getId(), connectionParameters, updateFileBytes, credentialData, this);
             LOG.debug("State | Entry: ACTIVATING | Firmware update activation started");
         } catch (Exception e) {
             LOG.error("Error during firmware update activation for job {}: {}", firmwareUpdateJob.getId(), e.getMessage(), e);
@@ -196,8 +230,18 @@ public class FirmwareUpdateJobServiceImpl implements FirmwareUpdateJobService, F
             case ACTIVATING -> {
                 this.triggerFirmwareUpdateActivation(firmwareUpdateJob);
             }
-            case ACTIVATED, CANCELED, FAILED -> {
-                LOG.debug("Firmware update job '{}' has reached end state '{}'", enteredState, firmwareUpdateJob.getId());
+            case ACTIVATED, CANCELED -> {
+                LOG.debug("Firmware update job '{}' has reached end state '{}'", firmwareUpdateJob.getId(), enteredState) ;
+            }
+            case FAILED -> {
+                LOG.debug("Firmware update job '{}' has reached end state 'FAILED' '{}'", firmwareUpdateJob.getId(), enteredState);
+                // Set failure reason to UNKNOWN_ERROR if it is not already set with a more specific reason during previous handling of the failure
+                var firmwareUpdateJobOptional = this.firmwareUpdateJobJpaRepository.findById(firmwareUpdateJob.getId());
+                if (firmwareUpdateJobOptional.isPresent() && firmwareUpdateJobOptional.get().getFailureReason() == null) {
+                    var updatedFirmwareUpdateJob = firmwareUpdateJobOptional.get();
+                    updatedFirmwareUpdateJob.setFailureReason(FirmwareUpdateJobFailureReason.UNKNOWN_ERROR);
+                    firmwareUpdateJobJpaRepository.save(updatedFirmwareUpdateJob);
+                }
             }
             default -> {
                 LOG.warn("Firmware update job '{}' entered state '{}'", enteredState, firmwareUpdateJob.getId());
@@ -236,11 +280,28 @@ public class FirmwareUpdateJobServiceImpl implements FirmwareUpdateJobService, F
     }
 
     @Override
-    public void onUpdateFailed(UUID firmwareUpdateJobId, String errorMessage) {
+    public void onUpdateFailed(UUID firmwareUpdateJobId, Throwable error) {
         var firmwareUpdateJobOptional = this.firmwareUpdateJobJpaRepository.findById(firmwareUpdateJobId);
         if (firmwareUpdateJobOptional.isEmpty()) {
-            LOG.error("Firmware update job '{}' not found while handling update failure: {}", firmwareUpdateJobId, errorMessage);
+            LOG.error("Firmware update job '{}' not found while handling update failure", firmwareUpdateJobId, error);
             return;
+        }
+
+        try {
+            var updatedFirmwareUpdateJob = firmwareUpdateJobOptional.get();
+            if (error.getMessage().contains("invalid credentials")) {
+                updatedFirmwareUpdateJob.setFailureReason(FirmwareUpdateJobFailureReason.INVALID_CREDENTIALS);
+                LOG.error("Firmware update job '{}' failed due to invalid credentials", firmwareUpdateJobId);
+            } else if (error.getMessage().contains("firmware version is already installed")) {
+                updatedFirmwareUpdateJob.setFailureReason(FirmwareUpdateJobFailureReason.FIRMWARE_VERSION_ALREADY_INSTALLED);
+                LOG.error("Firmware update job '{}' failed because the firmware version is already installed on the device", firmwareUpdateJobId);
+            } else {
+                updatedFirmwareUpdateJob.setFailureReason(FirmwareUpdateJobFailureReason.UNKNOWN_ERROR);
+                LOG.error("Firmware update job '{}' failed", firmwareUpdateJobId, error);
+            }
+            firmwareUpdateJobJpaRepository.save(updatedFirmwareUpdateJob);
+        } catch (Exception ex) {
+            LOG.error("Error while setting failure reason of firmware update job '{}': {}", firmwareUpdateJobId, ex.getMessage(), ex);
         }
 
         switch (firmwareUpdateJobOptional.get().getState()) {

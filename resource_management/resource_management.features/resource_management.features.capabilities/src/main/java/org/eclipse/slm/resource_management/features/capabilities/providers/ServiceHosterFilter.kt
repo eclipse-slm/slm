@@ -1,4 +1,4 @@
-package org.eclipse.slm.resource_management.features.providers
+package org.eclipse.slm.resource_management.features.capabilities.providers
 
 import org.eclipse.slm.common.model.DeploymentType
 import java.net.URLEncoder

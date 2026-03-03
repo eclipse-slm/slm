@@ -42,8 +42,8 @@
         </dependency>
         <!-- Keycloak !-->
         <dependency>
-            <artifactId>keycloak-admin-client</artifactId>
             <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-admin-client</artifactId>
             <version>${keycloak.version}</version>
         </dependency>
         <dependency>
@@ -66,12 +66,6 @@
             <artifactId>resteasy-jaxb-provider</artifactId>
             <version>${resteasy.version}</version>
         </dependency>
-        <!-- Consul !-->
-        <dependency>
-            <groupId>com.ecwid.consul</groupId>
-            <artifactId>consul-api</artifactId>
-            <version>1.4.5</version>
-        </dependency>
         <!-- Utils !-->
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
@@ -87,6 +81,13 @@
         <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>common.utils.keycloak</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Consul Client !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.consul.client</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

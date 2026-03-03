@@ -13,6 +13,7 @@
       <v-btn
           id="button-confirm-dialog"
           variant="text"
+          :disabled="confirmLoading"
           @click.native="$emit('canceled')"
       >
         {{ cancelButtonLabel }}
@@ -24,8 +25,16 @@
           id="button-confirm-dialog"
           variant="text"
           :color="attention ? 'error' : ''"
+          :disabled="confirmButtonDisabled || confirmLoading"
           @click="$emit('confirmed')"
       >
+        <v-progress-circular
+          v-if="confirmLoading"
+          size="16"
+          width="2"
+          indeterminate
+          class="mr-2"
+        />
         {{ confirmButtonLabel }}
       </v-btn>
     </template>
@@ -53,6 +62,14 @@ const props = defineProps({
   confirmButtonLabel: {
     type: String,
     default: "Yes"
+  },
+  confirmButtonDisabled: {
+    type: Boolean,
+    default: false
+  },
+  confirmLoading: {
+    type: Boolean,
+    default: false
   },
   cancelButtonLabel: {
     type: String,

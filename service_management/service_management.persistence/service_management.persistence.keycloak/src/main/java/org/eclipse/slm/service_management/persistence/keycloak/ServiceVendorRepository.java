@@ -4,6 +4,7 @@ import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakGroupNotFoundEx
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakUserNotFoundException;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
+import org.eclipse.slm.service_management.model.exceptions.ServiceVendorRuntimeException;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendor;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendorDeveloper;
 import org.eclipse.slm.service_management.model.vendors.exceptions.ServiceVendorNotFoundException;
@@ -19,7 +20,7 @@ import java.util.*;
 @Component
 public class ServiceVendorRepository {
 
-    public final static Logger LOG = LoggerFactory.getLogger(ServiceVendorRepository.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ServiceVendorRepository.class);
 
     private final ServiceVendorJpaRepository serviceVendorJpaRepository;
 
@@ -33,7 +34,7 @@ public class ServiceVendorRepository {
     }
 
     public List<ServiceVendor> getServiceVendors() {
-        var serviceVendors = serviceVendorJpaRepository.findAll();;
+        var serviceVendors = serviceVendorJpaRepository.findAll();
         return serviceVendors;
     }
 
@@ -83,7 +84,7 @@ public class ServiceVendorRepository {
     }
 
     public void deleteServiceVendorById(UUID serviceVendorId, String keycloakRealm)
-            throws ServiceVendorNotFoundException, KeycloakGroupNotFoundException {
+            throws ServiceVendorNotFoundException, ServiceVendorRuntimeException {
         var serviceVendorOptional = this.serviceVendorJpaRepository.findById(serviceVendorId);
         if (serviceVendorOptional.isEmpty()) {
             throw new ServiceVendorNotFoundException(serviceVendorId);
@@ -91,9 +92,11 @@ public class ServiceVendorRepository {
         else {
             var serviceVendor = serviceVendorOptional.get();
             this.serviceVendorJpaRepository.delete(serviceVendor);
-            this.keycloakAdminClient.deleteGroup(
-                    keycloakRealm,
-                    serviceVendor.getKeycloakGroupName());
+            try {
+                this.keycloakAdminClient.deleteGroup(serviceVendor.getKeycloakGroupName());
+            } catch (Exception ex) {
+                throw new ServiceVendorRuntimeException("Failed to delete service vendor with id '" + serviceVendorId + "'.", ex);
+            }
         }
     }
 

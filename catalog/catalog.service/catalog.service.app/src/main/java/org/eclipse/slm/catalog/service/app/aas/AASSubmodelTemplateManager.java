@@ -11,7 +11,7 @@ import java.util.List;
 @Component
 public class AASSubmodelTemplateManager {
 
-    public final static Logger LOG = LoggerFactory.getLogger(AASSubmodelTemplateManager.class);
+    private final static Logger LOG = LoggerFactory.getLogger(AASSubmodelTemplateManager.class);
 
     private final AASSubmodelTemplateRepository aasSubmodelTemplateRepository;
 

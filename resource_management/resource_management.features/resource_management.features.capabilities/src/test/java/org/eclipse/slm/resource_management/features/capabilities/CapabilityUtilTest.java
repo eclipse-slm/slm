@@ -1,37 +1,14 @@
 package org.eclipse.slm.resource_management.features.capabilities;
 
-import org.eclipse.slm.common.consul.client.apis.ConsulAclApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulNodesApiClient;
-import org.eclipse.slm.common.consul.client.apis.ConsulServicesApiClient;
 import org.eclipse.slm.resource_management.features.capabilities.model.Capability;
-import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilityJpaRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = {
-        CapabilityUtil.class,
-        CapabilityJpaRepository.class,
-        ConsulNodesApiClient.class,
-        ConsulServicesApiClient.class,
-        ConsulAclApiClient.class,
-        RestTemplate.class
-})
-@ActiveProfiles("test")
 public class CapabilityUtilTest {
-    @Autowired
-    CapabilityUtil capabilityUtil;
-    @MockBean
-    CapabilityJpaRepository capabilityJpaRepository;
 
     static Capability capability;
     static Map<String, String> configParams;
@@ -44,31 +21,27 @@ public class CapabilityUtilTest {
 
     @Test
     public void testGetNonSecretConfigParameter() {
-        Map<String, String> nonSecretConfigParameter = capabilityUtil.getNonSecretConfigParameter(
+        Map<String, String> nonSecretConfigParameter = CapabilityUtil.getNonSecretConfigParameter(
                 capability,
                 configParams
         );
 
-        assertNotNull(nonSecretConfigParameter);
-        assertEquals(1, nonSecretConfigParameter.size());
-        assertEquals(
-                configParams.get("username"),
-                nonSecretConfigParameter.get("username")
-        );
+        assertThat(nonSecretConfigParameter).isNotNull();
+        assertThat(nonSecretConfigParameter).hasSize(1);
+        assertThat(nonSecretConfigParameter.get("username"))
+                .isEqualTo(configParams.get("username"));
     }
 
     @Test
     public void testGetSecretConfigParameter() {
-        Map<String, String> nonSecretConfigParameter = capabilityUtil.getSecretConfigParameter(
+        Map<String, String> nonSecretConfigParameter = CapabilityUtil.getSecretConfigParameter(
                 capability,
                 configParams
         );
 
-        assertNotNull(nonSecretConfigParameter);
-        assertEquals(1, nonSecretConfigParameter.size());
-        assertEquals(
-                configParams.get("password"),
-                nonSecretConfigParameter.get("password")
-        );
+        assertThat(nonSecretConfigParameter).isNotNull();
+        assertThat(nonSecretConfigParameter).hasSize(1);
+        assertThat(nonSecretConfigParameter.get("password"))
+                .isEqualTo(configParams.get("password"));
     }
 }

@@ -1,4 +1,4 @@
-package org.eclipse.slm.resource_management.features.providers
+package org.eclipse.slm.resource_management.features.capabilities.providers
 
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService
 

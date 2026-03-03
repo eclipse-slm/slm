@@ -13,11 +13,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static org.eclipse.slm.resource_management.features.device_integration.firmware_update.driver.FirmwareUpdateDriverClient.FIRMWARE_FILE_CHUNK_SIZE;
-
 public class FirmwareUpdateResponseStreamObserver implements StreamObserver<ArtefactUpdate.ArtefactMessage> {
 
-    public final static Logger LOG = LoggerFactory.getLogger(FirmwareUpdateResponseStreamObserver.class);
+    private final static Logger LOG = LoggerFactory.getLogger(FirmwareUpdateResponseStreamObserver.class);
 
     private final DriverInfo driverInfo;
 
@@ -110,11 +108,10 @@ public class FirmwareUpdateResponseStreamObserver implements StreamObserver<Arte
 
     @Override
     public void onError(Throwable throwable) {
-        LOG.error("Error during update job '{}' for driver '{}'", this.firmwareUpdateJobId, this.driverInfo, throwable);
+        LOG.debug("Error during update job '{}' for driver '{}'", this.firmwareUpdateJobId, this.driverInfo, throwable);
 
-        var errorMessage = "Error during update job '" + this.firmwareUpdateJobId + "' for driver '" + this.driverInfo + "': " + throwable.getMessage();
         for (var listener : listeners) {
-            listener.onUpdateFailed(this.firmwareUpdateJobId, errorMessage);
+            listener.onUpdateFailed(this.firmwareUpdateJobId, throwable);
         }
 
         this.channel.shutdown();

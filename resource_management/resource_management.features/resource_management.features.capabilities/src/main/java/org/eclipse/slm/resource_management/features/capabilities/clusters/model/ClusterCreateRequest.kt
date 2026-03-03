@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*
 
 class ClusterCreateRequest(
-    @JsonProperty("clusterTypeId")
+    @field:JsonProperty("clusterTypeId")
     val clusterTypeId: UUID,
 )
 {
@@ -13,4 +13,6 @@ class ClusterCreateRequest(
     var clusterMembers: Map<UUID, String> = emptyMap()
 
     var configParameterValues: Map<String, String> = emptyMap()
+
+    var fullPathOwnerGroupId: String = ""
 }

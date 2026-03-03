@@ -1,13 +1,17 @@
 package org.eclipse.slm.resource_management.features.capabilities.persistence;
 
-import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.client.apis.*;
-import org.eclipse.slm.common.consul.model.catalog.Node;
+
+import org.eclipse.slm.common.consul.client.*;
+import org.eclipse.slm.common.consul.model.acl.policies.Policy;
+import org.eclipse.slm.common.consul.model.catalog.CatalogRegistration;
 import org.eclipse.slm.common.consul.model.catalog.NodeService;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;
+import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClientFactory;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.CapabilityUtil;
+import org.eclipse.slm.resource_management.features.capabilities.exceptions.CapabilityNotFoundException;
+import org.eclipse.slm.resource_management.features.capabilities.exceptions.CapabilityServiceNotFoundException;
+import org.eclipse.slm.resource_management.features.capabilities.exceptions.CapabilityServiceRuntimeException;
 import org.eclipse.slm.resource_management.features.capabilities.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,324 +23,149 @@ import java.util.*;
 public class SingleHostCapabilitiesConsulClient {
     private final static Logger LOG = LoggerFactory.getLogger(SingleHostCapabilitiesConsulClient.class);
 
-    private static final String KV_FOLDER_CAPABILITY_SERVICES = "capabilityServices";
+    private final ResourcesConsulClientFactory resourcesConsulClientFactory;
+    private final ResourcesConsulClient resourcesConsulAdminClient;
 
-    private final ResourcesConsulClient resourcesConsulClient;
-    private final ConsulNodesApiClient consulNodesApiClient;
-    private final ConsulServicesApiClient consulServicesApiClient;
-    private final ConsulGenericServicesClient consulGenericServicesClient;
-    private final ConsulAclApiClient consulAclApiClient;
-    private final ConsulHealthApiClient consulHealthApiClient;
-    private final CapabilityUtil capabilityUtil;
+    private final ConsulClientFactory consulClientFactory;
+    private final ConsulClient adminConsulClient;
+
     private final CapabilityJpaRepository capabilityJpaRepository;
 
-
     public SingleHostCapabilitiesConsulClient(
-            ResourcesConsulClient resourcesConsulClient,
-            ConsulNodesApiClient consulNodesApiClient,
-            ConsulServicesApiClient consulServicesApiClient,
-            ConsulGenericServicesClient consulGenericServicesClient,
-            ConsulAclApiClient consulAclApiClient,
-            ConsulHealthApiClient consulHealthApiClient,
-            CapabilityUtil capabilityUtil,
+            ConsulClientFactory consulClientFactory,
+            ResourcesConsulClientFactory resourcesConsulClientFactory,
             CapabilityJpaRepository capabilityJpaRepository
     ) {
-        this.resourcesConsulClient = resourcesConsulClient;
-        this.consulNodesApiClient = consulNodesApiClient;
-        this.consulServicesApiClient = consulServicesApiClient;
-        this.consulGenericServicesClient = consulGenericServicesClient;
-        this.consulAclApiClient = consulAclApiClient;
-        this.consulHealthApiClient = consulHealthApiClient;
-        this.capabilityUtil = capabilityUtil;
+        this.resourcesConsulClientFactory = resourcesConsulClientFactory;
+        this.resourcesConsulAdminClient = resourcesConsulClientFactory.createAdminClient();
+        this.consulClientFactory = consulClientFactory;
+        this.adminConsulClient = consulClientFactory.createAdminClient();
         this.capabilityJpaRepository = capabilityJpaRepository;
     }
 
-    //region ADD Function
-    public void addSingleHostCapabilityWithHealthCheckToAllConsulNodes(
-            ConsulCredential consulCredential,
-            Capability capability,
-            Boolean isManaged,
-            Map<String, String> configParameter
-    ) throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException {
-        if (capability.getHealthCheck() != null) {
-            var existingResources = this.resourcesConsulClient.getResources(consulCredential);
-            for (var existingResource : existingResources) {
-                List<NodeService> nodeServices = consulServicesApiClient.getNodeServicesByNodeId(new ConsulCredential(), existingResource.getId());
-                Optional<NodeService> consulService = nodeServices.stream().filter(srv -> srv.getService().equals("consul")).findFirst();
-
-                if(consulService.isEmpty())
-                    this.addSingleHostCapabilityToNode(
-                        consulCredential,
-                        capability,
-                        existingResource.getId(),
-                        CapabilityServiceStatus.INSTALL,
-                        isManaged,
-                        configParameter
-                    );
-            }
-        }
-        else {
-            LOG.error("Capability " + capability + "has no health check defined");
-        }
-    }
-
     public CapabilityService addSingleHostCapabilityToNode(
-            ConsulCredential consulCredential,
-            Capability capability,
-            UUID nodeId,
-            CapabilityServiceStatus capabilityServiceStatus
-    ) throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException {
-        return addSingleHostCapabilityToNode(
-                consulCredential,
-                capability,
-                nodeId,
-                capabilityServiceStatus,
-                false,
-                new HashMap<>()
-        );
-    }
-
-    public CapabilityService addSingleHostCapabilityToNode(
-            ConsulCredential consulCredential,
             Capability capability,
             UUID resourceId,
             CapabilityServiceStatus capabilityServiceStatus,
             Boolean isManaged,
-            Map<String, String> configParameter
-    ) throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException {
-
+            Map<String, String> configParameter,
+            String fullPathOwnerGroupId
+    ) throws ResourceNotFoundException {
+        // Register capability service on Consul node of resource
+        var capabilityServiceId = UUID.randomUUID();
         var singleHostCapabilityService = new SingleHostCapabilityService(
-                capability,
                 resourceId,
+                capabilityServiceId,
+                capability,
                 capabilityServiceStatus,
                 isManaged,
-                capabilityUtil.getNonSecretConfigParameter(capability,configParameter)
+                CapabilityUtil.getNonSecretConfigParameter(capability,configParameter)
         );
-        this.consulGenericServicesClient.registerService(
-                consulCredential,
-                singleHostCapabilityService.getConsulNodeId(),
-                singleHostCapabilityService.getService(),
-                singleHostCapabilityService.getId(),
-                capabilityUtil.getServicePortFromConfigParameter(capability, configParameter),
-                singleHostCapabilityService.getTags(),
-                singleHostCapabilityService.getServiceMeta()
-        );
+        var serviceRegistrationBuilder = CatalogRegistration.Service.builder(singleHostCapabilityService.getServiceName())
+                .id(singleHostCapabilityService.getId())
+                .tags(singleHostCapabilityService.getTags())
+                .meta(singleHostCapabilityService.getMeta());
+        var optionalPort = CapabilityUtil.getServicePortFromConfigParameter(capability, configParameter);
+        optionalPort.ifPresent(serviceRegistrationBuilder::port);
+        var serviceRegistration = serviceRegistrationBuilder.build();
 
-        var resourcePolicyName = ResourcesConsulClient.getResourcePolicyName(resourceId);
-        this.consulAclApiClient.addReadRuleToPolicy(
-                consulCredential,
-                resourcePolicyName,
-                "service",
-                singleHostCapabilityService.getService()
-        );
-        this.consulAclApiClient.addReadRuleToPolicy(
-                consulCredential,
-                resourcePolicyName,
-                "key_prefix",
-                KV_FOLDER_CAPABILITY_SERVICES + singleHostCapabilityService.getId()
-        );
-
-        var capabilityService = getCapabilityServiceOfResourceByCapabilityId(
-                capability.getId(),
-                resourceId
-        );
-
-        CapabilityHealthCheck healthCheck = singleHostCapabilityService.getCapability().getHealthCheck();
-        if(healthCheck != null) {
-            Optional<Node> optionalNode = this.consulNodesApiClient.getNodeById(
-                    consulCredential,
-                    resourceId
-            );
-
-            if(optionalNode.isEmpty())
-                throw new ResourceNotFoundException(resourceId);
-
-            this.consulHealthApiClient.addCheckForService(
-                    consulCredential,
-                    optionalNode.get().getNode(),
-                    capabilityService.getId(),
-                    capabilityUtil.getCheckByCapability(consulCredential, resourceId, capability)
-            );
-        }
-
+        this.adminConsulClient.services().registerService(singleHostCapabilityService.getResourceId(), serviceRegistration);
+        // Create read access policy and assign it to role of user group of owner
+        var policyName = CapabilitiesConsulClient.getCapabilityServicePolicyName(capabilityServiceId);
+        var policyRule =  "service \"" + singleHostCapabilityService.getServiceName() + "\" { policy = \"read\" }";
+        var policy = Policy.builder(policyName)
+                .rules(policyRule)
+                .build();
+        var createdPolicy = this.adminConsulClient.acl().createPolicy(policy);
+        this.adminConsulClient.acl().addPolicyToRole(fullPathOwnerGroupId, createdPolicy.getId());
+        // Get and return created capability service
+        var capabilityService = getCapabilityServiceOfResourceByCapabilityId(capability.getId(), resourceId);
         return capabilityService;
     }
-    //endregion
 
-    //region UPDATE Function
-    public void updateCapabilityService(
-            ConsulCredential consulCredential,
-            UUID nodeId,
-            CapabilityService capabilityService
-    ) throws ConsulLoginFailedException {
-        this.consulGenericServicesClient.registerService(
-                consulCredential,
-                nodeId,
-                capabilityService.getService(),
-                capabilityService.getId(),
-                Optional.ofNullable(capabilityService.getPort()),
-                capabilityService.getTags(),
-                capabilityService.getServiceMeta()
-        );
-    }
-    //endregion
+    public void updateCapabilityService(UUID nodeId, CapabilityService capabilityService) {
+        var serviceRegistration = CatalogRegistration.Service.builder(capabilityService.getServiceName())
+                .id(capabilityService.getId())
+                .port(capabilityService.getPort())
+                .tags(capabilityService.getTags())
+                .meta(capabilityService.getMeta())
+                .build();
 
-    //region DELETE Function
-    public void removeCapabilityServiceFromAllConsulNodes(
-            ConsulCredential consulCredential,
-            Capability capability
-    ) throws ConsulLoginFailedException {
-        var existingResources = this.resourcesConsulClient.getResources(consulCredential);
-        for (var existingResource : existingResources) {
-            try {
-                this.removeSingleHostCapabilityFromNode(consulCredential, capability, existingResource.getId());
-            } catch (ResourceNotFoundException e) {
-                LOG.warn("Unable to find resource [id = '"+existingResource.getId()+"'] => Skip removal of capability "
-                        + "[id = '"+capability.getId()+"']"
-                );
-            }
-        }
+        this.adminConsulClient.services().registerService(nodeId, serviceRegistration);
     }
 
-    public void removeSingleHostCapabilityFromNode(
-            ConsulCredential consulCredential,
-            Capability capability,
-            UUID resourceId
-    ) throws ConsulLoginFailedException, ResourceNotFoundException {
-        var nodeServices = this.consulServicesApiClient.getNodeServicesByNodeId(consulCredential, resourceId);
-
-        Optional<NodeService> capabilityService = nodeServices.stream()
+    public void removeSingleHostCapabilityFromNode(Capability capability, UUID resourceId) throws ResourceNotFoundException {
+        // Get capability service on Consul node of resource
+        var nodeServices = this.adminConsulClient.services().getNodeServicesByNodeId(resourceId);
+        Optional<NodeService> capabilityNodeService = nodeServices.stream()
                 .filter(ns -> ns.getMeta().containsKey("capabilityId"))
                 .filter(ns -> ns.getMeta().get("capabilityId").equals(capability.getId().toString() ))
                 .findFirst();
 
-        if(capabilityService.isEmpty()) {
-            return;
+        if(capabilityNodeService.isEmpty()) {
+            return; // No capability service for the capability found on this node, nothing to remove
         }
+        // Unregister capability service from Consul node
+        var capabilityService = SingleHostCapabilityService.createFromNodeService(capabilityNodeService.get(), resourceId, capability);
+        this.adminConsulClient.services().removeServiceByName(resourceId, capabilityService.getServiceName());
+        // Remove capability service policy
+        var policyName = CapabilitiesConsulClient.getCapabilityServicePolicyName(capabilityService.getId());
+        var policy = this.adminConsulClient.acl().getPolicyByNameOrThrow(policyName);
+        this.adminConsulClient.acl().deletePolicyById(policy.getId());
+    }
 
-        this.consulGenericServicesClient.deregisterService(
-                new ConsulCredential(),
-                resourceId,
-                capabilityService.get().getService()
-        );
-        var resourcePolicyName = ResourcesConsulClient.getResourcePolicyName(resourceId);
-        this.consulAclApiClient.removeReadRuleFromPolicy(
-                consulCredential,
-                resourcePolicyName,
-                "service",
-                capabilityService.get().getService()
-        );
-        this.consulAclApiClient.removeReadRuleFromPolicy(
-                consulCredential,
-                resourcePolicyName,
-                "key_prefix",
-                KV_FOLDER_CAPABILITY_SERVICES + capabilityService.get().getID()
-        );
-
-
-        var nodeChecks = this.consulHealthApiClient.getChecksOfNode(consulCredential, resourceId);
-        for(var nodeCheck : nodeChecks) {
-            if ( nodeCheck.getName().equals("capability_" + capability.getName())) {
-                this.consulHealthApiClient.removeCheckFromNode(consulCredential, resourceId, nodeCheck.getCheckId());
+    public void removeCapabilityServiceFromAllConsulNodes(Capability capability) {
+        var existingResources = this.resourcesConsulAdminClient.getResources();
+        for (var existingResource : existingResources) {
+            try {
+                this.removeSingleHostCapabilityFromNode(capability, existingResource.getId());
+            } catch (Exception e) {
+                throw new CapabilityServiceRuntimeException("Unable to remove capability service from resource with id = '" + existingResource.getId() + "'", e);
             }
         }
     }
-    //endregion
 
-    //region GET Function
-    public List<SingleHostCapabilityService> getSingleHostCapabilityServicesOfResource(
-            ConsulCredential consulCredential,
-            UUID consulNodeId
-    ) throws ConsulLoginFailedException {
+    public List<SingleHostCapabilityService> getSingleHostCapabilityServicesOfResource(UUID resourceId) {
+        var node = adminConsulClient.nodes().getNodeByIdOrThrow(resourceId);
+
         List<SingleHostCapabilityService> singleHostCapabilityServices = new ArrayList<>();
-        Optional<Node> optionalNode = consulNodesApiClient.getNodeById(consulCredential, consulNodeId);
-
-        if(optionalNode.isEmpty()) {
-            LOG.error("No consul node found with id = '" + consulNodeId + "'");
-            return null;
-        }
-
-        Node node = optionalNode.get();
-
-        var servicesOfNode = this.consulServicesApiClient.getNodeServices(consulCredential, node.getNode());
-
+        var servicesOfNode = this.adminConsulClient.services().getNodeServices(node.getNodeName());
         for (var serviceOfNode : servicesOfNode) {
             if (serviceOfNode.getTags().contains(SingleHostCapabilityService.class.getSimpleName())) {
-                Optional<Capability> capabilityOptional = capabilityJpaRepository.findById(
-                        UUID.fromString(serviceOfNode.getMeta().get("capabilityId"))
-                );
-
-                capabilityOptional.ifPresent(capability -> singleHostCapabilityServices.add(new SingleHostCapabilityService(
-                        capability,
-                        consulNodeId,
-                        UUID.fromString(serviceOfNode.getID()),
-                        capabilityUtil.getStatusOfConsulService(serviceOfNode),
-                        capabilityUtil.getIsManagedOfConsulService(serviceOfNode)
-                )));
+                var capabilityOptional = capabilityJpaRepository.findById(UUID.fromString(serviceOfNode.getMeta().get("capabilityId")));
+                capabilityOptional.ifPresent(capability -> singleHostCapabilityServices.add(
+                        SingleHostCapabilityService.createFromNodeService(serviceOfNode, resourceId, capability)
+                ));
             }
         }
 
         return singleHostCapabilityServices;
     }
 
-    public CapabilityService getCapabilityServiceForCapabilityOfResource(
-            ConsulCredential consulCredential,
-            Capability capability,
-            UUID consulNodeId
-    ) throws ConsulLoginFailedException, IllegalAccessException {
+    public CapabilityService getCapabilityServiceForCapabilityOfResource(Capability capability, UUID resourceId) {
+        var node = adminConsulClient.nodes().getNodeByIdOrThrow(resourceId);
 
-        Optional<Node> optionalNode = consulNodesApiClient.getNodeById(consulCredential, consulNodeId);
-
-        if(optionalNode.isEmpty()) {
-            LOG.error("No consul node found with id = '" + consulNodeId + "'");
-            return null;
-        }
-
-        Node node = optionalNode.get();
-
-        List<NodeService> servicesOfNode = this.consulServicesApiClient.getNodeServices(consulCredential, node.getNode());
+        List<NodeService> servicesOfNode = this.adminConsulClient.services().getNodeServices(node.getNodeName());
         for (var serviceOfNode : servicesOfNode) {
             if (serviceOfNode.getTags().contains(SingleHostCapabilityService.class.getSimpleName())) {
-                return new SingleHostCapabilityService(
-                        capability,
-                        consulNodeId,
-                        UUID.fromString(serviceOfNode.getID()),
-                        serviceOfNode.getPort(),
-                        capabilityUtil.getStatusOfConsulService(serviceOfNode),
-                        capabilityUtil.getIsManagedOfConsulService(serviceOfNode),
-                        capabilityUtil.getCustomMeta(serviceOfNode)
-                );
+                return SingleHostCapabilityService.createFromNodeService(serviceOfNode, resourceId, capability);
             }
         }
 
-        return null;
+        throw new CapabilityServiceRuntimeException("No capability service found for capability[id='" + capability.getId() + "'] on resource[id='"
+                + resourceId + "']");
     }
 
-    public CapabilityService getCapabilityServiceOfResourceByCapabilityId(
-            UUID capabilityId,
-            UUID consulNodeId
-    ) throws ConsulLoginFailedException, IllegalAccessException {
-        var consulCredential = new ConsulCredential();
-
-        Optional<Capability> optionalCapability = capabilityJpaRepository.findById(capabilityId);
-        Optional<Node> optionalNode = consulNodesApiClient.getNodeById(consulCredential, consulNodeId);
-
+    public CapabilityService getCapabilityServiceOfResourceByCapabilityId(UUID capabilityId, UUID resourceId) {
+        var node = adminConsulClient.nodes().getNodeByIdOrThrow(resourceId);
+        var optionalCapability = capabilityJpaRepository.findById(capabilityId);
         if(optionalCapability.isEmpty()) {
-            LOG.error("No capability found with id = '" + capabilityId + "'");
-            return null;
+            throw new CapabilityNotFoundException(capabilityId);
         }
+        var capability = optionalCapability.get();
 
-        if(optionalNode.isEmpty()) {
-            LOG.error("No consul node found with id = '" + consulNodeId + "'");
-            return null;
-        }
-
-        Capability capability = optionalCapability.get();
-        Node node = optionalNode.get();
-
-        var servicesOfNode = this.consulServicesApiClient.getNodeServices(consulCredential, node.getNode());
-
-        Optional<NodeService> optionalService = servicesOfNode
+        var servicesOfNode = this.adminConsulClient.services().getNodeServices(node.getNodeName());
+        Optional<NodeService> optionalNodeService = servicesOfNode
                 .stream()
                 .filter(service -> service.getMeta().containsKey(CapabilityService.META_KEY_CAPABILITY_ID))
                 .filter(nodeService ->
@@ -345,22 +174,9 @@ public class SingleHostCapabilitiesConsulClient {
                                 .equals(capabilityId.toString())
                 ).findFirst();
 
-        if(optionalService.isEmpty()) {
-            LOG.error("Node with id = '" + consulNodeId + "' has no service with capabilitId = '" + capabilityId + "'");
-            return null;
+        if(optionalNodeService.isEmpty()) {
+            throw new CapabilityServiceNotFoundException("Resource[id='" + resourceId + "'] has no capability service [id='" + capabilityId + "']");
         }
-
-        NodeService serviceOfNode = optionalService.get();
-
-        return new SingleHostCapabilityService(
-                capability,
-                consulNodeId,
-                UUID.fromString(serviceOfNode.getID()),
-                serviceOfNode.getPort(),
-                capabilityUtil.getStatusOfConsulService(serviceOfNode),
-                capabilityUtil.getIsManagedOfConsulService(serviceOfNode),
-                capabilityUtil.getCustomMeta(serviceOfNode)
-        );
+        return SingleHostCapabilityService.createFromNodeService(optionalNodeService.get(), resourceId, capability);
     }
-    //endregion
 }

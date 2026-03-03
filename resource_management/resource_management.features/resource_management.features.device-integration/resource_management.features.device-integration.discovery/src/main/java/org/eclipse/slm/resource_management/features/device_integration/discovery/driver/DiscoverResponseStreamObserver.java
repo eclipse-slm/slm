@@ -24,7 +24,7 @@ import java.util.List;
 
 public class DiscoverResponseStreamObserver implements StreamObserver<IahDiscover.DiscoverResponse> {
 
-    public final static Logger LOG = LoggerFactory.getLogger(DiscoverResponseStreamObserver.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DiscoverResponseStreamObserver.class);
 
     private DiscoveryJob discoveryJob;
 

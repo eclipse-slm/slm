@@ -1,10 +1,16 @@
 package org.eclipse.slm.resource_management.features.importer;
 
+import org.eclipse.slm.common.credentials.model.Credential;
+import org.eclipse.slm.common.credentials.model.CredentialDataUsernamePassword;
+import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
+import org.eclipse.slm.platform_management.service.api.credentials.CredentialCreateRequest;
+import org.eclipse.slm.platform_management.service.client.PlatformManagementClientFactory;
 import org.eclipse.slm.resource_management.common.aas.ResourceAas;
 import org.eclipse.slm.resource_management.common.aas.ResourcesSubmodelManager;
 import org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplate.DigitalNameplateV3;
 import org.eclipse.slm.resource_management.common.location.Location;
 import org.eclipse.slm.resource_management.common.location.LocationHandler;
+import org.eclipse.slm.resource_management.common.remote_access.RemoteAccessCreateDTO;
 import org.eclipse.slm.resource_management.common.remote_access.RemoteAccessManager;
 import org.eclipse.slm.resource_management.common.resources.ResourcesManager;
 import org.eclipse.slm.resource_management.features.capabilities.jobs.CapabilityAlreadyInstalledException;
@@ -16,12 +22,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedInputStream;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class ImporterService {
 
-    public final static Logger LOG = LoggerFactory.getLogger(ImporterService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ImporterService.class);
 
     private final ResourcesManager resourcesManager;
 
@@ -33,16 +41,20 @@ public class ImporterService {
 
     private final RemoteAccessManager remoteAccessManager;
 
+    private final PlatformManagementClientFactory platformManagementClientFactory;
+
     public ImporterService(ResourcesManager resourcesManager,
                            CapabilityJobService capabilityJobService,
                            LocationHandler locationHandler,
                            ResourcesSubmodelManager resourcesSubmodelManager,
-                           RemoteAccessManager remoteAccessManager) {
+                           RemoteAccessManager remoteAccessManager,
+                           PlatformManagementClientFactory platformManagementClientFactory) {
         this.resourcesManager = resourcesManager;
         this.capabilityJobService = capabilityJobService;
         this.locationHandler = locationHandler;
         this.resourcesSubmodelManager = resourcesSubmodelManager;
         this.remoteAccessManager = remoteAccessManager;
+        this.platformManagementClientFactory = platformManagementClientFactory;
     }
 
     public ImportDefinition getImportDefinition(MultipartFile importFile) {
@@ -66,7 +78,9 @@ public class ImporterService {
         }
     }
 
-    public void importDevices(JwtAuthenticationToken jwtAuthenticationToken, ImportDefinition importDefinition) {
+    public void importDevices(JwtAuthenticationToken jwtAuthenticationToken, ImportDefinition importDefinition, String fullPathOwnerGroupId) {
+        var userAccessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
+        var platformManagementClientUser = this.platformManagementClientFactory.create(userAccessToken);
 
         for (var location : importDefinition.getLocations().entrySet()) {
             this.locationHandler.addLocation(new Location(location.getKey(), location.getValue()));
@@ -74,24 +88,35 @@ public class ImporterService {
 
         for (var device : importDefinition.getDevices()) {
             try {
-                var addedResource = this.resourcesManager.addResource(jwtAuthenticationToken,
-                        device.resourceId, device.assetId, device.hostname, device.ipAddress, device.firmwareVersion, null, new DigitalNameplateV3());
+                var addedResource = this.resourcesManager.createResource(
+                        device.resourceId,
+                        device.assetId,
+                        device.hostname,
+                        device.ipAddress,
+                        device.firmwareVersion,
+                        null,
+                        new DigitalNameplateV3(),
+                        fullPathOwnerGroupId);
 
                 if (device.connectionPort != null
                         && device.connectionType != null
                         && device.username != null
                         && device.password != null) {
-                    var userId = jwtAuthenticationToken.getToken().getSubject();
-                    this.remoteAccessManager.addUsernamePasswordRemoteAccessService(userId,
+
+                    var credential = new Credential(UUID.randomUUID(), "",List.of(), new CredentialDataUsernamePassword(device.username, device.password));
+                    var credentialCreateRequest = new CredentialCreateRequest(List.of(), credential, fullPathOwnerGroupId);
+                    platformManagementClientUser.credentials().createCredential(credentialCreateRequest);
+
+                    this.remoteAccessManager.addRemoteAccessForResource(
                             device.resourceId,
-                            device.connectionType,
-                            device.connectionPort,
-                            device.username,
-                            device.password);
+                            new RemoteAccessCreateDTO(fullPathOwnerGroupId, credential.getId(), null, device.connectionPort, device.connectionType),
+                            userAccessToken
+                    );
+
                 }
 
                 if (device.locationId != null) {
-                    this.resourcesManager.setLocationOfResource(addedResource.getId(), device.locationId);
+                    this.resourcesManager.setLocationOfResource(addedResource.getId(), device.locationId, userAccessToken);
                 }
             } catch (Exception e) {
                 throw new ResourceManagementImportRuntimeException("Error importing devices: " + e.getMessage());
@@ -112,11 +137,11 @@ public class ImporterService {
         }
     }
 
-    public void importCapabilities(JwtAuthenticationToken jwtAuthenticationToken, ImportDefinition importDefinition, boolean forceInstall) {
+    public void importCapabilities(JwtAuthenticationToken jwtAuthenticationToken, ImportDefinition importDefinition, boolean forceInstall, String fullPathOwnerGroupId) {
         for (var device : importDefinition.getDevices()) {
             for (var capability : device.capabilities) {
                 try {
-                    this.capabilityJobService.initCapabilityJob(jwtAuthenticationToken, device.resourceId, capability.getCapabilityId(), capability.isSkipInstall(), Map.of(), forceInstall);
+                    this.capabilityJobService.initCapabilityJob(jwtAuthenticationToken, device.resourceId, capability.getCapabilityId(), capability.isSkipInstall(), Map.of(), forceInstall, fullPathOwnerGroupId);
                 } catch (CapabilityAlreadyInstalledException e) {
                     LOG.info("Capability {} already installed for resource '{}'", capability.getCapabilityId(), device.resourceId);
                 } catch (Exception e) {

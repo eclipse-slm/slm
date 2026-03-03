@@ -3,8 +3,6 @@ package org.eclipse.slm.resource_management.features.capabilities.clusters;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.vault.client.VaultCredential;
 import org.apache.http.client.utils.URIBuilder;
 import org.eclipse.slm.resource_management.common.location.LocationJpaRepository;
 import org.keycloak.representations.AccessTokenResponse;
@@ -33,19 +31,17 @@ import java.util.*;
 public class ClusterHandlerITConfig {
 
     //region Consul Properties:
-    ConsulCredential consulCredential = new ConsulCredential();
     public static String CONSUL_VERSION = "1.14";
     public static String CONSUL_HOST = "localhost";
     public static int CONSUL_PORT = 8500;
-    public static String CONSUL_TOKEN = "myroot";
+    public static String CONSUL_TOKEN = "root";
     //endregion
 
     //region Vault Properties
-    VaultCredential vaultCredential = new VaultCredential();
-    public static String VAULT_VERSION = "1.20.3";
+    public static String VAULT_VERSION = "1.21.2";
     public static String VAULT_HOST = "localhost";
     public static int VAULT_PORT = 8200;
-    public static String VAULT_TOKEN = "myroot";
+    public static String VAULT_TOKEN = "root";
     //endregion
 
     //region Mocks

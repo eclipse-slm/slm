@@ -18,7 +18,7 @@ public class FeignClientFactory {
         Decoder decoder = (response, type) -> {
             String body = "";
             try {
-                body = new String(response.body().asInputStream().readAllBytes());;
+                body = new String(response.body().asInputStream().readAllBytes());
                 return new JsonDeserializer().read(body, (Class<?>) type);
             } catch (IOException | DeserializationException e) {
                 if (e instanceof DeserializationException) {

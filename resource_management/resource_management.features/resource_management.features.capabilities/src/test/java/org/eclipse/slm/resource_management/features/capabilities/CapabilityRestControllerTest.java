@@ -10,7 +10,6 @@ import org.eclipse.slm.resource_management.features.capabilities.clusters.model.
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityFilter;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityType;
 import org.eclipse.slm.resource_management.features.capabilities.model.DeploymentCapability;
-import org.eclipse.slm.resource_management.features.capabilities.model.VirtualizationCapability;
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType;
 import org.eclipse.slm.resource_management.features.capabilities.model.awx.AwxAction;
 import org.junit.jupiter.api.*;
@@ -73,10 +72,9 @@ public class CapabilityRestControllerTest {
 
     private static DeploymentCapability dockerDeploymentCapability;
     private static DeploymentCapability dockerSwarmDeploymentCapability;
-    private static VirtualizationCapability kvmQemuVirtualizationCapability;
 
     @MockBean
-    private CapabilitiesService capabilitiesManager;
+    private CapabilitiesManager capabilitiesManager;
     //endregion
 
     //region Functions
@@ -86,10 +84,6 @@ public class CapabilityRestControllerTest {
 
     private String getSingleHostDeploymentCapabilityDTOAsJsonString() throws JsonProcessingException {
         return objectMapper.writeValueAsString(dockerDeploymentCapability);
-    }
-
-    private String getSingleHostVirtualizationCapabilityDTOAsJsonString() throws JsonProcessingException {
-        return objectMapper.writeValueAsString(kvmQemuVirtualizationCapability);
     }
     //endregion
 
@@ -160,29 +154,6 @@ public class CapabilityRestControllerTest {
                 new ClusterMemberType("Manager", "docker_manager", 3, false),
                 new ClusterMemberType("Worker","docker_worker", 1, true)
         ));
-        //endregion
-
-        //region Create Java Object of KVM/QEMU VirtualizationCapability
-        kvmQemuVirtualizationCapability = new VirtualizationCapability();
-        kvmQemuVirtualizationCapability.setName("KVM/QEMU");
-        kvmQemuVirtualizationCapability.setLogo("mdi-kvm");
-        kvmQemuVirtualizationCapability.setType(Arrays.asList(
-                CapabilityType.SETUP,
-                CapabilityType.VM
-        ));
-        kvmQemuVirtualizationCapability.setCapabilityClass("VirtualizationCapability");
-
-        // Set AWX Capability Actions
-        var kvmQemuVirtualizationCapabilityRepo = "https://github.com/FabOS-AI/fabos-slm-vrp-kvm";
-        var kvmQemuVirtualizationCapabilityBranch = "main";
-        dockerDeploymentCapability.getActions()
-                .put(ActionType.INSTALL, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "install.yml"));
-        dockerDeploymentCapability.getActions()
-                .put(ActionType.UNINSTALL, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "uninstall.yml"));
-        dockerDeploymentCapability.getActions()
-                .put(ActionType.CREATE_VM, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "create_vm.yml"));
-        dockerDeploymentCapability.getActions()
-                .put(ActionType.DELETE_VM, new AwxAction(kvmQemuVirtualizationCapabilityRepo, kvmQemuVirtualizationCapabilityBranch, "delete_vm.yml"));
         //endregion
     }
 
@@ -337,77 +308,6 @@ public class CapabilityRestControllerTest {
 
                 mockMvc.perform(
                                 delete(BASE_PATH + "/" + dockerSwarmDeploymentCapability.getId())
-                        )
-                        .andExpect(status().isOk())
-                        .andDo(MockMvcResultHandlers.print());
-            }
-        }
-    }
-
-
-    @Nested
-    @Order(30)
-    @DisplayName("Virtualization Capabilities")
-    @TestClassOrder(ClassOrderer.OrderAnnotation.class)
-    public class testVirtualizationCapabilities {
-        @Nested
-        @Order(10)
-        @DisplayName("Single Host Virtualization Capability")
-        @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-        public class testSingleHostVirtualizationCapability {
-            @Test
-            @Order(10)
-            @DisplayName("Get Capabilities and expect empty list (GET " + BASE_PATH + ")")
-            public void getCapabilitiesEmptyList(@Value("${:0}") int expectedSize) throws Exception {
-                mockMvc.perform(
-                                get(BASE_PATH)
-                                        .with(csrf())
-                        )
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$").isArray())
-                        .andExpect(jsonPath("$", hasSize(expectedSize)))
-                        .andDo(MockMvcResultHandlers.print())
-                        .andReturn();
-            }
-
-            @Test
-            @Order(20)
-            @DisplayName("Create Single Host Virtualization Capability (POST " + BASE_PATH + ")")
-            public void createSingleHostVirtualizationCapability() throws Exception {
-                mockMvc.perform(
-                                post(BASE_PATH)
-                                        .content( getSingleHostVirtualizationCapabilityDTOAsJsonString() )
-                                        .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isCreated())
-                        .andDo(MockMvcResultHandlers.print());
-            }
-
-            @Test
-            @Order(30)
-            @DisplayName("Get Capabilities and expect list with size == 1 (GET " + BASE_PATH + ")")
-            public void getCapabilitiesAndExpectSingleHostVirtualizationCapability(@Value("${:1}") int expectedSize) throws Exception {
-                Mockito
-                        .when(capabilitiesManager.getCapabilities(any(Optional.of(new CapabilityFilter.Builder().build()).getClass())))
-                        .thenReturn(Arrays.asList(kvmQemuVirtualizationCapability));
-
-                mockMvc.perform(get(BASE_PATH).with(csrf()))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$").isArray())
-                        .andExpect(jsonPath("$", hasSize(expectedSize)))
-                        .andDo(MockMvcResultHandlers.print())
-                        .andReturn();
-            }
-
-            @Test
-            @Order(40)
-            @DisplayName("Delete Single Host Virtualization Capability (DELETE " + BASE_PATH + "/{capabilityId})")
-            public void deleteSingleHostVirtualizationCapability() throws Exception {
-                Mockito
-                        .when(capabilitiesManager.deleteCapability(kvmQemuVirtualizationCapability.getId()))
-                        .thenReturn(true);
-
-                mockMvc.perform(
-                                delete(BASE_PATH + "/" + kvmQemuVirtualizationCapability.getId())
                         )
                         .andExpect(status().isOk())
                         .andDo(MockMvcResultHandlers.print());

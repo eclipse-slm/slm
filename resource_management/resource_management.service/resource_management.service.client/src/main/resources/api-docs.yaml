@@ -332,29 +332,6 @@ paths:
             "*/*":
               schema:
                 type: string
-  "/resources/providers/virtual-resource-provider/{virtualResourceProviderId}/vm":
-    post:
-      tags:
-      - capability-providers-rest-controller
-      summary: Create Virtual Machine
-      operationId: createVm
-      parameters:
-      - name: virtualResourceProviderId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: Realm
-        in: header
-        description: Keycloak Realm
-        required: true
-        schema:
-          type: string
-          default: fabos
-      responses:
-        '200':
-          description: OK
   "/resources/profiler":
     get:
       tags:
@@ -771,30 +748,6 @@ paths:
                 type: array
                 items:
                   "$ref": "#/components/schemas/CapabilityService"
-
-  "/resources/providers/virtual-resource-provider":
-    get:
-      tags:
-      - capability-providers-rest-controller
-      summary: Get all virtual resource provider
-      operationId: getVirtualResourceProviders
-      parameters:
-      - name: Realm
-        in: header
-        description: Keycloak Realm
-        required: true
-        schema:
-          type: string
-          default: fabos
-      responses:
-        '200':
-          description: OK
-          content:
-            "*/*":
-              schema:
-                type: array
-                items:
-                  "$ref": "#/components/schemas/VirtualResourceProvider"
   "/resources/providers/service-hoster":
     get:
       tags:
@@ -1377,18 +1330,6 @@ components:
       - DOCKER_CONTAINER
       - DOCKER_COMPOSE
       - KUBERNETES
-    VirtualizationCapabilityDTOApi:
-      required:
-      - actions
-      - capabilityClass
-      - clusterMemberTypes
-      - id
-      - logo
-      - name
-      - type
-      type: object
-      allOf:
-      - "$ref": "#/components/schemas/CapabilityDTOApi"
     BaseConfigurationCapability:
       required:
       - actions
@@ -1503,7 +1444,6 @@ components:
           oneOf:
           - "$ref": "#/components/schemas/BaseConfigurationCapability"
           - "$ref": "#/components/schemas/DeploymentCapability"
-          - "$ref": "#/components/schemas/VirtualizationCapability"
         status:
           "$ref": "#/components/schemas/CapabilityServiceStatus"
         serviceClass:
@@ -1682,31 +1622,6 @@ components:
           consulNodeId:
             type: string
             format: uuid
-    VirtualizationCapability:
-      required:
-      - actions
-      - capabilityClass
-      - cluster
-      - clusterMemberTypes
-      - connectionTypes
-      - id
-      - logo
-      - name
-      - type
-      type: object
-      allOf:
-      - "$ref": "#/components/schemas/Capability"
-    VirtualResourceProvider:
-      required:
-      - capabilityClass
-      type: object
-      properties:
-        capabilityService:
-
-          "$ref": "#/components/schemas/CapabilityService"
-
-        capabilityClass:
-          type: string
     CapabilityHostType:
       type: string
       enum:

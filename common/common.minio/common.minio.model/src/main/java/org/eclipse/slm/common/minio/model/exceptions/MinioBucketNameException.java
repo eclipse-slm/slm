@@ -1,6 +1,5 @@
 package org.eclipse.slm.common.minio.model.exceptions;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 public class MinioBucketNameException extends Exception {

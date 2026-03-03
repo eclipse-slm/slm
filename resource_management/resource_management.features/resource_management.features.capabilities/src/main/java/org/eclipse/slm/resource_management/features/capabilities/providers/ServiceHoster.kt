@@ -1,4 +1,4 @@
-package org.eclipse.slm.resource_management.features.providers
+package org.eclipse.slm.resource_management.features.capabilities.providers
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.eclipse.slm.resource_management.features.capabilities.model.DeploymentCapability

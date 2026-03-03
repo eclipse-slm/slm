@@ -46,7 +46,7 @@ message ServiceInfo {
     // Mandatory: Either 'dns_domainname' or 'ipv4_address' needs to be provided.
     // Intentionally there is no 'ipv6_address', because ipv6 without DNS will not really work.
     oneof grpc_ip {
-        // DNS host name of the driver
+         // DNS host name of the driver
         string dns_domainname = 1;
         // ipv4 address of the driver
         string ipv4_address = 2;
@@ -147,3 +147,4 @@ message QueryRegisteredServicesRequest {
 message QueryRegisteredServicesResponse {
     repeated ServiceInfo infos = 1;
 }
+

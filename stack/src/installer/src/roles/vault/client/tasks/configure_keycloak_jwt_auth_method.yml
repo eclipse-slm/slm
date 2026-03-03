@@ -26,9 +26,6 @@
   set_fact:
     base_url: "{{ vault.url.internal }}/v1/auth/{{ _mount_auth_path }}"
 
-- debug:
-    var: _oidc_discovery_url
-
 - name: "Create config for auth path '{{ _mount_auth_path }}'"
   uri:
     url: "{{ base_url }}/config"
@@ -59,12 +56,12 @@
       user_claim: sub
       bound_audiences:
         - "ui"
-        - "resource-management"
-        - "service-management"
+        - "resource_management"
+        - "service_management"
       claim_mappings:
         preferred_username: username
         email: email
       allowed_redirect_uris:
         - "*"
-      groups_claim: "/realm_access/roles"
+      groups_claim: "groups"
     status_code: 200,204

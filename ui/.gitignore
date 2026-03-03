@@ -8,6 +8,7 @@ package-lock.json
 
 # Ignore generated clients
 src/api/resource-management/client
+src/api/platform-management/client
 src/api/service-management/client
 src/api/notification-service/client
 

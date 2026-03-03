@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public abstract class GenericMessageListener<T extends AbstractEventMessage> implements MessageListener {
 
-    public final static Logger LOG = LoggerFactory.getLogger(GenericMessageListener.class);
+    private final static Logger LOG = LoggerFactory.getLogger(GenericMessageListener.class);
 
     private ConnectionFactory connectionFactory;
 
@@ -39,7 +39,7 @@ public abstract class GenericMessageListener<T extends AbstractEventMessage> imp
     @PostConstruct
     public void init()  throws Exception  {
         var queueName = this.exchangeName + "." + this.routingKeyAllEvents + "@" +this.nameOfReceivingService;
-        var queue = new Queue(queueName, false);;
+        var queue = new Queue(queueName, false);
 
         var amqpAdmin = new RabbitAdmin(rabbitTemplate.getConnectionFactory());
         amqpAdmin.declareQueue(queue);

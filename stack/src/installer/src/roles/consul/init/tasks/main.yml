@@ -16,9 +16,6 @@
   retries: 120
   delay: 3
 
-- debug:
-    var: oidc_discovery_crt
-
 - name: "Consul Init | Create auth method for Keycloak"
   uri:
     url: "{{ consul.url.internal }}/v1/acl/auth-method"
@@ -26,19 +23,7 @@
     headers:
       authorization: "Bearer {{ _consul_token }}"
     body_format: json
-    body:
-      Name: keycloak
-      Type: jwt
-      Description: FabOS Keycloak Instance
-      Config:
-        OIDCDiscoveryURL: "{{ keycloak.url.external_without_port }}/realms/{{ ENV.KEYCLOAK.REALM }}"
-        ClaimMappings:
-          given_name: first_name
-          family_name: last_name
-        ListClaimMappings:
-          groups: groups
-          "/realm_access/roles": resources
-      MaxTokenTTL: "1m"
+    body: "{{ consul_keyloak_auth_method }}"
     status_code: 200
   register: output_put_auth_method
 
@@ -60,6 +45,7 @@
           notification_service_url: "{{ notification_service.url.proxy }}"
           information_service_url: "{{ information_service.url.proxy }}"
           irs_url: "{{ irs.url.proxy }}"
+          platform_management_url: "{{ platform_management.url.proxy }}"
           resource_management_url: "{{ resource_management.url.proxy }}"
           service_management_url: "{{ service_management.url.proxy }}"
           monitoring_service_url: "{{ monitoring_service.url.proxy }}"

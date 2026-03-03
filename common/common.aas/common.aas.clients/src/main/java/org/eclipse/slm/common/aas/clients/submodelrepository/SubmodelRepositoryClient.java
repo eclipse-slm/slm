@@ -1,7 +1,6 @@
 package org.eclipse.slm.common.aas.clients.submodelrepository;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import feign.RequestInterceptor;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonDeserializer;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
@@ -98,6 +97,9 @@ public class SubmodelRepositoryClient {
         catch (ValueMapperNotFoundException e) {
             LOG.error("Value mapper not found for submodel with id: " + submodelId);
         }
+        catch (Exception e) {
+            LOG.error("Error while fetching submodel value only with id '" + submodelId + "': " + e.getMessage(), e);
+        }
 
         return null;
     }
@@ -108,26 +110,43 @@ public class SubmodelRepositoryClient {
         } catch (CollidingIdentifierException e) {
             this.connectedSubmodelRepository.updateSubmodel(submodel.getId(), submodel);
         }
-        catch (RuntimeException e) {
-            LOG.error(e.getMessage());
+        catch (Exception e) {
+            LOG.error("Error while creating/updating submodel with id '" + submodel.getId() + "': " + e.getMessage(), e);
         }
     }
 
     public void deleteSubmodel(String submodelId) {
-        this.connectedSubmodelRepository.deleteSubmodel(submodelId);
+        try {
+            this.connectedSubmodelRepository.deleteSubmodel(submodelId);
+        } catch (Exception e) {
+            LOG.error("Error while deleting submodel with id '" + submodelId + "': " + e.getMessage(), e);
+        }
     }
 
     public SubmodelElement getSubmodelElement(String submodelId, String smeIdShort) {
-        var submodelElement = this.connectedSubmodelRepository.getSubmodelElement(submodelId, smeIdShort);
-        return submodelElement;
+        try {
+            var submodelElement = this.connectedSubmodelRepository.getSubmodelElement(submodelId, smeIdShort);
+            return submodelElement;
+        } catch (Exception e) {
+            LOG.error("Error while fetching submodel element with idShortPath '" + smeIdShort + "' in submodel with id '" + submodelId + "': " + e.getMessage(), e);
+            return null;
+        }
     }
 
     public void createSubmodelElement(String submodelId, SubmodelElement submodelElement) {
-        this.connectedSubmodelRepository.createSubmodelElement(submodelId, submodelElement);
+        try {
+            this.connectedSubmodelRepository.createSubmodelElement(submodelId, submodelElement);
+        } catch (Exception e) {
+            LOG.error("Error while creating submodel element with idShortPath '" + submodelElement.getIdShort() + "' in submodel with id '" + submodelId + "': " + e.getMessage(), e);
+        }
     }
 
     public void updateSubmodelElement(String submodelId, String idShortPath, SubmodelElement submodelElement) {
-        this.connectedSubmodelRepository.updateSubmodelElement(submodelId, idShortPath, submodelElement);
+        try {
+            this.connectedSubmodelRepository.updateSubmodelElement(submodelId, idShortPath, submodelElement);
+        } catch (Exception e) {
+            LOG.error("Error while updating submodel element with idShortPath '" + idShortPath + "' in submodel with id '" + submodelId + "': " + e.getMessage(), e);
+        }
     }
 
     public void createOrUpdateSubmodelElement(String submodelId, String idShortPath, SubmodelElement submodelElement) {
@@ -135,11 +154,18 @@ public class SubmodelRepositoryClient {
             this.connectedSubmodelRepository.updateSubmodelElement(submodelId, idShortPath, submodelElement);
         } catch (ElementDoesNotExistException e) {
             this.connectedSubmodelRepository.createSubmodelElement(submodelId, idShortPath, submodelElement);
+        } catch (Exception e) {
+            LOG.error("Error while creating/updating submodel element with idShortPath '" + idShortPath + "' in submodel with id '" + submodelId + "': " + e.getMessage(), e);
         }
     }
 
     public SubmodelQueryResult querySubmodel(int limit, String cursor, Map<String, Object> query) {
-        return this.submodelRepositoryQueryApiClient.querySubmodel(limit, cursor, query);
+        try {
+            return this.submodelRepositoryQueryApiClient.querySubmodel(limit, cursor, query);
+        } catch (Exception e)    {
+            LOG.error("Error while querying submodel repository: " + e.getMessage(), e);
+            return null;
+        }
     }
 
     public String getSubmodelRepositoryUrl() {

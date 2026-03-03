@@ -1,26 +1,24 @@
 package org.eclipse.slm.resource_management.common.remote_access;
 
 import org.eclipse.slm.resource_management.common.resources.ResourceUpdatedListener;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface RemoteAccessManager {
 
-    List<UUID> getRemoteAccessServiceIdsOfResource(UUID resourceId);
+    List<RemoteAccessDTOReadMinimal> getRemoteAccessesOfResource(UUID resourceId, String jwtAccessToken);
 
-    RemoteAccessDTO getRemoteAccessService(UUID resourceId, UUID remoteAccessId, JwtAuthenticationToken jwtAuthenticationToken);
+    List<UUID> getRemoteAccessIdsOfResource(UUID resourceId, String jwtAccessToken);
 
-    void deleteRemoteAccess(UUID resourceId, UUID remoteAccessId);
+    RemoteAccessDTOReadFull getRemoteAccessByIdOrThrow(UUID resourceId, UUID remoteAccessId, String jwtAccessToken) throws RemoteAccessRuntimeException;
 
-    RemoteAccessDTO addUsernamePasswordRemoteAccessService(
-            String ownerUserId,
+    void deleteRemoteAccessById(UUID resourceId, UUID remoteAccessId, String jwtAccessToken, boolean deleteCredentialIfOrphaned);
+
+    RemoteAccessDTOReadFull addRemoteAccessForResource(
             UUID resourceId,
-            ConnectionType connectionType,
-            int connectionPort,
-            String username,
-            String password
+            RemoteAccessCreateDTO remoteAccess,
+            String userAccessToken
     );
 
     void registerResourceUpdatedListener(ResourceUpdatedListener resourceUpdatedListener);

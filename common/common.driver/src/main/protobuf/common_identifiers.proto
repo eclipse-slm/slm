@@ -45,7 +45,7 @@ message GetIdentifiersRequest {
 
 
 message GetIdentifiersResponse {
-    repeated DeviceIdentifier identifiers = 1;
+   repeated DeviceIdentifier identifiers = 1;
 }
 
 // ==================================================================
@@ -58,7 +58,7 @@ message GetSupportedSemanticsRequest {
 }
 
 message GetSupportedSemanticsResponse {
-    repeated SupportedSemantic supportedSemantic = 1;
+  repeated SupportedSemantic supportedSemantic = 1;
 }
 
 
@@ -104,7 +104,7 @@ message SupportedSemantic {
     // Human readable name of the identifier, e.g. "Manufacturer"
     string name = 1;
     // List of semantic identifiers
-    repeated SemanticClassifier classifiers = 2;
+	repeated SemanticClassifier classifiers = 2;
 }
 
 message SemanticClassifier {
@@ -112,7 +112,7 @@ message SemanticClassifier {
     // supported default classifier:
     // "IRDI": e.g. for "CDD" or "eClass" classifier)
     // "URI": e.g. for JSON-Link
-    string type = 1;
-    // The value of the semantic identifier, e.g. "0112/2///61987#ABA565#007" (IEC CDD/IRDI "Manufacturer")
-    string value = 2;
+	string type = 1;
+	// The value of the semantic identifier, e.g. "0112/2///61987#ABA565#007" (IEC CDD/IRDI "Manufacturer")
+	string value = 2;
 }

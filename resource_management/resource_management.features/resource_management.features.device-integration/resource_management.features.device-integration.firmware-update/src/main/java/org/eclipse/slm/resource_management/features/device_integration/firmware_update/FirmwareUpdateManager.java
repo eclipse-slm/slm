@@ -15,7 +15,9 @@ import org.eclipse.slm.common.keycloak.client.KeycloakServiceClient;
 import org.eclipse.slm.common.minio.client.MinioClient;
 import org.eclipse.slm.common.minio.model.exceptions.*;
 import org.eclipse.slm.common.utils.files.FileDownloader;
+import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.common.aas.ResourceAas;
+import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialsManager;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceTypeNotFoundException;
 import org.eclipse.slm.resource_management.common.resource_types.ResourceTypesManager;
 import org.eclipse.slm.resource_management.features.device_integration.firmware_update.exceptions.FirmwareUpdateFileNotFoundException;
@@ -34,6 +36,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import org.eclipse.slm.common.credentials.model.CredentialEntityLinkCreateDTO;
+import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialEntityType;
+import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialScope;
 
 @Component
 public class FirmwareUpdateManager {
@@ -58,12 +64,15 @@ public class FirmwareUpdateManager {
 
     private final KeycloakServiceClient keycloakServiceClient;
 
+    private final ResourceCredentialsManager resourceCredentialsManager;
+
     public FirmwareUpdateManager(@Value("${deployment.url}")String resourceManagementDeploymentUrl,
                                  ResourcesManager resourcesManager, ResourceTypesManager resourceTypesManager, FirmwareUpdateJobJpaRepository firmwareUpdateJobRepository,
                                  AasRepositoryClientFactory aasRepositoryClientFactory,
                                  SubmodelRegistryClientFactory submodelRegistryClientFactroy,
                                  MinioClient minioClient,
-                                 KeycloakServiceClient keycloakServiceClient) {
+                                 KeycloakServiceClient keycloakServiceClient,
+                                 ResourceCredentialsManager resourceCredentialsManager) {
         this.resourceManagementDeploymentUrl = resourceManagementDeploymentUrl;
         this.resourcesManager = resourcesManager;
         this.resourceTypesManager = resourceTypesManager;
@@ -72,6 +81,7 @@ public class FirmwareUpdateManager {
         this.submodelRegistryClient = submodelRegistryClientFactroy.getClient();
         this.minioClient = minioClient;
         this.keycloakServiceClient = keycloakServiceClient;
+        this.resourceCredentialsManager = resourceCredentialsManager;
     }
 
     @PostConstruct
@@ -105,7 +115,8 @@ public class FirmwareUpdateManager {
         updateInformation.setAvailableFirmwareVersions(availableFirmwareVersions);
 
         FirmwareVersionDetails currentFirmwareVersion = null;
-        var resource = this.resourcesManager.getResourceByIdOrThrow(jwtAuthenticationToken, resourceId);
+        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
+        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, accessToken);
 
         for (int i = 0; i < availableFirmwareVersions.size(); i++) {
             var firmwareVersion = availableFirmwareVersions.get(i);
@@ -420,6 +431,34 @@ public class FirmwareUpdateManager {
                 this.minioClient.removeObject(FirmwareUpdateManager.FIRMWARE_UPDATE_BUCKET_NAME, objectName);
                 LOG.debug("Removed firmware update file '" + objectItem.objectName() + "' for software nameplate id (Base64): " + softwareNameplateIdBase64Encoded);
             }
+        }
+    }
+
+    public void assignFirmwareUpdateCredentialToResource(UUID resourceId, UUID credentialId, String userAccessToken) {
+        var entityLink = new CredentialEntityLinkCreateDTO(ResourceCredentialEntityType.RESOURCE.toString(), resourceId.toString());
+        resourceCredentialsManager.addEntityLinksToCredential(credentialId, List.of(entityLink), userAccessToken);
+        resourceCredentialsManager.addCredentialScopes(
+                credentialId,
+                List.of(ResourceCredentialScope.FIRMWARE_UPDATE.name()),
+                userAccessToken);
+    }
+
+    public void unassignFirmwareUpdateCredentialFromResource(UUID resourceId, UUID credentialId, String userAccessToken, boolean deleteIfOrphaned) {
+        var credential = resourceCredentialsManager.getCredentialByIdForUser(credentialId, userAccessToken);
+        var hasOtherScopes = credential.getScopes().stream().anyMatch(scope -> !ResourceCredentialScope.FIRMWARE_UPDATE.equals(scope));
+
+        resourceCredentialsManager.removeCredentialScopes(
+                credentialId,
+                List.of(ResourceCredentialScope.FIRMWARE_UPDATE.name()),
+                userAccessToken);
+
+        if (!hasOtherScopes) {
+            resourceCredentialsManager.deleteCredentialEntityLink(
+                    credentialId,
+                    ResourceCredentialEntityType.RESOURCE,
+                    resourceId,
+                    deleteIfOrphaned,
+                    userAccessToken);
         }
     }
 }

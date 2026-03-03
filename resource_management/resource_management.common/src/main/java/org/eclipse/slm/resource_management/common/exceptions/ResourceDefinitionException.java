@@ -11,4 +11,9 @@ public class ResourceDefinitionException extends Exception {
         super(message);
     }
 
+    public ResourceDefinitionException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
+
 }

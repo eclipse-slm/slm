@@ -4,12 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.slm.common.awx.client.AwxCredential;
 import org.eclipse.slm.common.awx.client.observer.*;
 import org.eclipse.slm.common.awx.model.*;
-import org.eclipse.slm.common.consul.client.ConsulCredential;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
-import org.eclipse.slm.common.keycloak.client.KeycloakServiceClient;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
-import org.eclipse.slm.resource_management.features.capabilities.CapabilitiesService;
 import org.eclipse.slm.resource_management.features.capabilities.CapabilityUtil;
 import org.eclipse.slm.resource_management.features.capabilities.exceptions.CapabilityRuntimeException;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
@@ -17,12 +13,10 @@ import org.eclipse.slm.resource_management.features.capabilities.model.Capabilit
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType;
 import org.eclipse.slm.resource_management.features.capabilities.model.awx.AwxAction;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.SingleHostCapabilitiesConsulClient;
-import org.eclipse.slm.resource_management.features.capabilities.persistence.SingleHostCapabilitiesVaultClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.*;
@@ -34,10 +28,6 @@ import java.util.concurrent.TimeUnit;
 
 public class CapabilityJobExecutor implements IAwxJobObserverListener {
     private final static Logger LOG = LoggerFactory.getLogger(CapabilityJobExecutor.class);
-
-    private final CapabilitiesService capabilitiesService;
-
-    private final CapabilityUtil capabilityUtil;
 
     private final ObjectMapper objectMapper;
 
@@ -57,16 +47,12 @@ public class CapabilityJobExecutor implements IAwxJobObserverListener {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final Map<AwxJobObserver, ScheduledFuture<?>> awxJobObserverTimeouts = new HashMap<>();
 
-    public CapabilityJobExecutor(CapabilitiesService capabilitiesService,
-                                 CapabilityUtil capabilityUtil,
-                                 AwxJobExecutor awxJobExecutor,
+    public CapabilityJobExecutor(AwxJobExecutor awxJobExecutor,
                                  AwxJobObserverInitializer awxJobObserverInitializer,
                                  SingleHostCapabilitiesConsulClient singleHostCapabilitiesConsulClient,
                                  @NonNull CapabilityJob capabilityJob,
                                  @NonNull CapabilityService capabilityService,
                                  @Value("${resource-management.capabilities.awx-job-timeout-in-minutes:20}") int awxJobTimeoutInMin) {
-        this.capabilitiesService = capabilitiesService;
-        this.capabilityUtil = capabilityUtil;
         this.awxJobExecutor = awxJobExecutor;
         this.awxJobObserverInitializer = awxJobObserverInitializer;
         this.singleHostCapabilitiesConsulClient = singleHostCapabilitiesConsulClient;
@@ -99,15 +85,14 @@ public class CapabilityJobExecutor implements IAwxJobObserverListener {
 
         try {
             var awxCredential = new AwxCredential(jwtAuthenticationToken);
-            var consulCredential = new ConsulCredential();
 
-            Map<String, String> secretConfigParams = capabilityUtil.getSecretConfigParameter(capability, configParameters);
-            Map<String, String> nonSecretConfigParams = capabilityUtil.getNonSecretConfigParameter(capability, configParameters);
+            Map<String, String> secretConfigParams = CapabilityUtil.getSecretConfigParameter(capability, configParameters);
+            Map<String, String> nonSecretConfigParams = CapabilityUtil.getNonSecretConfigParameter(capability, configParameters);
 
             Map<String, Object> extraVars = new HashMap<>();
             extraVars.put("keycloak_token", KeycloakTokenUtil.getToken(jwtAuthenticationToken));
             extraVars.put("resource_id", resourceId.toString());
-            extraVars.put("service_name", capabilityService.getService());
+            extraVars.put("service_name", capabilityService.getServiceName());
             extraVars.put("supported_connection_types", capabilityInstallAction.getConnectionTypes());
             if(!nonSecretConfigParams.isEmpty())
                 extraVars.put("consul_service_meta", objectMapper.writeValueAsString(nonSecretConfigParams));
@@ -152,13 +137,11 @@ public class CapabilityJobExecutor implements IAwxJobObserverListener {
 
         try {
             var awxCredential = new AwxCredential(jwtAuthenticationToken);
-            var consulCredential = new ConsulCredential();
-
             var uninstallAction = (AwxAction) capability.getActions().get(ActionType.UNINSTALL);
             Map<String, Object> extraVars = new HashMap<>();
             extraVars.put("keycloak_token", KeycloakTokenUtil.getToken(jwtAuthenticationToken));
             extraVars.put("resource_id", resourceId.toString());
-            extraVars.put("service_name", capabilityService.getService());
+            extraVars.put("service_name", capabilityService.getServiceName());
             extraVars.put("supported_connection_types", uninstallAction.getConnectionTypes());
 
             int awxJobId = awxJobExecutor.executeJob(
@@ -168,7 +151,7 @@ public class CapabilityJobExecutor implements IAwxJobObserverListener {
             );
 
             capabilityService.setStatus(CapabilityServiceStatus.UNINSTALL);
-            singleHostCapabilitiesConsulClient.updateCapabilityService(consulCredential, resourceId, capabilityService);
+            singleHostCapabilitiesConsulClient.updateCapabilityService(resourceId, capabilityService);
 
             var awxJobObserver = this.awxJobObserverInitializer.initNewObserver(awxJobId, JobTarget.DEPLOYMENT_CAPABILITY, JobGoal.DELETE, this);
 

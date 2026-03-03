@@ -1,6 +1,5 @@
 package org.eclipse.slm.resource_management.features.capabilities.jobs;
 
-import org.eclipse.slm.resource_management.features.capabilities.dto.CapabilityJobDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

@@ -1,10 +1,6 @@
 package org.eclipse.slm.common.aas.clients.submodelregistry;
 
 import org.apache.logging.log4j.util.Base64Util;
-import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException;
-import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.SerializationException;
-import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonDeserializer;
-import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonSerializer;
 import org.eclipse.digitaltwin.aas4j.v3.model.*;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.*;
 import org.eclipse.slm.common.aas.clients.auth.AuthRequestInterceptor;

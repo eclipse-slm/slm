@@ -19,9 +19,14 @@ spring:
       discovery:
         acl-token: ${consul.acl-token}
         register: false
+        query-passing: false
 
 resource-management:
-  url: http://localhost:9010
+  scheme: http
+  host: localhost
+  port: 9010
+  path: /resource-management
+  url: ${resource-management.scheme}://${resource-management.host}:${resource-management.port}${resource-management.path}
   init-directories: init/
 
 keycloak:

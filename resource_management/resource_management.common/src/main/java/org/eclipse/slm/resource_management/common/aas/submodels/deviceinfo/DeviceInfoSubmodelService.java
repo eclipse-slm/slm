@@ -3,6 +3,7 @@ package org.eclipse.slm.resource_management.common.aas.submodels.deviceinfo;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.slm.common.aas.repositories.submodels.AbstractSubmodelService;
 import org.eclipse.slm.common.keycloak.client.KeycloakServiceClient;
+import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.common.aas.ResourceAas;
 import org.eclipse.slm.resource_management.common.resources.ResourcesManager;
 import org.slf4j.Logger;
@@ -14,7 +15,7 @@ import java.util.UUID;
 
 public class DeviceInfoSubmodelService extends AbstractSubmodelService {
 
-    public final static Logger LOG = LoggerFactory.getLogger(DeviceInfoSubmodelService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DeviceInfoSubmodelService.class);
 
     private String aasId;
 
@@ -45,8 +46,9 @@ public class DeviceInfoSubmodelService extends AbstractSubmodelService {
         } catch (SSLException e) {
             throw new RuntimeException(e);
         }
+        var accessToken = KeycloakTokenUtil.getToken(resourceManagementJwtAuthentication);
 
-        var resource = resourcesManager.getResourceByIdOrThrow(resourceManagementJwtAuthentication, resourceId);
+        var resource = resourcesManager.getResourceByIdOrThrow(resourceId, accessToken);
 
         return new DeviceInfoSubmodel(resource);
     }

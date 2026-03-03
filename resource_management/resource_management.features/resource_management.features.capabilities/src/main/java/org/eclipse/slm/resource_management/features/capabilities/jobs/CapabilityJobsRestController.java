@@ -2,7 +2,6 @@ package org.eclipse.slm.resource_management.features.capabilities.jobs;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.eclipse.slm.resource_management.features.capabilities.dto.CapabilityJobDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,12 +43,13 @@ public class CapabilityJobsRestController {
             @PathVariable(name = "resourceId")                                                   UUID resourceId,
             @RequestParam(name = "capabilityId")                                                 UUID capabilityId,
             @RequestParam(name = "skipInstall", required = false, defaultValue = "false")        boolean skipInstall,
-            @RequestParam(name = "forceInstall", required = false, defaultValue = "false")        boolean forceInstall,
+            @RequestParam(name = "forceInstall", required = false, defaultValue = "false")       boolean forceInstall,
+            @RequestParam(name = "fullPathOwnerGroupId", required = true)                        String fullPathOwnerGroupId,
             @RequestBody Map<String, String> configParameters
     ) throws Exception {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-        this.capabilityJobService.initCapabilityJob(jwtAuthenticationToken, resourceId, capabilityId, skipInstall, configParameters, forceInstall);
+        this.capabilityJobService.initCapabilityJob(jwtAuthenticationToken, resourceId, capabilityId, skipInstall, configParameters, forceInstall, fullPathOwnerGroupId);
 
         return ResponseEntity.ok().build();
     }
