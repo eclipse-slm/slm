@@ -115,6 +115,9 @@ management:
 security:
   auth-white-list: ""
   origins: "*"
+  api-key-auth:
+    enabled: false
+    value: "your-secret-api-key"
 
 ### Keycloak
 keycloak:

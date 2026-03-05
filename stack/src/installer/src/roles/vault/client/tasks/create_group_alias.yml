@@ -50,4 +50,11 @@
       mount_accessor: "{{ __mount_accessor }}"
       canonical_id: "{{ __group_id }}"
   register: output_create_group_alias
+  failed_when: >
+    output_create_group_alias.status == 400 and
+    (
+      output_create_group_alias.json is not defined or
+      output_create_group_alias.json.errors is not defined or
+      ('combination of mount and group alias name is already in use' not in (output_create_group_alias.json.errors | join(' ')))
+    )
   changed_when: output_create_group_alias.status in [200, 204]
