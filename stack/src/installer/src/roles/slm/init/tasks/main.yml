@@ -11,6 +11,8 @@
     database_port: "{{ item.database_port }}"
     database_user_username: "{{ item.database_user_username }}"
     database_schema: "{{ item.app_name }}"
+    security_auth_api_key_enabled: "{{ item.security_auth_api_key_enabled | default(false) }}"
+    security_auth_api_key_value: "{{ item.security_auth_api_key_value | default('') }}"
   with_items:
     - app_name: platform_management
       database_host: "{{ ENV.PLATFORM_MANAGEMENT.DATABASE.HOST.INTERNAL }}"
@@ -19,6 +21,8 @@
       host: "{{ ENV.PLATFORM_MANAGEMENT.HOST.INTERNAL }}"
       port: "{{ ENV.PLATFORM_MANAGEMENT.PORT.INTERNAL | int }}"
       consul_app_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+      security_auth_api_key_enabled: true
+      security_auth_api_key_value: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
     - app_name: service_management
       database_host: "{{ ENV.SERVICE_MANAGEMENT.DATABASE.HOST.INTERNAL }}"
       database_port: "{{ ENV.SERVICE_MANAGEMENT.DATABASE.PORT.INTERNAL }}"
@@ -96,7 +100,54 @@
   include_tasks:
     file: "configure_vault.yml"
 
-- name: "Start internal SLM components"
+- name: "Start SLM components | Platform Management"
+  block:
+    - set_fact:
+        slm_compose: "{{ lookup('template', 'slm-platform-management.yml') }}"
+    - name: "Start containers"
+      delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+      community.docker.docker_compose_v2:
+        project_name: eclipse-slm
+        definition: "{{ slm_compose | from_yaml }}"
+        state: present
+        pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+    - name: "Store resulting compose files"
+      template:
+        src: "slm-platform-management.yml"
+        dest: "{{ _store_compose_file }}"
+      when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
+- name: "Create SLM default users"
+  block:
+    - name: "Wait for Platform Management ('{{ platform_management.url.internal }}/actuator/health') being up"
+      uri:
+        url: "{{ platform_management.url.internal }}/actuator/health"
+        status_code: 200
+        return_content: true
+      register: result
+      until: result.json is defined and result.json.status == 'UP'
+      retries: 120
+      delay: 3
+    - name: "Create user '{{ USER.USERNAME }}' via Platform Management API"
+      uri:
+        url: "{{ platform_management.url.internal }}/users"
+        method: POST
+        body_format: json
+        headers:
+          X-API-KEY: "{{ app_configs['platform_management']['security']['api-key-auth']['value'] }}"
+        body:
+          username: "{{ USER.USERNAME }}"
+          firstName: "{{ USER.FIRSTNAME }}"
+          lastName: "{{ USER.LASTNAME }}"
+          password: "{{ USER.PASSWORD }}"
+          isPasswordTemporary: "{{ USER.IS_PASSWORD_TEMPORARY }}"
+          email: "{{ USER.EMAIL }}"
+        status_code: 200, 201
+      loop: "{{ ENV.USERS }}"
+      loop_control:
+        loop_var: USER
+
+- name: "Start SLM components | Rest of SLM components"
   block:
     - set_fact:
         slm_compose: "{{ lookup('template', 'slm.yml') }}"
@@ -107,12 +158,11 @@
         definition: "{{ slm_compose | from_yaml}}"
         state: present
         pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
-
-- name: "Store resulting compose file"
-  template:
-    src: "slm.yml"
-    dest: "{{ _store_compose_file }}"
-  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+    - name: "Store resulting compose files"
+      template:
+        src: "slm.yml"
+        dest: "{{ _store_compose_file }}"
+      when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
 
 - name: "Register UI at Consul (discovery server)"
   include_role:
@@ -128,7 +178,7 @@
       - "exposed"
       - "traefik.http.routers.ui.rule=PathPrefix(`/`)"
 
-- name: "Start SLM catalog"
+- name: "Start SLM components | Catalog Service"
   block:
     - set_fact:
         catalog_compose: "{{ lookup('template', 'catalog.yml') }}"
@@ -139,9 +189,8 @@
         definition: "{{ catalog_compose | from_yaml }}"
         state: present
         pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
-
-- name: "Store resulting compose file"
-  template:
-    src: "catalog.yml"
-    dest: "{{ _store_compose_file }}_catalog"
-  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+    - name: "Store resulting compose file"
+      template:
+        src: "catalog.yml"
+        dest: "{{ _store_compose_file }}_catalog"
+      when: (_store_compose_file is defined) and (_store_compose_file|length > 0)

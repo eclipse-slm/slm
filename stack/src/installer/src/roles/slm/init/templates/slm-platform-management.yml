@@ -1,0 +1,57 @@
+services:
+
+  platform-management:
+    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm/platform-management:{{ ENV.SLM_VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
+    environment:
+      DEPLOYMENT_URL: "{{ platform_management.url.proxy }}"
+      CONSUL_SCHEME: "{{ app_configs['platform_management']['consul']['scheme'] }}"
+      CONSUL_HOST: "{{ app_configs['platform_management']['consul']['host'] }}"
+      CONSUL_PORT: "{{ app_configs['platform_management']['consul']['port'] }}"
+      CONSUL_ACLTOKEN: "{{ app_configs['platform_management']['consul']['acl-token'] }}"
+      CONSUL_SERVICE_ADDRESS: "{{ ENV.PLATFORM_MANAGEMENT.HOST.INTERNAL }}"
+      CONSUL_SERVICE_PORT: "{{ ENV.PLATFORM_MANAGEMENT.PORT.INTERNAL }}"
+      MONITORING_SERVICE_URL: "{{ monitoring_service.url.proxy }}"
+    ports:
+      - "{{ ENV.PLATFORM_MANAGEMENT.PORT.EXTERNAL }}:{{ ENV.PLATFORM_MANAGEMENT.PORT.INTERNAL }}"
+    networks:
+      default:
+        aliases:
+          - "{{ ENV.PLATFORM_MANAGEMENT.HOST.INTERNAL }}"
+    extra_hosts:
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:9001/swagger-ui/index.html" ]
+
+  platform-management-database:
+    image: "mariadb:{{ ENV.RESOURCE_MANAGEMENT.DATABASE.VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
+    ports:
+      - "{{ ENV.PLATFORM_MANAGEMENT.DATABASE.PORT.EXTERNAL }}:{{ ENV.PLATFORM_MANAGEMENT.DATABASE.PORT.INTERNAL }}"
+    networks:
+      default:
+        aliases:
+          - "{{ ENV.PLATFORM_MANAGEMENT.DATABASE.HOST.INTERNAL }}"
+    environment:
+      MARIADB_ROOT_PASSWORD: "{{ app_configs['platform_management']['database']['root_password'] }}"
+      MARIADB_USER: "{{ app_configs['platform_management']['database']['username'] }}"
+      MARIADB_PASSWORD: "{{ app_configs['platform_management']['database']['password'] }}"
+      MARIADB_DATABASE: "{{ app_configs['platform_management']['database']['schema'] }}"
+    volumes:
+      - platform-management-database_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+
+volumes:
+  platform-management-database_data:
+

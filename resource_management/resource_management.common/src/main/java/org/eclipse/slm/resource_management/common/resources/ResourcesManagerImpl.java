@@ -153,6 +153,9 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
             }
 
             var resource = new BasicResource(resourceId, resourceHostname, resourceIp);
+            if (digitalNameplateV3 != null) {
+                assetId = digitalNameplateV3.getUriOfTheProduct();
+            }
             resource.setAssetId(assetId);
             resource.setFirmwareVersion(firmwareVersion);
             resource.setDriverId(driverId);

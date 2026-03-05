@@ -4,7 +4,6 @@
     that:
       - (keycloak.url.external is defined) and (keycloak.url.external|length > 0)
       - (ENV.KEYCLOAK.ADMIN_USERNAME is defined) and (ENV.KEYCLOAK.ADMIN_USERNAME|length > 0)
-      - (ENV.KEYCLOAK.DEFAULT_USER_PASSWORD is defined) and (ENV.KEYCLOAK.DEFAULT_USER_PASSWORD|length > 0)
       - (ENV.CONSUL.SCHEME.INTERNAL is defined) and (ENV.CONSUL.SCHEME.INTERNAL|length > 0)
       - (ENV.CONSUL.HOST.INTERNAL is defined) and (ENV.CONSUL.HOST.INTERNAL|length > 0)
       - (ENV.CONSUL.PORT.INTERNAL is defined)
@@ -169,17 +168,6 @@
       _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
       _keycloak_group: "{{ item }}"
     with_items: "{{ keycloak_groups_top_level }}"
-
-  - name: "Create users"
-    import_tasks: create_users.yml
-
-- name: "Update keycloak_config dictionary"
-  set_fact:
-    keycloak_config: "{{ keycloak_config | combine(
-  { 'default_user_username': keycloak_default_user.username,
-    'default_user_password': keycloak_default_user.credentials[0].value
-  }
-  , recursive=true) }}"
 
 - name: "Store resulting compose file"
   template:

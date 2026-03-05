@@ -71,6 +71,10 @@
           port: "{{ app_configs.rabbitmq.port }}"
           username: "{{ app_configs.rabbitmq.users[_app_name].username }}"
           password: "{{ app_configs.rabbitmq.users[_app_name].password }}"
+      security:
+        api-key-auth:
+          enabled: "{{ security_auth_api_key_enabled | default(false) }}"
+          value: "{{ security_auth_api_key_value | default('') }}"
 
 - name: "Store database config in Consul"
   include_role:
