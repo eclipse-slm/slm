@@ -105,7 +105,7 @@ public class ImporterService {
 
                     var credential = new Credential(UUID.randomUUID(), "",List.of(), new CredentialDataUsernamePassword(device.username, device.password));
                     var credentialCreateRequest = new CredentialCreateRequest(List.of(), credential, fullPathOwnerGroupId);
-                    platformManagementClientUser.credentials().createCredential(credentialCreateRequest);
+                    platformManagementClientUser.credentials().createOrUpdateCredential(credential.getId(), credentialCreateRequest);
 
                     this.remoteAccessManager.addRemoteAccessForResource(
                             device.resourceId,
