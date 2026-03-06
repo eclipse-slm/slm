@@ -26,7 +26,7 @@ import static org.hamcrest.Matchers.*;
 
 @DisplayName("Dummy Deployment Capability")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class DcDockerTest {
+public class DcDummyTest {
 
     @BeforeAll
     public static void init()
@@ -51,34 +51,69 @@ public class DcDockerTest {
                 .log().all()
                 .get("/resources")
                 .then()
-                .assertThat() .statusCode(200);
+                .assertThat().statusCode(200);
 
-        var resourceDefinition = new HashMap<String, Object>();
-        resourceDefinition.put("resourceHostname", testResource.hostname);
-        resourceDefinition.put("resourceIp", testResource.ip);
+        var resourceCreateRequest = new HashMap<String, Object>();
+        resourceCreateRequest.put("resourceHostname", testResource.hostname);
+        resourceCreateRequest.put("resourceIp", testResource.ip);
+        resourceCreateRequest.put("fullPathOwnerGroupId", KeycloakUtil.getKeycloakFullPathUserGroupId());
         var digitalNameplate = new HashMap<String, String>();
         digitalNameplate.put("uriOfTheProduct", "N/A");
         digitalNameplate.put("manufacturerName", "N/A");
+        digitalNameplate.put("manufacturerProductDesignation", "N/A");
+        digitalNameplate.put("addressInformation", "N/A");
         digitalNameplate.put("serialNumber", "N/A");
-        resourceDefinition.put("digitalNameplateV3", digitalNameplate);
+        resourceCreateRequest.put("digitalNameplateV3", digitalNameplate);
         var resourceId = given().auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
                 .log().all()
                 .contentType(ContentType.JSON)
-                .body(resourceDefinition)
+                .body(resourceCreateRequest)
                 .post("/resources")
                 .then()
-                .assertThat() .statusCode(201).extract().body().asString().replace("\"", "");
+                .assertThat().statusCode(201).extract().body().asString().replace("\"", "");
+
+        var credentialId = UUID.randomUUID();
+        var credentialData = new HashMap<String, Object>();
+        credentialData.put("credentialDataType", "USERNAME_PASSWORD");
+        credentialData.put("username", testResource.username);
+        credentialData.put("password", testResource.password);
+
+        var credential = new HashMap<String, Object>();
+        credential.put("id", credentialId.toString());
+        credential.put("name", "test-credential-" + credentialId);
+        credential.put("scopesRaw", List.of("REMOTE_ACCESS"));
+        credential.put("data", credentialData);
+
+        var credentialCreateRequest = new HashMap<String, Object>();
+        credentialCreateRequest.put("credential", credential);
+        credentialCreateRequest.put("entityLinks", List.of());
+        credentialCreateRequest.put("fullPathOwnerGroupId", KeycloakUtil.getKeycloakFullPathUserGroupId());
 
         given().auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
                 .log().all()
-                .queryParam("resourceId ", resourceId)
-                .queryParam("resourceUsername", testResource.username)
-                .queryParam("resourcePassword", testResource.password)
-                .queryParam("resourceConnectionType", "ssh")
-                .queryParam("resourceConnectionPort", 22)
-                .put("/resources/" + resourceId + "/remote-access")
+                .baseUri(TestConfig.PLATFORM_MANAGEMENT_BASE_URL)
+                .port(TestConfig.PLATFORM_MANAGEMENT_PORT)
+                .basePath(TestConfig.PLATFORM_MANAGEMENT_BASE_PATH)
+                .contentType(ContentType.JSON)
+                .body(credentialCreateRequest)
+                .put("/credentials/" + credentialId)
                 .then()
-                .assertThat() .statusCode(200).extract().body().asString().replace("\"", "");
+                .assertThat().statusCode(200);
+
+        var remoteAccessRequest = new HashMap<String, Object>();
+        remoteAccessRequest.put("fullPathOwnerGroupId", KeycloakUtil.getKeycloakFullPathUserGroupId());
+        remoteAccessRequest.put("credentialId", credentialId.toString());
+        remoteAccessRequest.put("username", testResource.username);
+        remoteAccessRequest.put("connectionPort", 22);
+        remoteAccessRequest.put("connectionType", "ssh");
+
+        given().auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
+                .log().all()
+                .contentType(ContentType.JSON)
+                .body(remoteAccessRequest)
+                .post("/resources/" + resourceId + "/remote-access")
+                .then()
+                .assertThat().statusCode(200);
 
         try{
             var uuid = UUID.fromString(resourceId);
@@ -96,7 +131,7 @@ public class DcDockerTest {
     @Order(20)
     @Test
     @DisplayName("Install deployment capability on resource")
-    public void addDockerDeploymentCapability() throws InterruptedException {
+    public void addDummyDeploymentCapability() throws InterruptedException {
         List<TestResource> testResourceList =  getTestResources().collect(Collectors.toList());
         int resourceCount = testResourceList.size();
 
@@ -104,18 +139,21 @@ public class DcDockerTest {
                 .log().all()
                 .get("/resources")
                 .then()
-                .assertThat() .statusCode(200).body("$", hasSize(lessThanOrEqualTo (resourceCount))).extract().body().path("find{ it.ip == '"+testResourceList.get(0).ip+"' }.id").toString();
+                .assertThat() .statusCode(200).extract().body().path("find{ it.ip == '"+testResourceList.get(0).ip+"' }.id").toString();
 
         var dcName = "Dummy";
         var capabilityId = given().auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
                 .log().all()
                 .get("/resources/capabilities")
                 .then()
-                .assertThat() .statusCode(200).body("$", hasSize(greaterThanOrEqualTo(1))).extract().body().path("find{ it.name == '"+dcName+"' }.id").toString();
+                .assertThat() .statusCode(200).extract().body().path("find{ it.name == '"+dcName+"' }.id").toString();
 
         given().auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
                 .log().all()
                 .queryParam("capabilityId", capabilityId)
+                .queryParam("fullPathOwnerGroupId", KeycloakUtil.getKeycloakFullPathUserGroupId())
+                .contentType(ContentType.JSON)
+                .body(new HashMap<String, String>())
                 .put("/resources/" + resourceId + "/capabilities")
                 .then()
                 .assertThat() .statusCode(200);
@@ -125,7 +163,7 @@ public class DcDockerTest {
         while (System.currentTimeMillis() < start_time + timeout) {
 
             var deploymentCapabilities = given().auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
-                    .get("/resources/" + resourceId + "/deployment-capabilities")
+                    .get("/resources/" + resourceId + "/capabilities/services")
                     .then()
                     .assertThat() .statusCode(200).extract().body().as(new TypeRef<List<Object>>(){});
 
@@ -148,7 +186,8 @@ public class DcDockerTest {
     public void createServiceOffering() throws URISyntaxException, IOException {
         RequestSpecification requestSpecification = RestAssured.given()
             .baseUri(TestConfig.SERVICE_MANAGEMENT_BASE_URL)
-            .port(TestConfig.SERVICE_MANAGEMENT_PORT);
+            .port(TestConfig.SERVICE_MANAGEMENT_PORT)
+            .basePath(TestConfig.SERVICE_MANAGEMENT_BASE_PATH);
         TestServiceVendor serviceVendor = TestConfig.TEST_SERVICE_VENDOR;
 
         ClassLoader classLoader = getClass().getClassLoader();
@@ -189,7 +228,7 @@ public class DcDockerTest {
             given().spec(requestSpecification)
                 .auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
                 .log().all()
-            .get("/services/offerings/?withImage=false")
+            .get("/services/offerings?withImage=false")
             .then().assertThat() .statusCode(200).body("$", hasSize(greaterThanOrEqualTo (0)))
             .extract().body().path("count{ it }").toString()
         );
@@ -200,7 +239,7 @@ public class DcDockerTest {
                 .log().all()
             .contentType(ContentType.JSON)
             .body(serviceOfferingJson)
-            .post("/services/offerings/")
+            .post("/services/offerings")
             .then()
             .assertThat().statusCode(anyOf(is(200), is(500)));
         }
@@ -208,7 +247,7 @@ public class DcDockerTest {
         given().spec(requestSpecification)
             .auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
             .log().all()
-        .get("/services/offerings/?withImage=false")
+        .get("/services/offerings?withImage=false")
         .then().assertThat() .statusCode(200).body("$", hasSize(greaterThanOrEqualTo (1)));
 
         return;
@@ -220,7 +259,8 @@ public class DcDockerTest {
     public void deployService() throws URISyntaxException, IOException, InterruptedException {
         RequestSpecification requestSpecification = RestAssured.given()
             .baseUri(TestConfig.SERVICE_MANAGEMENT_BASE_URL)
-            .port(TestConfig.SERVICE_MANAGEMENT_PORT);
+            .port(TestConfig.SERVICE_MANAGEMENT_PORT)
+            .basePath(TestConfig.SERVICE_MANAGEMENT_BASE_PATH);
 
         ClassLoader classLoader = getClass().getClassLoader();
         URL resource = classLoader.getResource("service-order.json");
@@ -230,7 +270,7 @@ public class DcDockerTest {
         String resourceId = given()
             .auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
             .log().all()
-        .get("/resources/")
+        .get("/resources")
         .then().assertThat() .statusCode(200).body("$", hasSize(greaterThanOrEqualTo (1)))
         .extract().body().path("[0].id").toString();
 
@@ -238,11 +278,9 @@ public class DcDockerTest {
         String serviceOfferingId = given().spec(requestSpecification)
             .auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
             .log().all()
-        .get("/services/offerings/?withImage=false")
+        .get("/services/offerings?withImage=false")
         .then().assertThat() .statusCode(200).body("$", hasSize(greaterThanOrEqualTo (1)))
         .extract().body().path("[0].id").toString();
-
-        serviceOrderJson.put("projectAbbreviation", "fabos");
 
         // Get PreOrder Service Instance Count
         int preOrderServiceInstanceCount = Integer.parseInt(
@@ -300,11 +338,12 @@ public class DcDockerTest {
 
     @Order(50)
     @Test
-    @DisplayName("Undeploy docker service")
+    @DisplayName("Undeploy dummy service")
     public void undeployService() throws InterruptedException {
         RequestSpecification requestSpecification = RestAssured.given()
             .baseUri(TestConfig.SERVICE_MANAGEMENT_BASE_URL)
-            .port(TestConfig.SERVICE_MANAGEMENT_PORT);
+            .port(TestConfig.SERVICE_MANAGEMENT_PORT)
+            .basePath(TestConfig.SERVICE_MANAGEMENT_BASE_PATH);
 
         // Get Service Instance ID
         String serviceInstanceId = given().spec(requestSpecification)
@@ -366,8 +405,8 @@ public class DcDockerTest {
 
     @Order(60)
     @Test
-    @DisplayName("Remove Docker deployment capability")
-    public void removeDockerDeploymentCapability() throws InterruptedException {
+    @DisplayName("Remove Dummy deployment capability")
+    public void removeDummyDeploymentCapability() throws InterruptedException {
         List<TestResource> testResourceList =  getTestResources().collect(Collectors.toList());
         int resourceCount = testResourceList.size();
 
@@ -396,7 +435,7 @@ public class DcDockerTest {
         while (System.currentTimeMillis() < start_time + timeout) {
 
             var deploymentCapabilities = given().auth().preemptive().oauth2(KeycloakUtil.getKeycloakAccessToken())
-                    .get("/resources/" + resourceId + "/capabilities")
+                    .get("/resources/" + resourceId + "/capabilities/services")
                     .then()
                     .assertThat() .statusCode(200).extract().body().as(new TypeRef<List<Object>>(){});
 

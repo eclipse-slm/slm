@@ -218,9 +218,12 @@ public class ResourcesRestControllerIT {
         public void addNewResource() throws Exception {
             var testResource = ResourcesRestControllerITHelper.getTestResource();
             var path = ResourcesRestApiConfig.BASE_PATH;
-            var resourceCreateRequest = new CreateResourceRequest();
-            resourceCreateRequest.setResourceHostname(testResource.getHostname());
-            resourceCreateRequest.setResourceIp(testResource.getIp());
+            var resourceCreateRequest = new CreateResourceRequest(
+                    testResource.getHostname(),
+                    testResource.getIp(),
+                    null,
+                    "/test/group"
+            );
             var objectMapper = new ObjectMapper();
             var jsonBody = objectMapper.writeValueAsString(resourceCreateRequest);
 
@@ -257,9 +260,12 @@ public class ResourcesRestControllerIT {
         public void addExistingResource() throws Exception {
             var testResource = ResourcesRestControllerITHelper.getTestResource();
             var path = ResourcesRestApiConfig.BASE_PATH + "/" + testResource.getId();
-            var resourceCreateRequest = new CreateResourceRequest();
-            resourceCreateRequest.setResourceHostname(testResource.getHostname());
-            resourceCreateRequest.setResourceIp(testResource.getIp());
+            var resourceCreateRequest = new CreateResourceRequest(
+                    testResource.getHostname(),
+                    testResource.getIp(),
+                    null,
+                    "/test/group"
+            );
             var objectMapper = new ObjectMapper();
             var jsonBody = objectMapper.writeValueAsString(resourceCreateRequest);
 

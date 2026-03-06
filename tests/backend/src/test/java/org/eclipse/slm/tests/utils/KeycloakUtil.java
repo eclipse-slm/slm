@@ -13,30 +13,41 @@ public class KeycloakUtil {
 
     public static String getKeycloakAccessToken()
     {
-        String accessToken = given().spec(TestConfig.KEYCLOAK_SERVICE_SPEC)
+        try {
+            String accessToken = given().spec(TestConfig.KEYCLOAK_SERVICE_SPEC)
                     .header("Content-Type", "application/x-www-form-urlencoded")
                     .formParam("grant_type", "password")
                     .formParam("client_id", "ui")
                     .formParam("username", TestConfig.KEYCLOAK_USERNAME)
                     .formParam("password", TestConfig.KEYCLOAK_PASSWORD)
-//                .log().all()
-                .post("/protocol/openid-connect/token")
-                .then()
-//                .log().all()
-                .assertThat().statusCode(200)
+                    .post("/protocol/openid-connect/token")
+                    .then()
+                    .assertThat().statusCode(200)
                     .extract().response().jsonPath().getString("access_token");
 
-        return accessToken;
+            return accessToken;
+        } catch (Exception ex) {
+            throw new KeycloakAuthException("Failed to obtain access token from Keycloak", ex);
+        }
     }
 
-    public static String getKeycloakUserUuid() throws JsonProcessingException {
-        String accessToken = getKeycloakAccessToken();
-        String[] chunks = accessToken.split("\\.");
-        Base64.Decoder decoder = Base64.getUrlDecoder();
-        String payload = new String(decoder.decode(chunks[1]));
-        JsonNode jsonNode = new ObjectMapper().readTree(payload);
+    public static String getKeycloakUserUuid() throws KeycloakAuthException {
+        try {
+            String accessToken = getKeycloakAccessToken();
+            String[] chunks = accessToken.split("\\.");
+            Base64.Decoder decoder = Base64.getUrlDecoder();
+            String payload = new String(decoder.decode(chunks[1]));
+            JsonNode jsonNode = new ObjectMapper().readTree(payload);
 
-        return jsonNode.get("sub").asText();
+            return jsonNode.get("sub").asText();
+        } catch (JsonProcessingException e) {
+            throw new KeycloakAuthException("Failed to parse access token", e);
+        }
+    }
+
+    public static String getKeycloakFullPathUserGroupId() throws KeycloakAuthException {
+        var userId = getKeycloakUserUuid();
+        return "/users/" + userId;
     }
 
 }

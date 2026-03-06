@@ -361,8 +361,6 @@ public class DcDockerSwarmTest {
 //        .then().assertThat() .statusCode(200).body("$", hasSize(greaterThanOrEqualTo (1)))
 //        .extract().body().path("[0].id").toString();
 //
-//        serviceOrderJson.put("projectAbbreviation", "fabos");
-//
 //        // Get PreOrder Service Instance Count
 //        int preOrderServiceInstanceCount = Integer.parseInt(
 //            given().spec(requestSpecification)
