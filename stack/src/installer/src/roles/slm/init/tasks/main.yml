@@ -114,7 +114,7 @@
     - name: "Store resulting compose files"
       template:
         src: "slm-platform-management.yml"
-        dest: "{{ _store_compose_file }}"
+        dest: "{{ _store_compose_file }}_platform_management"
       when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
 
 - name: "Create SLM default users"
