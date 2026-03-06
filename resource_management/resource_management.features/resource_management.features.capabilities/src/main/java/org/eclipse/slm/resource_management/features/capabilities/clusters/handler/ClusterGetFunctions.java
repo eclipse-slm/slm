@@ -54,10 +54,7 @@ public class ClusterGetFunctions extends AbstractClusterFunctions {
             List<MultiHostCapabilityService> multiHostCapabilityServices = this.multiHostCapabilitiesConsulClient.getMultiHostCapabilitiesServicesOfUser();
 
             for (MultiHostCapabilityService multiHostCapabilityService : multiHostCapabilityServices) {
-                var nodes = this.multiHostCapabilitiesConsulClient.getNodesOfMultiHostCapabilityService(
-                        
-                        multiHostCapabilityService.getId()
-                );
+                var nodes = this.multiHostCapabilitiesConsulClient.getNodesOfMultiHostCapabilityService(multiHostCapabilityService.getId());
 
                 // pull vault data (secrets) for cluster
                 Map<String, String> secretsOfClusterFromVault = new HashMap<>();
@@ -69,13 +66,13 @@ public class ClusterGetFunctions extends AbstractClusterFunctions {
                 }
 
                 // create cluster with data from service (consul) and vault
-                Cluster cluster = new Cluster(
-                        multiHostCapabilityService,
-                        nodes,
-                        secretsOfClusterFromVault
-                );
-
-                clusterList.add(cluster);
+//                Cluster cluster = new Cluster(
+//                        multiHostCapabilityService,
+//                        nodes,
+//                        secretsOfClusterFromVault
+//                );
+//
+//                clusterList.add(cluster);
             }
 
             return clusterList;

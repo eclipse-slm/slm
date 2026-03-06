@@ -194,7 +194,7 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
             multiHostCapabilitiesConsulClient.scaleMultiHostCapabilityService(
                     
                     scaleOperation,
-                    multiHostCapabilityService.getId()
+                    multiHostCapabilityService.getServiceId()
             );
 
             this.notificationMessageSender.sendMessage(new NotificationEventMessage(

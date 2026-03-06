@@ -109,7 +109,7 @@ public class SingleHostCapabilitiesConsulClient {
         var capabilityService = SingleHostCapabilityService.createFromNodeService(capabilityNodeService.get(), resourceId, capability);
         this.adminConsulClient.services().removeServiceByName(resourceId, capabilityService.getServiceName());
         // Remove capability service policy
-        var policyName = CapabilitiesConsulClient.getCapabilityServicePolicyName(capabilityService.getId());
+        var policyName = CapabilitiesConsulClient.getCapabilityServicePolicyName(capabilityService.getServiceId());
         var policy = this.adminConsulClient.acl().getPolicyByNameOrThrow(policyName);
         this.adminConsulClient.acl().deletePolicyById(policy.getId());
     }

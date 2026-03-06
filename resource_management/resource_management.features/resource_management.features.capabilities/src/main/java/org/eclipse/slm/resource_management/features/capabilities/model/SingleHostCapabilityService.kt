@@ -26,7 +26,7 @@ class SingleHostCapabilityService : CapabilityService {
         fun createFromNodeService(nodeService: NodeService, nodeId: UUID, capability: Capability): SingleHostCapabilityService {
             var singleHostCapabilityService = SingleHostCapabilityService(
                 nodeId,
-                nodeService.id,
+                UUID.fromString(nodeService.id),
                 capability,
                 CapabilityServiceStatus.valueOf(nodeService.meta?.get(META_KEY_STATUS)!!),
                 nodeService.meta?.get(META_KEY_MANAGED).toBoolean(),

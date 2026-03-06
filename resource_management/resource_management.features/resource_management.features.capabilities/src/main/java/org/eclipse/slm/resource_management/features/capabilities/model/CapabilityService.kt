@@ -22,7 +22,7 @@ open class CapabilityService(
     var managed: Boolean = false,
     var customMeta: Map<String, String> = emptyMap()
 ) : NodeService(
-    serviceId,
+    serviceId.toString(),
     capability.name.lowercase().replace(" ", "_") + "_" + serviceId
 ) {
 
@@ -54,7 +54,7 @@ open class CapabilityService(
 
         @JvmStatic
         fun createFromNodeService(nodeService: NodeService, nodeId: UUID, capability: Capability): CapabilityService {
-            var capabilityService = builder(nodeId, nodeService.id!!, capability)
+            var capabilityService = builder(nodeId, UUID.fromString(nodeService.id), capability)
                 .status(CapabilityServiceStatus.valueOf(nodeService.meta?.get(META_KEY_STATUS)!!))
                 .managed(nodeService.meta?.get(META_KEY_MANAGED).toBoolean())
                 .customMeta(CapabilityUtil.getCustomMeta(nodeService.meta)).build()
@@ -63,6 +63,13 @@ open class CapabilityService(
         }
 
     }
+
+    var serviceId: UUID = UUID.fromString(super.id)
+        get() = UUID.fromString(super.id)
+        set(value) {
+            super.id = value.toString()
+            field = value
+        }
 
     override var tags: List<String> = ArrayList()
         get() = arrayListOf(

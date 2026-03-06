@@ -144,7 +144,8 @@ public class ConsulServicesClient extends AbstractConsulClient {
                 .build();
         this.consulCatalogApiClient.registerEntity(catalogRegistration);
 
-        return this.getServiceByIdOrThrow(service.getId());
+        var serviceId = UUID.fromString(service.getId());
+        return this.getServiceByIdOrThrow(serviceId);
     }
 
     public void removeServiceByName(UUID nodeId, String serviceName) {
@@ -162,7 +163,7 @@ public class ConsulServicesClient extends AbstractConsulClient {
                     .findFirst();
 
             if (nodeService.isPresent()) {
-                var serviceId = nodeService.get().getId();
+                var serviceId = UUID.fromString(nodeService.get().getId());
 
                 var catalogDeregistration = new CatalogDeregistration(nodeName, this.consulDatacenter, null, serviceId, null, null);
                 this.consulCatalogApiClient.deregisterEntity(catalogDeregistration);

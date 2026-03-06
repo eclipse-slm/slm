@@ -161,7 +161,7 @@ public class MultiHostCapabilitiesConsulClient {
 
         for(NodeService nodeService : filteredNodeService) {
             Optional<MultiHostCapabilityService> mhcs =
-                    getMultiHostCapabilityServiceOfUser(nodeService.getId());
+                    getMultiHostCapabilityServiceOfUser(UUID.fromString(nodeService.getId()));
 
             if(mhcs.isPresent())
                 multiHostCapabilityServicesOfResource.add(mhcs.get());
@@ -181,10 +181,7 @@ public class MultiHostCapabilitiesConsulClient {
                 .findFirst();
     }
 
-    public List<Service> getNodesOfMultiHostCapabilityService(
-            
-            String serviceName
-    ) {
+    public List<Service> getNodesOfMultiHostCapabilityService(String serviceName) {
         Map<String, List<String>> services = this.consulAdminClient.services().getServices();
 
         List<String> clusterServiceNames = services.entrySet()
@@ -194,10 +191,7 @@ public class MultiHostCapabilitiesConsulClient {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 
-        var consulServices = this.consulAdminClient.services().getServicesByName(
-                
-                clusterServiceNames
-        );
+        var consulServices = this.consulAdminClient.services().getServicesByName(clusterServiceNames);
 
         return consulServices.get(serviceName);
     }
@@ -291,7 +285,7 @@ public class MultiHostCapabilitiesConsulClient {
         try {
             var consulNodeOptional = this.consulAdminClient.nodes().getNodeById(
                     
-                    multiHostCapabilityService.getId()
+                    multiHostCapabilityService.getServiceId()
             );
             if (consulNodeOptional.isPresent()) {
 

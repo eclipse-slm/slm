@@ -245,7 +245,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
             if (capabilityService.getManaged()) {
                 this.singleHostCapabilitiesConsulClient.removeSingleHostCapabilityFromNode( capability, capabilityJob.getResourceId());
 
-                singleHostCapabilitiesVaultClient.deleteSingleHostCapabilityServiceSecrets(capabilityService.getId());
+                singleHostCapabilitiesVaultClient.deleteSingleHostCapabilityServiceSecrets(capabilityService.getServiceId());
             }
 
             var capabilityJobExecutor = this.capabilityJobExecutorFactory.create(capabilityJob, capabilityService, this);
@@ -304,7 +304,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
             return;
         }
 
-        this.singleHostCapabilitiesVaultClient.deleteSingleHostCapabilityServiceSecrets(capabilityService.getId());
+        this.singleHostCapabilitiesVaultClient.deleteSingleHostCapabilityServiceSecrets(capabilityService.getServiceId());
         this.singleHostCapabilitiesConsulClient.removeSingleHostCapabilityFromNode( capabilityService.getCapability(), resourceId);
     }
 

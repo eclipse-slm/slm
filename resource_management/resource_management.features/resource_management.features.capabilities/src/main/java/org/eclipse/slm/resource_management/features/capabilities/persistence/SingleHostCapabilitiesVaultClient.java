@@ -55,11 +55,11 @@ public class SingleHostCapabilitiesVaultClient {
 
     public void addSingleHostCapabilityServiceSecrets(CapabilityService capabilityService, Map<String, String> configParameters, String fullPathOwnerGroupId) {
         var secretsConfigParameter = CapabilityUtil.getSecretConfigParameter(capabilityService.getCapability(), configParameters);
-        var secretsPath = getSecretPathForSingleHostCapabilityServiceSecrets(capabilityService.getId());
+        var secretsPath = getSecretPathForSingleHostCapabilityServiceSecrets(capabilityService.getServiceId());
         this.vaultAdminClient.kv(VAULT_SECRETS_ENGINE_NAME).addSecretsToKvEngine(secretsPath, secretsConfigParameter);
 
-        var capabilityPolicyName = SingleHostCapabilitiesVaultClient.getCapabilityServicePolicyName(capabilityService.getId());
-        var capabilityPolicyRule = SingleHostCapabilitiesVaultClient.getCapabilityServicePolicyRule(capabilityService.getId());
+        var capabilityPolicyName = SingleHostCapabilitiesVaultClient.getCapabilityServicePolicyName(capabilityService.getServiceId());
+        var capabilityPolicyRule = SingleHostCapabilitiesVaultClient.getCapabilityServicePolicyRule(capabilityService.getServiceId());
         this.vaultAdminClient.acl().createOrUpdatePolicy(capabilityPolicyName, capabilityPolicyRule);
         this.vaultAdminClient.acl().addPolicyToGroup(fullPathOwnerGroupId, capabilityPolicyName);
     }

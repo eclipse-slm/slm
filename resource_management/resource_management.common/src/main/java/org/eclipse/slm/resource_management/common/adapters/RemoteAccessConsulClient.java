@@ -29,7 +29,7 @@ public class RemoteAccessConsulClient {
         var serviceOfCatalogRegistration = RemoteAccessConsulMapper.INSTANCE.toCatalogRegistrationService(remoteAccessConsulService);
         var createdConsulService = this.consulClient.services().registerService(resourceId, serviceOfCatalogRegistration);
         // Create read access policy and assign it to role of user group of owner
-        var policyName = getRemoteAccessServicePolicyName(remoteAccessConsulService.getId());
+        var policyName = getRemoteAccessServicePolicyName(remoteAccessConsulService.getServiceId());
         var policyRule =  "service \"" + remoteAccessConsulService.getServiceName() + "\" { policy = \"read\" }";
         var policy = Policy.builder(policyName)
                 .rules(policyRule)

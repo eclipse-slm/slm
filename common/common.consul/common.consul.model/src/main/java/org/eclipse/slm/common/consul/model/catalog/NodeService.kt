@@ -15,7 +15,7 @@ open class NodeService(
 
     /** The unique ID of the service */
     @field:JsonProperty("ID")
-    var id: UUID,
+    open var id: String,
 
     /** The name of the service */
     @field:JsonProperty("Service")

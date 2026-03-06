@@ -13,7 +13,7 @@ class RemoteAccessConsulService private constructor(
     var connectionType: ConnectionType,
     var credentialId: UUID,
     var username: String? = null
-) : NodeService(id) {
+) : NodeService(id.toString()) {
 
     constructor(
         id: UUID,
@@ -55,7 +55,8 @@ class RemoteAccessConsulService private constructor(
                 username = meta[USERNAME_META_DATA_KEY]
             }
 
-            val remoteAccessConsulService = RemoteAccessConsulService(nodeService.id, connectionType, credentialId, username)
+            var remoteAccessServiceId = UUID.fromString(nodeService.id)
+            val remoteAccessConsulService = RemoteAccessConsulService(remoteAccessServiceId, connectionType, credentialId, username)
             remoteAccessConsulService.port = nodeService.port
 
             return remoteAccessConsulService
@@ -67,8 +68,14 @@ class RemoteAccessConsulService private constructor(
         }
     }
 
+    var serviceId: UUID
+        get() = UUID.fromString(super.id)
+        set(value) {
+            super.id = value.toString()
+        }
+
     override var serviceName: String = ""
-        get() = convertIdToServiceName(this.id, this.connectionType)
+        get() = convertIdToServiceName(this.serviceId, this.connectionType)
 
     override var tags: List<String> = ArrayList()
         get() = arrayListOf(

@@ -150,7 +150,7 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
             try {
                 multiHostCapabilitiesConsulClient.removeMultiHostCapabilityService(
                         
-                        multiHostCapabilityService.getId()
+                        multiHostCapabilityService.getServiceId()
                 );
             } catch (ConsulLoginFailedException e) {
                 LOG.error("Failed to delete MultiHostCapabilityService [id = '"+multiHostCapabilityService.getId()+"'] due to login error");
