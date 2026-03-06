@@ -20,6 +20,14 @@ export SLM_IP=172.17.0.1
 **Use lowercase for the hostname to avoid case problems (e.g. with token authentication)**
 :::
 
+::: warning For Ubuntu 24+ users
+**Disable Apparmor for rsyslogd as follows:**
+```sh
+sudo ln -s /etc/apparmor.d/usr.sbin.rsyslogd /etc/apparmor.d/disable/
+sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.rsyslogd
+```
+:::
+
 Run the following command to start the SLM installer:
 ```sh
 docker run \
