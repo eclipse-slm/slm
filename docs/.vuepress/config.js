@@ -66,6 +66,7 @@ module.exports = {
         '@vuepress/plugin-back-to-top',
         '@vuepress/plugin-medium-zoom',
         '@dovyp/vuepress-plugin-clipboard-copy',
-        '@vuepress/medium-zoom'
+        '@vuepress/medium-zoom',
+        'tabs'
       ],
-}
+};
