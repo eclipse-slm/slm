@@ -69,7 +69,7 @@ module.exports = {
         '@vuepress/medium-zoom',
         ['tabs', {
           useUrlFragment: false,
-          cacheLifetime: 0,
+          cacheLifetime: -1,
           clearHash: true
         }]
       ],
