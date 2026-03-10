@@ -22,7 +22,7 @@ export SLM_VERSION=1.4.0-SNAPSHOT
 
 ::::: tabs
 
-:::: tab "docker run"
+:::: tab "docker run" {id="docker-run"}
 
 ::: warning For Ubuntu 24+ users
 **Disable Apparmor for rsyslogd as follows:**
@@ -46,7 +46,7 @@ docker run \
 ```
 ::::
 
-:::: tab "installer"
+:::: tab "installer" {id="installer"}
 ```shell
 wget https://raw.githubusercontent.com/eclipse-slm/slm/main/stack/run-installer.sh
 chmod +x run-installer.sh
