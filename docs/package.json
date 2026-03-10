@@ -9,17 +9,20 @@
   },
   "repository": "https://github.com/ma-sch/vuepress-test",
   "scripts": {
-    "dev": "vuepress dev --temp .temp",
-    "build": "vuepress build",
-    "start": "nodemon --ext md,vue --watch .vuepress --watch . --exec vuepress dev"
+    "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider vuepress dev --temp .temp",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider vuepress build",
+    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider nodemon --ext md,vue --watch .vuepress --watch . --exec vuepress dev"
   },
   "license": "Apache License 2.0",
   "devDependencies": {
     "@dovyp/vuepress-plugin-clipboard-copy": "^1.0.0-alpha.7",
     "@vuepress/plugin-medium-zoom": "^1.9.7",
     "axios": "^0.21.0",
+    "cross-env": "^7.0.3",
+    "vue-tabs-component": "^1.5.0",
     "vuepress": "^1.9.7",
-    "vuepress-plugin-global-variables": "^0.2.0"
+    "vuepress-plugin-global-variables": "^0.2.0",
+    "vuepress-plugin-tabs": "^0.3.0"
   },
   "dependencies": {
     "vuetify": "^2.6.9"
