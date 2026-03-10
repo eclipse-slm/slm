@@ -49,6 +49,8 @@ public class DockerStackTests {
         put("notification-service-database", "healthy");
         put("prometheus", "healthy");
         put("rabbitmq", "healthy");
+        put("platform-management", "healthy");
+        put("platform-management-database", "healthy");
         put("resource-management", "healthy");
         put("resource-management-database", "healthy");
         put("service-management", "healthy");

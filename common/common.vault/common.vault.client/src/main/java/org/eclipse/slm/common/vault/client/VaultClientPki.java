@@ -61,6 +61,10 @@ public class VaultClientPki extends AbstractVaultClient {
             this.vaultApiClientPki.importSignedIntermediateCert(pkiNameFull, importSignedIntermediateCertRequest);
 
         } catch (FeignResponseException e) {
+            if (e.getStatusCode() == 400) {
+                LOG.debug("The intermediate CA pki '{}' (probably) already exists. Status code: {}, message: {}", pkiName, e.getStatusCode(), e.getMessage());
+                return;
+            }
             throw new VaultRuntimeException("Error adding intermediate CA pki '" + pkiName + "'. Status code: " + e.getStatusCode() + ", message: " + e.getMessage(), e);
         }
 

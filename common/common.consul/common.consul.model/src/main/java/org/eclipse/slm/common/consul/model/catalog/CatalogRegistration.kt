@@ -1,14 +1,13 @@
 package org.eclipse.slm.common.consul.model.catalog
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.util.UUID
 
 /** CatalogRegistration represents a request to register a node, service, and/or check with the Consul catalog.
  *
  * For more information see <a href="https://developer.hashicorp.com/consul/api-docs/catalog#json-request-body-schema">Consul API docs</a>.
  */
 data class CatalogRegistration(
-    /** An optional UUID to assign to the node. This must be a 36-character UUID-formatted string. */
+    /** An optional string to assign to the node. */
     @field:JsonProperty("ID")
     val id: String? = null,
 
@@ -108,7 +107,7 @@ data class CatalogRegistration(
 
         /** An optional ID for the service. */
         @field:JsonProperty("ID")
-        val id: UUID? = null,
+        val id: String? = null,
 
         /** Optional tags for the service. */
         @field:JsonProperty("Tags")
@@ -132,13 +131,13 @@ data class CatalogRegistration(
         }
 
         class Builder(private val serviceName: String) {
-            private var id: UUID? = null
+            private var id: String? = null
             private var tags: List<String>? = null
             private var address: String? = null
             private var meta: Map<String, String>? = null
             private var port: Int? = null
 
-            fun id(id: UUID?) = apply { this.id = id }
+            fun id(id: String?) = apply { this.id = id }
             fun tags(tags: List<String>?) = apply { this.tags = tags }
             fun address(address: String?) = apply { this.address = address }
             fun meta(meta: Map<String, String>?) = apply { this.meta = meta }

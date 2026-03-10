@@ -16,7 +16,7 @@ import org.junit.platform.suite.api.SuiteDisplayName;
         NotificationServiceTests.class,
         ResourceManagementTests.class,
         ServiceManagementTests.class,
-        DcDockerTest.class
+        DcDummyTest.class
 })
 public class StackTestSuite {
 

@@ -41,17 +41,6 @@ public class TestConfig {
             new TestResource("192.168.0.154", "192.168.0.154", "root", "password")
     ));
 
-    // Test Raspi Resource List
-    public static List<TestResource> testRaspiResourceList = new ArrayList<>(List.of(
-            new TestResource("fabos-edge-pi-01", "192.168.0.151", "pi", "fabos_01"),
-            new TestResource("fabos-edge-pi-02", "192.168.0.168", "pi", "fabos_01"),
-            new TestResource("fabos-edge-pi-03", "192.168.0.140", "pi", "fabos_01"),
-            new TestResource("fabos-edge-pi-04", "192.168.0.143", "pi", "fabos_01"),
-            new TestResource("fabos-edge-pi-05", "192.168.0.123", "pi", "fabos_01"),
-            new TestResource("fabos-edge-pi-06", "192.168.0.130", "pi", "fabos_01"),
-            new TestResource("fabos-edge-pi-07", "192.168.0.237", "pi", "fabos_01")
-    ));
-
     // AWX
     public static final int AWX_PORT = Integer.parseInt(System.getenv().getOrDefault("AWX_PORT", "8013"));
     public static final String AWX_BASE_URL =  "http://" + TestConfig.HOST;
@@ -64,18 +53,23 @@ public class TestConfig {
     public static final int VAULT_PORT = Integer.parseInt(System.getenv().getOrDefault("VAULT_PORT", "8200"));
     public static final String VAULT_BASE_URL =  "http://" + TestConfig.HOST;
 
+    // Platform Management
+    public static final int PLATFORM_MANAGEMENT_PORT = Integer.parseInt(System.getenv().getOrDefault("PLATFORM_MANAGEMENT_PORT", "443"));
+    public static final String PLATFORM_MANAGEMENT_BASE_URL =  "https://" + TestConfig.HOST;
+    public static final String PLATFORM_MANAGEMENT_BASE_PATH = "/platform-management";
+
     // Notification Service
     public static final int NOTIFICATION_SERVICE_PORT = Integer.parseInt(System.getenv().getOrDefault("NOTIFICATION_SERVICE_PORT", "443"));
     public static final String NOTIFICATION_SERVICE_BASE_URL =  "https://" + TestConfig.HOST;
     public static final String NOTIFICATION_SERVICE_BASE_PATH = "/notification-service";
 
     // Resource Management
-    public static final int RESOURCE_MANAGEMENT_PORT = Integer.parseInt(System.getenv().getOrDefault("RESOURCE_REGISTRY_PORT", "443"));
+    public static final int RESOURCE_MANAGEMENT_PORT = Integer.parseInt(System.getenv().getOrDefault("RESOURCE_MANAGEMENT_PORT", "443"));
     public static final String RESOURCE_MANAGEMENT_BASE_URL =  "https://" + TestConfig.HOST;
     public static final String RESOURCE_MANAGEMENT_BASE_PATH = "/resource-management";
 
     // Service Management
-    public static final int SERVICE_MANAGEMENT_PORT = Integer.parseInt(System.getenv().getOrDefault("SERVICE_REGISTRY_PORT", "443"));
+    public static final int SERVICE_MANAGEMENT_PORT = Integer.parseInt(System.getenv().getOrDefault("SERVICE_MAnAGEMENT_PORT", "443"));
     public static final String SERVICE_MANAGEMENT_BASE_URL =  "https://" + TestConfig.HOST;
     public static final String SERVICE_MANAGEMENT_BASE_PATH = "/service-management";
 

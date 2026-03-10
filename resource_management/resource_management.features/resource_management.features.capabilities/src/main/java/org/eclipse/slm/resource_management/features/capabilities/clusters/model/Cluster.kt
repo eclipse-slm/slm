@@ -18,7 +18,7 @@ class Cluster {
     var managed: Boolean = false
 
     constructor(multiHostCapabilityService: MultiHostCapabilityService, nodes: List<Node>, metaData: Map<String, String>) {
-        this.id = multiHostCapabilityService.id
+        this.id = UUID.fromString(multiHostCapabilityService.id)
         this.name = multiHostCapabilityService.serviceName
         this.clusterType = multiHostCapabilityService.capability!!.name
         this.memberMapping = multiHostCapabilityService.memberMapping!!

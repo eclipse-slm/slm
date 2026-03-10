@@ -259,7 +259,7 @@ public class ClusterCreateFunctions extends AbstractClusterFunctions implements 
                 .build();
         this.consulAdminClient.nodes().registerEntity(catalogRegistration);
         // Create policy for resource
-        var resourcePolicyName = ResourcesConsulClient.getResourcePolicyName(multiHostCapabilityService.getId());
+        var resourcePolicyName = ResourcesConsulClient.getResourcePolicyName(multiHostCapabilityService.getServiceId());
         var resourcePolicyRule =  "node \"" + multiHostCapabilityService.getId() + "\" { policy = \"read\" }";
         var resourcePolicy = Policy.builder(resourcePolicyName)
                 .description("Access policy for resource '" + multiHostCapabilityService.getId() + "'")

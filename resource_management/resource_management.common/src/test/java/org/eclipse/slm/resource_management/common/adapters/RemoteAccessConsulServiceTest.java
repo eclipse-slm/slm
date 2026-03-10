@@ -84,7 +84,7 @@ class RemoteAccessConsulServiceTest {
             meta.put(RemoteAccessConsulService.CREDENTIAL_ID_META_DATA_KEY, credentialId.toString());
 
             var nodeService = new NodeService(
-                    serviceId,
+                    serviceId.toString(),
                     RemoteAccessConsulService.convertIdToServiceName(serviceId, connectionType),
                     null,
                     List.of(),
@@ -98,7 +98,7 @@ class RemoteAccessConsulServiceTest {
             assertThat(service.getConnectionType()).isEqualTo(connectionType);
             assertThat(service.getCredentialId()).isEqualTo(credentialId);
             assertThat(service.getPort()).isEqualTo(port);
-            assertThat(service.getId()).isEqualTo(serviceId);
+            assertThat(service.getId()).isEqualTo(serviceId.toString());
         }
     }
 }

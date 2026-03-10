@@ -57,7 +57,7 @@ public class ConsulServicesClientTest {
                 .id(UUID.randomUUID())
                 .build();
             consulNodesClient.registerNode(node);
-            UUID serviceId = UUID.randomUUID();
+            var serviceId = UUID.randomUUID().toString();
             String serviceName = "test-service";
             List<String> tags = List.of("tag1", "tag2");
             Map<String, String> meta = Map.of("metaKey", "metaValue");
@@ -91,7 +91,7 @@ public class ConsulServicesClientTest {
                 .id(UUID.randomUUID())
                 .build();
             consulNodesClient.registerNode(node);
-            UUID serviceId = UUID.randomUUID();
+            var serviceId = UUID.randomUUID().toString();
             String serviceName = "service-by-id";
 
             var service = CatalogRegistration.Service.builder(serviceName)
@@ -101,7 +101,7 @@ public class ConsulServicesClientTest {
             consulServicesClient.registerService(node.getId(), service);
 
             // Act
-            var found = consulServicesClient.getServiceById(serviceId);
+            var found = consulServicesClient.getServiceById(UUID.fromString(serviceId));
 
             // Assert
             assertThat(found).isPresent();
@@ -126,7 +126,7 @@ public class ConsulServicesClientTest {
                 .id(UUID.randomUUID())
                 .build();
             consulNodesClient.registerNode(node);
-            UUID serviceId = UUID.randomUUID();
+            var serviceId = UUID.randomUUID().toString();
             String serviceName = "tagged-service";
             List<String> tags = List.of("special-tag");
 
@@ -157,7 +157,7 @@ public class ConsulServicesClientTest {
                 .id(UUID.randomUUID())
                 .build();
             consulNodesClient.registerNode(node);
-            UUID serviceId = UUID.randomUUID();
+            var serviceId = UUID.randomUUID().toString();
             String serviceName = "by-name-service";
 
             var service = CatalogRegistration.Service.builder(serviceName)
@@ -186,7 +186,7 @@ public class ConsulServicesClientTest {
                 .id(UUID.randomUUID())
                 .build();
             consulNodesClient.registerNode(node);
-            UUID serviceId = UUID.randomUUID();
+            var serviceId = UUID.randomUUID().toString();
             String serviceName = "service-by-name";
 
             var service = CatalogRegistration.Service.builder(serviceName)
@@ -222,7 +222,7 @@ public class ConsulServicesClientTest {
                     .address("127.0.0.15")
                 .build();
             consulNodesClient.registerNode(node);
-            UUID serviceId = UUID.randomUUID();
+            var serviceId = UUID.randomUUID().toString();
             String serviceName = "node-services-service";
             var service = CatalogRegistration.Service.builder(serviceName)
                     .id(serviceId)
@@ -247,7 +247,7 @@ public class ConsulServicesClientTest {
                 .id(UUID.randomUUID())
                 .build();
             consulNodesClient.registerNode(node);
-            UUID serviceId = UUID.randomUUID();
+            var serviceId = UUID.randomUUID().toString();
             String serviceName = "remove-service";
 
             var service = CatalogRegistration.Service.builder(serviceName)
