@@ -68,7 +68,9 @@ module.exports = {
         '@dovyp/vuepress-plugin-clipboard-copy',
         '@vuepress/medium-zoom',
         'tabs', {
-          useUrlFragment: false
+          useUrlFragment: false,
+          cacheLifetime: 0,
+          clearHash: true
         }
       ],
 };
