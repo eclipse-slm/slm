@@ -20,6 +20,7 @@ fi
 
 : "${SLM_HOSTNAME:?Error: SLM_HOSTNAME is not set}"
 : "${SLM_IP:?Error: SLM_IP is not set}"
+: "${SLM_VERSION:?Error: SLM_VERSION is not set}"
 
 # Disable rsyslog AppArmor profile only on Ubuntu 24+ hosts.
 if [[ -r /etc/os-release ]]; then
@@ -39,4 +40,4 @@ docker run \
   --env "SLM_IP=${SLM_IP}" \
   --volume /var/run/docker.sock:/var/run/docker.sock \
   --add-host "${SLM_HOSTNAME}:host-gateway" \
-  ghcr.io/eclipse-slm/slm/installer:1.4.0-SNAPSHOT
+  ghcr.io/eclipse-slm/slm/installer:${SLM_VERSION}
