@@ -74,7 +74,7 @@ public class ConsulServicesClientTest {
 
             // Assert
             assertThat(registered.getServiceName()).isEqualTo(serviceName);
-            assertThat(registered.getServiceId()).isEqualTo(serviceId);
+            assertThat(registered.getServiceId().toString()).isEqualTo(serviceId);
             assertThat(registered.getServiceTags()).containsAll(tags);
             assertThat(registered.getServiceMeta()).containsAllEntriesOf(meta);
         }

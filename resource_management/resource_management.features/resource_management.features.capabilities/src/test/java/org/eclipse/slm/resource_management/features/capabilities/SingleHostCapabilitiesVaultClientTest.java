@@ -43,13 +43,13 @@ public class SingleHostCapabilitiesVaultClientTest {
                 SingleHostCapabilitiesVaultClientTestData.TEST_GROUP_ID
         );
         // Assert | Secrets added
-        var secrets = singleHostCapabilitiesVaultClient.getSingleHostCapabilityServiceSecrets(SingleHostCapabilitiesVaultClientTestData.singleHostCapabilityService.getId());
+        var secrets = singleHostCapabilitiesVaultClient.getSingleHostCapabilityServiceSecrets(SingleHostCapabilitiesVaultClientTestData.singleHostCapabilityService.getServiceId());
         assertThat(secrets)
                 .hasSize(1)
                 .containsEntry("password", SingleHostCapabilitiesVaultClientTestData.configParameters.get("password"));
         // Assert | Policy created and assigned to user group
         var capabilityPolicyName = SingleHostCapabilitiesVaultClient
-                .getCapabilityServicePolicyName(SingleHostCapabilitiesVaultClientTestData.singleHostCapabilityService.getId());
+                .getCapabilityServicePolicyName(SingleHostCapabilitiesVaultClientTestData.singleHostCapabilityService.getServiceId());
         var capabilityPolicy =  vaultAdminClient.acl().getPolicy(capabilityPolicyName);
         assertThat(capabilityPolicy).isNotNull();
         var vaultGroup = vaultAdminClient.acl().getGroupByName(SingleHostCapabilitiesVaultClientTestData.TEST_GROUP_ID);
@@ -61,15 +61,15 @@ public class SingleHostCapabilitiesVaultClientTest {
     @Order(20)
     public void testDeleteSecretConfigParametersOfSingleHostCapabilityService() {
         // Act
-        singleHostCapabilitiesVaultClient.deleteSingleHostCapabilityServiceSecrets(SingleHostCapabilitiesVaultClientTestData.singleHostCapabilityService.getId());
+        singleHostCapabilitiesVaultClient.deleteSingleHostCapabilityServiceSecrets(SingleHostCapabilitiesVaultClientTestData.singleHostCapabilityService.getServiceId());
         // Assert | Secrets deleted
         var secrets = singleHostCapabilitiesVaultClient.getSingleHostCapabilityServiceSecrets(
-                SingleHostCapabilitiesVaultClientTestData.singleHostCapabilityService.getId()
+                SingleHostCapabilitiesVaultClientTestData.singleHostCapabilityService.getServiceId()
         );
         assertEquals(0, secrets.size());
         // Assert | Policy deleted
         var capabilityPolicyName = SingleHostCapabilitiesVaultClient
-                .getCapabilityServicePolicyName(SingleHostCapabilitiesVaultClientTestData.singleHostCapabilityService.getId());
+                .getCapabilityServicePolicyName(SingleHostCapabilitiesVaultClientTestData.singleHostCapabilityService.getServiceId());
         assertThatThrownBy(() -> vaultAdminClient.acl().getPolicy(capabilityPolicyName))
                 .isInstanceOf(VaultPolicyNotFoundException.class);
         var vaultGroup = vaultAdminClient.acl().getGroupByName(SingleHostCapabilitiesVaultClientTestData.TEST_GROUP_ID);

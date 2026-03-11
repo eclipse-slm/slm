@@ -105,7 +105,7 @@ public class SingleHostCapabilitiesConsulClientTest {
                     CapabilityService.META_KEY_MANAGED
                 );
             // Assert | Created Consul ACL Policy
-            var capabilityServicePolicyName = CapabilitiesConsulClient.getCapabilityServicePolicyName(capabilityService.getId());
+            var capabilityServicePolicyName = CapabilitiesConsulClient.getCapabilityServicePolicyName(capabilityService.getServiceId());
             var capabilityServicePolicy = adminConsulClient.acl().getPolicyByNameOrThrow(capabilityServicePolicyName);
             assertThat(capabilityServicePolicy).isNotNull();
             // Assert | Assigned Policy to Role of User Group
@@ -180,7 +180,7 @@ public class SingleHostCapabilitiesConsulClientTest {
             // Arrange
             var nodeId = SingleHostCapabilitiesConsulClientTestData.testResource1.getId();
             var before = capabilitiesConsulClient.getCapabilityServicesOfResource(nodeId);
-            var capabilityServiceId = before.get(0).getId();
+            var capabilityServiceId = before.get(0).getServiceId();
             // Act
             singleHostCapabilitiesConsulClient.removeSingleHostCapabilityFromNode(
                     SingleHostCapabilitiesConsulClientTestData.testSingleHostDeploymentCapability,
