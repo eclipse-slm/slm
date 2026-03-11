@@ -69,12 +69,12 @@ public class RemoteAccessConsulClientTest {
                     RemoteAccessConsulService.class.getSimpleName()
             );
             assertThat(consulRemoteAccessNodeServices)
-                .filteredOn(s -> s.getId().equals(remoteAccessCreated.getId()))
-                .anySatisfy(s -> {
-                    assertThat(s.getPort()).isEqualTo(22);
-                    assertThat(s.getMeta().get(RemoteAccessConsulService.CONNECTION_TYPE_META_DATA_KEY)).isEqualTo(connectionType.toString());
-                    assertThat(s.getMeta().get(RemoteAccessConsulService.CREDENTIAL_ID_META_DATA_KEY)).isEqualTo(credentialId.toString());
-                    assertThat(s.getTags()).contains(RemoteAccessConsulService.class.getSimpleName());
+                .filteredOn(nodeService -> nodeService.getId().equals(remoteAccessCreated.getId().toString()))
+                .anySatisfy(nodeService -> {
+                    assertThat(nodeService.getPort()).isEqualTo(22);
+                    assertThat(nodeService.getMeta().get(RemoteAccessConsulService.CONNECTION_TYPE_META_DATA_KEY)).isEqualTo(connectionType.toString());
+                    assertThat(nodeService.getMeta().get(RemoteAccessConsulService.CREDENTIAL_ID_META_DATA_KEY)).isEqualTo(credentialId.toString());
+                    assertThat(nodeService.getTags()).contains(RemoteAccessConsulService.class.getSimpleName());
                 });
             var remoteAccessConsulServiceName = RemoteAccessConsulService.convertIdToServiceName(testRemoteAccess.getId(), testRemoteAccess.getConnectionType());
             var userGroupPolicy = adminConsulClient.acl()

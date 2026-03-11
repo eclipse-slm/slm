@@ -157,14 +157,14 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
             resourceId = ((SingleHostCapabilityService)serviceHoster.getCapabilityService()).getResourceId();
         }
         else {
-            resourceId = serviceHoster.getCapabilityService().getId();
+            resourceId = serviceHoster.getCapabilityService().getResourceId();
         }
         var serviceInstance = new ServiceInstance(
                 serviceId,
                 new ArrayList<>(),
                 serviceMetaData,
                 resourceId,
-                serviceHoster.getCapabilityService().getId(),
+                serviceHoster.getCapabilityService().getServiceId(),
                 serviceOfferingVersion.getServiceOffering().getId(),
                 serviceOfferingVersion.getId(),
                 servicePorts,

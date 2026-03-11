@@ -190,7 +190,7 @@ public class ServiceOfferingOrderHandler {
 
             var matchingResource = new MatchingResourceDTO(
                     resourceId,
-                    serviceHoster.getCapabilityService().getId(),
+                    serviceHoster.getCapabilityService().getServiceId(),
                     serviceHoster.getCapabilityService() instanceof MultiHostCapabilityService);
             matchingResources.add(matchingResource);
         }
@@ -204,7 +204,7 @@ public class ServiceOfferingOrderHandler {
             resourceId = ((SingleHostCapabilityService)capabilityService).getResourceId();
         }
         else {
-            resourceId = capabilityService.getId();
+            resourceId = capabilityService.getResourceId();
         }
 
         return resourceId;
