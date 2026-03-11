@@ -5,7 +5,6 @@
  */
 
  import Vuetify from "vuetify";
- import Tabs from 'vue-tabs-component';
  import "vuetify/dist/vuetify.min.css";
 
 export default ({
@@ -16,7 +15,4 @@ export default ({
 }) => {
   Vue.use(Vuetify);
   options.vuetify = new Vuetify({});
-  Vue.use(Tabs, {
-    setFragment: false
-  });
 };

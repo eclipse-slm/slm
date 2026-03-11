@@ -20,9 +20,19 @@ export SLM_VERSION=1.4.0-SNAPSHOT
 **Use lowercase for the hostname to avoid case problems (e.g. with token authentication)**
 :::
 
-::::: tabs
+By default, the installer sets up the SLM on the host on which it is running. To install the SLM on a remote host, the
+following environment variables must be set and added via the `--env` flag to the `docker run` command above:
 
-:::: tab "docker run" {id="docker-run"}
+| Environment Variable     | Description                       |
+|--------------------------|-----------------------------------|
+| DEPLOYMENT_HOST_HOSTNAME | Hostname or ip of the remote host |
+| DEPLOYMENT_HOST_USER     | SSH username of remote host       |
+| DEPLOYMENT_HOST_PASSWORD | SSH password of remote host       |
+
+To start the installation either start the installer container via docker run or use the installer script (see the 
+following sections for details). Both options will execute the same installation routine.
+
+### docker run
 
 ::: warning For Ubuntu 24+ users
 **Disable Apparmor for rsyslogd as follows:**
@@ -44,26 +54,13 @@ docker run \
   --add-host $SLM_HOSTNAME:host-gateway \
   ghcr.io/eclipse-slm/slm/installer:$SLM_VERSION
 ```
-::::
 
-:::: tab "installer" {id="installer"}
+### Installer Script
 ```shell
 wget https://raw.githubusercontent.com/eclipse-slm/slm/main/stack/run-installer.sh
 chmod +x run-installer.sh
 ./run-installer.sh
 ```
-::::
-
-:::::
-
-By default, the installer sets up the SLM on the host on which it is running. To install the SLM on a remote host, the 
-following environment variables must be set and added via the `--env` flag to the `docker run` command above:
-
-| Environment Variable     | Description                       |
-|--------------------------|-----------------------------------|
-| DEPLOYMENT_HOST_HOSTNAME | Hostname or ip of the remote host |
-| DEPLOYMENT_HOST_USER     | SSH username of remote host       |
-| DEPLOYMENT_HOST_PASSWORD | SSH password of remote host       |
 
 ## Uninstall
 Run the following command to start the SLM uninstaller:
