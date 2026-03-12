@@ -15,6 +15,7 @@ public class AwxJobObserverInitializer {
     private final static Logger LOG = LoggerFactory.getLogger(AwxJobObserverInitializer.class);
     private final int pollingInterval;
 
+    private String awxScheme;
     private String awxHost;
     private String awxPort;
     private String awxUrl;
@@ -31,6 +32,7 @@ public class AwxJobObserverInitializer {
             @Value("${awx.password}") String awxPassword,
             @Value("${awx.polling-interval-in-s}") int pollingInterval
     ) {
+        this.awxScheme = awxSchema;
         this.awxHost = awxHost;
         this.awxPort = awxPort;
         this.awxUrl = awxSchema + "://" + awxHost + ":" + awxPort;
@@ -41,11 +43,11 @@ public class AwxJobObserverInitializer {
 
     @PostConstruct
     private void init() {
-        this.websocketClient = new AwxWebsocketClient(this.awxHost, this.awxPort, this.awxUsername, this.awxPassword);
+        this.websocketClient = new AwxWebsocketClient(this.awxScheme, this.awxHost, this.awxPort, this.awxUsername, this.awxPassword);
         try {
             this.websocketClient.start();
         }catch (Exception e){
-            LOG.error("Could not connect to AWX Websocket: " + this.awxUrl);
+            LOG.error("Could not connect to AWX Websocket: {}", this.awxUrl, e);
         }
     }
 
@@ -63,9 +65,7 @@ public class AwxJobObserverInitializer {
         );
         try {
             this.websocketClient.registerObserver(observer);
-        } catch (DeploymentException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (DeploymentException | IOException e) {
             throw new RuntimeException(e);
         }
         return observer;
