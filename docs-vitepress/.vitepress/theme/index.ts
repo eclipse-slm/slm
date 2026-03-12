@@ -1,9 +1,11 @@
 import type { Theme } from 'vitepress';
 import DefaultTheme from 'vitepress/theme';
+import { enhanceAppWithTabs } from 'vitepress-plugin-tabs/client'
 
 export default <Theme>{
     extends: DefaultTheme,
     enhanceApp({ app }) {
+        enhanceAppWithTabs(app);
         // https://vuejs.org/api/application.html#app-config-globalproperties
         app.config.globalProperties.$slm = {
             version: {
@@ -114,7 +116,5 @@ export default <Theme>{
                 gui: '/aas/ui',
             }
         };
-        app.config.globalProperties.$animal = 'Cat';
-        app.config.globalProperties.$colour = 'Blue';
     },
 };

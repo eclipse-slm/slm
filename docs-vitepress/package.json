@@ -3,5 +3,8 @@
     "dev": "vitepress dev",
     "build": "vitepress build",
     "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "vitepress-plugin-tabs": "^0.8.0"
   }
 }

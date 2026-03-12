@@ -32,8 +32,8 @@ following environment variables must be set and added via the `--env` flag to th
 To start the installation either start the installer container via docker run or use the installer script (see the 
 following sections for details). Both options will execute the same installation routine.
 
-### docker run
-
+::::tabs
+== docker run
 ::: warning For Ubuntu 24+ users
 **Disable Apparmor for rsyslogd as follows:**
 ```sh
@@ -54,13 +54,17 @@ docker run \
   --add-host $SLM_HOSTNAME:host-gateway \
   ghcr.io/eclipse-slm/slm/installer:$SLM_VERSION
 ```
-
-### Installer Script
+==
+== installer script
 ```shell
 wget https://raw.githubusercontent.com/eclipse-slm/slm/main/stack/run-installer.sh
 chmod +x run-installer.sh
 ./run-installer.sh
 ```
+==
+::::
+
+
 
 ## Uninstall
 Run the following command to start the SLM uninstaller:
