@@ -9,6 +9,7 @@ import org.eclipse.slm.common.consul.client.ConsulServicesClient;
 import org.eclipse.slm.common.consul.model.catalog.Service;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.service_management.model.exceptions.ServiceOptionNotFoundException;
+import org.eclipse.slm.service_management.model.services.exceptions.ServiceInstanceRuntimeException;
 import org.eclipse.slm.service_management.service.app.service_deployment.CapabilityServiceNotFoundException;
 import org.eclipse.slm.service_management.service.app.service_deployment.ServiceUndeploymentHandler;
 import org.eclipse.slm.service_management.service.app.service_deployment.ServiceUpdateHandler;
@@ -118,8 +119,9 @@ public class ServiceInstancesHandler {
     public void deleteServiceInstanceOfUser(UUID serviceInstanceId, JwtAuthenticationToken jwtAuthenticationToken)
             throws ConsulLoginFailedException, ServiceInstanceNotFoundException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, SSLException, CapabilityServiceNotFoundException {
 
+        var consulServiceName = ServiceInstancesConsulClient.getServiceInstancePolicyName(serviceInstanceId);
         var optionalConsulService = this.consulAdminClient.services()
-                .getServiceByName( "service_" + serviceInstanceId);
+                .getServiceByName( consulServiceName);
 
         if (optionalConsulService.isPresent()) {
             if (!optionalConsulService.get().isEmpty()) {
@@ -205,13 +207,16 @@ public class ServiceInstancesHandler {
     }
 
     public ServiceInstanceDetails getServiceInstanceDetails(JwtAuthenticationToken jwtAuthenticationToken, UUID serviceInstanceId)
-            throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException {
+            throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, ServiceInstanceRuntimeException {
 
         var serviceInstance = this.getServiceInstanceOfUser(serviceInstanceId, jwtAuthenticationToken);
         var orders = this.getOrdersOfServiceInstance(serviceInstanceId);
         orders = orders.stream()
                 .sorted(Comparator.comparing(ServiceOrder::getCreated))
                 .collect(Collectors.toList());
+        if (orders.isEmpty()) {
+            throw new ServiceInstanceRuntimeException("Service instance '" + serviceInstanceId + "' has no orders, cannot determine details");
+        }
         var firstOrder = orders.get(0);
         var lastOrder = orders.get(orders.size() - 1);
 
