@@ -4,6 +4,9 @@ import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "",
+  versioning: {
+    latestVersion: "1.4.0-SNAPSHOT"
+  },
   description: "The Eclipse Service Lifecycle Management (SLM) provides a set of applications to manage the lifecycle of AI (artificial intelligence) services in production environments. The service lifecycle consists of the release, deploy, and operate phase and exits with the decommissioning of the service. It has a connection to the software development lifecycle (idea, design, code, build, test) and the AI model development lifecycle (idea, data acquisition, data analysis, data preparation, model training, model evaluation).",
   markdown: {
     config(md) {
@@ -16,8 +19,18 @@ export default defineConfig({
     logo: '/img/logo.svg',
 
     nav: [
-      { text: 'Home', link: '/' },
+      {
+        text: 'Home',
+        link: '/',
+      },
+      {
+        component: 'versions'
+      }
     ],
+
+    search: {
+      provider: "local"
+    },
 
     sidebar:  {
       '/docs/': [

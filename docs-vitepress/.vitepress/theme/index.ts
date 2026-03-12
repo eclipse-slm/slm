@@ -1,11 +1,13 @@
 import type { Theme } from 'vitepress';
 import DefaultTheme from 'vitepress/theme';
-import { enhanceAppWithTabs } from 'vitepress-plugin-tabs/client'
+import { enhanceAppWithTabs } from 'vitepress-plugin-tabs/client';
+import versions from '../components/versions.vue';
 
 export default <Theme>{
     extends: DefaultTheme,
     enhanceApp({ app }) {
         enhanceAppWithTabs(app);
+        app.component('versions', versions);
         // https://vuejs.org/api/application.html#app-config-globalproperties
         app.config.globalProperties.$slm = {
             version: {
