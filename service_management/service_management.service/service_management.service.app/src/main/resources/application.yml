@@ -125,7 +125,11 @@ notification-service:
 
 ### Resource Management
 resource-management:
-  url: "http://localhost:9010/resource-management"
+  scheme: http
+  host: localhost
+  port: 9010
+  path: /resource-management
+  url: ${resource-management.scheme}://${resource-management.host}:${resource-management.port}${resource-management.path}
 
 ### Security
 security:
