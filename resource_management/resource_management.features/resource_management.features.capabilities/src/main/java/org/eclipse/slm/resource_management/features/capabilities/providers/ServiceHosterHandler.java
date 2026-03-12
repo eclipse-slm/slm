@@ -24,20 +24,16 @@ public class ServiceHosterHandler extends ProviderHandler {
         );
     }
     public List<ServiceHoster> getServiceHosters(
-            
             Optional<ServiceHosterFilter> filter) throws ConsulLoginFailedException {
         List<ServiceHoster> serviceHosterList = new ArrayList<>();
 
-        List<CapabilityService> deploymentCapabilityServices = capabilitiesConsulClient.getCapabilityServicesByCapabilityClass(
-                
-                DeploymentCapability.class
-        );
+        List<CapabilityService> deploymentCapabilityServices = capabilitiesConsulClient.getCapabilityServicesByCapabilityClass(DeploymentCapability.class);
 
         List<CapabilityService> filteredList = new ArrayList<>(deploymentCapabilityServices);
         if (filter.isPresent()) {
             if (filter.get().getCapabilityServiceId() != null) {
                 filteredList = filteredList.stream()
-                        .filter(dcs -> dcs.getId().equals(filter.get().getCapabilityServiceId()))
+                        .filter(dcs -> dcs.getServiceId().equals(filter.get().getCapabilityServiceId()))
                         .collect(Collectors.toList());
             }
 

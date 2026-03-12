@@ -120,7 +120,7 @@ public class ServiceOfferingOrderHandler {
                                         var serviceHosterFilter = new ServiceHosterFilter.Builder()
                                                 .capabilityServiceId(deploymentCapabilityServiceId)
                                                 .build();
-                                        var serviceHosters = resourceManagementClient.providers().getServiceHosters(Optional.of(serviceHosterFilter));
+                                        var serviceHosters = resourceManagementClient.providers().getServiceHosters(serviceHosterFilter);
                                         var resourceId = this.getResourceIdOfServiceHoster(serviceHosters.get(0).getCapabilityService());
                                         optionalServiceOptionValue.get().setValue(resourceId);
                                     }
@@ -130,7 +130,7 @@ public class ServiceOfferingOrderHandler {
                                         var serviceHosterFilter = new ServiceHosterFilter.Builder()
                                                 .capabilityServiceId(deploymentCapabilityServiceId)
                                                 .build();
-                                        var serviceHosters = resourceManagementClient.providers().getServiceHosters(Optional.of(serviceHosterFilter));
+                                        var serviceHosters = resourceManagementClient.providers().getServiceHosters(serviceHosterFilter);
                                         var resourceIp = this.getResourceIpOfServiceHoster(serviceHosters.get(0).getCapabilityService());
                                         optionalServiceOptionValue.get().setValue(resourceIp);
                                     }
@@ -161,7 +161,7 @@ public class ServiceOfferingOrderHandler {
         var serviceHosterFilter = new ServiceHosterFilter.Builder()
                 .supportedDeploymentType(serviceOfferingDeploymentType)
                 .build();
-        var serviceHosters = resourceManagementClient.providers().getServiceHosters(Optional.of(serviceHosterFilter));
+        var serviceHosters = resourceManagementClient.providers().getServiceHosters(serviceHosterFilter);
 
         serviceHosters = serviceHosters.stream()
                 .filter(sh -> {
