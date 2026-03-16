@@ -18,7 +18,7 @@ A step-by-step wizard will open to support the service offering creation process
 | Field | Value |
 |-------|-------|
 | Service Name                  | Node-RED |
-| Service Category              | *Select your created service category (see [Step 3](/docs/getting-started/first-steps/step3)*) |
+| Service Category              | *Select your created service category (see [Step 3](/docs/getting-started/first-steps/step3-create-service-vendor.md)*) |
 | Deployment Type               | Docker Compose |
 | Version                       | 2.2.2 |
 | Short Description             | Node-RED provides a browser-based flow editor that makes it easy to wire together flows using the wide range of nodes in the palette. |

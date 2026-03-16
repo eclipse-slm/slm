@@ -4,13 +4,13 @@ permalink: /docs/getting-started/first-steps/step5/
 
 # Step 5: Deploy a service
 
-In the last step we will deploy your created service offering from [Step 4](/docs/getting-started/first-steps/step4). To see the details of your service offering click on it:
+In the last step we will deploy your created service offering from [Step 4](/docs/getting-started/first-steps/step4-create-service-offering.md). To see the details of your service offering click on it:
 ![first-steps-step5-wizard-service-offering-overview](/img/figures/first-steps/first-steps-step5-wizard-service-offering-overview.png)
 
 Click on the `ORDER` button:
 ![first-steps-step5-wizard-service-offering-details](/img/figures/first-steps/first-steps-step5-wizard-service-offering-details.png)
 
-Select the device you added in [Step 1](/docs/getting-started/first-steps/step1) as `Deployment Resource`. The service options can be changed or left at the default values. Click on the `CHECKOUT` button to deploy the service offering on the selected resource:
+Select the device you added in [Step 1](/docs/getting-started/first-steps/step1-add-resource.md) as `Deployment Resource`. The service options can be changed or left at the default values. Click on the `CHECKOUT` button to deploy the service offering on the selected resource:
 ![first-steps-step5-wizard-deploy](/img/figures/first-steps/first-steps-step5-wizard-deploy.png)
 
 The deployment of the service on your device is triggered and will take some time. After the deployment was successfull you should see the service instance in the overview in the `Services` section:
