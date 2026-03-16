@@ -40,7 +40,7 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: github-pages                          # The branch the action should deploy to
-          FOLDER: docs/.vuepress/dist                   # The folder the action should deploy
+          FOLDER: docs/.vitepress/dist                   # The folder the action should deploy
           TARGET_FOLDER: ${{ env.VERSION_PATH }}
           CLEAN: true                                   # Automatically remove deleted files from the deploy branch
           CLEAN_EXCLUDE: '["version"]'
