@@ -9,7 +9,7 @@ import VPNavBarMenuGroup from 'vitepress/dist/client/theme-default/components/VP
 import { onMounted, ref } from 'vue';
 
 const versionPathSegment = 'version'
-const selected = ref('latest');
+const selected = ref(extractVersionFromPath(window.location.pathname));
 const options = ref([]);
 const item = ref({
   text: selected,
@@ -81,10 +81,16 @@ function onChange() {
 }
 
 function updateSelected() {
+  let doReload = false;
   try {
-    selected.value = extractVersionFromPath(window.location.pathname);
+    const newValue = extractVersionFromPath(window.location.pathname);
+    doReload = newValue !== selected.value;
+    selected.value = newValue;
   } catch (error) {
+    doReload = 'latest' !== selected.value;
     selected.value = 'latest';
+  } finally {
+    if(doReload) window.location.reload(true);
   }
 }
 
