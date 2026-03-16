@@ -29,6 +29,7 @@
         <module>common.driver</module>
         <module>common.credentials</module>
         <module>common.restclient</module>
+        <module>common.restserver</module>
     </modules>
 
 </project>
