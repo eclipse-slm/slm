@@ -32,8 +32,8 @@ following environment variables must be set and added via the `--env` flag to th
 To start the installation either start the installer container via docker run or use the installer script (see the 
 following sections for details). Both options will execute the same installation routine.
 
-::::tabs
-== docker run
+### docker run
+
 ::: warning For Ubuntu 24+ users
 **Disable Apparmor for rsyslogd as follows:**
 ```sh
@@ -54,17 +54,13 @@ docker run \
   --add-host $SLM_HOSTNAME:host-gateway \
   ghcr.io/eclipse-slm/slm/installer:$SLM_VERSION
 ```
-==
-== installer script
+
+### Installer Script
 ```shell
 wget https://raw.githubusercontent.com/eclipse-slm/slm/main/stack/run-installer.sh
 chmod +x run-installer.sh
 ./run-installer.sh
 ```
-==
-::::
-
-
 
 ## Uninstall
 Run the following command to start the SLM uninstaller:
@@ -119,12 +115,12 @@ which are added during the initial startup. In rare cases this adding process fa
 capabilities are available in the UI:
 
 <figure>
-    <img src='/img/figures/installation/known-issues-missing-dcs-dc-button-disabled.png' alt="known-issues-missing-dcs-dc-button-disabled">
+    <img :src="$withBase('/img/figures/installation/known-issues-missing-dcs-dc-button-disabled.png')">
     <figcaption>Deployment Capability Button disabled because of missing single host deployment capabilities</figcaption>
 </figure>
 
 <figure>
-    <img src='/img/figures/installation/known-issues-missing-dcs-cluster-button-disabled.png'>
+    <img :src="$withBase('/img/figures/installation/known-issues-missing-dcs-cluster-button-disabled.png')">
     <figcaption>Cluster Button disabled because of missing multi host deployment capabilities</figcaption>
 </figure>
 
@@ -138,16 +134,16 @@ After the container has started and has added the deployment capabilities and it
 host and cluster) should be available after reloading the ui:
 
 <figure>
-    <img src='/img/figures/installation/known-issues-missing-dcs-dc-button-enabled.png'>
+    <img :src="$withBase('/img/figures/installation/known-issues-missing-dcs-dc-button-enabled.png')">
     <figcaption>Deployment Capability Button enabled</figcaption>
 </figure>
 
 <figure>
-    <img src='/img/figures/installation/known-issues-missing-dcs-cluster-button-enabled.png'>
+    <img :src="$withBase('/img/figures/installation/known-issues-missing-dcs-cluster-button-enabled.png')">
     <figcaption>Cluster Create Button enabled</figcaption>
 </figure>
 
 <figure>
-    <img src='/img/figures/installation/known-issues-missing-dcs-cluster-types-available.png'>
+    <img :src="$withBase('/img/figures/installation/known-issues-missing-dcs-cluster-types-available.png')">
     <figcaption>Default Cluster Types available in selection form</figcaption>
 </figure>

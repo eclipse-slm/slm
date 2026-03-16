@@ -1,16 +1,9 @@
 ---
-# https://vitepress.dev/reference/default-theme-home-page
-layout: home
-
-hero:
-  name: ""
-  text: Eclipse SLM
-  tagline: "Eclipse Service Lifecycle Management"
-  actions:
-    - theme: brand
-      text: Getting started →
-      link: /docs/getting-started/
-
+home: true
+metaTitle: Eclipse Service Lifecycle Management
+heroImage: /img/logo.svg
+actionText: Getting started →
+actionLink: /docs/getting-started/
 features:
   - title: Resource Management
     details: >
@@ -30,5 +23,5 @@ features:
         <li>Extend with your own deployment capabilities</li>
       </ul>
 footer: >
+   
 ---
-

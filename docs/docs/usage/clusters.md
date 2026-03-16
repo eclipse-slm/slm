@@ -52,13 +52,13 @@ The Service Lifecycle Management provides an [official K8S deployment capability
 
 Example:
 * Go to the `Resource` tab and press the `+` button in the bottom right corner.
-  <img :src="$withBase('/img/figures/use/cluster-create-new-1.png')">
+  ![cluster-create-new-1](/img/figures/use/cluster-create-new-1.png)
 
 * Select `ADD EXISTING`.
-  <img :src="$withBase('/img/figures/use/cluster-create-new-2.png')">
+  ![cluster-create-new-2](/img/figures/use/cluster-create-new-2.png)
 
 * Select `Cluster`.
-  <img :src="$withBase('/img/figures/use/cluster-create-new-3.png')">
+  ![cluster-create-new-3](/img/figures/use/cluster-create-new-3.png)
 
 * Configure cluster
   * Select `Create Methode` `Use existing resources`.
@@ -66,10 +66,10 @@ Example:
   *  Assign the hosts to the member types.
   * Press `CREATE`, and the automation to set up your Kubernetes cluster will be triggered. It will take a few minutes.
 
-<img :src='/img/figures/use/cluster-create-new-4.png')">
+![cluster-create-new-4](/img/figures/use/cluster-create-new-4.png)
 
 * After the automation has finished, your new Kubernetes cluster will be shown in the `Resources` overview.
-  <img :src="$withBase('/img/figures/use/cluster-create-new-5.png')">
+  ![cluster-create-new-5](/img/figures/use/cluster-create-new-5.png)
 
 ## Add managed clusters
 Already existing clusters be added as managed clusters. To allow the addition of a managed cluster, a corresponding cluster deployment capability must be available. That deployment capability must have an `INSTALL` action with the property `skipable: true`. Configuration parameters in the action, can be used to query information required for accessing the cluster.
@@ -117,13 +117,13 @@ The Service Lifecycle Management provides an [official K8S deployment capability
 
 Example:
 * Go to the `Resource` tab and press the `+` button in the bottom right corner.
-  <img :src="$withBase('/img/figures/use/cluster-add-existing-1.png')">
+  ![cluster-add-existing-1](/img/figures/use/cluster-add-existing-1.png)
 
 * Select `ADD EXISTING`.
-  <img :src="$withBase('/img/figures/use/cluster-add-existing-2.png')">
+  ![cluster-add-existing-2](/img/figures/use/cluster-add-existing-2.png)
 
 * Select `Cluster`.
-  <img :src="$withBase('/img/figures/use/cluster-add-existing-3.png')">
+  ![cluster-add-existing-3](/img/figures/use/cluster-add-existing-3.png)
 
 * Add details of cluster 
   * Select `Cluster Type` `Kubernetes`.
@@ -131,7 +131,7 @@ Example:
   * Enter the name of the namespace where the Service Lifecycle Management should deploy your services.
   * Press `ADD`, and your Kubernetes cluster will be added.
 
-  <img :src="$withBase('/img/figures/use/cluster-add-existing-4.png')">
+  ![cluster-add-existing-4](/img/figures/use/cluster-add-existing-4.png)
 
 * Your Kubernetes cluster will be shown in the `Resources` overview.
-  <img :src="$withBase('/img/figures/use/cluster-add-existing-5.png')">
+  ![cluster-add-existing-5](/img/figures/use/cluster-add-existing-5.png)
