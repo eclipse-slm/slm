@@ -85,7 +85,7 @@ public class ServiceInstancesConsulClient {
     public CatalogRegistration.Service convertServiceInstanceToConsulService(ServiceInstance serviceInstance) {
         var serviceName = this.getConsulServiceNameForServiceInstance(serviceInstance.getId());
         var consulService = CatalogRegistration.Service.builder(serviceName)
-                .id(serviceInstance.getId())
+                .id(serviceInstance.getId().toString())
                 .meta(serviceInstance.getMetaData())
                 .tags(serviceInstance.getTags())
             .build();

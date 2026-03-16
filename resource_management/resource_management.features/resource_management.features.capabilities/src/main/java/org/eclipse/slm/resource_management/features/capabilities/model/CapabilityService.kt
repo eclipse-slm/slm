@@ -1,5 +1,6 @@
 package org.eclipse.slm.resource_management.features.capabilities.model
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import org.eclipse.slm.common.consul.model.catalog.NodeService
@@ -15,11 +16,23 @@ import kotlin.text.toBoolean
     JsonSubTypes.Type(value = MultiHostCapabilityService::class, name = "MultiHostCapabilityService")
 )
 open class CapabilityService(
+
+    @param:JsonProperty("resourceId")
     val resourceId: UUID,
+
+    @JsonProperty("serviceId")
     serviceId: UUID,
+
+    @param:JsonProperty("capability")
     val capability: Capability,
+
+    @param:JsonProperty("status")
     var status: CapabilityServiceStatus = CapabilityServiceStatus.UNKNOWN,
+
+    @param:JsonProperty("managed")
     var managed: Boolean = false,
+
+    @param:JsonProperty("customMeta")
     var customMeta: Map<String, String> = emptyMap()
 ) : NodeService(
     serviceId.toString(),

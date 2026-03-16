@@ -76,9 +76,9 @@ public class AbstractServiceDeploymentHandler {
         var serviceHosterFilter = new ServiceHosterFilter.Builder()
                 .capabilityServiceId(deploymentCapabilityServiceId)
                 .build();
-        var serviceHosters = resourceManagementClient.providers().getServiceHosters(Optional.of(serviceHosterFilter));
+        var serviceHosters = resourceManagementClient.providers().getServiceHosters(serviceHosterFilter);
 
-        if (serviceHosters.size() > 0) {
+        if (!serviceHosters.isEmpty()) {
             return serviceHosters.get(0);
         }
 

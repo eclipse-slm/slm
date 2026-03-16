@@ -54,14 +54,14 @@ class RemoteAccessConsulMapperTest {
             ConnectionType connectionType = ConnectionType.ssh;
             var credentialId = UUID.randomUUID();
             var createDTO = new RemoteAccessCreateDTO(ownerId, credentialId, username, port, connectionType);
-            UUID serviceId = UUID.randomUUID();
+            var serviceId = UUID.randomUUID();
             var service = new RemoteAccessConsulService(serviceId, createDTO);
 
             // Act
             CatalogRegistration.Service catalogService = RemoteAccessConsulMapper.INSTANCE.toCatalogRegistrationService(service);
 
             // Assert
-            assertThat(catalogService.getId()).isEqualTo(serviceId);
+            assertThat(catalogService.getId()).isEqualTo(serviceId.toString());
             assertThat(catalogService.getServiceName()).isEqualTo(service.getServiceName());
             assertThat(catalogService.getPort()).isEqualTo(port);
             assertThat(catalogService.getTags()).containsExactlyInAnyOrderElementsOf(service.getTags());

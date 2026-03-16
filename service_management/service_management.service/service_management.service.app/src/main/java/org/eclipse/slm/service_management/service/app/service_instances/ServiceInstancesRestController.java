@@ -3,6 +3,7 @@ package org.eclipse.slm.service_management.service.app.service_instances;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.service_management.model.exceptions.ServiceOptionNotFoundException;
+import org.eclipse.slm.service_management.model.services.exceptions.ServiceInstanceRuntimeException;
 import org.eclipse.slm.service_management.service.app.service_deployment.CapabilityServiceNotFoundException;
 import org.eclipse.slm.service_management.model.offerings.ServiceOrder;
 import org.eclipse.slm.service_management.model.offerings.exceptions.InvalidServiceOfferingDefinitionException;
@@ -46,7 +47,7 @@ public class ServiceInstancesRestController {
 
     @RequestMapping(value = "/{serviceInstanceId}", method = RequestMethod.DELETE)
     @Operation(summary = "Delete a service instance")
-    public ResponseEntity deleteServiceInstance(
+    public ResponseEntity<Void> deleteServiceInstance(
         @PathVariable(name = "serviceInstanceId") UUID serviceInstanceId)
             throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException,
             ServiceOfferingVersionNotFoundException, SSLException, CapabilityServiceNotFoundException {
@@ -97,7 +98,7 @@ public class ServiceInstancesRestController {
     @Operation(summary = "Get details of service instance")
     public ResponseEntity<ServiceInstanceDetails> getServiceInstanceDetails(
             @PathVariable(name = "serviceInstanceId") UUID serviceInstanceId
-    ) throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException {
+    ) throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, ServiceInstanceRuntimeException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         var serviceInstanceDetails = this.serviceInstancesHandler

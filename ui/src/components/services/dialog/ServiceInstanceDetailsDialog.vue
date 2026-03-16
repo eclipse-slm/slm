@@ -21,7 +21,7 @@
             <progress-circular />
           </div>
 
-          <div v-else-if="apiStateError">
+          <div v-else-if="apiStateError" class="mt-8">
             Error loading service details
           </div>
 
@@ -345,10 +345,17 @@ export default {
                       name: response[0].name,
                       url: aasGuiUrl,
                     }
-                  }).catch(logRequestError)
+                  }).catch(e => {
+                    console.log("test")
+                    logRequestError(e)
+                    this.apiState = ApiState.ERROR
+                  })
                 }
               })
-            } ).catch(logRequestError)
+            } ).catch(e => {
+              logRequestError(e)
+              this.apiState = ApiState.ERROR
+            })
           }
         }
       }

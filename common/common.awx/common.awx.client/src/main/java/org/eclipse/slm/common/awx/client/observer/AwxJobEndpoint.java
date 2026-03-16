@@ -40,6 +40,10 @@ public class AwxJobEndpoint extends Endpoint implements MessageHandler.Partial<S
         }
     }
 
+    public boolean isSessionOpen() {
+        return this.session != null && this.session.isOpen();
+    }
+
     @Override
     public void onOpen(Session session, EndpointConfig config) {
         try {
@@ -76,6 +80,12 @@ public class AwxJobEndpoint extends Endpoint implements MessageHandler.Partial<S
     @Override
     public void onError(Session session, Throwable cause) {
         LOG.error("WebSocket error occurred", cause);
+    }
+
+    @Override
+    public void onClose(Session session, CloseReason closeReason) {
+        LOG.warn("WebSocket connection to AWX closed: {}", closeReason);
+        this.session = null;
     }
 
 

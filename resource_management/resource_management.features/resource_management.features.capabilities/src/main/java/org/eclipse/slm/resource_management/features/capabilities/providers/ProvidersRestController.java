@@ -25,9 +25,10 @@ public class ProvidersRestController implements ProvidersRestApi {
     }
 
     @Override
-    public List<ServiceHoster> getServiceHosters(Optional<ServiceHosterFilter> filter) {
+    public List<ServiceHoster> getServiceHosters(ServiceHosterFilter filter) {
         try {
-            return serviceHosterHandler.getServiceHosters(filter);
+            var optionalFilter = Optional.ofNullable(filter);
+            return serviceHosterHandler.getServiceHosters(optionalFilter);
         } catch (ConsulLoginFailedException e) {
             LOG.warn("Failed to log into Consul. Return empty list of service hoster.");
             return new ArrayList<>();

@@ -10,7 +10,7 @@ import java.util.UUID;
 public class CapabilityServiceNotFoundException extends Exception {
 
     public CapabilityServiceNotFoundException(CapabilityService capabilityService) {
-        this(capabilityService.getId());
+        this(capabilityService.getServiceId());
     }
 
     public CapabilityServiceNotFoundException(UUID capabilityServiceId) {
