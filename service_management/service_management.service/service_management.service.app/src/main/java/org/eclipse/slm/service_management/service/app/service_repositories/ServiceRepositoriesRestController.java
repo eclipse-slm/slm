@@ -1,19 +1,18 @@
 package org.eclipse.slm.service_management.service.app.service_repositories;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
 import org.eclipse.slm.service_management.model.service_repositories.ServiceRepository;
-import org.eclipse.slm.service_management.model.service_repositories.ServiceRepositoryDTOApiRead;
 import org.eclipse.slm.service_management.model.service_repositories.ServiceRepositoryCreateResponse;
+import org.eclipse.slm.service_management.model.service_repositories.ServiceRepositoryDTOApiRead;
 import org.eclipse.slm.service_management.model.vendors.exceptions.ServiceVendorAccessDenied;
-import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.TypeToken;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,19 +20,16 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/services/vendors/{serviceVendorId}/repositories")
-public class ServiceRepositoriesRestController {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ServiceRepositoriesRestController.class);
+@RequestMapping(ServiceRepositoriesRestApiConfig.BASE_PATH)
+@Tag(name = ServiceRepositoriesRestApiConfig.TAG)
+public class ServiceRepositoriesRestController implements ServiceRepositoriesRestApi {
 
     @Autowired
     private ServiceRepositoryHandler serviceRepositoryHandler;
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    @Operation(summary = "Get repositories containing files for service offerings")
-    @ResponseBody
+    @Override
     public ResponseEntity<List<ServiceRepositoryDTOApiRead>> getRepositories(
-            @PathVariable(name = "serviceVendorId") UUID serviceVendorId
+            UUID serviceVendorId
     ) throws ServiceVendorAccessDenied, ServiceRepositoryNotFound {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
@@ -50,12 +46,10 @@ public class ServiceRepositoriesRestController {
         }
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    @Operation(summary = "Create repository containing files for service offerings")
-    @ResponseBody
+    @Override
     public ResponseEntity<ServiceRepositoryCreateResponse> createRepository(
-            @PathVariable(name = "serviceVendorId") UUID serviceVendorId,
-            @RequestBody ServiceRepository serviceRepository
+            UUID serviceVendorId,
+            ServiceRepository serviceRepository
     ) throws ServiceVendorAccessDenied {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
@@ -73,13 +67,11 @@ public class ServiceRepositoriesRestController {
         }
     }
 
-    @RequestMapping(value = "/{serviceRepositoryId}", method = RequestMethod.PUT)
-    @Operation(summary = "Create or update a repository containing files for service offerings")
-    @ResponseBody
+    @Override
     public ResponseEntity<ServiceRepositoryCreateResponse> createOrUpdateRepository(
-            @PathVariable(name = "serviceVendorId") UUID serviceVendorId,
-            @PathVariable(name = "serviceRepositoryId") UUID serviceRepositoryId,
-            @RequestBody ServiceRepository serviceRepository
+            UUID serviceVendorId,
+            UUID serviceRepositoryId,
+            ServiceRepository serviceRepository
     ) throws ServiceVendorAccessDenied {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
@@ -97,12 +89,10 @@ public class ServiceRepositoriesRestController {
         }
     }
 
-    @RequestMapping(value = "/{repositoryId}", method = RequestMethod.DELETE)
-    @Operation(summary = "Delete repository containing files for service offerings")
-    @ResponseBody
-    public ResponseEntity deleteRepository(
-            @PathVariable(name = "serviceVendorId") UUID serviceVendorId,
-            @PathVariable(name = "repositoryId") UUID repositoryId
+    @Override
+    public ResponseEntity<Void> deleteRepository(
+            UUID serviceVendorId,
+            UUID repositoryId
     ) throws ServiceVendorAccessDenied {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 

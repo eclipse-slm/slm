@@ -2,7 +2,6 @@ package org.eclipse.slm.resource_management.common.remote_access;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.UUID;
 
-@RequestMapping("/resources")
-@Tag(name = "Resources")
 public interface RemoteAccessRestApi {
 
     @RequestMapping(value = "/{resourceId}/remote-access/{remoteAccessId}", method = RequestMethod.GET)

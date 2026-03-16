@@ -2,7 +2,7 @@ package org.eclipse.slm.service_management.service.app.service_instances;
 
 import org.eclipse.slm.service_management.model.services.ServiceInstanceGroup;
 import org.eclipse.slm.service_management.persistence.api.ServiceInstanceGroupJpaRepository;
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,8 +13,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/services/instances/groups")
-public class ServiceInstancesGroupsRestController {
+@RequestMapping(ServiceInstancesGroupsRestApiConfig.BASE_PATH)
+@Tag(name = ServiceInstancesGroupsRestApiConfig.TAG)
+public class ServiceInstancesGroupsRestController implements ServiceInstancesGroupsRestApi {
 
     private final ServiceInstancesHandler serviceInstancesHandler;
 
@@ -26,10 +27,9 @@ public class ServiceInstancesGroupsRestController {
         this.serviceInstanceGroupJpaRepository = serviceInstanceGroupJpaRepository;
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    @Operation(summary = "Get service instance groups")
+    @Override
     public ResponseEntity<List<ServiceInstanceGroup>> getServiceInstanceGroups(
-            @RequestParam(name = "filterById", required = false) Optional<UUID> filterById
+            Optional<UUID> filterById
     ) {
         if(filterById.isPresent()) {
             var optionalLocation = serviceInstanceGroupJpaRepository.findById(filterById.get());
@@ -39,10 +39,9 @@ public class ServiceInstancesGroupsRestController {
         }
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    @Operation(summary = "Create service instance group")
+    @Override
     public ResponseEntity<ServiceInstanceGroup> createServiceInstanceGroup(
-            @RequestBody ServiceInstanceGroup group
+            ServiceInstanceGroup group
     ){
         group.setId(UUID.randomUUID());
         group = serviceInstanceGroupJpaRepository.save(group);
@@ -50,11 +49,10 @@ public class ServiceInstancesGroupsRestController {
         return ResponseEntity.ok(group);
     }
 
-    @RequestMapping(value = "{serviceInstanceGroupId}", method = RequestMethod.PUT)
-    @Operation(summary = "Create or update service instance group")
+    @Override
     public ResponseEntity<ServiceInstanceGroup> createOrUpdateServiceInstanceGroup(
-            @PathVariable(name = "serviceInstanceGroupId") UUID serviceInstanceGroupId,
-            @RequestBody ServiceInstanceGroup group
+            UUID serviceInstanceGroupId,
+            ServiceInstanceGroup group
     ){
         group.setId(serviceInstanceGroupId);
         group = serviceInstanceGroupJpaRepository.save(group);
@@ -62,10 +60,9 @@ public class ServiceInstancesGroupsRestController {
         return ResponseEntity.ok(group);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.DELETE)
-    @Operation(summary = "Delete service instance group")
-    public ResponseEntity deleteServiceInstanceGroup(
-            @RequestParam(name = "id") UUID id
+    @Override
+    public ResponseEntity<Void> deleteServiceInstanceGroup(
+            UUID id
     ) {
         serviceInstanceGroupJpaRepository.deleteById(id);
 

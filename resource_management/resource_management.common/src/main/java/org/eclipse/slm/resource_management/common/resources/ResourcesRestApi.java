@@ -1,7 +1,6 @@
 package org.eclipse.slm.resource_management.common.resources;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceDefinitionException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.UUID;
 
-@RequestMapping(ResourcesRestApiConfig.BASE_PATH)
-@Tag(name = ResourcesRestApiConfig.TAG)
 public interface ResourcesRestApi {
 
     @RequestMapping(value = "", method = RequestMethod.GET)

@@ -18,7 +18,6 @@ import org.eclipse.slm.service_management.model.offerings.exceptions.ServiceOffe
 import org.eclipse.slm.service_management.model.offerings.ServiceRequirement;
 import org.eclipse.slm.service_management.model.offerings.responses.ServiceOfferingVersionCreateResponse;
 import org.eclipse.slm.service_management.model.vendors.exceptions.ServiceVendorNotFoundException;
-import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
@@ -36,9 +35,9 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/services/offerings/{serviceOfferingId}/versions")
-@Tag(name = "Service Offering Versions")
-public class ServiceOfferingVersionsRestController {
+@RequestMapping(ServiceOfferingVersionsRestApiConfig.BASE_PATH)
+@Tag(name = ServiceOfferingVersionsRestApiConfig.TAG)
+public class ServiceOfferingVersionsRestController implements ServiceOfferingVersionsRestApi {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServiceOfferingVersionsRestController.class);
 
@@ -54,10 +53,9 @@ public class ServiceOfferingVersionsRestController {
         this.serviceOfferingOrderHandler = serviceOfferingOrderHandler;
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get service offering versions of service offering")
+    @Override
     public ResponseEntity<List<ServiceOfferingVersionDTOApi>> getServiceOfferingVersionsOfServiceOffering(
-            @PathVariable(name = "serviceOfferingId") UUID serviceOfferingId
+            UUID serviceOfferingId
     ) throws ServiceOfferingNotFoundException {
         var serviceOfferingVersions = this.serviceOfferingVersionHandler
                 .getServiceOfferingVersionsOfServiceOffering(serviceOfferingId);
@@ -68,11 +66,10 @@ public class ServiceOfferingVersionsRestController {
         return ResponseEntity.ok(serviceOfferingVersionsDTOApi);
     }
 
-    @RequestMapping(value = "/{serviceOfferingVersionId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get service offering version by id")
+    @Override
     public ResponseEntity<ServiceOfferingVersionDTOApi> getServiceOfferingVersionById(
-            @PathVariable(name = "serviceOfferingId") UUID serviceOfferingId,
-            @PathVariable(name = "serviceOfferingVersionId") UUID serviceOfferingVersionId) throws ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException {
+            UUID serviceOfferingId,
+            UUID serviceOfferingVersionId) throws ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException {
         var serviceOfferingVersion = this.serviceOfferingVersionHandler
                 .getServiceOfferingVersionById(serviceOfferingId, serviceOfferingVersionId);
 
@@ -82,35 +79,32 @@ public class ServiceOfferingVersionsRestController {
         return ResponseEntity.ok(serviceOfferingVersionDTOApi);
     }
 
-    @RequestMapping(value = "/{serviceOfferingVersionId}/requirements", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get service offering version requirements by id")
+    @Override
     public ResponseEntity<List<ServiceRequirement>> getServiceOfferingVersionRequirementsById(
-            @PathVariable(name = "serviceOfferingId") UUID serviceOfferingId,
-            @PathVariable(name = "serviceOfferingVersionId") UUID serviceOfferingVersionId) throws ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException {
+            UUID serviceOfferingId,
+            UUID serviceOfferingVersionId) throws ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException {
         var serviceOfferingVersion = this.serviceOfferingVersionHandler
                 .getServiceOfferingVersionById(serviceOfferingId, serviceOfferingVersionId);
 
         return ResponseEntity.ok(serviceOfferingVersion.getServiceRequirements());
     }
 
-    @RequestMapping(value = "/{serviceOfferingVersionId}/requirements", method = RequestMethod.PUT)
-    @Operation(summary = "Create or update requirements for service offering version")
-    public @ResponseBody ResponseEntity createOrUpdateServiceOfferingVersionRequirementsWithId(
-            @PathVariable(name = "serviceOfferingId") UUID serviceOfferingId,
-            @PathVariable(name = "serviceOfferingVersionId") UUID serviceOfferingVersionId,
-            @RequestBody List<ServiceRequirement> requirements) throws ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException {
+    @Override
+    public @ResponseBody ResponseEntity<Void> createOrUpdateServiceOfferingVersionRequirementsWithId(
+            UUID serviceOfferingId,
+            UUID serviceOfferingVersionId,
+            List<ServiceRequirement> requirements) throws ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException {
         var serviceOfferingVersion = this.serviceOfferingVersionHandler
                 .getServiceOfferingVersionById(serviceOfferingId, serviceOfferingVersionId);
         serviceOfferingVersion.setServiceRequirements(requirements);
 
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    @Operation(summary = "Create new service offering version")
+    @Override
     public ResponseEntity<ServiceOfferingVersionCreateResponse> createServiceOfferingVersionWithAutoGeneratedId(
-            @PathVariable(name = "serviceOfferingId") UUID serviceOfferingId,
-            @RequestBody ServiceOfferingVersionDTOApi serviceOfferingVersionDTOApi)
+            UUID serviceOfferingId,
+            ServiceOfferingVersionDTOApi serviceOfferingVersionDTOApi)
             throws ServiceOfferingNotFoundException, ServiceOfferingVersionCreateException {
 
         serviceOfferingVersionDTOApi.setServiceOfferingId(serviceOfferingId);
@@ -120,12 +114,11 @@ public class ServiceOfferingVersionsRestController {
         return ResponseEntity.ok(new ServiceOfferingVersionCreateResponse(serviceOfferingVersion));
     }
 
-    @RequestMapping(value = "/{serviceOfferingVersionId}", method = RequestMethod.PUT)
-    @Operation(summary = "Create new service offering version with specified id or update existing one")
+    @Override
     public ResponseEntity<ServiceOfferingVersionCreateResponse> createOrUpdateServiceOfferingVersionWithId(
-            @PathVariable(name = "serviceOfferingId") UUID serviceOfferingId,
-            @PathVariable(name = "serviceOfferingVersionId") UUID serviceOfferingVersionId,
-            @RequestBody ServiceOfferingVersionDTOApi serviceOfferingVersionDTOApi)
+            UUID serviceOfferingId,
+            UUID serviceOfferingVersionId,
+            ServiceOfferingVersionDTOApi serviceOfferingVersionDTOApi)
             throws ServiceOfferingNotFoundException, ServiceOfferingVersionCreateException {
 
         serviceOfferingVersionDTOApi.setServiceOfferingId(serviceOfferingId);
@@ -136,23 +129,21 @@ public class ServiceOfferingVersionsRestController {
         return ResponseEntity.ok(new ServiceOfferingVersionCreateResponse(serviceOfferingVersion));
     }
 
-    @RequestMapping(value = "/{serviceOfferingVersionId}", method = RequestMethod.DELETE)
-    @Operation(summary = "Delete service offering version")
+    @Override
     public @ResponseBody ResponseEntity<Void> deleteServiceOfferingVersion(
-            @PathVariable(name = "serviceOfferingId") UUID serviceOfferingId,
-            @PathVariable(name = "serviceOfferingVersionId") UUID serviceOfferingVersionId
+            UUID serviceOfferingId,
+            UUID serviceOfferingVersionId
     ) throws ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, ServiceVendorNotFoundException, ServiceCategoryNotFoundException {
         this.serviceOfferingVersionHandler.deleteServiceOfferingVersionById(serviceOfferingId, serviceOfferingVersionId);
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/{serviceOfferingVersionId}/order", method = RequestMethod.POST)
-    @Operation(summary = "Order service offering version")
+    @Override
     public ResponseEntity<Void> orderServiceOfferingVersionById(
-            @PathVariable(name = "serviceOfferingId") UUID serviceOfferingId,
-            @PathVariable(name = "serviceOfferingVersionId") UUID serviceOfferingVersionId,
-            @RequestBody ServiceOrder serviceOrder,
-            @RequestParam(name = "deploymentCapabilityServiceId") UUID deploymentCapabilityServiceId)
+            UUID serviceOfferingId,
+            UUID serviceOfferingVersionId,
+            ServiceOrder serviceOrder,
+            UUID deploymentCapabilityServiceId)
             throws SSLException, JsonProcessingException, ServiceOptionNotFoundException,
             ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException, ConsulLoginFailedException {
 
@@ -164,11 +155,10 @@ public class ServiceOfferingVersionsRestController {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/{serviceOfferingVersionId}/matching-resources", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get possible resources matching service requirements")
+    @Override
     public @ResponseBody ResponseEntity<List<MatchingResourceDTO>> getResourcesMatchingServiceRequirements(
-            @PathVariable(name = "serviceOfferingId") UUID serviceOfferingId,
-            @PathVariable(name = "serviceOfferingVersionId") UUID serviceOfferingVersionId)
+            UUID serviceOfferingId,
+            UUID serviceOfferingVersionId)
             throws SSLException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
@@ -177,12 +167,11 @@ public class ServiceOfferingVersionsRestController {
         return ResponseEntity.ok().body(matchingResources);
     }
 
-    @RequestMapping(value = "/{serviceOfferingVersionId}/file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, method = RequestMethod.POST)
-    @Operation(summary = "Upload new service offering file for deployment ")
+    @Override
     public ResponseEntity<Void> createOrUpdateServiceOfferingFileWithId(
-            @PathVariable(name = "serviceOfferingId") UUID serviceOfferingId,
-            @PathVariable(name = "serviceOfferingVersionId") UUID serviceOfferingVersionId,
-            @RequestPart("file") MultipartFile file
+            UUID serviceOfferingId,
+            UUID serviceOfferingVersionId,
+            MultipartFile file
     )
             throws ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, MinioUploadException, MinioBucketCreateException, MinioRemoveObjectException, MinioObjectPathNameException, MinioBucketNameException {
 
@@ -192,12 +181,11 @@ public class ServiceOfferingVersionsRestController {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/{serviceOfferingVersionId}/file/{fileName}", method = RequestMethod.GET)
-    @Operation(summary = "Download service offering file ")
+    @Override
     public ResponseEntity<InputStreamResource> getServiceOfferingFileWithId(
-            @PathVariable(name = "serviceOfferingId") UUID serviceOfferingId,
-            @PathVariable(name = "serviceOfferingVersionId") UUID serviceOfferingVersionId,
-            @PathVariable(name = "fileName") String fileName
+            UUID serviceOfferingId,
+            UUID serviceOfferingVersionId,
+            String fileName
     ) throws Exception {
 
         var result = this.serviceOfferingVersionHandler

@@ -1,7 +1,6 @@
 package org.eclipse.slm.resource_management.features.device_integration.firmware_update;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.slm.common.minio.model.exceptions.MinioBucketCreateException;
 import org.eclipse.slm.common.minio.model.exceptions.MinioBucketNameException;
 import org.eclipse.slm.common.minio.model.exceptions.MinioObjectPathNameException;
@@ -24,8 +23,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-@RequestMapping("/resources")
-@Tag(name = "Updates")
 public interface FirmwareUpdatesRestApi {
 
     @RequestMapping(value = "/{resourceId}/updates", method = RequestMethod.GET)

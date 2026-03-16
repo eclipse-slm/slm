@@ -7,13 +7,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/services/offerings/{serviceOfferingId}/versions/{aasId}/aas")
-@Tag(name = "Service Offering Versions")
-public class ServiceOfferingVersionsSubmodelRepositoryHTTPApiController extends MultiSubmodelRepositoryHTTPApiController {
+@RequestMapping(ServiceOfferingVersionsSubmodelRepositoryHTTPApiConfig.BASE_PATH)
+@Tag(name = ServiceOfferingVersionsSubmodelRepositoryHTTPApiConfig.TAG)
+public class ServiceOfferingVersionsSubmodelRepositoryHTTPApiController
+        extends MultiSubmodelRepositoryHTTPApiController
+        implements ServiceOfferingVersionsSubmodelRepositoryHTTPApi {
 
     @Autowired
-    public ServiceOfferingVersionsSubmodelRepositoryHTTPApiController(ServiceOfferingVersionsSubmodelRepositoryFactory submodelRepositoryFactory) {
+    public ServiceOfferingVersionsSubmodelRepositoryHTTPApiController(
+            ServiceOfferingVersionsSubmodelRepositoryFactory submodelRepositoryFactory
+    ) {
         super(submodelRepositoryFactory);
     }
-
 }

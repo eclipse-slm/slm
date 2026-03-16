@@ -11,7 +11,7 @@ import org.eclipse.slm.service_management.model.vendors.ServiceVendorDeveloper;
 import org.eclipse.slm.service_management.model.vendors.exceptions.ServiceVendorNotFoundException;
 import org.eclipse.slm.service_management.model.vendors.responses.ServiceVendorCreateResponse;
 import org.eclipse.slm.service_management.persistence.keycloak.ServiceVendorRepository;
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +26,9 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/services/vendors")
-public class ServiceVendorsRestController {
+@RequestMapping(ServiceVendorsRestApiConfig.BASE_PATH)
+@Tag(name = ServiceVendorsRestApiConfig.TAG)
+public class ServiceVendorsRestController implements ServiceVendorsRestApi {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServiceVendorsRestController.class);
 
@@ -40,10 +41,9 @@ public class ServiceVendorsRestController {
         this.serviceVendorRepository = serviceVendorRepository;
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get service vendors")
+    @Override
     public ResponseEntity<List<ServiceVendor>> getServiceVendors(
-            @RequestParam(name = "withImage", required = false, defaultValue = "false") boolean withImage) {
+            boolean withImage) {
         var serviceVendors = this.serviceVendorRepository.getServiceVendors();
         if (!withImage) {
             for (var serviceVendor : serviceVendors) {
@@ -54,11 +54,10 @@ public class ServiceVendorsRestController {
         return ResponseEntity.ok(serviceVendors);
     }
 
-    @RequestMapping(value = "/{serviceVendorId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get service vendor by id")
+    @Override
     public ResponseEntity<ServiceVendor> getServiceVendorById(
-            @PathVariable(name = "serviceVendorId") UUID serviceVendorId,
-            @RequestParam(name = "withImage", required = false, defaultValue = "false") boolean withImage
+            UUID serviceVendorId,
+            boolean withImage
     ) throws ServiceVendorNotFoundException {
         var serviceVendorOptional = this.serviceVendorRepository.getServiceVendorById(serviceVendorId);
         if (serviceVendorOptional.isPresent()) {
@@ -73,9 +72,9 @@ public class ServiceVendorsRestController {
         }
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Override
     public ResponseEntity<ServiceVendorCreateResponse> createServiceVendor(
-            @RequestBody ServiceVendorDTOApi serviceVendorDTOApi) {
+            ServiceVendorDTOApi serviceVendorDTOApi) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var realm =  KeycloakTokenUtil.getRealm(jwtAuthenticationToken);
         serviceVendorDTOApi.setId(UUID.randomUUID());
@@ -87,10 +86,10 @@ public class ServiceVendorsRestController {
         return ResponseEntity.ok(response);
     }
 
-    @RequestMapping(value = "/{serviceVendorId}", method = RequestMethod.PUT)
+    @Override
     public ResponseEntity<Void> createOrUpdateServiceVendorWithId(
-            @PathVariable(name = "serviceVendorId") UUID serviceVendorId,
-            @RequestBody ServiceVendorDTOApi serviceVendorDTOApi) {
+            UUID serviceVendorId,
+            ServiceVendorDTOApi serviceVendorDTOApi) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var realm =  KeycloakTokenUtil.getRealm(jwtAuthenticationToken);
 
@@ -102,18 +101,18 @@ public class ServiceVendorsRestController {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/{serviceVendorId}", method = RequestMethod.DELETE)
+    @Override
     public ResponseEntity<Void> deleteServiceVendor(
-            @PathVariable(name = "serviceVendorId") UUID serviceVendorId
+            UUID serviceVendorId
     ) throws ServiceVendorNotFoundException, ServiceVendorRuntimeException {
         this.serviceVendorRepository.deleteServiceVendorById(serviceVendorId, "fabos");
 
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/{serviceVendorId}/logo", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    @Override
     public ResponseEntity<byte[]> getLogoOfServiceVendor(
-            @PathVariable(name = "serviceVendorId") UUID serviceVendorId
+            UUID serviceVendorId
     ) throws ServiceVendorNotFoundException {
         var serviceVendorLogo = this.serviceVendorRepository.getServiceVendorLogo(serviceVendorId);
         return ResponseEntity.ok()
@@ -121,9 +120,9 @@ public class ServiceVendorsRestController {
                 .body(serviceVendorLogo);
     }
 
-    @RequestMapping(value = "/{serviceVendorId}/developers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Override
     public ResponseEntity<List<ServiceVendorDeveloper>> getDevelopersOfServiceVendor(
-            @PathVariable(name = "serviceVendorId") UUID serviceVendorId) throws KeycloakGroupNotFoundException, ServiceVendorNotFoundException
+            UUID serviceVendorId) throws KeycloakGroupNotFoundException, ServiceVendorNotFoundException
     {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var realm =  KeycloakTokenUtil.getRealm(jwtAuthenticationToken);
@@ -132,10 +131,10 @@ public class ServiceVendorsRestController {
         return ResponseEntity.ok(serviceVendorDevelopers);
     }
 
-    @RequestMapping(value = "/{serviceVendorId}/developers/{userId}", method = RequestMethod.PUT)
+    @Override
     public ResponseEntity<Void> addDeveloperToServiceVendor(
-            @PathVariable(name = "serviceVendorId") UUID serviceVendorId,
-            @PathVariable(name = "userId") UUID userId)
+            UUID serviceVendorId,
+            UUID userId)
         throws ServiceVendorNotFoundException, KeycloakUserNotFoundException, KeycloakGroupNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var realm =  KeycloakTokenUtil.getRealm(jwtAuthenticationToken);
@@ -144,10 +143,10 @@ public class ServiceVendorsRestController {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/{serviceVendorId}/developers/{userId}", method = RequestMethod.DELETE)
+    @Override
     public ResponseEntity<Void> removeDeveloperFromServiceVendor(
-            @PathVariable(name = "serviceVendorId") UUID serviceVendorId,
-            @PathVariable(name = "userId") UUID userId)
+            UUID serviceVendorId,
+            UUID userId)
         throws ServiceVendorNotFoundException, KeycloakUserNotFoundException, KeycloakGroupNotFoundException
     {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
