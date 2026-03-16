@@ -79,7 +79,7 @@ fabric.properties
 
 # Build output
 target/
-/node_modules/
+node_modules/
 /monitoring/
 /lib/
 site/
