@@ -14,7 +14,10 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     siteTitle: "",
-    logo: '/img/logo.svg',
+    logo: {
+     light: '/img/logo.svg',
+     dark: '/img/logo_white.svg'
+    },
 
     nav: [
       {
