@@ -6,10 +6,14 @@ permalink: /docs/usage/api/
 All components of the Service Lifecycle Management have a REST API. More details about the individual APIs are described below.
 
 ## Authentication
-All APIs are secured using token-based authentication via Keycloak. To get a access token from Keycloak, the request below can be used. It will return a JSON containing a filed `access_token`. This token must be used for authentication on the component APIs.
-::: warning ATTENTION
-`<<your-slm-host>>`, `<<your-username>>` and `<<your-password>>`must be replaced!
-:::
+Protected API endpoints require authentication. Depending on the endpoint and component security configuration, one of the following authentication methods can be used:
+
+- Bearer token via Keycloak
+- API key via the `X-API-KEY` request header
+
+### Authentication via bearer token (Keycloak)
+
+To get an access token from Keycloak, the request below can be used. It will return a JSON containing a field `access_token`. This token can then be used for authenticated requests against the component APIs.
 ```sh
 curl --request POST \
   --url http://<<your-slm-host>>:7080/auth/realms/fabos/protocol/openid-connect/token \
@@ -19,6 +23,26 @@ curl --request POST \
   --data username=<<your-username>> \
   --data password=<<your-password>>
   ```
+
+### Authentication via API key
+
+Some endpoints can also be called using API key authentication. In this case, the API key must be sent in the `X-API-KEY` request header.
+
+This is especially useful for:
+
+- automation scripts
+- bootstrapping scenarios
+- service-to-service communication without interactive user login
+
+Example:
+
+```sh
+curl --request GET \
+  --url https://<<your-slm-host>>/platform-management/users/example-user \
+  --header 'X-API-KEY: <<your-api-key>>'
+```
+
+Whether API key authentication is supported depends on the respective endpoint and component security configuration.
 
 ## External Components
 
@@ -87,37 +111,21 @@ The REST API of Vault is reachable under the following URL `http://<<your-slm-ho
 URL: `http://<<your-slm-host>>:{{ $slm.ports.catalogService }}{{ $slm.basePaths.catalogService }}`
 
 ### Platform Management
-URL: `http://<<your-slm-host>>:{{ $slm.ports.platformManagement }}{{ $slm.basePaths.platformManagement }}`. \
-API documentation is available via Swagger `http://<<your-slm-host>>:{{ $slm.ports.platformManagement }}{{ $slm.basePaths.platformManagement }}/swagger-ui/index.html`. When requests are made via the Swagger UI, an Authorization is required via the "Authorize" button. If spring_oauth is used, it will redirect to the Keycloak login page.
+URL: `http://<<your-slm-host>>/{{ $slm.basePaths.platformManagement }}`. \
+API documentation is available via Swagger `https://<<your-slm-host>>/{{ $slm.basePaths.platformManagement }}/swagger-ui/index.html`. When requests are made via the Swagger UI, an Authorization is required via the "Authorize" button. If spring_oauth is used, it will redirect to the Keycloak login page.
 
 ### Notification Service
-URL: `http://<<your-slm-host>>:{{ $slm.ports.notificationService }}{{ $slm.basePaths.notificationService }}`. \
-API documentation is available via Swagger `http://<<your-slm-host>>:{{ $slm.ports.notificationService }}{{ $slm.basePaths.notificationService }}/swagger-ui/index.html`. When requests are made via the Swagger UI, an Authorization is required via the "Authorize" button. If spring_oauth is used, it will redirect to the Keycloak login page.
+URL: `https://<<your-slm-host>>/{{ $slm.basePaths.notificationService }}` \
+API documentation is available via Swagger `https://<<your-slm-host>>/{{ $slm.basePaths.notificationService }}/swagger-ui/index.html`. When requests are made via the Swagger UI, an Authorization is required via the "Authorize" button. If spring_oauth is used, it will redirect to the Keycloak login page.
 
 ### Resource Management
-URL: `http://<<your-slm-host>>:{{ $slm.ports.resourceManagement }}{{ $slm.basePaths.resourceManagement }}` \
-API documentation is available via Swagger `http://<<your-slm-host>>:{{ $slm.ports.resourceManagement }}{{ $slm.basePaths.resourceManagement }}/swagger-ui/index.html`. When requests are made via the Swagger UI, an Authorization is required via the "Authorize" button. If spring_oauth is used, it will redirect to the Keycloak login page.
+URL: `https://<<your-slm-host>>/{{ $slm.basePaths.resourceManagement }}` \
+API documentation is available via Swagger `https://<<your-slm-host>>/{{ $slm.basePaths.resourceManagement }}/swagger-ui/index.html`. When requests are made via the Swagger UI, an Authorization is required via the "Authorize" button. If spring_oauth is used, it will redirect to the Keycloak login page.
 
 ### Service Management
-URL: `http://<<your-slm-host>>:{{ $slm.ports.serviceManagement }}{{ $slm.basePaths.serviceManagement }}` \
-API documentation is available via Swagger `http://<<your-slm-host>>:{{ $slm.ports.serviceManagement }}{{ $slm.basePaths.serviceManagement }}/swagger-ui/index.html`. When requests are made via the Swagger UI, an Authorization is required via the "Authorize" button. If spring_oauth is used, it will redirect to the Keycloak login page.
+URL: `https://<<your-slm-host>>/{{ $slm.basePaths.serviceManagement }}` \
+API documentation is available via Swagger `https://<<your-slm-host>>/{{ $slm.basePaths.serviceManagement }}/swagger-ui/index.html`. When requests are made via the Swagger UI, an Authorization is required via the "Authorize" button. If spring_oauth is used, it will redirect to the Keycloak login page.
 
 ### Information Service
-URL: `http://<<your-slm-host>>:{{ $slm.ports.informationService }}{{ $slm.basePaths.informationService }}` \
-API documentation is available via Swagger `http://<<your-slm-host>>:{{ $slm.ports.informationService }}{{ $slm.basePaths.informationService }}/swagger-ui/index.html`. When requests are made via the Swagger UI, an Authorization is required via the "Authorize" button. If spring_oauth is used, it will redirect to the Keycloak login page.
-
-
-## Postman
-In order to simplify the use of the API, there is a public [Postman workspace](https://www.postman.com/fabos-ai/workspace/service-lifecycle-management). The requests can be viewed without a Postman account. For sending requests, an account and a locally installed [Postman desktop client](https://www.postman.com/downloads/) are required:
-
-1) Login to your Postman account
-2) Open the [Postman workspace](https://www.postman.com/fabos-ai/workspace/service-lifecycle-management) of the Service Lifecycle Management
-3) Select `Collections` tab on the left and fork collection `Service Lifecycle Management` by right-clicking the collection and select `Create a fork`
-   ![postman_fork_collection](/img/figures/api/postman_fork_collection.png)
-4) Enter the required details and hit `Fork Collection`
-   ![postman_fork_collection_details](/img/figures/api/postman_fork_collection_details.png)
-5) Your selected Postman workspace will open and show the forked collection. Select `Environments` tab on the left and press `Import`. A dialog will show up and ask to `Upload Files`:
-   ![postman_import_environment](/img/figures/api/postman_import_environment.png)
-6) Select the file `postman-env.json` generated by the [Config Exporter](/docs/development/development-environment#local-development). The file wil be parsed to an environment with the name schema `SLM - <<your-slm-hostname>>`. Press the `Import` button to finally import the environment.
-7) To perform the request of the forked collection against your Service Lifecycle Management instance you need to select the imported environment in the upper right corner:
-   ![postman_select_environment](/img/figures/api/postman_select_environment.png)
+URL: `https://<<your-slm-host>>{{ $slm.basePaths.informationService }}` \
+API documentation is available via Swagger `https://<<your-slm-host>>/{{ $slm.basePaths.informationService }}/swagger-ui/index.html`. When requests are made via the Swagger UI, an Authorization is required via the "Authorize" button. If spring_oauth is used, it will redirect to the Keycloak login page.

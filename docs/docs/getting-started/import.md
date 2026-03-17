@@ -3,9 +3,10 @@ permalink: /docs/getting-started/import/
 ---
 
 # Import
-After initial setup, publicly available content (e.g., service offerings) can be imported into your instance of the Service Lifecycle Management.
+After initial setup, publicly available content (e.g., service offerings) can be imported into your instance of the Service Lifecycle Management or
+source information can be added to the Resource Management.
 
-## Service Registry
+## Service Management
 To import content into the Service Registry of the Service Lifecycle Management local directories or git repositories can be used. See the two sections below for more information how to configure import from local directories or git repositories. The import can be started using this command:
 ``` sh
 docker-compose up --force-recreate service-registry-init
