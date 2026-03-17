@@ -2,9 +2,11 @@ import type { Theme } from 'vitepress';
 import DefaultTheme from 'vitepress/theme';
 import { enhanceAppWithTabs } from 'vitepress-plugin-tabs/client';
 import versions from '../components/versions.vue';
+import Layout from "./Layout.vue";
 
 export default <Theme>{
     extends: DefaultTheme,
+    Layout,
     enhanceApp({ app }) {
         enhanceAppWithTabs(app);
         app.component('versions', versions);

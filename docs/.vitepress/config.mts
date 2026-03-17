@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitepress'
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
+import lightbox from "vitepress-plugin-lightbox"
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -8,7 +9,8 @@ export default defineConfig({
   base: "/slm/",
   markdown: {
     config(md) {
-      md.use(tabsMarkdownPlugin)
+      md.use(tabsMarkdownPlugin);
+      md.use(lightbox, {});
     }
   },
   themeConfig: {
