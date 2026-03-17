@@ -54,7 +54,7 @@ export default defineConfig({
                 { text: "Step 5: Deploy Service", link: "/docs/getting-started/first-steps/step5-deploy-service" }
               ]
             },
-            'getting-started/import',
+            { text: "Import", link: "/docs/getting-started/import" },
           ],
         },
         {
@@ -62,12 +62,13 @@ export default defineConfig({
           collapsed: true,
           items: [
             { text: "Overview", link: "/docs/usage/" },
+            { text: "Credential Management", link: "/docs/usage/credential-management" },
             { text: "Capabilities", link: "/docs/usage/capabilities" },
             { text: "Clusters", link: "/docs/usage/clusters" },
             { text: "Discovery", link: "/docs/usage/discovery" },
             { text: "Profiler", link: "/docs/usage/profiler" },
             { text: "Service Offerings", link: "/docs/usage/service-offerings" },
-            { text: "Users", link: "/docs/usage/users" },
+            { text: "User Management", link: "/docs/usage/user-management" },
             { text: "API", link: "/docs/usage/api" },
             { text: "Reporting Issues", link: "/docs/usage/reporting-issues" },
           ],
