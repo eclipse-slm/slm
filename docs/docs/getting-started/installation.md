@@ -64,7 +64,9 @@ chmod +x run-installer.sh
 ==
 ::::
 
-
+SLM initializes its own PKI in Vault, including a dedicated Root CA, and issues certificates used by Traefik. Traefik acts as the HTTPS reverse proxy 
+and terminates TLS for incoming traffic. If you want to use your own certificate chain, place an additional proxy in front of Traefik. For more details, 
+see [Architecture - HTTPS](./architecture#https).
 
 ## Uninstall
 Run the following command to start the SLM uninstaller:
