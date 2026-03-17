@@ -7,7 +7,7 @@ permalink: /docs/development/development-environment/
 ## Local development
 
 **1) Setup SLM instance**
-To setup a SLM instance with the latest snapshot version follow the [installation instructions](/docs/getting-started/installation/) 
+To setup a SLM instance with the latest snapshot version follow the [installation instructions](/docs/getting-started/installation) 
 and use the latest snapshot version as tag or the SLM installer docker image (e.g. `ghcr.io/eclipse-slm/slm/installer:1.4.0-SNAPSHOT`).
 
 **1) Export Configuration**
