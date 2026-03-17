@@ -21,7 +21,8 @@ export default <Theme>{
                 notificationService: '9002',
                 informationService: '9003',
                 resourceManagement: '9010',
-                serviceManagement: '9020'
+                serviceManagement: '9020',
+                vault: '8200'
             },
             basePaths: {
                 catalogService: '/catalog-service',
