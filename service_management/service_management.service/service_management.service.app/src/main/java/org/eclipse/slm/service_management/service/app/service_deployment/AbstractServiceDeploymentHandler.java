@@ -13,7 +13,6 @@ import org.eclipse.slm.service_management.service.app.service_instances.ServiceI
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import javax.net.ssl.SSLException;
-import java.util.Optional;
 import java.util.UUID;
 
 public class AbstractServiceDeploymentHandler {
@@ -71,7 +70,7 @@ public class AbstractServiceDeploymentHandler {
             JwtAuthenticationToken jwtAuthenticationToken, UUID deploymentCapabilityServiceId)
             throws CapabilityServiceNotFoundException {
         var accessToken = jwtAuthenticationToken.getToken().getTokenValue();
-        var resourceManagementClient = resourceManagementClientFactory.create(accessToken);
+        var resourceManagementClient = resourceManagementClientFactory.createWithBearerTokenAuth(accessToken);
 
         var serviceHosterFilter = new ServiceHosterFilter.Builder()
                 .capabilityServiceId(deploymentCapabilityServiceId)

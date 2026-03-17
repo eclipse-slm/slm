@@ -1,20 +1,20 @@
 # Service Management
 service-management:
-  url: http://localhost:9020
+  scheme: http
+  host: localhost
+  port: 9020
+  path: /service-management
+  url: ${service-management.scheme}://${service-management.host}:${service-management.port}${service-management.path}
   init-directories:
   git-repos:
     urls: "https://github.com/FabOS-AI/fabos-slm-service-registry-content.git"
     clone-directory: tmp/
-
-# Keycloak
-keycloak:
-  auth-server-url: http://localhost:7080/auth
-  realm: fabos
-  username: fabos
-  password: password
+  api-key: your-service-management-api-key
 
 # Spring
 spring:
+  config:
+    import: "optional:consul:"
   cloud:
     consul:
       host: ${consul.host}

@@ -14,10 +14,10 @@ public class ResourceManagementClient extends AbstractApiClient {
     private final CapabilitiesApiClient capabilitiesApiClient;
     private final ProvidersApiClient providersApiClient;
 
-    public ResourceManagementClient(String platformManagementBaseUrl,
+    public ResourceManagementClient(String resourceManagementBaseUrl,
                                     ObjectFactory<HttpMessageConverters> messageConverters,
                                     AuthRequestInterceptor authRequestInterceptor) {
-        super(platformManagementBaseUrl, messageConverters, authRequestInterceptor);
+        super(resourceManagementBaseUrl, messageConverters, authRequestInterceptor);
 
         var profilerRestApiBaseUrl = this.baseUrl + ProfilerRestApiConfig.BASE_PATH;
         this.profilerRestApiClient = this.buildFeignClient(ProfilerRestApiClient.class, profilerRestApiBaseUrl);

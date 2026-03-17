@@ -2,7 +2,6 @@ package org.eclipse.slm.service_management.service.initializer;
 
 import jakarta.transaction.Transactional;
 import org.eclipse.slm.common.utils.serviceofferingimport.DTOConfig;
-import org.eclipse.slm.service_management.service.client.handler.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +77,7 @@ public class Application {
 
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
-    public void init() throws IOException, ApiException, InterruptedException {
+    public void init() throws IOException, InterruptedException {
         List<ServiceInstance> serviceManagementInstances = discoveryClient.getInstances("service-management");
         while (serviceManagementInstances.size() == 0) {
             var services = discoveryClient.getServices();

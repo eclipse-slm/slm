@@ -3,14 +3,13 @@ package org.eclipse.slm.service_management.service.initializer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
+import org.eclipse.slm.common.aas.clients.base.FeignResponseException;
 import org.eclipse.slm.common.utils.files.FilesUtil;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendor;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendorDTOApi;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendorDTOFileImport;
-import org.eclipse.slm.service_management.service.client.handler.ApiException;
-import org.eclipse.slm.service_management.service.client.handler.ServiceVendorsRestControllerApi;
+import org.eclipse.slm.service_management.service.client.ServiceManagementClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -26,14 +25,11 @@ public class ServiceVendorsInitializer extends AbstractInitializer {
 
     private Map<String, ServiceVendor> serviceVendors = new HashMap<>();
 
-    private ServiceVendorsRestControllerApi serviceVendorsRestApi;
-
-    @PostConstruct
-    private void initApi() {
-        this.serviceVendorsRestApi = new ServiceVendorsRestControllerApi(this.apiClient);
+    protected ServiceVendorsInitializer(ServiceManagementClientFactory serviceManagementClientFactory) {
+        super(serviceManagementClientFactory);
     }
 
-    public void init(String initDirectory) throws ApiException, FileNotFoundException, JsonProcessingException {
+    public void init(String initDirectory) throws FileNotFoundException, JsonProcessingException {
         var serviceVendorsInitDirectory = initDirectory + "service-vendors/";
         var files = FilesUtil.findFiles(
                 serviceVendorsInitDirectory, "service-vendors", ".yaml");
@@ -58,20 +54,16 @@ public class ServiceVendorsInitializer extends AbstractInitializer {
                 var serviceVendorDTOApi = ObjectMapperUtils.map(serviceVendor, ServiceVendorDTOApi.class);
 
                 try {
-                    this.serviceVendorsRestApi.createOrUpdateServiceVendorWithId(serviceVendorDTOApi.getId(), this.keycloakRealm, serviceVendorDTOApi);
+                    this.serviceManagementClient.serviceVendors().createOrUpdateServiceVendorWithId(serviceVendorDTOApi.getId(), serviceVendorDTOApi);
                     this.serviceVendors.put(serviceVendor.getName(), serviceVendor);
-                } catch (ApiException e) {
+                } catch (FeignResponseException e) {
                     var objectMapper = new ObjectMapper();
                     LOG.error("API call for service vendor '" + objectMapper.writeValueAsString(serviceVendorDTOApi) + "' failed: " +
-                            "HTTP Code: " + e.getCode() + " | Message: " + e.getMessage() + " | Body: " + e.getResponseBody());
+                            "HTTP Code: " + e.getStatusCode() + " | Message: " + e.getMessage() + " | Body: " + e.getBody());
                 }
             }
 
             LOG.info("Service vendors initialization finished");
         }
-    }
-
-    public Map<String, ServiceVendor> getServiceVendors() {
-        return serviceVendors;
     }
 }

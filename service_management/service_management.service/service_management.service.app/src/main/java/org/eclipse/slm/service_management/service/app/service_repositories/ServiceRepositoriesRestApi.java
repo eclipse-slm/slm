@@ -16,20 +16,20 @@ import java.util.UUID;
 
 public interface ServiceRepositoriesRestApi {
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @RequestMapping(value = "/{serviceVendorId}/repositories", method = RequestMethod.GET)
     @Operation(summary = "Get repositories containing files for service offerings")
     ResponseEntity<List<ServiceRepositoryDTOApiRead>> getRepositories(
             @PathVariable(name = "serviceVendorId") UUID serviceVendorId
     ) throws ServiceVendorAccessDenied, ServiceRepositoryNotFound;
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "/{serviceVendorId}/repositories", method = RequestMethod.POST)
     @Operation(summary = "Create repository containing files for service offerings")
     ResponseEntity<ServiceRepositoryCreateResponse> createRepository(
             @PathVariable(name = "serviceVendorId") UUID serviceVendorId,
             @RequestBody ServiceRepository serviceRepository
     ) throws ServiceVendorAccessDenied;
 
-    @RequestMapping(value = "/{serviceRepositoryId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{serviceVendorId}/repositories/{serviceRepositoryId}", method = RequestMethod.PUT)
     @Operation(summary = "Create or update a repository containing files for service offerings")
     ResponseEntity<ServiceRepositoryCreateResponse> createOrUpdateRepository(
             @PathVariable(name = "serviceVendorId") UUID serviceVendorId,
@@ -37,7 +37,7 @@ public interface ServiceRepositoriesRestApi {
             @RequestBody ServiceRepository serviceRepository
     ) throws ServiceVendorAccessDenied;
 
-    @RequestMapping(value = "/{repositoryId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{serviceVendorId}/repositories/{repositoryId}", method = RequestMethod.DELETE)
     @Operation(summary = "Delete repository containing files for service offerings")
     ResponseEntity<Void> deleteRepository(
             @PathVariable(name = "serviceVendorId") UUID serviceVendorId,

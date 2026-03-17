@@ -1,6 +1,7 @@
 package org.eclipse.slm.service_management.service.app.service_categories;
 
 import jakarta.transaction.Transactional;
+import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUserOrApiKey;
 import org.eclipse.slm.service_management.model.offerings.ServiceCategory;
 import org.eclipse.slm.service_management.model.offerings.responses.ServiceCategoryCreateResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping(ServiceCategoriesRestApiConfig.BASE_PATH)
 @Tag(name = ServiceCategoriesRestApiConfig.TAG)
+@AuthorizedAsSlmUserOrApiKey
 public class ServiceCategoriesRestController implements ServiceCategoriesRestApi {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServiceCategoriesRestController.class);
@@ -44,6 +46,7 @@ public class ServiceCategoriesRestController implements ServiceCategoriesRestApi
     }
 
     @Override
+    @AuthorizedAsSlmUserOrApiKey
     public ResponseEntity<ServiceCategoryCreateResponse> createServiceCategory(ServiceCategory serviceCategory) {
         var createdServiceCategory = this.serviceCategoryHandler.createServiceCategory(serviceCategory);
         var response = new ServiceCategoryCreateResponse(createdServiceCategory.getId());
@@ -53,12 +56,14 @@ public class ServiceCategoriesRestController implements ServiceCategoriesRestApi
 
     @Transactional
     @Override
+    @AuthorizedAsSlmUserOrApiKey
     public ResponseEntity<Void> createOrUpdateServiceCategory(ServiceCategory serviceCategory) {
         var createdOrUpdatedServiceCategory = this.serviceCategoryHandler.createOrUpdateServiceCategory(serviceCategory);
         return ResponseEntity.ok().build();
     }
 
     @Override
+    @AuthorizedAsSlmUserOrApiKey
     public ResponseEntity<ServiceCategoryCreateResponse> deleteServiceCategories(long serviceCategoryId)
             throws ServiceCategoryNotFoundException {
         try {

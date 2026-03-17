@@ -3712,9 +3712,9 @@
         "operationId": "getServiceHosters",
         "parameters": [
           {
-            "name": "filter",
+            "name": "arg0",
             "in": "query",
-            "required": false,
+            "required": true,
             "schema": {
               "$ref": "#/components/schemas/ServiceHosterFilter"
             }
@@ -4391,6 +4391,11 @@
   "components": {
     "schemas": {
       "CreateResourceRequest": {
+        "required": [
+          "fullPathOwnerGroupId",
+          "resourceHostname",
+          "resourceIp"
+        ],
         "type": "object",
         "properties": {
           "resourceHostname": {
@@ -4673,11 +4678,11 @@
       "Key": {
         "type": "object",
         "properties": {
-          "value": {
-            "type": "string"
-          },
           "type": {
             "$ref": "#/components/schemas/KeyTypes"
+          },
+          "value": {
+            "type": "string"
           }
         }
       },
@@ -4743,13 +4748,13 @@
           "timestamp": {
             "type": "string"
           },
-          "correlationId": {
-            "type": "string"
-          },
           "messageType": {
             "$ref": "#/components/schemas/MessageTypeEnum"
           },
           "code": {
+            "type": "string"
+          },
+          "correlationId": {
             "type": "string"
           }
         }
@@ -5412,7 +5417,8 @@
         "type": "string",
         "enum": [
           "UNKNOWN_ERROR",
-          "INVALID_CREDENTIALS"
+          "INVALID_CREDENTIALS",
+          "FIRMWARE_VERSION_ALREADY_INSTALLED"
         ]
       },
       "FirmwareUpdateJobState": {
@@ -5699,14 +5705,14 @@
           "version": {
             "type": "string"
           },
-          "templateId": {
-            "type": "string"
-          },
           "revision": {
             "type": "string"
           },
           "creator": {
             "$ref": "#/components/schemas/Reference"
+          },
+          "templateId": {
+            "type": "string"
           },
           "embeddedDataSpecifications": {
             "type": "array",
@@ -5722,14 +5728,26 @@
           "id": {
             "type": "string"
           },
-          "idShort": {
-            "type": "string"
-          },
           "endpoints": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Endpoint"
             }
+          },
+          "idShort": {
+            "type": "string"
+          },
+          "administration": {
+            "$ref": "#/components/schemas/AdministrativeInformation"
+          },
+          "assetKind": {
+            "$ref": "#/components/schemas/AssetKind"
+          },
+          "assetType": {
+            "type": "string"
+          },
+          "globalAssetId": {
+            "type": "string"
           },
           "specificAssetIds": {
             "type": "array",
@@ -5743,24 +5761,6 @@
               "$ref": "#/components/schemas/SubmodelDescriptor"
             }
           },
-          "assetKind": {
-            "$ref": "#/components/schemas/AssetKind"
-          },
-          "assetType": {
-            "type": "string"
-          },
-          "administration": {
-            "$ref": "#/components/schemas/AdministrativeInformation"
-          },
-          "globalAssetId": {
-            "type": "string"
-          },
-          "description": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LangStringTextType"
-            }
-          },
           "displayName": {
             "type": "array",
             "items": {
@@ -5771,6 +5771,12 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Extension"
+            }
+          },
+          "description": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LangStringTextType"
             }
           }
         }
@@ -5897,20 +5903,8 @@
       "ProtocolInformation": {
         "type": "object",
         "properties": {
-          "subprotocol": {
-            "type": "string"
-          },
-          "subprotocolBody": {
-            "type": "string"
-          },
           "endpointProtocol": {
             "type": "string"
-          },
-          "securityAttributes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SecurityAttributeObject"
-            }
           },
           "endpointProtocolVersion": {
             "type": "array",
@@ -5918,8 +5912,20 @@
               "type": "string"
             }
           },
+          "subprotocol": {
+            "type": "string"
+          },
+          "subprotocolBody": {
+            "type": "string"
+          },
           "subprotocolBodyEncoding": {
             "type": "string"
+          },
+          "securityAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SecurityAttributeObject"
+            }
           },
           "href": {
             "type": "string"
@@ -5929,14 +5935,14 @@
       "SecurityAttributeObject": {
         "type": "object",
         "properties": {
+          "type": {
+            "$ref": "#/components/schemas/SecurityTypeEnum"
+          },
           "value": {
             "type": "string"
           },
           "key": {
             "type": "string"
-          },
-          "type": {
-            "$ref": "#/components/schemas/SecurityTypeEnum"
           }
         }
       },
@@ -5977,31 +5983,25 @@
           "id": {
             "type": "string"
           },
-          "idShort": {
-            "type": "string"
-          },
           "endpoints": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Endpoint"
             }
           },
+          "idShort": {
+            "type": "string"
+          },
           "semanticId": {
             "$ref": "#/components/schemas/Reference"
+          },
+          "administration": {
+            "$ref": "#/components/schemas/AdministrativeInformation"
           },
           "supplementalSemanticId": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Reference"
-            }
-          },
-          "administration": {
-            "$ref": "#/components/schemas/AdministrativeInformation"
-          },
-          "description": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LangStringTextType"
             }
           },
           "displayName": {
@@ -6014,6 +6014,12 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Extension"
+            }
+          },
+          "description": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LangStringTextType"
             }
           }
         }
@@ -6062,14 +6068,14 @@
       "Qualifier": {
         "type": "object",
         "properties": {
-          "value": {
-            "type": "string"
+          "kind": {
+            "$ref": "#/components/schemas/QualifierKind"
           },
           "type": {
             "type": "string"
           },
-          "kind": {
-            "$ref": "#/components/schemas/QualifierKind"
+          "value": {
+            "type": "string"
           },
           "valueType": {
             "$ref": "#/components/schemas/DataTypeDefXsd"
@@ -6111,16 +6117,16 @@
           "administration": {
             "$ref": "#/components/schemas/AdministrativeInformation"
           },
-          "description": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LangStringTextType"
-            }
-          },
           "displayName": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LangStringNameType"
+            }
+          },
+          "description": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LangStringTextType"
             }
           },
           "idShort": {
@@ -6170,16 +6176,16 @@
               "$ref": "#/components/schemas/EmbeddedDataSpecification"
             }
           },
-          "description": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LangStringTextType"
-            }
-          },
           "displayName": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LangStringNameType"
+            }
+          },
+          "description": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LangStringTextType"
             }
           },
           "idShort": {
@@ -6307,16 +6313,16 @@
           "administration": {
             "$ref": "#/components/schemas/AdministrativeInformation"
           },
-          "description": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LangStringTextType"
-            }
-          },
           "displayName": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LangStringNameType"
+            }
+          },
+          "description": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LangStringTextType"
             }
           },
           "idShort": {
@@ -6345,12 +6351,6 @@
           "defaultThumbnail": {
             "$ref": "#/components/schemas/Resource"
           },
-          "specificAssetIds": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SpecificAssetId"
-            }
-          },
           "assetKind": {
             "$ref": "#/components/schemas/AssetKind"
           },
@@ -6359,6 +6359,12 @@
           },
           "globalAssetId": {
             "type": "string"
+          },
+          "specificAssetIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SpecificAssetId"
+            }
           }
         }
       },
@@ -6509,6 +6515,7 @@
           "meta",
           "resourceId",
           "serviceClass",
+          "serviceId",
           "status",
           "tags"
         ],
@@ -6520,8 +6527,7 @@
           },
           "serviceId": {
             "type": "string",
-            "format": "uuid",
-            "writeOnly": true
+            "format": "uuid"
           },
           "capability": {
             "oneOf": [
@@ -6561,8 +6567,7 @@
             "type": "string"
           },
           "ID": {
-            "type": "string",
-            "format": "uuid"
+            "type": "string"
           },
           "Service": {
             "type": "string"
@@ -6651,6 +6656,7 @@
           "meta",
           "resourceId",
           "serviceClass",
+          "serviceId",
           "status",
           "tags"
         ],
@@ -6662,6 +6668,9 @@
           {
             "type": "object",
             "properties": {
+              "capability": {
+                "$ref": "#/components/schemas/Capability"
+              },
               "memberMapping": {
                 "type": "object",
                 "additionalProperties": {
@@ -6693,8 +6702,7 @@
         "type": "object",
         "properties": {
           "ID": {
-            "type": "string",
-            "format": "uuid"
+            "type": "string"
           },
           "Service": {
             "type": "string"
@@ -6757,6 +6765,7 @@
           "meta",
           "resourceId",
           "serviceClass",
+          "serviceId",
           "status",
           "tags"
         ],
@@ -6768,6 +6777,9 @@
           {
             "type": "object",
             "properties": {
+              "capability": {
+                "$ref": "#/components/schemas/Capability"
+              },
               "isManaged": {
                 "type": "boolean",
                 "writeOnly": true
@@ -7241,9 +7253,9 @@
         "description": "Oauth2 flow",
         "flows": {
           "authorizationCode": {
-            "authorizationUrl": "https://slm.dev-vm.local/auth/realms/fabos/protocol/openid-connect/auth",
-            "tokenUrl": "https://slm.dev-vm.local/auth/realms/fabos/protocol/openid-connect/token",
-            "refreshUrl": "https://slm.dev-vm.local/auth/realms/fabos/protocol/openid-connect/token",
+            "authorizationUrl": "https://localhost/auth/realms/fabos/protocol/openid-connect/auth",
+            "tokenUrl": "https://localhost/auth/realms/fabos/protocol/openid-connect/token",
+            "refreshUrl": "https://localhost/auth/realms/fabos/protocol/openid-connect/token",
             "scopes": {}
           }
         }

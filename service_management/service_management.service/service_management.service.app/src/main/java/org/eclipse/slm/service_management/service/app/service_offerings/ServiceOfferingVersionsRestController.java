@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.minio.model.exceptions.*;
+import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUser;
+import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUserOrApiKey;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
 import org.eclipse.slm.resource_management.common.model.MatchingResourceDTO;
 import org.eclipse.slm.service_management.model.exceptions.ServiceOptionNotFoundException;
@@ -37,6 +39,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(ServiceOfferingVersionsRestApiConfig.BASE_PATH)
 @Tag(name = ServiceOfferingVersionsRestApiConfig.TAG)
+@AuthorizedAsSlmUserOrApiKey
 public class ServiceOfferingVersionsRestController implements ServiceOfferingVersionsRestApi {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServiceOfferingVersionsRestController.class);
@@ -130,35 +133,29 @@ public class ServiceOfferingVersionsRestController implements ServiceOfferingVer
     }
 
     @Override
-    public @ResponseBody ResponseEntity<Void> deleteServiceOfferingVersion(
-            UUID serviceOfferingId,
-            UUID serviceOfferingVersionId
-    ) throws ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, ServiceVendorNotFoundException, ServiceCategoryNotFoundException {
+    public @ResponseBody ResponseEntity<Void> deleteServiceOfferingVersion(UUID serviceOfferingId, UUID serviceOfferingVersionId)
+            throws ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException {
         this.serviceOfferingVersionHandler.deleteServiceOfferingVersionById(serviceOfferingId, serviceOfferingVersionId);
         return ResponseEntity.ok().build();
     }
 
     @Override
-    public ResponseEntity<Void> orderServiceOfferingVersionById(
-            UUID serviceOfferingId,
-            UUID serviceOfferingVersionId,
-            ServiceOrder serviceOrder,
-            UUID deploymentCapabilityServiceId)
-            throws SSLException, JsonProcessingException, ServiceOptionNotFoundException,
-            ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException, ConsulLoginFailedException {
+    @AuthorizedAsSlmUser
+    public ResponseEntity<Void> orderServiceOfferingVersionById(UUID serviceOfferingId, UUID serviceOfferingVersionId, ServiceOrder serviceOrder)
+            throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, ServiceOfferingNotFoundException,
+            ServiceOfferingVersionNotFoundException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException, ConsulLoginFailedException {
 
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         this.serviceOfferingOrderHandler
                 .orderServiceOfferingById(serviceOfferingId, serviceOfferingVersionId,
-                        serviceOrder, deploymentCapabilityServiceId, jwtAuthenticationToken);
+                        serviceOrder, jwtAuthenticationToken);
 
         return ResponseEntity.ok().build();
     }
 
     @Override
-    public @ResponseBody ResponseEntity<List<MatchingResourceDTO>> getResourcesMatchingServiceRequirements(
-            UUID serviceOfferingId,
-            UUID serviceOfferingVersionId)
+    @AuthorizedAsSlmUser
+    public @ResponseBody ResponseEntity<List<MatchingResourceDTO>> getResourcesMatchingServiceRequirements(UUID serviceOfferingId, UUID serviceOfferingVersionId)
             throws SSLException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
@@ -168,12 +165,9 @@ public class ServiceOfferingVersionsRestController implements ServiceOfferingVer
     }
 
     @Override
-    public ResponseEntity<Void> createOrUpdateServiceOfferingFileWithId(
-            UUID serviceOfferingId,
-            UUID serviceOfferingVersionId,
-            MultipartFile file
-    )
-            throws ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, MinioUploadException, MinioBucketCreateException, MinioRemoveObjectException, MinioObjectPathNameException, MinioBucketNameException {
+    public ResponseEntity<Void> createOrUpdateServiceOfferingFileWithId(UUID serviceOfferingId, UUID serviceOfferingVersionId, MultipartFile file)
+            throws ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, MinioUploadException, MinioBucketCreateException,
+            MinioRemoveObjectException, MinioObjectPathNameException, MinioBucketNameException {
 
         this.serviceOfferingVersionHandler
                 .createOrUpdateServiceOfferingFile(serviceOfferingId, serviceOfferingVersionId, file);
@@ -182,11 +176,8 @@ public class ServiceOfferingVersionsRestController implements ServiceOfferingVer
     }
 
     @Override
-    public ResponseEntity<InputStreamResource> getServiceOfferingFileWithId(
-            UUID serviceOfferingId,
-            UUID serviceOfferingVersionId,
-            String fileName
-    ) throws Exception {
+    public ResponseEntity<InputStreamResource> getServiceOfferingFileWithId(UUID serviceOfferingId, UUID serviceOfferingVersionId, String fileName)
+            throws Exception {
 
         var result = this.serviceOfferingVersionHandler
                 .getServiceOfferingFile(serviceOfferingId, serviceOfferingVersionId, fileName);

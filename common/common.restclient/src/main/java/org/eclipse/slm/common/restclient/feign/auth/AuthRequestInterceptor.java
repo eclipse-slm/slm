@@ -7,7 +7,11 @@ public abstract class AuthRequestInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate requestTemplate) {
-        requestTemplate.header("Authorization", this.getAuthorizationHeaderValue());
+        requestTemplate.header(this.getAuthorizationHeaderKey(), this.getAuthorizationHeaderValue());
+    }
+
+    public String getAuthorizationHeaderKey() {
+        return "Authorization";
     }
 
     public abstract String getAuthorizationHeaderValue();

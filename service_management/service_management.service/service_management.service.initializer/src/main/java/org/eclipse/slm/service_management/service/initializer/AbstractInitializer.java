@@ -1,12 +1,10 @@
 package org.eclipse.slm.service_management.service.initializer;
 
 import org.eclipse.slm.common.utils.files.FilesUtil;
-import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
-import org.eclipse.slm.service_management.service.client.ServiceManagementApiClientInitializer;
-import org.eclipse.slm.service_management.service.client.handler.ApiClient;
+import org.eclipse.slm.service_management.service.client.ServiceManagementClient;
+import org.eclipse.slm.service_management.service.client.ServiceManagementClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -20,31 +18,23 @@ public abstract class AbstractInitializer {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractInitializer.class);
 
-    @Autowired
-    protected ServiceManagementApiClientInitializer serviceManagementApiClientInitializer;
+    protected final ServiceManagementClientFactory serviceManagementClientFactory;
 
     @Value("#{'${service-management.init-directories}'.split(',')}")
     private String[] serviceManagementInitDirectoryPathConfigs;
 
-    @Value("${keycloak.auth-server-url}")
-    protected String keycloakAuthServerUrl;
+    @Value("${service-management.api-key}")
+    protected String serviceManagementApiKey;
 
-    @Value("${keycloak.realm}")
-    protected String keycloakRealm;
+    protected ServiceManagementClient serviceManagementClient;
 
-    @Value("${keycloak.username}")
-    protected String keycloakUsername;
-
-    @Value("${keycloak.password}")
-    protected String keycloakPassword;
-
-    protected ApiClient apiClient;
+    protected AbstractInitializer(ServiceManagementClientFactory serviceManagementClientFactory) {
+        this.serviceManagementClientFactory = serviceManagementClientFactory;
+    }
 
     @PostConstruct
     private void initApiClient() {
-        var keycloakAccessToken = KeycloakTokenUtil.getAccessTokenFromKeycloakInstance(
-                this.keycloakAuthServerUrl, this.keycloakRealm, this.keycloakUsername, this.keycloakPassword);
-        this.apiClient = serviceManagementApiClientInitializer.init(keycloakAccessToken);
+        this.serviceManagementClient = serviceManagementClientFactory.createWithApiKeyAuth(this.serviceManagementApiKey);
     }
 
     protected List<String> getInitDirectories() {

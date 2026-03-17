@@ -75,7 +75,7 @@ public class ServiceOfferingOrderHandler {
 
     public void orderServiceOfferingById(UUID serviceOfferingId, UUID serviceOfferingVersionId,
                                          ServiceOrder serviceOrder,
-                                         UUID deploymentCapabilityServiceId, JwtAuthenticationToken jwtAuthenticationToken)
+                                         JwtAuthenticationToken jwtAuthenticationToken)
             throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException, ConsulLoginFailedException {
         var serviceOffering = this.serviceOfferingHandler.getServiceOfferingById(serviceOfferingId);
         var serviceOfferingVersion = this.serviceOfferingVersionHandler
@@ -115,10 +115,10 @@ public class ServiceOfferingOrderHandler {
                                 var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
                                 switch (deploymentVariable) {
                                     case TARGET_RESOURCE_ID -> {
-                                        var resourceManagementClient = resourceManagementClientFactory.create(accessToken);
+                                        var resourceManagementClient = resourceManagementClientFactory.createWithBearerTokenAuth(accessToken);
 
                                         var serviceHosterFilter = new ServiceHosterFilter.Builder()
-                                                .capabilityServiceId(deploymentCapabilityServiceId)
+                                                .capabilityServiceId(serviceOrder.getDeploymentCapabilityServiceId())
                                                 .build();
                                         var serviceHosters = resourceManagementClient.providers().getServiceHosters(serviceHosterFilter);
                                         var resourceId = this.getResourceIdOfServiceHoster(serviceHosters.get(0).getCapabilityService());
@@ -126,9 +126,9 @@ public class ServiceOfferingOrderHandler {
                                     }
 
                                     case TARGET_RESOURCE_IP -> {
-                                        var resourceManagementClient = resourceManagementClientFactory.create(accessToken);
+                                        var resourceManagementClient = resourceManagementClientFactory.createWithBearerTokenAuth(accessToken);
                                         var serviceHosterFilter = new ServiceHosterFilter.Builder()
-                                                .capabilityServiceId(deploymentCapabilityServiceId)
+                                                .capabilityServiceId(serviceOrder.getDeploymentCapabilityServiceId())
                                                 .build();
                                         var serviceHosters = resourceManagementClient.providers().getServiceHosters(serviceHosterFilter);
                                         var resourceIp = this.getResourceIpOfServiceHoster(serviceHosters.get(0).getCapabilityService());
@@ -143,7 +143,7 @@ public class ServiceOfferingOrderHandler {
             }
         }
 
-        this.serviceDeploymentHandler.deployServiceOfferingToResource(jwtAuthenticationToken, deploymentCapabilityServiceId, serviceOfferingVersion, serviceOrder);
+        this.serviceDeploymentHandler.deployServiceOfferingToResource(jwtAuthenticationToken, serviceOfferingVersion, serviceOrder);
     }
 
     public List<MatchingResourceDTO> getCapabilityServicesMatchingServiceRequirements(UUID serviceOfferingId,
@@ -156,7 +156,7 @@ public class ServiceOfferingOrderHandler {
 
         var serviceOfferingDeploymentType = serviceOfferingVersion.getDeploymentDefinition().getDeploymentType();
         var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-        var resourceManagementClient = resourceManagementClientFactory.create(accessToken);
+        var resourceManagementClient = resourceManagementClientFactory.createWithBearerTokenAuth(accessToken);
 
         var serviceHosterFilter = new ServiceHosterFilter.Builder()
                 .supportedDeploymentType(serviceOfferingDeploymentType)
