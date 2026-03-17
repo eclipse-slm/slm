@@ -72,15 +72,15 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
 
     public DeploymentJobRun deployServiceOfferingToResource(
             JwtAuthenticationToken jwtAuthenticationToken,
-            UUID deploymentCapabilityServiceId,
-            ServiceOfferingVersion serviceOfferingVersion, ServiceOrder serviceOrder)
+            ServiceOfferingVersion serviceOfferingVersion,
+            ServiceOrder serviceOrder)
             throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException {
 
         var serviceId = UUID.randomUUID();
         serviceOrder.setServiceInstanceId(serviceId);
         var serviceOfferingDeploymentType = serviceOfferingVersion.getDeploymentType();
-        var serviceHoster = this.getServiceHoster(jwtAuthenticationToken, deploymentCapabilityServiceId);
-        serviceOrder.setDeploymentCapabilityServiceId(deploymentCapabilityServiceId);
+        var serviceHoster = this.getServiceHoster(jwtAuthenticationToken, serviceOrder.getDeploymentCapabilityServiceId());
+        serviceOrder.setDeploymentCapabilityServiceId(serviceOrder.getDeploymentCapabilityServiceId());
         var awxCapabilityAction = this.getAwxDeployCapabilityAction(ActionType.DEPLOY, serviceHoster.getCapabilityService().getCapability());
 
         AwxJobObserver awxJobObserver;
@@ -119,7 +119,7 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                 KubernetesManifestFile deployableManifestFile = this.getDeployableManifestFile(serviceOfferingVersion, serviceOrder);
 
                 HashMap<String, Object> extraVarsMap = new HashMap<>() {{
-                    put("resource_id", deploymentCapabilityServiceId);
+                    put("resource_id", serviceOrder.getDeploymentCapabilityServiceId());
                     put("service_id", serviceId);
                     put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
                     put("service_name", serviceHoster.getCapabilityService().getServiceName());

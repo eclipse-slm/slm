@@ -1,5 +1,7 @@
 package org.eclipse.slm.resource_management.common.remote_access;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUser;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -15,6 +18,8 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@RequestMapping(RemoteAccessRestApiConfig.BASE_PATH)
+@Tag(name = RemoteAccessRestApiConfig.TAG)
 public class RemoteAccessRestController implements RemoteAccessRestApi {
 
     private final static Logger LOG = LoggerFactory.getLogger(RemoteAccessRestController.class);

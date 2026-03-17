@@ -1,6 +1,5 @@
 package org.eclipse.slm.resource_management.service.initializer;
 
-import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementClient;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementClientFactory;
 import org.slf4j.Logger;
@@ -24,18 +23,8 @@ public abstract class AbstractInitializer {
     @Value("${resource-management.init-directories:init/}")
     private String resourceManagementInitDirectoryPathConfig;
 
-    @Value("${keycloak.auth-server-url}")
-    protected String keycloakAuthServerUrl;
-
-    @Value("${keycloak.realm}")
-    protected String keycloakRealm;
-
-    @Value("${keycloak.username}")
-    protected String keycloakUsername;
-
-    @Value("${keycloak.password}")
-    protected String keycloakPassword;
-
+    @Value("${resource-management.api-key}")
+    private String resourceManagementApiKey;
 
     public AbstractInitializer(FileUtil fileUtil, ResourceManagementClientFactory resourceManagementClientFactory) {
         this.fileUtil = fileUtil;
@@ -44,13 +33,7 @@ public abstract class AbstractInitializer {
 
     @PostConstruct
     private void initResourceManagementClient() {
-        var keycloakAccessToken = KeycloakTokenUtil.getAccessTokenFromKeycloakInstance(
-                this.keycloakAuthServerUrl,
-                this.keycloakRealm,
-                this.keycloakUsername,
-                this.keycloakPassword
-        );
-        this.resourceManagementClient = resourceManagementClientFactory.create(keycloakAccessToken);
+        this.resourceManagementClient = this.resourceManagementClientFactory.createWithApiKeyAuth(this.resourceManagementApiKey);
     }
 
     protected String getInitDirectory() throws FileNotFoundException {

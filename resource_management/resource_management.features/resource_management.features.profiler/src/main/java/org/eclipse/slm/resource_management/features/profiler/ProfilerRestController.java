@@ -25,14 +25,6 @@ public class ProfilerRestController implements ProfilerRestApi {
         this.profilerService = profilerService;
     }
 
-    public ResponseEntity<Profiler> createProfiler(ProfilerDTOApi profilerDTOApi) {
-        var createdProfiler = profilerService.createProfiler(
-                ProfilerToProfilerDTOApiMapper.INSTANCE.toEntity(profilerDTOApi)
-        );
-
-        return ResponseEntity.ok(createdProfiler);
-    }
-
     public ResponseEntity<List<Profiler>> getProfiler() {
         return ResponseEntity.ok(profilerService.getProfiler());
     }
@@ -60,6 +52,14 @@ public class ProfilerRestController implements ProfilerRestApi {
         );
 
         return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<Profiler> createProfiler(ProfilerDTOApi profilerDTOApi) {
+        var createdProfiler = profilerService.createProfiler(
+                ProfilerToProfilerDTOApiMapper.INSTANCE.toEntity(profilerDTOApi)
+        );
+
+        return ResponseEntity.ok(createdProfiler);
     }
 
     public ResponseEntity<Void> deleteProfiler(UUID profilerId) {

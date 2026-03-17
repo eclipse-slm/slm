@@ -1,14 +1,15 @@
 package org.eclipse.slm.platform_management.service.app.users;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmAdminOrApiKey;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/users")
-@Tag(name = "User Management")
+@RequestMapping(UserManagementRestApiConfig.BASE_PATH)
+@Tag(name = UserManagementRestApiConfig.TAG)
 public class UserManagementRestController implements UserManagementRestApi {
 
     private final UserManager userManager;
@@ -18,6 +19,7 @@ public class UserManagementRestController implements UserManagementRestApi {
     }
 
     @Override
+    @AuthorizedAsSlmAdminOrApiKey
     public ResponseEntity<Void> createUser(UserCreateRequest userCreateRequest) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
 

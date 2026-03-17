@@ -1,8 +1,10 @@
 package org.eclipse.slm.service_management.service.app.service_instances;
 
+import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUser;
+import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUserOrApiKey;
 import org.eclipse.slm.service_management.model.services.ServiceInstanceGroup;
 import org.eclipse.slm.service_management.persistence.api.ServiceInstanceGroupJpaRepository;
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,24 +15,20 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/services/instances/groups")
-public class ServiceInstancesGroupsRestController {
-
-    private final ServiceInstancesHandler serviceInstancesHandler;
+@RequestMapping(ServiceInstancesGroupsRestApiConfig.BASE_PATH)
+@Tag(name = ServiceInstancesGroupsRestApiConfig.TAG)
+@AuthorizedAsSlmUser
+public class ServiceInstancesGroupsRestController implements ServiceInstancesGroupsRestApi {
 
     private final ServiceInstanceGroupJpaRepository serviceInstanceGroupJpaRepository;
 
     @Autowired
-    public ServiceInstancesGroupsRestController(ServiceInstancesHandler serviceInstancesHandler, ServiceInstanceGroupJpaRepository serviceInstanceGroupJpaRepository) {
-        this.serviceInstancesHandler = serviceInstancesHandler;
+    public ServiceInstancesGroupsRestController(ServiceInstanceGroupJpaRepository serviceInstanceGroupJpaRepository) {
         this.serviceInstanceGroupJpaRepository = serviceInstanceGroupJpaRepository;
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    @Operation(summary = "Get service instance groups")
-    public ResponseEntity<List<ServiceInstanceGroup>> getServiceInstanceGroups(
-            @RequestParam(name = "filterById", required = false) Optional<UUID> filterById
-    ) {
+    @Override
+    public ResponseEntity<List<ServiceInstanceGroup>> getServiceInstanceGroups(Optional<UUID> filterById) {
         if(filterById.isPresent()) {
             var optionalLocation = serviceInstanceGroupJpaRepository.findById(filterById.get());
             return ResponseEntity.ok(Arrays.asList(optionalLocation.get()));
@@ -39,34 +37,24 @@ public class ServiceInstancesGroupsRestController {
         }
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    @Operation(summary = "Create service instance group")
-    public ResponseEntity<ServiceInstanceGroup> createServiceInstanceGroup(
-            @RequestBody ServiceInstanceGroup group
-    ){
+    @Override
+    public ResponseEntity<ServiceInstanceGroup> createServiceInstanceGroup(ServiceInstanceGroup group){
         group.setId(UUID.randomUUID());
         group = serviceInstanceGroupJpaRepository.save(group);
 
         return ResponseEntity.ok(group);
     }
 
-    @RequestMapping(value = "{serviceInstanceGroupId}", method = RequestMethod.PUT)
-    @Operation(summary = "Create or update service instance group")
-    public ResponseEntity<ServiceInstanceGroup> createOrUpdateServiceInstanceGroup(
-            @PathVariable(name = "serviceInstanceGroupId") UUID serviceInstanceGroupId,
-            @RequestBody ServiceInstanceGroup group
-    ){
+    @Override
+    public ResponseEntity<ServiceInstanceGroup> createOrUpdateServiceInstanceGroup(UUID serviceInstanceGroupId, ServiceInstanceGroup group){
         group.setId(serviceInstanceGroupId);
         group = serviceInstanceGroupJpaRepository.save(group);
 
         return ResponseEntity.ok(group);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.DELETE)
-    @Operation(summary = "Delete service instance group")
-    public ResponseEntity deleteServiceInstanceGroup(
-            @RequestParam(name = "id") UUID id
-    ) {
+    @Override
+    public ResponseEntity<Void> deleteServiceInstanceGroup(UUID id) {
         serviceInstanceGroupJpaRepository.deleteById(id);
 
         return ResponseEntity.ok().build();

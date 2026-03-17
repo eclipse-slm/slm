@@ -175,7 +175,7 @@ public class ServiceDeploymentHandlerTest {
         var serviceOfferingOrder = new ServiceOrder();
 
         var deploymentJobRun = this.serviceDeploymentHandler
-                .deployServiceOfferingToResource(jwtAuthenticationToken, resourceId, serviceOfferingVersion, serviceOfferingOrder);
+                .deployServiceOfferingToResource(jwtAuthenticationToken, serviceOfferingVersion, serviceOfferingOrder);
         var serviceId = deploymentJobRun.getServiceInstance().getId();
 
         this.serviceDeploymentHandler.onJobStateFinished(deploymentJobRun.getAwxJobObserver(), JobFinalState.SUCCESSFUL);

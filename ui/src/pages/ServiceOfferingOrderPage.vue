@@ -63,13 +63,13 @@ const order = () => {
 
   const serviceOfferingVersionOrder = {
     serviceOptionValues: serviceOptionValues,
+    deploymentCapabilityServiceId: matchingResources.value.find(obj => obj.resourceId === selectedResourceId.value).capabilityServiceId,
   };
 
   showProgressCircular.value = true;
   ServiceManagementClient.serviceOfferingVersionsApi.orderServiceOfferingVersionById(
       serviceOfferingId.value,
       serviceOfferingVersionId.value,
-      matchingResources.value.find(obj => obj.resourceId === selectedResourceId.value).capabilityServiceId,
       serviceOfferingVersionOrder
   ).then(response => {
     console.log(response);

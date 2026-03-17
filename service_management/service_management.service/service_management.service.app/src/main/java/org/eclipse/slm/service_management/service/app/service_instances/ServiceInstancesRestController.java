@@ -14,7 +14,7 @@ import org.eclipse.slm.service_management.model.services.ServiceInstanceDetails;
 import org.eclipse.slm.service_management.model.services.exceptions.ServiceInstanceGroupNotFoundException;
 import org.eclipse.slm.service_management.model.services.exceptions.ServiceInstanceNotFoundException;
 import org.eclipse.slm.service_management.model.services.exceptions.ServiceInstanceUpdateException;
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,8 +25,9 @@ import javax.net.ssl.SSLException;
 import java.util.*;
 
 @RestController
-@RequestMapping("/services/instances")
-public class ServiceInstancesRestController {
+@RequestMapping(ServiceInstancesRestApiConfig.BASE_PATH)
+@Tag(name = ServiceInstancesRestApiConfig.TAG)
+public class ServiceInstancesRestController implements ServiceInstancesRestApi {
 
     private final ServiceInstancesHandler serviceInstancesHandler;
 
@@ -35,8 +36,7 @@ public class ServiceInstancesRestController {
         this.serviceInstancesHandler = serviceInstancesHandler;
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    @Operation(summary = "Get all services of user")
+    @Override
     public ResponseEntity<List<ServiceInstance>> getServicesOfUser()
             throws ConsulLoginFailedException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
@@ -45,10 +45,9 @@ public class ServiceInstancesRestController {
         return ResponseEntity.ok(serviceInstances);
     }
 
-    @RequestMapping(value = "/{serviceInstanceId}", method = RequestMethod.DELETE)
-    @Operation(summary = "Delete a service instance")
+    @Override
     public ResponseEntity<Void> deleteServiceInstance(
-        @PathVariable(name = "serviceInstanceId") UUID serviceInstanceId)
+        UUID serviceInstanceId)
             throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException,
             ServiceOfferingVersionNotFoundException, SSLException, CapabilityServiceNotFoundException {
 
@@ -58,10 +57,9 @@ public class ServiceInstancesRestController {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/{serviceInstanceId}/versions", method = RequestMethod.GET)
-    @Operation(summary = "Get available version changes for service instance")
+    @Override
     public ResponseEntity<List<AvailableServiceInstanceVersionChange>> getAvailableVersionChangesForServiceInstance(
-            @PathVariable(name = "serviceInstanceId") UUID serviceInstanceId
+            UUID serviceInstanceId
     ) throws ConsulLoginFailedException, ServiceInstanceNotFoundException,
             ServiceOfferingNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
@@ -71,11 +69,10 @@ public class ServiceInstancesRestController {
         return ResponseEntity.ok(availableVersionChanges);
     }
 
-    @RequestMapping(value = "/{serviceInstanceId}/versions", method = RequestMethod.POST)
-    @Operation(summary = "Change service instance to version")
-    public ResponseEntity updateServiceInstanceToVersion(
-            @PathVariable(name = "serviceInstanceId") UUID serviceInstanceId,
-            @RequestParam(name = "targetServiceOfferingVersionId") UUID targetServiceOfferingVersionId
+    @Override
+    public ResponseEntity<Void> updateServiceInstanceToVersion(
+            UUID serviceInstanceId,
+            UUID targetServiceOfferingVersionId
     ) throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException,
             ServiceInstanceUpdateException, SSLException, JsonProcessingException, ServiceOptionNotFoundException,
             InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException {
@@ -85,19 +82,17 @@ public class ServiceInstancesRestController {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/{serviceInstanceId}/orders", method = RequestMethod.GET)
-    @Operation(summary = "Get orders of service instance")
+    @Override
     public ResponseEntity<List<ServiceOrder>> getOrdersOfServiceInstance(
-            @PathVariable(name = "serviceInstanceId") UUID serviceInstanceId
+            UUID serviceInstanceId
     ) {
         var orders = this.serviceInstancesHandler.getOrdersOfServiceInstance(serviceInstanceId);
         return ResponseEntity.ok(orders);
     }
 
-    @RequestMapping(value = "/{serviceInstanceId}/details", method = RequestMethod.GET)
-    @Operation(summary = "Get details of service instance")
+    @Override
     public ResponseEntity<ServiceInstanceDetails> getServiceInstanceDetails(
-            @PathVariable(name = "serviceInstanceId") UUID serviceInstanceId
+            UUID serviceInstanceId
     ) throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, ServiceInstanceRuntimeException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
@@ -107,11 +102,10 @@ public class ServiceInstancesRestController {
         return ResponseEntity.ok(serviceInstanceDetails);
     }
 
-    @RequestMapping(value = "/{serviceInstanceId}/groups", method = RequestMethod.PUT)
-    @Operation(summary = "Set groups for service instance")
-    public ResponseEntity setGroupsOfServiceInstance(
-            @PathVariable(name = "serviceInstanceId") UUID serviceInstanceId,
-            @RequestBody List<UUID> groupIds
+    @Override
+    public ResponseEntity<Void> setGroupsOfServiceInstance(
+            UUID serviceInstanceId,
+            List<UUID> groupIds
     ) throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceInstanceGroupNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 

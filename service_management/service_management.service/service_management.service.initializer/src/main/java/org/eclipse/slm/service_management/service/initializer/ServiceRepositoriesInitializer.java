@@ -3,11 +3,11 @@ package org.eclipse.slm.service_management.service.initializer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
+import org.eclipse.slm.common.restclient.feign.FeignResponseException;
 import org.eclipse.slm.common.utils.files.FilesUtil;
 import org.eclipse.slm.service_management.model.service_repositories.ServiceRepository;
-import org.eclipse.slm.service_management.service.client.handler.ApiException;
-import org.eclipse.slm.service_management.service.client.handler.ServiceRepositoriesRestControllerApi;
+import org.eclipse.slm.service_management.model.vendors.exceptions.ServiceVendorAccessDenied;
+import org.eclipse.slm.service_management.service.client.ServiceManagementClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -22,14 +22,12 @@ public class ServiceRepositoriesInitializer extends AbstractInitializer {
 
     private Map<UUID, ServiceRepository> serviceRepositories = new HashMap<>();
 
-    private ServiceRepositoriesRestControllerApi serviceRepositoriesRestApi;
-
-    @PostConstruct
-    private void initApi() {
-        this.serviceRepositoriesRestApi = new ServiceRepositoriesRestControllerApi(this.apiClient);
+    protected ServiceRepositoriesInitializer(ServiceManagementClientFactory serviceManagementClientFactory) {
+        super(serviceManagementClientFactory);
     }
 
-    public void init(String initDirectory) throws FileNotFoundException, ApiException, JsonProcessingException {
+
+    public void init(String initDirectory) throws FileNotFoundException, JsonProcessingException {
         var files = FilesUtil.findFiles(initDirectory, "service-repositories", ".yaml");
         if (files.length == 0) {
             LOG.info("No init file '" + initDirectory + "service-repositories.yaml' found " +
@@ -40,24 +38,22 @@ public class ServiceRepositoriesInitializer extends AbstractInitializer {
             });
             for (var serviceRepository : serviceRepositories) {
                 try {
-                    this.serviceRepositoriesRestApi.createOrUpdateRepository(
+                    this.serviceManagementClient.serviceRepositories().createOrUpdateRepository(
                             serviceRepository.getServiceVendorId(),
                             serviceRepository.getId(),
-                            this.keycloakRealm, serviceRepository);
+                            serviceRepository);
                     this.serviceRepositories.put(serviceRepository.getId(), serviceRepository);
-                } catch (ApiException e) {
+                } catch (FeignResponseException e) {
                     var objectMapper = new ObjectMapper();
                     LOG.error("API call for service repository '" + objectMapper.writeValueAsString(serviceRepository) + "' failed: " +
-                            "HTTP Code: " + e.getCode() + " | Message: " + e.getMessage() + " | Body: " + e.getResponseBody());
+                            "HTTP Code: " + e.getStatusCode() + " | Message: " + e.getMessage() + " | Body: " + e.getBody());
+                } catch (ServiceVendorAccessDenied e) {
+                    throw new RuntimeException(e);
                 }
             }
 
             LOG.info("Service repository initialization finished");
 
         }
-    }
-
-    public Map<UUID, ServiceRepository> getServiceRepositories() {
-        return serviceRepositories;
     }
 }

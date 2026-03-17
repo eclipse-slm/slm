@@ -1,5 +1,7 @@
 package org.eclipse.slm.resource_management.common.resources;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUser;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceDefinitionException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
@@ -10,11 +12,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
 
 @RestController
+@RequestMapping(ResourcesRestApiConfig.BASE_PATH)
+@Tag(name = ResourcesRestApiConfig.TAG)
 public class ResourcesRestController implements ResourcesRestApi {
 
     private final static Logger LOG = LoggerFactory.getLogger(ResourcesRestController.class);

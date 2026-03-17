@@ -5,14 +5,13 @@ import org.eclipse.slm.common.aas.clients.auth.JwtAuthenticationTokenAuthRequest
 import org.eclipse.slm.common.aas.clients.submodelregistry.SubmodelRegistryClient;
 import org.eclipse.slm.common.aas.clients.submodelregistry.SubmodelRegistryClientFactory;
 import org.eclipse.slm.common.aas.clients.submodelservice.SubmodelServiceClient;
+import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -20,9 +19,9 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/metrics")
-@Tag(name = "Metrics")
-public class MetricsRestController {
+@RequestMapping(MetricsRestApiConfig.BASE_PATH)
+@Tag(name = MetricsRestApiConfig.TAG)
+public class MetricsRestController implements MetricsRestApi {
 
     private final Logger LOG = LoggerFactory.getLogger(MetricsRestController.class);
 
@@ -32,9 +31,9 @@ public class MetricsRestController {
         this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
     }
 
-    @RequestMapping(value = "/{resourceId}", method = RequestMethod.GET)
+    @Override
     public ResponseEntity<Map<String, Object>> getMetric(
-            @PathVariable(name = "resourceId") UUID resourceId
+            UUID resourceId
     ) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 

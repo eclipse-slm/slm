@@ -1,21 +1,21 @@
 package org.eclipse.slm.resource_management.common.aas;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShellDescriptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/resources")
-@Tag(name = "Resources AAS")
-public class ResourcesAasRestController {
+@RequestMapping(ResourcesAasRestApiConfig.BASE_PATH)
+@Tag(name = ResourcesAasRestApiConfig.TAG)
+public class ResourcesAasRestController implements ResourcesAasRestApi {
 
     private final ResourcesAasHandler resourcesAasHandler;
 
@@ -24,18 +24,16 @@ public class ResourcesAasRestController {
         this.resourcesAasHandler = resourcesAasHandler;
     }
 
-    @RequestMapping(value = "/{resourceId}/aas-descriptor", method = RequestMethod.GET)
-    @Operation(summary = "Get AAS descriptor of resource")
+    @Override
     public ResponseEntity<AssetAdministrationShellDescriptor> getResourceAasDescriptor(
-            @PathVariable(name = "resourceId") UUID resourceId
+            UUID resourceId
     ) {
         var aasDescriptor = this.resourcesAasHandler.getResourceAasDescriptor(resourceId);
 
         return ResponseEntity.ok(aasDescriptor.get());
     }
 
-    @RequestMapping(value = "/aas", method = RequestMethod.GET)
-    @Operation(summary = "Get all AAS of resources")
+    @Override
     public List<AssetAdministrationShell> getResourceAASDescriptors() {
         // TODO: Fix together with Profiler update
 //        var allAASDescriptors = this.aasRegistryClient.getAllShellDescriptors();

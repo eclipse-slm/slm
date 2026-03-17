@@ -5,7 +5,7 @@ import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.service_management.service.app.utils.MultiTenancyUtil;
 import org.eclipse.slm.service_management.model.users.User;
 import org.eclipse.slm.service_management.persistence.keycloak.ServiceVendorRepository;
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,8 +20,9 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/services/users")
-public class UsersRestController {
+@RequestMapping(UsersRestApiConfig.BASE_PATH)
+@Tag(name = UsersRestApiConfig.TAG)
+public class UsersRestController implements UsersRestApi {
 
     private final ServiceVendorRepository serviceVendorRepository;
 
@@ -36,8 +37,7 @@ public class UsersRestController {
         this.keycloakAdminClient = keycloakAdminClient;
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    @Operation(summary = "Get users")
+    @Override
     public @ResponseBody ResponseEntity<List<User>> getUsers()
     {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
@@ -57,8 +57,7 @@ public class UsersRestController {
         return ResponseEntity.ok(users);
     }
 
-    @RequestMapping(value = "/id", method = RequestMethod.GET)
-    @Operation(summary = "Get user id of authenticated user")
+    @Override
     public @ResponseBody
     UUID getUserIdOfAuthenticatedUser()
     {
@@ -68,8 +67,7 @@ public class UsersRestController {
         return userId;
     }
 
-    @RequestMapping(value = "/vendors", method = RequestMethod.GET)
-    @Operation(summary = "Get service vendors of authenticated user")
+    @Override
     public @ResponseBody ResponseEntity<List<UUID>> getServiceVendorsOfUser() {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 

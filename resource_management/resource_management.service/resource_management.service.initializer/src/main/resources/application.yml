@@ -11,6 +11,8 @@ spring:
       - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   application:
     name: resource_management_init
+  config:
+    import: "optional:consul:"
   cloud:
     consul:
       enabled: false
@@ -28,12 +30,7 @@ resource-management:
   path: /resource-management
   url: ${resource-management.scheme}://${resource-management.host}:${resource-management.port}${resource-management.path}
   init-directories: init/
-
-keycloak:
-  auth-server-url: http://localhost:7080/auth
-  realm: fabos
-  username: fabos
-  password: password
+  api-key: your-resource-management-api-key
 
 ### Consul
 consul:

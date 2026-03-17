@@ -2,6 +2,7 @@ package org.eclipse.slm.resource_management.features.importer;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;

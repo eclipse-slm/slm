@@ -96,10 +96,10 @@ services:
         max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
     environment:
       RESOURCEMANAGEMENT_URL: "{{ resource_management.url.internal }}"
-      KEYCLOAK_AUTHSERVERURL: "{{ keycloak.url.external_without_port }}"
-      KEYCLOAK_REALM: "{{ ENV.KEYCLOAK.REALM }}"
-      KEYCLOAK_USERNAME: "{{ ENV.USERS[0].USERNAME }}"
-      KEYCLOAK_PASSWORD: "{{ ENV.USERS[0].PASSWORD }}"
+      RESOURCEMANAGEMENT_APIKEY: "{{ app_configs['resource_management']['security']['api-key-auth']['value'] }}"
+      CONSUL_SCHEME: "{{ app_configs['resource_management']['consul']['scheme'] }}"
+      CONSUL_HOST: "{{ app_configs['resource_management']['consul']['host'] }}"
+      CONSUL_PORT: "{{ app_configs['resource_management']['consul']['port'] }}"
       CONSUL_ACLTOKEN: "{{ app_configs['resource_management']['consul']['acl-token'] }}"
     extra_hosts:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
@@ -154,12 +154,9 @@ services:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     environment:
       SERVICEMANAGEMENT_URL: "{{ service_management.url.internal }}"
+      SERVICEMANAGEMENT_APIKEY: "{{ app_configs['resource_management']['security']['api-key-auth']['value'] }}"
       SERVICEMANAGEMENT_INITDIRECTORIES: "{{ ENV.SERVICE_MANAGEMENT.INITIALIZATION_LOCAL_DIRECTORIES }}"
       SERVICEMANAGEMENT_GITREPOS_URLS: "{{ ENV.SERVICE_MANAGEMENT.INITIALIZATION_GIT_REPOS }}"
-      KEYCLOAK_AUTHSERVERURL: "{{ keycloak.url.external_without_port }}"
-      KEYCLOAK_REALM: "{{ ENV.KEYCLOAK.REALM }}"
-      KEYCLOAK_USERNAME: "{{ ENV.USERS[0].USERNAME }}"
-      KEYCLOAK_PASSWORD: "{{ ENV.USERS[0].PASSWORD }}"
       CONSUL_SCHEME: "{{ app_configs['service_management']['consul']['scheme'] }}"
       CONSUL_HOST: "{{ app_configs['service_management']['consul']['host'] }}"
       CONSUL_PORT: "{{ app_configs['service_management']['consul']['port'] }}"
