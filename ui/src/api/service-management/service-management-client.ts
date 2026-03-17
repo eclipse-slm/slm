@@ -1,13 +1,13 @@
 import {
-    ServiceCategoriesRestControllerApi,
-    ServiceInstancesGroupsRestControllerApi,
-    ServiceInstancesRestControllerApi,
-    ServiceManagementVariablesRestControllerApi,
-    ServiceOfferingRestControllerApi,
-    ServiceOfferingVersionsRestControllerApi,
-    ServiceRepositoriesRestControllerApi,
-    ServiceVendorsRestControllerApi,
-    UsersRestControllerApi
+    ServiceCategoriesApi,
+    ServiceInstanceGroupsApi,
+    ServiceInstancesApi,
+    ServiceManagementVariablesApi,
+    ServiceOfferingsApi,
+    ServiceOfferingVersionsApi,
+    ServiceRepositoriesApi,
+    ServiceVendorsApi,
+    UsersApi
 } from "@/api/service-management/client";
 
 
@@ -15,15 +15,15 @@ class ServiceManagementClient {
 
     api = "/service-management";
 
-    serviceInstancesGroupsApi = new ServiceInstancesGroupsRestControllerApi(undefined, this.api);
-    serviceInstancesApi = new ServiceInstancesRestControllerApi(undefined, this.api);
-    variablesApi = new ServiceManagementVariablesRestControllerApi(undefined, this.api);
-    serviceOfferingsApi = new ServiceOfferingRestControllerApi(undefined, this.api);
-    serviceOfferingVersionsApi = new ServiceOfferingVersionsRestControllerApi(undefined, this.api);
-    serviceVendorsApi = new ServiceVendorsRestControllerApi(undefined, this.api);
-    usersApi = new UsersRestControllerApi(undefined, this.api);
-    serviceCategoriesApi = new ServiceCategoriesRestControllerApi(undefined, this.api);
-    serviceRepositoriesApi = new ServiceRepositoriesRestControllerApi(undefined, this.api);
+    serviceInstancesGroupsApi = new ServiceInstanceGroupsApi(undefined, this.api);
+    serviceInstancesApi = new ServiceInstancesApi(undefined, this.api);
+    variablesApi = new ServiceManagementVariablesApi(undefined, this.api);
+    serviceOfferingsApi = new ServiceOfferingsApi(undefined, this.api);
+    serviceOfferingVersionsApi = new ServiceOfferingVersionsApi(undefined, this.api);
+    serviceVendorsApi = new ServiceVendorsApi(undefined, this.api);
+    usersApi = new UsersApi(undefined, this.api);
+    serviceCategoriesApi = new ServiceCategoriesApi(undefined, this.api);
+    serviceRepositoriesApi = new ServiceRepositoriesApi(undefined, this.api);
 
 }
 
