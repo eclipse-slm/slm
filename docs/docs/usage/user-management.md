@@ -20,7 +20,7 @@ Base URL:
 https://<<your-slm-host>>/platform-management
 ```
 
-For authentication, use API key or bearer token as described in the [API documentation](/docs/usage/api/).
+For authentication, use API key or bearer token as described in the [API documentation](/docs/usage/api).
 
 ## Create a user
 
