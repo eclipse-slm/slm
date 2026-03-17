@@ -64,6 +64,7 @@ export default defineConfig({
             { text: "Overview", link: "/docs/usage/" },
             { text: "Capabilities", link: "/docs/usage/capabilities" },
             { text: "Clusters", link: "/docs/usage/clusters" },
+            { text: "Discovery", link: "/docs/usage/discovery" },
             { text: "Profiler", link: "/docs/usage/profiler" },
             { text: "Service Offerings", link: "/docs/usage/service-offerings" },
             { text: "Users", link: "/docs/usage/users" },
