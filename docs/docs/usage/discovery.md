@@ -10,7 +10,7 @@ The driver is responsible for discovering resources in your environment and prov
 
 To check if you have a discovery driver installed
 
-::: info go to
+::: info GO TO
 Discovery > Drivers
 :::
 
@@ -23,7 +23,7 @@ driver:
 
 To start a discovery
 
-::: info go to
+::: info GO TO
 Discovery > Inbox
 :::
 
@@ -40,7 +40,7 @@ At the bottom right of the window a status messages indicates that the discovery
 
 To check the status of the discovery job 
 
-::: info go to
+::: info GO TO
 Discovery > Jobs
 :::
 
@@ -65,7 +65,7 @@ Confirm the adding of the device in the dialog by clicking on "Add" at the botto
 
 After the device has been added, the device will disappear from the discovery inbox. To see the device
 
-::: info go to
+::: info GO TO
 Devices > Instances
 :::
 
