@@ -154,7 +154,7 @@ services:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     environment:
       SERVICEMANAGEMENT_URL: "{{ service_management.url.internal }}"
-      SERVICEMANAGEMENT_APIKEY: "{{ app_configs['resource_management']['security']['api-key-auth']['value'] }}"
+      SERVICEMANAGEMENT_APIKEY: "{{ app_configs['service_management']['security']['api-key-auth']['value'] }}"
       SERVICEMANAGEMENT_INITDIRECTORIES: "{{ ENV.SERVICE_MANAGEMENT.INITIALIZATION_LOCAL_DIRECTORIES }}"
       SERVICEMANAGEMENT_GITREPOS_URLS: "{{ ENV.SERVICE_MANAGEMENT.INITIALIZATION_GIT_REPOS }}"
       CONSUL_SCHEME: "{{ app_configs['service_management']['consul']['scheme'] }}"
