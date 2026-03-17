@@ -15,11 +15,11 @@ In this short tutorial you will learn how to manage a resource using Service Lif
 ## Prerequisites
 * Installed Service Lifecycle Management instance (see [Installation](/docs/getting-started/installation))
 * A device with one of the following operating systems 
-    * Ubuntu: 18.04, 20.04, 21.10, 22.04
+    * Ubuntu: 18.04, 20.04, 21.10, 22.04, 24.04
     * CentOS: 7, 8 
     * Raspbian
 ::: tip INFO
-**Other operating systems may work, but were not tested yet**
+**Other operating systems may work, but are not tested yet**
 :::
 
 * SSH access to the device via username and password
