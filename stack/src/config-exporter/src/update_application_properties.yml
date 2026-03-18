@@ -11,11 +11,11 @@
     - regexp: "acl-token: .*"
       line: "  acl-token: {{ _app_config['consul']['acl-token'] }}"
     - regexp: "scheme: .*"
-      line: "  scheme: {{ _app_config['consul']['scheme'] }}"
+      line: "  scheme: {{ consul_scheme }}"
     - regexp: "host: .*"
-      line: "  host: {{ _app_config['consul']['host'] }}"
+      line: "  host: {{ consul_host }}"
     - regexp: "port: .*"
-      line: "  port: {{ _app_config['consul']['port'] }}"
+      line: "  port: {{ consul_port }}"
 
 - name: "Check if deployment section exists in '{{ _application_yml_file }}'"
   ansible.builtin.lineinfile:
