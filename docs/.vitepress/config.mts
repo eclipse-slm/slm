@@ -85,6 +85,7 @@ export default defineConfig({
                 { text: "Clusters", link: "/docs/usage/resource-management/clusters" },
                 { text: "Discovery", link: "/docs/usage/resource-management/discovery" },
                 { text: "Profiler", link: "/docs/usage/resource-management/profiler" },
+                { text: "Firmware Update", link: "/docs/usage/resource-management/firmware-update" },
               ]
             },
             {
