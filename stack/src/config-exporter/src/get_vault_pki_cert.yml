@@ -21,6 +21,12 @@
     ttl: "{{ _cert_ttl }}"
   register: vault_cert
 
+- name: Make sure directories exist
+  file:
+    state: directory
+    path: "{{ item }}"
+  loop: "{{ [_certificate_dest, _key_dest] | map('dirname') | unique | list }}"
+
 - name: Write certificate to file
   copy:
     content: "{{ vault_cert.data.data.certificate }}"
