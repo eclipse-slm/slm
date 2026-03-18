@@ -1,8 +1,8 @@
 ---
-permalink: /docs/usage/credential-management/
+permalink: /docs/usage/common/credential-management/
 ---
 
-# Credential Management Concept
+# Credential Management
 
 This page describes the concept behind credential management in SLM and how to use it via the UI. The credential management provides a consistent way to:
 - store sensitive authentication data securely

@@ -1,5 +1,5 @@
 ---
-permalink: /docs/usage/reporting-issues
+permalink: /docs/usage/common/reporting-issues
 ---
 
 # Reporting Issues

@@ -1,5 +1,5 @@
 ---
-permalink: /docs/usage/user-management
+permalink: /docs/usage/common/user-management
 ---
 
 # User Management

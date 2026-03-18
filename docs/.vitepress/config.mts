@@ -64,15 +64,37 @@ export default defineConfig({
           collapsed: true,
           items: [
             { text: "Overview", link: "/docs/usage/" },
-            { text: "Credential Management", link: "/docs/usage/credential-management" },
-            { text: "Capabilities", link: "/docs/usage/capabilities" },
-            { text: "Clusters", link: "/docs/usage/clusters" },
-            { text: "Discovery", link: "/docs/usage/discovery" },
-            { text: "Profiler", link: "/docs/usage/profiler" },
-            { text: "Service Offerings", link: "/docs/usage/service-offerings" },
-            { text: "User Management", link: "/docs/usage/user-management" },
-            { text: "API", link: "/docs/usage/api" },
-            { text: "Reporting Issues", link: "/docs/usage/reporting-issues" },
+            {
+              text: "Common",
+              path: "/docs/usage/common/",
+              collapsed: true,
+              items: [
+
+                { text: "User Management", link: "/docs/usage/common/user-management" },
+                { text: "Credential Management", link: "/docs/usage/common/credential-management" },
+                { text: "API", link: "/docs/usage/common/api" },
+                { text: "Reporting Issues", link: "/docs/usage/common/reporting-issues" },
+              ]
+            },
+            {
+              text: "Resource Management",
+              path: "/docs/usage/resource-management/",
+              collapsed: true,
+              items: [
+                { text: "Capabilities", link: "/docs/usage/resource-management/capabilities" },
+                { text: "Clusters", link: "/docs/usage/resource-management/clusters" },
+                { text: "Discovery", link: "/docs/usage/resource-management/discovery" },
+                { text: "Profiler", link: "/docs/usage/resource-management/profiler" },
+              ]
+            },
+            {
+              text: "Service Management",
+              path: "/docs/usage/common/",
+              collapsed: true,
+              items: [
+                { text: "Service Offerings", link: "/docs/usage/service-management/service-offerings" }
+              ]
+            },
           ],
         },
         {

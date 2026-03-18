@@ -1,5 +1,5 @@
 ---
-permalink: /docs/usage/service-offerings
+permalink: /docs/usage/service-management/service-offerings
 ---
 
 # Service Offerings

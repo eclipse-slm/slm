@@ -1,8 +1,10 @@
+---
+permalink: /docs/usage/resource-management/discovery
+---
+
 # Discovery
 
 Discovery is a feature of the SLM that allows you to discover resources in your environment and provide information about them to the SLM.
-
-
 
 ## Drivers
 In order to use the discovery features of the SLM, you need to have a discovery driver installed first.

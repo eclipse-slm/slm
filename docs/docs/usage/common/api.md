@@ -1,5 +1,5 @@
 ---
-permalink: /docs/usage/api/
+permalink: /docs/usage/common/api/
 ---
 
 # API

@@ -1,5 +1,5 @@
 ---
-permalink: /docs/usage/capabilities
+permalink: /docs/usage/resource-management/capabilities
 ---
 
 # Capabilities

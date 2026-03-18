@@ -1,5 +1,5 @@
 ---
-permalink: /docs/usage/profiler
+permalink: /docs/usage/resource-management/profiler
 ---
 
 # Profiler

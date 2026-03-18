@@ -1,5 +1,5 @@
 ---
-permalink: /docs/usage/clusters
+permalink: /docs/usage/resource-management/clusters
 ---
 
 # Clusters
