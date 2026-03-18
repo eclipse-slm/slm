@@ -24,7 +24,7 @@ Edit the `stack/config-exporter/.env` file and set the following variable values
 | `CONSUL_PORT`        | Port of the host where the Consul instance of the SLM is running.                                                             |
 | `CONSUL_TOKEN`       | Master token of the Consul instance of your SLM instance. The Consul master token is printed at the end of the installer run. |
 
-Run the config exporter sing the following command inside the directory `stack/config-exporter`:
+Run the config exporter using the following command inside the directory `stack/config-exporter`:
 ```
 docker-compose up
 ```
