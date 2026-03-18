@@ -3,7 +3,7 @@ permalink: /docs/usage/resource-management/clusters
 ---
 
 # Clusters
-The Service Lifecycle Management enables the [installation of new clusters](#install-new-clusters) and the integration of [existing clusters (managed clusters)](#add-managed-clusters). To deploy a service offering into a cluster, the corresponding deployment capability must have the deployment type of the service offering defined in the property `supportedDeploymentTypes`(see section [Deployment Capabilites](/docs/usage/capabilities#deployment-capabilities) for details).
+The Service Lifecycle Management enables the [installation of new clusters](#install-new-clusters) and the integration of [existing clusters (managed clusters)](#add-managed-clusters). To deploy a service offering into a cluster, the corresponding deployment capability must have the deployment type of the service offering defined in the property `supportedDeploymentTypes`(see section [Deployment Capabilites](/docs/usage/resource-management/capabilities#deployment-capabilities) for details).
 
 ## Install new clusters
 A corresponding cluster deployment capability must be available to allow the installation of a new cluster. That deployment capability must have an `INSTALL` action and a definition for `clusterMemberTypes`.
