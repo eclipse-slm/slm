@@ -48,7 +48,7 @@
     - name: "Trust SLM root CA"
       include_tasks: trust_slm_root_ca.yml
       vars:
-        vault_url: "{{ vault_config.scheme }}://{{ vault_config.host }}:{{ vault_config.port }}"
+        vault_url: "{{ SLM_NODE_META.vault_url }}"
 
 
     - set_fact:
