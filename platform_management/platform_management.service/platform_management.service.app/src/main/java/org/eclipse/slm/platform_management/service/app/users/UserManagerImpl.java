@@ -31,7 +31,8 @@ public class UserManagerImpl implements UserManager {
     private final static Logger LOG = LoggerFactory.getLogger(UserManagerImpl.class);
 
     public final static String KEYCLOAK_PARENT_GROUP_USERS = "users";
-    public final static String KEYCLOAK_REALM_ROLE_NAME_SLM_USERS = "slm-user";
+    public final static String KEYCLOAK_REALM_ROLE_NAME_SLM_USER = "slm-user";
+    public final static String KEYCLOAK_REALM_ROLE_NAME_SLM_ADMIN = "slm-admin";
     public final static String CONSUL_KEYCLOAK_AUTH_METHOD_NAME = "keycloak";
 
     private final MultiTenantKeycloakRegistration multiTenantKeycloakRegistration;
@@ -130,7 +131,10 @@ public class UserManagerImpl implements UserManager {
 
         this.keycloakAdminClient.setUserPassword(keycloakUserId.toString(), userCreateRequest.getPassword(), userCreateRequest.isPasswordTemporary());
 
-        this.keycloakAdminClient.assignUserToRealmRole(UserManagerImpl.KEYCLOAK_REALM_ROLE_NAME_SLM_USERS, keycloakUserId.toString());
+        this.keycloakAdminClient.assignUserToRealmRole(UserManagerImpl.KEYCLOAK_REALM_ROLE_NAME_SLM_USER, keycloakUserId.toString());
+        if (userCreateRequest.isAdmin()) {
+            this.keycloakAdminClient.assignUserToRealmRole(UserManagerImpl.KEYCLOAK_REALM_ROLE_NAME_SLM_ADMIN, keycloakUserId.toString());
+        }
 
         this.keycloakAdminClient.createChildGroup(realm, keycloakUserId.toString(),
                 "Group of user '" + userCreateRequest.getUsername() + "'",

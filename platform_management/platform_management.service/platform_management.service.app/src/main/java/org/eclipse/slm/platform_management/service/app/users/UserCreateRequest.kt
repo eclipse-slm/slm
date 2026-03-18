@@ -22,4 +22,7 @@ data class UserCreateRequest(
     @param:JsonProperty("email")
     val email: String,
 
-    )
+    @param:JsonProperty("isAdmin")
+    val isAdmin: Boolean = false,
+
+)

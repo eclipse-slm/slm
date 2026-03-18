@@ -143,6 +143,7 @@
           password: "{{ USER.PASSWORD }}"
           isPasswordTemporary: "{{ USER.IS_PASSWORD_TEMPORARY }}"
           email: "{{ USER.EMAIL }}"
+          isAdmin: "{{ USER.IS_ADMIN }}"
         status_code: 200, 201
       loop: "{{ ENV.USERS }}"
       loop_control:
