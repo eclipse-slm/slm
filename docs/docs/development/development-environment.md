@@ -14,15 +14,15 @@ and use the latest snapshot version as tag or the SLM installer docker image (e.
 
 Edit the `stack/config-exporter/.env` file and set the following variable values according to your development setup:
 
-|                      |                                                                                                                               |
-|----------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| `LOCAL_PROJECT_PATH` | Path to the checked out [SLM git repository](https://github.com/eclipse-slm/slm). If you are using Docker Desktop for Windows add the above path in `Settings -> Resources -> FILE SHARING`.                                            |
-| `SLM_HOSTNAME`       | Hostname of the host where your SLM instance is running.                                                                      |
-| `LOCAL_HOSTNAME`     | Hostname of your local development machine.                                                                                   |
-| `CONSUL_SCHEME`      | Scheme of the host where the Consul instance of the SLM is running.                                                           |
-| `CONSUL_HOST`        | Hostname of the host where the Consul instance of the SLM is running.                                                         |
-| `CONSUL_PORT`        | Port of the host where the Consul instance of the SLM is running.                                                             |
-| `CONSUL_TOKEN`       | Master token of the Consul instance of your SLM instance. The Consul master token is printed at the end of the installer run. |
+|                      |                                                                                                                                                                                                      |
+|----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `LOCAL_PROJECT_PATH` | Path to the checked out [SLM git repository](https://github.com/eclipse-slm/slm). If you are using Docker Desktop for Windows add the above path in `Settings -> Resources -> FILE SHARING`.         |
+| `SLM_HOSTNAME`       | Hostname of the host where your SLM instance is running.                                                                                                                                             |
+| `LOCAL_HOSTNAME`     | Hostname of your local development machine.                                                                                                                                                          |
+| `CONSUL_SCHEME`      | Scheme of the host where the Consul instance of the SLM is running.                                                                                                                                  |
+| `CONSUL_HOST`        | Hostname of the host where the Consul instance of the SLM is running.                                                                                                                                |
+| `CONSUL_PORT`        | Port of the host where the Consul instance of the SLM is running.                                                                                                                                    |
+| `CONSUL_TOKEN`       | Master token of the Consul instance of your SLM instance. The Consul master token is printed at the end of the installer run or can be found under `/consul/config/local.json` in the consul container |
 
 Run the config exporter using the following command inside the directory `stack/config-exporter`:
 ```
