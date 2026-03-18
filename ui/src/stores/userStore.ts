@@ -36,7 +36,7 @@ export const useUserStore = defineStore('userStore', {
         isUserDeveloper(state): boolean{
             let isDeveloper = false
             this.userGroups.forEach(userGroup => {
-                if (userGroup.startsWith('vendor')) {
+                if (userGroup.startsWith('/vendor')) {
                     isDeveloper = true
                 }
             })
