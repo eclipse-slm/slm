@@ -17,6 +17,10 @@
         consul_port: "{{ lookup('env', 'CONSUL_PORT') }}"
         consul_token: "{{ lookup('env', 'CONSUL_TOKEN') }}"
 
+    - name: "Set Spring Profile"
+      set_fact:
+        spring_profile: "{{ lookup('env', 'SPRING_PROFILE', default='dev') }}"
+
     - name: "Get meta data of SLM node from Consul"
       include_tasks: get_consul_node_meta.yml
       vars:
@@ -44,12 +48,46 @@
         catalog_service_config: "{{ lookup('community.general.consul_kv', 'config/catalog_service/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         monitoring_config: "{{ lookup('community.general.consul_kv', 'config/monitoring/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         minio_config: "{{ lookup('community.general.consul_kv', 'config/minio/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
-#
+
+    - set_fact:
+        platform_management_external_config:  "{{ platform_management_config  | combine({'database':{'port': platform_db_port}}, recursive=True)      | combine(lookup('template', '../templates/service_external_consul_kv_entry.j2') | from_yaml, recursive=True) }}"
+        resource_management_external_config:  "{{ resource_management_config  | combine({'database':{'port': resource_db_port}}, recursive=True)      | combine(lookup('template', '../templates/service_external_consul_kv_entry.j2') | from_yaml, recursive=True) }}"
+        service_management_external_config:   "{{ service_management_config   | combine({'database':{'port': service_db_port}}, recursive=True)       | combine(lookup('template', '../templates/service_external_consul_kv_entry.j2') | from_yaml, recursive=True) }}"
+        notification_service_external_config: "{{ notification_service_config | combine({'database':{'port': notification_db_port}}, recursive=True)  | combine(lookup('template', '../templates/service_external_consul_kv_entry.j2') | from_yaml, recursive=True) }}"
+      vars:
+        host: "{{ SLM_HOSTNAME }}"
+        resource_db_port: 3310
+        service_db_port: 3320
+        notification_db_port: 3302
+        platform_db_port: 3301
+
+    - name: "Write custom spring profile configs to Consul"
+      community.general.consul_kv:
+        scheme: "{{ consul_scheme }}"
+        host: "{{ consul_host }}"
+        port: "{{ consul_port }}"
+        token: "{{ consul_token }}"
+        key: "{{ item.key }}"
+        value: "{{ item.value }}"
+        state: present
+      loop:
+        # Notification Service:
+        - key: "config/notification_service::{{ spring_profile }}/data"
+          value: "{{ notification_service_external_config | to_yaml }}"
+        # Platform Management:
+        - key: "config/platform_management::{{ spring_profile }}/data"
+          value: "{{ platform_management_external_config | to_yaml }}"
+        # Resource Management:
+        - key: "config/resource_management::{{ spring_profile }}/data"
+          value: "{{ resource_management_external_config | to_yaml }}"
+        # Service Management:
+        - key: "config/service_management::{{ spring_profile }}/data"
+          value: "{{ service_management_external_config | to_yaml }}"
+
     - name: "Trust SLM root CA"
       include_tasks: trust_slm_root_ca.yml
       vars:
         vault_url: "{{ SLM_NODE_META.vault_url }}"
-
 
     - set_fact:
         service_urls: {}
@@ -60,9 +98,13 @@
         _service_name: "{{ item.service_name }}"
       loop:
         - service_name: "platform-management"
+        - service_name: "platform-management-external"
         - service_name: "resource-management"
+        - service_name: "resource-management-external"
         - service_name: "service-management"
+        - service_name: "service-management-external"
         - service_name: "notification-service"
+        - service_name: "notification-service-external"
         - service_name: "information-service"
         - service_name: "awx"
         - service_name: "auth"
@@ -97,26 +139,35 @@
       vars:
         _application_yml_file: "{{ module.application_yml_file }}"
         _app_config: "{{ module.app_config }}"
+        _consul_service_name: "{{ module.consul_service_name }}"
       when: CONFIGURE_CORE_PROJECT|default(false)|bool == true
       loop_control:
         loop_var: module
       loop:
         - application_yml_file: /project/notification_service/notification_service.service/notification_service.service.app/src/main/resources/application.yml
           app_config: "{{ notification_service_config }}"
+          consul_service_name: "notification-service"
         - application_yml_file: /project/information_service/information_service.service/information_service.service.app/src/main/resources/application.yml
           app_config: "{{ information_service_config }}"
+          consul_service_name:
         - application_yml_file: /project/platform_management/platform_management.service/platform_management.service.app/src/main/resources/application.yml
           app_config: "{{ platform_management_config }}"
+          consul_service_name: "platform-management"
         - application_yml_file: /project/resource_management/resource_management.service/resource_management.service.app/src/main/resources/application.yml
           app_config: "{{ resource_management_config }}"
+          consul_service_name: "resource-management"
         - application_yml_file: /project/resource_management/resource_management.service/resource_management.service.initializer/src/main/resources/application.yml
           app_config: "{{ service_management_config }}"
+          consul_service_name:
         - application_yml_file: /project/service_management/service_management.service/service_management.service.app/src/main/resources/application.yml
           app_config: "{{ service_management_config }}"
+          consul_service_name: "service-management"
         - application_yml_file: /project/service_management/service_management.service/service_management.service.initializer/src/main/resources/application.yml
           app_config: "{{ service_management_config }}"
+          consul_service_name:
         - application_yml_file: /project/catalog/catalog.service/catalog.service.app/src/main/resources/application.yml
           app_config: "{{ catalog_service_config }}"
+          consul_service_name:
 
     - name: "Copy application properties"
       template:

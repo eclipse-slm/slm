@@ -1,9 +1,18 @@
 - debug:
     var: _app_config
+    
+- name: Set application-dev.yml path
+  set_fact:
+    _application_dev_yml_file: "{{ _application_yml_file | dirname }}/application-{{ spring_profile }}.yml"
 
-- name: "Update Consul config in file '{{ _application_yml_file }}'"
+- name: "Copy '{{ _application_yml_file }}' to '{{ _application_dev_yml_file }}'"
+  ansible.builtin.copy:
+    src: "{{ _application_yml_file }}"
+    dest: "{{ _application_dev_yml_file }}"
+
+- name: "Update Consul config in file '{{ _application_dev_yml_file }}'"
   ansible.builtin.lineinfile:
-    path: "{{ _application_yml_file }}"
+    path: "{{ _application_dev_yml_file }}"
     insertafter: "consul:"
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
@@ -17,18 +26,26 @@
     - regexp: "port: .*"
       line: "  port: {{ consul_port }}"
 
-- name: "Check if deployment section exists in '{{ _application_yml_file }}'"
+- name: "Update consul service name in file '{{ _application_dev_yml_file }}'"
+  when: (_consul_service_name is defined) and (_consul_service_name | length > 0)
   ansible.builtin.lineinfile:
-    path: "{{ _application_yml_file }}"
+    path: "{{ _application_dev_yml_file }}"
+    insertafter : 'consul:'
+    regexp: "name: {{ _consul_service_name }}.*"
+    line: '    name: {{ _consul_service_name }}-external'
+
+- name: "Check if deployment section exists in '{{ _application_dev_yml_file }}'"
+  ansible.builtin.lineinfile:
+    path: "{{ _application_dev_yml_file }}"
     regexp: "### Deployment"
     state: absent
   check_mode: yes
   changed_when: false
   register: deployment_section
 
-- name: "Update deployment section in file '{{ _application_yml_file }}'"
+- name: "Update deployment section in file '{{ _application_dev_yml_file }}'"
   ansible.builtin.lineinfile:
-    path: "{{ _application_yml_file }}"
+    path: "{{ _application_dev_yml_file }}"
     insertafter: "### Deployment"
     firstmatch: true
     regexp: " hostname:"
