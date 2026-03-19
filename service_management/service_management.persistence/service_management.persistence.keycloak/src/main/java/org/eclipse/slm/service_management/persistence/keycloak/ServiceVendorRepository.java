@@ -157,6 +157,7 @@ public class ServiceVendorRepository {
     public List<UUID> getServiceVendorsOfDeveloper(JwtAuthenticationToken jwtAuthenticationToken) {
         var token = jwtAuthenticationToken.getToken();
         var otherClaims = token.getClaims();
+        var vendorKey = "/vendor_";
 
         var serviceVendorIds = new ArrayList<UUID>();
         if (otherClaims.containsKey("groups")) {
@@ -168,12 +169,11 @@ public class ServiceVendorRepository {
                 userGroupsCasted = (ArrayList<String>)userGroups;
             }
             for (var userGroup : userGroupsCasted) {
-                if (userGroup.startsWith("vendor_")) {
-                    var serviceVendorId = UUID.fromString(userGroup.toString().replace("vendor_", ""));
+                if (userGroup.startsWith(vendorKey)) {
+                    var serviceVendorId = UUID.fromString(userGroup.toString().replace(vendorKey, ""));
                     serviceVendorIds.add(serviceVendorId);
                 }
             }
-
         }
 
         return serviceVendorIds;
