@@ -3,6 +3,7 @@
 _config_generated/
 *.flattened-pom.xml
 *.zip
+application-dev.yml
 
 # Vitepress
 */.vitepress/cache
