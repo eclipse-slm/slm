@@ -53,6 +53,7 @@ spring:
     name: resource_management
   main:
     allow-bean-definition-overriding: true
+  # Disable spring.config by comment when using "dev" profile, otherwise the application will fail to start because of missing consul configuration
   config:
     import: "consul:"
   cloud:
@@ -113,6 +114,10 @@ management:
     web.exposure.include: health,info
   info:
     git.enabled: false
+
+### Platform Management Config
+platform-management:
+  consul-service-name: platform-management
 
 ### Resource Management Config
 resource-management:

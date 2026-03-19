@@ -53,6 +53,7 @@ spring:
     name: service_management
   main:
     allow-bean-definition-overriding: true
+# Disable spring.config by comment when using "dev" profile, otherwise the application will fail to start because of missing consul configuration
   config:
     import: "consul:"
   cloud:
@@ -123,8 +124,13 @@ notification-service:
   path: "/notification-service"
   url: ${notification-service.scheme}://${notification-service.host}:${notification-service.port}${notification-service.path}
 
-### Resource Management
+### Platform Management Config
+platform-management:
+  consul-service-name: platform-management
+
+### Resource Management Config
 resource-management:
+  consul-service-name: resource-management
   scheme: http
   host: localhost
   port: 9010
@@ -216,11 +222,11 @@ consul:
     address: host.docker.internal
     port: ${server.port}
   scheme: http
-  host: consul
+  host: myhost.local
   port: 8500
   url: ${consul.scheme}://${consul.host}:${consul.port}
   datacenter: fabos
-  acl-token: your-consul-acl-token
+  acl-token: YCD6wjaj0qhsMbn7iDfYVHAW
 
 service-management:
   url: http://localhost:9020

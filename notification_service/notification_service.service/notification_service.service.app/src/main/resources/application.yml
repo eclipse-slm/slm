@@ -55,6 +55,7 @@ spring:
     user:
       name: admin
       password: password
+  # Disable spring.config by comment when using "dev" profile, otherwise the application will fail to start because of missing consul configuration
   config:
     import: "consul:"
   cloud:
