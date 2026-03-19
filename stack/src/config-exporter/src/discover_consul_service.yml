@@ -9,12 +9,15 @@
 - set_fact:
     consul_service: "{{ get_consul_service.json }}"
 
-- set_fact:
-    service_url: "http://{{ consul_service[0].ServiceAddress }}:{{ consul_service[0].ServicePort  }}"
+- name: Add service url to service_urls
+  when: consul_service | length > 0
+  block:
+    - set_fact:
+        service_url: "http://{{ consul_service[0].ServiceAddress }}:{{ consul_service[0].ServicePort  }}"
 
-- set_fact:
-    service_urls: "{{ service_urls | combine({
-      _service_name: {
-        'url': service_url
-      }
-    }, recursive=true) }}"
+    - set_fact:
+        service_urls: "{{ service_urls | combine({
+          _service_name: {
+            'url': service_url
+          }
+        }, recursive=true) }}"
