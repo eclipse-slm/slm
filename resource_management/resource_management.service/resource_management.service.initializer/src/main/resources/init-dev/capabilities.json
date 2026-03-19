@@ -51,7 +51,7 @@
     ],
     "clusterMemberTypes": [],
     "executionEnvironment": {
-      "image": "ghcr.io/eclipse-slm/awx-ee-slm:1.4.0-snapshot",
+      "image": "ghcr.io/eclipse-slm/awx-ee-slm-default:1.4.0-SNAPSHOT",
       "pull": "",
       "description": "TEST TEST TEST",
       "registryCredential": {
