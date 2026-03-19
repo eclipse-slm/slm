@@ -26,7 +26,8 @@ public class ResourceManagementClientFactory {
     @Value("${resource-management.path:}")
     private String resourceManagementBasePath;
 
-    private final String resourceManagementConsulServiceName = "resource-management";
+    @Value("${resource-management.consul-service-name:resource-management}")
+    private String resourceManagementConsulServiceName;
 
     public ResourceManagementClientFactory(LoadBalancerClient loadBalancerClient, ObjectFactory<HttpMessageConverters> messageConverters) {
         this.loadBalancerClient = loadBalancerClient;

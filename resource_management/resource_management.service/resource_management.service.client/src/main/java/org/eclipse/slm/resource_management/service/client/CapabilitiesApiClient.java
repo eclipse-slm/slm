@@ -6,7 +6,7 @@ import org.eclipse.slm.resource_management.features.capabilities.CapabilitiesRes
 import org.springframework.cloud.openfeign.FeignClient;
 
 @FeignClient(
-        name = "resource-management",
+        name = "${resource-management.consul-service-name}",
         contextId = "resourceManagementCapabilitiesClient",
         path = ResourceManagementApiConfig.BASE_PATH + CapabilitiesRestApiConfig.BASE_PATH
 )

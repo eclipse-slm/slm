@@ -6,7 +6,7 @@ import org.eclipse.slm.resource_management.features.profiler.ProfilerRestApiConf
 import org.springframework.cloud.openfeign.FeignClient;
 
 @FeignClient(
-        name = "resource-management",
+        name = "${resource-management.consul-service-name}",
         contextId = "resourceManagementProfilerClient",
         path = ResourceManagementApiConfig.BASE_PATH + ProfilerRestApiConfig.BASE_PATH
 )
