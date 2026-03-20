@@ -319,7 +319,7 @@ public class ServiceVendorRepositoryTest {
         @Test
         @DisplayName("One vendor associated")
         @WithMockJwtAuth(claims = @OpenIdClaims(
-                otherClaims = @Claims(stringArrayClaims = @StringArrayClaim(name = "groups", value = { "vendor_c12c5a32-c57d-4afd-89f4-9bcd4ae7bee3" })
+                otherClaims = @Claims(stringArrayClaims = @StringArrayClaim(name = "groups", value = { "/vendor_c12c5a32-c57d-4afd-89f4-9bcd4ae7bee3" })
         )))
         public void oneVendorAssociated() {
             var jwtAuthenticationToken = (JwtAuthenticationToken) TestSecurityContextHolder.getContext().getAuthentication();
