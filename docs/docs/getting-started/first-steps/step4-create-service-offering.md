@@ -87,14 +87,18 @@ Upload the files in the corresponding fields (field for `env` and `env.list` wil
 3) `env.list` in `Environment Variable Files -> env.list`. Enable Service Option for `TZ`:
    ![](/img/figures/first-steps/first-steps-step4-wizard-step2-env-list.png)
 
-In case your docker compose workload requires credentials for pulling the images you can fill select those credentials
-by the `Docker Registries Credentials` field. For this example we will not use any credentials, so just leave the field 
+In case your docker compose workload requires credentials for pulling the images you can select those credentials
+via the `Docker Registries Credentials` field. For this example we will not use any credentials, so just leave the field 
 empty.
 
 Click on the `NEXT` button. All environment variables with `Service Option` enabled will be converted to a service 
 option of the service offering. Service options are values that can be edited by the users during the order process. 
 For this example enter the following information for the two service options:
 ![](/img/figures/first-steps/first-steps-step4-wizard-step3.png)
+
+The Service Options are grouped by `Service Option Categories`. A default category `Common` is already created for you
+and `.env` and `env.list` variables do also a separate category. You can also create your own categories and arrange
+the options as you wish. For this example we will use the default categories and delete `Common` as it is empty.
 
 Click on the `NEXT` button to go to the requirements step. Here you can define requirements for your service offering. 
 Requirements are used to find the right host for your service offering in case it requires specific hardware or software 
