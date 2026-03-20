@@ -150,3 +150,6 @@ vault:
     role-id: platform-management
     secret-id: your-secret-id
     app-role-path: approle
+
+platform-management:
+  consul-service-name: ${consul.service.name}
