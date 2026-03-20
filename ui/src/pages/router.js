@@ -192,8 +192,10 @@ export const router = createRouter({
   routes: routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore();
+  await userStore.updateStore();
+
   if (to.meta.developerPermissionRequired) {
     if (userStore.isUserDeveloper) {
       next();
