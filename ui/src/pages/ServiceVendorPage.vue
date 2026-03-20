@@ -91,20 +91,18 @@
             </v-btn>
             <!-- Service Offering Delete Dialog !-->
             <confirm-dialog
-              v-if="serviceOfferingDeleteDialog"
               :show="serviceOfferingDeleteDialog"
               title="Delete service offering?"
-              :text="`Do you want to delete service offering '${serviceOfferingToDelete.name}'?`"
+              :text="`Do you want to delete service offering '${serviceOfferingToDelete?.name ?? ''}'?`"
               @canceled="serviceOfferingDeleteDialog = false"
               @confirmed="onDeleteServiceOfferingConfirmed"
             />
 
             <!-- Service Offering Version Delete Dialog !-->
             <confirm-dialog
-              v-if="serviceOfferingVersionDeleteDialog"
               :show="serviceOfferingVersionDeleteDialog"
               title="Delete service offering version?"
-              :text="`Do you want to delete service offering version '${serviceOfferingVersionToDelete.version}'?`"
+              :text="`Do you want to delete service offering version '${serviceOfferingVersionToDelete?.version ?? ''}'?`"
               @canceled="serviceOfferingVersionDeleteDialog = false"
               @confirmed="onDeleteServiceOfferingVersionConfirmed"
             />

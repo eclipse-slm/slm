@@ -30,12 +30,12 @@ const props = defineProps({
   }
 });
 
-const dialogActive = ref(false)
+const dialogActive = ref(Boolean(props.show))
 const showProp = toRef(props,'show'); // react to prop
 
 watch(showProp, (value) => {
-  dialogActive.value = showProp.value;
-});
+  dialogActive.value = Boolean(value);
+}, { immediate: true });
 </script>
 
 <template>

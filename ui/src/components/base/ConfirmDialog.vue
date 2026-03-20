@@ -14,7 +14,7 @@
           id="button-confirm-dialog"
           variant="text"
           :disabled="confirmLoading"
-          @click.native="$emit('canceled')"
+          @click="$emit('canceled')"
       >
         {{ cancelButtonLabel }}
       </v-btn>
