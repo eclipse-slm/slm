@@ -2,6 +2,34 @@ import ApiState from '@/api/apiState'
 import {defineStore} from "pinia";
 import {globals} from "@/main";
 
+interface KeycloakLike {
+    authenticated?: boolean,
+    loadUserInfo?: () => Promise<any>,
+}
+
+const KEYCLOAK_WAIT_INTERVAL_MS = 100;
+const KEYCLOAK_WAIT_TIMEOUT_MS = 10000;
+
+function sleep (ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function waitForKeycloak (timeoutMs = KEYCLOAK_WAIT_TIMEOUT_MS): Promise<KeycloakLike | undefined> {
+    const startedAt = Date.now();
+
+    while ((Date.now() - startedAt) < timeoutMs) {
+        const keycloak = globals.$keycloak?.keycloak as KeycloakLike | undefined;
+
+        if (keycloak?.loadUserInfo !== undefined) {
+            return keycloak;
+        }
+
+        await sleep(KEYCLOAK_WAIT_INTERVAL_MS);
+    }
+
+    return undefined;
+}
+
 interface UserStoreState {
     apiState: number,
     userInfo: null | any,
@@ -23,9 +51,9 @@ export const useUserStore = defineStore('userStore', {
             return `/users/${state.userInfo?.sub}`
         },
         userName: (state) => {
-            return state.userInfo.preferred_username
+            return state.userInfo?.preferred_username
         },
-        userRoles(state) {
+        userRoles() {
             const roles = globals.$keycloak?.realmAccess?.roles;
             if(roles === undefined){
                 return [];
@@ -33,7 +61,7 @@ export const useUserStore = defineStore('userStore', {
 
             return roles;
         },
-        isUserDeveloper(state): boolean{
+        isUserDeveloper(): boolean{
             let isDeveloper = false
             this.userGroups.forEach(userGroup => {
                 if (userGroup.startsWith('/vendor')) {
@@ -56,12 +84,24 @@ export const useUserStore = defineStore('userStore', {
     },
     actions: {
         async getUserDetails () {
-            if (globals.$keycloak?.keycloak != undefined) {
-                if (globals.$keycloak.keycloak.authenticated) {
-                    await globals.$keycloak?.keycloak.loadUserInfo().then(userInfo => {
-                        this.userInfo = userInfo;
-                    })
-                }
+            const keycloak = await waitForKeycloak();
+
+            if (keycloak === undefined) {
+                console.warn('Keycloak was not initialized in time. userInfo will be cleared.');
+                this.userInfo = null;
+                return;
+            }
+
+            if (!keycloak.authenticated) {
+                this.userInfo = null;
+                return;
+            }
+
+            try {
+                this.userInfo = await keycloak.loadUserInfo?.() ?? null;
+            } catch (error) {
+                this.userInfo = null;
+                throw error;
             }
         },
 
