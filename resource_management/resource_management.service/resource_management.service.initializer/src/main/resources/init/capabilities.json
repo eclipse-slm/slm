@@ -13,7 +13,7 @@
         "actionClass": "AwxAction",
         "actionType": "INSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
-        "awxBranch": "1.0.4",
+        "awxBranch": "1.0.5",
         "playbook": "install.yml",
         "skipable": true,
         "connectionTypes": ["ssh", "WinSsh"]
@@ -22,7 +22,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNINSTALL",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
-        "awxBranch": "1.0.4",
+        "awxBranch": "1.0.5",
         "playbook": "uninstall.yml",
         "connectionTypes": ["ssh", "WinSsh"]
       },
@@ -30,7 +30,7 @@
         "actionClass": "AwxAction",
         "actionType": "DEPLOY",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
-        "awxBranch": "1.0.4",
+        "awxBranch": "1.0.5",
         "playbook": "deploy.yml",
         "connectionTypes": ["ssh", "WinSsh"]
       },
@@ -38,7 +38,7 @@
         "actionClass": "AwxAction",
         "actionType": "UNDEPLOY",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
-        "awxBranch": "1.0.4",
+        "awxBranch": "1.0.5",
         "playbook": "undeploy.yml",
         "connectionTypes": ["ssh", "WinSsh"]
       },
@@ -46,7 +46,7 @@
         "actionClass": "AwxAction",
         "actionType": "UPDATE",
         "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
-        "awxBranch": "1.0.4",
+        "awxBranch": "1.0.5",
         "playbook": "deploy.yml",
         "connectionTypes": ["ssh", "WinSsh"]
       }
