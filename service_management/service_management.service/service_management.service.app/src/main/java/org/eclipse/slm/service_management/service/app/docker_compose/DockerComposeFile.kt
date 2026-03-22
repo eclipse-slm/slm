@@ -10,7 +10,7 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 
 data class DockerComposeFile(
     @JsonProperty("version")
-    var version: String,
+    var version: String? = null,
 
     @JsonProperty("services")
     var services: Map<String, DockerComposeFileService>,
