@@ -83,8 +83,8 @@
     controller_host: "{{ awx.url.internal }}"
     controller_username: "{{ _awx_admin_username }}"
     controller_password: "{{ _awx_admin_password }}"
-    name: "AWX-EE-SLM-1.4.0-SNAPSHOT"
-    image: ghcr.io/eclipse-slm/awx-ee-slm-default:1.4.0-SNAPSHOT
+    name: "AWX-EE-SLM-1.4.0-RELEASE"
+    image: ghcr.io/eclipse-slm/awx-ee-slm-default:1.4.0-RELEASE
     organization: "{{ awx_slm_organization_name }}"
 
 - block:
