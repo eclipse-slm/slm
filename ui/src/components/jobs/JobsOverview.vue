@@ -137,7 +137,8 @@ export default {
         const location = 'de-DE'
 
         if (time !== null) {
-          return new Date(time).toLocaleDateString(location, options)
+          const date = new Date(time).toLocaleDateString(location, options)
+          return (date == 'Invalid Date') ? '' : date
         } else {
           return ''
         }
