@@ -384,6 +384,7 @@ const { parse } = require('dot-properties')
           reader.onload = () => {
             this.serviceOfferingVersion.deploymentDefinition.dotEnvFile.content = reader.result
             const parsedVariables = parse(reader.result)
+            this.serviceOfferingVersion.deploymentDefinition.dotEnvFile.environmentVariables = []
             for (const envVar in parsedVariables) {
               this.serviceOfferingVersion.deploymentDefinition.dotEnvFile.environmentVariables.push({
                 key: envVar,
@@ -403,6 +404,7 @@ const { parse } = require('dot-properties')
           reader.onload = () => {
             this.serviceOfferingVersion.deploymentDefinition.envFiles[envFileName].content = reader.result
             const parsedVariables = parse(reader.result)
+            this.serviceOfferingVersion.deploymentDefinition.envFiles[envFileName].environmentVariables = []
             for (const envVar in parsedVariables) {
               if (this.serviceOfferingVersion.deploymentDefinition.envFiles[envFileName].environmentVariables
                   .filter(ev => ev.key === envVar).length === 0) {
