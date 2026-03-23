@@ -76,9 +76,7 @@ public class DockerComposeFileParserDependsOnTest {
         @Test
         @DisplayName("Serialize depends_on with condition")
         public void serializeDependsOnWithCondition() throws JsonProcessingException, JSONException {
-            var expectedCompose = """
-                    version: "3"
-                                        
+            var expectedCompose = """ 
                     services:
                       test-service:
                         image: "test-image:1.0.0"
@@ -96,7 +94,7 @@ public class DockerComposeFileParserDependsOnTest {
                     null, null, new ArrayList<>(), new ArrayList<>(), new DockerComposeFileEnvironment(),
                    null, null, new DockerComposeFileLabels(), null, null, null,
                     dependsOn, null, null, null, "");
-            var composeFile = new DockerComposeFile("3", Map.of("test-service", service), null, null);
+            var composeFile = new DockerComposeFile(Map.of("test-service", service), null, null);
 
             var actualComposeYAML = DockerComposeFileParser.composeFileToYAML(composeFile);
             DockerComposeFileParserTestUtil.assertYAMLFiles(expectedCompose, actualComposeYAML);
@@ -105,9 +103,7 @@ public class DockerComposeFileParserDependsOnTest {
         @Test
         @DisplayName("Serialize depends_on without condition")
         public void serializeDependsOnWithoutCondition() throws JsonProcessingException, JSONException {
-            var expectedCompose = """
-                    version: "3"
-                                        
+            var expectedCompose = """ 
                     services:
                       test-service:
                         image: "test-image:1.0.0"
@@ -123,7 +119,7 @@ public class DockerComposeFileParserDependsOnTest {
                     null, null, new ArrayList<>(), new ArrayList<>(), new DockerComposeFileEnvironment(),
                     null, null, new DockerComposeFileLabels(), null, null, null,
                     dependsOn, null, null, null, "");
-            var composeFile = new DockerComposeFile("3", Map.of("test-service", service), null, null);
+            var composeFile = new DockerComposeFile(Map.of("test-service", service), null, null);
 
             var actualComposeYAML = DockerComposeFileParser.composeFileToYAML(composeFile);
             DockerComposeFileParserTestUtil.assertYAMLFiles(expectedCompose, actualComposeYAML);

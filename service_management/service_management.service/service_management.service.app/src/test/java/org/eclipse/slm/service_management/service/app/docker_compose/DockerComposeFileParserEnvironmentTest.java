@@ -91,8 +91,6 @@ public class DockerComposeFileParserEnvironmentTest {
         public void replaceServiceOptionValuesForEnvironmentVariables() throws JSONException, JsonProcessingException {
             //region Expected Results
             var expectedComposeFile = """
-                        version: '3'
-                            
                         services:
                         
                           service1:

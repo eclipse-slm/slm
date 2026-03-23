@@ -23,9 +23,7 @@ public class DockerComposeFileParserEnvFileTest {
     @Test
     public void mergeComposeFileWithEnvFiles() throws JsonProcessingException, JSONException {
         //region Expected Result
-        String EXPECTED_COMPOSE_FILE = """
-                    version: '3'
-                        
+        String EXPECTED_COMPOSE_FILE = """                       
                     services:
                     
                       service1:

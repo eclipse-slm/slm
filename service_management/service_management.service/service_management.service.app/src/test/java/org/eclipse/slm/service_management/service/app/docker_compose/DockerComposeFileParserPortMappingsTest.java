@@ -26,9 +26,7 @@ public class DockerComposeFileParserPortMappingsTest {
         @DisplayName("Replace service options values for port mappings")
         public void replaceServiceOptionValuesForPortMappings() throws JSONException, JsonProcessingException {
             //region Expected Results
-            var expectedComposeFile = """
-                        version: '3'
-                            
+            var expectedComposeFile = """                            
                         services:
                         
                           service1:
