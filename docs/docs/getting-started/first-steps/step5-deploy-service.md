@@ -21,4 +21,8 @@ The deployment of the service on your device is triggered and will take some tim
 If you click on the port of the service instance your deployed Node-RED instance should open:
 ![first-steps-step5-wizard-result](/img/figures/first-steps/first-steps-step5-wizard-result.png)
 
-**Congratulations, you have deployed your first service using the Service Lifecycle Management!**
+**Congratulations, you have deployed your first service using the Service Lifecycle Management!** 
+
+To delete the Deployment go back to the service view and click on the :wastebasket: button. Confirm the deletion by clicking on `YES` in the pop-up:
+
+![first-steps-step5-delete-service-instance](/img/figures/first-steps/first-steps-step5-delete-service-instance.png)
