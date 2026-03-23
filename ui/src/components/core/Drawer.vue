@@ -185,7 +185,7 @@ export default {
             icon: 'mdi-server',
             title: this.$t('drawer.section.resources.clusters.title'),
             to: '/clusters',
-            visible: true,
+            visible: false,
           },
           {
             id: 'main-menu-button-discovery',
