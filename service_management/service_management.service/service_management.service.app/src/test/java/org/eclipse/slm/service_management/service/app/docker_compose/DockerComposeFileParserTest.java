@@ -8,6 +8,7 @@ import org.eclipse.slm.service_management.model.offerings.exceptions.InvalidServ
 import org.eclipse.slm.service_management.model.offerings.options.*;
 import org.json.JSONException;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -21,9 +22,7 @@ public class DockerComposeFileParserTest {
     @Test
     public void generateDeployableComposeFileForServiceOffering() throws JsonProcessingException, ServiceOptionNotFoundException, JSONException, InvalidServiceOfferingDefinitionException {
         //region Expected Result
-        String EXPECTED_COMPOSE_FILE = """
-            version: '3'
-                
+        String EXPECTED_COMPOSE_FILE = """                
             services:
             
               service1:
@@ -240,5 +239,50 @@ public class DockerComposeFileParserTest {
                 serviceOfferingVersion, serviceOptionValues);
 
         DockerComposeFileParserTestUtil.assertComposeFiles(EXPECTED_COMPOSE_FILE, dockerComposeFile);
+    }
+
+    @Nested
+    @DisplayName("Parsing of docker compose 'version'")
+    public class Parsing {
+
+        @Test
+        @DisplayName("Parse compose without version definition")
+        public void parseWithoutVersionDefinition() throws JsonProcessingException, JSONException {
+            var composeFileExpected = """    
+                    services:
+                      test-service:
+                        image: "test-image:1.0.0"
+                    """;
+            var composeFileIncoming = """    
+                    services:
+                      test-service:
+                        image: "test-image:1.0.0"
+                    """;
+
+            var parsedComposeFile = DockerComposeFileParser.parseComposeFile(composeFileIncoming);
+
+            DockerComposeFileParserTestUtil.assertComposeFiles(composeFileExpected, parsedComposeFile);
+        }
+
+        @Test
+        @DisplayName("Parse compose without version definition")
+        public void parseWithVersionDefinition() throws JsonProcessingException, JSONException {
+            var composeFileExpected = """    
+                    services:
+                      test-service:
+                        image: "test-image:1.0.0"
+                    """;
+            var composeFileIncoming = """    
+                    version: '3'
+                    
+                    services:
+                      test-service:
+                        image: "test-image:1.0.0"
+                    """;
+
+            var parsedComposeFile = DockerComposeFileParser.parseComposeFile(composeFileIncoming);
+
+            DockerComposeFileParserTestUtil.assertComposeFiles(composeFileExpected, parsedComposeFile);
+        }
     }
 }

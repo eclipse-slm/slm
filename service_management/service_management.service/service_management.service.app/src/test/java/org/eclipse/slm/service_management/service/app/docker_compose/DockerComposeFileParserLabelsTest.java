@@ -92,8 +92,6 @@ public class DockerComposeFileParserLabelsTest {
         public void replaceServiceOptionValuesForLabels() throws JSONException, JsonProcessingException {
             //region Expected Results
             var expectedComposeFile = """
-                        version: '3'
-                            
                         services:
                         
                           service1:

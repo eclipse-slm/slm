@@ -50,6 +50,7 @@ import ResourceManagementActuatorRestApi from "@/api/resource-management/resourc
 import NotificationServiceActuatorRestApi from "@/api/notification-service/notificationServiceActuatorRestApi";
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import {useEnvStore} from "@/stores/environmentStore";
+import PlatformManagementActuatorRestApi from "@/api/platform-management/platformManagementActuatorRestApi";
 
 export default {
   name: "VersionsOverview",
@@ -60,8 +61,14 @@ export default {
   data () {
     return {
       components: {
-        service_management: {
-          prettyName: "Service Management",
+        platform_management: {
+          prettyName: "Platform Management",
+          version: undefined,
+          buildTime: undefined,
+          status: undefined
+        },
+        notification_service: {
+          prettyName: "Notification Service",
           version: undefined,
           buildTime: undefined,
           status: undefined
@@ -72,8 +79,8 @@ export default {
           buildTime: undefined,
           status: undefined
         },
-        notification_service: {
-          prettyName: "Notification Service",
+        service_management: {
+          prettyName: "Service Management",
           version: undefined,
           buildTime: undefined,
           status: undefined
@@ -99,6 +106,14 @@ export default {
   },
   mounted() {
     this.components.ui.version = this.envStore.appVersion
+
+    PlatformManagementActuatorRestApi.getInfo().then((info) => {
+      this.components.platform_management.version = info.build.version
+      this.components.platform_management.buildTime = info.build.time
+    })
+    PlatformManagementActuatorRestApi.getHealth().then((health) => {
+      this.components.platform_management.status = health.status
+    })
 
     ServiceManagementActuatorRestApi.getInfo().then((info) => {
       this.components.service_management.version = info.build.version

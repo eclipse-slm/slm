@@ -93,6 +93,8 @@ import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 import {storeToRefs} from "pinia";
 import ServiceManagementClient from "@/api/service-management/service-management-client";
 import logRequestError from "@/api/restApiHelper";
+import updateToken from "@/utils/updateToken";
+import {globals} from "@/main";
 
 export default {
     name: 'ServiceVendorDevelopersTable',
@@ -170,6 +172,7 @@ export default {
         this.addedDevelopers.forEach(developer => {
           ServiceManagementClient.serviceVendorsApi.addDeveloperToServiceVendor(this.serviceVendor.id, developer.id).then(() => {
             this.developersOfServiceVendor.push(developer)
+            updateToken() // Update the token, as membership in a service vendor is determined via the groups claim in the token
             this.$toast.info(`Successfully added developer '${developer.username}'`)
           }).catch(logRequestError)
         })

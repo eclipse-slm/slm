@@ -179,7 +179,7 @@ public final class DockerContainerServiceOfferingOrderUtil {
         Map<String, DockerComposeFileService> dockerComposeServices = new HashMap<>();
         dockerComposeServices.put("service", dockerComposeFileService);
 
-        var dockerComposeFile = new DockerComposeFile("3", dockerComposeServices, null, namedVolumes);
+        var dockerComposeFile = new DockerComposeFile(dockerComposeServices, null, namedVolumes);
 
         return dockerComposeFile;
     }
