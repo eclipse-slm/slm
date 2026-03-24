@@ -13,9 +13,9 @@ vault_config:
           policy: "\npath \"pki_int_slm/*\" {  capabilities = [ \"read\" , \"create\", \"update\"  ]}"
 
 consul_kv:
-  http.router.aas-ui.entryPoints: web, websecure
-  http.router.aas-ui.middlewares: aas-ui-add-trailing-slash
-  http.router.aas-ui.rule: PathPrefix(`/aas/ui`)
-  http.router.aas-ui.service: aas-ui
+  http.routers.aas-ui.entryPoints: web, websecure
+  http.routers.aas-ui.middlewares: aas-ui-add-trailing-slash
+  http.routers.aas-ui.rule: PathPrefix(`/aas/ui`)
+  http.routers.aas-ui.service: aas-ui
   http.middlewares.aas-ui-add-trailing-slash.replacePath.path: "/aas/ui/"
   http.services.aas-ui.loadBalancer.servers.0.url: "http://localhost/"
