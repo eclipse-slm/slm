@@ -20,7 +20,7 @@ FROM nginx:mainline-alpine-slim AS production-stage
 # Define port 80 as exposed port
 EXPOSE 80
 # Define environment variables
-ENV APP_VERSION="1.4.0-RELEASE" \
+ENV APP_VERSION="1.5.0-SNAPSHOT" \
     I18N_LOCALE="en" \
     I18N_LOCALE_FALLBACK="en" \
     PLATFORM_MANAGEMENT_URL="http://resource-management:9001/" \

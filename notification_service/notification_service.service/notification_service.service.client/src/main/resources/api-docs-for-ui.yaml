@@ -7,7 +7,7 @@ info:
     name: "Fraunhofer IPA"
     url: "https://www.ipa.fraunhofer.de"
     email: "matthias.schneider@ipa.fraunhofer.de"
-  version: "1.4.0-RELEASE"
+  version: "1.5.0-SNAPSHOT"
 servers:
 - url: "http://localhost:9002/notification-service"
   description: "Generated server url"
