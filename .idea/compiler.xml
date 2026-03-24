@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Annotation profile for Eclipse Service Lifecycle Management" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
+        </processorPath>
+        <module name="common.awx.model" />
+        <module name="resource_management.features.profiler" />
+        <module name="catalog.persistence.api" />
+        <module name="resource_management.service.client" />
+        <module name="common.keycloak.testing" />
+        <module name="notification_service.service.client" />
+        <module name="common.consul.model" />
+        <module name="common.minio.client" />
+        <module name="common.aas.repositories" />
+        <module name="common.keycloak.client" />
+        <module name="common.aas.clients" />
+        <module name="service_management.persistence.keycloak" />
+        <module name="common.database.testing" />
+        <module name="information_service.service.app" />
+        <module name="common.vault.client" />
+        <module name="service_management.model" />
+        <module name="common.aas.model" />
+        <module name="notification_service.model" />
+        <module name="common.consul.testing.containers" />
+        <module name="common.messaging" />
+        <module name="common.awx.client" />
+        <module name="notification_service.communication.websocket" />
+        <module name="platform_management.service.app" />
+        <module name="common.utils.general" />
+        <module name="resource_management.features.device-integration.common" />
+        <module name="common.keycloak.config" />
+        <module name="resource_management.features.capabilities" />
+        <module name="common.vault.testing" />
+        <module name="resource_management.features.metrics" />
+        <module name="platform_management.service.api" />
+        <module name="common.restserver" />
+        <module name="resource_management.service.app" />
+        <module name="service_management.persistence.api" />
+        <module name="common.utils.objectmapper" />
+        <module name="common.driver" />
+        <module name="common.restclient" />
+        <module name="common.credentials" />
+        <module name="common.consul.testing.utils" />
+        <module name="common.parent.client" />
+        <module name="service_management.service.app" />
+        <module name="catalog.model" />
+        <module name="resource_management.common" />
+        <module name="catalog.service.app" />
+        <module name="common.parent.service" />
+        <module name="service_management.service.initializer" />
+        <module name="common.consul.client" />
+        <module name="platform_management.service.client" />
+        <module name="common.keycloak.model" />
+        <module name="notification_service.persistence.api" />
+        <module name="common.model" />
+        <module name="common.utils.files" />
+        <module name="catalog.persistence.mariadb" />
+        <module name="common.utils.serviceofferingimport" />
+        <module name="common.vault.model" />
+        <module name="notification_service.service.app" />
+        <module name="service_management.persistence.mariadb" />
+        <module name="service_management.service.client" />
+        <module name="notification_service.messaging" />
+        <module name="resource_management.features.importer" />
+        <module name="resource_management.features.device-integration.discovery" />
+        <module name="common.minio.model" />
+        <module name="resource_management.features.device-integration.firmware-update" />
+        <module name="common.utils.keycloak" />
+        <module name="resource_management.service.initializer" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="catalog" options="-Xlint:unchecked" />
+      <module name="catalog.model" options="-Xlint:unchecked" />
+      <module name="catalog.persistence" options="-Xlint:unchecked" />
+      <module name="catalog.persistence.api" options="-Xlint:unchecked" />
+      <module name="catalog.persistence.mariadb" options="-Xlint:unchecked" />
+      <module name="catalog.service" options="-Xlint:unchecked" />
+      <module name="catalog.service.app" options="-Xlint:unchecked" />
+      <module name="catalog.ui" options="-Xlint:unchecked" />
+      <module name="common" options="-Xlint:unchecked" />
+      <module name="common.aas" options="-Xlint:unchecked" />
+      <module name="common.aas.clients" options="-Xlint:unchecked" />
+      <module name="common.aas.model" options="-Xlint:unchecked" />
+      <module name="common.aas.repositories" options="-Xlint:unchecked" />
+      <module name="common.awx" options="-Xlint:unchecked" />
+      <module name="common.awx.client" options="-Xlint:unchecked" />
+      <module name="common.awx.model" options="-Xlint:unchecked" />
+      <module name="common.consul" options="-Xlint:unchecked" />
+      <module name="common.consul.client" options="-Xlint:unchecked" />
+      <module name="common.consul.model" options="-Xlint:unchecked" />
+      <module name="common.consul.testing" options="-Xlint:unchecked" />
+      <module name="common.consul.testing.containers" options="-Xlint:unchecked" />
+      <module name="common.consul.testing.utils" options="-Xlint:unchecked" />
+      <module name="common.credentials" options="-Xlint:unchecked" />
+      <module name="common.database" options="-Xlint:unchecked" />
+      <module name="common.database.testing" options="-Xlint:unchecked" />
+      <module name="common.driver" options="-Xlint:unchecked" />
+      <module name="common.keycloak" options="-Xlint:unchecked" />
+      <module name="common.keycloak.client" options="-Xlint:unchecked" />
+      <module name="common.keycloak.config" options="-Xlint:unchecked" />
+      <module name="common.keycloak.model" options="-Xlint:unchecked" />
+      <module name="common.keycloak.testing" options="-Xlint:unchecked" />
+      <module name="common.messaging" options="-Xlint:unchecked" />
+      <module name="common.minio" options="-Xlint:unchecked" />
+      <module name="common.minio.client" options="-Xlint:unchecked" />
+      <module name="common.minio.model" options="-Xlint:unchecked" />
+      <module name="common.model" options="-Xlint:unchecked" />
+      <module name="common.parent" options="-Xlint:unchecked" />
+      <module name="common.parent.client" options="-Xlint:unchecked" />
+      <module name="common.parent.service" options="-Xlint:unchecked" />
+      <module name="common.restclient" options="-Xlint:unchecked" />
+      <module name="common.restserver" options="-Xlint:unchecked" />
+      <module name="common.utils" options="-Xlint:unchecked" />
+      <module name="common.utils.files" options="-Xlint:unchecked" />
+      <module name="common.utils.general" options="-Xlint:unchecked" />
+      <module name="common.utils.keycloak" options="-Xlint:unchecked" />
+      <module name="common.utils.objectmapper" options="-Xlint:unchecked" />
+      <module name="common.utils.serviceofferingimport" options="-Xlint:unchecked" />
+      <module name="common.vault" options="-Xlint:unchecked" />
+      <module name="common.vault.client" options="-Xlint:unchecked" />
+      <module name="common.vault.model" options="-Xlint:unchecked" />
+      <module name="common.vault.testing" options="-Xlint:unchecked" />
+      <module name="information_service" options="-Xlint:unchecked" />
+      <module name="information_service.service" options="-Xlint:unchecked" />
+      <module name="information_service.service.app" options="-Xlint:unchecked" />
+      <module name="notification_service" options="-Xlint:unchecked" />
+      <module name="notification_service.communication" options="-Xlint:unchecked" />
+      <module name="notification_service.communication.websocket" options="-Xlint:unchecked" />
+      <module name="notification_service.messaging" options="-Xlint:unchecked" />
+      <module name="notification_service.model" options="-Xlint:unchecked" />
+      <module name="notification_service.persistence" options="-Xlint:unchecked" />
+      <module name="notification_service.persistence.api" options="-Xlint:unchecked" />
+      <module name="notification_service.service" options="-Xlint:unchecked" />
+      <module name="notification_service.service.app" options="-Xlint:unchecked" />
+      <module name="notification_service.service.client" options="-Xlint:unchecked" />
+      <module name="platform_management" options="-Xlint:unchecked" />
+      <module name="platform_management.service" options="-Xlint:unchecked" />
+      <module name="platform_management.service.api" options="-Xlint:unchecked" />
+      <module name="platform_management.service.app" options="-Xlint:unchecked" />
+      <module name="platform_management.service.client" options="-Xlint:unchecked" />
+      <module name="resource_management" options="-Xlint:unchecked" />
+      <module name="resource_management.common" options="-Xlint:unchecked" />
+      <module name="resource_management.features" options="-Xlint:unchecked" />
+      <module name="resource_management.features.capabilities" options="-Xlint:unchecked" />
+      <module name="resource_management.features.device-integration" options="-Xlint:unchecked" />
+      <module name="resource_management.features.device-integration.common" options="-Xlint:unchecked" />
+      <module name="resource_management.features.device-integration.discovery" options="-Xlint:unchecked" />
+      <module name="resource_management.features.device-integration.firmware-update" options="-Xlint:unchecked" />
+      <module name="resource_management.features.importer" options="-Xlint:unchecked" />
+      <module name="resource_management.features.metrics" options="-Xlint:unchecked" />
+      <module name="resource_management.features.profiler" options="-Xlint:unchecked" />
+      <module name="resource_management.service" options="-Xlint:unchecked" />
+      <module name="resource_management.service.app" options="-Xlint:unchecked" />
+      <module name="resource_management.service.client" options="-Xlint:unchecked" />
+      <module name="resource_management.service.initializer" options="-Xlint:unchecked" />
+      <module name="service_management" options="-Xlint:unchecked" />
+      <module name="service_management.model" options="-Xlint:unchecked" />
+      <module name="service_management.persistence" options="-Xlint:unchecked" />
+      <module name="service_management.persistence.api" options="-Xlint:unchecked" />
+      <module name="service_management.persistence.keycloak" options="-Xlint:unchecked" />
+      <module name="service_management.persistence.mariadb" options="-Xlint:unchecked" />
+      <module name="service_management.service" options="-Xlint:unchecked" />
+      <module name="service_management.service.app" options="-Xlint:unchecked" />
+      <module name="service_management.service.client" options="-Xlint:unchecked" />
+      <module name="service_management.service.initializer" options="-Xlint:unchecked" />
+      <module name="slm" options="-Xlint:unchecked" />
+      <module name="ui" options="-Xlint:unchecked" />
+    </option>
+  </component>
+</project>
