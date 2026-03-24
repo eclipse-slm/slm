@@ -14,7 +14,7 @@ Set in your current shell the environment variables `SLM_HOSTNAME`, `SLM_IP` and
 ```sh
 export SLM_HOSTNAME=myhost.local
 export SLM_IP=172.17.0.1
-export SLM_VERSION=1.4.0-SNAPSHOT
+export SLM_VERSION=1.4.0-RELEASE
 ```
 ::: warning ATTENTION
 **Use lowercase for the hostname to avoid case problems (e.g. with token authentication)**
@@ -74,7 +74,7 @@ Run the following command to start the SLM uninstaller:
 docker run \
   --rm \
   --volume /var/run/docker.sock:/var/run/docker.sock \
-  ghcr.io/eclipse-slm/slm/uninstaller:1.4.0-SNAPSHOT
+  ghcr.io/eclipse-slm/slm/uninstaller:1.4.0-RELEASE
 ```
 
 ## Components

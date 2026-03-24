@@ -101,7 +101,7 @@ awx:
   username: admin
   password: password
   polling-interval-in-s: 4
-  default-execution-environment: AWX-EE-SLM-1.4.0-SNAPSHOT
+  default-execution-environment: AWX-EE-SLM-1.4.0-RELEASE
 
 ### Vault
 vault:

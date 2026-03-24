@@ -37,6 +37,8 @@ jobs:
         ]
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
@@ -60,7 +62,7 @@ jobs:
             }
           ]'
       - name: Delete old Mavenpackages
-        if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
+        if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main')
         uses: SmartsquareGmbH/delete-old-packages@v0.8.1
         continue-on-error: true
         with:
@@ -71,11 +73,27 @@ jobs:
             org.eclipse.slm.common.aas
             org.eclipse.slm.common.aas.clients
             org.eclipse.slm.common.aas.repositories
+      - name: Detect semantic version tag on current commit
+        id: tag_check
+        shell: bash
+        run: |
+          git fetch --tags --force
+          SEMVER_REGEX='^v?(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'
+
+          HAS_SEMVER_TAG=false
+          while IFS= read -r tag; do
+            if [[ "$tag" =~ $SEMVER_REGEX ]]; then
+              HAS_SEMVER_TAG=true
+              break
+            fi
+          done < <(git tag --points-at "$GITHUB_SHA")
+
+          echo "has_version_tag=$HAS_SEMVER_TAG" >> "$GITHUB_OUTPUT"
       - name: Build '${{ matrix.build.type }}' with Maven and push Docker Images
-        if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
+        if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || (github.ref_name == 'main' && steps.tag_check.outputs.has_version_tag == 'true'))
         run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' deploy
       - name: Build '${{ matrix.build.type }}' with Maven
-        if: github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')
+        if: github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/') || startsWith(github.ref_name, 'release/') || (github.ref_name == 'main' && steps.tag_check.outputs.has_version_tag == 'false')
         run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' verify
       - name: Build Coveralls Report
         if: ${{ env.COVERALLS_REPO_TOKEN != '' && matrix.build.type == 'backend' && (github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')) }}
@@ -89,7 +107,7 @@ jobs:
 
   deploy-staging-environment:
     needs: build
-    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
+    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main')
     runs-on: self-hosted
     env:
       STAGING_VM_IP: ${{ github.ref_name == 'develop' && '10.17.165.36' || '10.17.166.74' }}
@@ -140,7 +158,7 @@ jobs:
 
   test-external-components:
     needs: deploy-staging-environment
-    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
+    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main')
     runs-on: self-hosted
     container:
       image: maven:3.9-eclipse-temurin-21-noble
@@ -178,7 +196,7 @@ jobs:
 
   test-internal-components:
     needs: test-external-components
-    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
+    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main')
     runs-on: self-hosted
     container:
       image: maven:3.9-eclipse-temurin-21-noble

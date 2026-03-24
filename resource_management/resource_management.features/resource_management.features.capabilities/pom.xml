@@ -40,43 +40,43 @@
         <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>common.vault.client</artifactId>
-            <version>1.4.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>common.consul.client</artifactId>
-            <version>1.4.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>resource_management.common</artifactId>
-            <version>1.4.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>common.model</artifactId>
-            <version>1.4.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>common.awx.client</artifactId>
-            <version>1.4.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>notification_service.messaging</artifactId>
-            <version>1.4.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>common.keycloak.config</artifactId>
-            <version>1.4.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <!-- State Machine !-->

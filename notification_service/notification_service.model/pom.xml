@@ -22,7 +22,7 @@
         <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>common.model</artifactId>
-            <version>1.4.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <!-- OpenAPI !-->
