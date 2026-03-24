@@ -27,6 +27,15 @@
   - set_fact:
       _traefik_additional_config: "{{ ENV.TRAEFIK.ADDITIONAL_CONFIG | from_yaml }}"
     when: ENV.TRAEFIK.ADDITIONAL_CONFIG is mapping
+  - name: "Traefik | Add default config to Consul"
+    community.general.consul_kv:
+      scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+      host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+      port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
+      token: "{{ _consul_token }}"
+      key: "traefik/{{ item.key | replace('.', '/') }}"
+      value: "{{ item.value }}"
+    loop: "{{ consul_kv | default({}) | dict2items }}"
   - name: "Traefik | Add additional config to Consul"
     community.general.consul_kv:
       scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
