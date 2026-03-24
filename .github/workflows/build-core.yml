@@ -75,7 +75,6 @@ jobs:
             org.eclipse.slm.common.aas.repositories
       - name: Detect semantic version tag on current commit
         id: tag_check
-        if: github.event_name != 'pull_request' && github.ref_name == 'main'
         shell: bash
         run: |
           git fetch --tags --force
