@@ -73,7 +73,7 @@ async function loadVersions() {
   }));
 
   mappedOptions.sort((left, right) => compareVersionStrings(left.text, right.text));
-  mappedOptions.unshift({ value: 'latest', text: 'latest', link: "/" });
+  mappedOptions.unshift({ value: 'latest', text: 'latest', link: `${window.location.origin}${basePath}/` });
   options.value = mappedOptions;
 }
 
