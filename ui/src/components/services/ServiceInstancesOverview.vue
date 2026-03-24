@@ -1,8 +1,6 @@
 <template>
   <div>
-    <base-material-card
-      class="px-5 py-3"
-    >
+    <base-material-card>
       <template #heading>
         <overview-heading text="Service Instances" />
       </template>
@@ -12,29 +10,10 @@
         item="services"
       />
       <v-card-text v-else>
-        <v-row>
-          <!--            <v-select-->
-          <!--              :value="selectedServiceType"-->
-          <!--              :items="availableServiceTypes"-->
-          <!--              label="Resource Type"-->
-          <!--              clearable-->
-          <!--              @change="updateSelectedResourceType"-->
-          <!--            />-->
-          <v-spacer />
-          <!--            <v-text-field-->
-          <!--              v-model="searchServices"-->
-          <!--              label="Search services"-->
-          <!--              append-icon="search"-->
-          <!--              clearable-->
-          <!--            />-->
-        </v-row>
-
-        <v-row>
-          <service-instances-table
-            class="mt-0 flex"
-            @service-instance-clicked="onServiceInstanceClicked"
-          />
-        </v-row>
+        <service-instances-table
+          class="mt-0 flex"
+          @service-instance-clicked="onServiceInstanceClicked"
+        />
       </v-card-text>
     </base-material-card>
 
@@ -46,13 +25,14 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import ServiceInstancesTable from '@/components/services/ServiceInstancesTable'
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-  import ServiceInstanceDetailsDialog from "@/components/services/dialog/ServiceInstanceDetailsDialog";
 
-  export default {
+import ServiceInstancesTable from '@/components/services/ServiceInstancesTable'
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import ServiceInstanceDetailsDialog from "@/components/services/dialog/ServiceInstanceDetailsDialog.vue";
+import {useServiceInstancesStore} from "@/stores/serviceInstancesStore";
+
+export default {
     name: 'ServiceInstancesOverview',
     components: {
       ServiceInstanceDetailsDialog,
@@ -60,15 +40,19 @@
       ServiceInstancesTable,
       NoItemAvailableNote
     },
+    setup(){
+      const serviceInstancesStore = useServiceInstancesStore();
+      return {serviceInstancesStore};
+    },
     data () {
       return {
         selectedServiceInstance: null
       }
     },
     computed: {
-      ...mapGetters([
-        'services',
-      ]),
+      services () {
+        return this.serviceInstancesStore.services
+      },
     },
     methods: {
       onServiceInstanceClicked (serviceInstance) {

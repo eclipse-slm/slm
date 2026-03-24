@@ -2,11 +2,14 @@ package org.eclipse.slm.common.awx.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.module.kotlin.KotlinModule;
+import jakarta.annotation.PostConstruct;
+import org.eclipse.slm.common.awx.client.observer.JobFinalState;
+import org.eclipse.slm.common.awx.client.observer.JobState;
 import org.eclipse.slm.common.awx.model.*;
-import org.eclipse.slm.notification_service.model.JobFinalState;
-import org.eclipse.slm.notification_service.model.JobState;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
@@ -15,10 +18,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -30,7 +35,6 @@ import reactor.netty.http.client.HttpClient;
 import reactor.netty.tcp.TcpClient;
 import reactor.retry.Repeat;
 
-import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -55,8 +59,10 @@ public class AwxClient {
     private final String DEFAULT_CONSUL_CREDENTIAL_TYPE_NAME = "Consul";
     private final String DEFAULT_VAULT_CREDENTIAL_TYPE_NAME = "HashiCorp Vault";
 
-//    @Value("${awx.url}")
     public String awxUrl;
+
+    public String awxHost;
+    public String awxPort;
 
     @Value("${awx.username}")
     private String awxUsername;
@@ -66,10 +72,8 @@ public class AwxClient {
 
     private ObjectMapper objectMapper;
 
-    @Autowired
-    RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
-//    private WebClient webClient;
 
     private List<String> finalStates = Stream.of(JobFinalState.values())
             .map(JobFinalState::name)
@@ -87,17 +91,27 @@ public class AwxClient {
             @Value("${awx.host}") String host,
             @Value("${awx.port}") String port
     ) {
+        this.awxHost = host;
+        this.awxPort = port;
         this.awxUrl = scheme + "://" + host + ":" + port;
     }
 
     @PostConstruct
     public void init() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, SSLException {
         this.objectMapper = new ObjectMapper();
-        KotlinModule kotlinModule = new KotlinModule.Builder()
+        var kotlinModule = new KotlinModule.Builder()
                 .nullIsSameAsDefault(true)
                 .build();
         this.objectMapper.registerModule(kotlinModule);
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
+        var mappingJacksonHttpMessageConverter = new MappingJackson2HttpMessageConverter();
+        mappingJacksonHttpMessageConverter.setObjectMapper(this.objectMapper);
+
+        this.restTemplate = new RestTemplateBuilder()
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .additionalMessageConverters(mappingJacksonHttpMessageConverter)
+                .build();
         this.restTemplate.setRequestFactory(
                 new HttpComponentsClientHttpRequestFactory()
         );
@@ -130,9 +144,6 @@ public class AwxClient {
     }
 
     public Results<Organization> getOrganizations() throws JsonProcessingException {
-//        ResponseEntity<String> response
-//                = restTemplate.getForEntity(this.getAwxApiUrl() + "/organizations/", String.class);
-
         ResponseEntity<String> response = this.restTemplate.exchange(
                 this.getAwxApiUrl() +"/organizations/",
                 HttpMethod.GET,
@@ -156,29 +167,25 @@ public class AwxClient {
     }
 
     public Results<Organization> getOrganizationByName(String name) throws JsonProcessingException {
-        ResponseEntity<String> response = this.restTemplate.exchange(
+        ResponseEntity<ObjectNode> response = this.restTemplate.exchange(
                 this.getAwxApiUrl() +"/organizations/?name="+name,
                 HttpMethod.GET,
                 new HttpEntity<>(getAdminAuthHeader()),
-                String.class
+                ObjectNode.class
         );
-        return this.objectMapper.readValue(response.getBody(), new TypeReference<Results<Organization>>() {});
+        var json = this.objectMapper.writeValueAsString(response.getBody());
+        return this.objectMapper.readValue(json, new TypeReference<Results<Organization>>() {});
     }
 
     public Organization getDefaultOrganisation() throws JsonProcessingException {
-        ResponseEntity<String> response = this.restTemplate.exchange(
+        ResponseEntity<ObjectNode> response = this.restTemplate.exchange(
                 this.getAwxApiUrl() + "/organizations/?name="+DEFAULT_ORGANISATION,
                 HttpMethod.GET,
                 new HttpEntity<>(getAdminAuthHeader()),
-                String.class
+                ObjectNode.class
         );
 
         var results = getOrganizationByName(DEFAULT_ORGANISATION);
-
-//                this.objectMapper.readValue(
-//                response.getBody(),
-//                new TypeReference<Results<Organization>>() {}
-//        );
 
         if(results.getCount() == 0) {
             Organization createdOrganization = createOrganization(new OrganizationCreateRequest(
@@ -255,11 +262,11 @@ public class AwxClient {
     public void deleteTeam(int teamId) {
         String url = this.getAwxApiUrl() + "/teams/" + teamId + "/";
 
-        ResponseEntity<String> response = restTemplate.exchange(
+        ResponseEntity<ObjectNode> response = restTemplate.exchange(
                 url,
                 HttpMethod.DELETE,
                 new HttpEntity<>(getAdminAuthHeader()),
-                String.class
+                ObjectNode.class
         );
 
         return;
@@ -281,10 +288,10 @@ public class AwxClient {
         Map<String, Integer> body = new HashMap<>();
         body.put("id", roleId);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(
+        ResponseEntity<ObjectNode> response = restTemplate.postForEntity(
                 this.getAwxApiUrl() + "/teams/" + teamId + "/roles/",
                 new HttpEntity<>(body, getAdminAuthHeader()),
-                String.class
+                ObjectNode.class
         );
     }
 
@@ -345,14 +352,15 @@ public class AwxClient {
         HttpHeaders header = getAdminAuthHeader();
         HttpEntity<?> entity = new HttpEntity<>(header);
 
-        ResponseEntity<String> response = this.restTemplate.exchange(
+        ResponseEntity<ObjectNode> response = this.restTemplate.exchange(
                 this.getAwxApiUrl() + "/inventories/?name="+DEFAULT_INVENTORY,
                 HttpMethod.GET,
                 entity,
-                String.class
+                ObjectNode.class
         );
 
-        var inventoryQueryResult = this.objectMapper.readValue(response.getBody(), new TypeReference<Results<Inventory>>() {});
+        var json = this.objectMapper.writeValueAsString(response.getBody());
+        var inventoryQueryResult = this.objectMapper.readValue(json, new TypeReference<Results<Inventory>>() {});
         Inventory defaultInventory = null;
 
         if(inventoryQueryResult.getCount() == 0) {
@@ -402,19 +410,20 @@ public class AwxClient {
     }
 
     public void deleteInventory(int inventoryId) {
-        ResponseEntity<String> response = restTemplate.exchange(
+        ResponseEntity<ObjectNode> response = restTemplate.exchange(
                 this.getAwxApiUrl() + "/inventories/" + inventoryId + "/",
                 HttpMethod.DELETE,
                 new HttpEntity<>(getAdminAuthHeader()),
-                String.class
+                ObjectNode.class
         );
     }
 
     public Collection<Host> getHostsOfInventory(int inventoryId) throws JsonProcessingException {
-        ResponseEntity<String> response
-                = restTemplate.getForEntity(this.getAwxApiUrl() + "/inventories/" + inventoryId + "/hosts/", String.class);
+        ResponseEntity<ObjectNode> response
+                = restTemplate.getForEntity(this.getAwxApiUrl() + "/inventories/" + inventoryId + "/hosts/", ObjectNode.class);
 
-        var hostResults = this.objectMapper.readValue(response.getBody(), new TypeReference<Results<Host>>() {});
+        var json = this.objectMapper.writeValueAsString(response.getBody());
+        var hostResults = this.objectMapper.readValue(json, new TypeReference<Results<Host>>() {});
         return hostResults.getResults();
     }
     //endregion
@@ -477,11 +486,11 @@ public class AwxClient {
 
     public void cancelProjectUpdate(int projectUpdateId) {
         String url = this.getAwxApiUrl() + "/project_updates/" + projectUpdateId + "/cancel/";
-        ResponseEntity<String> response = restTemplate.exchange(
+        ResponseEntity<ObjectNode> response = restTemplate.exchange(
                 url,
                 HttpMethod.POST,
                 new HttpEntity<>(getAdminAuthHeader()),
-                String.class
+                ObjectNode.class
         );
     }
 
@@ -664,11 +673,11 @@ public class AwxClient {
 
         while(tries <= tryLimit) {
             try {
-                ResponseEntity<String> response = restTemplate.exchange(
+                ResponseEntity<ObjectNode> response = restTemplate.exchange(
                         this.getAwxApiUrl() + "/projects/" + projectId + "/",
                         HttpMethod.DELETE,
                         httpEntity,
-                        String.class
+                        ObjectNode.class
                 );
 
                 log.info("Delete awx project with id = " + projectId);
@@ -776,10 +785,6 @@ public class AwxClient {
                 new ParameterizedTypeReference<Results<JobTemplate>>() {});
         Results<JobTemplate> jobTemplateResults = response.getBody();
 
-//        ResponseEntity<String> response
-//                = restTemplate.getForEntity(url, String.class);
-
-//        var jobTemplateResults = this.objectMapper.readValue(response.getBody(), new TypeReference<Results<JobTemplate>>() {});
         return jobTemplateResults;
     }
 
@@ -794,10 +799,6 @@ public class AwxClient {
         ResponseEntity<Results<JobTemplate>> response = restTemplate.exchange(url, HttpMethod.GET, httpEntity, new ParameterizedTypeReference<Results<JobTemplate>>() {});
         Results<JobTemplate> projectResults = response.getBody();
 
-//        ResponseEntity<String> response
-//                = restTemplate.getForEntity(url, String.class);
-
-//        var jobTemplateResults = this.objectMapper.readValue(response.getBody(), new TypeReference<Results<JobTemplate>>() {});
         return projectResults;
     }
 
@@ -845,12 +846,17 @@ public class AwxClient {
         return response.getBody().getJob();
     }
 
-    public JobTemplate createJobTemplate(String scmUrl, String scmBranch, String playbook, List<String> referencedJobTemplateCredentials)
+    public JobTemplate createJobTemplate(String scmUrl, String scmBranch, String playbook, List<String> referencedJobTemplateCredentials, String defaultExecutionEnvironmentName)
             throws AwxProjectUpdateFailedException, SSLException, JsonProcessingException {
-        Project project = createProjectAndWait(new ProjectDTOApiCreate(
+        var projectToCreate = new ProjectDTOApiCreate(
                 scmUrl,
                 scmBranch
-        ));
+        );
+        var executionEnvironment = getExecutionEnvironmentByName(defaultExecutionEnvironmentName);
+        if (executionEnvironment.isPresent()) {
+            projectToCreate.setDefault_environment(executionEnvironment.get().getId());
+        }
+        Project project = createProjectAndWait(projectToCreate);
 
         JobTemplate createdJobTemplate = createJobTemplate(
                 project.getId(),
@@ -865,18 +871,24 @@ public class AwxClient {
         List<JobTemplate> jobTemplateList = new ArrayList<>();
         for(String playbook : playbooks) {
             jobTemplateList.add(
-                    createJobTemplate(scmUrl, scmBranch, playbook, referencedJobTemplateCredentials)
+                    createJobTemplate(scmUrl, scmBranch, playbook, referencedJobTemplateCredentials, "")
             );
         }
         return jobTemplateList;
     }
 
-    public JobTemplate createJobTemplate(String scmUrl, String scmBranch, String playbook, Credential scmCredential, List<String> referencedJobTemplateCredentials) throws AwxProjectUpdateFailedException, SSLException, JsonProcessingException {
-        Project project = createProjectAndWait(new ProjectDTOApiCreate(
+    public JobTemplate createJobTemplate(String scmUrl, String scmBranch, String playbook, Credential scmCredential, List<String> referencedJobTemplateCredentials, String defaultExecutionEnvironmentName) throws AwxProjectUpdateFailedException, SSLException, JsonProcessingException {
+        var projectToCreate = new ProjectDTOApiCreate(
                 scmUrl,
                 scmBranch,
                 scmCredential
-        ));
+        );
+        var executionEnvironment = getExecutionEnvironmentByName(defaultExecutionEnvironmentName);
+        if(executionEnvironment.isPresent()){
+            projectToCreate.setDefault_environment(executionEnvironment.get().getId());
+        }
+        Project project = createProjectAndWait(projectToCreate);
+
 
         JobTemplate createdJobTemplate = createJobTemplate(
                 project.getId(),
@@ -887,13 +899,55 @@ public class AwxClient {
         return createdJobTemplate;
     }
 
+    private Optional<ExecutionEnvironment> getExecutionEnvironmentByName(String name) {
+        String url = this.getAwxApiUrl() + "/execution_environments/?search=" + name;
+
+        ResponseEntity<Results<ExecutionEnvironment>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                new HttpEntity<>(null, getAdminAuthHeader()),
+                new ParameterizedTypeReference<Results<ExecutionEnvironment>>() {});
+        Results<ExecutionEnvironment> executionEnvironmentResults = response.getBody();
+        if(executionEnvironmentResults.getCount() > 0){
+            for (ExecutionEnvironment executionEnvironment : executionEnvironmentResults.getResults()) {
+                if (name.equals(executionEnvironment.getName())) {
+                    return Optional.of(executionEnvironment);
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<ExecutionEnvironment> createOrUpdateExecutionEnvironment(ExecutionEnvironmentCreate executionEnvironmentCreate) {
+        String url = this.getAwxApiUrl() + "/execution_environments/";
+        HttpHeaders headers = getAdminAuthHeader();
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<ExecutionEnvironmentCreate> httpEntity = new HttpEntity<>(executionEnvironmentCreate, headers);
+
+        var ee = this.getExecutionEnvironmentByName(executionEnvironmentCreate.getName());
+        if (ee.isEmpty()) {
+            restTemplate.postForEntity(url, httpEntity, ExecutionEnvironment.class);
+
+            return this.getExecutionEnvironmentByName(executionEnvironmentCreate.getName());
+        }
+
+        log.info("ExecutionEnvironment exists already => update ExecutionEnvironment");
+        url += ee.get().getId() + "/";
+        restTemplate.exchange(url, HttpMethod.PUT, httpEntity, Void.class);
+
+        return this.getExecutionEnvironmentByName(executionEnvironmentCreate.getName());
+
+    }
+
     public JobTemplate createJobTemplateAndAddExecuteRoleToDefaultTeam(
             String scmUrl,
             String scmBranch,
             String playbook,
-            List<String> referencedJobTemplateCredentials
-    ) throws JsonProcessingException, AwxProjectUpdateFailedException, SSLException {
-        JobTemplate jobTemplate = createJobTemplate(scmUrl, scmBranch, playbook, referencedJobTemplateCredentials);
+            List<String> referencedJobTemplateCredentials,
+            String defaultExecutionEnvironment) throws JsonProcessingException, AwxProjectUpdateFailedException, SSLException {
+        JobTemplate jobTemplate = createJobTemplate(scmUrl, scmBranch, playbook, referencedJobTemplateCredentials, defaultExecutionEnvironment);
 
         addProjectRoleToDefaultTeam(
                 jobTemplate.getProject(),
@@ -918,8 +972,8 @@ public class AwxClient {
                 scmUrl,
                 scmBranch,
                 playbook,
-                referencedJobTemplateCredentials
-        );
+                referencedJobTemplateCredentials,
+                "");
 
         Credential consulCredential = getCredentialByName(
                 DEFAULT_CONSUL_CREDENTIAL_TYPE_NAME
@@ -940,8 +994,8 @@ public class AwxClient {
             String playbook,
             String scmUsername,
             String scmPassword,
-            List<String> referencedJobTemplateCredentials
-    ) throws JsonProcessingException, AwxProjectUpdateFailedException, SSLException {
+            List<String> referencedJobTemplateCredentials,
+            String defaultExecutionEnvironment) throws JsonProcessingException, AwxProjectUpdateFailedException, SSLException {
         Credential scmCredential = createSourceControlCredentialForDefaultOrga(
                 scmUsername,
                 scmPassword,
@@ -953,7 +1007,8 @@ public class AwxClient {
                 scmBranch,
                 playbook,
                 scmCredential,
-                referencedJobTemplateCredentials
+                referencedJobTemplateCredentials,
+                defaultExecutionEnvironment
         );
 
         addProjectRoleToDefaultTeam(
@@ -975,7 +1030,8 @@ public class AwxClient {
             String playbook,
             String username,
             String password,
-            List<String> referencedJobTemplateCredentials
+            List<String> referencedJobTemplateCredentials,
+            String defaultExecutionEnvironment
     ) throws JsonProcessingException, AwxProjectUpdateFailedException, SSLException {
 
         JobTemplate jobTemplate = createJobTemplateAddExecuteRoleToDefaultTeamAddScmCredential(
@@ -984,8 +1040,8 @@ public class AwxClient {
                 playbook,
                 username,
                 password,
-                referencedJobTemplateCredentials
-        );
+                referencedJobTemplateCredentials,
+                defaultExecutionEnvironment);
 
         Credential consulCredential = getCredentialByName(
                 DEFAULT_CONSUL_CREDENTIAL_TYPE_NAME
@@ -1049,7 +1105,7 @@ public class AwxClient {
                 url,
                 HttpMethod.PATCH,
                 new HttpEntity<>(jobTemplate, getAdminAuthHeader()),
-                String.class
+                ObjectNode.class
         );
     }
 
@@ -1063,11 +1119,11 @@ public class AwxClient {
 
         while(tries <= tryLimit) {
             try {
-                ResponseEntity<String> response = restTemplate.exchange(
+                ResponseEntity<ObjectNode> response = restTemplate.exchange(
                         this.getAwxApiUrl() + "/job_templates/" + jobTemplateId + "/",
                         HttpMethod.DELETE,
                         httpEntity,
-                        String.class
+                        ObjectNode.class
                 );
                 break;
             } catch (HttpClientErrorException e) {
@@ -1142,8 +1198,7 @@ public class AwxClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<SurveyDTOApi> httpEntity = new HttpEntity<>(new SurveyDTOApi(survey), headers);
 
-        String response = restTemplate.postForEntity(url, httpEntity, String.class).getBody();
-        return;
+        var response = restTemplate.postForEntity(url, httpEntity, ObjectNode.class).getBody();
     }
 
     public void enableSurvey(int jobTemplateId) {
@@ -1160,7 +1215,7 @@ public class AwxClient {
                 url,
                 HttpMethod.DELETE,
                 new HttpEntity<>(getAdminAuthHeader()),
-                String.class
+                ObjectNode.class
         );
     }
     //endregion
@@ -1214,7 +1269,7 @@ public class AwxClient {
         HttpEntity<HashMap<String, Integer>> httpEntity = new HttpEntity<>(body, headers);
 
         try {
-            restTemplate.postForEntity(url, httpEntity, String.class);
+            restTemplate.postForEntity(url, httpEntity, ObjectNode.class);
         } catch(HttpClientErrorException e) {
             log.warn("Not able to assign credential with id="+credentialId+" to job template with id="+jobTemplateId);
             log.warn(e.getMessage());
@@ -1274,11 +1329,11 @@ public class AwxClient {
     public void deleteCredential(int credentialId) {
         HttpHeaders headers = getAdminAuthHeader();
 
-        ResponseEntity<String> response = restTemplate.exchange(
+        ResponseEntity<ObjectNode> response = restTemplate.exchange(
                 this.getAwxApiUrl() + "/credentials/"+credentialId+"/",
                 HttpMethod.DELETE,
                 new HttpEntity<>(headers),
-                String.class
+                ObjectNode.class
         );
 
         log.info("Delete awx credential with id = " + credentialId);
@@ -1481,10 +1536,11 @@ public class AwxClient {
 
     private LinkedMultiValueMap<String, String> getAuthHeader(AwxCredential awxCredential) {
         LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap();
-        if(awxCredential.keycloakPrincipal != null) {
+        if(awxCredential.jwtAuthenticationToken != null) {
             linkedMultiValueMap.add(
-                    "Authorization",
-                    "Bearer " + getAccessToken(awxCredential.keycloakPrincipal.getKeycloakSecurityContext().getTokenString())
+                    HttpHeaders.AUTHORIZATION,
+                    "Bearer " +
+                            getAccessToken(awxCredential.jwtAuthenticationToken.getToken().getTokenValue())
             );
         } else {
             String str = (awxCredential.username == null ? "" : awxCredential.username) + ":" + (awxCredential.password == null ? "" : awxCredential.password);
@@ -1511,6 +1567,7 @@ public class AwxClient {
 
     public void setAwxPort(int port) {
         try {
+            this.awxPort = String.valueOf(port);
             URL initialUrl = new URL(awxUrl);
             URL newURL = new URL(initialUrl.getProtocol(), initialUrl.getHost(), port, initialUrl.getFile());
 

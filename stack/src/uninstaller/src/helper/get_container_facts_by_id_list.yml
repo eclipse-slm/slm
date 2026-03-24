@@ -1,0 +1,12 @@
+---
+- ansible.builtin.assert:
+    that: item is defined
+
+- name: "Get Container Facts"
+  community.docker.docker_container_info:
+    name: "{{ item }}"
+  register: container_facts
+
+- name: Add Container Fact to list
+  ansible.builtin.set_fact:
+    container_facts_list: "{{ container_facts_list + [ container_facts ] }}"

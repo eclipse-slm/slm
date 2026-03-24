@@ -8,31 +8,27 @@
 
   export default {
     name: 'App',
+    data() {
+      return {
+        tokenRefreshTimer: null
+      }
+    },
     watch: {
       $route () {
         updateToken()
       },
     },
     created () {
-      this.$store.dispatch('getUserDetails')
+      this.timer = setInterval(() => {
+        updateToken()
+      }, 60000)
     },
     mounted () {
-      NotificationServiceWebsocketClient.connect()
-      this.$store.dispatch('updateCatalogStore')
-      this.$store.dispatch('initServiceStore')
-      this.$store.dispatch('getVirtualResourceProviders')
-      this.$store.dispatch('getServiceHosters')
-      this.$store.dispatch('getServiceInstanceGroups')
-      this.$store.dispatch('getDeploymentCapabilities')
-      this.$store.dispatch('getResourcesFromBackend')
-      this.$store.dispatch('getLocations')
-      this.$store.dispatch('getProfiler')
-      this.$store.dispatch('getCluster')
-      this.$store.dispatch('getNotifications')
-      this.$store.dispatch('getClusterTypes')
+
     },
-    destroyed () {
+    unmounted () {
       NotificationServiceWebsocketClient.disconnect()
+      clearInterval(this.timer)
     },
   }
 </script>

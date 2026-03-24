@@ -80,7 +80,7 @@
   export default {
     name: 'ServiceDetailsOverview',
     props: {
-      serviceOffering: { type: Object },
+      serviceOffering: { type: Object, default: null },
     },
   }
 </script>

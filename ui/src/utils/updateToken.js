@@ -1,6 +1,18 @@
-import Vue from 'vue'
+import {globals} from "@/main";
 
 export default async function () {
-    await Vue.prototype.$keycloak.keycloak.updateToken(70)
-    return Vue.prototype.$keycloak.token
+    if(globals.$keycloak?.keycloak?.updateToken !== undefined) {
+        return globals.$keycloak.keycloak.updateToken(-1).then((refreshed) => {
+            if (refreshed) {
+                console.debug('Token refresh successful');
+                return refreshed;
+            } else {
+                console.error('Token refresh failed ');
+                globals.$keycloak.logoutFn();
+            }
+        }).catch((error) => {
+            console.error('Token refresh failed ', error);
+            globals.$keycloak.logoutFn();
+        });
+    }
 }

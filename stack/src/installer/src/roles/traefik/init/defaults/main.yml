@@ -1,0 +1,21 @@
+vault_config:
+  pki_intermediate_ca:
+    name: "pki_int_slm"
+    role_name: "traefik"
+    allowed_domains: "{{ ENV.SLM_HOSTNAME }}"
+    allow_any_name: false
+    ttl: "1d"
+    max_ttl: "90d"
+  approle:
+    name: "traefik"
+    policies:
+        - name: "traefik"
+          policy: "\npath \"pki_int_slm/*\" {  capabilities = [ \"read\" , \"create\", \"update\"  ]}"
+
+consul_kv:
+  http.routers.aas-ui.entryPoints: web, websecure
+  http.routers.aas-ui.middlewares: aas-ui-add-trailing-slash
+  http.routers.aas-ui.rule: PathPrefix(`/aas/ui`)
+  http.routers.aas-ui.service: aas-ui
+  http.middlewares.aas-ui-add-trailing-slash.replacePath.path: "/aas/ui/"
+  http.services.aas-ui.loadBalancer.servers.0.url: "http://localhost/"

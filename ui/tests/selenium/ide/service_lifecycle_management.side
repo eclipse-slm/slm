@@ -151,7 +151,7 @@
       "id": "2b59881d-df44-473d-83f3-ec6d13f10a1c",
       "comment": "",
       "command": "open",
-      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=self-service-portal&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
+      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=ui&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
       "targets": [],
       "value": ""
     }, {
@@ -411,7 +411,7 @@
       "id": "697de462-636c-40a5-87a0-83e81a0b2fe2",
       "comment": "",
       "command": "open",
-      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=self-service-portal&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
+      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=ui&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
       "targets": [],
       "value": ""
     }, {
@@ -513,7 +513,7 @@
       "id": "31a18006-d154-455c-bb63-c295cbe26215",
       "comment": "",
       "command": "open",
-      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=self-service-portal&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
+      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=ui&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
       "targets": [],
       "value": ""
     }, {
@@ -810,7 +810,7 @@
       "id": "adbb3574-9eee-4a80-b60b-167daed2337f",
       "comment": "",
       "command": "open",
-      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=self-service-portal&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
+      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=ui&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
       "targets": [],
       "value": ""
     }, {
@@ -1038,7 +1038,7 @@
       "id": "470cfbc4-8e9b-45d2-b589-841da6916c3d",
       "comment": "",
       "command": "open",
-      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=self-service-portal&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
+      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=ui&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
       "targets": [],
       "value": ""
     }, {
@@ -1309,7 +1309,7 @@
       "id": "2587f9b0-1a81-41d2-8929-28d40f6a8002",
       "comment": "",
       "command": "open",
-      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=self-service-portal&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
+      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=ui&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
       "targets": [],
       "value": ""
     }, {
@@ -1616,7 +1616,7 @@
       "id": "69e49c27-0a1c-4777-84af-3ab33fe492d4",
       "comment": "",
       "command": "open",
-      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=self-service-portal&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
+      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=ui&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
       "targets": [],
       "value": ""
     }, {
@@ -1977,7 +1977,7 @@
       "id": "90e66e70-7d66-4818-b706-65788a706045",
       "comment": "",
       "command": "open",
-      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=self-service-portal&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
+      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=ui&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
       "targets": [],
       "value": ""
     }, {
@@ -2400,7 +2400,7 @@
       "id": "8938eab0-f4c4-4742-8a05-ce7319c1fe52",
       "comment": "",
       "command": "open",
-      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=self-service-portal&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
+      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=ui&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
       "targets": [],
       "value": ""
     }, {
@@ -2755,7 +2755,7 @@
       "id": "e8b14c72-11be-4813-bdaa-9c72291a5ae5",
       "comment": "",
       "command": "open",
-      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=self-service-portal&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
+      "target": "http://localhost:7080/auth/realms/fabos/protocol/openid-connect/auth?client_id=ui&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2F%23%2F&state=65b111d5-8dbf-45dc-82ef-c0be82c324f8&response_mode=fragment&response_type=code&scope=openid&nonce=0e256cc7-2e60-4b62-accc-0ab5c72e0e29",
       "targets": [],
       "value": ""
     }, {

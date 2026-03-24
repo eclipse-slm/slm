@@ -1,17 +1,17 @@
 <template>
   <div>
     <div
-      v-if="apiStateLoading"
+      v-if="apiState === ApiState.INIT || apiState === ApiState.LOADING || apiState === ApiState.UPDATING"
       class="text-center"
     >
-      <progress-circular />
+      <ProgressCircular />
     </div>
-    <div v-if="apiStateError">
+    <div v-if="apiState === ApiState.ERROR">
       Error
     </div>
 
     <v-container
-      v-if="apiStateLoaded"
+      v-if="apiState === ApiState.LOADED"
       id="user-profile"
       fluid
       tag="section"
@@ -26,22 +26,12 @@
           <v-select
             v-model="selectedServiceVendor"
             :items="serviceVendorsOfDeveloper"
+            item-title="name"
             return-object
             label="Select Service Vendor"
             autofocus
-            @change="onServiceVendorSelected"
-          >
-            <template
-              #selection="data"
-            >
-              {{ data.item.name }}
-            </template>
-            <template
-              #item="data"
-            >
-              {{ data.item.name }}
-            </template>
-          </v-select>
+            @update:modelValue="onServiceVendorSelected"
+          />
         </v-col>
       </v-row>
 
@@ -65,7 +55,7 @@
               v-if="serviceOfferingsOfVendor == null && serviceOfferingsOfVendorLoaded"
             >
               <v-alert
-                outlined
+                variant="outlined"
                 type="info"
               >
                 No service offerings available
@@ -84,8 +74,8 @@
               @click="serviceOfferingCreateDialog = true"
             >
               <v-icon
-                dense
-                small
+                density="compact"
+                size="small"
                 class="mr-2"
               >
                 mdi-plus
@@ -101,20 +91,18 @@
             </v-btn>
             <!-- Service Offering Delete Dialog !-->
             <confirm-dialog
-              v-if="serviceOfferingDeleteDialog"
               :show="serviceOfferingDeleteDialog"
               title="Delete service offering?"
-              :text="`Do you really want to delete service offering '${serviceOfferingToDelete.name}'?`"
+              :text="`Do you want to delete service offering '${serviceOfferingToDelete?.name ?? ''}'?`"
               @canceled="serviceOfferingDeleteDialog = false"
               @confirmed="onDeleteServiceOfferingConfirmed"
             />
 
             <!-- Service Offering Version Delete Dialog !-->
             <confirm-dialog
-              v-if="serviceOfferingVersionDeleteDialog"
               :show="serviceOfferingVersionDeleteDialog"
               title="Delete service offering version?"
-              :text="`Do you really want to delete service offering version '${serviceOfferingVersionToDelete.version}'?`"
+              :text="`Do you want to delete service offering version '${serviceOfferingVersionToDelete?.version ?? ''}'?`"
               @canceled="serviceOfferingVersionDeleteDialog = false"
               @confirmed="onDeleteServiceOfferingVersionConfirmed"
             />
@@ -131,50 +119,35 @@
               item-key="id"
               :items="repositoriesOfVendor"
             >
-              <template
-                #body="{ items }"
-              >
-                <tbody
-                  v-for="repository in items"
-                  :key="repository.id"
+              <template #item.password="{ }">
+                <v-text-field
+                  label="Encrypted"
+                  size="small"
+                  disabled
+                />
+              </template>
+              <template #item.actions="{ item : serviceRepository }">
+                <v-btn
+                  class="ma-2"
+                  color="error"
+                  @click="onDeleteRepositoryClicked(serviceRepository)"
                 >
-                  <tr>
-                    <td>{{ repository.id }}</td>
-                    <td>{{ repository.address }}</td>
-                    <td>{{ repository.username }}</td>
-                    <td>
-                      <v-text-field
-                        label="Encrypted"
-                        disabled
-                      />
-                    </td>
-                    <td>{{ repository.type }}</td>
-                    <td>
-                      <v-btn
-                        class="ma-1"
-                        small
-                        outlined
-                        fab
-                        color="red"
-                        @click="onDeleteRepositoryClicked(repository)"
-                      >
-                        <v-icon>
-                          mdi-delete
-                        </v-icon>
-                      </v-btn>
-                    </td>
-                  </tr>
-                </tbody>
+                  <v-icon>
+                    mdi-delete
+                  </v-icon>
+                </v-btn>
               </template>
             </v-data-table>
+
             <v-divider />
+
             <v-btn
               color="secondary"
               @click="serviceRepositoryCreateDialog = true"
             >
               <v-icon
-                dense
-                small
+                density="compact"
+                size="small"
                 class="mr-2"
               >
                 mdi-plus
@@ -195,7 +168,7 @@
                 :avatar="getImageUrl(selectedServiceVendor.logo)"
               >
                 <v-card-text class="text-center">
-                  <div class="text-h4 font-weight-light mb-3 black--text">
+                  <div class="text-h4 font-weight-light mb-3 text-black">
                     {{ selectedServiceVendor.name }}
                   </div>
 
@@ -213,8 +186,8 @@
                     @click="showEditServiceVendorDialog = true"
                   >
                     <v-icon
-                      dense
-                      small
+                      density="compact"
+                      size="small"
                       class="mr-2"
                     >
                       mdi-pencil
@@ -255,25 +228,25 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
-  import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
-  import UsersRestApi from '@/api/service-management/usersRestApi'
-  import ApiState from '@/api/apiState'
-  import Vue from 'vue'
-  import ServiceRepositoryCreateDialog from '@/components/service_vendors/ServiceRepositoryCreateDialog'
-  import ServiceVendorsDevelopersTable from '@/components/service_vendors/ServiceVendorDevelopersTable'
-  import ServiceVendorCreateOrEditDialog from '@/components/service_vendors/ServiceVendorCreateOrEditDialog'
-  import logRequestError from '@/api/restApiHelper'
-  import getImageUrl from '@/utils/imageUtil'
-  import ServiceOfferingTable from "@/components/service_offerings/ServiceOfferingTable";
-  import ConfirmDialog from "@/components/base/ConfirmDialog";
-  import ServiceOfferingVersionsRestApi from  "@/api/service-management/serviceOfferingVersionsRestApi";
-  import ServiceOfferingCreateDialog from "@/components/service_offerings/dialogs/ServiceOfferingCreateDialog";
-  import ProgressCircular from "@/components/base/ProgressCircular";
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
 
-  export default {
+import ApiState from '@/api/apiState'
+import ServiceRepositoryCreateDialog from '@/components/service_vendors/ServiceRepositoryCreateDialog'
+import ServiceVendorsDevelopersTable from '@/components/service_vendors/ServiceVendorDevelopersTable'
+import ServiceVendorCreateOrEditDialog from '@/components/service_vendors/ServiceVendorCreateOrEditDialog'
+import logRequestError from '@/api/restApiHelper'
+import getImageUrl from '@/utils/imageUtil'
+import ServiceOfferingTable from "@/components/service_offerings/ServiceOfferingTable.vue";
+import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
+import ServiceOfferingCreateDialog from "@/components/service_offerings/dialogs/ServiceOfferingCreateDialog.vue";
+import ProgressCircular from "@/components/base/ProgressCircular.vue";
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
+import {useStore} from "@/stores/store";
+import {useUserStore} from "@/stores/userStore";
+import {storeToRefs} from "pinia";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
+
+export default {
     components: {
       OverviewHeading,
       ProgressCircular,
@@ -284,7 +257,19 @@
       ServiceVendorsDevelopersTable,
       ServiceVendorCreateOrEditDialog,
     },
-    props: ['serviceVendorId'],
+    props: {
+      serviceVendorId: {
+        type: String,
+        default: null
+      }
+    },
+    setup(){
+      const store = useStore();
+      const userStore = useUserStore();
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      const {apiState, serviceVendorById, serviceOfferingCategoryNameById} = storeToRefs(serviceOfferingsStore)
+      return {apiState, store, userStore, serviceOfferingsStore, serviceVendorById, serviceOfferingCategoryNameById};
+    },
     data () {
       return {
         serviceOfferings: [],
@@ -311,11 +296,29 @@
         showEditServiceVendorDialog: false,
       }
     },
+    computed: {
+      ApiState() {
+        return ApiState
+      },
+      userId () {
+        return this.userStore.userId
+      },
+      RepositoriesTableHeaders () {
+        return [
+          { title: 'Id', value: 'id', sortable: false },
+          { title: 'Address', value: 'address', sortable: true },
+          { title: 'Username', value: 'username', sortable: false },
+          { title: 'Password', value: 'password', sortable: false },
+          { title: 'Type', value: 'type', sortable: true },
+          { title: 'Actions', value: 'actions', sortable: false },
+        ]
+      },
+    },
     created () {
-      this.$store.dispatch('getServiceVendors').then(() => {
-        UsersRestApi.getServiceVendorsOfDeveloper(this.userId).then(serviceVendorIdsOfDeveloper => {
+      this.serviceOfferingsStore.getServiceVendors().then(() => {
+        ServiceManagementClient.usersApi.getServiceVendorsOfUser(this.userId).then(response => {
           this.serviceVendorsOfDeveloper = []
-          serviceVendorIdsOfDeveloper.forEach(serviceVendorId => {
+          response.data.forEach(serviceVendorId => {
             if (this.serviceVendorId != undefined) {
               if (this.serviceVendorId == serviceVendorId) {
                 this.selectedServiceVendor = this.serviceVendorById(serviceVendorId)
@@ -324,38 +327,9 @@
             }
             this.serviceVendorsOfDeveloper.push(this.serviceVendorById(serviceVendorId))
           })
-        })
-      })
-    },
-    computed: {
-      ...mapGetters([
-        'themeColorMain',
-        'apiStateServices',
-        'userId',
-        'serviceOfferingCategoryNameById',
-        'serviceVendorById',
-      ]),
-      apiStateLoaded () {
-        return this.apiStateServices.serviceOfferingCategories === ApiState.LOADED
-      },
-      apiStateLoading () {
-        if (this.apiStateServices.serviceOfferingCategories === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferingCategories')
-        }
-        return this.apiStateServices.serviceOfferingCategories === ApiState.LOADING || this.apiStateServices.serviceOfferingCategories === ApiState.INIT
-      },
-      apiStateError () {
-        return this.apiStateServices.serviceOfferingCategories === ApiState.ERROR
-      },
-      RepositoriesTableHeaders () {
-        return [
-          { text: 'Id', value: 'id', sortable: false },
-          { text: 'Address', value: 'address', sortable: true },
-          { text: 'Username', value: 'username', sortable: false },
-          { text: 'Password', value: 'password', sortable: false },
-          { text: 'Type', value: 'type', sortable: true },
-        ]
-      },
+        }).catch(logRequestError);
+      }
+      );
     },
     methods: {
       getServiceOfferingTableInterface (serviceOfferingTableInterface) {
@@ -367,18 +341,18 @@
         this.serviceOfferingDeleteDialog = true
       },
       onDeleteServiceOfferingConfirmed () {
-        ServiceOfferingsRestApi.deleteServiceOffering(this.serviceOfferingToDelete.id).then(response => {
-          Vue.$toast.info(`Successfully delete service offering '${this.serviceOfferingToDelete.name}'`)
+        ServiceManagementClient.serviceOfferingsApi.deleteServiceOffering(this.serviceOfferingToDelete.id).then(response => {
+          this.$toast.info(`Successfully delete service offering '${this.serviceOfferingToDelete.name}'`)
           this.serviceOfferingDeleteDialog = false
-          this.$store.dispatch('getServiceOfferings')
-          ServiceOfferingsRestApi.getOfferings(false, this.selectedServiceVendor.id).then(
-              serviceOfferingsOfVendor => {
-                this.serviceOfferingsOfVendor = serviceOfferingsOfVendor
+          this.serviceOfferingsStore.getServiceOfferings();
+          ServiceManagementClient.serviceOfferingsApi.getServiceOfferings(false, this.selectedServiceVendor.id).then(
+              response => {
+                this.serviceOfferingsOfVendor = response.data
                 this.serviceOfferingsOfVendorLoaded = true
 
               },
-          )
-        })
+          ).catch(logRequestError)
+        }).catch(logRequestError);
       },
 
       onDeleteServiceOfferingVersion(serviceOfferingVersion) {
@@ -386,14 +360,14 @@
         this.serviceOfferingVersionDeleteDialog = true
       },
       onDeleteServiceOfferingVersionConfirmed () {
-        ServiceOfferingVersionsRestApi.deleteServiceOfferingVersion(
+        ServiceManagementClient.serviceOfferingVersionsApi.deleteServiceOfferingVersion(
             this.serviceOfferingVersionToDelete.serviceOfferingId, this.serviceOfferingVersionToDelete.id)
         .then(response => {
-          Vue.$toast.info(`Successfully delete service offering version '${this.serviceOfferingVersionToDelete.version}'`)
+          this.$toast.info(`Successfully delete service offering version '${this.serviceOfferingVersionToDelete.version}'`)
           this.serviceOfferingVersionDeleteDialog = false
           this.serviceOfferingVersionToDelete = undefined
           this.$options.serviceOfferingTableInterface.updateExpanded()
-        })
+        }).catch(logRequestError);
       },
 
       onServiceVendorSelected () {
@@ -401,38 +375,45 @@
 
         this.loadRepositories()
 
-        ServiceOfferingsRestApi.getOfferings(false, this.selectedServiceVendor.id).then(
-          serviceOfferingsOfVendor => {
-            this.serviceOfferingsOfVendor = serviceOfferingsOfVendor
+        ServiceManagementClient.serviceOfferingsApi.getServiceOfferings(false, this.selectedServiceVendor.id).then(
+          response => {
+            this.serviceOfferingsOfVendor = response.data
             this.serviceOfferingsOfVendorLoaded = true
           },
-        )
+        ).catch(logRequestError)
       },
 
       onServiceRepositoryCreateDialogConfirmed (repository) {
-        ServiceVendorsRestApi.addRepositoryToServiceVendor(this.selectedServiceVendor.id, repository).then(response => {
+        let api;
+        if (repository.id === null || repository.id === ''){
+          api = ServiceManagementClient.serviceRepositoriesApi.createRepository(this.selectedServiceVendor.id, repository);
+        }else{
+          api = ServiceManagementClient.serviceRepositoriesApi.createOrUpdateRepository(this.selectedServiceVendor.id, repository.id, repository);
+        }
+
+        api.then(response => {
           this.loadRepositories()
-          Vue.$toast.info(`Successfully created repository '${repository.address}'`)
+          this.$toast.info(`Successfully created repository '${repository.address}'`)
           this.serviceRepositoryCreateDialog = false
         })
           .catch((error) => {
-            Vue.$toast.error(`Failed to created repository '${repository.address}'`)
+            this.$toast.error(`Failed to created repository '${repository.address}'`)
             logRequestError(error)
           })
       },
       onDeleteRepositoryClicked (repository) {
-        ServiceVendorsRestApi.deleteRepositoryOfServiceVendor(this.selectedServiceVendor.id, repository.id).then(() => {
+        ServiceManagementClient.serviceRepositoriesApi.deleteRepository(this.selectedServiceVendor.id, repository.id).then(() => {
           this.loadRepositories()
-          Vue.$toast.info(`Successfully removed repository '${repository.address}'`)
-        })
+          this.$toast.info(`Successfully removed repository '${repository.address}'`)
+        }).catch(logRequestError)
       },
 
       loadRepositories () {
-        ServiceVendorsRestApi.getRepositoriesOfServiceVendor(this.selectedServiceVendor.id).then(
-          repositories => {
-            this.repositoriesOfVendor = repositories
+        ServiceManagementClient.serviceRepositoriesApi.getRepositories(this.selectedServiceVendor.id).then(
+          response => {
+            this.repositoriesOfVendor = response.data
           },
-        )
+        ).catch(logRequestError)
       },
 
       onEditServiceVendorDialogConfirmed (updatedServiceVendor) {

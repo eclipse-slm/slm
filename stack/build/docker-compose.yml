@@ -1,0 +1,43 @@
+services:
+
+  installer:
+    image: ${DOCKER_IMAGE_REGISTRY}/slm/installer:${SLM_VERSION}
+    build: ../src/installer
+
+  uninstaller:
+    image: ${DOCKER_IMAGE_REGISTRY}/slm/uninstaller:${SLM_VERSION}
+    build: ../src/uninstaller
+
+  aas-broker:
+    image: ${DOCKER_IMAGE_REGISTRY}/aas/broker:${AAS_BROKER_VERSION}
+    build: ../src/aas-broker
+
+  aas-gui:
+    image: ${DOCKER_IMAGE_REGISTRY}/aas/gui:${AAS_GUI_VERSION}
+    build: ../src/aas-gui
+
+  consul:
+    image: ${DOCKER_IMAGE_REGISTRY}/consul:${CONSUL_VERSION}
+    build: ../src/consul
+
+  keycloak:
+    image: ${DOCKER_IMAGE_REGISTRY}/keycloak:${KEYCLOAK_VERSION}
+    build: ../src/keycloak/keycloak
+
+  vault:
+    image: ${DOCKER_IMAGE_REGISTRY}/vault:${VAULT_VERSION}
+    build: ../src/vault
+
+  config-exporter:
+    image: ${DOCKER_IMAGE_REGISTRY}/slm/config-exporter:${SLM_VERSION}
+    build: ../src/config-exporter
+
+  prometheus:
+    image: ${DOCKER_IMAGE_REGISTRY}/monitoring-prometheus:${PROMETHEUS_VERSION}
+    build: ../src/prometheus
+
+  traefik:
+    image: ${DOCKER_IMAGE_REGISTRY}/traefik:${TRAEFIK_VERSION}
+    build: ../src/traefik
+
+

@@ -1,13 +1,13 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="active"
     max-width="800px"
     @click:outside="closeDialog"
   >
-    <template>
+    <template #default>
       <v-toolbar
         color="primary"
-        dark
+        theme="dark"
       >
         <v-row
           align="center"
@@ -23,10 +23,9 @@
             cols="1"
           >
             <v-btn
-              icon
               @click="closeDialog"
             >
-              <v-icon>mdi-close</v-icon>
+              <v-icon icon="mdi-close" />
             </v-btn>
           </v-col>
         </v-row>
@@ -58,21 +57,33 @@
   </v-dialog>
 </template>
 <script>
-  import ClustersCreateDialogPage from "@/components/clusters/dialogs/ClustersCreateDialogPage";
-  import ClustersCreateDialogPageStart from "@/components/clusters/dialogs/ClustersCreateDialogPageStart.vue";
-  import ClustersCreateDialogPageCreateNewCluster
-    from "@/components/clusters/dialogs/ClustersCreateDialogPageCreateNewCluster.vue";
-  import ClustersCreateDialogPageAddExistingCluster
-    from "@/components/clusters/dialogs/ClustersCreateDialogPageAddExistingCluster.vue";
+import ClustersCreateDialogPage from "@/components/clusters/dialogs/ClustersCreateDialogPage";
+import ClustersCreateDialogPageStart from "@/components/clusters/dialogs/ClustersCreateDialogPageStart.vue";
+import ClustersCreateDialogPageCreateNewCluster
+  from "@/components/clusters/dialogs/ClustersCreateDialogPageCreateNewCluster.vue";
+import ClustersCreateDialogPageAddExistingCluster
+  from "@/components/clusters/dialogs/ClustersCreateDialogPageAddExistingCluster.vue";
+import {toRef} from "vue";
 
-  export default {
+export default {
     name: 'ClusterCreateDialog',
     components: {
       ClustersCreateDialogPageStart,
       ClustersCreateDialogPageCreateNewCluster,
       ClustersCreateDialogPageAddExistingCluster
     },
-    props: ['show'],
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      }
+    },
+    setup(props){
+      const active = toRef(props, 'show')
+      return{
+        active
+      }
+    },
     data () {
       return {
         page: ClustersCreateDialogPage.START,

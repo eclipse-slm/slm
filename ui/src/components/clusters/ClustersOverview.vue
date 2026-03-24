@@ -1,14 +1,12 @@
 <template>
   <div>
-    <base-material-card
-      class="px-5 py-3"
-    >
+    <base-material-card>
       <template #heading>
         <overview-heading text="Clusters" />
       </template>
 
       <no-item-available-note
-        v-if="!clusters.length"
+        v-if="!resourceClustersStore.clusters.length"
         item="Cluster"
       />
 
@@ -20,22 +18,16 @@
     </base-material-card>
 
 
-    <v-fab-transition>
-      <v-btn
-        id="resources-button-add-resource"
-        class="mb-10 elevation-15"
-        color="primary"
-        absolute
-        bottom
-        right
-        fab
-        @click="showCreateDialog = true"
-      >
-        <v-icon large>
-          mdi-plus
-        </v-icon>
-      </v-btn>
-    </v-fab-transition>
+    <v-fab
+      id="resources-button-add-resource"
+      icon="mdi-plus"
+      class="mx-4"
+      elevation="15"
+      color="primary"
+      location="right bottom"
+      :app="true"
+      @click="showCreateDialog = true"
+    />
 
     <clusters-create-dialog
       :show="showCreateDialog"
@@ -45,11 +37,14 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 import ClustersCreateDialog from "@/components/clusters/dialogs/ClustersCreateDialog.vue";
 import ResourcesTableClusters from "@/components/resources/ResourcesTableClusters.vue";
+import {useResourceClustersStore} from "@/stores/resourceClustersStore";
+import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
+import {useCapabilitiesStore} from "@/stores/capabilitiesStore";
 
 export default {
   name: 'ClustersOverview',
@@ -59,6 +54,12 @@ export default {
     NoItemAvailableNote,
     ClustersCreateDialog
   },
+  setup(){
+    const resourceClustersStore = useResourceClustersStore();
+    const resourceDevicesStore = useResourceDevicesStore();
+    const capabilitiesStore = useCapabilitiesStore();
+    return {resourceClustersStore, resourceDevicesStore, capabilitiesStore}
+  },
   data () {
     return {
       showCreateDialog: false,
@@ -66,17 +67,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'clusters',
-    ])
   },
   mounted () {
-    this.$store.dispatch('getDeploymentCapabilities')
   },
   methods: {
-    ...mapActions([
-      'getResourcesFromBackend',
-    ])
   },
 }
 </script>

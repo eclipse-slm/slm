@@ -1,54 +1,63 @@
 <template>
   <v-list-group
-    :group="group"
+    :value="item.title"
     :prepend-icon="item.icon"
-    :sub-group="subGroup"
+    :subgroup="subGroup"
     append-icon="mdi-menu-down"
-    :color="barColor !== 'rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.7)' ? 'white' : 'grey darken-1'"
+    :color="store.barColor !== 'rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.7)' ? 'white' : 'grey darken-1'"
   >
-    <template v-slot:activator>
-      <v-list-item-icon
+    <template #activator="{ props }">
+      <v-list-item
         v-if="text"
-        class="v-list-item__icon--text"
-      >{{computedText}}</v-list-item-icon>
+        v-bind="props"
+        :to="(children.length > item.goToChildOnClick) ? children[item.goToChildOnClick].to : undefined"
+      >
+        <v-list-item-title
+          @click="onParentClicked(item)"
+        >
+          {{ item.title }}
+        </v-list-item-title>
+      </v-list-item>
 
-      <v-list-item-avatar
-        v-else-if="item.avatar"
+      <v-list-item
+        v-else-if="item.icon"
+        v-bind="props"
+        :tile="item.title"
+        :prepend-icon="item.icon"
         class="align-self-center"
         color="white"
         contain
-      >
-        <v-img src="https://demos.creative-tim.com/vuetify-material-dashboard/favicon.ico" />
-      </v-list-item-avatar>
-
-      <v-list-item-content>
-        <v-list-item-title >{{item.title}}</v-list-item-title>
-      </v-list-item-content>
+      />
     </template>
 
     <template v-for="(child, i) in children">
-      <base-item-sub-group
-        v-if="child.children"
+      <div
+        v-if="child.visible"
         :key="`sub-group-${i}`"
-        :item="child"
-      />
+      >
+        <v-list-group
+          v-if="child.children"
+          :item="child"
+        />
 
-      <base-item
-        v-else
-        :key="`item-${i}`"
-        :item="child"
-        text
-      />
+        <base-item
+          v-else
+          :id="child.id"
+          :key="`item-${i}`"
+          :item="child"
+        />
+      </div>
     </template>
   </v-list-group>
 </template>
 
 <script>
-  // Utilities
-  import kebabCase from 'lodash/kebabCase'
-  import { mapState } from 'vuex'
+// Utilities
+import kebabCase from 'lodash/kebabCase'
 
-  export default {
+import {useStore} from "@/stores/store";
+
+export default {
     name: 'ItemGroup',
 
     inheritAttrs: false,
@@ -72,25 +81,16 @@
         default: false,
       },
     },
-
+    setup(){
+      const store = useStore();
+      return {store};
+    },
     computed: {
-      ...mapState(['barColor']),
       children () {
         return this.item.children.map(item => ({
           ...item,
           to: !item.to ? undefined : `${this.item.group}/${item.to}`,
         }))
-      },
-      computedText () {
-        if (!this.item || !this.item.title) return ''
-
-        let text = ''
-
-        this.item.title.split(' ').forEach(val => {
-          text += val.substring(0, 1)
-        })
-
-        return text
       },
       group () {
         return this.genGroup(this.item.children)
@@ -112,6 +112,8 @@
             return group
           }).join('|')
       },
+      onParentClicked (item) {
+      }
     },
   }
 </script>
@@ -120,4 +122,10 @@
 .v-list-group__activator p {
   margin-bottom: 0;
 }
+
+.v-list-group {
+  --list-indent-size: 16px;
+  --prepend-width: 0px;
+}
+
 </style>

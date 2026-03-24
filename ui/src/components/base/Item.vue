@@ -4,32 +4,36 @@
     :rel="href && href !== '#' ? 'noopener' : undefined"
     :target="href && href !== '#' ? '_blank' : undefined"
     :to="item.to"
-    :active-class="`primary ${!isDark ? 'black' : 'white'}--text`"
+    :active-class="`bg-primary ${!isDark ? 'black' : 'white'}--text`"
   >
-    <v-list-item-icon
-      v-if="text"
-      class="v-list-item__icon--text"
-    >{{computedText}}</v-list-item-icon>
-
-    <v-list-item-icon v-else-if="item.icon">
-      <v-icon>{{item.icon}}</v-icon>
-    </v-list-item-icon>
-
-    <v-list-item-content v-if="item.title || item.subtitle">
-      <v-list-item-title>{{item.title}}</v-list-item-title>
-      <v-list-item-subtitle>{{item.subtitle}}</v-list-item-subtitle>
-    </v-list-item-content>
+    <template #prepend>
+      <v-icon
+        v-if="text"
+        class="v-list-item__icon--text"
+      >
+        {{ computedText }}
+      </v-icon>
+      <v-icon
+        v-else-if="item.icon"
+        :icon="item.icon"
+      />
+    </template>
+    <v-list-item-title v-if="item.title">
+      {{ item.title }}
+    </v-list-item-title>
+    <v-list-item-subtitle v-if="item.subtitle">
+      {{ item.subtitle }}
+    </v-list-item-subtitle>
   </v-list-item>
 </template>
 
-<script>
-  import Themeable from 'vuetify/lib/mixins/themeable'
+<script lang="js">
+import {useTheme} from 'vuetify'
 
-  export default {
+export default {
     // eslint-disable-next-line vue/multi-word-component-names
     name: 'Item',
 
-    mixins: [Themeable],
 
     props: {
       item: {
@@ -46,6 +50,12 @@
         type: Boolean,
         default: false,
       },
+    },
+
+    setup(){
+      const theme = useTheme()
+      const isDark = theme.current.value.dark
+      return {isDark}
     },
 
     computed: {
@@ -66,3 +76,4 @@
     },
   }
 </script>
+

@@ -29,118 +29,131 @@
         v-else
         v-model="createWizardState.currentStep"
         horizontal
+        hide-actions
+        :items="[$t('ServiceStepper.Common'), 'Deployment Definition', 'Service Options', $t('ServiceStepper.Requirements') ]"
       >
-        <v-stepper-header>
-          <v-stepper-step
+        <!--        <v-stepper-header>
+          <v-stepper-item
             step="1"
             :complete="createWizardState.step1.completed"
           >
-            {{ $t('ServiceStepper.Common') }}
-          </v-stepper-step>
+          </v-stepper-item>
 
-          <v-stepper-step
+          <v-stepper-item
             step="2"
             :complete="createWizardState.step2.completed"
           >
-            {{ "Deployment Definition" }}
-          </v-stepper-step>
+          </v-stepper-item>
 
-          <v-stepper-step
+          <v-stepper-item
             step="3"
             :complete="createWizardState.step3.completed"
           >
-            {{ "Service Options" }}
-          </v-stepper-step>
+          </v-stepper-item>
 
-          <v-stepper-step
+          <v-stepper-item
             step="4"
             :complete="createWizardState.step4.completed"
           >
-          {{ $t('ServiceStepper.Requirements') }}
-          </v-stepper-step>
-        </v-stepper-header>
+          </v-stepper-item>
+        </v-stepper-header>-->
 
-        <v-stepper-items>
-          <!-- Step 1 - Common -->
-          <v-stepper-content step="1">
-            <service-offering-version-wizard-step1-common
-              :edit-mode="editMode"
-              :service-offering-version="newServiceOfferingVersion"
-              :service-vendor-id="serviceVendorId"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
-            />
-          </v-stepper-content>
+        <!-- Step 1 - Common -->
+        <template #item.1>
+          <service-offering-version-wizard-step1-common
+            :edit-mode="editMode"
+            :service-offering-version="newServiceOfferingVersion"
+            :service-vendor-id="serviceVendorId"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
+          />
+        </template>
+        <!-- Step 2 - Deployment Definition -->
+        <template #item.2>
+          <!-- Docker Container -->
+          <service-offering-version-wizard-step2-deployment-definition-docker-container
+            v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'DOCKER_CONTAINER'"
+            :edit-mode="editMode"
+            :service-offering-version="newServiceOfferingVersion"
+            :service-vendor-id="serviceVendorId"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
+          />
+          <!-- Docker Compose -->
+          <service-offering-version-wizard-step2-deployment-definition-docker-compose
+            v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'DOCKER_COMPOSE'"
+            :edit-mode="editMode"
+            :service-offering-version="newServiceOfferingVersion"
+            :service-vendor-id="serviceVendorId"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
+          />
+          <!-- Kubernetes -->
+          <service-offering-version-wizard-step2-deployment-definition-kubernetes
+            v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'KUBERNETES'"
+            :edit-mode="editMode"
+            :service-offering-version="newServiceOfferingVersion"
+            :service-vendor-id="serviceVendorId"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
+          />
+          <!-- Codesys -->
+          <service-offering-version-wizard-step2-deployment-definition-codesys
+            v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'CODESYS'"
+            :edit-mode="editMode"
+            :service-offering-version="newServiceOfferingVersion"
+            :service-vendor-id="serviceVendorId"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
+          />
+        </template>
+        <!-- Step 3 - Service Options -->
+        <template #item.3>
+          <service-offering-version-wizard-step3-service-options
+            :edit-mode="editMode"
+            :service-offering-version="newServiceOfferingVersion"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
+          />
+        </template>
 
-          <!-- Step 2 - Deployment Definition -->
-          <v-stepper-content step="2">
-            <!-- Docker Container -->
-            <service-offering-version-wizard-step2-deployment-definition-docker-container
-              v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'DOCKER_CONTAINER'"
-              :edit-mode="editMode"
-              :service-offering-version="newServiceOfferingVersion"
-              :service-vendor-id="serviceVendorId"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
-            />
-            <!-- Docker Compose -->
-            <service-offering-version-wizard-step2-deployment-definition-docker-compose
-              v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'DOCKER_COMPOSE'"
-              :edit-mode="editMode"
-              :service-offering-version="newServiceOfferingVersion"
-              :service-vendor-id="serviceVendorId"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
-            />
-            <!-- Kubernetes -->
-            <service-offering-version-wizard-step2-deployment-definition-kubernetes
-              v-if="newServiceOfferingVersion.deploymentDefinition.deploymentType === 'KUBERNETES'"
-              :edit-mode="editMode"
-              :service-offering-version="newServiceOfferingVersion"
-              :service-vendor-id="serviceVendorId"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
-            />
-          </v-stepper-content>
-
-          <!-- Step 3 - Service Options -->
-          <v-stepper-content step="3">
-            <service-offering-version-wizard-step3-service-options
-              :edit-mode="editMode"
-              :service-offering-version="newServiceOfferingVersion"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
-            />
-          </v-stepper-content>
-
-          <!--- Step 4 - Service Requirements -->
-          <v-stepper-content step="4">
-            <service-offering-version-wizard-step4-requirements
-              :edit-mode="editMode"
-              :service-offering-version="newServiceOfferingVersion"
-              @step-canceled="onStepCanceled"
-              @step-completed="onStepCompleted"
-            />
-          </v-stepper-content>
-        </v-stepper-items>
+        <!--- Step 4 - Service Requirements -->
+        <template #item.4>
+          <service-offering-version-wizard-step4-requirements
+            :edit-mode="editMode"
+            :service-offering-version="newServiceOfferingVersion"
+            @step-canceled="onStepCanceled"
+            @step-completed="onStepCompleted"
+          />
+        </template>
       </v-stepper>
     </div>
   </div>
 </template>
 
 <script>
-  import ServiceOfferingVersionWizardStep1Common from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep1Common'
-  import ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer'
-  import ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose'
-  import ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes'
-  import ServiceOfferingVersionWizardStep3ServiceOptions from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep3ServiceOptions'
-  import ServiceOfferingVersionWizardStep4Requirements from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep4Requirements'
-  import ServiceOfferingVersionsRestApi from '@/api/service-management/serviceOfferingVersionsRestApi'
-  import { mapGetters } from 'vuex'
-  import ApiState from '@/api/apiState'
-  import Vue from 'vue'
+import ServiceOfferingVersionWizardStep1Common
+  from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep1Common'
+import ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys
+  from "@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys.vue";
+import ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer
+  from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer'
+import ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose
+  from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose'
+import ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes
+  from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes'
+import ServiceOfferingVersionWizardStep3ServiceOptions
+  from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep3ServiceOptions'
+import ServiceOfferingVersionWizardStep4Requirements
+  from '@/components/service_offerings/wizard_service_offering_version/ServiceOfferingVersionWizardStep4Requirements'
 
-  export default {
+import ApiState from '@/api/apiState'
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
+import {storeToRefs} from "pinia";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
+import logRequestError from "@/api/restApiHelper";
+
+export default {
     name: 'ServiceOfferingCreatePage',
 
     components: {
@@ -148,11 +161,33 @@
       ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer,
       ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose,
       ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes,
+      ServiceOfferingVersionWizardStep2DeploymentDefinitionCodesys,
       ServiceOfferingVersionWizardStep3ServiceOptions,
       ServiceOfferingVersionWizardStep4Requirements,
     },
-    props: ['editMode', 'serviceOfferingVersionId', 'serviceOfferingId', 'serviceVendorId'],
-
+    props: {
+      editMode: {
+        type: Boolean,
+        default: false
+      },
+      serviceOfferingId: {
+        type: String,
+        default: null
+      },
+      serviceOfferingVersionId: {
+        type: String,
+        default: null
+      },
+      serviceVendorId: {
+        type: String,
+        default: null
+      }
+    },
+    setup(){
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      const {serviceOfferingDeploymentTypePrettyName} = storeToRefs(serviceOfferingsStore)
+      return {serviceOfferingsStore, serviceOfferingDeploymentTypePrettyName}
+    },
     data () {
       return {
         createWizardState: {
@@ -195,18 +230,40 @@
             },
             envFiles: {},
 
-            manifestFile: ''
+            manifestFile: '',
+
+            codesysFile: '',
+            applicationPath: ''
           },
           serviceRequirements: []
         },
       }
     },
 
+    computed: {
+      apiStateServices () {
+        return this.serviceOfferingsStore.apiState
+      },
+      apiStateLoaded () {
+        return this.apiStateServices === ApiState.LOADED
+      },
+      apiStateLoading () {
+        if (this.apiStateServices === ApiState.INIT) {
+          this.serviceOfferingsStore.getServiceOfferingDeploymentTypes();
+        }
+        return this.apiStateServices === ApiState.LOADING || this.apiStateServices === ApiState.INIT
+      },
+      apiStateError () {
+        return this.apiStateServices === ApiState.ERROR
+      },
+    },
+
     created () {
       if (this.editMode) {
         this.newServiceOfferingVersion = null
-        ServiceOfferingVersionsRestApi.getServiceOfferingVersionById(this.serviceOfferingId, this.serviceOfferingVersionId)
-            .then(serviceOfferingVersion => {
+        ServiceManagementClient.serviceOfferingVersionsApi.getServiceOfferingVersionById(this.serviceOfferingId, this.serviceOfferingVersionId)
+            .then(result => {
+              const serviceOfferingVersion = result.data;
               var requirements = serviceOfferingVersion.serviceRequirements
               for(let requirementId = 0; requirementId < requirements.length; requirementId++) {
                 var requirement = requirements[requirementId]
@@ -224,30 +281,11 @@
               }
               serviceOfferingVersion.serviceRequirements = requirements
               this.newServiceOfferingVersion = serviceOfferingVersion
-            })
+            }).catch(logRequestError)
       }
       else {
         this.newServiceOfferingVersion.serviceOfferingId = this.serviceOfferingId
       }
-    },
-
-    computed: {
-      ...mapGetters([
-        'apiStateServices',
-        'serviceOfferingDeploymentTypePrettyName',
-      ]),
-      apiStateLoaded () {
-        return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADED
-      },
-      apiStateLoading () {
-        if (this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferingDeploymentTypes')
-        }
-        return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADING || this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT
-      },
-      apiStateError () {
-        return this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.ERROR
-      },
     },
 
     methods: {
@@ -301,11 +339,34 @@
             }
 
             if (this.editMode) {
-              ServiceOfferingVersionsRestApi.updateServiceOfferingVersion(serviceOfferingVersionDTO).then(
+              switch (serviceOfferingVersionDTO.deploymentDefinition.deploymentType) {
+                case 'Docker Container':
+                  serviceOfferingVersionDTO.deploymentDefinition.deploymentType = 'DOCKER_CONTAINER'
+                  break;
+                case 'Docker Compose':
+                  serviceOfferingVersionDTO.deploymentDefinition.deploymentType = 'DOCKER_COMPOSE'
+                  break;
+                default:
+                  break;
+              }
+              ServiceManagementClient.serviceOfferingVersionsApi.createOrUpdateServiceOfferingVersionWithId(
+                  serviceOfferingVersionDTO.serviceOfferingId, serviceOfferingVersionDTO.id,serviceOfferingVersionDTO
+              ).then(
                 response => {
                   if (response.status === 200) {
-                    Vue.$toast.info('Successfully updated service offering version')
-                    this.$store.dispatch('getServiceOfferings')
+
+                    if(serviceOfferingVersionDTO.deploymentDefinition.deploymentType === 'CODESYS'){
+                      ServiceManagementClient.serviceOfferingVersionsApi.createOrUpdateServiceOfferingFileWithId(
+                          response.data.serviceOfferingId,
+                          response.data.serviceOfferingVersionId,
+                          this.newServiceOfferingVersion.deploymentDefinition.codesysFile
+                      ).then(uploadFileResponse => {
+                        this.$toast.info('Successfully uploaded file for offering')
+                      }).catch(error => console.log(error));
+                    }
+
+                    this.$toast.info('Successfully updated service offering version')
+                    this.serviceOfferingsStore.getServiceOfferings();
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
                   } else {
                     console.log(response)
@@ -316,19 +377,46 @@
                   console.log(exception)
                 })
             } else {
-              ServiceOfferingVersionsRestApi.addServiceOfferingVersion(serviceOfferingVersionDTO).then(
+              switch (serviceOfferingVersionDTO.deploymentDefinition.deploymentType) {
+                case 'Docker Container':
+                  serviceOfferingVersionDTO.deploymentDefinition = 'DOCKER_CONTAINER'
+                  break
+                case 'Docker Compose':
+                  serviceOfferingVersionDTO.deploymentDefinition = 'DOCKER_COMPOSE'
+                  break
+                case 'Kubernetes':
+                  serviceOfferingVersionDTO.deploymentDefinition = 'KUBERNETES'
+                  break
+                case 'Codesys':
+                  serviceOfferingVersionDTO.deploymentDefinition = 'CODESYS'
+                  break
+                default:
+                  break
+              }
+              ServiceManagementClient.serviceOfferingVersionsApi.createServiceOfferingVersionWithAutoGeneratedId(serviceOfferingVersionDTO.serviceOfferingId, serviceOfferingVersionDTO).then(
                 response => {
                   if (response.status === 200) {
-                    Vue.$toast.info('Successfully created service offering version')
-                    this.$store.dispatch('getServiceOfferings')
+
+                    if(serviceOfferingVersionDTO.deploymentDefinition.deploymentType === 'CODESYS'){
+                      ServiceManagementClient.serviceOfferingVersionsApi.createOrUpdateServiceOfferingFileWithId(
+                          response.data.serviceOfferingId,
+                          response.data.serviceOfferingVersionId,
+                          this.newServiceOfferingVersion.deploymentDefinition.codesysFile
+                      ).then(uploadFileResponse => {
+                        this.$toast.info('Successfully uploaded file for offering')
+                      }).catch(error => console.log(error));
+                    }
+
+                    this.$toast.info('Successfully created service offering version')
+                    this.serviceOfferingsStore.getServiceOfferings();
                     this.$router.push({ path: `/services/vendors/${this.serviceVendorId}` })
                   } else {
                     console.log(response)
                   }
                 })
                 .catch(exception => {
-                  Vue.$toast.error('Failed to create service offering version')
-                  console.log('Service offering version creation failed: ' + exception.response.data.message)
+                  this.$toast.error('Failed to create service offering version')
+                  console.log('Service offering version creation failed: ' + exception?.response?.data?.message)
                   console.log(exception)
                 })
             }

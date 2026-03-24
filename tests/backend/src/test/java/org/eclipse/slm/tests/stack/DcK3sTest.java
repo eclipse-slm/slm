@@ -29,9 +29,10 @@ public class DcK3sTest {
     @BeforeAll
     public static void init()
     {
-        RestAssured.baseURI = TestConfig.RESOURCE_REGISTRY_BASE_URL;
-        RestAssured.port = TestConfig.RESOURCE_REGISTRY_PORT;
+        RestAssured.baseURI = TestConfig.RESOURCE_MANAGEMENT_BASE_URL;
+        RestAssured.port = TestConfig.RESOURCE_MANAGEMENT_PORT;
         RestAssured.basePath = "";
+        RestAssured.useRelaxedHTTPSValidation();
     }
 
     public static Stream<TestResource> getTestResources() {
@@ -264,8 +265,8 @@ public class DcK3sTest {
     @DisplayName("Create Service Offering")
     public void createServiceOffering() throws URISyntaxException, IOException {
         RequestSpecification requestSpecification = RestAssured.given()
-            .baseUri(TestConfig.SERVICE_REGISTRY_BASE_URL)
-            .port(TestConfig.SERVICE_REGISTRY_PORT);
+            .baseUri(TestConfig.SERVICE_MANAGEMENT_BASE_URL)
+            .port(TestConfig.SERVICE_MANAGEMENT_PORT);
         TestServiceVendor serviceVendor = TestConfig.TEST_SERVICE_VENDOR;
 
         ClassLoader classLoader = getClass().getClassLoader();
@@ -358,8 +359,6 @@ public class DcK3sTest {
 //        .get("/services/offerings/?withImage=false")
 //        .then().assertThat() .statusCode(200).body("$", hasSize(greaterThanOrEqualTo (1)))
 //        .extract().body().path("[0].id").toString();
-//
-//        serviceOrderJson.put("projectAbbreviation", "fabos");
 //
 //        // Get PreOrder Service Instance Count
 //        int preOrderServiceInstanceCount = Integer.parseInt(

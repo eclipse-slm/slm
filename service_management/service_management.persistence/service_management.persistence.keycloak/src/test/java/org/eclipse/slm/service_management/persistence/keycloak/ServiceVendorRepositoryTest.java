@@ -1,9 +1,11 @@
 package org.eclipse.slm.service_management.persistence.keycloak;
 
-import org.eclipse.slm.common.keycloak.config.KeycloakUtil;
-import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.*;
+import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakGroupNotFoundException;
+import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakGroupRuntimeException;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakUserNotFoundException;
+import org.eclipse.slm.service_management.model.exceptions.ServiceVendorRuntimeException;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendor;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendorDeveloper;
 import org.eclipse.slm.service_management.model.vendors.exceptions.ServiceVendorNotFoundException;
@@ -12,37 +14,32 @@ import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguratio
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.KeycloakSecurityContext;
-import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.test.context.TestSecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @DataJpaTest
 @ContextConfiguration(classes = {
         ServiceVendorRepository.class,
         ServiceVendorJpaRepository.class,
-        KeycloakUtil.class
+        KeycloakAdminClient.class
 })
 @EntityScan( basePackages = { "org.eclipse.slm.service_management.model" })
 @EnableJpaRepositories(basePackages = "org.eclipse.slm.service_management.persistence.api")
@@ -57,13 +54,7 @@ public class ServiceVendorRepositoryTest {
     private ServiceVendorRepository serviceVendorRepository;
 
     @MockBean
-    private MultiTenantKeycloakRegistration multiTenantKeycloakRegistration;
-
-    @MockBean
-    private KeycloakUtil keycloakUtil;
-
-    @Mock
-    private KeycloakPrincipal keycloakPrincipal;
+    private KeycloakAdminClient keycloakAdminClient;
 
     private RecursiveComparisonConfiguration defaultRecursiveComparisonConfiguration = RecursiveComparisonConfiguration.builder()
             .withIgnoredFields("id", "persisted")
@@ -134,12 +125,12 @@ public class ServiceVendorRepositoryTest {
         @Test
         @DisplayName("Create vendor without logo")
         public void createVendorWithoutLogo() {
-            when(keycloakUtil.createGroup(any(), any(), any())).thenReturn(new GroupRepresentation());
+            when(keycloakAdminClient.createGroup(any(), any(), any())).thenReturn(new GroupRepresentation());
 
             var createdServiceVendor = generateTestServiceVendor();
             serviceVendorRepository.createOrUpdateServiceVendorWithId(createdServiceVendor, "fabos");
 
-            verify(keycloakUtil).createGroup(
+            verify(keycloakAdminClient).createGroup(
                     argThat(realm -> realm.equals("fabos")),
                     argThat(groupName -> groupName.equals(createdServiceVendor.getKeycloakGroupName())),
                     any());
@@ -151,12 +142,12 @@ public class ServiceVendorRepositoryTest {
         @Test
         @DisplayName("Create vendor with logo")
         public void createVendorWithLogo() {
-            when(keycloakUtil.createGroup(any(), any(), any())).thenReturn(new GroupRepresentation());
+            when(keycloakAdminClient.createGroup(any(), any(), any())).thenReturn(new GroupRepresentation());
 
             var createdServiceVendor = generateTestServiceVendorWithLogo();
             serviceVendorRepository.createOrUpdateServiceVendorWithId(createdServiceVendor, "fabos");
 
-            verify(keycloakUtil).createGroup(
+            verify(keycloakAdminClient).createGroup(
                     argThat(realm -> realm.equals("fabos")),
                     argThat(groupName -> groupName.equals(createdServiceVendor.getKeycloakGroupName())),
                     any());
@@ -198,15 +189,13 @@ public class ServiceVendorRepositoryTest {
 
         @Test
         @DisplayName("Vendor exists")
-        public void vendorExists() throws ServiceVendorNotFoundException, KeycloakGroupNotFoundException {
+        public void vendorExists() throws ServiceVendorNotFoundException, KeycloakGroupNotFoundException, KeycloakGroupRuntimeException, ServiceVendorRuntimeException {
             var serviceVendorId = UUID.randomUUID();
             var storedServiceVendor = addTestServiceVendorInDatabase(serviceVendorId);
 
             serviceVendorRepository.deleteServiceVendorById(serviceVendorId, "fabos");
 
-            verify(keycloakUtil).deleteGroup(
-                    argThat(realm -> realm.equals("fabos")),
-                    argThat(groupName -> groupName.equals(storedServiceVendor.getKeycloakGroupName())));
+            verify(keycloakAdminClient).deleteGroup(argThat(groupName -> groupName.equals(storedServiceVendor.getKeycloakGroupName())));
         }
     }
 
@@ -238,7 +227,7 @@ public class ServiceVendorRepositoryTest {
             var userId = UUID.randomUUID();
             serviceVendorRepository.addDeveloperToServiceVendor(serviceVendor.getId(), userId, "fabos");
 
-            when(keycloakUtil.getUsersOfGroup("fabos", serviceVendor.getKeycloakGroupName()))
+            when(keycloakAdminClient.getUsersOfGroup("fabos", serviceVendor.getKeycloakGroupName()))
                     .thenReturn(List.of(getKeycloakUserRepresentationForServiceVendorDeveloper(serviceVendorDeveloper)));
 
             var developers = serviceVendorRepository.getDevelopersOfServiceVendor(serviceVendor.getId(), "fabos");
@@ -267,7 +256,7 @@ public class ServiceVendorRepositoryTest {
 
             serviceVendorRepository.addDeveloperToServiceVendor(serviceVendor.getId(), serviceVendorDeveloper.getId(), "fabos");
 
-            verify(keycloakUtil).assignUserToGroup(
+            verify(keycloakAdminClient).assignUserToGroup(
                     argThat(realm -> realm.equals("fabos")),
                     argThat(groupName -> groupName.equals(serviceVendor.getKeycloakGroupName())),
                     argThat(userId -> userId.equals(serviceVendorDeveloper.getId())));
@@ -292,7 +281,7 @@ public class ServiceVendorRepositoryTest {
             var developerUserId = UUID.randomUUID();
 
             doThrow(new KeycloakUserNotFoundException(developerUserId))
-                    .when(keycloakUtil).removeUserFromGroup("fabos", serviceVendor.getKeycloakGroupName(), developerUserId);
+                    .when(keycloakAdminClient).removeUserFromGroup("fabos", serviceVendor.getKeycloakGroupName(), developerUserId);
 
             assertThatThrownBy(() -> {
                 serviceVendorRepository.removeDeveloperFromServiceVendor(serviceVendor.getId(), developerUserId, "fabos");
@@ -307,7 +296,7 @@ public class ServiceVendorRepositoryTest {
 
             serviceVendorRepository.removeDeveloperFromServiceVendor(serviceVendor.getId(), serviceVendorDeveloper.getId(), "fabos");
 
-            verify(keycloakUtil).removeUserFromGroup(
+            verify(keycloakAdminClient).removeUserFromGroup(
                     argThat(realm -> realm.equals("fabos")),
                     argThat(groupName -> groupName.equals(serviceVendor.getKeycloakGroupName())),
                     argThat(userId -> userId.equals(serviceVendorDeveloper.getId())));
@@ -319,27 +308,24 @@ public class ServiceVendorRepositoryTest {
 
         @Test
         @DisplayName("No vendors associated")
+        @WithMockJwtAuth()
         public void noVendorsAssociated() {
-            var accessToken = new AccessToken();
-            var keycloakSecurityContext = new KeycloakSecurityContext("", accessToken,"", null);
-            when(keycloakPrincipal.getKeycloakSecurityContext()).thenReturn(keycloakSecurityContext);
+            var jwtAuthenticationToken = (JwtAuthenticationToken) TestSecurityContextHolder.getContext().getAuthentication();
 
-            var developers = serviceVendorRepository.getServiceVendorsOfDeveloper(keycloakPrincipal);
+            var developers = serviceVendorRepository.getServiceVendorsOfDeveloper(jwtAuthenticationToken);
             assertThat(developers).hasSize(0);
         }
 
         @Test
         @DisplayName("One vendor associated")
+        @WithMockJwtAuth(claims = @OpenIdClaims(
+                otherClaims = @Claims(stringArrayClaims = @StringArrayClaim(name = "groups", value = { "/vendor_c12c5a32-c57d-4afd-89f4-9bcd4ae7bee3" })
+        )))
         public void oneVendorAssociated() {
-            var serviceVendor = generateTestServiceVendor();
-            var accessToken = new AccessToken();
-            var groups = new ArrayList<String>();
-            groups.add(serviceVendor.getKeycloakGroupName());
-            accessToken.setOtherClaims("groups", groups);
-            var keycloakSecurityContext = new KeycloakSecurityContext("", accessToken,"", null);
-            when(keycloakPrincipal.getKeycloakSecurityContext()).thenReturn(keycloakSecurityContext);
+            var jwtAuthenticationToken = (JwtAuthenticationToken) TestSecurityContextHolder.getContext().getAuthentication();
+            var serviceVendor = generateTestServiceVendorWithId(UUID.fromString("c12c5a32-c57d-4afd-89f4-9bcd4ae7bee3"));
 
-            var serviceVendors = serviceVendorRepository.getServiceVendorsOfDeveloper(keycloakPrincipal);
+            var serviceVendors = serviceVendorRepository.getServiceVendorsOfDeveloper(jwtAuthenticationToken);
             assertThat(serviceVendors).hasSize(1);
             assertThat(serviceVendors).contains(serviceVendor.getId());
         }
@@ -355,6 +341,10 @@ public class ServiceVendorRepositoryTest {
 
     private ServiceVendor generateTestServiceVendor() {
         return this.generateTestServiceVendor(UUID.randomUUID(), null);
+    }
+
+    private ServiceVendor generateTestServiceVendorWithId(UUID serviceVendorId) {
+        return this.generateTestServiceVendor(serviceVendorId, null);
     }
 
     private ServiceVendor generateTestServiceVendorWithLogo() {

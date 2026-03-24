@@ -1,6 +1,6 @@
 awx:
   scheme: http
   host: localhost
-  port: 80
+  port: 8013
   username: admin
   password: password

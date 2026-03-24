@@ -1,18 +1,30 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "baseUrl": ".",
-    "jsx": "preserve",
-    "module": "es2015",
-    "moduleResolution": "node",
-    "paths": {
-      "@/*": ["src/*"]
-    },
-    "skipLibCheck": true,
     "sourceMap": true,
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "allowJs": true,
     "strict": true,
-    "target": "es5",
+    "noImplicitThis": true,
     "noImplicitAny": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "removeComments": false,
+    "jsx": "preserve",
+    "rootDir": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/components/*": ["src/components/*"]
+    },
+    "forceConsistentCasingInFileNames": true,
     "strictPropertyInitialization": false
-  }
+  },
+  "include": [
+    "src",
+    "src/**/*.ts"
+  ]
 }

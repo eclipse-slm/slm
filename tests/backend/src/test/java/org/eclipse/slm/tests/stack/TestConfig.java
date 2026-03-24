@@ -11,26 +11,26 @@ public class TestConfig {
 
     // Common
     public static final String DOCKER_HOST = System.getenv().getOrDefault("DOCKER_HOST", "tcp://localhost:2375");
-    public static final String HOST = System.getenv().getOrDefault("TARGET_HOST", "ipa-wn1152");
+    public static final String HOST = System.getenv().getOrDefault("TARGET_HOST", "develop.staging.slm.local");
 
     /// Keycloak
     public static final String KEYCLOAK_REALM = System.getenv().getOrDefault("KEYCLOAK_REALM", "fabos");
     public static final String KEYCLOAK_USERNAME = System.getenv().getOrDefault("KEYCLOAK_USERNAME", "fabos");
     public static final String KEYCLOAK_PASSWORD = System.getenv().getOrDefault("KEYCLOAK_PASSWORD", "password");
-    public static final int KEYCLOAK_PORT = Integer.parseInt(System.getenv().getOrDefault("KEYCLOAK_PORT", "7080"));
-    public static final String KEYCLOAK_BASE_URL =  "http://" + TestConfig.HOST;
+    public static final int KEYCLOAK_PORT = Integer.parseInt(System.getenv().getOrDefault("KEYCLOAK_PORT", "443"));
+    public static final String KEYCLOAK_BASE_URL =  "https://" + TestConfig.HOST;
     public static final RequestSpecification KEYCLOAK_SERVICE_SPEC = new RequestSpecBuilder()
                 .setContentType(ContentType.URLENC)
-            .setBaseUri("http://" + TestConfig.HOST)
+            .setBaseUri("https://" + TestConfig.HOST)
             .setPort(TestConfig.KEYCLOAK_PORT)
             .setBasePath("/auth/realms/" + KEYCLOAK_REALM)
             .build();
 
     // Test Resource
-    public static final String TEST_RESOURCE_HOSTNAME = System.getenv().getOrDefault("TEST_RESOURCE_HOSTNAME", "10.3.7.168");
-    public static final String TEST_RESOURCE_IP = System.getenv().getOrDefault("TEST_RESOURCE_IP", "10.3.7.168");
-    public static final String TEST_RESOURCE_USERNAME = System.getenv().getOrDefault("TEST_RESOURCE_USERNAME", "vfk");
-    public static final String TEST_RESOURCE_PASSWORD = System.getenv().getOrDefault("TEST_RESOURCE_PASSWORD", "667d0224");
+    public static final String TEST_RESOURCE_HOSTNAME = System.getenv().getOrDefault("TEST_RESOURCE_HOSTNAME", "10.17.165.103");
+    public static final String TEST_RESOURCE_IP = System.getenv().getOrDefault("TEST_RESOURCE_IP", "10.17.165.103");
+    public static final String TEST_RESOURCE_USERNAME = System.getenv().getOrDefault("TEST_RESOURCE_USERNAME", "operation");
+    public static final String TEST_RESOURCE_PASSWORD = System.getenv().getOrDefault("TEST_RESOURCE_PASSWORD", "2ZiDLjTF");
 
     // Test Resource List
     public static List<TestResource> testResourceList = new ArrayList<>(List.of(
@@ -41,19 +41,8 @@ public class TestConfig {
             new TestResource("192.168.0.154", "192.168.0.154", "root", "password")
     ));
 
-    // Test Raspi Resource List
-    public static List<TestResource> testRaspiResourceList = new ArrayList<>(List.of(
-            new TestResource("fabos-edge-pi-01", "192.168.0.151", "pi", "fabos_01"),
-            new TestResource("fabos-edge-pi-02", "192.168.0.168", "pi", "fabos_01"),
-            new TestResource("fabos-edge-pi-03", "192.168.0.140", "pi", "fabos_01"),
-            new TestResource("fabos-edge-pi-04", "192.168.0.143", "pi", "fabos_01"),
-            new TestResource("fabos-edge-pi-05", "192.168.0.123", "pi", "fabos_01"),
-            new TestResource("fabos-edge-pi-06", "192.168.0.130", "pi", "fabos_01"),
-            new TestResource("fabos-edge-pi-07", "192.168.0.237", "pi", "fabos_01")
-    ));
-
     // AWX
-    public static final int AWX_PORT = Integer.parseInt(System.getenv().getOrDefault("AWX_PORT", "80"));
+    public static final int AWX_PORT = Integer.parseInt(System.getenv().getOrDefault("AWX_PORT", "8013"));
     public static final String AWX_BASE_URL =  "http://" + TestConfig.HOST;
 
     // Consul
@@ -64,17 +53,25 @@ public class TestConfig {
     public static final int VAULT_PORT = Integer.parseInt(System.getenv().getOrDefault("VAULT_PORT", "8200"));
     public static final String VAULT_BASE_URL =  "http://" + TestConfig.HOST;
 
+    // Platform Management
+    public static final int PLATFORM_MANAGEMENT_PORT = Integer.parseInt(System.getenv().getOrDefault("PLATFORM_MANAGEMENT_PORT", "443"));
+    public static final String PLATFORM_MANAGEMENT_BASE_URL =  "https://" + TestConfig.HOST;
+    public static final String PLATFORM_MANAGEMENT_BASE_PATH = "/platform-management";
+
     // Notification Service
-    public static final int NOTIFICATION_SERVICE_PORT = Integer.parseInt(System.getenv().getOrDefault("NOTIFICATION_SERVICE_PORT", "9001"));
-    public static final String NOTIFICATION_SERVICE_BASE_URL =  "http://" + TestConfig.HOST;
+    public static final int NOTIFICATION_SERVICE_PORT = Integer.parseInt(System.getenv().getOrDefault("NOTIFICATION_SERVICE_PORT", "443"));
+    public static final String NOTIFICATION_SERVICE_BASE_URL =  "https://" + TestConfig.HOST;
+    public static final String NOTIFICATION_SERVICE_BASE_PATH = "/notification-service";
 
-    // Resource Registry
-    public static final int RESOURCE_REGISTRY_PORT = Integer.parseInt(System.getenv().getOrDefault("RESOURCE_REGISTRY_PORT", "9010"));
-    public static final String RESOURCE_REGISTRY_BASE_URL =  "http://" + TestConfig.HOST;
+    // Resource Management
+    public static final int RESOURCE_MANAGEMENT_PORT = Integer.parseInt(System.getenv().getOrDefault("RESOURCE_MANAGEMENT_PORT", "443"));
+    public static final String RESOURCE_MANAGEMENT_BASE_URL =  "https://" + TestConfig.HOST;
+    public static final String RESOURCE_MANAGEMENT_BASE_PATH = "/resource-management";
 
-    // Service Registry
-    public static final int SERVICE_REGISTRY_PORT = Integer.parseInt(System.getenv().getOrDefault("SERVICE_REGISTRY_PORT", "9020"));
-    public static final String SERVICE_REGISTRY_BASE_URL =  "http://" + TestConfig.HOST;
+    // Service Management
+    public static final int SERVICE_MANAGEMENT_PORT = Integer.parseInt(System.getenv().getOrDefault("SERVICE_MAnAGEMENT_PORT", "443"));
+    public static final String SERVICE_MANAGEMENT_BASE_URL =  "https://" + TestConfig.HOST;
+    public static final String SERVICE_MANAGEMENT_BASE_PATH = "/service-management";
 
     // Test Service Vendor
     public static final TestServiceVendor TEST_SERVICE_VENDOR =  new TestServiceVendor("fabos");

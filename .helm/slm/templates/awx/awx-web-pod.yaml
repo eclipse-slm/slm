@@ -10,8 +10,8 @@ spec:
           image: ghcr.io/eclipse-slm/awx/awx-web:{{.Values.awx.version}}
           imagePullPolicy: Always
           ports:
-            - containerPort: 8052
-            - containerPort: 8053
+            - containerPort: 8013
+            - containerPort: 8043
           env:
             - name: AWX_ADMIN_USERNAME
               value: {{ .Values.awx.admin_username  }}
@@ -36,7 +36,7 @@ spec:
 
           livenessProbe:
             httpGet:
-              port: 8052
+              port: 8013
               path: /
             initialDelaySeconds: 180
             periodSeconds: 90

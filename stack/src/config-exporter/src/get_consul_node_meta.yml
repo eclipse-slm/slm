@@ -1,0 +1,10 @@
+- name: "Discover node '{{ _node_name }}' in Consul"
+  uri:
+    url: "{{ consul_scheme }}://{{ consul_host }}:{{ consul_port }}/v1/catalog/node/{{ _node_name }}"
+    method: GET
+    headers:
+      authorization: "Bearer {{ consul_token }}"
+  register: get_consul_node
+
+- set_fact:
+    node_meta: "{{ get_consul_node.json.Node.Meta }}"

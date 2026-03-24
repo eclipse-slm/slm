@@ -4,7 +4,7 @@
       <v-container class="pa-8">
         <v-row>
           <v-icon
-            large
+            size="large"
             class="mr-7 ml-2"
           >
             mdi-arrow-decision
@@ -20,7 +20,7 @@
         <div v-if="selectedClusterCreateOption === 'useExistingResources'">
           <v-row id="resource-create-select-cluster-type">
             <v-icon
-              large
+              size="large"
               class="mr-7 ml-2"
             >
               mdi-selection-multiple
@@ -28,17 +28,17 @@
             <v-select
               v-model="selectedClusterType"
               :items="availableClusterTypes"
-              item-text="name"
+              item-title="name"
               label="Cluster Type"
               required
               return-object
-              @change="onClusterTypeSelected"
+              @update:modelValue="onClusterTypeSelected"
             />
           </v-row>
           <div v-if="selectedClusterType">
-            <v-subheader class="mt-6">
+            <v-list-subheader class="mt-6">
               Cluster Member:
-            </v-subheader>
+            </v-list-subheader>
             <v-row
               v-for="clusterMemberType in selectedClusterType.clusterMemberTypes"
               :key="clusterMemberType.name"
@@ -50,17 +50,16 @@
                   v-model="clusterMembersByMemberType[clusterMemberType.name]"
                   :label="clusterMemberType.prettyName"
                   :items="availableClusterResourcesByMemberType[clusterMemberType.name]"
-                  item-text="hostname"
+                  item-title="hostname"
                   item-value="id"
                   return-object
                   hide-selected
-                  deletable-chips
+                  closable-chips
                   chips
                   multiple
-                  outlined
+                  variant="outlined"
                   :error-messages="errorMessageByMemberType[clusterMemberType.name]"
-                  @change="onSelectedClusterMembersChanged($event)"
-                  @input="limiter"
+                  @update:modelValue="limiter();onSelectedClusterMembersChanged($event)"
                 >
                   <template slot="no-data">
                     No resources available
@@ -75,21 +74,21 @@
 
     <v-card-actions>
       <v-btn
-        text
+        variant="text"
         @click="onBackButtonClicked"
       >
         Back
       </v-btn>
       <v-spacer />
       <v-btn
-        text
+        variant="text"
         @click="onCancelButtonClicked"
       >
         Cancel
       </v-btn>
       <v-btn
         id="resource-create-button-create-cluster"
-        text
+        variant="text"
         :disabled="!validInput"
         @click="onCreateButtonClicked"
       >
@@ -100,14 +99,25 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import clustersRestApi from '@/api/resource-management/clustersRestApi'
-  import ClustersCreateDialogPage from "@/components/clusters/dialogs/ClustersCreateDialogPage";
 
-  export default {
+import ClustersCreateDialogPage from "@/components/clusters/dialogs/ClustersCreateDialogPage";
+import {useProviderStore} from "@/stores/providerStore";
+import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
+import {useResourceClustersStore} from "@/stores/resourceClustersStore";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
+
+export default {
     name: 'ClustersCreateDialogPageCreateNewCluster',
     enums: {
       ClustersCreateDialogPage,
+    },
+    setup(){
+      const providerStore = useProviderStore();
+      const resourceDevicesStore = useResourceDevicesStore();
+      const resourceClustersStore = useResourceClustersStore();
+
+      return {providerStore, resourceDevicesStore, resourceClustersStore};
     },
     data () {
       return {
@@ -120,28 +130,37 @@
         validInput: false,
       }
     },
-    mounted() {
-      this.$emit('title-changed', 'Create new cluster')
-    },
     computed: {
-      ...mapGetters(['virtualResourceProviders', 'availableClusterTypes', 'resources']),
+      virtualResourceProviders() {
+        return this.providerStore.virtualResourceProviders
+      },
+      availableClusterTypes() {
+        return this.resourceClustersStore.availableClusterTypes;
+      },
+      resources() {
+        return this.resourceDevicesStore.resources;
+      },
+
       clusterCreateOptions () {
         const options = [
           {
-            text: 'Use existing resources',
+            title: 'Use existing resources',
             value: 'useExistingResources',
           },
         ]
 
         if (this.virtualResourceProviders.length !== 0) {
           options.push({
-            text: 'Create Members',
+            title: 'Create Members',
             value: 'createVirtualResources',
           })
         }
 
         return options
       },
+    },
+    mounted() {
+      this.$emit('title-changed', 'Create new cluster')
     },
     methods: {
       onClusterTypeSelected () {
@@ -171,6 +190,7 @@
             }
           })
         }
+
       },
       limiter (e) {
         this.validInput = true
@@ -210,7 +230,12 @@
           })
         }
 
-        clustersRestApi.createClusterResource(this.selectedClusterType.id, false, clusterMembers, {})
+        ResourceManagementClient.clusterApi.createClusterResource({
+          clusterTypeId: this.selectedClusterType.id,
+          skipInstall: false,
+          clusterMembers: clusterMembers,
+          configParameterValues: {}
+        }).then().catch(logRequestError)
         this.clearForm()
         this.$emit('confirmed')
       },

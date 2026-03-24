@@ -1,0 +1,69 @@
+
+// Filter type and option definitions
+syntax = "proto3";
+
+import "common_variant.proto";
+import "common_operators.proto";
+
+package siemens.common.filters.v1;
+
+message SupportedFilter {
+    // The name of the option
+    string key = 1;
+    // The data type of the option
+    siemens.common.types.v1.VariantType datatype = 2;
+    // Whether the option is mandatory; optional
+    bool mandatory = 3;
+    // The default value of the option; optional
+    siemens.common.types.v1.Variant defaultValue = 4;
+    // A description of the option (English and human readable); optional
+    string description = 5;
+}
+
+message SupportedOption {
+    // The name of the option
+    string key = 1;
+    // The data type of the option
+    siemens.common.types.v1.VariantType datatype = 2;
+    // Whether the option is mandatory; optional
+    bool mandatory = 3;
+    // The default value of the option; optional
+    siemens.common.types.v1.Variant defaultValue = 4;
+    // A description of the option (English and human readable); optional
+    string description = 5;
+}
+
+message ActiveFilter {
+    string key = 1; // e.g. Timeout
+    // array of raw-data
+    siemens.common.operators.v1.ComparisonOperator operator = 2; //optional
+    siemens.common.types.v1.Variant value = 3;
+}
+
+
+message ActiveOption {
+    string key = 1; // e.g. Timeout
+    // array of raw-data
+    siemens.common.operators.v1.ComparisonOperator operator = 2; //optional (when missing it means EQUAL)
+    siemens.common.types.v1.Variant value = 3;
+}
+
+// Get list of supported filter types from the connector
+
+message FilterTypesRequest {
+    //void
+}
+
+message FilterTypesResponse {
+    repeated SupportedFilter filter_types = 1;
+}
+
+// Get list of supported filter options from the connector
+
+message FilterOptionsRequest {
+    //void
+}
+
+message FilterOptionsResponse {
+    repeated SupportedOption filter_options = 1;
+}

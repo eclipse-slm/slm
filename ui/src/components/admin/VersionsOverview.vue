@@ -3,7 +3,7 @@
     fluid
     tag="section"
   >
-    <base-material-card color="secondary">
+    <base-material-card color="bg-secondary">
       <template #heading>
         <overview-heading text="Components" />
       </template>
@@ -19,39 +19,25 @@
         item-key="id"
         :items="Object.values(components)"
       >
-        <template
-          #body="{ items }"
-        >
-          <tbody
-            v-for="component in items"
-            :key="component.prettyName"
+        <template #item.status="{item}">
+          <v-icon
+            v-if="item.status === 'UP'"
+            color="green"
           >
-            <tr>
-              <td> {{ component.prettyName }} </td>
-              <td> {{ component.version }} </td>
-              <td> {{ component.buildTime }} </td>
-              <td>
-                <v-icon
-                  v-if="component.status === 'UP'"
-                  color="green"
-                >
-                  mdi-check-circle
-                </v-icon>
-                <v-icon
-                  v-else-if="component.status === undefined"
-                  color="yellow darken-2"
-                >
-                  mdi-help-circle
-                </v-icon>
-                <v-icon
-                  v-else
-                  color="red"
-                >
-                  mdi-alert-circle
-                </v-icon>
-              </td>
-            </tr>
-          </tbody>
+            mdi-check-circle
+          </v-icon>
+          <v-icon
+            v-else-if="item.status === undefined"
+            color="yellow-darken-2"
+          >
+            mdi-help-circle
+          </v-icon>
+          <v-icon
+            v-else
+            color="red"
+          >
+            mdi-alert-circle
+          </v-icon>
         </template>
       </v-data-table>
     </base-material-card>
@@ -59,20 +45,30 @@
 </template>
 
 <script>
-import getEnv from "@/utils/env";
 import ServiceManagementActuatorRestApi from "@/api/service-management/serviceManagementActuatorRestApi";
 import ResourceManagementActuatorRestApi from "@/api/resource-management/resourceManagementActuatorRestApi";
 import NotificationServiceActuatorRestApi from "@/api/notification-service/notificationServiceActuatorRestApi";
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import {useEnvStore} from "@/stores/environmentStore";
+import PlatformManagementActuatorRestApi from "@/api/platform-management/platformManagementActuatorRestApi";
 
 export default {
   name: "VersionsOverview",
   components: { OverviewHeading },
+  setup() {
+    return { envStore: useEnvStore() }
+  },
   data () {
     return {
       components: {
-        service_management: {
-          prettyName: "Service Management",
+        platform_management: {
+          prettyName: "Platform Management",
+          version: undefined,
+          buildTime: undefined,
+          status: undefined
+        },
+        notification_service: {
+          prettyName: "Notification Service",
           version: undefined,
           buildTime: undefined,
           status: undefined
@@ -83,8 +79,8 @@ export default {
           buildTime: undefined,
           status: undefined
         },
-        notification_service: {
-          prettyName: "Notification Service",
+        service_management: {
+          prettyName: "Service Management",
           version: undefined,
           buildTime: undefined,
           status: undefined
@@ -101,15 +97,23 @@ export default {
   computed: {
     tableHeaders () {
       return [
-        { text: 'Name', value: 'name', sortable: true },
-        { text: 'Version', value: 'version', sortable: true },
-        { text: 'Build Time', value: 'buildTime', sortable: true },
-        { text: 'Status', value: 'status', sortable: true },
+        { title: 'Name', value: 'prettyName', sortable: true },
+        { title: 'Version', value: 'version', sortable: true },
+        { title: 'Build Time', value: 'buildTime', sortable: true },
+        { title: 'Status', value: 'status', sortable: true },
       ]
     },
   },
   mounted() {
-    this.components.ui.version = getEnv('VUE_APP_VERSION')
+    this.components.ui.version = this.envStore.appVersion
+
+    PlatformManagementActuatorRestApi.getInfo().then((info) => {
+      this.components.platform_management.version = info.build.version
+      this.components.platform_management.buildTime = info.build.time
+    })
+    PlatformManagementActuatorRestApi.getHealth().then((health) => {
+      this.components.platform_management.status = health.status
+    })
 
     ServiceManagementActuatorRestApi.getInfo().then((info) => {
       this.components.service_management.version = info.build.version

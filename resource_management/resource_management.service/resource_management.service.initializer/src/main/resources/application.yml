@@ -11,6 +11,8 @@ spring:
       - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   application:
     name: resource_management_init
+  config:
+    import: "optional:consul:"
   cloud:
     consul:
       enabled: false
@@ -19,16 +21,16 @@ spring:
       discovery:
         acl-token: ${consul.acl-token}
         register: false
+        query-passing: false
 
 resource-management:
-  url: http://localhost:9010
+  scheme: http
+  host: localhost
+  port: 9010
+  path: /resource-management
+  url: ${resource-management.scheme}://${resource-management.host}:${resource-management.port}${resource-management.path}
   init-directories: init/
-
-keycloak:
-  auth-server-url: http://localhost:7080/auth
-  realm: fabos
-  username: fabos
-  password: password
+  api-key: your-resource-management-api-key
 
 ### Consul
 consul:
@@ -36,5 +38,5 @@ consul:
   host: localhost
   port: 8500
   datacenter: fabos
-  acl-token: fBQjSo6nGOjiIDA5ZewZYZz4
+  acl-token: your-consul-acl-token
 

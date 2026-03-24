@@ -7,7 +7,7 @@ data class JobUpdate(
     var type: String,
     var url: String,
     var related: Map<String, String>,
-    var summary_fields: Map<String, Object>,
+    var summary_fields: Map<String, Any>,
     var created: Date?,
     var modified: Date?,
     var name: String,
@@ -40,6 +40,6 @@ data class JobUpdate(
     var project: Int,
     var job_type: String,
     var job_tags: String,
-    var host_status_counts: Map<String, Object>,
+//    var host_status_counts: Map<String, Object>,
     var playbook_counts: Map<String, Int>
 )

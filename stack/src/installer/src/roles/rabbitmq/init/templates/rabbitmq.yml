@@ -1,0 +1,25 @@
+services:
+  rabbitmq:
+    image: 'rabbitmq:{{ ENV.RABBITMQ.VERSION }}'
+    restart: unless-stopped
+    environment:
+      - 'RABBITMQ_DEFAULT_USER={{ app_configs.rabbitmq.users.admin.username }}'
+      - 'RABBITMQ_DEFAULT_PASS={{ app_configs.rabbitmq.users.admin.password }}'
+    networks:
+        default:
+            aliases:
+              - "{{ ENV.RABBITMQ.HOST.INTERNAL }}"
+    ports:
+      - '{{ ENV.RABBITMQ.PORT.EXTERNAL }}:{{ ENV.RABBITMQ.PORT.INTERNAL }}'
+      - '{{ ENV.RABBITMQ.MANAGEMENT_PORT.EXTERNAL }}:{{ ENV.RABBITMQ.MANAGEMENT_PORT.INTERNAL }}'
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  rabbitmq_data:

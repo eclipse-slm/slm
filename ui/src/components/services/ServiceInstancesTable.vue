@@ -1,44 +1,61 @@
 <template>
-  <v-card>
-    <v-btn-toggle
-      v-model="groupByServiceInstanceGroups"
-      class="px-4 py-4"
-      mandatory
-      @change="onGroupByServiceInstanceGroupsClicked"
-    >
-      <v-btn
-        small
-        :color="groupByServiceInstanceGroups == 0 ? 'secondary' : 'disabled'"
+  <v-container fluid>
+    <v-row>
+      <v-text-field
+        v-model="searchServices"
+        label="Search services"
+        append-inner-icon="mdi-magnify"
+        clearable
+        variant="underlined"
+      />
+      <v-spacer />
+      <v-spacer />
+      <v-btn-toggle
+        v-model="groupByServiceInstanceGroups"
+        class="px-2 py-2"
+        mandatory
+        base-color="disable"
+        @update:modelValue="onGroupByServiceInstanceGroupsClicked"
       >
-        <v-icon color="white">
-          mdi-ungroup
-        </v-icon>
-      </v-btn>
-      <v-btn
-        small
-        :color="groupByServiceInstanceGroups == 1 ? 'secondary' : 'disabled'"
-      >
-        <v-icon color="white">
-          mdi-group
-        </v-icon>
-      </v-btn>
-    </v-btn-toggle>
+        <v-btn
+          :color="groupByServiceInstanceGroups === 0 ? 'secondary' : 'disable'"
+        >
+          <v-icon color="white">
+            mdi-ungroup
+          </v-icon>
+        </v-btn>
+        <v-btn
+          :color="groupByServiceInstanceGroups === 1 ? 'secondary' : 'disable'"
+        >
+          <v-icon color="white">
+            mdi-group
+          </v-icon>
+        </v-btn>
+      </v-btn-toggle>
+    </v-row>
 
     <v-data-table
+      id="table-service-instances"
       :headers="headers"
       :items="groupedServices"
       item-key="rowId"
-      :item-class="rowClass"
-      :group-by="groupByServiceInstanceGroups ? 'groupName' : null"
+      :search="searchServices"
+      :row-props="rowClass"
+      :group-by="groupByServiceInstanceGroups ? [{key: 'groupName'}] : []"
       @click:row="onServiceInstanceClicked"
     >
-      <template #group.header="{items, isOpen, toggle}">
-        <th colspan="7">
-          <v-icon @click="toggle">
-            {{ isOpen ? 'mdi-minus' : 'mdi-plus' }}
-          </v-icon>
-          {{ items[0].groupName }}
-        </th>
+      <template #group-header="{ item, columns, toggleGroup, isGroupOpen }">
+        <tr>
+          <td :colspan="columns.length">
+            <v-btn
+              :icon="isGroupOpen(item) ? '$expand' : '$next'"
+              class="ma-2"
+              variant="text"
+              @click="toggleGroup(item)"
+            />
+            {{ item.value }}
+          </td>
+        </tr>
       </template>
 
       <template #item.offering="{ item : serviceInstance }">
@@ -95,27 +112,28 @@
       <template
         #item.actions="{ item : serviceInstance }"
       >
-        <v-row>
+        <v-row align="center">
           <v-btn
             :disabled="serviceInstance.markedForDelete"
             class="ml-4"
             color="error"
+            size="small"
             @click.stop="onDeleteClicked(serviceInstance)"
           >
             <v-icon>mdi-delete</v-icon>
           </v-btn>
 
           <v-menu>
-            <template #activator="{ on: onMenu, attrs: attrsMenu }">
-              <v-tooltip top>
-                <template #activator="{ on }">
-                  <div v-on="!availableVersionChangesOfServices[serviceInstance.id] ? on : ''">
+            <template #activator="{ propsM }">
+              <v-tooltip location="top">
+                <template #activator="{ props }">
+                  <div v-bind="!availableVersionChangesOfServices[serviceInstance.id] ? props : ''">
                     <v-btn
                       :disabled="!availableVersionChangesOfServices[serviceInstance.id]"
                       color="blue"
                       class="ml-4"
-                      v-bind="attrsMenu"
-                      v-on="onMenu"
+                      size="small"
+                      v-bind="propsM"
                     >
                       <v-icon>
                         mdi-upload
@@ -128,7 +146,7 @@
             </template>
 
             <v-list>
-              <v-subheader>Available versions</v-subheader>
+              <v-list-subheader>Available versions</v-list-subheader>
               <v-list-item
                 v-for="(availableVersionChange, i) in availableVersionChangesOfServices[serviceInstance.id]"
                 :key="i"
@@ -162,7 +180,7 @@
       @confirmed="onServiceDeleteConfirmed"
     />
 
-    <resources-info-dialog
+    <DeviceInfoView
       :resource="selectedResource"
       @closed="selectedResource = null"
     />
@@ -171,40 +189,50 @@
       v-if="serviceVersionChange.dialog"
       :show="serviceVersionChange.dialog"
       :title="`Change version of service instance '${serviceVersionChange.serviceInstance.id}'?`"
-      :text="`Do you really want to change to version '${serviceVersionChange.targetServiceVersion.version}'?`"
+      :text="`Do you want to change to version '${serviceVersionChange.targetServiceVersion.version}'?`"
       @canceled="serviceVersionChange.dialog = false"
       @confirmed="onServiceInstanceVersionChangedConfirmed"
     />
-  </v-card>
+  </v-container>
 </template>
 
 <script>
-  import {
-    mapGetters,
-  } from 'vuex'
-  import ServiceInstanceDeleteDialog from '@/components/services/ServiceInstanceDeleteDialog'
-  import ServiceInstancesRestApi from '@/api/service-management/serviceInstancesRestApi'
-  import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
-  import Vue from "vue";
-  import ConfirmDialog from "@/components/base/ConfirmDialog";
-  import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
+import ServiceInstanceDeleteDialog from '@/components/services/ServiceInstanceDeleteDialog.vue'
+import DeviceInfoView from '@/components/resources/deviceinfo/DeviceInfoView.vue'
+import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
+import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
+import {useServiceInstancesStore} from "@/stores/serviceInstancesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
+import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
+import {storeToRefs} from "pinia";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
+import logRequestError from "@/api/restApiHelper";
 
-  export default {
+export default {
     name: 'ServiceInstancesTable',
     comments: {
       ServiceInstanceDeleteDialog,
     },
-    components: { ServiceInstanceDeleteDialog, ResourcesInfoDialog, ConfirmDialog },
+    components: { ServiceInstanceDeleteDialog, DeviceInfoView, ConfirmDialog },
     mixins: [ serviceInstanceMixin ],
+    setup(){
+      const serviceInstancesStore = useServiceInstancesStore();
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      const resourceDevicesStore = useResourceDevicesStore();
+      const {serviceInstanceGroupById} = storeToRefs(serviceInstancesStore)
+      const {serviceOfferingById} = storeToRefs(serviceOfferingsStore)
+      const {resourceById} = storeToRefs(resourceDevicesStore)
+      return {serviceInstancesStore, resourceDevicesStore, serviceOfferingById, serviceInstanceGroupById, resourceById};
+    },
     data () {
       return {
         headers: [
-          { text: 'Id', value: 'id', sortable: true },
-          { text: 'Service Offering', value: 'offering', sortable: true },
-          { text: 'Ports', value: 'ports', sortable: true, width: '20%' },
-          { text: 'Tags', value: 'tags', sortable: true },
-          { text: 'Resource', value: 'resource', sortable: true },
-          { text: 'Actions', value: 'actions' },
+          { title: 'Id', key: 'id', sortable: true },
+          { title: 'Service Offering', key: 'offering', sortable: true },
+          { title: 'Ports', key: 'ports', sortable: true, width: '20%' },
+          { title: 'Tags', key: 'tags', sortable: true },
+          { title: 'Resource', key: 'resource', sortable: true },
+          { title: 'Actions', key: 'actions' },
         ],
         serviceToDelete: null,
         selectedResource: null,
@@ -217,25 +245,25 @@
           targetServiceVersion: null
         },
         groupedServices: [],
-        groupByServiceInstanceGroups: 0
+        groupByServiceInstanceGroups: 0,
+        searchServices: undefined
       }
     },
     computed: {
-      ...mapGetters([
-        'services',
-        'serviceOfferingById',
-        'resourceById',
-        'serviceInstanceGroupById'
-      ]),
+      services () {
+        return this.serviceInstancesStore.services
+      },
+
     },
     created() {
+
       this.groupedServices = this.services
       this.services.forEach(service => {
-        ServiceInstancesRestApi.getAvailableVersionsForServiceInstance(service.id).then(availableUpdates => {
-          if (availableUpdates.length > 0) {
-            Vue.set(this.availableVersionChangesOfServices, service.id, availableUpdates)
+        ServiceManagementClient.serviceInstancesApi.getAvailableVersionChangesForServiceInstance(service.id).then(response => {
+          if (response.data && response.data.length > 0) {
+            this.availableVersionChangesOfServices[service.id] = response.data;
           }
-        })
+        }).catch(logRequestError)
       })
     },
     methods: {
@@ -246,8 +274,8 @@
         this.serviceToDelete = null
       },
       onServiceDeleteConfirmed () {
-        ServiceInstancesRestApi.deleteServiceInstance(this.serviceToDelete.id)
-        this.$store.commit('SET_SERVICE_MARKED_FOR_DELETE', this.serviceToDelete)
+        ServiceManagementClient.serviceInstancesApi.deleteServiceInstance(this.serviceToDelete.id).then().catch(logRequestError)
+        this.serviceInstancesStore.setServiceMarkedForDelete(this.serviceToDelete);
         this.serviceToDelete = null
         this.$toast.info('Service deletion started')
       },
@@ -267,20 +295,21 @@
       },
 
       onServiceInstanceVersionChangedConfirmed() {
-        ServiceInstancesRestApi.changeServiceInstanceVersion(
+        ServiceManagementClient.serviceInstancesApi.updateServiceInstanceToVersion(
             this.serviceVersionChange.serviceInstance.id,
-            this.serviceVersionChange.targetServiceVersion.serviceOfferingVersionId)
+            this.serviceVersionChange.targetServiceVersion.serviceOfferingVersionId
+        ).then().catch(logRequestError)
       },
 
-      onServiceInstanceClicked (serviceInstance) {
-        this.$emit('service-instance-clicked', serviceInstance)
+      onServiceInstanceClicked (event, serviceInstance) {
+        this.$emit('service-instance-clicked', serviceInstance.item)
       },
 
       onGroupByServiceInstanceGroupsClicked () {
         if (this.groupByServiceInstanceGroups === 1) {
           this.groupedServices = []
           this.services.forEach(service => {
-            if (service.groupIds.length == 0) {
+            if (service.groupIds.length === 0) {
               let serviceWithGroup = JSON.parse(JSON.stringify(service))
               serviceWithGroup.groupName = 'No group'
               serviceWithGroup.rowId = service.id + "_ungrouped"
@@ -301,7 +330,12 @@
       },
 
       rowClass (item) {
-        return item.markedForDelete ? 'grey--text text--lighten-1 row-pointer' : 'row-pointer'
+        return {
+          class: {
+            'text-grey text--lighten-1 row-pointer': item.markedForDelete,
+            'row-pointer': item.markedForDelete
+          }
+        };
       },
 
     },

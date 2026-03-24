@@ -14,7 +14,7 @@
           color="primary"
           icon="mdi-desktop-classic"
           title="Resources"
-          :value="overviewResources.length.toString()"
+          :value="resources.length.toString()"
           @click.native="onResourcesCardClicked"
         />
       </v-col>
@@ -33,19 +33,19 @@
         />
       </v-col>
 
-      <!--      <v-col-->
-      <!--        cols="12"-->
-      <!--        sm="6"-->
-      <!--        lg="3"-->
-      <!--      >-->
-      <!--        <base-material-stats-card-->
-      <!--          color="green"-->
-      <!--          icon="mdi-account-hard-hat"-->
-      <!--          title="Jobs"-->
-      <!--          :value="jobs.length.toString()"-->
-      <!--          @click.native="onResourcesCardClicked"-->
-      <!--        />-->
-      <!--      </v-col>-->
+      <!--      <v-col
+        cols="12"
+        sm="6"
+        lg="3"
+      >
+        <base-material-stats-card
+          color="green"
+          icon="mdi-account-hard-hat"
+          title="Jobs"
+          :value="jobs.length.toString()"
+          @click.native="onResourcesCardClicked"
+        />
+      </v-col>-->
 
       <v-col
         cols="12"
@@ -68,7 +68,7 @@
       >
         <base-material-stats-card
           color="warn"
-          icon="apps"
+          icon="mdi-apps"
           title="Services"
           :value="services.length.toString()"
           @click.native="onServicesCardClicked"
@@ -76,22 +76,29 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col>
-        <base-material-card class="px-5 py-3">
+      <v-col
+        cols="12"
+        lg="8"
+      >
+        <base-material-card>
           <template #heading>
             <v-container
               fluid
               class="ma-0 pa-0"
             >
-              <v-row class="info text-h3 font-weight-light">
+              <v-row class="bg-info text-h3 font-weight-light">
                 <v-col>
                   <v-icon
-                    large
+                    size="large"
                     class="ml-2 mr-4"
+                    style="font-size: 36px;"
+                    color="white"
                   >
                     mdi-run-fast
                   </v-icon>
-                  Latest {{ jobCount }} Jobs
+                  <span style="color: white">
+                    Latest {{ jobCount }} Jobs
+                  </span>
                 </v-col>
               </v-row>
             </v-container>
@@ -107,7 +114,6 @@
             <v-data-table
               id="jobsDashboardTable"
               :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
               :hide-default-footer="true"
               :footer-props="{'items-per-page-options':[jobCount]}"
               :headers="DataTableHeaders"
@@ -115,118 +121,139 @@
               :items="jobs"
               style="border-bottom:1px solid #E0E0E0"
             >
-              <template #header.id="{ header }">
-                <v-icon small>
+              <template #header.id="{ column }">
+                <v-icon size="small">
                   mdi-pound
-                </v-icon> {{ header.text }}
+                </v-icon> {{ column.title }}
               </template>
-              <template #header.name="{ header }">
-                <v-icon small>
+              <template #header.name="{ column }">
+                <v-icon size="small">
                   mdi-form-textbox
                 </v-icon>
-                {{ header.text }}
+                {{ column.title }}
               </template>
-              <template #header.started="{ header }">
-                <v-icon small>
+              <template #header.started="{ column }">
+                <v-icon size="small">
                   mdi-clock-start
-                </v-icon> {{ header.text }}
+                </v-icon> {{ column.title }}
               </template>
-              <template #header.finished="{ header }">
-                <v-icon small>
+              <template #header.finished="{ column }">
+                <v-icon size="small">
                   mdi-clock-end
-                </v-icon> {{ header.text }}
+                </v-icon> {{ column.title }}
               </template>
-              <template #header.elapsed="{ header }">
-                <v-icon small>
+              <template #header.elapsed="{ column }">
+                <v-icon size="small">
                   mdi-alarm
-                </v-icon> {{ header.text }}
+                </v-icon> {{ column.title }}
               </template>
-              <template #header.status="{ header }">
-                <v-icon small>
+              <template #header.status="{ column }">
+                <v-icon size="small">
                   mdi-list-status
-                </v-icon> {{ header.text }}
+                </v-icon> {{ column.title }}
               </template>
-              <template
-                #body="{ items }"
-              >
-                <tbody
-                  v-for="job in items"
-                  :key="job.id"
-                >
-                  <tr>
-                    <td>{{ job.id }}</td>
-                    <td>{{ job.name }}</td>
-                    <td>{{ getFormattedDate(job.started) }}</td>
-                    <td>{{ getFormattedDate(job.finished) }}</td>
-                    <td v-if="job.status === 'running'" />
-                    <td v-else-if="job.elapsed > 60">
-                      {{ Math.floor(job.elapsed/60) }}m {{ Math.round(job.elapsed % 60) }}s
-                    </td>
-                    <td v-else>
-                      {{ Math.round(job.elapsed % 60) }}s
-                    </td>
-                    <td>
-                      <v-tooltip right>
-                        <template #activator="{ on, attrs }">
-                          <v-icon
-                            v-if="job.status == 'successful'"
-                            v-bind="attrs"
-                            v-on="on"
-                          >
-                            mdi-check-circle-outline
-                          </v-icon>
-                          <v-icon
-                            v-if="job.status == 'running'"
-                            v-bind="attrs"
-                            v-on="on"
-                          >
-                            mdi-run-fast
-                          </v-icon>
-                          <v-icon
-                            v-else-if="job.status == 'pending'"
-                            v-bind="attrs"
-                            v-on="on"
-                          >
-                            mdi-timer-sand-empty
-                          </v-icon>
-                          <v-icon
-                            v-else-if="job.status == 'canceled' || job.status == 'failed'|| job.status == 'error'"
-                            v-bind="attrs"
-                            v-on="on"
-                          >
-                            mdi-alert-circle-outline
-                          </v-icon>
-                        </template>
-                        <span>
-                          {{ job.status }}
-                        </span>
-                      </v-tooltip>
-                    </td>
-                  </tr>
-                </tbody>
+
+              <template #item.id="{item}">
+                {{ item.id }}
+              </template>
+
+              <template #item.name="{item}">
+                {{ item.name }}
+              </template>
+
+              <template #item.started="{item}">
+                {{ getFormattedDate(item.started) }}
+              </template>
+
+              <template #item.finished="{item}">
+                {{ getFormattedDate(item.finished) }}
+              </template>
+
+              <template #item.status="{item}">
+                <span v-if="item.status === 'running'">
+                  {{ getFormattedTime(new Date().getTime() - new Date(item.started).getTime()) }}
+                </span>
+                <span v-else>
+                  {{ getFormattedTime(new Date(item.finished).getTime() - new Date(item.started).getTime()) }}
+                </span>
+                <v-tooltip location="right">
+                  <template #activator="{ props }">
+                    <v-icon
+                      v-if="item.status === 'successful'"
+                      v-bind="props"
+                    >
+                      mdi-check-circle-outline
+                    </v-icon>
+                    <v-icon
+                      v-if="item.status === 'running'"
+                      v-bind="props"
+                    >
+                      mdi-run-fast
+                    </v-icon>
+                    <v-icon
+                      v-else-if="item.status === 'pending'"
+                      v-bind="props"
+                    >
+                      mdi-timer-sand-empty
+                    </v-icon>
+                    <v-icon
+                      v-else-if="item.status === 'canceled' || item.status === 'failed'|| item.status === 'error'"
+                      v-bind="props"
+                    >
+                      mdi-alert-circle-outline
+                    </v-icon>
+                  </template>
+                  <span>
+                    {{ item.status }}
+                  </span>
+                </v-tooltip>
               </template>
             </v-data-table>
             <v-card-subtitle>Total Job Count: {{ jobs.length }}</v-card-subtitle>
           </v-card-text>
         </base-material-card>
       </v-col>
+      <v-col
+        cols="12"
+        lg="4"
+      >
+        <dashboard-resource-statistics />
+      </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-  import { mapGetters, mapActions } from 'vuex'
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
 
-  export default {
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import DashboardResourceStatistics from "@/components/dashboard/DashboardResourceStatistics.vue";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
+import {useServiceInstancesStore} from "@/stores/serviceInstancesStore";
+import {useResourceClustersStore} from "@/stores/resourceClustersStore";
+import {useUserStore} from "@/stores/userStore";
+import {useJobsStore} from "@/stores/jobsStore";
+import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
+
+export default {
     name: 'DashboardDashboard',
     components: {
+      DashboardResourceStatistics,
       NoItemAvailableNote,
+    },
+
+    setup(){
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      const serviceInstancesStore = useServiceInstancesStore();
+      const resourceClustersStore = useResourceClustersStore();
+      const userStore = useUserStore();
+      const jobsStore = useJobsStore();
+      const resourceDevicesStore = useResourceDevicesStore();
+      return {serviceInstancesStore, serviceOfferingsStore, resourceClustersStore, userStore, jobsStore, resourceDevicesStore};
     },
 
     data () {
       return {
-        sortBy: 'id',
+        sortBy: [{key: 'id'}],
         sortDesc: true,
         jobCount: 5,
         dataCompletedTasksChart: {
@@ -237,11 +264,11 @@
             ],
           },
           options: {
-            lineSmooth: this.$chartist.Interpolation.cardinal({
-              tension: 0,
-            }),
+            // lineSmooth: this.$chartist.Interpolation.cardinal({
+            //   tension: 0,
+            // }),
             low: 0,
-            high: 1000, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            high: 1000,
             chartPadding: {
               top: 0,
               right: 0,
@@ -253,29 +280,29 @@
         headers: [
           {
             sortable: false,
-            text: 'ID',
+            title: 'ID',
             value: 'id',
           },
           {
             sortable: false,
-            text: 'Name',
+            title: 'Name',
             value: 'name',
           },
           {
             sortable: false,
-            text: 'Salary',
+            title: 'Salary',
             value: 'salary',
             align: 'right',
           },
           {
             sortable: false,
-            text: 'Country',
+            title: 'Country',
             value: 'country',
             align: 'right',
           },
           {
             sortable: false,
-            text: 'City',
+            title: 'City',
             value: 'city',
             align: 'right',
           },
@@ -283,35 +310,46 @@
         tabs: 0,
       }
     },
-
     computed: {
-      ...mapGetters([
-        'userGroups',
-        'overviewResources',
-        'services',
-        'serviceOfferings',
-        'jobs',
-        'clusters'
-      ]),
+      userGroups() {
+        return this.userStore.userGroups
+      },
+      resources() {
+        return this.resourceDevicesStore.resources
+      },
+      clusters() {
+        return this.resourceClustersStore.clusters;
+      },
+      services() {
+        return this.serviceInstancesStore.services
+      },
+      serviceOfferings() {
+        return this.serviceOfferingsStore.serviceOfferings
+      },
+      jobs() {
+        return this.jobsStore.jobs
+      },
+
       DataTableHeaders () {
         return [
-          { text: 'ID', value: 'id', sortable: true },
-          { text: 'Name', value: 'name', sortable: true },
-          { text: 'Started at', value: 'started', sortable: true },
-          { text: 'Finished at', value: 'finished', sortable: true },
-          { text: 'Duration', value: 'elapsed', sortable: true },
-          { text: 'Status', value: 'status', sortable: false },
+          { title: 'ID', value: 'id', sortable: true },
+          { title: 'Name', value: 'name', sortable: true },
+          { title: 'Started at', value: 'started', sortable: true },
+          { title: 'Finished at', value: 'finished', sortable: true },
+          { title: 'Duration', value: 'elapsed', sortable: true },
+          { title: 'Status', value: 'status', sortable: false },
         ]
       },
     },
 
     mounted () {
-      this.getResourcesOverview()
-      this.$store.dispatch('updateServicesStore')
+      this.resourceDevicesStore.updateStore()
+      this.resourceClustersStore.updateStore()
+      this.serviceOfferingsStore.updateStore();
+      this.serviceInstancesStore.updateStore();
     },
 
     methods: {
-      ...mapActions(['getResourcesOverview']),
       complete (index) {
         this.list[index] = !this.list[index]
       },

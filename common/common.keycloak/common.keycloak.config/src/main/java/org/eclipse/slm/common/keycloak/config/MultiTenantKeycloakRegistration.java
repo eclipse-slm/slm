@@ -1,25 +1,32 @@
 package org.eclipse.slm.common.keycloak.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.kotlin.KotlinModule;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import org.eclipse.slm.common.consul.client.ConsulClient;
+import org.eclipse.slm.common.consul.client.ConsulClientFactory;
+import org.eclipse.slm.common.keycloak.config.jwt.IssuerProperties;
+import org.eclipse.slm.common.keycloak.config.jwt.MisconfigurationException;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.OAuth2Constants;
-import org.keycloak.adapters.KeycloakDeployment;
-import org.keycloak.adapters.KeycloakDeploymentBuilder;
-import org.keycloak.adapters.springboot.KeycloakSpringBootProperties;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.representations.adapters.config.AdapterConfig;
-import org.keycloak.representations.idm.ClientRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -31,53 +38,47 @@ import java.util.*;
  * @author des
  */
 @Component
-@EnableConfigurationProperties({MultiTenantKeycloakApplicationProperties.class, KeycloakSpringBootProperties.class})
-//@PropertySource("classpath:application.yml")
 public class MultiTenantKeycloakRegistration {
 
     private static final Logger LOG = LoggerFactory.getLogger(MultiTenantKeycloakRegistration.class);
 
-    private static final int INTERVAL = 2000;
-    private static final int WAIT_TIME_KEYCLOAK = 24000;
-    private static final int MAX_RETRY_LOAD_CLIENT = 10;
     private static final String CONFIG_FILE_ENDING = "-keycloak.json";
-    private static final String CREDENTIAL_INITIAL_ACCESS_TOKEN = "initial-access-token";
-    private static final String CREDENTIAL_REGISTRATION_ACCESS_TOKEN = "registration-access-token";
-    private static final String CREDENTIAL_SECRET = "secret";
 
-    private final Object lock = new Object();
+    private static final Map<String, KeycloakOidcConfig> keycloakOidcConfigs = new HashMap<>();
 
-    private static final Map<String, KeycloakDeployment> cache = new HashMap<>();
+    @Value("${keycloak.tenants.config-path}")
+    private String keycloakConfigPath;
 
     private final List<String> realms = new ArrayList<>();
-    private Map<String, File> adapterConfigFiles;
 
-    @Value("${server.port}")
-    private int port;
+    private Map<String, File> oidcConfigFiles;
 
-    private KeycloakSpringBootProperties keycloakSpringBootProperties;
-    private MultiTenantKeycloakApplicationProperties multiTenantKeycloakProperties;
-    private ApplicationContext context;
+    private Map<String, Keycloak> keycloakClientMap = new HashMap<>();
 
-    private Map<String, RealmResource> realmResourceMap = new HashMap<>();
+    private Optional<ConsulClient> consulClient;
+
+    @Value("${spring.cloud.consul.config.prefix:config}")
+    private String consulKVPrefix;
+
+    @Value("${spring.application.name}")
+    private String applicationName;
+
+    private List<IssuerProperties> issuers = new ArrayList<>();
 
     /**
      * Instantiates a new Multi tenant keycloak registration.
      *
-     * @param keycloakSpringBootProperties  the keycloak spring boot properties
-     * @param multiTenantKeycloakProperties the multi tenant keycloak properties
+     * @param consulClientFactory
      */
     @Autowired
-    public MultiTenantKeycloakRegistration(
-            KeycloakSpringBootProperties keycloakSpringBootProperties,
-            MultiTenantKeycloakApplicationProperties multiTenantKeycloakProperties,
-            ApplicationContext context
-    ) {
-        this.keycloakSpringBootProperties = keycloakSpringBootProperties;
-        this.multiTenantKeycloakProperties = multiTenantKeycloakProperties;
-        this.context = context;
+    public MultiTenantKeycloakRegistration(ConsulClientFactory consulClientFactory) {
+        if (consulClientFactory == null) {
+            this.consulClient = Optional.empty();
+        }
+        else {
+            this.consulClient = Optional.of(consulClientFactory.createAdminClient());
+        }
     }
-
 
     /**
      * Initialize client configurations for multiple keycloak realms (can be provided by different keycloak instances),
@@ -85,169 +86,98 @@ public class MultiTenantKeycloakRegistration {
      * If no configuration file is found, a new file is created based on the defined Keycloak properties.
      */
     @PostConstruct
-    public void init() {
-        //multiTenantKeycloakProperties = new MultiTenantKeycloakProperties(keycloakSpringBootProperties);
-        Map<String, AdapterConfig> adapterConfigs = new HashMap<>();
-        // search in config folder for keycloak client configurations
-        String keycloakConfigDirectory;
-        if(multiTenantKeycloakProperties.getConfigPath().startsWith("/") || multiTenantKeycloakProperties.getConfigPath().startsWith(":", 1)) {
-            // absolute path
-            keycloakConfigDirectory = multiTenantKeycloakProperties.getConfigPath();
-        } else {
-            // relative path
-            keycloakConfigDirectory = PersistentPropertiesUtil.getExecutionPath(this) + multiTenantKeycloakProperties.getConfigPath();
+    public void init() throws IOException {
+        if (keycloakConfigPath.startsWith("consul:")) {
+            // Load Keycloak config from Consul KV
+            var kvPathPrefix = this.consulKVPrefix + "/" + this.applicationName;
+            var kvSubPath = keycloakConfigPath.replace("consul:", "");
+            var kvPath = kvPathPrefix + "/" + kvSubPath;
+            this.loadKeycloakConfigFromConsul(kvPath);
         }
-        adapterConfigFiles = PersistentPropertiesUtil.findFiles(keycloakConfigDirectory, "regex:.*" + CONFIG_FILE_ENDING);
-        LOG.info("Found realm configuration files: {}", adapterConfigFiles.keySet());
-        // read keycloak client configurations from files
-        for (Map.Entry<String, File> entry : adapterConfigFiles.entrySet()) {
-            AdapterConfig adapterConfig = PersistentPropertiesUtil.loadFromFile(entry.getValue(), AdapterConfig.class);
-            adapterConfig.setDisableTrustManager(true);
-            // TODO: Use trust store to verify certificates of Keycloak servers
-            // adapterConfig.setTruststore("classpath:truststore.p12");
-            // adapterConfig.setTruststorePassword("password");
-            String realm = adapterConfig.getRealm().toLowerCase(Locale.ROOT);
-            adapterConfigs.put(realm, adapterConfig);
-
-            LOG.info("Wait for keycloak instance and initialize realm configuration: {}", realm);
-            var keycloakDeployment = KeycloakDeploymentBuilder.build(adapterConfig);
-            if (keycloakDeployment != null)
-            {
-                cache.put(adapterConfig.getRealm().toLowerCase(Locale.ROOT), keycloakDeployment);
-                realms.add(realm);
-                LOG.info("Client configuration initialized for realm '{}'", realm);
-
-                Keycloak keycloak = KeycloakBuilder.builder()
-                        .serverUrl(adapterConfig.getAuthServerUrl())
-                        .realm(realm)
-                        .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-                        .clientId(adapterConfig.getResource())
-                        .clientSecret((String) adapterConfig.getCredentials().get("secret"))
-                        .build();
-
-                this.realmResourceMap.put(realm, keycloak.realm(realm) );
+        else {
+            // Search in config folder for keycloak client configurations
+            String keycloakConfigDirectory = "";
+            if(keycloakConfigPath.startsWith("/") || keycloakConfigPath.startsWith(":", 1)) {
+                // Absolute directory path
+                keycloakConfigDirectory = keycloakConfigPath;
+            } else {
+                // Relative directory path
+                keycloakConfigDirectory = PersistentPropertiesUtil.getExecutionPath(this) + keycloakConfigPath;
             }
-            else {
-                LOG.error("Failed to initialize client configuration for realm '{}', therefore application is stopped", realm);
-                System.exit(SpringApplication.exit(context, () -> 666));
-            }
+            this.loadKeycloakConfigFromDirectory(keycloakConfigDirectory);
         }
     }
 
-    /**
-     * Wait until keycloak instance is up and running by periodically checking the reachability of the URL.
-     *
-     * @param url the keycloak url
-     */
-    private void waitForKeycloakConnectivity(String url) {
+    private void loadKeycloakConfigFromDirectory(String keycloakConfigDirectory) {
+        oidcConfigFiles = PersistentPropertiesUtil.findFiles(keycloakConfigDirectory, "regex:.*" + CONFIG_FILE_ENDING);
+        LOG.info("Found realm configuration files: {}", oidcConfigFiles.keySet());
+        // Read keycloak client configurations from files
+        for (Map.Entry<String, File> entry : oidcConfigFiles.entrySet()) {
+            var keycloakOidcConfig = PersistentPropertiesUtil.loadFromFile(entry.getValue(), KeycloakOidcConfig.class);
+            this.processOidcConfig(keycloakOidcConfig);
+        }
+    }
+
+    private void loadKeycloakConfigFromConsul(String keyValuePath) throws IOException {
+        if (this.consulClient.isPresent()) {
+            var response = this.consulClient.get().kv().readKey(keyValuePath, false, false, false, null);
+            var value = response.get(0).getDecodedValue();
+            value = value.replace("'", "\"");
+
+            var mapper = new ObjectMapper()
+                    .registerModule(new KotlinModule.Builder()
+                            .nullIsSameAsDefault(true)
+                            .build());
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            var reader = mapper.readerFor(KeycloakOidcConfig.class);
+            var keycloakOidcConfig = reader.readValue(value, KeycloakOidcConfig.class);
+            this.processOidcConfig(keycloakOidcConfig);
+        }
+        else {
+            LOG.error("Load of Keycloak config from Consul configured, but no Consul client available");
+        }
+    }
+
+    private void processOidcConfig(KeycloakOidcConfig keycloakOidcConfig) {
+        var realm = keycloakOidcConfig.getRealm().toLowerCase(Locale.ROOT);
+
+        keycloakOidcConfigs.put(realm, keycloakOidcConfig);
+        realms.add(realm);
+        LOG.info("Client configuration initialized for realm '{}'", realm);
+
         try {
-            boolean isReachable = ConnectivityCheckUtil.isUrlAvailable(url);
-            if (!isReachable) {
-                synchronized (lock) {
-                    while (!isReachable) {
-                        isReachable = ConnectivityCheckUtil.isUrlAvailable(url);
-                        lock.wait(INTERVAL);
-                    }
-                }
-            }
-        } catch (InterruptedException e) {
-            LOG.warn("Wait time to check keycloak connectivity interrupted", e);
-            // Restore interrupted state...
-            Thread.currentThread().interrupt();
+            Keycloak keycloak = KeycloakBuilder.builder()
+                .serverUrl(keycloakOidcConfig.getAuthServerUrl())
+                .realm(realm)
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                .clientId(keycloakOidcConfig.getResource())
+                .clientSecret(keycloakOidcConfig.getCredentials().getSecret())
+                .build();
+            this.keycloakClientMap.put(realm, keycloak);
+        } catch (Exception e) {
+            throw new RuntimeException("Error initializing Keycloak client for realm '" + realm + "'", e);
         }
-    }
 
-    private void setServiceRedirectUris(ClientRepresentation client) {
-        if (client.getRedirectUris() == null) {
-            client.setRedirectUris(new ArrayList<>());
+        var issuerProperties = new IssuerProperties();
+        try {
+            issuerProperties.setUri(new URL(keycloakOidcConfig.getAuthServerUrlIncludingRealm()));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
         }
-        String[] s;
-        if (multiTenantKeycloakProperties.getRedirectUris() != null && multiTenantKeycloakProperties.getRedirectUris().length > 0) {
-            s = multiTenantKeycloakProperties.getRedirectUris();
-        } else {
-            s = new String[]{String.format("http://%s:%s/*", ConnectivityCheckUtil.getIpAddress(), port),
-                    String.format("http://localhost:%s/*", port),
-                    String.format("http://127.0.0.1:%s/*", port)};
-        }
-        Arrays.asList(s).forEach(serviceUri -> {
-                    if (!client.getRedirectUris().contains(serviceUri)) {
-                        client.getRedirectUris().add(serviceUri);
-                    }
-                }
-        );
-    }
-
-    private void setServiceWebOrigins(ClientRepresentation client) {
-        if (client.getWebOrigins() == null) {
-            client.setWebOrigins(new ArrayList<>());
-        }
-        String[] s;
-        if (multiTenantKeycloakProperties.getWebOrigins() != null && multiTenantKeycloakProperties.getWebOrigins().length > 0) {
-            s = multiTenantKeycloakProperties.getWebOrigins();
-        } else {
-            s = new String[]{String.format("http://%s:%s", ConnectivityCheckUtil.getIpAddress(), port),
-                    String.format("http://localhost:%s", port),
-                    String.format("http://127.0.0.1:%s", port)};
-        }
-        Arrays.asList(s).forEach(serviceUri -> {
-                    if (!client.getWebOrigins().contains(serviceUri)) {
-                        client.getWebOrigins().add(serviceUri);
-                    }
-                }
-        );
-    }
-
-    private void saveAdapterConfig(AdapterConfig adapterConfig) {
-        File configFile = adapterConfigFiles.get(adapterConfig.getRealm().toLowerCase(Locale.ROOT) + CONFIG_FILE_ENDING);
-        PersistentPropertiesUtil.saveToFile(configFile, adapterConfig);
-    }
-
-    private void updateRegistrationToken(AdapterConfig adapterConfig, ClientRepresentation clientRepresentation) {
-        String registrationAccessToken = clientRepresentation.getRegistrationAccessToken();
-        adapterConfig.getCredentials().put(CREDENTIAL_REGISTRATION_ACCESS_TOKEN, registrationAccessToken);
-        saveAdapterConfig(adapterConfig);
+        this.issuers.add(issuerProperties);
     }
 
     /**
-     * Get first realm keycloak deployment.
+     * Get first Keycloak OIDC config.
      *
-     * @return the keycloak deployment
+     * @return the keycloak ODIC config
      */
-    public KeycloakDeployment getFirstRealm() {
-        Optional<Map.Entry<String, KeycloakDeployment>> optional = cache.entrySet().stream().findFirst();
-        if (optional.isPresent()) {
-            return optional.get().getValue();
+    public KeycloakOidcConfig getFirstOidcConfig() {
+        var optionalKeycloakOidcConfig = keycloakOidcConfigs.entrySet().stream().findFirst();
+        if (optionalKeycloakOidcConfig.isPresent()) {
+            return optionalKeycloakOidcConfig.get().getValue();
         }
         return null;
-    }
-
-    /**
-     * Get realm keycloak deployment.
-     *
-     * @param realm the realm
-     * @return the keycloak deployment
-     */
-    public KeycloakDeployment getRealm(String realm) {
-        return cache.get(realm.toLowerCase(Locale.ROOT));
-    }
-
-    /**
-     * Contains realm boolean.
-     *
-     * @param realm the realm
-     * @return the boolean
-     */
-    public boolean containsRealm(String realm) {
-        return cache.containsKey(realm.toLowerCase(Locale.ROOT));
-    }
-
-    /**
-     * Get realm count int.
-     *
-     * @return the int
-     */
-    public int getRealmCount() {
-        return cache.size();
     }
 
     /**
@@ -259,21 +189,49 @@ public class MultiTenantKeycloakRegistration {
         return realms;
     }
 
-    public boolean isRealmConfigured(String authUrl)
-    {
-        for (var keycloakDeployment : cache.values())
-        {
-            if (keycloakDeployment.getAuthUrl().build().toString().contains(authUrl))
-            {
-                return true;
-            }
+    public RealmResource getRealmResource(String realmName) {
+        Keycloak keycloak = keycloakClientMap.get(realmName);
+        if (keycloak == null) {
+            throw new IllegalStateException("No Keycloak client for realm: " + realmName);
         }
-
-        return false;
+        return keycloak.realm(realmName);
     }
 
-    public RealmResource getRealmResource(String realmName) {
-        RealmResource realm = realmResourceMap.get(realmName);
-        return realmResourceMap.get(realmName);
+    public List<IssuerProperties> getIssuers() {
+        return issuers;
+    }
+
+    public void setIssuers(List<IssuerProperties> issuers) {
+        this.issuers = issuers;
+    }
+
+    public IssuerProperties getIssuerProperties(URL issuerUri) throws MisconfigurationException {
+        final var issuerProperties = issuers.stream().filter(iss -> issuerUri.equals(iss.getUri())).toList();
+        if (issuerProperties.isEmpty()) {
+            throw new MisconfigurationException("Missing authorities mapping properties for %s".formatted(issuerUri.toString()));
+        }
+        if (issuerProperties.size() > 1) {
+            throw new MisconfigurationException("Too many authorities mapping properties for %s".formatted(issuerUri.toString()));
+        }
+        return issuerProperties.get(0);
+    }
+
+    public String getDefaultRealm() {
+        var optionalKeycloakOidcConfig = keycloakOidcConfigs.entrySet().stream().findFirst();
+        if (optionalKeycloakOidcConfig.isPresent()) {
+            return optionalKeycloakOidcConfig.get().getValue().getRealm();
+        }
+        return null;
+    }
+
+    @PreDestroy
+    public void closeKeycloakClients() {
+        for (Keycloak keycloak : keycloakClientMap.values()) {
+            try {
+                keycloak.close();
+            } catch (Exception e) {
+                LOG.warn("Error closing Keycloak client", e);
+            }
+        }
     }
 }

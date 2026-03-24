@@ -1,0 +1,639 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Notification Service"
+  description: "REST API of Notification Service"
+  contact:
+    name: "Fraunhofer IPA"
+    url: "https://www.ipa.fraunhofer.de"
+    email: "matthias.schneider@ipa.fraunhofer.de"
+  version: "1.4.0-RELEASE"
+servers:
+- url: "http://localhost:9002/notification-service"
+  description: "Generated server url"
+security:
+- bearer_auth: []
+- spring_oauth: []
+paths:
+  /observer/job:
+    post:
+      tags:
+      - "observer-rest-controller"
+      summary: "Create observer for running job"
+      operationId: "createJobObserver"
+      parameters:
+      - name: "userUuid"
+        in: "query"
+        required: true
+        schema:
+          type: "string"
+      - name: "jobId"
+        in: "query"
+        required: true
+        schema:
+          type: "integer"
+          format: "int32"
+      - name: "jobTarget"
+        in: "query"
+        required: true
+        schema:
+          $ref: "#/components/schemas/JobTarget"
+      - name: "jobGoal"
+        in: "query"
+        required: true
+        schema:
+          $ref: "#/components/schemas/JobGoal"
+      responses:
+        "200":
+          description: "OK"
+  /notification:
+    post:
+      tags:
+      - "notification-rest-controller"
+      summary: "Create new notification"
+      operationId: "createNotification"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Notification"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+  /notifications/read:
+    patch:
+      tags:
+      - "notification-rest-controller"
+      summary: "Set read property of notifications"
+      operationId: "setReadOfNotifications"
+      parameters:
+      - name: "read"
+        in: "query"
+        required: true
+        schema:
+          type: "boolean"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                type: "integer"
+                format: "int64"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+  /notifications:
+    get:
+      tags:
+      - "notification-rest-controller"
+      summary: "Get notifications of a user"
+      operationId: "getNotifications"
+      parameters:
+      - name: "isRead"
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Notification"
+  /notifications/event-notification-model:
+    get:
+      tags:
+      - "notification-rest-controller"
+      summary: "Get event notification model"
+      operationId: "getEventNotificationModel"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EventNotificationModel"
+components:
+  schemas:
+    JobTarget:
+      type: "string"
+      enum:
+      - "PROJECT"
+      - "RESOURCE"
+      - "SERVICE"
+      - "DEPLOYMENT_CAPABILITY"
+      - "BASE_CONFIGURATION_CAPABILITY"
+      - "DISCOVERY"
+    JobGoal:
+      type: "string"
+      enum:
+      - "CREATE"
+      - "DELETE"
+      - "UPDATE"
+      - "UPGRADE"
+      - "MOVE"
+      - "MODIFY"
+      - "ADD"
+    Notification:
+      required:
+      - "id"
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        userId:
+          type: "string"
+        timestamp:
+          type: "string"
+          format: "date-time"
+        category:
+          $ref: "#/components/schemas/NotificationCategory"
+        subCategory:
+          $ref: "#/components/schemas/NotificationSubCategory"
+        eventType:
+          $ref: "#/components/schemas/NotificationEventType"
+        read:
+          type: "boolean"
+    NotificationCategory:
+      type: "string"
+      enum:
+      - "JOBS"
+      - "RESOURCES"
+      - "SERVICES"
+    NotificationEventType:
+      type: "string"
+      enum:
+      - "CREATED"
+      - "DELETED"
+      - "UPDATED"
+      - "UPGRADED"
+      - "MOVED"
+      - "MODIFIED"
+      - "ADDED"
+      - "INSTALLED"
+      - "UNINSTALLED"
+      - "FAILED"
+    NotificationSubCategory:
+      type: "string"
+      enum:
+      - "RESOURCE"
+      - "CLUSTER"
+      - "SERVICE"
+      - "JOB"
+      - "CAPABILITY"
+      - "DISCOVERY"
+      - "FIRMWARE_UPDATE"
+    CapabilityJobDTO:
+      required:
+      - "capabilityId"
+      - "configParameters"
+      - "createdAt"
+      - "id"
+      - "logMessages"
+      - "resourceId"
+      - "skipInstall"
+      - "stateTransitions"
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        resourceId:
+          type: "string"
+          format: "uuid"
+        capabilityId:
+          type: "string"
+          format: "uuid"
+        skipInstall:
+          type: "boolean"
+        configParameters:
+          type: "object"
+          additionalProperties:
+            type: "string"
+        state:
+          $ref: "#/components/schemas/CapabilityJobState"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        stateTransitions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/CapabilityJobStateTransition"
+        logMessages:
+          type: "array"
+          items:
+            type: "string"
+    CapabilityJobEventNotification:
+      required:
+      - "capabilityJob"
+      - "eventType"
+      - "timestamp"
+      - "userId"
+      type: "object"
+      properties:
+        userId:
+          type: "string"
+        timestamp:
+          type: "string"
+          format: "date-time"
+        eventType:
+          $ref: "#/components/schemas/CapabilityJobEventType"
+        capabilityJob:
+          $ref: "#/components/schemas/CapabilityJobDTO"
+    CapabilityJobEventType:
+      type: "string"
+      enum:
+      - "CHANGED"
+    CapabilityJobState:
+      type: "string"
+      enum:
+      - "CREATED"
+      - "INSTALLING"
+      - "INSTALLED"
+      - "UNINSTALLING"
+      - "UNINSTALLED"
+      - "FAILED"
+    CapabilityJobStateTransition:
+      required:
+      - "id"
+      - "timestamp"
+      type: "object"
+      properties:
+        fromState:
+          type: "string"
+        toState:
+          type: "string"
+        timestamp:
+          type: "string"
+          format: "date-time"
+        id:
+          type: "integer"
+          format: "int64"
+    DiscoveredResource:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        resourceId:
+          type: "string"
+          format: "uuid"
+        name:
+          type: "string"
+        serialNumber:
+          type: "string"
+        manufacturerName:
+          type: "string"
+        productName:
+          type: "string"
+        ipAddress:
+          type: "string"
+        macAddress:
+          type: "string"
+        firmwareVersion:
+          type: "string"
+        connectionParameters:
+          type: "string"
+        ignored:
+          type: "boolean"
+    DiscoveryJobDTO:
+      required:
+      - "discoveryResult"
+      - "driverId"
+      - "id"
+      - "startDate"
+      - "state"
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        driverId:
+          type: "string"
+        startDate:
+          type: "string"
+          format: "date-time"
+        finishDate:
+          type: "string"
+          format: "date-time"
+        state:
+          $ref: "#/components/schemas/DiscoveryJobState"
+        discoveryResult:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/DiscoveredResource"
+    DiscoveryJobEventNotification:
+      required:
+      - "discoveryJob"
+      - "eventType"
+      - "timestamp"
+      - "userId"
+      type: "object"
+      properties:
+        userId:
+          type: "string"
+        timestamp:
+          type: "string"
+          format: "date-time"
+        eventType:
+          $ref: "#/components/schemas/DiscoveryJobEventType"
+        discoveryJob:
+          $ref: "#/components/schemas/DiscoveryJobDTO"
+    DiscoveryJobEventType:
+      type: "string"
+      enum:
+      - "CHANGED"
+    DiscoveryJobState:
+      type: "string"
+      enum:
+      - "CREATED"
+      - "IN_PROGRESS"
+      - "COMPLETED"
+      - "FAILED"
+    EVENT_CLASS:
+      type: "string"
+      enum:
+      - "RESOURCE_EVENT"
+      - "DISCOVERY_EVENT"
+      - "CAPABILITY_JOB_EVENT"
+      - "FIRMWARE_UPDATE_JOB_EVENT"
+      - "SERVICE_INSTANCE_EVENT"
+    EventNotification:
+      required:
+      - "eventType"
+      - "timestamp"
+      - "type"
+      - "userId"
+      type: "object"
+      properties:
+        userId:
+          type: "string"
+        timestamp:
+          type: "string"
+          format: "date-time"
+        eventType:
+          $ref: "#/components/schemas/EventType"
+        type:
+          type: "string"
+      discriminator:
+        propertyName: "type"
+    EventNotificationModel:
+      required:
+      - "eventClass"
+      type: "object"
+      properties:
+        eventClass:
+          $ref: "#/components/schemas/EVENT_CLASS"
+        eventNotification:
+          oneOf:
+          - $ref: "#/components/schemas/CapabilityJobEventNotification"
+          - $ref: "#/components/schemas/DiscoveryJobEventNotification"
+          - $ref: "#/components/schemas/FirmwareUpdateJobEventNotification"
+          - $ref: "#/components/schemas/ResourceEventNotification"
+          - $ref: "#/components/schemas/ServiceInstanceEventNotification"
+        resourceEventNotification:
+          $ref: "#/components/schemas/ResourceEventNotification"
+        capabilityJobEventNotification:
+          $ref: "#/components/schemas/CapabilityJobEventNotification"
+        discoveryEventNotification:
+          $ref: "#/components/schemas/DiscoveryJobEventNotification"
+        firmwareUpdateJobEventNotification:
+          $ref: "#/components/schemas/FirmwareUpdateJobEventNotification"
+        serviceInstanceEventNotification:
+          $ref: "#/components/schemas/ServiceInstanceEventNotification"
+    EventType:
+      type: "object"
+    FirmwareUpdateJobDTO:
+      required:
+      - "createdAt"
+      - "driverId"
+      - "id"
+      - "logMessages"
+      - "resourceId"
+      - "softwareNameplateId"
+      - "state"
+      - "stateTransitions"
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        resourceId:
+          type: "string"
+          format: "uuid"
+        driverId:
+          type: "string"
+        softwareNameplateId:
+          type: "string"
+        state:
+          $ref: "#/components/schemas/FirmwareUpdateJobState"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        stateTransitions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/FirmwareUpdateJobStateTransition"
+        logMessages:
+          type: "array"
+          items:
+            type: "string"
+    FirmwareUpdateJobEventNotification:
+      required:
+      - "eventType"
+      - "firmwareUpdateJob"
+      - "timestamp"
+      - "userId"
+      type: "object"
+      properties:
+        userId:
+          type: "string"
+        timestamp:
+          type: "string"
+          format: "date-time"
+        eventType:
+          $ref: "#/components/schemas/FirmwareUpdateJobEventType"
+        firmwareUpdateJob:
+          $ref: "#/components/schemas/FirmwareUpdateJobDTO"
+    FirmwareUpdateJobEventType:
+      type: "string"
+      enum:
+      - "CHANGED"
+    FirmwareUpdateJobState:
+      type: "string"
+      enum:
+      - "CREATED"
+      - "PREPARING"
+      - "PREPARED"
+      - "ACTIVATING"
+      - "ACTIVATED"
+      - "CANCELING"
+      - "CANCELED"
+      - "FAILED"
+    FirmwareUpdateJobStateTransition:
+      required:
+      - "id"
+      - "timestamp"
+      type: "object"
+      properties:
+        fromState:
+          type: "string"
+        toState:
+          type: "string"
+        timestamp:
+          type: "string"
+          format: "date-time"
+        id:
+          type: "integer"
+          format: "int64"
+    ResourceDTO:
+      required:
+      - "capabilityServiceIds"
+      - "clusterMember"
+      - "id"
+      - "remoteAccessAvailable"
+      - "remoteAccessIds"
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        assetId:
+          type: "string"
+        locationId:
+          type: "string"
+          format: "uuid"
+        ip:
+          type: "string"
+        hostname:
+          type: "string"
+        firmwareVersion:
+          type: "string"
+        clusterMember:
+          type: "boolean"
+        capabilityServiceIds:
+          type: "array"
+          items:
+            type: "string"
+            format: "uuid"
+        remoteAccessIds:
+          type: "array"
+          items:
+            type: "string"
+            format: "uuid"
+        driverId:
+          type: "string"
+        remoteAccessAvailable:
+          type: "boolean"
+    ResourceEventNotification:
+      required:
+      - "eventType"
+      - "resource"
+      - "timestamp"
+      - "userId"
+      type: "object"
+      properties:
+        userId:
+          type: "string"
+        timestamp:
+          type: "string"
+          format: "date-time"
+        eventType:
+          $ref: "#/components/schemas/ResourceEventType"
+        resource:
+          $ref: "#/components/schemas/ResourceDTO"
+    ResourceEventType:
+      type: "string"
+      enum:
+      - "CREATED"
+      - "UPDATED"
+      - "DELETED"
+    ServiceInstance:
+      required:
+      - "capabilityServiceId"
+      - "groupIds"
+      - "id"
+      - "metaData"
+      - "ports"
+      - "resourceId"
+      - "serviceOfferingId"
+      - "serviceOfferingVersionId"
+      - "tags"
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        tags:
+          type: "array"
+          items:
+            type: "string"
+        metaData:
+          type: "object"
+          additionalProperties:
+            type: "string"
+        resourceId:
+          type: "string"
+          format: "uuid"
+        capabilityServiceId:
+          type: "string"
+          format: "uuid"
+        serviceOfferingId:
+          type: "string"
+          format: "uuid"
+        serviceOfferingVersionId:
+          type: "string"
+          format: "uuid"
+        ports:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int32"
+        groupIds:
+          type: "array"
+          items:
+            type: "string"
+            format: "uuid"
+    ServiceInstanceEventNotification:
+      required:
+      - "eventType"
+      - "serviceInstance"
+      - "timestamp"
+      - "userId"
+      type: "object"
+      properties:
+        userId:
+          type: "string"
+        timestamp:
+          type: "string"
+          format: "date-time"
+        eventType:
+          $ref: "#/components/schemas/ServiceInstanceEventType"
+        serviceInstance:
+          $ref: "#/components/schemas/ServiceInstance"
+    ServiceInstanceEventType:
+      type: "string"
+      enum:
+      - "CREATED"
+      - "UPDATED"
+      - "DELETED"
+  securitySchemes:
+    spring_oauth:
+      type: "oauth2"
+      description: "Oauth2 flow"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://localhost/auth/realms/fabos/protocol/openid-connect/auth"
+          tokenUrl: "https://localhost/auth/realms/fabos/protocol/openid-connect/token"
+          refreshUrl: "https://localhost/auth/realms/fabos/protocol/openid-connect/token"
+          scopes: {}
+    bearer_auth:
+      type: "http"
+      scheme: "bearer"
+      bearerFormat: "JWT"

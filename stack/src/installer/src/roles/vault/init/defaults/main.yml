@@ -1,0 +1,2 @@
+vault_config_directory: "/vault/config"
+vault_token_file: "{{ vault_config_directory }}/root/root_token"

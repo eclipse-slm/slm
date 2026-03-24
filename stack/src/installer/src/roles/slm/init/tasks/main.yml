@@ -1,0 +1,198 @@
+- name: "SLM | Create and store configs"
+  include_tasks:
+    file: "create_and_store_config.yml"
+  vars:
+    _app_name: "{{ item.app_name }}"
+    scheme: "{{ item.scheme }}"
+    host: "{{ item.host }}"
+    port: "{{ item.port }}"
+    consul_app_token: "{{ item.consul_app_token }}"
+    database_host: "{{ item.database_host }}"
+    database_port: "{{ item.database_port }}"
+    database_user_username: "{{ item.database_user_username }}"
+    database_schema: "{{ item.app_name }}"
+    security_auth_api_key_enabled: "{{ item.security_auth_api_key_enabled | default(false) }}"
+    security_auth_api_key_value: "{{ item.security_auth_api_key_value | default('') }}"
+  with_items:
+    - app_name: platform_management
+      database_host: "{{ ENV.PLATFORM_MANAGEMENT.DATABASE.HOST.INTERNAL }}"
+      database_port: "{{ ENV.PLATFORM_MANAGEMENT.DATABASE.PORT.INTERNAL }}"
+      scheme: "{{ ENV.PLATFORM_MANAGEMENT.SCHEME.INTERNAL }}"
+      host: "{{ ENV.PLATFORM_MANAGEMENT.HOST.INTERNAL }}"
+      port: "{{ ENV.PLATFORM_MANAGEMENT.PORT.INTERNAL | int }}"
+      consul_app_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+      security_auth_api_key_enabled: true
+    - app_name: service_management
+      database_host: "{{ ENV.SERVICE_MANAGEMENT.DATABASE.HOST.INTERNAL }}"
+      database_port: "{{ ENV.SERVICE_MANAGEMENT.DATABASE.PORT.INTERNAL }}"
+      scheme: "{{ ENV.SERVICE_MANAGEMENT.SCHEME.INTERNAL }}"
+      host: "{{ ENV.SERVICE_MANAGEMENT.HOST.INTERNAL }}"
+      port: "{{ ENV.SERVICE_MANAGEMENT.PORT.INTERNAL | int }}"
+      consul_app_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+      security_auth_api_key_enabled: true
+    - app_name: resource_management
+      database_host: "{{ ENV.RESOURCE_MANAGEMENT.DATABASE.HOST.INTERNAL }}"
+      database_port: "{{ ENV.RESOURCE_MANAGEMENT.DATABASE.PORT.INTERNAL }}"
+      scheme: "{{ ENV.RESOURCE_MANAGEMENT.SCHEME.INTERNAL }}"
+      host: "{{ ENV.RESOURCE_MANAGEMENT.HOST.INTERNAL }}"
+      port: "{{ ENV.RESOURCE_MANAGEMENT.PORT.INTERNAL | int }}"
+      consul_app_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+      security_auth_api_key_enabled: true
+    - app_name: notification_service
+      database_host: "{{ ENV.NOTIFICATION_SERVICE.DATABASE.HOST.INTERNAL }}"
+      database_port: "{{ ENV.NOTIFICATION_SERVICE.DATABASE.PORT.INTERNAL }}"
+      scheme: "{{ ENV.NOTIFICATION_SERVICE.SCHEME.INTERNAL }}"
+      host: "{{ ENV.NOTIFICATION_SERVICE.HOST.INTERNAL }}"
+      port: "{{ ENV.NOTIFICATION_SERVICE.PORT.INTERNAL | int }}"
+      consul_app_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+    - app_name: information_service
+      scheme: "{{ ENV.INFORMATION_SERVICE.SCHEME.INTERNAL }}"
+      host: "{{ ENV.INFORMATION_SERVICE.HOST.INTERNAL }}"
+      port: "{{ ENV.INFORMATION_SERVICE.PORT.INTERNAL | int }}"
+      consul_app_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+    - app_name: catalog_service
+      database_host: "{{ ENV.SLM_CATALOG_SERVICE.DATABASE.HOST.INTERNAL }}"
+      database_port: "{{ ENV.SLM_CATALOG_SERVICE.DATABASE.PORT.INTERNAL }}"
+      scheme: "{{ ENV.SLM_CATALOG_SERVICE.SCHEME.INTERNAL }}"
+      host: "{{ ENV.SLM_CATALOG_SERVICE.HOST.INTERNAL }}"
+      port: "{{ ENV.SLM_CATALOG_SERVICE.PORT.INTERNAL | int }}"
+      consul_app_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+
+- name: "SLM | Create RabbitMQ exchanges"
+  include_role:
+    name: rabbitmq/client
+    tasks_from: add_exchange
+  vars:
+      _exchange_name: "{{ item }}"
+  loop:
+      - "resources"
+      - "services"
+      - "notifications"
+
+- name: "Create Minio access"
+  include_tasks: "create_and_store_minio_config.yml"
+  vars:
+    _app_name: "{{ item }}"
+  with_items:
+    - "service_management"
+    - "resource_management"
+
+- name: "Get Keycloak admin access token"
+  include_role:
+    name: keycloak/client
+    tasks_from: authentication/get_admin_access_token.yml
+
+- name: "Configure Keycloak"
+  include_tasks:
+    file: "configure_keycloak.yml"
+
+- name: "Create Consul role for Keycloak clients"
+  include_role:
+    name: consul/client
+    tasks_from: create_role
+  vars:
+    _role_name: "{{ item.consul_role.name }}"
+    _policies: "{{ item.consul_role.policies }}"
+    _binding_rule: "{{ item.consul_role.binding_rule }}"
+  when: item.consul_role is defined
+  loop: "{{ keycloak_clients }}"
+
+- name: "Configure Vault"
+  include_tasks:
+    file: "configure_vault.yml"
+
+- name: "Start SLM components | Platform Management"
+  block:
+    - set_fact:
+        slm_compose: "{{ lookup('template', 'slm-platform-management.yml') }}"
+    - name: "Start containers"
+      delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+      community.docker.docker_compose_v2:
+        project_name: eclipse-slm
+        definition: "{{ slm_compose | from_yaml }}"
+        state: present
+        pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+    - name: "Store resulting compose files"
+      template:
+        src: "slm-platform-management.yml"
+        dest: "{{ _store_compose_file }}_platform_management"
+      when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
+- name: "Create SLM default users"
+  block:
+    - name: "Wait for Platform Management ('{{ platform_management.url.internal }}/actuator/health') being up"
+      uri:
+        url: "{{ platform_management.url.internal }}/actuator/health"
+        status_code: 200
+        return_content: true
+      register: result
+      until: result.json is defined and result.json.status == 'UP'
+      retries: 120
+      delay: 3
+    - name: "Create user '{{ USER.USERNAME }}' via Platform Management API"
+      uri:
+        url: "{{ platform_management.url.internal }}/users"
+        method: POST
+        body_format: json
+        headers:
+          X-API-KEY: "{{ app_configs['platform_management']['security']['api-key-auth']['value'] }}"
+        body:
+          username: "{{ USER.USERNAME }}"
+          firstName: "{{ USER.FIRSTNAME }}"
+          lastName: "{{ USER.LASTNAME }}"
+          password: "{{ USER.PASSWORD }}"
+          isPasswordTemporary: "{{ USER.IS_PASSWORD_TEMPORARY }}"
+          email: "{{ USER.EMAIL }}"
+          isAdmin: "{{ USER.IS_ADMIN }}"
+        status_code: 200, 201
+      loop: "{{ ENV.USERS }}"
+      loop_control:
+        loop_var: USER
+
+- name: "Start SLM components | Rest of SLM components"
+  block:
+    - set_fact:
+        slm_compose: "{{ lookup('template', 'slm.yml') }}"
+    - name: "Start containers"
+      delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+      community.docker.docker_compose_v2:
+        project_name: eclipse-slm
+        definition: "{{ slm_compose | from_yaml}}"
+        state: present
+        pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+    - name: "Store resulting compose files"
+      template:
+        src: "slm.yml"
+        dest: "{{ _store_compose_file }}"
+      when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
+- name: "Register UI at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: ui
+    _service_port: "80"
+    _service_address: "ui"
+    _additional_tags:
+      - "slm"
+      - "frontend"
+      - "exposed"
+      - "traefik.http.routers.ui.rule=PathPrefix(`/`)"
+
+- name: "Start SLM components | Catalog Service"
+  block:
+    - set_fact:
+        catalog_compose: "{{ lookup('template', 'catalog.yml') }}"
+    - name: "Start containers"
+      delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+      community.docker.docker_compose_v2:
+        project_name: eclipse-slm
+        definition: "{{ catalog_compose | from_yaml }}"
+        state: present
+        pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+    - name: "Store resulting compose file"
+      template:
+        src: "catalog.yml"
+        dest: "{{ _store_compose_file }}_catalog"
+      when: (_store_compose_file is defined) and (_store_compose_file|length > 0)

@@ -1,0 +1,53 @@
+- name: "Start discovery components"
+  block:
+    - set_fact:
+        discovery_compose: "{{ lookup('template', 'discovery.yml') }}"
+    - name: "Start containers"
+      delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+      community.docker.docker_compose_v2:
+        project_name: eclipse-slm
+        definition: "{{ discovery_compose | from_yaml}}"
+        state: present
+        pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+
+- name: "Store resulting compose file"
+  template:
+    src: "discovery.yml"
+    dest: "{{ _store_compose_file }}"
+  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
+- name: "Store driver registry config in Consul"
+  include_role:
+    name: consul/client
+    tasks_from: create_or_add_config
+  vars:
+    _app_name: "driver-registry"
+    _config:
+      driver-registry:
+        host: "{{ ENV.DISCOVERY.DRIVER_REGISTRY.HOST.INTERNAL }}"
+        port: "{{ ENV.DISCOVERY.DRIVER_REGISTRY.PORT.INTERNAL }}"
+
+- name: "Add discovery config for resource management"
+  include_role:
+      name: consul/client
+      tasks_from: create_or_add_config
+  vars:
+    _app_name: "resource_management"
+    _config:
+      discovery:
+        driver-registry:
+          address: "{{ ENV.DISCOVERY.DRIVER_REGISTRY.HOST.INTERNAL }}"
+          port: "{{ ENV.DISCOVERY.DRIVER_REGISTRY.PORT.INTERNAL }}"
+
+- name: "Register driver registry at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: "driver-registry"
+    _service_port: "{{ ENV.DISCOVERY.DRIVER_REGISTRY.PORT.INTERNAL }}"
+    _service_address: "{{ ENV.DISCOVERY.DRIVER_REGISTRY.HOST.INTERNAL }}"
+    _tcp: "{{ ENV.DISCOVERY.DRIVER_REGISTRY.HOST.INTERNAL }}:{{ ENV.DISCOVERY.DRIVER_REGISTRY.PORT.INTERNAL }}"
+    _additional_tags:
+      - "driver-registry"
+      - "discovery"

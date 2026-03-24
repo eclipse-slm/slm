@@ -1,0 +1,24 @@
+- name: "Create Keycloak clients"
+  include_role:
+    name: "keycloak/client"
+    tasks_from: clients/create_client.yml
+  vars:
+    _keycloak_access_token: "{{ keycloak_access_token }}"
+    _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
+    _keycloak_client: "{{ item }}"
+  loop: "{{ keycloak_clients }}"
+
+- name: "Create Keycloak group for service account of clients"
+  include_role:
+    name: "keycloak/client"
+    tasks_from: groups/create_child_group_and_assign_user.yml
+  vars:
+    _keycloak_access_token: "{{ keycloak_access_token }}"
+    _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
+    _username: "service-account-{{ item.client_id }}"
+    _keycloak_parent_group_name: "backendServices"
+    _keycloak_child_group:
+      name: "{{ item.client_id }}"
+      description: "Group for service account of client '{{ item.client_id }}'"
+  loop: "{{ keycloak_clients }}"
+  when: item.create_backend_service_group | default(false)

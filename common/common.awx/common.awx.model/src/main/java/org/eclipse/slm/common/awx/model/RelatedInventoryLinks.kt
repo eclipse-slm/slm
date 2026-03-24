@@ -18,5 +18,6 @@ data class RelatedInventoryLinks (
     var object_roles: String,
     var instance_groups: String,
     var copy: String,
-    var organization: String
+    var organization: String,
+    var labels: String
 )

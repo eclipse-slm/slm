@@ -16,6 +16,7 @@ public class VaultTests {
         RestAssured.baseURI = TestConfig.VAULT_BASE_URL;
         RestAssured.port = TestConfig.VAULT_PORT;
         RestAssured.basePath = "";
+        RestAssured.useRelaxedHTTPSValidation();
     }
 
     @Test

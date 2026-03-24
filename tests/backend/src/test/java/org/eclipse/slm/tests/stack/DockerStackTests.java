@@ -6,7 +6,7 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
-import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
+import com.github.dockerjava.zerodep.ZerodepDockerHttpClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,29 +23,42 @@ public class DockerStackTests {
 
     private static final Logger LOG = LoggerFactory.getLogger(DockerStackTests.class);
 
-    private HashMap<String, String> stackContainerStateMap = new HashMap<>() {{
-        put("awx-init", "exited");
-        put("awx-web", "healthy");
-        put("awx-task", "running");
+    private HashMap<String, String> stackContainersExpectedStatesMap = new HashMap<>() {{
+        put("aas-broker", "healthy");
+        put("aas-database", "healthy");
+        put("aas-discovery", "healthy");
+        put("aas-environment", "healthy");
+        put("aas-gui", "running");
+        put("aas-registry", "healthy");
+        put("awx", "running");
+        put("awx-jwt-authenticator", "healthy");
+        put("awx-postgres", "healthy");
         put("awx-redis", "healthy");
         put("awx-redis-init", "exited");
-        put("awx-postgres", "healthy");
-        put("awx-jwt-authenticator", "healthy");
+        put("catalog", "healthy");
+        put("catalog-database", "healthy");
         put("consul", "healthy");
         put("consul-esm", "running");
+        put("driver-registry", "running");
+        put("information-service", "healthy");
         put("keycloak", "healthy");
         put("keycloak-database", "healthy");
-        put("keycloak-init", "exited");
-        put("vault", "healthy");
-        put("ui", "running");
+        put("minio", "healthy");
+        put("monitoring-prometheus-aas", "running");
         put("notification-service", "healthy");
         put("notification-service-database", "healthy");
+        put("prometheus", "healthy");
+        put("rabbitmq", "healthy");
+        put("platform-management", "healthy");
+        put("platform-management-database", "healthy");
         put("resource-management", "healthy");
         put("resource-management-database", "healthy");
-        put("resource-management-init", "exited");
         put("service-management", "healthy");
         put("service-management-database", "healthy");
-        put("service-management-init", "exited");
+        put("submodel-registry", "healthy");
+        put("traefik", "healthy");
+        put("ui", "running");
+        put("vault", "healthy");
     }};
 
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -56,7 +69,7 @@ public class DockerStackTests {
         var dockerClientConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withDockerHost(TestConfig.DOCKER_HOST)
                 .build();
-        var httpClient = new ApacheDockerHttpClient.Builder()
+        var httpClient = new ZerodepDockerHttpClient.Builder()
                 .dockerHost(dockerClientConfig.getDockerHost())
                 .sslConfig(dockerClientConfig.getSSLConfig())
                 .maxConnections(100)
@@ -66,17 +79,18 @@ public class DockerStackTests {
         DockerClient dockerClient = DockerClientImpl.getInstance(dockerClientConfig, httpClient);
 
         long start_time = System.currentTimeMillis();
-        long timeout = 600000;
+        long timeout = 300000;
+        var stackContainersActualStatesMap = new HashMap<>();
         while (System.currentTimeMillis() < start_time + timeout) {
 
             List<Container> containers = dockerClient.listContainersCmd()
                     .withShowAll(true)
                     .exec();
 
-            this.stackContainerStateMap.entrySet().removeIf(
+            this.stackContainersExpectedStatesMap.entrySet().removeIf(
                     entry ->
                     {
-                        var targetContainerState = entry.getValue();
+                        var expectedContainerState = entry.getValue();
 
                         for(var container : containers)
                         {
@@ -85,9 +99,10 @@ public class DockerStackTests {
                                     .findAny();
                             if (containerName.isPresent())
                             {
-                                if (targetContainerState.equals("exited") || targetContainerState.equals("running"))
+                                if (expectedContainerState.equals("exited") || expectedContainerState.equals("running"))
                                 {
-                                    if (container.getState().equals(targetContainerState))
+                                    stackContainersActualStatesMap.put(entry, container.getState());
+                                    if (container.getState().equals(expectedContainerState))
                                     {
                                         return true;
                                     }
@@ -97,7 +112,8 @@ public class DockerStackTests {
                                     var containerHealth = dockerClient.inspectContainerCmd(container.getId()).exec().getState().getHealth();
                                     if (containerHealth != null)
                                     {
-                                        if (containerHealth.getStatus().equals(targetContainerState))
+                                        stackContainersActualStatesMap.put(entry, containerHealth.getStatus());
+                                        if (containerHealth.getStatus().equals(expectedContainerState))
                                         {
                                             return true;
                                         }
@@ -110,21 +126,22 @@ public class DockerStackTests {
                     }
             );
 
-            if (this.stackContainerStateMap.size() == 0)
+            if (this.stackContainersExpectedStatesMap.size() == 0)
             {
                 return;
             }
             else
             {
                 LOG.info("The following containers are in wrong state: "
-                    + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(stackContainerStateMap.keySet())
+                    + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(stackContainersExpectedStatesMap.keySet())
                 + "\n ... sleeping");
                 Thread.sleep(10000);
             }
         }
 
         Assertions.fail("The following containers have the wrong state: "
-                + objectMapper.writeValueAsString(this.stackContainerStateMap));
+                + objectMapper.writeValueAsString(this.stackContainersExpectedStatesMap) + "\n Actual container states: "
+                + objectMapper.writeValueAsString(stackContainersActualStatesMap));
     }
 
 }

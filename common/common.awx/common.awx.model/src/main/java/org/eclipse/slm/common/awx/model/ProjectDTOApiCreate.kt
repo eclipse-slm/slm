@@ -47,4 +47,5 @@ data class ProjectDTOApiCreate(
 
     var organization : Int? = null
     var credential: Int? = null
+    var default_environment: Int? = null
 }

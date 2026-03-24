@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: resource-management
-          image: ghcr.io/eclipse-slm/slm/resource-management:1.3.0-RELEASE
+          image: ghcr.io/eclipse-slm/slm/resource-management:1.4.0-RELEASE
           imagePullPolicy: Always
           ports:
             - containerPort: 9010
@@ -28,7 +28,7 @@ spec:
               value: http://aas-registry:4000/registry
             - name: BASYX_AASSERVER_URL
               value: http://aas-server:4001/aasServer
-            - name: MONITORING_SERVICE_URL
+            - name: MONITORING_PROMETHEUS_AAS_URL
               value: http://monitoring:9080
             - name: CONSUL_HOST
               value: "consul"

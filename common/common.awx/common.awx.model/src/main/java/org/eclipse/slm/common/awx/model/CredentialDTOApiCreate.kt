@@ -5,5 +5,5 @@ data class CredentialDTOApiCreate(
     val description: String,
     val organization: Int?,
     val credential_type: Int,
-    val inputs: Map<String, String>
+    val inputs: Map<String, Object>
 )

@@ -1,0 +1,81 @@
+services:
+  keycloak:
+    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/keycloak:{{ ENV.KEYCLOAK.VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
+#    ports:
+#      - "{{ ENV.KEYCLOAK.PORT.EXTERNAL }}:{{ ENV.KEYCLOAK.PORT.INTERNAL }}"
+    depends_on:
+      - keycloak-database
+    environment:
+      KC_HOSTNAME: "{{ ENV.KEYCLOAK.HOST.EXTERNAL }}"
+      KC_DB_HOST: "{{ keycloak_config.database.host }}"
+      KC_DB_URL_HOST: "{{ keycloak_config.database.url_host }}"
+      KC_DB_SCHEMA: "{{ keycloak_config.database.schema }}"
+      KC_DB_USERNAME: "{{ keycloak_config.database.username }}"
+      KC_DB_PASSWORD: "{{ keycloak_config.database.password }}"
+      KEYCLOAK_ADMIN: "{{ keycloak_config.users.admin.username }}"
+      KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak_config.users.admin.password }}"
+      KC_HTTP_RELATIVE_PATH: "{{ keycloak_config.http.relative_path }}"
+      KC_PROXY: edge
+      KC_PROXY_ADDRESS_FORWARDING: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: "xforwarded"
+    networks:
+      default:
+        aliases:
+          - "{{ ENV.KEYCLOAK.HOST.INTERNAL }}"
+    healthcheck:
+      test: [
+        "CMD-SHELL",
+        "exec 3<>/dev/tcp/localhost/9000; \
+           echo -en 'GET /health/ready' >&3; \
+           # Give the server a moment to respond, then search for 'UP'
+           if timeout 3 cat <&3 | grep -m 1 'UP'; then \
+             exec 3<&-; exec 3>&-; exit 0; \
+           else \
+             exec 3<&-; exec 3>&-; exit 1; \
+           fi"
+      ]
+      start_period: 10s
+      interval: 5s
+      timeout: 2s
+      retries: 20
+    extra_hosts:
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
+
+  keycloak-database:
+    image: "mariadb:{{ ENV.KEYCLOAK.DATABASE.VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
+    volumes:
+      - keycloak-database_data:/var/lib/mysql
+    networks:
+      default:
+        aliases:
+          - "{{ ENV.KEYCLOAK.DATABASE.HOST.INTERNAL }}"
+    environment:
+      MARIADB_ROOT_PASSWORD: "{{ keycloak_config.database.root_password }}"
+      MARIADB_USER: "{{ keycloak_config.database.username }}"
+      MARIADB_PASSWORD: "{{ keycloak_config.database.password }}"
+      MARIADB_DATABASE: "{{ keycloak_config.database.schema }}"
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      start_period: 30s
+      start_interval: 10s
+      interval: 1m
+      timeout: 5s
+      retries: 3
+
+volumes:
+  keycloak-database_data:

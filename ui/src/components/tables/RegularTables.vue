@@ -12,24 +12,23 @@
     <base-material-card
       icon="mdi-clipboard-text"
       title="Simple Table"
-      class="px-5 py-3"
     >
-      <v-simple-table>
+      <v-table>
         <thead>
           <tr>
-            <th class="primary--text">
+            <th class="text-primary">
               ID
             </th>
-            <th class="primary--text">
+            <th class="text-primary">
               Name
             </th>
-            <th class="primary--text">
+            <th class="text-primary">
               Country
             </th>
-            <th class="primary--text">
+            <th class="text-primary">
               City
             </th>
-            <th class="text-right primary--text">
+            <th class="text-right text-primary">
               Salary
             </th>
           </tr>
@@ -96,19 +95,18 @@
             </td>
           </tr>
         </tbody>
-      </v-simple-table>
+      </v-table>
     </base-material-card>
 
     <div class="py-3" />
 
     <base-material-card
       color="success"
-      dark
+      theme="dark"
       icon="mdi-clipboard-plus"
       title="Table on Dark Background"
-      class="px-5 py-3"
     >
-      <v-simple-table>
+      <v-table>
         <thead>
           <tr>
             <th>ID</th>
@@ -182,7 +180,7 @@
             </td>
           </tr>
         </tbody>
-      </v-simple-table>
+      </v-table>
     </base-material-card>
   </v-container>
 </template>

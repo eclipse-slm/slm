@@ -1,0 +1,55 @@
+### Inputs
+- name: "Assert inputs of 'awx/init | awx_jwt_authenticator_init.yml'"
+  assert:
+    that:
+      - (awx.url.internal is defined) and (awx.url.internal|length > 0)
+      - (_awx_admin_username is defined) and (_awx_admin_username|length > 0)
+      - (_awx_admin_password is defined) and (_awx_admin_password|length > 0)
+      - (_awx_jwt_authenticator_username is defined) and (_awx_jwt_authenticator_username|length > 0)
+      - (_awx_jwt_authenticator_password is defined) and (_awx_jwt_authenticator_password|length > 0)
+      - (_consul_token is defined) and (_consul_token|length > 0)
+
+- name: "Add user '{{ _awx_jwt_authenticator_username }}'"
+  block:
+    - name: "Add user in AWX"
+      awx.awx.user:
+        controller_host: "{{ awx.url.internal }}"
+        controller_username: "{{ _awx_admin_username }}"
+        controller_password: "{{ _awx_admin_password }}"
+        username: "{{ _awx_jwt_authenticator_username }}"
+        password: "{{ _awx_jwt_authenticator_password }}"
+        email: "{{ _awx_jwt_authenticator_username }}@fab-os.org"
+        first_name: AWX
+        last_name: JWT Authenticator
+        superuser: yes
+        state: present
+    - name: "Add AWX JWT authenticator username and password in Consul"
+      include_role:
+        name: consul/client
+        tasks_from: create_or_add_config
+      vars:
+        _config:
+          awx:
+            username: '{{ _awx_jwt_authenticator_username }}'
+            password: '{{ _awx_jwt_authenticator_password}}'
+
+- name: "Create application 'awx_jwt_authenticator'"
+  include_role:
+    name: awx/client
+    tasks_from: application_create.yml
+  vars:
+    awx_username: "{{ _awx_admin_username }}"
+    awx_password: "{{ _awx_admin_password }}"
+    awx_application_name: "awx_jwt_authenticator"
+    awx_application_description: "AWX JWT Authenticator"
+    awx_organization_name: "{{ awx_slm_organization_name }}"
+
+- name: "Create team in which AWX JWT Authenticator can add new users"
+  awx.awx.team:
+    controller_host: "{{ awx.url.internal }}"
+    controller_username: "{{ _awx_admin_username }}"
+    controller_password: "{{ _awx_admin_password }}"
+    name: "user"
+    description: "Team for users added by AWX JWT Authenticator"
+    organization: "{{ awx_slm_organization_name }}"
+    state: present

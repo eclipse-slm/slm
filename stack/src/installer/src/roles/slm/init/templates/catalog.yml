@@ -1,0 +1,58 @@
+services:
+
+  catalog:
+    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm/catalog:{{ ENV.SLM_CATALOG_SERVICE.VERSION }}"
+    restart: unless-stopped
+    depends_on:
+      - catalog-database
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
+    environment:
+      DEPLOYMENT_HOSTNAME: "{{ ENV.SLM_CATALOG_SERVICE.HOST.EXTERNAL }}"
+      DEPLOYMENT_PATH: "{{ ENV.SLM_CATALOG_SERVICE.PATH.EXTERNAL }}"
+      CONSUL_SCHEME: "{{ app_configs['catalog_service']['consul']['scheme'] }}"
+      CONSUL_HOST: "{{ app_configs['catalog_service']['consul']['host'] }}"
+      CONSUL_PORT: "{{ app_configs['catalog_service']['consul']['port'] }}"
+      CONSUL_ACLTOKEN: "{{ app_configs['catalog_service']['consul']['acl-token'] }}"
+      CONSUL_SERVICE_ADDRESS: "{{ ENV.SLM_CATALOG_SERVICE.HOST.INTERNAL }}"
+      CONSUL_SERVICE_PORT: "{{ ENV.SLM_CATALOG_SERVICE.PORT.INTERNAL }}"
+    ports:
+      - "{{ ENV.SLM_CATALOG_SERVICE.PORT.EXTERNAL }}:{{ ENV.SLM_CATALOG_SERVICE.PORT.INTERNAL }}"
+    networks:
+      default:
+        aliases:
+          - "{{ ENV.SLM_CATALOG_SERVICE.HOST.INTERNAL }}"
+    extra_hosts:
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:10000/swagger-ui/index.html" ]
+
+  catalog-database:
+    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/mariadb:{{ ENV.SLM_CATALOG_SERVICE.DATABASE.VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
+    ports:
+      - "{{ ENV.SLM_CATALOG_SERVICE.DATABASE.PORT.EXTERNAL }}:{{ ENV.SLM_CATALOG_SERVICE.DATABASE.PORT.INTERNAL }}"
+    networks:
+      default:
+        aliases:
+          - "{{ ENV.SLM_CATALOG_SERVICE.DATABASE.HOST.INTERNAL }}"
+    environment:
+      MARIADB_ROOT_PASSWORD: "{{ app_configs['catalog_service']['database']['root_password'] }}"
+      MARIADB_USER: "{{ app_configs['catalog_service']['database']['username'] }}"
+      MARIADB_PASSWORD: "{{ app_configs['catalog_service']['database']['password'] }}"
+      MARIADB_DATABASE: "{{ app_configs['catalog_service']['database']['schema'] }}"
+    volumes:
+      - catalog-database_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+
+volumes:
+  catalog-database_data:

@@ -1,0 +1,146 @@
+### Application
+application:
+  name: "^project.artifactId^"
+  version: "^project.version^"
+  timestamp: "^timestamp^"
+
+### Deployment
+deployment:
+  scheme: "http"
+  hostname: localhost
+  port: 9002
+  path: "/notification-service"
+  url: ${deployment.scheme}://${deployment.hostname}:${deployment.port}${deployment.path}
+
+### Server / API
+server:
+  port: 9002
+  error:
+    include-message: always
+  servlet:
+    context-path: ${deployment.path}
+  forward-headers-strategy: framework
+
+open-api:
+  title: Notification Service
+  description: REST API of Notification Service
+  version: "^project.version^"
+  contact:
+    name: Fraunhofer IPA
+    url: https://www.ipa.fraunhofer.de
+    email: matthias.schneider@ipa.fraunhofer.de
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+    oauth:
+      clientId: ui
+      clientSecret: unused-and-not-required
+
+### Database
+database:
+  host: 127.0.0.1
+  port: 3301
+  schema: notifications
+  username: notification-service
+  password: password
+
+### Spring
+spring:
+  application:
+    name: notification_service
+  security:
+    user:
+      name: admin
+      password: password
+  # Disable spring.config by comment when using "dev" profile, otherwise the application will fail to start because of missing consul configuration
+  config:
+    import: "consul:"
+  cloud:
+    consul:
+      host: ${consul.host}
+      port: ${consul.port}
+      discovery:
+        enabled: true
+        hostname: ${consul.service.address}
+        port: ${consul.service.port}
+        acl-token: ${consul.acl-token}
+        register-health-check: true
+        healthCheckPath: ${deployment.path}/actuator/health
+        tags:
+          - slm
+          - backend
+          - ${spring.application.name}
+          - exposed
+        service-name: ${spring.application.name}
+        instance-id: ${consul.service.name}
+        metadata:
+          version: ${application.version}
+      config:
+        enabled: true
+        fail-fast: true
+        profileSeparator: '::'
+        format: YAML
+        acl-token: ${consul.acl-token}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        type:
+          preferred_uuid_jdbc_type: CHAR
+  datasource:
+    platform: mysql
+    initialization-mode: always
+    driver-class-name=org: 'mariadb.jdbc.Driver'
+    url: jdbc:mariadb://${database.host}:${database.port}/${database.schema}?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: ${database.username}
+    password: ${database.password}
+
+management:
+  endpoints:
+    web.exposure.include: health,info
+  info:
+    git.enabled: false
+
+### Components - Internal
+notification-service:
+  scheme: "http"
+  host: "localhost"
+  port: ${server.port}
+  path: ""
+  url: ${notification-service.scheme}://${notification-service.host}:${notification-service.port}${notification-service.path}
+
+### Security
+security:
+  auth-white-list: "/ws/**"
+  origins: "*"
+
+### Keycloak
+keycloak:
+  tenants:
+    config-path: consul:keycloak
+
+### AWX
+awx:
+  scheme: http
+  host: localhost
+  port: 8013
+  username: admin
+  password: password
+  polling-interval-in-s: 4
+
+### Consul
+consul:
+  service:
+    name: notification-service
+    address: host.docker.internal
+    port: ${server.port}
+  scheme: http
+  host: consul
+  port: 8500
+  url: ${consul.scheme}://${consul.host}:${consul.port}
+  datacenter: fabos
+  acl-token: your-consul-acl-token

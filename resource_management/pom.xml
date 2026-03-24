@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse.slm</groupId>
     <artifactId>resource_management</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
@@ -16,9 +15,9 @@
     </parent>
 
     <modules>
+        <module>resource_management.common</module>
         <module>resource_management.service</module>
-        <module>resource_management.persistence</module>
-        <module>resource_management.model</module>
+        <module>resource_management.features</module>
     </modules>
 
 </project>

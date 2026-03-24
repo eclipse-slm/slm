@@ -1,9 +1,7 @@
-version: '3'
-
 services:
 
   slm-catalog:
-    image: fabos4ai/slm-catalog:${SLM_CATALOG_VERSION}
+    image: fabos4ai/slm-catalog:${SLM_CATALOG_SERVICE_VERSION}
     restart: unless-stopped
     depends_on:
       - slm-catalog-database
@@ -19,7 +17,7 @@ services:
         aliases:
           - slm-catalog
     extra_hosts:
-      - "${SLM_HOSTNAME}:172.17.0.1"
+      - "${SLM_HOSTNAME}:host-gateway"
     volumes:
       - slm-catalog-database_config:/app/database/config
     healthcheck:

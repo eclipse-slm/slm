@@ -1,23 +1,30 @@
 <template>
   <v-container fluid>
-    <div>
-      <base-material-card
-        class="px-5 py-3"
-      >
+    <div
+      v-if="apiStateLoading"
+      class="text-center"
+    >
+      <v-progress-circular
+        :size="70"
+        :width="7"
+        color="primary"
+        indeterminate
+      />
+    </div>
+    <div v-if="apiStateError">
+      Error
+    </div>
+
+    <div v-if="apiStateLoaded">
+      <base-material-card>
         <template #heading>
           <overview-heading text="Jobs" />
         </template>
 
-        <no-item-available-note
-          v-if="!jobs.length"
-          item="jobs"
-        />
-
         <v-data-table
-          v-else
+          v-if="jobs && jobs.length > 0"
           id="jobsTable"
           :sort-by.sync="sortBy"
-          :sort-desc.sync="sortDesc"
           :footer-props="{
             'items-per-page-options': [5, 10, 20, -1],
           }"
@@ -25,78 +32,103 @@
           item-key="id"
           :items="jobs"
         >
-          <template
-            #body="{ items }"
-          >
-            <tbody
-              v-for="job in items"
-              :key="job.id"
-            >
-              <tr>
-                <td>
-                  <a
-                    :href="`${awxURL}/#/jobs/playbook/${job.id}`"
-                    target="_blank"
-                  >{{ job.id }}</a>
-                </td>
-                <td>{{ job.name }}</td>
-                <td>{{ getFormattedDate(job.started) }}</td>
-                <td>{{ getFormattedDate(job.finished) }}</td>
-                <td v-if="job.status === 'running'">
-                  {{ getFormattedTime(jobs_running.find(j => j.id === job.id).elapsed) }}
-                </td>
-                <td v-else-if="job.elapsed > 60">
-                  {{ Math.floor(job.elapsed/60) }}m {{ Math.round(job.elapsed % 60) }}s
-                </td>
-                <td v-else>
-                  {{ Math.round(job.elapsed % 60) }}s
-                </td>
-                <td>{{ job.status }}</td>
-              </tr>
-            </tbody>
+          <template #item.id="{ item }">
+            <a
+              :href="`${awxURL}/#/jobs/playbook/${item.id}`"
+              target="_blank"
+            >{{ item.id }}</a>
+          </template>
+
+          <template #item.name="{ item }">
+            {{ item.name }}
+          </template>
+
+          <template #item.started="{ item }">
+            {{ getFormattedDate(item.started) }}
+          </template>
+
+          <template #item.finished="{ item }">
+            {{ getFormattedDate(item.finished) }}
+          </template>
+
+          <template #item.elapsed="{ item }">
+            {{ getFormattedTime(item.elapsed) }}
+          </template>
+
+          <template #item.status="{ item }">
+            {{ item.status }}
           </template>
         </v-data-table>
+
+        <no-item-available-note
+          v-else
+          item="jobs"
+        />
       </base-material-card>
     </div>
   </v-container>
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
-  import getEnv from '@/utils/env'
 
-  export default {
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {useJobsStore} from "@/stores/jobsStore";
+import ApiState from "@/api/apiState";
+import {useEnvStore} from "@/stores/environmentStore";
+
+export default {
     name: 'JobsOverview',
     components: {
       OverviewHeading,
       NoItemAvailableNote
     },
+    setup(){
+      const envStore = useEnvStore();
+      const jobsStore = useJobsStore();
+      return {envStore, jobsStore}
+    },
     data: function () {
       return {
         observer: null,
-        sortBy: 'id',
+        sortBy: [{key: 'id', order: 'desc'}],
         sortDesc: true,
       }
     },
     computed: {
-      ...mapGetters([
-        'jobs',
-        'jobs_running',
-      ]),
+      apiStateJobs() {
+        return this.jobsStore.apiState
+      },
+      apiStateLoaded () {
+        return this.apiStateJobs === ApiState.LOADED
+      },
+      apiStateLoading () {
+        if (this.apiStateJobs === ApiState.INIT) {
+          this.jobsStore.updateStore();
+        }
+        return this.apiStateJobs === ApiState.LOADING || this.apiStateJobs === ApiState.INIT
+      },
+      apiStateError () {
+        return this.apiStateJobs === ApiState.ERROR
+      },
+      jobs () {
+        return this.jobsStore.jobs
+      },
+      jobs_running () {
+        return this.jobsStore.jobs_running
+      },
       DataTableHeaders () {
         return [
-          { text: 'ID', value: 'id', sortable: true },
-          { text: 'Name', value: 'name', sortable: true },
-          { text: 'Started at', value: 'started', sortable: true },
-          { text: 'Finished at', value: 'finished', sortable: true },
-          { text: 'Duration', value: 'elapsed', sortable: true },
-          { text: 'Status', value: 'status', sortable: false },
+          { title: 'ID', value: 'id', sortable: true },
+          { title: 'Name', value: 'name', sortable: true },
+          { title: 'Started at', value: 'started', sortable: true },
+          { title: 'Finished at', value: 'finished', sortable: true },
+          { title: 'Duration', value: 'elapsed', sortable: true },
+          { title: 'Status', value: 'status', sortable: false },
         ]
       },
       awxURL () {
-        return getEnv('VUE_APP_AWX_URL')
+        return this.envStore.awxUrl
       }
     },
     methods: {
@@ -105,18 +137,36 @@
         const location = 'de-DE'
 
         if (time !== null) {
-          return new Date(time).toLocaleDateString(location, options)
+          const date = new Date(time).toLocaleDateString(location, options)
+          return (date == 'Invalid Date') ? '' : date
         } else {
           return ''
         }
       },
-      getFormattedTime (time) {
-        // const milliseconds = parseInt((time % 1000))
-        const seconds = parseInt((time / 1000) % 60)
-        const minutes = parseInt((time / (1000 * 60)) % 60)
-        // const hours = parseInt((time / (1000 * 60 * 60)) % 24)
+      getFormattedTime (duration) {
+        // Hours, minutes and seconds
+        const hrs = ~~(duration / 3600);
+        const mins = ~~((duration % 3600) / 60);
+        const secs = ~~duration % 60;
 
-        return (minutes > 0) ? `${minutes}m ${seconds}s` : `${seconds}s`
+        // Output like "1:01" or "4:03:59" or "123:03:59"
+        let ret = "";
+
+        if (hrs > 0) {
+          ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+        }
+
+        ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+        ret += "" + secs;
+
+        return ret;
+
+        // // const milliseconds = parseInt((time % 1000))
+        // const seconds = parseInt((time / 1000) % 60)
+        // const minutes = parseInt((time / (1000 * 60)) % 60)
+        // // const hours = parseInt((time / (1000 * 60 * 60)) % 24)
+        //
+        // return (minutes > 0) ? `${minutes}m ${seconds}s` : `${seconds}s`
       },
     },
   }

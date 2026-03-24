@@ -1,3 +1,5 @@
+import * as yup from "yup";
+
 function isEnvVarExisting (envVarKey, environmentVariables) {
     for (const envVar of environmentVariables) {
         if (envVar.key === envVarKey) {
@@ -34,31 +36,30 @@ function deleteServiceOption (serviceOptionKey, serviceOptionCategories) {
 var serviceOptionMixin = {
     methods: {
         getValidationRulesForServiceOption (serviceOption) {
-            const rule = {}
-
-            if (serviceOption.required) {
-                rule.required = true
-            }
+            let rule = yup.string();
 
             switch (serviceOption.optionType) {
                 case 'ENVIRONMENT_VARIABLE':
                 case 'LABEL':
                     // Nothing to do, will be handled in next switch
-                    break
+                    break;
 
-                case 'PORT_MAPPING':
-                    rule.integer = true
-                    rule.min_value = 1
-                    rule.max_value = 65536
-                    return rule
+                case 'PORT':
+                    rule = yup.number().integer().min(1).max(65536);
+                    if (serviceOption.required) {
+                        rule.required();
+                    }
+                    return rule;
 
                 case 'VOLUME':
-                    rule.alpha_dash = true
-                    // rule.regex = '^\\/$|(\\/[a-zA-Z_0-9-]+)+$'
-                    return rule
+                    rule = yup.string().matches(new RegExp('^\\\\/$|(\\\\/[a-zA-Z_0-9-]+)+$'));
+                    if (serviceOption.required) {
+                        rule.required();
+                    }
+                    return;
 
                 default:
-                    break
+                    break;
             }
 
             switch (serviceOption.valueType) {
@@ -67,33 +68,37 @@ var serviceOptionMixin = {
                 case 'BOOLEAN':
                 case 'ENUM':
                 case 'AUTO_GENERATED_UUID':
-                    break
+                    break;
 
                 case 'EMAIL':
-                    rule.email = true
-                    break
+                    rule = yup.string().email();
+                    break;
 
                 case 'NUMBER':
-                    rule.numeric = true
-                    break
+                    rule = yup.number();
+                    break;
 
                 case 'DECIMAL':
-                    rule.double = true
-                    break
+                    rule = yup.number();
+                    break;
 
                 case 'INTEGER':
-                    rule.integer = true
-                    break
+                    rule = yup.number().integer();
+                    break;
 
                 case 'IP':
-                    rule.ip = true
-                    break
+                    rule = yup.string().ipv4();
+                    break;
 
                 default:
-                    break
+                    break;
             }
 
-            return rule
+            if (serviceOption.required) {
+                rule.required();
+            }
+
+            return rule;
         },
     },
 }

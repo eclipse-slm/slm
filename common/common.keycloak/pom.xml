@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse.slm</groupId>
     <artifactId>common.keycloak</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
@@ -18,6 +17,8 @@
     <modules>
         <module>common.keycloak.config</module>
         <module>common.keycloak.model</module>
+        <module>common.keycloak.client</module>
+        <module>common.keycloak.testing</module>
     </modules>
 
 </project>

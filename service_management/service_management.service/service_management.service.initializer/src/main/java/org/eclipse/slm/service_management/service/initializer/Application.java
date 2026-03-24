@@ -1,7 +1,7 @@
 package org.eclipse.slm.service_management.service.initializer;
 
+import jakarta.transaction.Transactional;
 import org.eclipse.slm.common.utils.serviceofferingimport.DTOConfig;
-import org.eclipse.slm.service_management.service.client.handler.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +12,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootApplication(
         scanBasePackages = {
@@ -29,9 +33,12 @@ import java.util.ArrayList;
                 DataSourceAutoConfiguration.class,
                 SecurityAutoConfiguration.class
         })
+@EnableDiscoveryClient(autoRegister = false)
 public class Application {
 
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
+
+    private final ConfigurableApplicationContext applicationContext;
 
     private final ServiceOfferingInitializer serviceOfferingInitializer;
 
@@ -43,13 +50,17 @@ public class Application {
 
     private final GitRepoInitializer gitRepoInitializer;
 
+    private final DiscoveryClient discoveryClient;
+
     @Autowired
-    public Application(ServiceOfferingInitializer serviceOfferingInitializer, ServiceVendorsInitializer serviceVendorsInitializer, ServiceRepositoriesInitializer serviceRepositoriesInitializer, ServiceCategoriesInitializer serviceCategoriesInitializer, GitRepoInitializer gitRepoInitializer) {
+    public Application(ConfigurableApplicationContext applicationContext, ServiceOfferingInitializer serviceOfferingInitializer, ServiceVendorsInitializer serviceVendorsInitializer, ServiceRepositoriesInitializer serviceRepositoriesInitializer, ServiceCategoriesInitializer serviceCategoriesInitializer, GitRepoInitializer gitRepoInitializer, DiscoveryClient discoveryClient) {
+        this.applicationContext = applicationContext;
         this.serviceOfferingInitializer = serviceOfferingInitializer;
         this.serviceVendorsInitializer = serviceVendorsInitializer;
         this.serviceRepositoriesInitializer = serviceRepositoriesInitializer;
         this.serviceCategoriesInitializer = serviceCategoriesInitializer;
         this.gitRepoInitializer = gitRepoInitializer;
+        this.discoveryClient = discoveryClient;
     }
 
     public static void main(String[] args) {
@@ -66,7 +77,16 @@ public class Application {
 
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
-    public void init() throws IOException, ApiException {
+    public void init() throws IOException, InterruptedException {
+        List<ServiceInstance> serviceManagementInstances = discoveryClient.getInstances("service-management");
+        while (serviceManagementInstances.size() == 0) {
+            var services = discoveryClient.getServices();
+            serviceManagementInstances = discoveryClient.getInstances("service-management");
+            LOG.error("No service management instance available");
+            Thread.sleep(5000);
+        }
+        var serviceManagementInstance = serviceManagementInstances.get(0);
+
         // Configure Model Mapper
         DTOConfig.configureModelMapper();
 
@@ -87,6 +107,8 @@ public class Application {
             this.serviceOfferingInitializer.init(initDirectory);
             LOG.info("Finished initialization from directory '" + initDirectory + "'");
         }
+
+        applicationContext.close();
     }
 
 }

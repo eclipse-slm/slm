@@ -6,4 +6,4 @@ import java.util.*
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 class ServiceOfferingNotFoundException(serviceOfferingId: UUID) :
-    Exception("Service offering with id '$serviceOfferingId' not found")
+    RuntimeException("Service offering with id '$serviceOfferingId' not found")

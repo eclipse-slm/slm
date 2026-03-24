@@ -1,8 +1,8 @@
 package org.eclipse.slm.service_management.model.offerings
 
-import org.eclipse.slm.service_management.model.AbstractBaseEntityLong
-import javax.persistence.Entity
-import javax.persistence.Table
+import jakarta.persistence.Entity
+import jakarta.persistence.Table
+import org.eclipse.slm.common.model.AbstractBaseEntityLong
 
 @Entity
 @Table(name = "service_category")

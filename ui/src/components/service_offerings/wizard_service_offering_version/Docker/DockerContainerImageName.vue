@@ -3,84 +3,84 @@
     <v-col>
       <v-row>
         <v-col cols="3">
-          <v-subheader>
+          <v-list-subheader>
             Image Repository
-            <v-tooltip bottom>
-              <template #activator="{ on, attrs }">
+            <v-tooltip location="bottom">
+              <template #activator="{ props }">
                 <v-icon
                   class="mx-3"
                   color="secondary"
-                  dark
-                  v-bind="attrs"
+                  theme="dark"
+                  v-bind="props"
                   @click.stop="ImageDialog = true"
-                  v-on="on"
                 >
                   mdi-information
                 </v-icon>
               </template>
               <span>Image repository of the Docker image</span>
             </v-tooltip>
-          </v-subheader>
+          </v-list-subheader>
         </v-col>
 
         <v-col cols="9">
-          <ValidationProvider
-            v-slot="{ errors, valid }"
+          <Field
+            v-slot="{ field, errors }"
+            v-model="newServiceOffering.deploymentDefinition.imageRepository"
             name="Image Repository"
-            rules="required"
+            :rules="required"
           >
             <v-text-field
-              v-model="newServiceOffering.deploymentDefinition.imageRepository"
+              v-bind="field"
               class="full-width"
               placeholder="e.g. registry:port/myImage"
               required
-              dense
+              density="compact"
               clearable
               :error-messages="errors"
-              :success="valid"
+              :model-value="newServiceOffering.deploymentDefinition.imageRepository"
             />
-          </ValidationProvider>
+          </Field>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="3">
-          <v-subheader>
+          <v-list-subheader>
             Image Tag
-            <v-tooltip bottom>
-              <template #activator="{ on, attrs }">
+            <v-tooltip location="bottom">
+              <template #activator="{ props }">
                 <v-icon
                   class="mx-3"
                   color="secondary"
-                  dark
-                  v-bind="attrs"
+                  theme="dark"
+                  v-bind="props"
                   @click.stop="ImageDialog = true"
-                  v-on="on"
                 >
                   mdi-information
                 </v-icon>
               </template>
               <span>Tag of the Docker image</span>
             </v-tooltip>
-          </v-subheader>
+          </v-list-subheader>
         </v-col>
 
         <v-col cols="9">
-          <ValidationProvider
-            v-slot="{ errors, valid }"
+          <Field
+            v-slot="{ field, errors }"
+            v-model="newServiceOffering.deploymentDefinition.imageTag"
             name="Image Tag"
-            rules="required"
+            :rules="required"
           >
             <v-text-field
-              v-model="newServiceOffering.deploymentDefinition.imageTag"
+              v-bind="field"
               class="full-width"
               placeholder="e.g. latest"
               required
-              dense
+              density="compact"
               clearable
               :error-messages="errors"
-              :success="valid"
+              :model-value="newServiceOffering.deploymentDefinition.imageTag"
             />
-          </ValidationProvider>
+          </Field>
         </v-col>
       </v-row>
     </v-col>
@@ -88,10 +88,25 @@
 </template>
 
 <script>
-  export default {
+import {Field} from "vee-validate";
+import * as yup from 'yup';
+
+export default {
     name: 'DockerContainerImageName',
     comments: {
     },
-    props: ['newServiceOffering'],
+    components: {Field},
+    props: {
+      newServiceOffering: {
+        type: Object,
+        default: null
+      }
+    },
+    setup(){
+      const required = yup.string().required()
+      return {
+        required
+      }
+    },
   }
 </script>

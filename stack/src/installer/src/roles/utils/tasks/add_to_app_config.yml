@@ -1,0 +1,16 @@
+### Inputs
+- name: "Assert inputs of 'utils | add_to_app_config.yml'"
+  assert:
+    that:
+      - (_app_name is defined) and (_app_name|length > 0)   # Name of the app for which the app config should be added
+      - (_config is defined) and (_config|length > 0)      # Config which should be added
+
+- name: "Add config to variable app_configs['{{ _app_name }}']"
+  set_fact:
+    app_configs: "{{ app_configs | default({}) | combine(
+    { 
+      _app_name: _config
+    }, recursive=true) }}"
+
+# Outpus
+# Updated value for app_configs[{{ _app_name }}]

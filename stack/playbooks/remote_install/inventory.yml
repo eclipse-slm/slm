@@ -1,8 +1,0 @@
----
-target:
-  hosts:
-    target_host:
-      ansible_host: <insert-ip-of-host>
-      ansible_user: <insert-ssh-username>
-      ansible_password: <insert-ssh-password>
-      ansible_ssh_common_args: '-o StrictHostKeyChecking\=no -o ServerAliveInterval=10'

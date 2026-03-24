@@ -7,6 +7,8 @@ spring:
     properties:
       hibernate:
         id.new_generator_mappings: false
+        type:
+          preferred_uuid_jdbc_type: CHAR
   datasource:
     driver-class-name: 'org.testcontainers.jdbc.ContainerDatabaseDriver'
     url: jdbc:tc:mariadb:10.5:///mariadb://${database.schema}?createDatabaseIfNotExist=true&serverTimezone=UTC

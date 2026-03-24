@@ -2,18 +2,17 @@
   <v-container
     fluid
   >
-    <validation-observer
+    <ValidationForm
       ref="observer"
-      v-slot="{ invalid, handleSubmit, validate }"
+      v-slot="{ meta, handleSubmit, validate }"
     >
-      <v-list expand>
-        <v-list-group value="true">
-          <template #activator>
-            <v-list-item-content>
-              <v-list-item-title>
-                Container
-              </v-list-item-title>
-            </v-list-item-content>
+      <v-list :opened="['Container', 'Environment']">
+        <v-list-group value="Container">
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title="Container"
+            />
           </template>
 
           <div v-if="config_Container">
@@ -49,31 +48,30 @@
           </div>
         </v-list-group>
 
-        <v-row>
-          <v-col>
-            <v-list-group value="true">
-              <template #activator>
-                <v-list-item-content>
-                  <v-list-item-title>
-                    Environment
-                  </v-list-item-title>
-                </v-list-item-content>
-              </template>
+        <v-list-group value="Environment">
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title="Environment"
+            />
+          </template>
 
-              <docker-container-environment-variables
-                v-if="config_Environment"
-                :environment-variables="serviceOfferingVersion.deploymentDefinition.environmentVariables"
-                :editable="true"
-                :addable="true"
-              />
-            </v-list-group>
-          </v-col>
+          <docker-container-environment-variables
+            v-if="config_Environment"
+            :environment-variables="serviceOfferingVersion.deploymentDefinition.environmentVariables"
+            :editable="true"
+            :addable="true"
+          />
+        </v-list-group>
+        <v-row>
+          <v-col />
         </v-row>
       </v-list>
       <!-- Navigation Buttons-->
       <v-card-actions>
         <v-btn
-          :color="$vuetify.theme.themes.light.secondary"
+          variant="elevated"
+          :color="$vuetify.theme.themes.light.colors.secondary"
           type="submit"
           @click="onCancelButtonClicked()"
         >
@@ -81,29 +79,35 @@
         </v-btn>
         <v-spacer />
         <v-btn
-          :color="invalid ? $vuetify.theme.disable : $vuetify.theme.themes.light.secondary"
-          @click="invalid ? validate() : handleSubmit(onNextButtonClicked)"
+          variant="elevated"
+          :color="!meta.valid ? $vuetify.theme.themes.light.colors.disable : $vuetify.theme.themes.light.colors.secondary"
+          @click="!meta.valid ? validate() : handleSubmit(onNextButtonClicked)"
         >
           {{ $t('buttons.Next') }}
         </v-btn>
       </v-card-actions>
-    </validation-observer>
+    </ValidationForm>
   </v-container>
 </template>
 
 <script>
-  import DockerContainerEnvironmentVariables from './Docker/DockerEnvironmentVariables'
-  import { isServiceOptionExisting, deleteServiceOption, isEnvVarExisting } from '@/utils/serviceOptionUtil'
-  import DockerContainerRestartPolicy
-    from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerRestartPolicy'
-  import DockerContainerLabels from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerLabels'
-  import DockerContainerVolumeMapping from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerVolumes'
-  import DockerContainerPortMapping
-    from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerPortMappings'
-  import DockerContainerImageName from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerImageName'
-  import ServiceRepositorySelect from '@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect'
+import DockerContainerEnvironmentVariables from './Docker/DockerEnvironmentVariables'
+import {deleteServiceOption, isEnvVarExisting, isServiceOptionExisting} from '@/utils/serviceOptionUtil'
+import DockerContainerRestartPolicy
+  from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerRestartPolicy'
+import DockerContainerLabels
+  from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerLabels'
+import DockerContainerVolumeMapping
+  from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerVolumes'
+import DockerContainerPortMapping
+  from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerPortMappings'
+import DockerContainerImageName
+  from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerContainerImageName'
+import ServiceRepositorySelect
+  from '@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect'
+import {Form as ValidationForm} from "vee-validate";
 
-  export default {
+export default {
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerContainer',
     components: {
       DockerContainerRestartPolicy,
@@ -113,8 +117,23 @@
       DockerContainerImageName,
       DockerContainerEnvironmentVariables,
       ServiceRepositorySelect,
+      ValidationForm
     },
-    props: ['editMode', 'serviceOfferingVersion', 'serviceVendorId'],
+    props: {
+      editMode: {
+        type: Boolean,
+        default: false
+      },
+      serviceOfferingVersion: {
+        type: Object,
+        default: null
+      },
+      serviceVendorId: {
+        type: String,
+        default: null
+      },
+    },
+
     data () {
       return {
         stepNumber: 2,

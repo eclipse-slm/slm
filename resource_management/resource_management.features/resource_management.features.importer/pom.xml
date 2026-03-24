@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>resource_management.features.importer</artifactId>
+    <version>${revision}</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.eclipse.slm</groupId>
+        <artifactId>resource_management.features</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <dependencies>
+        <!-- Shared Modules !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>resource_management.common</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Excel !-->
+        <dependency>
+            <groupId>org.dhatim</groupId>
+            <artifactId>fastexcel-reader</artifactId>
+            <version>${fastexcel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>resource_management.features.capabilities</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>

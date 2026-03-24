@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("/catalog/aas")
 public class AASSubmodelTemplatesRestController {
 
-    public final static Logger LOG = LoggerFactory.getLogger(AASSubmodelTemplatesRestController.class);
+    private final static Logger LOG = LoggerFactory.getLogger(AASSubmodelTemplatesRestController.class);
 
     private final AASSubmodelTemplateManager aasSubmodelTemplateManager;
 

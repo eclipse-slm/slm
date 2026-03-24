@@ -1,0 +1,51 @@
+- name: "Assert inputs of 'vault/client | create_approle.yml'"
+  assert:
+    that:
+      - (vault.url.internal is defined) and (vault.url.internal|length > 0)           # URL of Vault
+      - (_vault_token is defined) and (_vault_token|length > 0)                       # Token to authenticate with Vault
+      - (_pki_name is defined) and (_pki_name|length > 0)
+      - (_role_name is defined) and (_role_name|length > 0)
+      - (_allowed_domains is defined) and (_allowed_domains|length > 0)
+      - (_ttl is defined) and (_ttl|length > 0)
+      - (_max_ttl is defined) and (_max_ttl|length > 0)
+      # Optional
+      # - _allow_any_name
+
+- name: "Get the config issuers of pki '{{ _pki_name }}'"
+  uri:
+    url: "{{ vault.url.internal }}/v1/{{ _pki_name }}/config/issuers"
+    validate_certs: no
+    method: GET
+    headers:
+      Authorization: "Bearer {{ _vault_token }}"
+    status_code: 200, 204
+  register: pki_int_issuers
+
+- name: "Check if the role name already exist"
+  uri:
+    url: "{{ vault.url.internal }}/v1/{{ _pki_name }}/roles/{{ _role_name }}"
+    validate_certs: no
+    method: GET
+    headers:
+      Authorization: "Bearer {{ _vault_token }}"
+    status_code: 200, 204, 400, 404
+  register: app_role
+
+- name: "Create a role named {{ _role_name }} which allows subdomains."
+  uri:
+    url: "{{ vault.url.internal }}/v1/{{ _pki_name }}/roles/{{ _role_name }}"
+    validate_certs: no
+    method: POST
+    headers:
+      Authorization: "Bearer {{ _vault_token }}"
+    status_code: 200, 204
+    body_format: json
+    body:
+      allowed_domains: " {{ _allowed_domains }}"
+      allow_subdomains: "true"
+      allow_bare_domains: "true"
+      allow_any_name: "{{ _allow_any_name | default('false')}}"
+      issuer_ref: "{{ pki_int_issuers.json.data.default }}"
+      ttl: "{{ _ttl }}"
+      max_ttl: "{{ _max_ttl }}"
+  when: app_role.status != 200

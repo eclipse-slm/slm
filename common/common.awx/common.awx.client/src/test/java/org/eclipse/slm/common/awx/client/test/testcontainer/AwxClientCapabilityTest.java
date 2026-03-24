@@ -5,7 +5,6 @@ import org.eclipse.slm.common.awx.client.AwxClient;
 import org.eclipse.slm.common.awx.client.AwxProjectUpdateFailedException;
 import org.eclipse.slm.common.awx.model.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,18 +14,17 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
 import javax.net.ssl.SSLException;
 import java.io.File;
+import java.time.Duration;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
         RestTemplate.class,
         AwxClient.class
@@ -39,16 +37,18 @@ public class AwxClientCapabilityTest {
     //region Variables
     static final DockerComposeContainer awxContainer;
 
-    private static int AWX_PORT = 8052;
-    private static String AWX_WEB_SERVICE = "awx-web-no-jwt";
+    private static int AWX_PORT = 8013;
+    private static String AWX_SERVICE = "awx";
 
     @Autowired
     AwxClient awxClient;
 
     static {
         awxContainer = new DockerComposeContainer(new File("src/test/resources/docker-compose.yml"))
-                .withExposedService(AWX_WEB_SERVICE, AWX_PORT, Wait.forListeningPort())
-                .withLocalCompose(true);
+                .withExposedService(AWX_SERVICE,AWX_PORT,
+                        Wait.forHttp("/#/login").forPort(AWX_PORT).withStartupTimeout(Duration.ofMinutes(5))
+                )
+                .withLocalCompose(false);
 
         awxContainer.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> stopContainer()));
@@ -61,14 +61,14 @@ public class AwxClientCapabilityTest {
 
     @BeforeEach
     public void beforeEach() {
-        awxClient.setAwxPort(awxContainer.getServicePort(AWX_WEB_SERVICE, AWX_PORT));
+        awxClient.setAwxPort(awxContainer.getServicePort(AWX_SERVICE, AWX_PORT));
     }
 
     @Nested
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     public class testCapabilityAwxMethods {
         //region Variables
-        public final static Logger LOG = LoggerFactory.getLogger(testCapabilityAwxMethods.class);
+        private final static Logger LOG = LoggerFactory.getLogger(testCapabilityAwxMethods.class);
         public static AwxClient staticAwxClient;
         List<String> jobTemplateCredentialNames = List.of("Consul", "HashiCorp Vault");
         String repo = "https://github.com/FabOS-AI/fabos-slm-dc-dummy";
@@ -135,8 +135,8 @@ public class AwxClientCapabilityTest {
                     repo,
                     branch,
                     playbook,
-                    jobTemplateCredentialNames
-            );
+                    jobTemplateCredentialNames,
+                    "");
 
             assertEquals(
                     projectsBefore.getCount()+1,
@@ -187,8 +187,8 @@ public class AwxClientCapabilityTest {
                     playbook,
                     username,
                     password,
-                    jobTemplateCredentialNames
-            );
+                    jobTemplateCredentialNames,
+                    "");
 
             Credential scmCredential = awxClient.getCredentialByUrlAndUsername(repo, username);
             assertEquals(username, scmCredential.getInputs().get("username"));

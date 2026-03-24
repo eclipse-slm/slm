@@ -19,11 +19,11 @@
           v-model="addedDevelopers"
           :items="developersAvailableForSharing"
           label="Add developer"
-          item-text="username"
+          item-title="username"
           return-object
           multiple
           chips
-          deletable-chips
+          closable-chips
         />
 
         <v-divider />
@@ -50,7 +50,7 @@
                   <v-btn
                     class="ma-1"
                     color="error"
-                    small
+                    size="small"
                     @click="onDeleteDeveloperClicked(developer)"
                   >
                     <v-icon>
@@ -72,8 +72,8 @@
           @click="onSaveDevelopersClicked()"
         >
           <v-icon
-            dense
-            small
+            density="compact"
+            size="small"
             class="mr-2"
           >
             mdi-check
@@ -86,16 +86,31 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import ServiceVendorsRestApi from '@/api/service-management/serviceVendorsRestApi'
-  import UsersRestApi from '@/api/service-management/usersRestApi'
-  import Vue from 'vue'
-  import OverviewHeading from "@/components/base/OverviewHeading.vue";
 
-  export default {
+import OverviewHeading from "@/components/base/OverviewHeading.vue";
+import {useUserStore} from "@/stores/userStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
+import {storeToRefs} from "pinia";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
+import logRequestError from "@/api/restApiHelper";
+import updateToken from "@/utils/updateToken";
+import {globals} from "@/main";
+
+export default {
     name: 'ServiceVendorDevelopersTable',
     components: {OverviewHeading},
-    props: ['serviceVendor'],
+    props: {
+      serviceVendor: {
+        type: Object,
+        default: null
+      }
+    },
+    setup(){
+      const userStore = useUserStore();
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      const {serviceOfferingCategoryNameById, serviceVendorById} = storeToRefs(serviceOfferingsStore)
+      return {userStore, serviceOfferingsStore, serviceOfferingCategoryNameById, serviceVendorById}
+    },
     data () {
       return {
         availableDevelopers: null,
@@ -103,6 +118,30 @@
         addedDevelopers: [],
         developersOfServiceVendor: [],
       }
+    },
+    computed: {
+      userId() {
+        return this.userStore.userId
+      },
+
+      tableHeaders () {
+        return [
+          { title: 'Username', value: 'username', sortable: true },
+          { title: 'Firstname', value: 'firstName', sortable: true },
+          { title: 'Lastname', value: 'lastName', sortable: true },
+          { title: 'Mail', value: 'email', sortable: true },
+          { title: 'Actions', value: 'developerActions', sortable: false },
+        ]
+      },
+      developersAvailableForSharing () {
+        const usersToRemove = []
+        for (const developer of this.developersOfServiceVendor) {
+          usersToRemove.push(developer.id)
+        }
+        return this.users.filter(function (developer) {
+          return usersToRemove.indexOf(developer.id) === -1
+        })
+      },
     },
     watch: {
       serviceVendor: {
@@ -115,70 +154,44 @@
         },
       },
     },
-    computed: {
-      ...mapGetters([
-        'userId',
-        'serviceOfferingCategoryNameById',
-        'serviceVendorById',
-      ]),
-      tableHeaders () {
-        return [
-          { text: 'Username', value: 'username', sortable: true },
-          { text: 'Firstname', value: 'firstName', sortable: true },
-          { text: 'Lastname', value: 'lastName', sortable: true },
-          { text: 'Mail', value: 'email', sortable: true },
-          { text: 'Actions', value: 'developerActions', sortable: false },
-        ]
-      },
-    developersAvailableForSharing () {
-          const usersToRemove = []
-          for (const developer of this.developersOfServiceVendor) {
-            usersToRemove.push(developer.id)
-          }
-          return this.users.filter(function (developer) {
-            return usersToRemove.indexOf(developer.id) === -1
-          })
-      },
-    },
     methods: {
       onDeleteDeveloperClicked (deletedDeveloper) {
         if (this.developersOfServiceVendor.length === 1) {
-          Vue.$toast.warning('Last developer of service vendor cannot be deleted')
+          this.$toast.warning('Last developer of service vendor cannot be deleted')
         } else {
-          ServiceVendorsRestApi.removeDeveloperFromServiceVendor(this.serviceVendor.id, deletedDeveloper.id).then(() => {
-            Vue.$toast.info(`Successfully removed developer '${deletedDeveloper.username}'`)
+          ServiceManagementClient.serviceVendorsApi.removeDeveloperFromServiceVendor(this.serviceVendor.id, deletedDeveloper.id).then(() => {
+            this.$toast.info(`Successfully removed developer '${deletedDeveloper.username}'`)
             this.loadDevelopersOfServiceVendor()
           })
             .catch(() => {
-              Vue.$toast.error(`Failed to remove developer '${deletedDeveloper.username}'`)
+              this.$toast.error(`Failed to remove developer '${deletedDeveloper.username}'`)
             })
         }
       },
       onSaveDevelopersClicked () {
-        console.log(this.addedDevelopers)
         this.addedDevelopers.forEach(developer => {
-          ServiceVendorsRestApi.addDeveloperToServiceVendor(this.serviceVendor.id, developer.id).then(() => {
+          ServiceManagementClient.serviceVendorsApi.addDeveloperToServiceVendor(this.serviceVendor.id, developer.id).then(() => {
             this.developersOfServiceVendor.push(developer)
-            Vue.$toast.info(`Successfully added developer '${developer.username}'`)
-            Vue.prototype.$keycloak.keycloak.updateToken(100000) // Force refresh of token
-          })
+            updateToken() // Update the token, as membership in a service vendor is determined via the groups claim in the token
+            this.$toast.info(`Successfully added developer '${developer.username}'`)
+          }).catch(logRequestError)
         })
         this.addedDevelopers = []
       },
 
       loadDevelopersOfServiceVendor () {
-        ServiceVendorsRestApi.getDevelopersOfServiceVendor(this.serviceVendor.id).then(
-          developers => {
-            this.developersOfServiceVendor = developers
+        ServiceManagementClient.serviceVendorsApi.getDevelopersOfServiceVendor(this.serviceVendor.id).then(
+          response => {
+            this.developersOfServiceVendor = response.data
           },
-        )
+        ).catch(logRequestError)
       },
       loadUsers () {
-        UsersRestApi.getUsers().then(
-          users => {
-            this.users = users
+        ServiceManagementClient.usersApi.getUsers().then(
+          response => {
+            this.users = response.data
           },
-        )
+        ).catch(logRequestError);
       },
     },
   }

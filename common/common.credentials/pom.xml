@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>common.credentials</artifactId>
+    <version>${revision}</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.eclipse.slm</groupId>
+        <artifactId>common</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <dependencies>
+        <!-- Spring | JPA !-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <!-- Spring | Testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Keycloak !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.utils.keycloak</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Vault !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.vault.client</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Common Model !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.model</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Model Mapping | Map Struct !-->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+        <!-- Testing | Common !-->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <!-- Testing | Vault !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.vault.testing</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Testing | Keycloak !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.keycloak.testing</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Testing | Database !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.database.testing</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>

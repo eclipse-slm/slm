@@ -1,0 +1,44 @@
+- set_fact:
+    monitoring_compose: "{{ lookup('template', 'monitoring.yml') }}"
+
+- name: "Start containers"
+  delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+  community.docker.docker_compose_v2:
+    project_name: eclipse-slm
+    definition: "{{ monitoring_compose | from_yaml}}"
+    state: present
+    pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+
+- name: "Store config in Consul"
+  include_role:
+    name: consul/client
+    tasks_from: create_or_add_config
+  vars:
+    _app_name: "monitoring"
+    _config:
+      prometheus:
+        scheme: "{{ ENV.MONITORING.PROMETHEUS.SCHEME.INTERNAL }}"
+        host: "{{ ENV.MONITORING.PROMETHEUS.HOST.INTERNAL }}"
+        port: "{{ ENV.MONITORING.PROMETHEUS.PORT.INTERNAL }}"
+      service:
+        scheme: "{{ ENV.MONITORING.PROMETHEUS_AAS.SCHEME.INTERNAL }}"
+        host: "{{ ENV.MONITORING.PROMETHEUS_AAS.HOST.INTERNAL }}"
+        port: "{{ ENV.MONITORING.PROMETHEUS_AAS.PORT.INTERNAL }}"
+
+- name: "Store resulting compose file"
+  template:
+    src: "monitoring.yml"
+    dest: "{{ _store_compose_file }}"
+  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
+- name: "Register Prometheus instance at Consul (discovery server)"
+  include_role:
+    name: consul/client
+    tasks_from: register_service
+  vars:
+    _service_name: prometheus
+    _service_port: "{{ ENV.MONITORING.PROMETHEUS.PORT.INTERNAL }}"
+    _service_address: "{{ ENV.MONITORING.PROMETHEUS.HOST.INTERNAL }}"
+    _http: "{{ ENV.MONITORING.PROMETHEUS.SCHEME.INTERNAL }}://{{ ENV.MONITORING.PROMETHEUS.HOST.INTERNAL }}:{{ ENV.MONITORING.PROMETHEUS.PORT.INTERNAL }}/-/healthy"
+    _additional_tags:
+      - "monitoring"

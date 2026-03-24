@@ -22,6 +22,7 @@
           <v-col>
             <v-btn
               class="mx-3 my-3"
+              style="background-color: #999; color: #fff"
               @click="hideServiceView"
             >
               {{ $t('buttons.Hide_info') }}
@@ -31,7 +32,7 @@
           <v-col>
             <v-btn
               class="mx-3 my-3"
-              :color="$vuetify.theme.themes.light.secondary"
+              :color="$vuetify.theme.themes.light.colors.secondary"
               :disabled="selectedServiceOfferingVersionId == null"
               @click="showOrderView"
             >
@@ -50,13 +51,13 @@
           justify="space-around"
         >
           <v-btn
-            text
+            variant="text"
             @click="SelectedServiceOverview = true"
           >
             {{ $t('ServiceLabels.Overview') }}
           </v-btn>
           <v-btn
-            text
+            variant="text"
             @click="SelectedServiceOverview = false"
           >
             {{ $t('ServiceLabels.Service_Requirements') }}
@@ -72,7 +73,8 @@
         <v-col v-show="!SelectedServiceOverview">
           <service-details-requirements
             :service-offering="serviceOffering"
-            :service-offering-version-id="selectedServiceOfferingVersionId" />
+            :service-offering-version-id="selectedServiceOfferingVersionId"
+          />
         </v-col>
       </v-col>
     </v-row>
@@ -83,20 +85,36 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import ServiceCard from '@/components/service_offerings/ServiceOfferingCardGrid'
-  import ServiceDetailsOverview from '@/components/service_offerings/ServiceOfferingDetailsOverview'
-  import ServiceDetailsRequirements from '@/components/service_offerings/ServiceOfferingDetailsRequirements.vue'
-  import ApiState from '@/api/apiState'
 
-  export default {
+import ServiceCard from '@/components/service_offerings/ServiceOfferingCardGrid'
+import ServiceDetailsOverview from '@/components/service_offerings/ServiceOfferingDetailsOverview'
+import ServiceDetailsRequirements from '@/components/service_offerings/ServiceOfferingDetailsRequirements.vue'
+import ApiState from '@/api/apiState'
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
+
+export default {
     name: 'ServiceOfferingDetailsPage',
     components: {
       ServiceCard,
       ServiceDetailsOverview,
       ServiceDetailsRequirements,
     },
-    props: ['serviceOfferingId', 'selectedService'],
+    props: {
+      serviceOfferingId: {
+        type: String,
+        default: null
+      },
+      selectedService: {
+        type: Object,
+        default: null
+      }
+    },
+        // ['serviceOfferingId', 'selectedService'],
+    setup(){
+      const serviceOfferingsStore = useServiceOfferingsStore();
+
+      return {serviceOfferingsStore}
+    },
     data () {
       return {
         SelectedServiceOverview: true,
@@ -105,39 +123,30 @@
       }
     },
     computed: {
-      ...mapGetters([
-        'apiStateServices',
-        'serviceOfferingById',
-      ]),
+      apiStateServices () {
+        return this.serviceOfferingsStore.apiState
+      },
+
       apiStateLoaded () {
-        return this.apiStateServices.serviceOfferingCategories === ApiState.LOADED &&
-          this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADED &&
-          this.apiStateServices.serviceOfferings === ApiState.LOADED &&
-          this.apiStateServices.serviceVendors === ApiState.LOADED
+        return this.apiStateServices === ApiState.LOADED
       },
       apiStateLoading () {
-        if (this.apiStateServices.serviceOfferingCategories === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferingCategories')
+        if (this.apiStateServices === ApiState.INIT) {
+          this.serviceOfferingsStore.getServiceOfferingCategories();
         }
-        if (this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferingDeploymentTypes')
+        if (this.apiStateServices === ApiState.INIT) {
+          this.serviceOfferingsStore.getServiceOfferingDeploymentTypes();
         }
-        if (this.apiStateServices.serviceOfferings === ApiState.INIT) {
-          this.$store.dispatch('getServiceOfferings')
+        if (this.apiStateServices === ApiState.INIT) {
+          this.serviceOfferingsStore.getServiceOfferings();
         }
-        if (this.apiStateServices.serviceVendors === ApiState.INIT) {
-          this.$store.dispatch('getServiceVendors')
+        if (this.apiStateServices === ApiState.INIT) {
+          this.serviceOfferingsStore.getServiceVendors();
         }
-        return this.apiStateServices.serviceOfferingCategories === ApiState.LOADING || this.apiStateServices.serviceOfferingCategories === ApiState.INIT ||
-          this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.LOADING || this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.INIT ||
-          this.apiStateServices.serviceOfferings === ApiState.LOADING || this.apiStateServices.serviceOfferings === ApiState.INIT ||
-          this.apiStateServices.serviceVendors === ApiState.LOADING || this.apiStateServices.serviceVendors === ApiState.INIT
+        return this.apiStateServices === ApiState.LOADING || this.apiStateServices === ApiState.INIT
       },
       apiStateError () {
-        return this.apiStateServices.serviceOfferingCategories === ApiState.ERROR &&
-          this.apiStateServices.serviceOfferingDeploymentTypes === ApiState.ERROR &&
-          this.apiStateServices.serviceOfferings === ApiState.ERROR &&
-          this.apiStateServices.serviceVendors === ApiState.ERROR
+        return this.apiStateServices === ApiState.ERROR
       },
       serviceOffering () {
         const serviceOffering = this.serviceOfferingById(this.serviceOfferingId)
@@ -153,7 +162,10 @@
       },
       onServiceOfferingVersionSelected (serviceOfferingVersionId) {
         this.selectedServiceOfferingVersionId = serviceOfferingVersionId
-      }
+      },
+      serviceOfferingById (id) {
+        return this.serviceOfferingsStore.serviceOfferingById(id)
+      },
     },
 
   }

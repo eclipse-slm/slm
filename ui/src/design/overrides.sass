@@ -12,37 +12,51 @@
 // * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 // Creative Tim refine style code
-@import variables
-@import vuetify-material/sidebar
-@import vuetify-material/appbar
-@import vuetify-material/buttons
-@import vuetify-material/pagination
-@import vuetify-material/footer
-@import vuetify-material/view
-@import vuetify-material/settings
-@import vuetify-material/card
-@import vuetify-material/table
-@import vuetify-material/tab
-@import vuetify-material/notification
-@import vuetify-material/modal
-@import vuetify-material/map
-@import vuetify-material/chip
+@use 'variables' as *
+@use 'vuetify-material/sidebar' as *
+@use 'vuetify-material/appbar' as *
+@use 'vuetify-material/buttons' as *
+@use 'vuetify-material/pagination' as *
+@use 'vuetify-material/footer' as *
+@use 'vuetify-material/view' as *
+@use 'vuetify-material/settings' as *
+@use 'vuetify-material/card' as *
+@use 'vuetify-material/table' as *
+@use 'vuetify-material/tab' as *
+@use 'vuetify-material/notification' as *
+@use 'vuetify-material/modal' as *
+@use 'vuetify-material/map' as *
+@use 'vuetify-material/chip' as *
 
 .v-btn.v-size--default,
 .v-btn.v-size--large
   &:not(.v-btn--icon):not(.v-btn--fab)
     padding: 0 30px !important
 
-.theme--light.v-list-item .v-list-item__action-text,
-.theme--light.v-list-item .v-list-item__subtitle
+.v-theme--light.v-list-item .v-list-item__action-text,
+.v-theme--light.v-list-item .v-list-item__subtitle
   color: #999
 
-.theme--light.v-text-field>.v-input__control>.v-input__slot:before
+.v-theme--light.v-text-field>.v-input__control>.v-input__slot:before
   border-color: #d2d2d2
 
 .v-label.v-label,
 .v-alert.v-alert
   font-size: $font-size-root
 
-.theme--light .v-content
+.v-theme--light .v-content
   background-color: #eee
+
+.v-table > .v-table__wrapper > table > tbody > tr > td, .v-table > .v-table__wrapper > table > thead > tr > td, .v-table > .v-table__wrapper > table > tfoot > tr > td
+  height: 32px !important
+
+.v-dialog > .v-overlay__content > .v-card > .v-card-text, .v-dialog > .v-overlay__content > form > .v-card > .v-card-text
+  padding: 0 24px 20px !important
+
+.v-table__wrapper // Hide scrollbar in v-data-table
+  overflow: visible !important
+  max-height: none !important
+  height: auto !important
+
+.v-toast
+  z-index: 9999 !important

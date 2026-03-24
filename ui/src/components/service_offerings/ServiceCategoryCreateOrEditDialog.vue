@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="active"
     width="400"
     @click:outside="$emit('canceled')"
   >
@@ -8,7 +8,7 @@
       <v-card>
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           Create new service category
         </v-toolbar>
@@ -24,6 +24,7 @@
         </v-card-text>
         <v-card-actions class="justify-center">
           <v-btn
+            variant="elevated"
             color="error"
             @click.native="$emit('canceled')"
           >
@@ -31,6 +32,7 @@
           </v-btn>
           <v-spacer />
           <v-btn
+            variant="elevated"
             color="info"
             @click="onConfirmedClicked"
           >
@@ -49,12 +51,32 @@
 
 <script>
 
-  import ServiceOfferingsRestApi from '@/api/service-management/serviceOfferingsRestApi'
-  import Vue from 'vue'
+import {toRef} from 'vue'
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
 
-  export default {
+export default {
     name: 'ServiceCategoryCreateOrEditDialog',
-    props: ['show', 'editMode', 'serviceCategory'],
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      },
+      editMode: {
+        type: Boolean,
+        default: false
+      },
+      serviceCategory: {
+        type: Object,
+        default: null
+      }
+    },
+    setup(props){
+      const active = toRef(props, 'show')
+      return{
+        active
+      }
+    },
     data () {
       return {
       }
@@ -68,25 +90,28 @@
       onConfirmedClicked () {
         let apiCall
         if (this.editMode) {
-          apiCall = ServiceOfferingsRestApi.createOrUpdateServiceCategoryWithId(this.serviceCategoryUpdate)
+          apiCall = ServiceManagementClient.serviceCategoriesApi.createOrUpdateServiceCategory(this.serviceCategoryUpdate)
         } else {
-          apiCall = ServiceOfferingsRestApi.createServiceCategory(this.serviceCategoryUpdate)
+          apiCall = ServiceManagementClient.serviceCategoriesApi.createServiceCategory(this.serviceCategoryUpdate)
         }
 
         apiCall.then(() => {
           if (this.editMode) {
-            Vue.$toast.info('Service category successfully updated')
+            this.$toast.info('Service category successfully updated')
           } else {
-            Vue.$toast.info('Service category successfully created')
+            this.$toast.info('Service category successfully created')
           }
-          this.$store.dispatch('getServiceOfferingCategories')
+
+          const serviceOfferingsStore = useServiceOfferingsStore();
+          serviceOfferingsStore.getServiceOfferingCategories();
+
           this.$emit('confirmed', this.serviceVendorUpdate)
         }).catch(exception => {
-          Vue.$toast.error('Failed to create service category')
+          this.$toast.error('Failed to create service category')
           console.log('Service category creation failed: ' + exception.response.data.message)
           console.log(exception)
         })
       },
-    },
+    }
   }
 </script>

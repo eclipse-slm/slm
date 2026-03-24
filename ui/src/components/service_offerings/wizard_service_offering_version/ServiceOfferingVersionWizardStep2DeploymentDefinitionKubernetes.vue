@@ -3,15 +3,14 @@
     <v-form
       v-model="validForm"
     >
-      <v-list expand>
+      <v-list :opened="['Kubernetes Manifest File']">
         <!-- Kubernetes Manifest File !-->
-        <v-list-group :value="true">
-          <template #activator>
-            <v-list-item-content>
-              <v-list-item-title>
-                Kubernetes Manifest File
-              </v-list-item-title>
-            </v-list-item-content>
+        <v-list-group value="Kubernetes Manifest File">
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title="Kubernetes Manifest File"
+            />
           </template>
           <v-row>
             <v-col>
@@ -20,9 +19,9 @@
                 accept=".yml,.yaml"
                 label="Click here to select Kubernetes Manifest file"
                 auto-grow
-                dense
-                outlined
-                @change="onLoadManifestFileClicked"
+                density="compact"
+                variant="outlined"
+                @update:modelValue="onLoadManifestFileClicked"
               />
             </v-col>
             <v-spacer />
@@ -30,63 +29,60 @@
           <v-textarea
             v-model="serviceOfferingVersion.deploymentDefinition.manifestFile"
             class="full-width"
-            outlined
-            dense
+            variant="outlined"
+            density="compact"
           />
         </v-list-group>
 
         <!-- Environment Variables (parsed Kubernetes objects)!-->
         <v-list-group
-            v-if="envVarsDefined"
-            :value="true"
+          v-if="envVarsDefined"
+          value="Environment (parsed from Kubernetes Objects)"
         >
-          <template #activator>
-            <v-list-item-content>
-              <v-list-item-title>
-                Environment (parsed from Kubernetes Objects)
-              </v-list-item-title>
-            </v-list-item-content>
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title="Environment (parsed from Kubernetes Objects)"
+            />
           </template>
           <docker-container-environment-variables
-              subheader="Environment Variables"
-              :environment-variables="serviceOfferingVersion.deploymentDefinition.environmentVariables"
-              :addable="false"
+            subheader="Environment Variables"
+            :environment-variables="serviceOfferingVersion.deploymentDefinition.environmentVariables"
+            :addable="false"
           />
         </v-list-group>
 
         <!-- Environment Variables (string replace) !-->
         <v-list-group
-            v-if="stringReplacementsDefined"
-            :value="true"
+          v-if="stringReplacementsDefined"
+          value="String Replacement (parsed from regular expression)"
         >
-          <template #activator>
-            <v-list-item-content>
-              <v-list-item-title>
-                String Replacement (parsed from regular expression)
-              </v-list-item-title>
-            </v-list-item-content>
+          <template #activator="{props}">
+            <v-list-item
+              v-bind="props"
+              title="String Replacement (parsed from regular expression)"
+            />
           </template>
           <docker-container-environment-variables
-              subheader="String Replacement Variables"
-              :environment-variables="serviceOfferingVersion.deploymentDefinition.stringReplacements"
-              :addable="false"
+            subheader="String Replacement Variables"
+            :environment-variables="serviceOfferingVersion.deploymentDefinition.stringReplacements"
+            :addable="false"
           />
         </v-list-group>
-
       </v-list>
 
       <service-repository-select
-          v-model="serviceOfferingVersion.serviceRepositories"
-          label="Private Container Registries Credentials"
-          :service-vendor-id="serviceVendorId"
-          :multiple="true"
+        v-model="serviceOfferingVersion.serviceRepositories"
+        label="Private Container Registries Credentials"
+        :service-vendor-id="serviceVendorId"
+        :multiple="true"
       />
-
     </v-form>
 
     <!-- Navigation Buttons-->
     <v-card-actions>
       <v-btn
+        variant="elevated"
         color="secondary"
         @click="onCancelButtonClicked()"
       >
@@ -94,6 +90,7 @@
       </v-btn>
       <v-spacer />
       <v-btn
+        variant="elevated"
         color="secondary"
         @click="onNextButtonClicked()"
       >
@@ -104,19 +101,32 @@
 </template>
 
 <script>
-  import 'vue-json-pretty/lib/styles.css'
-  import YAML from 'yaml'
-  const { parse } = require('dot-properties')
-  import DockerContainerEnvironmentVariables
-    from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerEnvironmentVariables'
-  import ServiceRepositorySelect
-    from "@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect.vue";
+import 'vue-json-pretty/lib/styles.css'
+import YAML from 'yaml'
+import DockerContainerEnvironmentVariables
+  from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerEnvironmentVariables'
+import ServiceRepositorySelect
+  from "@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect.vue";
 
-  export default {
+const { parse } = require('dot-properties')
+
+export default {
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes',
     components: {ServiceRepositorySelect, DockerContainerEnvironmentVariables},
-    props: ['editMode', 'serviceOfferingVersion', 'serviceVendorId'],
-
+  props: {
+    editMode: {
+      type: Boolean,
+      default: false
+    },
+    serviceOfferingVersion: {
+      type: Object,
+      default: null
+    },
+    serviceVendorId: {
+      type: String,
+      default: null
+    },
+  },
     data () {
       return {
         stepNumber: 2,
@@ -136,7 +146,8 @@
         this.serviceOfferingVersion.serviceOptionCategories.forEach(serviceOptionCategory => {
           serviceOptionCategory.serviceOptions.forEach(serviceOption => {
             if (serviceOption.optionType === "ENVIRONMENT_VARIABLE") {
-              let envVar = this.serviceOfferingVersion.deploymentDefinition.environmentVariables.find(envVar => envVar.key === serviceOption.key && envVar.serviceName === serviceOption.relation);
+              let envVar = this.serviceOfferingVersion.deploymentDefinition.environmentVariables
+                  .find(envVar => envVar.key === serviceOption.key && envVar.serviceName === serviceOption.relation);
               if (typeof envVar !== "undefined"){
                 envVar.isServiceOption = true
               }
@@ -163,8 +174,10 @@
         let serviceOptions = []
 
         // cache previously saved options, if available
-        let envVarServiceOptions = this.serviceOfferingVersion.serviceOptionCategories.map(soc => soc.serviceOptions).flat().filter((option) => option.optionType === 'ENVIRONMENT_VARIABLE')
-        let stringReplacementServiceOptions = this.serviceOfferingVersion.serviceOptionCategories.map(soc => soc.serviceOptions).flat().filter((option) => option.optionType === 'STRING_REPLACE')
+        let envVarServiceOptions = this.serviceOfferingVersion.serviceOptionCategories
+            .map(soc => soc.serviceOptions).flat().filter((option) => option.optionType === 'ENVIRONMENT_VARIABLE')
+        let stringReplacementServiceOptions = this.serviceOfferingVersion.serviceOptionCategories
+            .map(soc => soc.serviceOptions).flat().filter((option) => option.optionType === 'STRING_REPLACE')
         // console.log(this.serviceOfferingVersion.serviceOptionCategories)
         // console.log({envVarServiceOptions})
         // console.log({stringReplacementServiceOptions})

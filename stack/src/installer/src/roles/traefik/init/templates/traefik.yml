@@ -1,0 +1,48 @@
+services:
+
+  traefik:
+    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/traefik:v3.3.4"
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+      - "--ping=true"
+
+      - "--entryPoints.web.address=:{{ ENV.TRAEFIK.HTTP_PORT }}"
+      - "--entryPoints.websecure.address=:{{ ENV.TRAEFIK.HTTPS_PORT }}"
+      - "--entryPoints.websecure.http.tls.domains.main={{ ENV.SLM_HOSTNAME }}"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+
+      - "--providers.file.directory=/certs/"
+      - "--providers.file.watch=true"
+
+      - "--providers.consulCatalog.defaultRule=PathPrefix({{ '`/{{ .Name }}`' }})"
+      - "--providers.consulCatalog.constraints=Tag(`exposed`)"
+      - "--providers.consulCatalog.strictChecks=passing,warning,critical"
+      - "--providers.consulCatalog.endpoint.address={{ ENV.CONSUL.HOST.INTERNAL }}:{{ ENV.CONSUL.PORT.INTERNAL }}"
+      - "--providers.consulCatalog.endpoint.scheme={{ ENV.CONSUL.SCHEME.INTERNAL }}"
+      - "--providers.consulCatalog.endpoint.token={{ _consul_token }}"
+
+      - "--providers.consul.rootKey=traefik"
+      - "--providers.consul.token={{ _consul_token }}"
+      - "--providers.consul.endpoints=http://{{ ENV.CONSUL.HOST.INTERNAL }}:{{ ENV.CONSUL.PORT.INTERNAL }}"
+    environment:
+      SLM_HOSTNAME: "{{ ENV.SLM_HOSTNAME }}"
+      VAULT_APP_ROLE_ROLE_ID: "{{ app_configs['traefik']['vault']['app-role']['role-id'] }}"
+      VAULT_APP_ROLE_SECRET_ID: "{{ app_configs['traefik']['vault']['app-role']['secret-id'] }}"
+    networks:
+      default:
+    ports:
+      - "{{ ENV.TRAEFIK.HTTP_PORT }}:80"
+      - "{{ ENV.TRAEFIK.HTTPS_PORT }}:443"
+      - "{{ ENV.TRAEFIK.API_PORT }}:8080"
+    cap_add:
+      - CAP_NET_BIND_SERVICE
+    healthcheck:
+      test: [ "CMD", "traefik", "healthcheck", "--ping" ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 3s
+    extra_hosts:
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"

@@ -3,11 +3,11 @@
     v-model="showDialog"
     @click:outside="onCloseButtonClicked"
   >
-    <template>
+    <template #default="{}">
       <v-card v-if="showDialog">
         <v-toolbar
           color="primary"
-          dark
+          theme="dark"
         >
           {{ getServiceOfferingText(serviceInstance) }} | Service Instance {{ serviceInstance.id }}
         </v-toolbar>
@@ -21,25 +21,26 @@
             <progress-circular />
           </div>
 
-          <div v-else-if="apiStateError">
+          <div v-else-if="apiStateError" class="mt-8">
             Error loading service details
           </div>
 
-          <v-list v-if="apiStateLoaded">
+          <v-list
+            v-if="apiStateLoaded"
+            :opened="['Common']"
+          >
             <v-list-group
-              :value="true"
+              :model-value="true"
+              value="Common"
             >
-              <template #activator>
-                <v-list-item-icon>
-                  <v-icon>mdi-information</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>
-                    Common
-                  </v-list-item-title>
-                </v-list-item-content>
+              <template #activator="{props}">
+                <v-list-item
+                  v-bind="props"
+                  prepend-icon="mdi-information"
+                  title="Common"
+                />
               </template>
-              <v-simple-table v-slot>
+              <v-table>
                 <tbody>
                   <tr>
                     <th>{{ 'Id' }}</th>
@@ -126,20 +127,17 @@
                     </td>
                   </tr>
                 </tbody>
-              </v-simple-table>
+              </v-table>
             </v-list-group>
-            <v-list-group>
-              <template #activator>
-                <v-list-item-icon>
-                  <v-icon>mdi-adjust</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>
-                    Service Options
-                  </v-list-item-title>
-                </v-list-item-content>
+            <v-list-group value="Service Options">
+              <template #activator="{props}">
+                <v-list-item
+                  v-bind="props"
+                  prepend-icon="mdi-adjust"
+                  title="Service Options"
+                />
               </template>
-              <v-simple-table
+              <v-table
                 v-if="serviceInstanceDetails.serviceOptions.length>0"
                 fixed-header
               >
@@ -162,12 +160,11 @@
                       <td>
                         <v-tooltip
                           v-if="serviceOption.description != null"
-                          bottom
+                          location="bottom"
                         >
-                          <template #activator="{ on, attrs }">
+                          <template #activator="{ props }">
                             <div
-                              v-bind="attrs"
-                              v-on="on"
+                              v-bind="props"
                             >
                               {{ serviceOption.name }}
                             </div>
@@ -176,10 +173,10 @@
                         </v-tooltip>
                       </td>
                       <td>
-                        <div v-if="serviceOption.valueType == 'PASSWORD'">
+                        <div v-if="serviceOption.valueType === 'PASSWORD'">
                           •••••••••••••
                         </div>
-                        <div v-else-if="serviceOption.valueType == 'AAS_SM_TEMPLATE'">
+                        <div v-else-if="serviceOption.valueType === 'AAS_SM_TEMPLATE'">
                           <a
                             :href="aasGuiUrls[serviceOption.relation + '|' + serviceOption.key].url"
                             target="_blank"
@@ -202,24 +199,21 @@
                     </tr>
                   </tbody>
                 </template>
-              </v-simple-table>
+              </v-table>
               <no-item-available-note
                 v-else
                 item="Service Options"
               />
             </v-list-group>
             <v-list-group>
-              <template #activator>
-                <v-list-item-icon>
-                  <v-icon>mdi-history</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>
-                    Order History
-                  </v-list-item-title>
-                </v-list-item-content>
+              <template #activator="{ props }">
+                <v-list-item
+                  v-bind="props"
+                  prepend-icon="mdi-history"
+                  title="Order History"
+                />
               </template>
-              <v-simple-table fixed-header>
+              <v-table fixed-header>
                 <template #default>
                   <thead>
                     <tr>
@@ -245,13 +239,13 @@
                     </tr>
                   </tbody>
                 </template>
-              </v-simple-table>
+              </v-table>
             </v-list-group>
           </v-list>
 
           <v-card-actions class="justify-end">
             <v-btn
-              text
+              variant="text"
               @click="onCloseButtonClicked"
             >
               Close
@@ -259,34 +253,51 @@
           </v-card-actions>
         </v-card-text>
       </v-card>
-    </template>
 
-    <resources-info-dialog
-      :resource="selectedResource"
-      @closed="selectedResource = null"
-    />
+      <DeviceInfoView
+        :resource="selectedResource"
+        @closed="selectedResource = null"
+      />
+    </template>
   </v-dialog>
 </template>
 
 <script>
 
-  import {
-    mapGetters,
-  } from 'vuex'
-  import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
-  import ResourcesInfoDialog from '@/components/resources/dialogs/ResourcesInfoDialog'
-  import ServiceInstancesRestApi from "@/api/service-management/serviceInstancesRestApi";
-  import ApiState from "@/api/apiState";
-  import ProgressCircular from "@/components/base/ProgressCircular";
-  import AasRestApi from "@/api/resource-management/aasRestApi";
-  import getEnv from "@/utils/env";
-  import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {serviceInstanceMixin} from "@/components/services/serviceInstanceMixin";
+import DeviceInfoView from '@/components/resources/deviceinfo/DeviceInfoView.vue'
+import ApiState from "@/api/apiState";
+import ProgressCircular from "@/components/base/ProgressCircular.vue";
+import NoItemAvailableNote from "@/components/base/NoItemAvailableNote.vue";
+import {useServiceInstancesStore} from "@/stores/serviceInstancesStore";
+import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
+import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
+import {storeToRefs} from "pinia";
+import ResourceManagementClient from "@/api/resource-management/resource-management-client";
+import logRequestError from "@/api/restApiHelper";
+import ServiceManagementClient from "@/api/service-management/service-management-client";
+import {useEnvStore} from "@/stores/environmentStore";
 
-  export default {
+export default {
     name: 'ServiceInstanceDetailsDialog',
-    components: {NoItemAvailableNote, ProgressCircular, ResourcesInfoDialog },
+    components: {NoItemAvailableNote, ProgressCircular, DeviceInfoView },
     mixins: [ serviceInstanceMixin ],
-    props: ['serviceInstance'],
+    props: {
+      serviceInstance: {
+        type: Object,
+        default: null
+      }
+    },
+    setup(){
+      const envStore = useEnvStore();
+      const serviceInstancesStore = useServiceInstancesStore();
+      const serviceOfferingsStore = useServiceOfferingsStore();
+      const resourceDevicesStore = useResourceDevicesStore();
+      const {serviceInstanceGroupById} = storeToRefs(serviceInstancesStore)
+      const {serviceOfferingById} = storeToRefs(serviceOfferingsStore)
+      const {resourceById} = storeToRefs(resourceDevicesStore)
+      return {envStore, serviceInstancesStore, resourceDevicesStore, serviceOfferingById, serviceInstanceGroupById, resourceById};
+    },
     data () {
       return {
         selectedResource: null,
@@ -295,40 +306,10 @@
         aasGuiUrls: {}
       }
     },
-    watch: {
-      serviceInstance: {
-        immediate: true,
-        handler (val, oldVal) {
-          if (val != null) {
-            ServiceInstancesRestApi.getServiceInstanceDetails(this.serviceInstance.id).then(serviceInstanceDetails => {
-              this.serviceInstanceDetails = serviceInstanceDetails
-              this.apiState = ApiState.LOADED
-
-              serviceInstanceDetails.serviceOptions.forEach(serviceOption => {
-                if (serviceOption.valueType == "AAS_SM_TEMPLATE") {
-                  AasRestApi.getSubmoduleTemplateInstanceOfAas(serviceOption.defaultValue, serviceOption.currentValue).then(response => {
-                    let aasGuiBaseUrl = getEnv("VUE_APP_BASYX_AAS_GUI_URL")
-                    let smEndpoint = response[0].smEndpoint
-                    let aasGuiUrl = `${aasGuiBaseUrl}/?aas=${smEndpoint.replace('aas/submodels', 'aas&path=submodels')}`
-                    console.log(response)
-                    this.aasGuiUrls[serviceOption.relation + '|' + serviceOption.key] = {
-                      name: response[0].name,
-                      url: aasGuiUrl,
-                    }
-                  })
-                }
-              })
-            } )
-          }
-        }
-      }
-    },
     computed: {
-      ...mapGetters([
-        'serviceOfferingById',
-        'resourceById',
-        'serviceInstanceGroupById'
-      ]),
+      app() {
+        return app
+      },
       showDialog () {
         return this.serviceInstance !== null
       },
@@ -341,6 +322,43 @@
       apiStateError () {
         return this.apiState === ApiState.ERROR
       },
+    },
+    watch: {
+      serviceInstance: {
+        immediate: true,
+        handler (val, oldVal) {
+          if (val != null) {
+            ServiceManagementClient.serviceInstancesApi.getServiceInstanceDetails(this.serviceInstance.id).then(response => {
+              this.serviceInstanceDetails = response.data
+              this.apiState = ApiState.LOADED
+
+              response.data.serviceOptions.forEach(serviceOption => {
+                if (serviceOption.valueType === "AAS_SM_TEMPLATE") {
+                  ResourceManagementClient.submodelTemplatesRestControllerApi.getSubmodelTemplateInstancesBySemanticId(serviceOption.defaultValue, serviceOption.currentValue)
+                      .then(res => {
+                        let response = res.data;
+                    let aasGuiBaseUrl = this.envStore.basyxAasGuiUrl
+                    let smEndpoint = response[0].smEndpoint
+                    let aasGuiUrl = `${aasGuiBaseUrl}/?aas=${smEndpoint.replace('aas/submodels', 'aas&path=submodels')}`
+                    console.log(response)
+                    this.aasGuiUrls[serviceOption.relation + '|' + serviceOption.key] = {
+                      name: response[0].name,
+                      url: aasGuiUrl,
+                    }
+                  }).catch(e => {
+                    console.log("test")
+                    logRequestError(e)
+                    this.apiState = ApiState.ERROR
+                  })
+                }
+              })
+            } ).catch(e => {
+              logRequestError(e)
+              this.apiState = ApiState.ERROR
+            })
+          }
+        }
+      }
     },
     methods: {
       onCloseButtonClicked () {

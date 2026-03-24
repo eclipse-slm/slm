@@ -1,0 +1,29 @@
+services:
+
+  vault:
+    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/vault:{{ ENV.VAULT.VERSION }}"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "{{ ENV.LOGGING_MAX_FILE }}"
+        max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
+    ports:
+      - "{{ ENV.VAULT.PORT.EXTERNAL }}:{{ ENV.VAULT.PORT.INTERNAL }}"
+    networks:
+      default:
+        aliases:
+          - vault
+    extra_hosts:
+      - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
+    volumes:
+      - vault_config_root:/vault/config/root
+      - vault_data:/vault/file
+    cap_add:
+      - IPC_LOCK
+    healthcheck:
+      test: export VAULT_ADDR=http://127.0.0.1:8200 && vault status
+
+volumes:
+  vault_data:
+  vault_config_root:

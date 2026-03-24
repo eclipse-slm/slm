@@ -1,0 +1,18 @@
+### Inputs
+- name: "Assert inputs of 'rabbitmq/client | add_exchange.yml'"
+  assert:
+    that:
+      - (_exchange_name is defined) and (_exchange_name|length > 0)     # Name of the exchange to be created
+
+- name: "RabbitMQ | Client | Add exchange '{{ _exchange_name }}' using the RabbitMQ Management API"
+  community.rabbitmq.rabbitmq_exchange:
+    login_protocol: "{{ ENV.RABBITMQ.SCHEME.INTERNAL }}"
+    login_host: "{{ ENV.RABBITMQ.HOST.INTERNAL }}"
+    login_port: "{{ ENV.RABBITMQ.MANAGEMENT_PORT.INTERNAL }}"
+    login_user: "{{ app_configs.rabbitmq.users.admin.username }}"
+    login_password: "{{ app_configs.rabbitmq.users.admin.password }}"
+    name: "{{ _exchange_name }}"
+    exchange_type: "topic"
+    durable: "true"
+    internal: "false"
+    state: "present"

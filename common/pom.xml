@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse.slm</groupId>
     <artifactId>common</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
@@ -16,13 +15,21 @@
     </parent>
 
     <modules>
+        <module>common.aas</module>
         <module>common.awx</module>
         <module>common.utils</module>
         <module>common.consul</module>
+        <module>common.database</module>
         <module>common.parent</module>
         <module>common.vault</module>
         <module>common.keycloak</module>
         <module>common.model</module>
+        <module>common.minio</module>
+        <module>common.messaging</module>
+        <module>common.driver</module>
+        <module>common.credentials</module>
+        <module>common.restclient</module>
+        <module>common.restserver</module>
     </modules>
 
 </project>

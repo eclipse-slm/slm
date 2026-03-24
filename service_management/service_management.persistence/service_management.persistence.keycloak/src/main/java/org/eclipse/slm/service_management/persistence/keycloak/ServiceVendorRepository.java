@@ -1,17 +1,18 @@
 package org.eclipse.slm.service_management.persistence.keycloak;
 
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakGroupNotFoundException;
-import org.eclipse.slm.common.keycloak.config.KeycloakUtil;
+import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakUserNotFoundException;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
+import org.eclipse.slm.service_management.model.exceptions.ServiceVendorRuntimeException;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendor;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendorDeveloper;
 import org.eclipse.slm.service_management.model.vendors.exceptions.ServiceVendorNotFoundException;
 import org.eclipse.slm.service_management.persistence.api.ServiceVendorJpaRepository;
-import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -19,21 +20,21 @@ import java.util.*;
 @Component
 public class ServiceVendorRepository {
 
-    public final static Logger LOG = LoggerFactory.getLogger(ServiceVendorRepository.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ServiceVendorRepository.class);
 
     private final ServiceVendorJpaRepository serviceVendorJpaRepository;
 
-    private final KeycloakUtil keycloakUtil;
+    private final KeycloakAdminClient keycloakAdminClient;
 
     @Autowired
     public ServiceVendorRepository(ServiceVendorJpaRepository serviceVendorJpaRepository,
-                                   KeycloakUtil keycloakUtil) {
+                                   KeycloakAdminClient keycloakAdminClient) {
         this.serviceVendorJpaRepository = serviceVendorJpaRepository;
-        this.keycloakUtil = keycloakUtil;
+        this.keycloakAdminClient = keycloakAdminClient;
     }
 
     public List<ServiceVendor> getServiceVendors() {
-        var serviceVendors = serviceVendorJpaRepository.findAll();;
+        var serviceVendors = serviceVendorJpaRepository.findAll();
         return serviceVendors;
     }
 
@@ -55,7 +56,7 @@ public class ServiceVendorRepository {
     private ServiceVendor createServiceVendor(ServiceVendor serviceVendor, String keycloakRealm) {
         var keycloakGroupName = serviceVendor.getKeycloakGroupName();
         var groupAttributes = new HashMap<String, List<String>>();
-        this.keycloakUtil.createGroup(
+        this.keycloakAdminClient.createGroup(
                 keycloakRealm,
                 keycloakGroupName,
                 groupAttributes);
@@ -83,7 +84,7 @@ public class ServiceVendorRepository {
     }
 
     public void deleteServiceVendorById(UUID serviceVendorId, String keycloakRealm)
-            throws ServiceVendorNotFoundException, KeycloakGroupNotFoundException {
+            throws ServiceVendorNotFoundException, ServiceVendorRuntimeException {
         var serviceVendorOptional = this.serviceVendorJpaRepository.findById(serviceVendorId);
         if (serviceVendorOptional.isEmpty()) {
             throw new ServiceVendorNotFoundException(serviceVendorId);
@@ -91,9 +92,11 @@ public class ServiceVendorRepository {
         else {
             var serviceVendor = serviceVendorOptional.get();
             this.serviceVendorJpaRepository.delete(serviceVendor);
-            this.keycloakUtil.deleteGroup(
-                    keycloakRealm,
-                    serviceVendor.getKeycloakGroupName());
+            try {
+                this.keycloakAdminClient.deleteGroup(serviceVendor.getKeycloakGroupName());
+            } catch (Exception ex) {
+                throw new ServiceVendorRuntimeException("Failed to delete service vendor with id '" + serviceVendorId + "'.", ex);
+            }
         }
     }
 
@@ -101,7 +104,7 @@ public class ServiceVendorRepository {
             throws KeycloakGroupNotFoundException, ServiceVendorNotFoundException {
         var serviceVendorOptional = this.serviceVendorJpaRepository.findById(serviceVendorId);
         if (serviceVendorOptional.isPresent()) {
-            var usersOfServiceVendorKeycloakGroup = this.keycloakUtil.getUsersOfGroup(
+            var usersOfServiceVendorKeycloakGroup = this.keycloakAdminClient.getUsersOfGroup(
                     keycloakRealm,
                     serviceVendorOptional.get().getKeycloakGroupName());
 
@@ -128,7 +131,7 @@ public class ServiceVendorRepository {
             throws KeycloakUserNotFoundException, KeycloakGroupNotFoundException, ServiceVendorNotFoundException {
         var serviceVendorOptional = this.serviceVendorJpaRepository.findById(serviceVendorId);
         if (serviceVendorOptional.isPresent()) {
-            this.keycloakUtil.assignUserToGroup(
+            this.keycloakAdminClient.assignUserToGroup(
                     keycloakRealm,
                     serviceVendorOptional.get().getKeycloakGroupName(),
                     userId);
@@ -142,7 +145,7 @@ public class ServiceVendorRepository {
             throws ServiceVendorNotFoundException, KeycloakUserNotFoundException, KeycloakGroupNotFoundException {
         var serviceVendorOptional = this.serviceVendorJpaRepository.findById(serviceVendorId);
         if (serviceVendorOptional.isPresent()) {
-            this.keycloakUtil.removeUserFromGroup(
+            this.keycloakAdminClient.removeUserFromGroup(
                     keycloakRealm,
                     serviceVendorOptional.get().getKeycloakGroupName(),
                     userId);
@@ -151,20 +154,26 @@ public class ServiceVendorRepository {
         }
     }
 
-    public List<UUID> getServiceVendorsOfDeveloper(KeycloakPrincipal keycloakPrincipal) {
-        var token = keycloakPrincipal.getKeycloakSecurityContext().getToken();
-        var otherClaims = token.getOtherClaims();
+    public List<UUID> getServiceVendorsOfDeveloper(JwtAuthenticationToken jwtAuthenticationToken) {
+        var token = jwtAuthenticationToken.getToken();
+        var otherClaims = token.getClaims();
+        var vendorKey = "/vendor_";
 
         var serviceVendorIds = new ArrayList<UUID>();
         if (otherClaims.containsKey("groups")) {
-            var userGroups = (ArrayList) otherClaims.get("groups");
-            for (var userGroup : userGroups) {
-                if (userGroup.toString().startsWith("vendor_")) {
-                    var serviceVendorId = UUID.fromString(userGroup.toString().replace("vendor_", ""));
+            var userGroups = otherClaims.get("groups");
+            List<String> userGroupsCasted;
+            if (userGroups instanceof String[]) {
+                userGroupsCasted = List.of((String[])userGroups);
+            } else {
+                userGroupsCasted = (ArrayList<String>)userGroups;
+            }
+            for (var userGroup : userGroupsCasted) {
+                if (userGroup.startsWith(vendorKey)) {
+                    var serviceVendorId = UUID.fromString(userGroup.toString().replace(vendorKey, ""));
                     serviceVendorIds.add(serviceVendorId);
                 }
             }
-
         }
 
         return serviceVendorIds;

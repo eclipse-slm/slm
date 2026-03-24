@@ -14,4 +14,6 @@ data class JobTemplateDTOApiCreate(
 
 ) {
     var ask_variables_on_launch: Boolean = true
+
+    var allow_simultaneous: Boolean = true
 }

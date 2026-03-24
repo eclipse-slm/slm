@@ -6,7 +6,7 @@
       "actionClass": "AwxAction",
       "actionType": "RUN",
       "awxRepo": "https://github.com/eclipse-slm/slm-pr-ansible-facts",
-      "awxBranch": "1.0.0",
+      "awxBranch": "1.1.0",
       "playbook": "run.yml"
     }
   },

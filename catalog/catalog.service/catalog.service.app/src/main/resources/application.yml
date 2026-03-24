@@ -4,11 +4,21 @@ application:
   version: "^project.version^"
   timestamp: "^timestamp^"
 
+### Deployment
+deployment:
+  scheme: "https"
+  hostname: "localhost"
+  port: 443
+  path: "/catalog-service"
+  url: ${deployment.scheme}://${deployment.hostname}:${deployment.port}${deployment.path}
+
 ### Server / API
 server:
   port: 10000
   error:
     include-message: always
+  servlet:
+    context-path: ${deployment.path}
 
 open-api:
   title: Service Lifecycle Management Catalog
@@ -36,22 +46,42 @@ database:
 ### Spring
 spring:
   application:
-    name: slm_catalog
-  main:
-    allow-bean-definition-overriding: true
+    name: catalog_service
+  # Disable spring.config by comment when using "dev" profile, otherwise the application will fail to start because of missing consul configuration
+  config:
+    import: "consul:"
   cloud:
     consul:
       host: ${consul.host}
       port: ${consul.port}
       discovery:
-        ip-address: "172.17.0.1"
+        enabled: true
+        hostname: ${consul.service.address}
+        port: ${consul.service.port}
         acl-token: ${consul.acl-token}
-        prefer-ip-address: true
         register-health-check: true
+        healthCheckPath: ${deployment.path}/actuator/health
+        tags:
+          - slm
+          - backend
+          - ${spring.application.name}
+          - exposed
+        service-name: ${spring.application.name}
+        instance-id: ${consul.service.name}
+        metadata:
+          version: ${application.version}
+      config:
+        enabled: true
+        fail-fast: true
+        profileSeparator: '::'
+        format: YAML
+        acl-token: ${consul.acl-token}
   jpa:
     properties:
       hibernate:
         enable_lazy_load_no_trans: true
+        type:
+          preferred_uuid_jdbc_type: CHAR
     hibernate:
       ddl-auto: update
   datasource:
@@ -72,8 +102,12 @@ management:
 
 ### Consul
 consul:
+  service:
+    name: catalog-service
+    address: host.docker.internal
+    port: ${server.port}
   scheme: http
-  host: localhost
+  host: consul
   port: 8500
   datacenter: fabos
-  acl-token: myroot
+  acl-token: your-consul-acl-token

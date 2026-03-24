@@ -1,4 +1,4 @@
-FROM openjdk:18.0.2.1-jdk-slim-buster
+FROM eclipse-temurin:21-jdk-noble
 
 ENV RESOURCEMANAGEMENT_URL="http://resource-management:9010" \
     RESOURCEMANAGEMENT_INITDIRECTORIES="/init/" \
@@ -16,10 +16,13 @@ RUN apt update && \
     apt install -y curl jq
 
 COPY target/*-exec.jar /app/app.jar
-COPY src/main/resources/init/capabilities.json /init/capabilities.json
-COPY src/main/resources/init/profiler.json /init/profiler.json
+# common.sh is copied from common/common.parent/common.parent.service/src/docker/common.sh to target/copied-sources via maven resources plugin
+COPY target/copied-sources/common.sh /app/common.sh
 COPY src/main/docker/startup.sh /app/startup.sh
 RUN chmod +x /app/startup.sh
+
+COPY src/main/resources/init/capabilities.json /init/capabilities.json
+COPY src/main/resources/init/profiler.json /init/profiler.json
 
 WORKDIR /app
 

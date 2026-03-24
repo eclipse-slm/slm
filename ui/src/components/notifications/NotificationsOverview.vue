@@ -8,7 +8,7 @@
         >
           <v-row>
             <v-col
-              class="secondary text-h3 font-weight-light"
+              class="bg-secondary text-h3 font-weight-light"
             >
               Notifications
             </v-col>
@@ -26,40 +26,27 @@
             </span>
             <v-btn
               class="mr-2"
-              outlined
-              icon
-              :text="filterRead !== true"
+              variant="outlined"
               @click="filter(true)"
             >
-              <v-icon>
-                mdi-email-open
-              </v-icon>
+              <v-icon icon="mdi-email-open" />
             </v-btn>
-
             <v-btn
-              outlined
-              icon
-              :text="filterRead !== false"
+              variant="outlined"
+
               @click="filter(false)"
             >
-              <v-icon>
-                mdi-email
-              </v-icon>
+              <v-icon icon="mdi-email" />
             </v-btn>
           </v-col>
           <v-col class="text-right">
             <v-btn
               v-if="notifications_unread.length > 0"
-              text
-              outlined
-              @click="markAsRead"
+              variant="outlined"
+              prepend-icon="mdi-email-open-outline"
+              @click="notificationStore.markAllAsRead()"
             >
               Mark all
-              <v-icon
-                right
-              >
-                mdi-email-open-outline
-              </v-icon>
             </v-btn>
           </v-col>
         </v-row>
@@ -70,7 +57,6 @@
       <v-data-table
         id="notificationsTable"
         :sort-by.sync="sortBy"
-        :sort-desc.sync="sortDesc"
         :footer-props="{
           'items-per-page-options': [5, 10, 20, -1],
         }"
@@ -94,69 +80,74 @@
         <template
           #item.date="{item}"
         >
-          {{ getFormatedDate(item.date) }}
+          {{ getFormatedDate(item.timestamp) }}
+        </template>
+
+        <template
+          #item.text="{item}"
+        >
+          {{ getNotificationText(item) }}
         </template>
       </v-data-table>
     </base-material-card>
   </div>
 </template>
 
-<script>
-  import { mapActions, mapGetters } from 'vuex'
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useNotificationStore } from '@/stores/notificationStore'
+import NotificationTextGenerator from '@/utils/notificationTextGenerator'
 
-  export default {
-    name: 'NotificationsOverview',
-    components: {},
-    data: function () {
-      return {
-        sortBy: 'id',
-        sortDesc: true,
-        filterRead: null,
-      }
-    },
-    computed: {
-      ...mapGetters([
-        'notifications',
-        'notifications_unread',
-      ]),
-      DataTableHeaders () {
-        return [
-          {
-            value: 'read',
-            filter: value => {
-              if (this.filterRead === null) return true
-              return value === this.filterRead
-            },
-          },
-          { text: 'ID', value: 'id', sortable: true },
-          { text: 'Category', value: 'category', sortable: true },
-          { text: 'Date', value: 'date', sortable: true },
-          { text: 'Text', value: 'text', sortable: false },
-        ]
-      },
-    },
-    methods: {
-      ...mapActions(['markAsRead']),
-      getFormatedDate (time) {
-        const options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }
-        const location = 'de-DE'
+const { t } = useI18n()
+const notificationStore = useNotificationStore()
 
-        if (time !== null) {
-          return new Date(time).toLocaleDateString(location, options)
-        } else {
-          return ''
-        }
-      },
-      filter (value) {
-        if (this.filterRead === value) {
-          this.filterRead = null
-        } else {
-          this.filterRead = value
-        }
-      },
+const sortBy = ref(['id'])
+const sortDesc = ref(true)
+const filterRead = ref(null)
+
+const notifications = computed(() => notificationStore.notifications)
+const notifications_unread = computed(() => notificationStore.notifications_unread)
+
+const DataTableHeaders = computed(() => [
+  {
+    value: 'read',
+    filter: value => {
+      if (filterRead.value === null) return true
+      return value === filterRead.value
     },
+  },
+  { title: 'ID', value: 'id', sortable: true },
+  { title: 'Category', value: 'category', sortable: true },
+  { title: 'Sub Category', value: 'subCategory', sortable: true },
+  { title: 'Event Type', value: 'eventType', sortable: true },
+  { title: 'Date', value: 'timestamp', sortable: true },
+  { title: 'Text', value: 'text', sortable: false },
+])
+
+function getFormatedDate(time) {
+  const options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }
+  const location = 'de-DE'
+  if (time !== null) {
+    return new Date(time).toLocaleDateString(location, options)
+  } else {
+    return ''
   }
+}
 
+function getNotificationText(item) {
+  return NotificationTextGenerator.generateLocalizedText(item, t)
+}
+
+function filter(value) {
+  if (filterRead.value === value) {
+    filterRead.value = null
+  } else {
+    filterRead.value = value
+  }
+}
 </script>
 
-<style></style>
+<style>
+
+</style>

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.get;
-import static io.restassured.RestAssured.given;
 
 @DisplayName("Consul")
 public class ConsulTests {
@@ -17,6 +16,7 @@ public class ConsulTests {
         RestAssured.baseURI = TestConfig.CONSUL_BASE_URL;
         RestAssured.port = TestConfig.CONSUL_PORT;
         RestAssured.basePath = "";
+        RestAssured.useRelaxedHTTPSValidation();
     }
 
     @Test

@@ -1,0 +1,155 @@
+### Application
+application:
+  name: "^project.artifactId^"
+  version: "^project.version^"
+  timestamp: "^timestamp^"
+
+### Deployment
+deployment:
+  scheme: "http"
+  hostname: localhost
+  port: 9001
+  path: "/platform-management"
+  url: ${deployment.scheme}://${deployment.hostname}:${deployment.port}${deployment.path}
+
+### Server / API
+server:
+  port: 9001
+  error:
+    include-message: always
+  servlet:
+    context-path: ${deployment.path}
+  forward-headers-strategy: framework
+
+open-api:
+  title: Platform Management
+  description: REST API of Platform Management
+  version: "^project.version^"
+  contact:
+    name: Fraunhofer IPA
+    url: https://www.ipa.fraunhofer.de
+    email: matthias.schneider@ipa.fraunhofer.de
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+    oauth:
+      clientId: ui
+      clientSecret: unused-and-not-required
+
+### Database
+database:
+  host: 127.0.0.1
+  port: 3310
+  schema: resources
+  username: resource-management
+  password: password
+
+### Spring
+spring:
+  application:
+    name: platform_management
+  main:
+    allow-bean-definition-overriding: true
+  # Disable spring.config by comment when using "dev" profile, otherwise the application will fail to start because of missing consul configuration
+  config:
+    import: "consul:"
+  cloud:
+    consul:
+      host: ${consul.host}
+      port: ${consul.port}
+      discovery:
+        enabled: true
+        hostname: ${consul.service.address}
+        port: ${consul.service.port}
+        acl-token: ${consul.acl-token}
+        register-health-check: true
+        healthCheckPath: ${deployment.path}/actuator/health
+        tags:
+          - slm
+          - backend
+          - ${spring.application.name}
+          - exposed
+        service-name: ${consul.service.name}
+        instance-id: ${consul.service.name}
+        metadata:
+          version: ${application.version}
+      config:
+        enabled: true
+        fail-fast: true
+        profileSeparator: '::'
+        format: YAML
+        acl-token: ${consul.acl-token}
+  security:
+    user:
+      name: "user"
+      password: "password"
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        type:
+          preferred_uuid_jdbc_type: CHAR
+  datasource:
+    driver-class-name=org: 'mariadb.jdbc.Driver'
+    url: jdbc:mariadb://${database.host}:${database.port}/${database.schema}?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: ${database.username}
+    password: ${database.password}
+  sql:
+    init:
+      platform: mysql
+      mode: always
+
+management:
+  endpoints:
+    web.exposure.include: health,info
+  info:
+    git.enabled: false
+  health:
+    rabbit:
+      enabled: false
+
+### Security
+security:
+  auth-white-list: ""
+  origins: "*"
+  api-key-auth:
+    enabled: false
+    value: "your-secret-api-key"
+
+### Keycloak
+keycloak:
+  tenants:
+    config-path: consul:keycloak
+
+### Consul
+consul:
+  service:
+    name: platform-management
+    address: localhost
+    port: ${server.port}
+  scheme: http
+  host: consul
+  port: 8500
+  url: ${consul.scheme}://${consul.host}:${consul.port}
+  datacenter: fabos
+  acl-token: your-consul-acl-token
+
+### Vault
+vault:
+  scheme: http
+  host: consul
+  port: 8500
+  url: ${vault.scheme}://${vault.host}:${vault.port}
+  authentication: APPROLE
+  #  token: your-secret-token
+  app-role:
+    role-id: platform-management
+    secret-id: your-secret-id
+    app-role-path: approle
+
+platform-management:
+  consul-service-name: ${consul.service.name}

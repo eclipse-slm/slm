@@ -12,12 +12,13 @@
 
     <modules>
         <module>common</module>
+        <module>platform_management</module>
         <module>resource_management</module>
         <module>service_management</module>
         <module>ui</module>
         <module>notification_service</module>
+        <module>information_service</module>
         <module>catalog</module>
-        <module>coverage</module>
     </modules>
 
     <profiles>
@@ -30,73 +31,85 @@
     </profiles>
 
     <properties>
-        <revision>1.3.0-RELEASE</revision>
+        <revision>1.4.0-RELEASE</revision>
 
-        <java.version>18</java.version>
-        <kotlin.version>1.7.20</kotlin.version>
-        <jackson.version>2.13.2</jackson.version>
+        <java.version>21</java.version>
+        <kotlin.version>2.2.21</kotlin.version>
+        <jackson.version>2.17.2</jackson.version>
         <resource.delimiter>^</resource.delimiter>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <maven.plugin.surefire.version>3.1.2</maven.plugin.surefire.version>
-        <maven.plugin.failsafe.version>3.1.2</maven.plugin.failsafe.version>
-        <maven.plugin.dockerfile.version>1.4.10</maven.plugin.dockerfile.version>
-        <maven.plugin.swagger-codegen.version>3.0.24</maven.plugin.swagger-codegen.version>
-        <maven.plugin.spring.boot.version>${spring.boot.version}</maven.plugin.spring.boot.version>
-        <maven.plugin.apache.compiler.version>3.8.0</maven.plugin.apache.compiler.version>
-        <maven.plugin.apache.deploy.version>2.8.2</maven.plugin.apache.deploy.version>
-        <maven.plugin.apache.resources.version>3.2.0</maven.plugin.apache.resources.version>
-        <maven.plugin.codehaus.exec.version>1.2.1</maven.plugin.codehaus.exec.version>
-        <maven.plugin.jacoco.version>0.8.8</maven.plugin.jacoco.version>
-        <maven.plugin.openapi-generator.version>6.4.0</maven.plugin.openapi-generator.version>
 
-        <spring.version>5.3.23</spring.version>
-        <spring.boot.version>2.7.4</spring.boot.version>
-        <spring.security.version>5.7.3</spring.security.version>
-        <spring-cloud.version>2021.0.4</spring-cloud.version>
-        <spring-cloud-contract-wiremock.version>3.1.4</spring-cloud-contract-wiremock.version>
-        <springdoc.openapi.version>1.6.11</springdoc.openapi.version>
-        <swagger.version>1.6.7</swagger.version>
-        <keycloak.version>18.0.2</keycloak.version>
-        <migbase.version>2.2</migbase.version>
-        <joda-time.version>2.10.10</joda-time.version>
-        <mariadb.client.version>2.7.4</mariadb.client.version>
-        <model.mapper.version>2.4.5</model.mapper.version>
-        <github.docker.java.version>3.2.13</github.docker.java.version>
-        <apache.commons.version>3.12.0</apache.commons.version>
-        <apache.httpcomponents.version>4.5.12</apache.httpcomponents.version>
-        <netty.version>4.1.73.Final</netty.version>
-        <jgit.version>6.2.0.202206071550-r</jgit.version>
-        <basyx.version>1.3.1</basyx.version>
-
-        <junit.jupiter.version>5.9.3</junit.jupiter.version>
-        <junit.jupiter.platform.version>1.9.3</junit.jupiter.platform.version>
-        <testcontainers.version>1.17.3</testcontainers.version>
-        <rest-assured.version>5.3.1</rest-assured.version>
-        <assertj.version>3.23.1</assertj.version>
         <project.reporting.outputDirectory>${project.build}</project.reporting.outputDirectory>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <maven.plugin.surefire.version>3.5.4</maven.plugin.surefire.version>
+        <maven.plugin.surefire-report.version>3.5.4</maven.plugin.surefire-report.version>
+        <maven.plugin.failsafe.version>3.5.4</maven.plugin.failsafe.version>
+        <maven.plugin.docker.fabric8.version>0.48.1</maven.plugin.docker.fabric8.version>
+        <maven.plugin.swagger-codegen.version>3.0.24</maven.plugin.swagger-codegen.version>
+        <maven.plugin.spring.boot.version>${spring.boot.version}</maven.plugin.spring.boot.version>
+        <maven.plugin.apache.compiler.version>3.13.0</maven.plugin.apache.compiler.version>
+        <maven.plugin.apache.deploy.version>3.1.3</maven.plugin.apache.deploy.version>
+        <maven.plugin.apache.resources.version>3.2.0</maven.plugin.apache.resources.version>
+        <maven.plugin.codehaus.exec.version>3.5.0</maven.plugin.codehaus.exec.version>
+        <maven.plugin.jacoco.version>0.8.14</maven.plugin.jacoco.version>
+        <maven.plugin.coveralls.version>5.0.0</maven.plugin.coveralls.version>
+        <maven.plugin.openapi-generator.version>7.20.0</maven.plugin.openapi-generator.version>
+        <maven.plugin.deploy.version>3.1.3</maven.plugin.deploy.version>
+
+        <spring.boot.version>3.3.9</spring.boot.version>
+        <spring-cloud.version>2023.0.3</spring-cloud.version>
+        <spring-cloud-contract-wiremock.version>4.1.4</spring-cloud-contract-wiremock.version>
+        <spring.statemachine.version>4.0.0</spring.statemachine.version>
+        <springaddons-c4-soft.version>7.8.10</springaddons-c4-soft.version>
+        <springdoc.openapi.version>2.5.0</springdoc.openapi.version>
+        <swagger.version>2.2.22</swagger.version>
+        <keycloak.version>26.0.8</keycloak.version>
+        <migbase.version>2.2</migbase.version>
+        <joda-time.version>2.12.7</joda-time.version>
+        <mariadb.client.version>3.4.1</mariadb.client.version>
+        <model.mapper.version>3.2.6</model.mapper.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <github.docker.java.version>3.2.13</github.docker.java.version>
+        <apache.commons.version>3.12.0</apache.commons.version>
+        <apache.httpcomponents.version>4.5.14</apache.httpcomponents.version>
+        <apache.httpcomponents-client5.version>5.6</apache.httpcomponents-client5.version>
+        <apache.httpcomponents-client5.core.version>5.4.1</apache.httpcomponents-client5.core.version>
+        <netty.version>4.1.73.Final</netty.version>
+        <reactor.netty.version>1.0.15</reactor.netty.version>
+        <jgit.version>7.3.0.202506031305-r</jgit.version>
+        <basyx.version>2.0.0-milestone-07</basyx.version>
+        <aas.aas4j.version>1.0.2</aas.aas4j.version>
+        <minio.version>8.5.7</minio.version>
+        <commons.io.version>2.18.0</commons.io.version>
+        <hypersistence-utils-version>3.8.2</hypersistence-utils-version>
+        <uuid.generator.version>5.0.0</uuid.generator.version>
+        <resteasy.version>6.2.12.Final</resteasy.version>
+        <fastexcel.version>0.19.0</fastexcel.version>
+        <jakarta.ws.version>4.0.0</jakarta.ws.version>
+        <feign.version>13.8</feign.version>
+
+        <grpc.version>1.66.0</grpc.version>
+        <reactor-grpc.version>1.2.4</reactor-grpc.version>
+        <protobuf-java.version>3.25.4</protobuf-java.version>
+        <protobuf-maven-plugin.version>2.5.0</protobuf-maven-plugin.version>
+
+        <testcontainers.version>1.20.1</testcontainers.version>
+        <testcontainers.keycloak.version>4.0.1</testcontainers.keycloak.version>
+        <assertj.version>3.26.3</assertj.version>
+
+        
         <docker.image.registry>ghcr.io/eclipse-slm</docker.image.registry>
         <docker.image.skip>false</docker.image.skip>
 
-        <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
-        <jacoco.version>0.8.8</jacoco.version>
-        <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
+        <jacoco.version>0.8.14</jacoco.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- Spring Cloud !-->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <!-- Spring Boot -->
+            <!-- Spring -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -104,32 +117,20 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <!-- Kotlin !-->
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-stdlib</artifactId>
+                <artifactId>kotlin-bom</artifactId>
                 <version>${kotlin.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-stdlib-common</artifactId>
-                <version>${kotlin.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-stdlib-jdk8</artifactId>
-                <version>${kotlin.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-reflect</artifactId>
-                <version>${kotlin.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-test</artifactId>
-                <version>${kotlin.version}</version>
-                <scope>test</scope>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <!-- Jackson !-->
             <dependency>
@@ -142,19 +143,34 @@
                 <artifactId>jackson-module-kotlin</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
-            <!-- Keycloak !-->
             <dependency>
-                <groupId>org.keycloak.bom</groupId>
-                <artifactId>keycloak-adapter-bom</artifactId>
-                <version>${keycloak.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <!-- OpenAPI !-->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.openapi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
+            <!-- MariaDB !-->
+            <dependency>
+                <groupId>org.mariadb.jdbc</groupId>
+                <artifactId>mariadb-java-client</artifactId>
+                <version>${mariadb.client.version}</version>
             </dependency>
             <!-- Testing !-->
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>${junit.jupiter.version}</version>
+                <version>${junit-jupiter.version}</version>
+                <scope>test</scope>
                 <type>pom</type>
             </dependency>
             <dependency>
@@ -164,6 +180,77 @@
                 <classifier>runtime</classifier>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>mariadb</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- Utils !-->
+            <dependency>    <!-- Base64 encoding !-->
+                <groupId>com.brsanthu</groupId>
+                <artifactId>migbase64</artifactId>
+                <version>${migbase.version}</version>
+            </dependency>
+            <dependency>    <!-- Model mapping !-->
+                <groupId>org.modelmapper</groupId>
+                <artifactId>modelmapper</artifactId>
+                <version>${model.mapper.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
+            </dependency>
+            <dependency>    <!-- Model Mapping !-->
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+            <!-- HTTP !-->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${apache.commons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${apache.httpcomponents.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5</artifactId>
+                <version>${apache.httpcomponents-client5.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5</artifactId>
+                <version>${apache.httpcomponents-client5.core.version}</version>
+            </dependency>
+            <!-- AAS !-->
+            <dependency>
+                <groupId>org.eclipse.digitaltwin.aas4j</groupId>
+                <artifactId>aas4j-model</artifactId>
+                <version>${aas.aas4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.digitaltwin.aas4j</groupId>
+                <artifactId>aas4j-dataformat-aasx</artifactId>
+                <version>${aas.aas4j.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -172,6 +259,12 @@
             <groupId>com.esotericsoftware.yamlbeans</groupId>
             <artifactId>yamlbeans</artifactId>
             <version>1.15</version>
+        </dependency>
+        <!-- UUID !-->
+        <dependency>
+            <groupId>com.fasterxml.uuid</groupId>
+            <artifactId>java-uuid-generator</artifactId>
+            <version>${uuid.generator.version}</version>
         </dependency>
         <!-- Serialization !-->
         <dependency>
@@ -204,10 +297,12 @@
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-suite-engine</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-commons</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -217,18 +312,13 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
+            <version>5.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
             <version>1.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.openpojo</groupId>
-            <artifactId>openpojo</artifactId>
-            <version>${maven.plugin.jacoco.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -281,12 +371,6 @@
 
         <pluginManagement>
             <plugins>
-                <!-- Testing !-->
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${maven.plugin.jacoco.version}</version>
-                </plugin>
                 <!-- Spring Boot !-->
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
@@ -304,14 +388,21 @@
                         </execution>
                     </executions>
                 </plugin>
+                <!-- Deploy !-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${maven.plugin.apache.deploy.version}</version>
+                </plugin>
                 <!-- Docker Image !-->
                 <plugin>
-                    <groupId>com.spotify</groupId>
-                    <artifactId>dockerfile-maven-plugin</artifactId>
-                    <version>${maven.plugin.dockerfile.version}</version>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>${maven.plugin.docker.fabric8.version}</version>
                     <executions>
                         <execution>
                             <id>build-image</id>
+                            <phase>package</phase>
                             <goals>
                                 <goal>build</goal>
                             </goals>
@@ -325,43 +416,69 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
-                        <repository>${docker.image.registry}/${docker.image.name}</repository>
-                        <tag>${project.version}</tag>
-                        <dockerfile>Dockerfile</dockerfile>
-                        <contextDirectory>.</contextDirectory>
-                        <skipDockerInfo>true</skipDockerInfo>
                         <skip>${docker.image.skip}</skip>
+                        <images>
+                            <image>
+                                <name>${docker.image.registry}/${docker.image.name}</name>
+                                <build>
+                                    <dockerFile>${docker.dockerfile.path}</dockerFile>
+                                    <contextDir>${project.basedir}</contextDir>
+                                    <tags>
+                                        <tag>${project.version}</tag>
+                                    </tags>
+                                </build>
+                            </image>
+                        </images>
                     </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>javax.activation</groupId>
-                            <artifactId>javax.activation-api</artifactId>
-                            <version>1.2.0</version>
-                        </dependency>
-                    </dependencies>
+                </plugin>
+                <!-- Resources !-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven.plugin.apache.resources.version}</version>
+                    <configuration>
+                        <delimiters>
+                            <delimiter>${resource.delimiter}</delimiter>
+                        </delimiters>
+                        <useDefaultDelimiters>false</useDefaultDelimiters>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>copy-common-sh</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.basedir}/target/copied-sources</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${project.basedir}/../../../common/common.parent/common.parent.service/src/docker</directory>
+                                        <includes>
+                                            <include>common.sh</include>
+                                            <include>startup.sh</include>
+                                            <include>Dockerfile</include>
+                                        </includes>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <!-- Code Coverage | Jacoco !-->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${maven.plugin.jacoco.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
 
         <plugins>
-            <!-- Resources !-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>${maven.plugin.apache.resources.version}</version>
-                <configuration>
-                    <delimiters>
-                        <delimiter>${resource.delimiter}</delimiter>
-                    </delimiters>
-                    <useDefaultDelimiters>false</useDefaultDelimiters>
-                </configuration>
-            </plugin>
             <!-- Deployment !-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>${maven.plugin.apache.deploy.version}</version>
                 <configuration>
                     <skip>true</skip>
                 </configuration>
@@ -373,14 +490,20 @@
                 <version>${maven.plugin.surefire.version}</version>
                 <configuration>
                     <argLine>${surefireArgLine}</argLine>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <reportsDirectory>${project.build.directory}/test-reports</reportsDirectory>
+                    <systemPropertyVariables>
+                        <api.version>1.44</api.version> <!-- Fix for https://github.com/testcontainers/testcontainers-java/issues/11212 !-->
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven.plugin.failsafe.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <api.version>1.44</api.version> <!-- Fix for https://github.com/testcontainers/testcontainers-java/issues/11212 !-->
+                    </systemPropertyVariables>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -392,23 +515,39 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <!-- Reports | Maven Surefire !-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>${maven.plugin.surefire-report.version}</version>
                 <configuration>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <reportsDirectory>${project.build.directory}/test-reports</reportsDirectory>
+                    <aggregate>true</aggregate>
+                    <reportsDirectories>
+                        <reportsDirectory>${project.build.directory}/test-reports</reportsDirectory>
+                    </reportsDirectories>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>surefire-report</id>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>report-only</goal>
+                            <goal>failsafe-report-only</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.12.1</version>
             </plugin>
-            <!-- to generate code coverage -->
+            <!-- Code Coverage | Generate using Jacoco -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco-maven-plugin.version}</version>
                 <executions>
-                    <!-- set arg line property for surefire -->
                     <execution>
                         <id>prepare-agent</id>
                         <goals>
@@ -416,9 +555,11 @@
                         </goals>
                         <configuration>
                             <propertyName>surefireArgLine</propertyName>
+                            <excludes>
+                                <exclude>**/generated-sources/**</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
-                    <!-- set arg line property for failsafe -->
                     <execution>
                         <id>prepare-agent-integration</id>
                         <goals>
@@ -426,27 +567,47 @@
                         </goals>
                         <configuration>
                             <propertyName>failsafeArgLine</propertyName>
+                            <excludes>
+                                <exclude>**/generated-sources/**</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-            <!-- to push to coveralls -->
+            <!-- Code Coverage | Jacoco Report Aggregation !-->
             <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <version>4.3.0</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>javax.xml.bind</groupId>
-                        <artifactId>jaxb-api</artifactId>
-                        <version>2.3.1</version>
-                    </dependency>
-                </dependencies>
+                <groupId>io.github.olamy.maven.plugins</groupId>
+                <artifactId>jacoco-aggregator-maven-plugin</artifactId>
+                <version>1.0.4</version>
                 <configuration>
-                    <jacocoReports>coverage/target/site/jacoco-aggregate-ut/jacoco.xml</jacocoReports>
+                    <excludes>
+                        <exclude>siemens/**</exclude>       <!-- Exclude code generated from protobuf files in common.driver from coverage report -->
+                        <exclude>factory_x/**</exclude>     <!-- Exclude code generated from protobuf files in common.driver  from coverage report -->
+                        <exclude>**/*MapperImpl*</exclude>  <!-- Exclude generated mapper implementations of MapStruct !-->
+                        <exclude>org/eclipse/slm/service_management/service/client/**</exclude> <!-- Exclude auto-generated client code -->
+                        <exclude>org/eclipse/slm/service_management/model/**</exclude>          <!-- Exclude auto-generated client code -->
+                    </excludes>
                 </configuration>
             </plugin>
-            <!-- Compilation: Kotlin !-->
+            <!-- Code Coverage | Push to coveralls -->
+            <plugin>
+                <groupId>com.github.hazendaz.maven</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>${maven.plugin.coveralls.version}</version>
+                <configuration>
+                    <jacocoReports>
+                        <jacocoReport>${project.build.directory}/site/jacoco-aggregate/jacoco.xml</jacocoReport>
+                    </jacocoReports>
+                    <scanForSources>true</scanForSources>
+                    <sourceDirectories>
+                        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+                        <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+                        <sourceDirectory>${project.basedir}/src/target/generated-sources</sourceDirectory>
+                        <sourceDirectory>**/kotlin/*</sourceDirectory>
+                    </sourceDirectories>
+                </configuration>
+            </plugin>
+            <!-- Compilation | Kotlin !-->
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
@@ -483,15 +644,21 @@
                     <jvmTarget>${java.version}</jvmTarget>
                 </configuration>
             </plugin>
-            <!-- Compilation: Java !-->
+            <!-- Compilation | Java !-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.plugin.apache.compiler.version}</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>${java.version}</release>
                     <compilerArgument>-Xlint:unchecked</compilerArgument>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
                 <executions>
                     <!-- Replacing default-compile as it is treated specially by maven -->
@@ -548,55 +715,12 @@
         </plugins>
     </build>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.9</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>index</report>
-                            <report>summary</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.0.0-M9</version>
-                <configuration>
-                    <aggregate>true</aggregate>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jxr-plugin</artifactId>
-                <version>3.3.0</version>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco-maven-plugin.version}</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <!-- select non-aggregate reports -->
-                            <report>report-aggregate</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-        </plugins>
-    </reporting>
-
     <distributionManagement>
-        <site>
-            <id>cloud-edge-deployment</id>
-            <url>http://10.3.7.149/</url>
-        </site>
+        <repository>
+            <id>github-maven</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/eclipse-slm/slm</url>
+        </repository>
     </distributionManagement>
 
 </project>

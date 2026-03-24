@@ -13,7 +13,7 @@
       :dismissible="dismissible"
       :type="type"
       class="ma-0"
-      dark
+      theme="dark"
     >
       <slot />
     </base-material-alert>
