@@ -1,7 +1,7 @@
 # Release Process
 
 ## Capabilities & Profilers
-Ensure that all capabilities and profilers initialized via the [Resource Management Initializer](/resource_management/resource_management.service/resource_management.service.initializer/src/main/resources/init)
+Ensure that all capabilities and profilers initialized via the [Resource Management Initializer](/init)
 use tagged versions rather than branch names. This ensures that  the correct versions are used when creating releases and that changes made to the capabilities 
 and profilers after the release do not affect the released version.
 
