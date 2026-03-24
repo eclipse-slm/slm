@@ -8,6 +8,7 @@
 import VPNavBarMenuGroup from 'vitepress/dist/client/theme-default/components/VPNavBarMenuGroup.vue';
 import { onMounted, ref } from 'vue';
 
+const basePath = "/slm"
 const versionPathSegment = 'version'
 const selected = ref(extractVersionFromPath(window.location.pathname));
 const options = ref([]);
@@ -68,7 +69,7 @@ async function loadVersions() {
   const mappedOptions = (versionData?.tree ?? []).map((entry) => ({
     value: entry.path,
     text: entry.path,
-    link: `/${versionPathSegment}/${entry.path}/`
+    link: `${window.location.origin}${basePath}/${versionPathSegment}/${entry.path}/`
   }));
 
   mappedOptions.sort((left, right) => compareVersionStrings(left.text, right.text));
