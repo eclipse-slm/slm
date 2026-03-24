@@ -17,5 +17,5 @@ consul_kv:
   http.router.aas-ui.middlewares: aas-ui-add-trailing-slash
   http.router.aas-ui.rule: PathPrefix(`/aas/ui`)
   http.router.aas-ui.service: aas-ui
-  http.middlewares.aas-ui-add-trailing-slash.addSuffix.replacePath.path: "/aas/ui/"
+  http.middlewares.aas-ui-add-trailing-slash.replacePath.path: "/aas/ui/"
   http.services.aas-ui.loadBalancer.servers.0.url: "http://localhost/"
