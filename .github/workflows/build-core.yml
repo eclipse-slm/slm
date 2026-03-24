@@ -89,7 +89,7 @@ jobs:
 
   deploy-staging-environment:
     needs: build
-    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main'))
+    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main')
     runs-on: self-hosted
     env:
       STAGING_VM_IP: ${{ github.ref_name == 'develop' && '10.17.165.36' || '10.17.166.74' }}
