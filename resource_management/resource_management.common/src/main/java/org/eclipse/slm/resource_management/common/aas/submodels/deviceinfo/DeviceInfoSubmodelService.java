@@ -1,7 +1,7 @@
 package org.eclipse.slm.resource_management.common.aas.submodels.deviceinfo;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
-import org.eclipse.slm.common.aas.repositories.submodels.AbstractSubmodelService;
+import org.eclipse.slm.aas.repositories.submodels.AbstractSubmodelService;
 import org.eclipse.slm.common.keycloak.client.KeycloakServiceClient;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.common.aas.ResourceAas;

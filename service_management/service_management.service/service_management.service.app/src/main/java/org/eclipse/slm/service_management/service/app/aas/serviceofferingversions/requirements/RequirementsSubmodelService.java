@@ -1,8 +1,8 @@
 package org.eclipse.slm.service_management.service.app.aas.serviceofferingversions.requirements;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
-import org.eclipse.slm.common.aas.repositories.submodels.AbstractSubmodelService;
-import org.eclipse.slm.common.aas.repositories.exceptions.SubmodelNotFoundException;
+import org.eclipse.slm.aas.repositories.submodels.AbstractSubmodelService;
+import org.eclipse.slm.aas.repositories.exceptions.SubmodelNotFoundException;
 import org.eclipse.slm.service_management.persistence.api.ServiceOfferingJpaRepository;
 import org.eclipse.slm.service_management.persistence.api.ServiceOfferingVersionJpaRepository;
 

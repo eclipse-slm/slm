@@ -3,7 +3,7 @@ package org.eclipse.slm.service_management.service.initializer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.slm.common.aas.clients.base.FeignResponseException;
+import org.eclipse.slm.aas.clients.base.FeignResponseException;
 import org.eclipse.slm.common.utils.files.FilesUtil;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
 import org.eclipse.slm.service_management.model.vendors.ServiceVendor;

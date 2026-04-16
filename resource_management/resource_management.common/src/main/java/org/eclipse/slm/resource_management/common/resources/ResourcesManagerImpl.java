@@ -4,7 +4,7 @@ import org.eclipse.digitaltwin.aas4j.v3.model.DataTypeDefXsd;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangStringTextType;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultMultiLanguageProperty;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
-import org.eclipse.slm.common.aas.model.shellrepository.exceptions.ShellNotFoundException;
+import org.eclipse.slm.aas.model.shellrepository.exceptions.ShellNotFoundException;
 import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;
 import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClientFactory;
 import org.eclipse.slm.resource_management.common.adapters.ResourcesVaultClient;

@@ -1,7 +1,7 @@
 package org.eclipse.slm.resource_management.common.aas.submodels;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.eclipse.slm.common.aas.repositories.api.submodels.MultiSubmodelRepositoryHTTPApiController;
+import org.eclipse.slm.aas.repositories.api.submodels.MultiSubmodelRepositoryHTTPApiController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

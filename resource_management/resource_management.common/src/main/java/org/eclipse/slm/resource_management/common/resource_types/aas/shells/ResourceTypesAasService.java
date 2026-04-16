@@ -2,8 +2,8 @@ package org.eclipse.slm.resource_management.common.resource_types.aas.shells;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetInformation;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
-import org.eclipse.slm.common.aas.repositories.shells.AbstractAasService;
-import org.eclipse.slm.common.aas.repositories.submodels.SubmodelServiceFactory;
+import org.eclipse.slm.aas.repositories.shells.AbstractAasService;
+import org.eclipse.slm.aas.repositories.submodels.SubmodelServiceFactory;
 import org.eclipse.slm.resource_management.common.resource_types.aas.submodels.ResourceTypeSubmodelRepositoryFactory;
 import org.springframework.stereotype.Component;
 

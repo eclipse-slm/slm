@@ -1,10 +1,10 @@
 package org.eclipse.slm.resource_management.features.metrics;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.eclipse.slm.common.aas.clients.auth.JwtAuthenticationTokenAuthRequestInterceptor;
-import org.eclipse.slm.common.aas.clients.submodelregistry.SubmodelRegistryClient;
-import org.eclipse.slm.common.aas.clients.submodelregistry.SubmodelRegistryClientFactory;
-import org.eclipse.slm.common.aas.clients.submodelservice.SubmodelServiceClient;
+import org.eclipse.slm.aas.clients.auth.JwtAuthenticationTokenAuthRequestInterceptor;
+import org.eclipse.slm.aas.clients.submodelregistry.SubmodelRegistryClient;
+import org.eclipse.slm.aas.clients.submodelregistry.SubmodelRegistryClientFactory;
+import org.eclipse.slm.aas.clients.submodelservice.SubmodelServiceClient;
 import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

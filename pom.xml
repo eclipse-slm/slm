@@ -82,6 +82,7 @@
         <jgit.version>7.3.0.202506031305-r</jgit.version>
         <basyx.version>2.0.0-milestone-07</basyx.version>
         <aas.aas4j.version>1.0.2</aas.aas4j.version>
+        <aas.sdk.version>1.0.0-SNAPSHOT</aas.sdk.version>
         <minio.version>8.5.7</minio.version>
         <commons.io.version>2.18.0</commons.io.version>
         <hypersistence-utils-version>3.8.2</hypersistence-utils-version>
@@ -99,7 +100,6 @@
         <testcontainers.version>1.20.1</testcontainers.version>
         <testcontainers.keycloak.version>4.0.1</testcontainers.keycloak.version>
         <assertj.version>3.26.3</assertj.version>
-
         
         <docker.image.registry>ghcr.io/eclipse-slm</docker.image.registry>
         <docker.image.skip>false</docker.image.skip>
@@ -351,6 +351,11 @@
             <id>spring-milestones</id>
             <name>Spring Milestones</name>
             <url>https://repo.spring.io/milestone</url>
+        </repository>
+        <repository>
+            <id>central-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+            <snapshots><enabled>true</enabled></snapshots>
         </repository>
     </repositories>
 
@@ -714,13 +719,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <distributionManagement>
-        <repository>
-            <id>github-maven</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/eclipse-slm/slm</url>
-        </repository>
-    </distributionManagement>
 
 </project>

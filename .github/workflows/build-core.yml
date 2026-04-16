@@ -61,18 +61,6 @@ jobs:
               "password": "${{secrets.GITHUB_TOKEN}}"
             }
           ]'
-      - name: Delete old Mavenpackages
-        if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main')
-        uses: SmartsquareGmbH/delete-old-packages@v0.8.1
-        continue-on-error: true
-        with:
-          organization: eclipse-slm
-          type: maven
-          keep: 0
-          names: |
-            org.eclipse.slm.common.aas
-            org.eclipse.slm.common.aas.clients
-            org.eclipse.slm.common.aas.repositories
       - name: Detect semantic version tag on current commit
         id: tag_check
         shell: bash

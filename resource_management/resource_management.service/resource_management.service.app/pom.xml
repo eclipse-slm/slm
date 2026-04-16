@@ -83,8 +83,8 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>common.aas.clients</artifactId>
-            <version>${project.version}</version>
+            <artifactId>aas.clients</artifactId>
+            <version>${aas.sdk.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -124,8 +124,8 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>common.aas.repositories</artifactId>
-            <version>${project.version}</version>
+            <artifactId>aas.repositories</artifactId>
+            <version>${aas.sdk.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

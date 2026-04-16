@@ -2,7 +2,7 @@ package org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplat
 
 import org.eclipse.digitaltwin.aas4j.v3.model.*;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.*;
-import org.eclipse.slm.common.aas.repositories.submodels.SubmodelUtils;
+import org.eclipse.slm.aas.repositories.submodels.SubmodelUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;

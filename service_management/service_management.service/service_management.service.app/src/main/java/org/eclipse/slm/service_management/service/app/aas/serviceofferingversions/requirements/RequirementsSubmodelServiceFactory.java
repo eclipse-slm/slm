@@ -1,7 +1,7 @@
 package org.eclipse.slm.service_management.service.app.aas.serviceofferingversions.requirements;
 
 import org.eclipse.digitaltwin.basyx.submodelservice.SubmodelService;
-import org.eclipse.slm.common.aas.repositories.submodels.SubmodelServiceFactory;
+import org.eclipse.slm.aas.repositories.submodels.SubmodelServiceFactory;
 import org.eclipse.slm.service_management.persistence.api.ServiceOfferingJpaRepository;
 import org.eclipse.slm.service_management.persistence.api.ServiceOfferingVersionJpaRepository;
 import org.springframework.stereotype.Component;

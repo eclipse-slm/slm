@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 
 @SpringBootApplication( scanBasePackages = {
         "org.eclipse.slm.information_service",
-        "org.eclipse.slm.common.aas",
+        "org.eclipse.slm.aas",
         "org.eclipse.slm.common.messaging"
     },
         exclude = {
