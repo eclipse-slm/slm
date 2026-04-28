@@ -1,6 +1,6 @@
 services:
   monitoring-prometheus-aas:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm-monitoring-prometheus-aas:{{ ENV.MONITORING.PROMETHEUS_AAS.VERSION }}"
+    image: "{{ ENV.MONITORING.PROMETHEUS_AAS.IMAGE }}"
     restart: unless-stopped
     networks:
       default:
@@ -18,7 +18,7 @@ services:
       CONSUL_SERVICE_PORT: "{{ ENV.MONITORING.PROMETHEUS_AAS.PORT.INTERNAL }}"
 
   prometheus:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/monitoring-prometheus:{{ ENV.MONITORING.PROMETHEUS.VERSION }}"
+    image: "{{ ENV.MONITORING.PROMETHEUS.IMAGE }}"
     restart: unless-stopped
     environment:
       CONSUL_URL: "{{ consul.url.internal }}"

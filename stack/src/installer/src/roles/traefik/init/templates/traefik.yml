@@ -1,7 +1,7 @@
 services:
 
   traefik:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/traefik:v3.3.4"
+    image: "{{ ENV.TRAEFIK.IMAGE }}"
     restart: unless-stopped
     command:
       - "--api.insecure=true"

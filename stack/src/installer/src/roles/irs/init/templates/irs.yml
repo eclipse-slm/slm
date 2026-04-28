@@ -1,6 +1,6 @@
 services:
   irs-poller:
-    image: {{ ENV.DOCKER_IMAGE_REGISTRY }}/information-receiving-service/poller:{{ ENV.IRS.VERSION }}
+    image: "{{ ENV.IRS.POLLER_IMAGE }}"
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -18,7 +18,7 @@ services:
     memswap_limit: 1g
 
   irs-api:
-    image: {{ ENV.DOCKER_IMAGE_REGISTRY }}/information-receiving-service/api:{{ ENV.IRS.VERSION }}
+    image: "{{ ENV.IRS.API_IMAGE }}"
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -43,7 +43,7 @@ services:
     memswap_limit: 1g
 
   irs-gc:
-    image: {{ ENV.DOCKER_IMAGE_REGISTRY }}/information-receiving-service/gc:{{ ENV.IRS.VERSION }}
+    image: "{{ ENV.IRS.GC_IMAGE }}"
     restart: unless-stopped
     logging:
       driver: "json-file"

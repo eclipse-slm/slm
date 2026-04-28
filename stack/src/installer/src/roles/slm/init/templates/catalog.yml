@@ -1,7 +1,8 @@
 services:
 
+{% if ENV.SLM_CATALOG_SERVICE.ENABLED | default(true) %}
   catalog:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm/catalog:{{ ENV.SLM_CATALOG_SERVICE.VERSION }}"
+    image: "{{ ENV.SLM_CATALOG_SERVICE.IMAGE }}"
     restart: unless-stopped
     depends_on:
       - catalog-database
@@ -19,6 +20,9 @@ services:
       CONSUL_ACLTOKEN: "{{ app_configs['catalog_service']['consul']['acl-token'] }}"
       CONSUL_SERVICE_ADDRESS: "{{ ENV.SLM_CATALOG_SERVICE.HOST.INTERNAL }}"
       CONSUL_SERVICE_PORT: "{{ ENV.SLM_CATALOG_SERVICE.PORT.INTERNAL }}"
+{% for key, value in (ENV.SLM_CATALOG_SERVICE.ADDITIONAL_ENVIRONMENT | default({})).items() %}
+      {{ key }}: "{{ value }}"
+{% endfor %}
     ports:
       - "{{ ENV.SLM_CATALOG_SERVICE.PORT.EXTERNAL }}:{{ ENV.SLM_CATALOG_SERVICE.PORT.INTERNAL }}"
     networks:
@@ -31,7 +35,7 @@ services:
       test: [ "CMD", "curl", "http://localhost:10000/swagger-ui/index.html" ]
 
   catalog-database:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/mariadb:{{ ENV.SLM_CATALOG_SERVICE.DATABASE.VERSION }}"
+    image: "{{ ENV.SLM_CATALOG_SERVICE.DATABASE.IMAGE }}"
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -53,6 +57,7 @@ services:
       - catalog-database_data:/var/lib/mysql
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+{% endif %}
 
 volumes:
   catalog-database_data:

@@ -1,7 +1,8 @@
 services:
 
+{% if ENV.UI.ENABLED | default(true) %}
   ui:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm/ui:{{ ENV.SLM_VERSION }}"
+    image: "{{ ENV.UI.IMAGE }}"
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -26,9 +27,14 @@ services:
       RESOURCE_MANAGEMENT_URL: "{{ resource_management.url.proxy }}"
       SERVICE_MANAGEMENT_URL: "{{ service_management.url.proxy }}"
       CATALOG_SERVICE_URL: "{{ catalog_service.url.proxy }}"
+{% for key, value in (ENV.UI.ADDITIONAL_ENVIRONMENT | default({})).items() %}
+      {{ key }}: "{{ value }}"
+{% endfor %}
+{% endif %}
 
+{% if ENV.RESOURCE_MANAGEMENT.ENABLED | default(true) %}
   resource-management:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm/resource-management:{{ ENV.SLM_VERSION }}"
+    image: "{{ ENV.RESOURCE_MANAGEMENT.IMAGE }}"
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -49,6 +55,9 @@ services:
       AAS_SUBMODELREPOSITORY_URL: "{{ aas.submodel_repository.url.internal }}"
       AAS_CONCEPTDESCRIPTIONSREPOSITORY_URL: "{{ aas.concept_description_repository.url.internal }}"
       MONITORING_SERVICE_URL: "{{ monitoring_service.url.proxy }}"
+{% for key, value in (ENV.RESOURCE_MANAGEMENT.ADDITIONAL_ENVIRONMENT | default({})).items() %}
+      {{ key }}: "{{ value }}"
+{% endfor %}
     ports:
       - "{{ ENV.RESOURCE_MANAGEMENT.PORT.EXTERNAL }}:{{ ENV.RESOURCE_MANAGEMENT.PORT.INTERNAL }}"
     networks:
@@ -59,7 +68,9 @@ services:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:9010/swagger-ui/index.html" ]
+{% endif %}
 
+{% if ENV.RESOURCE_MANAGEMENT.ENABLED | default(true) %}
   resource-management-database:
     image: "mariadb:{{ ENV.RESOURCE_MANAGEMENT.DATABASE.VERSION }}"
     restart: unless-stopped
@@ -83,9 +94,11 @@ services:
       - resource-management-database_data:/var/lib/mysql
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+{% endif %}
 
+{% if (ENV.RESOURCE_MANAGEMENT.ENABLED | default(true)) and (ENV.RESOURCE_MANAGEMENT.INIT.ENABLED | default(true)) %}
   resource-management-init:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm/resource-management-init:{{ ENV.SLM_VERSION }}"
+    image: "{{ ENV.RESOURCE_MANAGEMENT.INIT.IMAGE }}"
     restart: "no"
     depends_on:
       - resource-management
@@ -101,11 +114,16 @@ services:
       CONSUL_HOST: "{{ app_configs['resource_management']['consul']['host'] }}"
       CONSUL_PORT: "{{ app_configs['resource_management']['consul']['port'] }}"
       CONSUL_ACLTOKEN: "{{ app_configs['resource_management']['consul']['acl-token'] }}"
+{% for key, value in (ENV.RESOURCE_MANAGEMENT.INIT.ADDITIONAL_ENVIRONMENT | default({})).items() %}
+      {{ key }}: "{{ value }}"
+{% endfor %}
     extra_hosts:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
+{% endif %}
 
+{% if ENV.SERVICE_MANAGEMENT.ENABLED | default(true) %}
   service-management:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm/service-management:{{ ENV.SLM_VERSION }}"
+    image: "{{ ENV.SERVICE_MANAGEMENT.IMAGE }}"
     restart: unless-stopped
     depends_on:
       - service-management-database
@@ -131,6 +149,9 @@ services:
       AAS_SUBMODELREPOSITORY_URL: "{{ aas.submodel_repository.url.internal }}"
       AAS_CONCEPTDESCRIPTIONSREPOSITORY_URL: "{{ aas.concept_description_repository.url.internal }}"
       SERVICEMANAGEMENT_URL: "{{ service_management.url.internal }}"
+{% for key, value in (ENV.SERVICE_MANAGEMENT.ADDITIONAL_ENVIRONMENT | default({})).items() %}
+      {{ key }}: "{{ value }}"
+{% endfor %}
     ports:
       - "{{ ENV.SERVICE_MANAGEMENT.PORT.EXTERNAL }}:{{ ENV.SERVICE_MANAGEMENT.PORT.INTERNAL }}"
     networks:
@@ -141,9 +162,11 @@ services:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:9020/swagger-ui/index.html" ]
+{% endif %}
 
+{% if (ENV.SERVICE_MANAGEMENT.ENABLED | default(true)) and (ENV.SERVICE_MANAGEMENT.INIT.ENABLED | default(true)) %}
   service-management-init:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm/service-management-init:{{ ENV.SLM_VERSION }}"
+    image: "{{ ENV.SERVICE_MANAGEMENT.INIT.IMAGE }}"
     restart: "no"
     logging:
       driver: "json-file"
@@ -161,7 +184,12 @@ services:
       CONSUL_HOST: "{{ app_configs['service_management']['consul']['host'] }}"
       CONSUL_PORT: "{{ app_configs['service_management']['consul']['port'] }}"
       CONSUL_ACLTOKEN: "{{ app_configs['service_management']['consul']['acl-token'] }}"
+{% for key, value in (ENV.SERVICE_MANAGEMENT.INIT.ADDITIONAL_ENVIRONMENT | default({})).items() %}
+      {{ key }}: "{{ value }}"
+{% endfor %}
+{% endif %}
 
+{% if ENV.SERVICE_MANAGEMENT.ENABLED | default(true) %}
   service-management-database:
     image: "mariadb:{{ ENV.SERVICE_MANAGEMENT.DATABASE.VERSION }}"
     restart: unless-stopped
@@ -185,9 +213,11 @@ services:
       - service-management-database_data:/var/lib/mysql
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+{% endif %}
 
+{% if ENV.NOTIFICATION_SERVICE.ENABLED | default(true) %}
   notification-service:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm/notification-service:{{ ENV.SLM_VERSION }}"
+    image: "{{ ENV.NOTIFICATION_SERVICE.IMAGE }}"
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -205,6 +235,9 @@ services:
       CONSUL_SERVICE_ADDRESS: "{{ ENV.NOTIFICATION_SERVICE.HOST.INTERNAL }}"
       CONSUL_SERVICE_PORT: "{{ ENV.NOTIFICATION_SERVICE.PORT.INTERNAL }}"
       KEYCLOAK_AUTHSERVERURL: "{{ keycloak.url.external }}"
+{% for key, value in (ENV.NOTIFICATION_SERVICE.ADDITIONAL_ENVIRONMENT | default({})).items() %}
+      {{ key }}: "{{ value }}"
+{% endfor %}
     networks:
       default:
         aliases:
@@ -213,7 +246,9 @@ services:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:9002/swagger-ui/index.html" ]
+{% endif %}
 
+{% if ENV.NOTIFICATION_SERVICE.ENABLED | default(true) %}
   notification-service-database:
     image: "mariadb:{{ ENV.NOTIFICATION_SERVICE.DATABASE.VERSION }}"
     restart: unless-stopped
@@ -237,9 +272,11 @@ services:
       - notification-service-database_data:/var/lib/mysql
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+{% endif %}
 
+{% if ENV.INFORMATION_SERVICE.ENABLED | default(true) %}
   information-service:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm/information-service:{{ ENV.SLM_VERSION }}"
+    image: "{{ ENV.INFORMATION_SERVICE.IMAGE }}"
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -264,6 +301,9 @@ services:
       IRS_URL_INTERNAL: "{{ irs.url.internal }}"
       IRS_URL_EXTERNAL: "{{ irs.url.proxy }}"
       KEYCLOAK_AUTHSERVERURL: "{{ keycloak.url.external }}"
+{% for key, value in (ENV.INFORMATION_SERVICE.ADDITIONAL_ENVIRONMENT | default({})).items() %}
+      {{ key }}: "{{ value }}"
+{% endfor %}
     networks:
       default:
         aliases:
@@ -272,6 +312,7 @@ services:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:9003/swagger-ui/index.html" ]
+{% endif %}
 
 volumes:
   notification-service-database_data:

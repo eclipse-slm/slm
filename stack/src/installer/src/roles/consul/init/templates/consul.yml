@@ -1,7 +1,7 @@
 services:
 
   consul:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/consul:{{ ENV.CONSUL.VERSION }}"
+    image: "{{ ENV.CONSUL.IMAGE }}"
     restart: unless-stopped
     command: "consul agent -server -bootstrap-expect 1 -ui -bind=0.0.0.0 -client=0.0.0.0 -advertise {{ ENV.SLM_IP }} -data-dir=/consul/data -config-dir=/consul/config"
     logging:

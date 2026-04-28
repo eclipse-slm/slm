@@ -1,6 +1,6 @@
 services:
   keycloak:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/keycloak:{{ ENV.KEYCLOAK.VERSION }}"
+    image: "{{ ENV.KEYCLOAK.IMAGE }}"
     restart: unless-stopped
     logging:
       driver: "json-file"

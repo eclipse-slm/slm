@@ -1,7 +1,7 @@
 services:
 
   awx:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/awx/awx-task:{{ ENV.AWX.VERSION }}"
+    image: "{{ ENV.AWX.TASK_IMAGE }}"
     user: "0"
     environment:
       OS: " Operating System: Docker Desktop"
@@ -45,7 +45,7 @@ services:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
 
   awx-jwt-authenticator:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/awx-jwt-authenticator:1.1.0-SNAPSHOT"
+    image: "{{ ENV.AWX.JWT_AUTHENTICATOR_IMAGE }}"
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -70,7 +70,7 @@ services:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
 
   awx-redis:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/awx/redis:{{ ENV.AWX.REDIS_VERSION }}"
+    image: "{{ ENV.AWX.REDIS_IMAGE }}"
     entrypoint: [ "redis-server" ]
     restart: unless-stopped
     logging:
@@ -107,7 +107,7 @@ services:
       - awx-redis:/var/run/redis/
 
   awx-postgres:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/awx/awx-postgres:{{ ENV.AWX.POSTGRES_VERSION }}"
+    image: "{{ ENV.AWX.POSTGRES_IMAGE }}"
     command: postgres -c log_destination=stderr -c log_min_messages=info -c log_min_duration_statement=1000 -c max_connections=1024
     restart: unless-stopped
     networks:

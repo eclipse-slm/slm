@@ -196,3 +196,4 @@
         src: "catalog.yml"
         dest: "{{ _store_compose_file }}_catalog"
       when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+  when: ENV.SLM_CATALOG_SERVICE.ENABLED | default(true)

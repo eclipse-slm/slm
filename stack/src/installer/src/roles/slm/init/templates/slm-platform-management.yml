@@ -1,7 +1,8 @@
 services:
 
+{% if ENV.PLATFORM_MANAGEMENT.ENABLED | default(true) %}
   platform-management:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/slm/platform-management:{{ ENV.SLM_VERSION }}"
+    image: "{{ ENV.PLATFORM_MANAGEMENT.IMAGE }}"
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -17,6 +18,9 @@ services:
       CONSUL_SERVICE_ADDRESS: "{{ ENV.PLATFORM_MANAGEMENT.HOST.INTERNAL }}"
       CONSUL_SERVICE_PORT: "{{ ENV.PLATFORM_MANAGEMENT.PORT.INTERNAL }}"
       MONITORING_SERVICE_URL: "{{ monitoring_service.url.proxy }}"
+{% for key, value in (ENV.PLATFORM_MANAGEMENT.ADDITIONAL_ENVIRONMENT | default({})).items() %}
+      {{ key }}: "{{ value }}"
+{% endfor %}
     ports:
       - "{{ ENV.PLATFORM_MANAGEMENT.PORT.EXTERNAL }}:{{ ENV.PLATFORM_MANAGEMENT.PORT.INTERNAL }}"
     networks:
@@ -27,7 +31,9 @@ services:
       - "{{ ENV.SLM_HOSTNAME }}:host-gateway"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:9001/swagger-ui/index.html" ]
+{% endif %}
 
+{% if ENV.PLATFORM_MANAGEMENT.ENABLED | default(true) %}
   platform-management-database:
     image: "mariadb:{{ ENV.RESOURCE_MANAGEMENT.DATABASE.VERSION }}"
     restart: unless-stopped
@@ -51,6 +57,7 @@ services:
       - platform-management-database_data:/var/lib/mysql
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "--silent" ]
+{% endif %}
 
 volumes:
   platform-management-database_data:

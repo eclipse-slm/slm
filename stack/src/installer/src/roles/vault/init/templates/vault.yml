@@ -1,7 +1,7 @@
 services:
 
   vault:
-    image: "{{ ENV.DOCKER_IMAGE_REGISTRY }}/vault:{{ ENV.VAULT.VERSION }}"
+    image: "{{ ENV.VAULT.IMAGE }}"
     restart: unless-stopped
     logging:
       driver: "json-file"
