@@ -115,8 +115,8 @@
     - name: "Store resulting compose files"
       template:
         src: "slm-platform-management.yml"
-        dest: "{{ _store_compose_file }}_platform_management"
-      when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+        dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/slm.platform-management.yml"
+      when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
 
 - name: "Create SLM default users"
   block:
@@ -163,8 +163,8 @@
     - name: "Store resulting compose files"
       template:
         src: "slm.yml"
-        dest: "{{ _store_compose_file }}"
-      when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+        dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/slm.yml"
+      when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
 
 - name: "Start SLM components | Drivers (optional)"
   include_tasks:

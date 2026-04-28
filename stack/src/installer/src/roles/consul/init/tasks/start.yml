@@ -100,8 +100,8 @@
 - name: "Store resulting compose file"
   template:
     src: "consul.yml"
-    dest: "{{ _store_compose_file }}"
-  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+    dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/consul.yml"
+  when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
 
 ### Outputs
 # CONSUL.MASTER_TOKEN    # Master token of the started Consul instance

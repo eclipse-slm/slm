@@ -23,8 +23,8 @@
   - name: "Store resulting compose file"
     template:
       src: "vault.yml"
-      dest: "{{ _store_compose_file }}"
-    when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+      dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/vault.yml"
+    when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
   - name: "Wait for Vault ('{{ vault.url.internal }}') being up"
     uri:
       url: "{{ vault.url.internal }}/v1/sys/health"

@@ -12,6 +12,6 @@
 - name: "Store resulting compose file"
   template:
     src: "catalog.yml"
-    dest: "{{ _store_compose_file | regex_replace('/+$', '') }}/catalog.yml"
-  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+    dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/slm.catalog.yml"
+  when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
 

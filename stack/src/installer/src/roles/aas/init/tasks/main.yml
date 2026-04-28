@@ -12,8 +12,8 @@
 - name: "Store resulting compose file"
   template:
     src: "aas.yml"
-    dest: "{{ _store_compose_file }}"
-  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+    dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/aas.yml"
+  when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
 
 - name: "Register AAS components at Consul (discovery server)"
   include_role:
