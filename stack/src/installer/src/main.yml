@@ -47,6 +47,15 @@
       loop:
         - "/env/env.yml"
       register: include_vars_env
+    - name: "Check if env.custom.yml exists"
+      ansible.builtin.stat:
+        path: "/env/env.custom.yml"
+      register: env_custom_file
+    - name: "Import config from env.custom.yml"
+      include_vars:
+        file: "/env/env.custom.yml"
+      when: env_custom_file.stat.exists
+      register: include_vars_env_custom
     - name: "Import config from env.yml"
       include_vars:
         file: "{{ item }}"
@@ -55,6 +64,9 @@
       register: include_vars_env_override
     - set_fact:
         ENV: "{{ ENV | combine(include_vars_env.results[0].ansible_facts, recursive=true) }}"
+    - set_fact:
+        ENV: "{{ ENV | combine(include_vars_env_custom.ansible_facts, recursive=true) }}"
+      when: env_custom_file.stat.exists
     - set_fact:
         ENV: "{{ ENV | combine(include_vars_env_override.results[0].ansible_facts, recursive=true) }}"
     - set_fact:
