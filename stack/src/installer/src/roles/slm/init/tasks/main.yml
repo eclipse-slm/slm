@@ -166,6 +166,16 @@
         dest: "{{ _store_compose_file }}"
       when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
 
+- name: "Start SLM components | Drivers (optional)"
+  include_tasks:
+    file: "deploy_drivers.yml"
+  when: ENV.RESOURCE_MANAGEMENT.DRIVERS.ENABLED | default(false)
+
+- name: "Start SLM components | Additional services (optional)"
+  include_tasks:
+    file: "deploy_additional_services.yml"
+  when: (ENV.ADDITIONAL_SERVICES | default({}) | length) > 0
+
 - name: "Register UI at Consul (discovery server)"
   include_role:
     name: consul/client
@@ -181,19 +191,6 @@
       - "traefik.http.routers.ui.rule=PathPrefix(`/`)"
 
 - name: "Start SLM components | Catalog Service"
-  block:
-    - set_fact:
-        catalog_compose: "{{ lookup('template', 'catalog.yml') }}"
-    - name: "Start containers"
-      delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
-      community.docker.docker_compose_v2:
-        project_name: eclipse-slm
-        definition: "{{ catalog_compose | from_yaml }}"
-        state: present
-        pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
-    - name: "Store resulting compose file"
-      template:
-        src: "catalog.yml"
-        dest: "{{ _store_compose_file }}_catalog"
-      when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+  include_tasks:
+    file: "deploy_catalog.yml"
   when: ENV.SLM_CATALOG_SERVICE.ENABLED | default(true)

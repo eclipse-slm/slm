@@ -1,0 +1,17 @@
+- set_fact:
+    catalog_compose: "{{ lookup('template', 'catalog.yml') }}"
+
+- name: "Start containers"
+  delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+  community.docker.docker_compose_v2:
+    project_name: eclipse-slm
+    definition: "{{ catalog_compose | from_yaml }}"
+    state: present
+    pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+
+- name: "Store resulting compose file"
+  template:
+    src: "catalog.yml"
+    dest: "{{ _store_compose_file | regex_replace('/+$', '') }}/catalog.yml"
+  when: (_store_compose_file is defined) and (_store_compose_file|length > 0)
+
