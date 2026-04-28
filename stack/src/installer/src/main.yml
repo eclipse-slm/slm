@@ -210,15 +210,20 @@
               minio_console_internal: "{{ minio.url.console.internal }}"
               minio_console_external: "{{ minio.url.console.external }}"
 
-    - name: "Login to private docker registry (if credentials are defined)"
+    - name: "Prepare docker registry logins"
+      set_fact:
+        docker_registry_logins: "{{ ENV.DOCKER_IMAGE_REGISTRY_LOGINS | default([]) }}"
+
+    - name: "Login to configured docker registries"
       community.docker.docker_login:
-        registry_url: "{{ ENV.DOCKER_IMAGE_REGISTRY_LOGIN_URL }}"
-        username: "{{ ENV.DOCKER_IMAGE_REGISTRY_USERNAME }}"
-        password: "{{ ENV.DOCKER_IMAGE_REGISTRY_PASSWORD }}"
+        registry_url: "{{ item.registry_url }}"
+        username: "{{ item.username }}"
+        password: "{{ item.password }}"
+      loop: "{{ docker_registry_logins }}"
       when: >
-        ((ENV.DOCKER_IMAGE_REGISTRY_LOGIN_URL is defined) and (ENV.DOCKER_IMAGE_REGISTRY_LOGIN_URL|length > 0)) and
-        ((ENV.DOCKER_IMAGE_REGISTRY_USERNAME is defined) and (ENV.DOCKER_IMAGE_REGISTRY_USERNAME|length > 0)) and
-        ((ENV.DOCKER_IMAGE_REGISTRY_PASSWORD) is defined and (ENV.DOCKER_IMAGE_REGISTRY_PASSWORD|length > 0))
+        ((item.registry_url is defined) and (item.registry_url|length > 0)) and
+        ((item.username is defined) and (item.username|length > 0)) and
+        ((item.password is defined) and (item.password|length > 0))
 
     - block:
       - name: "Create docker network for SLM"
