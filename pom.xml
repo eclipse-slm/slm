@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>Eclipse Service Lifecycle Management</name>
     <groupId>org.eclipse.slm</groupId>
     <artifactId>slm</artifactId>
     <version>${revision}</version>
@@ -20,6 +19,49 @@
         <module>information_service</module>
         <module>catalog</module>
     </modules>
+
+    <name>Eclipse Service Lifecycle Management</name>
+    <description>Eclipse SLM core components.</description>
+    <url>https://github.com/eclipse-slm/slm</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/apache-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>eclipse-slm</id>
+            <name>Eclipse SLM Contributors</name>
+            <organization>Eclipse SLM</organization>
+            <organizationUrl>https://github.com/eclipse-slm</organizationUrl>
+        </developer>
+    </developers>
+
+    <organization>
+        <name>Eclipse SLM</name>
+        <url>https://github.com/eclipse-slm</url>
+    </organization>
+
+    <scm>
+        <connection>scm:git:https://github.com/eclipse-slm/slm.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/eclipse-slm/slm.git</developerConnection>
+        <url>https://github.com/eclipse-slm/slm</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/eclipse-slm/slm/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>GitHub Actions</system>
+        <url>https://github.com/eclipse-slm/slm/actions</url>
+    </ciManagement>
 
     <profiles>
         <profile>
@@ -58,6 +100,11 @@
         <maven.plugin.coveralls.version>5.0.0</maven.plugin.coveralls.version>
         <maven.plugin.openapi-generator.version>7.20.0</maven.plugin.openapi-generator.version>
         <maven.plugin.deploy.version>3.1.3</maven.plugin.deploy.version>
+        <maven.plugin.dokka>2.2.0</maven.plugin.dokka>
+        <maven.plugin.source>3.3.1</maven.plugin.source>
+        <maven.plugin.central-publishing>0.10.0</maven.plugin.central-publishing>
+        <maven.plugin.gpg>3.2.8</maven.plugin.gpg>
+        <gpg.skip>true</gpg.skip>
 
         <spring.boot.version>3.3.9</spring.boot.version>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
@@ -476,6 +523,38 @@
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${maven.plugin.jacoco.version}</version>
                 </plugin>
+                <!-- Publishing !-->
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>${maven.plugin.central-publishing}</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <deploymentName>${maven.central.deployment.name}</deploymentName>
+                        <publishingServerId>central</publishingServerId>
+                        <autoPublish>true</autoPublish>
+                        <waitUntil>published</waitUntil>
+                        <centralSnapshotsUrl>https://central.sonatype.com/repository/maven-snapshots/</centralSnapshotsUrl>
+                    </configuration>
+                </plugin>
+                <!-- GPG Signing !-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>${maven.plugin.gpg}</version>
+                    <configuration>
+                        <skip>${gpg.skip}</skip>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -713,6 +792,35 @@
                         <phase>clean</phase>
                         <goals>
                             <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Sources !-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven.plugin.source}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Documentation !-->
+            <plugin>
+                <groupId>org.jetbrains.dokka</groupId>
+                <artifactId>dokka-maven-plugin</artifactId>
+                <version>${maven.plugin.dokka}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>javadocJar</goal>
                         </goals>
                     </execution>
                 </executions>
