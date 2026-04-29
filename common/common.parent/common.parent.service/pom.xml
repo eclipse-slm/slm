@@ -13,7 +13,7 @@
         <version>${revision}</version>
     </parent>
 
-    <name>Eclipse SLM AAS | common.parent.service</name>
+    <name>Eclipse SLM | common.parent.service</name>
     <description>Reusable components to implement core backend services.</description>
 
     <dependencies>
@@ -119,15 +119,6 @@
                         <include>truststore/**</include>
                     </includes>
                 </configuration>
-            </plugin>
-            <!-- Sign artifacts and publish to Sonatype OSSRH !-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.central</groupId>
-                <artifactId>central-publishing-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
