@@ -87,7 +87,7 @@ jobs:
       - name: Build '${{ matrix.build.type }}' with Maven and push Docker Images
         if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || (github.ref_name == 'main' && steps.tag_check.outputs.has_version_tag == 'true'))
         run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS -Dgpg.skip=false --projects '${{ matrix.build.maven-projects }}' deploy
-
+        env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       - name: Build '${{ matrix.build.type }}' with Maven
         if: github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/') || startsWith(github.ref_name, 'release/') || (github.ref_name == 'main' && steps.tag_check.outputs.has_version_tag == 'false')
