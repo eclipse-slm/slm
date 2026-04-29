@@ -45,9 +45,6 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-          server-id: central
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
       - uses: s4u/maven-settings-action@v2.8.0
@@ -61,9 +58,14 @@ jobs:
               "password": "${{secrets.GITHUB_TOKEN}}"
             },
             {
-              "id": "github-maven",
-              "username": "${{github.actor}}",
-              "password": "${{secrets.GITHUB_TOKEN}}"
+              "id": "central",
+              "username": "${{secrets.CENTRAL_SONATYPE_TOKEN_USERNAME}}",
+              "password": "${{secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD}}"
+            },
+            {
+              "id": "central-snapshots",
+              "username": "${{secrets.CENTRAL_SONATYPE_TOKEN_USERNAME}}",
+              "password": "${{secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD}}"
             }
           ]'
       - name: Detect semantic version tag on current commit
@@ -85,9 +87,7 @@ jobs:
       - name: Build '${{ matrix.build.type }}' with Maven and push Docker Images
         if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || (github.ref_name == 'main' && steps.tag_check.outputs.has_version_tag == 'true'))
         run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS -Dgpg.skip=false --projects '${{ matrix.build.maven-projects }}' deploy
-        env:
-          MAVEN_USERNAME: ${{ secrets.CENTRAL_SONATYPE_TOKEN_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD }}
+
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       - name: Build '${{ matrix.build.type }}' with Maven
         if: github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/') || startsWith(github.ref_name, 'release/') || (github.ref_name == 'main' && steps.tag_check.outputs.has_version_tag == 'false')
