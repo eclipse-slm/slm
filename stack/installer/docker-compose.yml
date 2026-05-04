@@ -1,6 +1,8 @@
 services:
   installer-api:
     image: ghcr.io/eclipse-slm/slm/installer-api:${SLM_VERSION}
+    pull_policy: always
+    restart: unless-stopped
     environment:
       INSTALLER_COMPOSE_PROJECT_NAME: eclipse-slm-installer
       SLM_HOSTNAME: ${SLM_HOSTNAME:-}
@@ -13,6 +15,8 @@ services:
 
   installer-ui:
     image: ghcr.io/eclipse-slm/slm/installer-ui:${SLM_VERSION}
+    pull_policy: always
+    restart: unless-stopped
     depends_on:
       - installer-api
     ports:

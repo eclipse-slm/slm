@@ -1,6 +1,4 @@
 from __future__ import annotations
-
-import json
 import sys
 from typing import Any, Dict
 
@@ -12,7 +10,10 @@ def main() -> int:
     runner = create_runner()
 
     def emit(event: Dict[str, Any]) -> None:
-        print(json.dumps(event), flush=True)
+        message = event.get("message")
+        if message is None:
+            return
+        print(str(message), flush=True)
 
     return runner.run(options, emit=emit)
 

@@ -3,17 +3,17 @@
 ## Download and run the script
 
 ```bash
-curl -fsSL -o run-installer.sh https://raw.githubusercontent.com/eclipse-slm/slm/develop/stack/installer/run-installer.sh
-chmod +x run-installer.sh
-./run-installer.sh
+curl -fsSL -o slm-installer.sh https://raw.githubusercontent.com/eclipse-slm/slm/develop/stack/installer/slm-installer.sh
+chmod +x slm-installer.sh
+./slm-installer.sh
 ```
 
 Alternative with `wget`:
 
 ```bash
-wget -O run-installer.sh https://raw.githubusercontent.com/eclipse-slm/slm/develop/stack/installer/run-installer.sh
-chmod +x run-installer.sh
-./run-installer.sh
+wget -O slm-installer.sh https://raw.githubusercontent.com/eclipse-slm/slm/develop/stack/installer/slm-installer.sh
+chmod +x slm-installer.sh
+./slm-installer.sh
 ```
 
 ## Modes
@@ -27,9 +27,9 @@ The UI stack is started with Docker Compose project name `eclipse-slm-installer`
 Examples:
 
 ```bash
-./run-installer.sh --mode ui
-./run-installer.sh --mode install
-./run-installer.sh --mode uninstall
+./slm-installer.sh --mode ui
+./slm-installer.sh --mode install
+./slm-installer.sh --mode uninstall
 ```
 
 ## API endpoints (UI mode)

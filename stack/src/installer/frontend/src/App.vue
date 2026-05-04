@@ -30,7 +30,7 @@
     <ConfirmDialog
       v-model="showStopDialog"
       title="Stop Installer"
-      text="Do you want to stop the installer and remove the installer containers?"
+      text="Do you want to stop the installer?"
       confirm-text="Stop"
       cancel-text="Cancel"
       confirm-color="warning"
@@ -38,6 +38,15 @@
       @confirm="stopInstaller"
       @cancel="showStopDialog = false"
     />
+
+    <v-snackbar
+      v-model="showStopSuccess"
+      color="success"
+      timeout="3000"
+      location="top"
+    >
+      Installer stopped successfully.
+    </v-snackbar>
   </v-app>
 </template>
 
@@ -49,6 +58,7 @@ import { getApiBaseUrl } from './config/runtimeConfig';
 
 const showStopDialog = ref(false);
 const stoppingInstaller = ref(false);
+const showStopSuccess = ref(false);
 
 async function stopInstaller() {
   showStopDialog.value = false;
@@ -56,9 +66,15 @@ async function stopInstaller() {
   const apiBase = getApiBaseUrl();
 
   try {
-    await fetch(`${apiBase}/api/installer/stop`, {
+    const response = await fetch(`${apiBase}/api/installer/stop`, {
       method: 'POST'
     });
+
+    if (!response.ok) {
+      throw new Error(`Failed to stop installer (HTTP ${response.status})`);
+    }
+
+    showStopSuccess.value = true;
   } finally {
     // The backend call removes both installer containers, including this UI.
     setTimeout(() => {
