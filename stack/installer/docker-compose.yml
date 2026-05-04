@@ -4,6 +4,7 @@ services:
     environment:
       SLM_HOSTNAME: ${SLM_HOSTNAME:-}
       SLM_IP: ${SLM_IP:-}
+      INSTALLER_COMPOSE_PROJECT_NAME: eclipse-slm-installer
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
 
@@ -12,5 +13,5 @@ services:
     depends_on:
       - installer-api
     ports:
-      - "8080:80"
+      - "6060:80"
 

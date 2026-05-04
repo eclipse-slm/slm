@@ -21,6 +21,7 @@ done
 
 INSTALLER_MODE="${MODE_ARG:-${INSTALLER_MODE:-}}"
 INSTALLER_DOWNLOAD_REF="${INSTALLER_DOWNLOAD_REF:-develop}"
+INSTALLER_COMPOSE_PROJECT_NAME="eclipse-slm-installer"
 SLM_VERSION="1.5.0-SNAPSHOT"
 
 echo "Eclipse Service Lifecycle Management | Installer | Version: ${SLM_VERSION}"
@@ -129,27 +130,50 @@ SLM_IP=${SLM_IP:-}
 SLM_VERSION=${SLM_VERSION}
 EOF
 
-  sudo docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d --pull always --remove-orphans
-  echo "Open installer UI with the following URL: http://<IP-or-hostname-of-the-machine-running-the-installer>:8080"
+  sudo docker compose \
+    -p "${INSTALLER_COMPOSE_PROJECT_NAME}" \
+    --env-file "${ENV_FILE}" \
+    -f "${COMPOSE_FILE}" \
+    up -d --pull always --remove-orphans
+
+  echo "Open installer UI with one of these URLs:"
+  echo "  http://localhost:6060"
+  host_ips="$(hostname -I 2>/dev/null | tr ' ' '\n' | sed '/^$/d' | sort -u)"
+  if [[ -n "${host_ips}" ]]; then
+    while IFS= read -r ip; do
+      echo "  http://${ip}:6060"
+    done <<< "${host_ips}"
+  fi
   exit 0
 fi
 
-prompt_required_with_default "SLM_HOSTNAME" "SLM_HOSTNAME"
-prompt_required_with_default "SLM_IP" "SLM_IP"
+if [[ "${INSTALLER_MODE}" == "install" ]]; then
+  prompt_required_with_default "SLM_HOSTNAME" "SLM_HOSTNAME"
+  prompt_required_with_default "SLM_IP" "SLM_IP"
+fi
 
 echo "Starting non-interactive installer with:"
 echo "MODE=${INSTALLER_MODE}"
-echo "SLM_HOSTNAME=${SLM_HOSTNAME}"
-echo "SLM_IP=${SLM_IP}"
+echo "SLM_HOSTNAME=${SLM_HOSTNAME:-n/a}"
+echo "SLM_IP=${SLM_IP:-n/a}"
 echo "SLM_VERSION=${SLM_VERSION}"
 
-sudo docker run \
-  --rm \
-  --pull=always \
-  --env "SLM_HOSTNAME=${SLM_HOSTNAME}" \
-  --env "SLM_IP=${SLM_IP}" \
-  --volume /var/run/docker.sock:/var/run/docker.sock \
-  --add-host "${SLM_HOSTNAME}:host-gateway" \
-  ghcr.io/eclipse-slm/slm/installer-api:${SLM_VERSION} \
-  "${INSTALLER_MODE}"
+if [[ "${INSTALLER_MODE}" == "install" ]]; then
+  sudo docker run \
+    --rm \
+    --pull=always \
+    --env "SLM_HOSTNAME=${SLM_HOSTNAME}" \
+    --env "SLM_IP=${SLM_IP}" \
+    --volume /var/run/docker.sock:/var/run/docker.sock \
+    --add-host "${SLM_HOSTNAME}:host-gateway" \
+    ghcr.io/eclipse-slm/slm/installer-api:${SLM_VERSION} \
+    install
+else
+  sudo docker run \
+    --rm \
+    --pull=always \
+    --volume /var/run/docker.sock:/var/run/docker.sock \
+    ghcr.io/eclipse-slm/slm/installer-api:${SLM_VERSION} \
+    uninstall
+fi
 

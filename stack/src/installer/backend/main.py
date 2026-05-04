@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import subprocess
 import threading
 from contextlib import suppress
 from datetime import datetime
@@ -35,6 +36,7 @@ app.add_middleware(
 
 job_manager = JobManager()
 FIXED_SLM_VERSION = "1.5.0-SNAPSHOT"
+INSTALLER_COMPOSE_PROJECT_NAME = "eclipse-slm-installer"
 api_router = APIRouter(prefix=API_PREFIX)
 
 
@@ -82,6 +84,11 @@ class JobResponse(BaseModel):
 
 class JobLogsResponse(BaseModel):
     logs: list[Dict[str, Any]]
+
+
+class InstallerStopResponse(BaseModel):
+    status: str
+    message: str
 
 
 def _record_to_response(record: Dict[str, Any]) -> JobResponse:
@@ -205,6 +212,23 @@ def _start_background_job(record: Any, runner: Any, options: Any, failure_messag
     threading.Thread(target=run_job, daemon=True).start()
 
 
+def _stop_installer_stack(project_name: str) -> None:
+    """Stop and remove all containers that belong to the installer compose project."""
+    ids_cmd = [
+        "docker",
+        "ps",
+        "-aq",
+        "--filter",
+        f"label=com.docker.compose.project={project_name}",
+    ]
+    ids_result = subprocess.run(ids_cmd, capture_output=True, text=True, check=False)
+    ids = [container_id.strip() for container_id in ids_result.stdout.splitlines() if container_id.strip()]
+    if not ids:
+        return
+
+    subprocess.run(["docker", "rm", "-f", *ids], capture_output=True, text=True, check=False)
+
+
 @api_router.post("/install", response_model=JobResponse, status_code=201)
 async def start_install(request: JobCreateRequest) -> JobResponse:
     _raise_if_active_job_exists()
@@ -283,6 +307,16 @@ async def cancel_job() -> JobResponse:
         raise HTTPException(status_code=409, detail="No active job to cancel")
 
     return _record_to_response(updated.to_dict())
+
+
+@api_router.post("/installer/stop", response_model=InstallerStopResponse, status_code=202)
+async def stop_installer() -> InstallerStopResponse:
+    project_name = os.getenv("INSTALLER_COMPOSE_PROJECT_NAME", INSTALLER_COMPOSE_PROJECT_NAME)
+    threading.Thread(target=_stop_installer_stack, args=(project_name,), daemon=True).start()
+    return InstallerStopResponse(
+        status="stopping",
+        message=f"Stopping installer stack '{project_name}'.",
+    )
 
 
 @api_router.websocket("/stream")

@@ -22,6 +22,8 @@ chmod +x run-installer.sh
 - `install`: runs non-interactive installer and exits
 - `uninstall`: runs non-interactive uninstaller and exits
 
+The UI stack is started with Docker Compose project name `eclipse-slm-installer`.
+
 Examples:
 
 ```bash
@@ -34,7 +36,10 @@ Examples:
 
 When running in `ui` mode, the backend is exposed through the frontend host under `/api`.
 
-- Swagger UI: `http://<installer-host>:8080/api/docs`
-- OpenAPI JSON: `http://<installer-host>:8080/api/openapi.json`
-- ReDoc: `http://<installer-host>:8080/api/redoc`
+- Swagger UI: `http://<installer-host>:6060/api/docs`
+- OpenAPI JSON: `http://<installer-host>:6060/api/openapi.json`
+- ReDoc: `http://<installer-host>:6060/api/redoc`
+
+The installer UI includes a `Stop Installer` action in the top-right app bar.
+It stops and removes the installer frontend and backend containers.
 
