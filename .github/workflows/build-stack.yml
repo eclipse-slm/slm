@@ -27,8 +27,8 @@ jobs:
           - prometheus
           - traefik
           - config-exporter
-          - installer
-          - uninstaller
+          - installer-api
+          - installer-ui
     steps:
       - uses: actions/checkout@v3
       - name: Build docker image

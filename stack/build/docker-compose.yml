@@ -1,12 +1,16 @@
 services:
 
-  installer:
-    image: ${DOCKER_IMAGE_REGISTRY}/slm/installer:${SLM_VERSION}
-    build: ../src/installer
+  installer-api:
+    image: ${DOCKER_IMAGE_REGISTRY}/slm/installer-api:${SLM_VERSION}
+    build:
+      context: ../src/installer
+      dockerfile: backend/Dockerfile
 
-  uninstaller:
-    image: ${DOCKER_IMAGE_REGISTRY}/slm/uninstaller:${SLM_VERSION}
-    build: ../src/uninstaller
+  installer-ui:
+    image: ${DOCKER_IMAGE_REGISTRY}/slm/installer-ui:${SLM_VERSION}
+    build:
+      context: ../src/installer
+      dockerfile: frontend/Dockerfile
 
   aas-broker:
     image: ${DOCKER_IMAGE_REGISTRY}/aas/broker:${AAS_BROKER_VERSION}
