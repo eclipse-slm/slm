@@ -8,11 +8,11 @@ ENV CONSUL_URL=http://consul:8500 \
 
 RUN mkdir /compose
 
-RUN curl https://dl.min.io/client/mc/release/linux-amd64/mc \
+RUN curl -fL https://dl.min.io/client/mc/release/linux-amd64/mc \
       --create-dirs \
       -o /usr/local/bin/mc
-
 RUN chmod +x /usr/local/bin/mc
+RUN /usr/local/bin/mc --version
 
 COPY src /src
 COPY env.yml /env/env.yml
