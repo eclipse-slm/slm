@@ -1,9 +1,9 @@
 package org.eclipse.slm.resource_management.features.capabilities.jobs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.slm.common.awx.client.AwxCredential;
-import org.eclipse.slm.common.awx.client.observer.*;
-import org.eclipse.slm.common.awx.model.*;
+import org.eclipse.slm.awx.client.AwxCredential;
+import org.eclipse.slm.awx.client.observer.*;
+import org.eclipse.slm.awx.model.*;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.CapabilityUtil;

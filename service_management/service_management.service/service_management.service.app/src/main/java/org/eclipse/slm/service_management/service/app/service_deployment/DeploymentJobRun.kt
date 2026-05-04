@@ -1,6 +1,6 @@
 package org.eclipse.slm.service_management.service.app.service_deployment
 
-import org.eclipse.slm.common.awx.client.observer.AwxJobObserver
+import org.eclipse.slm.awx.client.observer.AwxJobObserver
 import org.eclipse.slm.service_management.model.offerings.ServiceOrder
 import org.eclipse.slm.service_management.model.services.ServiceInstance
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken

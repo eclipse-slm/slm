@@ -1,9 +1,9 @@
 package org.eclipse.slm.resource_management.features.capabilities;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.eclipse.slm.common.awx.client.AwxClient;
-import org.eclipse.slm.common.awx.client.AwxProjectUpdateFailedException;
-import org.eclipse.slm.common.awx.model.*;
+import org.eclipse.slm.awx.client.AwxClient;
+import org.eclipse.slm.awx.client.AwxProjectUpdateFailedException;
+import org.eclipse.slm.awx.model.*;
 
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotCreatedException;
@@ -160,7 +160,7 @@ public class CapabilitiesManager implements ICapabilitiesManager {
         capabilityJpaRepository.save(capability);
     }
 
-    private Optional<org.eclipse.slm.common.awx.model.ExecutionEnvironment> createExecutionEnvironment(Capability capability)
+    private Optional<org.eclipse.slm.awx.model.ExecutionEnvironment> createExecutionEnvironment(Capability capability)
             throws ResourceNotCreatedException, JsonProcessingException, ResourceRuntimeException {
         if (capability.getExecutionEnvironment() != null) {
 

@@ -15,7 +15,6 @@
     </parent>
 
     <modules>
-        <module>common.awx</module>
         <module>common.utils</module>
         <module>common.consul</module>
         <module>common.database</module>

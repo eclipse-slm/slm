@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
         "org.eclipse.slm.notification_service",
         "org.eclipse.slm.notification_service.communication.websocket",
         "org.eclipse.slm.common.parent.service",
-        "org.eclipse.slm.common.awx.client",
+        "org.eclipse.slm.awx.client",
         "org.eclipse.slm.common.keycloak",
         "org.eclipse.slm.common.consul.client",
     }

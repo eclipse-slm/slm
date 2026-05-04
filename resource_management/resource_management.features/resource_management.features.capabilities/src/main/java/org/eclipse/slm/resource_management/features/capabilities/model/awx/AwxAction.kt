@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonTypeName
-import org.eclipse.slm.common.awx.model.SurveyItem
+import org.eclipse.slm.awx.model.SurveyItem
 import org.eclipse.slm.resource_management.common.remote_access.ConnectionType
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.Action
 

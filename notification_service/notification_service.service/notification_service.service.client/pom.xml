@@ -50,8 +50,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>common.awx.client</artifactId>
-            <version>${project.version}</version>
+            <artifactId>awx.client</artifactId>
             <scope>compile</scope>
         </dependency>
     </dependencies>
