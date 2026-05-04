@@ -252,7 +252,7 @@
         community.docker.docker_network:
           name: "eclipse-slm_default"
           connected:
-            - eclipse-slm-installer
+            - "{{ lookup('ansible.builtin.env', 'HOSTNAME') | default('eclipse-slm-installer', true) }}"
           appends: true
 
       - name: "Remove helper container for network creation"

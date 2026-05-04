@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import ipaddress
 import os
 import subprocess
 import threading
@@ -154,6 +155,12 @@ async def _append_queued_event(job_id: str, operation: str) -> None:
 def _start_background_job(record: Any, runner: Any, options: Any, failure_message: str) -> None:
     event_loop = asyncio.get_running_loop()
 
+    def log_event_to_container(event: Dict[str, Any]) -> None:
+        message = str(event.get("message", "")).strip()
+        if not message:
+            return
+        print(message, flush=True)
+
     def submit(coro: Any, wait: bool = False) -> None:
         if event_loop.is_closed() or app.state.shutdown_requested:
             return
@@ -168,6 +175,7 @@ def _start_background_job(record: Any, runner: Any, options: Any, failure_messag
                 future.result(timeout=5)
 
     def emit(event: Dict[str, Any]) -> None:
+        log_event_to_container(event)
         submit(job_manager.append_event(record.job_id, event))
 
     def run_job() -> None:
@@ -229,9 +237,79 @@ def _stop_installer_stack(project_name: str) -> None:
     subprocess.run(["docker", "rm", "-f", *ids], capture_output=True, text=True, check=False)
 
 
+def _docker_host_gateway_ip() -> str:
+    """Return the Docker host gateway IP as seen from inside this container."""
+    route_path = "/proc/net/route"
+    try:
+        with open(route_path, "r", encoding="utf-8") as handle:
+            lines = handle.readlines()
+    except OSError as exc:
+        raise RuntimeError(f"Could not read {route_path}: {exc}") from exc
+
+    for line in lines[1:]:
+        parts = line.split()
+        if len(parts) < 3:
+            continue
+        destination = parts[1]
+        gateway_hex = parts[2]
+        if destination != "00000000":
+            continue
+
+        try:
+            gateway_int = int(gateway_hex, 16)
+            gateway_bytes = gateway_int.to_bytes(4, byteorder="little", signed=False)
+            return str(ipaddress.IPv4Address(gateway_bytes))
+        except (ValueError, OverflowError):
+            continue
+
+    raise RuntimeError("Could not determine Docker host gateway IP from /proc/net/route")
+
+
+def _ensure_container_hostname_mapping(hostname: str) -> None:
+    hostname = hostname.strip()
+    if not hostname:
+        return
+
+    ip_address = _docker_host_gateway_ip()
+
+    hosts_path = "/etc/hosts"
+    try:
+        with open(hosts_path, "r", encoding="utf-8") as handle:
+            lines = handle.readlines()
+    except OSError as exc:
+        raise RuntimeError(f"Could not read {hosts_path}: {exc}") from exc
+
+    rewritten: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            rewritten.append(line)
+            continue
+
+        parts = stripped.split()
+        aliases = parts[1:]
+        if hostname in aliases:
+            continue
+        rewritten.append(line)
+
+    rewritten.append(f"{ip_address}\t{hostname}\n")
+
+    try:
+        with open(hosts_path, "w", encoding="utf-8") as handle:
+            handle.writelines(rewritten)
+    except OSError as exc:
+        raise RuntimeError(f"Could not write {hosts_path}: {exc}") from exc
+
+
 @api_router.post("/install", response_model=JobResponse, status_code=201)
 async def start_install(request: JobCreateRequest) -> JobResponse:
     _raise_if_active_job_exists()
+
+    try:
+        _ensure_container_hostname_mapping(request.slmHostname)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
     request_data = request.model_dump()
     record = job_manager.create_job(request_data, operation="install")
     await _append_queued_event(record.job_id, operation="install")
