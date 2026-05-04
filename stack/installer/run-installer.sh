@@ -20,10 +20,14 @@ while [[ $# -gt 0 ]]; do
 done
 
 INSTALLER_MODE="${MODE_ARG:-${INSTALLER_MODE:-}}"
+INSTALLER_DOWNLOAD_REF="${INSTALLER_DOWNLOAD_REF:-develop}"
+SLM_VERSION="1.5.0-SNAPSHOT"
+
+echo "Eclipse Service Lifecycle Management | Installer | Version: ${SLM_VERSION}"
 
 if [[ -z "${INSTALLER_MODE}" ]]; then
   echo "Select installer mode:"
-  echo "  1) UI mode (frontend + backend)"
+  echo "  1) UI mode"
   echo "  2) Non-interactive install"
   echo "  3) Non-interactive uninstall"
   read -r -p "Enter choice [1-3]: " mode_choice
@@ -107,7 +111,7 @@ if [[ "${INSTALLER_MODE}" == "ui" ]]; then
   TMP_DIR="$(mktemp -d)"
   COMPOSE_FILE="${TMP_DIR}/docker-compose.yml"
   ENV_FILE="${TMP_DIR}/.env"
-  COMPOSE_URL="https://raw.githubusercontent.com/eclipse-slm/slm/${SLM_VERSION:-develop}/stack/installer/docker-compose.yml"
+  COMPOSE_URL="https://raw.githubusercontent.com/eclipse-slm/slm/${INSTALLER_DOWNLOAD_REF}/stack/installer/docker-compose.yml"
 
   cleanup_tmp_dir() {
     rm -rf "${TMP_DIR}"
@@ -122,16 +126,16 @@ if [[ "${INSTALLER_MODE}" == "ui" ]]; then
   cat > "${ENV_FILE}" <<EOF
 SLM_HOSTNAME=${SLM_HOSTNAME:-}
 SLM_IP=${SLM_IP:-}
-SLM_VERSION=${SLM_VERSION:-}
+SLM_VERSION=${SLM_VERSION}
 EOF
 
-  sudo docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up --pull always --remove-orphans
+  sudo docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d --pull always --remove-orphans
+  echo "Open installer UI with the following URL: http://<IP-or-hostname-of-the-machine-running-the-installer>:8080"
   exit 0
 fi
 
 prompt_required_with_default "SLM_HOSTNAME" "SLM_HOSTNAME"
 prompt_required_with_default "SLM_IP" "SLM_IP"
-prompt_required_with_default "SLM_VERSION" "SLM_VERSION"
 
 echo "Starting non-interactive installer with:"
 echo "MODE=${INSTALLER_MODE}"
