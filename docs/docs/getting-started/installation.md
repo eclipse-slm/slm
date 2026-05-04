@@ -9,8 +9,42 @@ next: /docs/getting-started/first-steps/
 * Docker
 
 ## Install
+The installation of the Eclipse Service Lifecycle Management can be done via an installer component. The installer can be started directly on the host where the SLM 
+should be installed. Alternatively, it can also be started on a different host and install the SLM remotely via SSH. The installers offers an Web-UI to follow the 
+installation process and see the logs. Non-interactive installation is also possible via a CLI mode without UI.
 
-Set in your current shell the environment variables `SLM_HOSTNAME`, `SLM_IP` and `SLM_VERSION` for the host where the stack will be started. E.g.:
+::::tabs
+== Script
+Run the following commands to start the SLM installer. It will start a UI where you can follow start the installation process and see the logs. After the 
+installation is finished, you can stop the installer with the button in the top-right app bar.
+
+::: warning ATTENTION
+**The script will request the hostname where the SLM will be installed. Use lowercase for the hostname to avoid case problems (e.g. with token authentication)**
+:::
+
+```shell
+curl -fsSL -o slm-installer.sh https://raw.githubusercontent.com/eclipse-slm/slm/develop/stack/installer/slm-installer.sh
+chmod +x slm-installer.sh
+./slm-installer.sh --mode ui
+```
+
+Alternative the installer can also be started in CLI mode without UI. In this case the installer will run the installation routine and exit after it has finished:
+```shell
+curl -fsSL -o slm-installer.sh https://raw.githubusercontent.com/eclipse-slm/slm/develop/stack/installer/slm-installer.sh
+chmod +x slm-installer.sh
+./slm-installer.sh --mode install
+```
+==
+== Docker
+::: warning For Ubuntu 24+ users
+**Disable Apparmor for rsyslogd as follows:**
+```sh
+sudo ln -s /etc/apparmor.d/usr.sbin.rsyslogd /etc/apparmor.d/disable/
+sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.rsyslogd
+```
+:::
+
+Set in your current shell the environment variables `SLM_HOSTNAME`, `SLM_IP` and `SLM_VERSION` for the host where the SLM will be installed. E.g.:
 ```sh
 export SLM_HOSTNAME=myhost.local
 export SLM_IP=172.17.0.1
@@ -21,7 +55,7 @@ export SLM_VERSION=1.5.0-SNAPSHOT
 :::
 
 By default, the installer sets up the SLM on the host on which it is running. To install the SLM on a remote host, the
-following environment variables must be set and added via the `--env` flag to the `docker run` command above:
+following environment variables must be set and added via the `--env` flag to the `docker run` command below:
 
 | Environment Variable     | Description                       |
 |--------------------------|-----------------------------------|
@@ -29,20 +63,8 @@ following environment variables must be set and added via the `--env` flag to th
 | DEPLOYMENT_HOST_USER     | SSH username of remote host       |
 | DEPLOYMENT_HOST_PASSWORD | SSH password of remote host       |
 
-To start the installation either start the installer container via docker run or use the installer script (see the 
-following sections for details). Both options will execute the same installation routine.
-
-::::tabs
-== docker run
-::: warning For Ubuntu 24+ users
-**Disable Apparmor for rsyslogd as follows:**
-```sh
-sudo ln -s /etc/apparmor.d/usr.sbin.rsyslogd /etc/apparmor.d/disable/
-sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.rsyslogd
-```
-:::
-
 Run the following command to start the SLM installer:
+
 ```sh
 docker run \
   --rm \
@@ -52,30 +74,38 @@ docker run \
   --env SLM_IP=$SLM_IP \
   --volume /var/run/docker.sock:/var/run/docker.sock \
   --add-host $SLM_HOSTNAME:host-gateway \
-  ghcr.io/eclipse-slm/slm/installer:$SLM_VERSION
-```
-==
-== installer script
-```shell
-wget https://raw.githubusercontent.com/eclipse-slm/slm/main/stack/run-installer.sh
-chmod +x run-installer.sh
-./run-installer.sh
+  ghcr.io/eclipse-slm/slm/installer-api:$SLM_VERSION
+  install
 ```
 ==
 ::::
 
+### HTTPS
 SLM initializes its own PKI in Vault, including a dedicated Root CA, and issues certificates used by Traefik. Traefik acts as the HTTPS reverse proxy 
 and terminates TLS for incoming traffic. If you want to use your own certificate chain, place an additional proxy in front of Traefik. For more details, 
 see [Architecture - HTTPS](./architecture#https).
 
 ## Uninstall
-Run the following command to start the SLM uninstaller:
+::::tabs
+== Script
+Run the following commands to start the uninstallation of the SLM:
+```sh
+curl -fsSL -o slm-installer.sh https://raw.githubusercontent.com/eclipse-slm/slm/develop/stack/installer/slm-installer.sh
+chmod +x slm-installer.sh
+./slm-installer.sh --mode uninstall
+```
+==
+== Docker
+Run the following docker command to start the uninstallation of the SLM:
 ```sh
 docker run \
   --rm \
   --volume /var/run/docker.sock:/var/run/docker.sock \
-  ghcr.io/eclipse-slm/slm/uninstaller:1.5.0-SNAPSHOT
+  ghcr.io/eclipse-slm/slm/installer-api:1.5.0-SNAPSHOT \
+  uninstall
 ```
+==
+::::
 
 ## Components
 

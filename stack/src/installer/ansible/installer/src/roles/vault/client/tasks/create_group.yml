@@ -1,0 +1,26 @@
+### Inputs
+- name: "Assert inputs of 'vault/client | create_policy.yml'"
+  assert:
+    that:
+      - (vault.url.internal is defined) and (vault.url.internal|length > 0)   # The URL of the Vault server
+      - (_vault_token is defined) and (_vault_token|length > 0)               # The token used for authentication with Vault
+      - (_group_name is defined) and (_group_name|length > 0)                 # The name of the group to be created
+      - (_group_type is defined) and (_group_type|length > 0)                 # The type of the group ("internal" | "external")
+      - (_group_policies is defined) and (_group_policies|length > 0)         # List of policies to be attached to the group
+    fail_msg: "Variable must be defined and not empty"
+
+- name: "Create Vault group '{{ _group_name }}'"
+  uri:
+    url: "{{ vault.url.internal }}/v1/identity/group"
+    validate_certs: no
+    method: POST
+    headers:
+      X-Vault-Token: "{{ _vault_token }}"
+    body_format: json
+    body:
+      name: "{{ _group_name }}"
+      type: "{{ _group_type }}"
+      policies: "{{ _group_policies | default([]) }}"
+    status_code: 200, 204, 400
+  register: output_create_group
+  changed_when: output_create_group.status in [200, 204]

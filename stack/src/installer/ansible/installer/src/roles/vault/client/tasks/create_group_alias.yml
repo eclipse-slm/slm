@@ -1,0 +1,60 @@
+### Inputs
+- name: "Assert inputs of 'vault/client | create_policy.yml'"
+  assert:
+    that:
+      - (vault.url.internal is defined) and (vault.url.internal|length > 0)   # The URL of the Vault server
+      - (_vault_token is defined) and (_vault_token|length > 0)               # The token used for authentication with Vault
+      - (_group_name is defined) and (_group_name|length > 0)                 # The name of the group to be created
+      - (_alias_name is defined) and (_alias_name|length > 0)                 # The alias name to be created
+      - (_mount_accessor_name is defined) and (_mount_accessor_name|length > 0) # The name of the auth mount
+    fail_msg: "Variable must be defined and not empty"
+
+- name: "Get mount accessor for auth method '{{ _mount_accessor_name }}'"
+  block:
+  - uri:
+      url: "{{ vault.url.internal }}/v1/sys/auth/{{ _mount_accessor_name }}"
+      validate_certs: no
+      method: GET
+      headers:
+        X-Vault-Token: "{{ _vault_token }}"
+      body_format: json
+      status_code: 200
+    register: output_auth_mount
+  - set_fact:
+      __mount_accessor: "{{ output_auth_mount.json.accessor }}"
+
+- name: "Get group id of group '{{ _group_name }}'"
+  block:
+  - uri:
+      url: "{{ vault.url.internal }}/v1/identity/group/name/{{ _group_name }}"
+      validate_certs: no
+      method: GET
+      headers:
+        X-Vault-Token: "{{ _vault_token }}"
+      body_format: json
+      status_code: 200
+    register: output_group_lookup
+  - set_fact:
+      __group_id: "{{ output_group_lookup.json.data.id }}"
+
+- name: "Create group alias for '{{ _alias_name }}'"
+  uri:
+    url: "{{ vault.url.internal }}/v1/identity/group-alias"
+    validate_certs: no
+    method: POST
+    headers:
+      X-Vault-Token: "{{ _vault_token }}"
+    body_format: json
+    body:
+      name: "{{ _alias_name }}"
+      mount_accessor: "{{ __mount_accessor }}"
+      canonical_id: "{{ __group_id }}"
+  register: output_create_group_alias
+  failed_when: >
+    output_create_group_alias.status == 400 and
+    (
+      output_create_group_alias.json is not defined or
+      output_create_group_alias.json.errors is not defined or
+      ('combination of mount and group alias name is already in use' not in (output_create_group_alias.json.errors | join(' ')))
+    )
+  changed_when: output_create_group_alias.status in [200, 204]
