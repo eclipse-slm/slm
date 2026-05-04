@@ -21,7 +21,6 @@ jobs:
       packages: write
     env:
       MAVEN_CLI_OPTS: "-s ci/ci_maven_settings.xml --batch-mode --errors --fail-at-end --show-version --no-transfer-progress -DinstallAtEnd=true -DdeployAtEnd=true"
-      MAVEN_PROFILES: ""
       COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
     strategy:
       matrix:
@@ -84,14 +83,18 @@ jobs:
           done < <(git tag --points-at "$GITHUB_SHA")
 
           echo "has_version_tag=$HAS_SEMVER_TAG" >> "$GITHUB_OUTPUT"
-      - name: Build '${{ matrix.build.type }}' with Maven and push Docker Images
-        if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || (github.ref_name == 'main' && steps.tag_check.outputs.has_version_tag == 'true'))
-        run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS -Dgpg.skip=false --projects '${{ matrix.build.maven-projects }}' deploy
+      - name: Build '${{ matrix.build.type }}' snapshots with Maven and push Docker Images
+        if: github.event_name != 'pull_request' && github.ref_name == 'develop'
+        run: mvn -Psnapshot $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' deploy
+
+      - name: Build '${{ matrix.build.type }}' release artifacts with Maven and push Docker Images
+        if: github.event_name != 'pull_request' && github.ref_name == 'main' && steps.tag_check.outputs.has_version_tag == 'true'
+        run: mvn -Prelease $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' deploy
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       - name: Build '${{ matrix.build.type }}' with Maven
         if: github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/') || startsWith(github.ref_name, 'release/') || (github.ref_name == 'main' && steps.tag_check.outputs.has_version_tag == 'false')
-        run: mvn $MAVEN_PROFILES $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' verify
+        run: mvn -Psnapshot $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' verify
       - name: Build Coveralls Report
         if: ${{ env.COVERALLS_REPO_TOKEN != '' && matrix.build.type == 'backend' && (github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')) }}
         run: mvn jacoco-aggregator:report-aggregate-all coveralls:report -DrepoToken=$COVERALLS_REPO_TOKEN
