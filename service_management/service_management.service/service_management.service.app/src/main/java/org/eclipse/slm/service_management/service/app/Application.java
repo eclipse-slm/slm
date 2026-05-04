@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         "org.eclipse.slm.notification_service.messaging",
         "org.eclipse.slm.resource_management.service.client",
         "org.eclipse.slm.aas",
-        "org.eclipse.slm.common.awx",
+        "org.eclipse.slm.awx",
         "org.eclipse.slm.common.consul",
         "org.eclipse.slm.common.keycloak",
         "org.eclipse.slm.common.minio",
