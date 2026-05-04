@@ -139,6 +139,7 @@
         <maven.plugin.central-publishing>0.10.0</maven.plugin.central-publishing>
         <maven.plugin.gpg>3.2.8</maven.plugin.gpg>
         <gpg.skip>true</gpg.skip>
+        <maven.central.deployment.name>${project.artifactId}-${revision}</maven.central.deployment.name>
 
         <common.awx.client.version>1.0.0-SNAPSHOT</common.awx.client.version>
 

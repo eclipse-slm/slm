@@ -1,5 +1,9 @@
 name: Build Core
 
+concurrency:
+  group: build-core-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches:
@@ -14,15 +18,68 @@ on:
       - develop
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      has_release_tag: ${{ steps.evaluate.outputs.has_release_tag }}
+      should_snapshot_deploy: ${{ steps.evaluate.outputs.should_snapshot_deploy }}
+      should_release_deploy: ${{ steps.evaluate.outputs.should_release_deploy }}
+      should_verify: ${{ steps.evaluate.outputs.should_verify }}
+      should_run_staging: ${{ steps.evaluate.outputs.should_run_staging }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Determine workflow mode
+        id: evaluate
+        shell: bash
+        run: |
+          git fetch --tags --force
+          STABLE_SEMVER_REGEX='^v?(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'
+          LEGACY_RELEASE_REGEX='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)-RELEASE$'
+
+          HAS_RELEASE_TAG=false
+          while IFS= read -r tag; do
+            if [[ "$tag" =~ $STABLE_SEMVER_REGEX || "$tag" =~ $LEGACY_RELEASE_REGEX ]]; then
+              HAS_RELEASE_TAG=true
+              break
+            fi
+          done < <(git tag --points-at "$GITHUB_SHA")
+
+          SHOULD_SNAPSHOT_DEPLOY=false
+          SHOULD_RELEASE_DEPLOY=false
+          SHOULD_VERIFY=false
+          SHOULD_RUN_STAGING=false
+
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            SHOULD_VERIFY=true
+          elif [[ "$GITHUB_REF_NAME" == "develop" ]]; then
+            SHOULD_SNAPSHOT_DEPLOY=true
+            SHOULD_RUN_STAGING=true
+          elif [[ "$GITHUB_REF_NAME" == "main" && "$HAS_RELEASE_TAG" == "true" ]]; then
+            SHOULD_RELEASE_DEPLOY=true
+            SHOULD_RUN_STAGING=true
+          else
+            SHOULD_VERIFY=true
+          fi
+
+          echo "has_release_tag=$HAS_RELEASE_TAG" >> "$GITHUB_OUTPUT"
+          echo "should_snapshot_deploy=$SHOULD_SNAPSHOT_DEPLOY" >> "$GITHUB_OUTPUT"
+          echo "should_release_deploy=$SHOULD_RELEASE_DEPLOY" >> "$GITHUB_OUTPUT"
+          echo "should_verify=$SHOULD_VERIFY" >> "$GITHUB_OUTPUT"
+          echo "should_run_staging=$SHOULD_RUN_STAGING" >> "$GITHUB_OUTPUT"
+
   build:
-    runs-on: ubuntu-22.04
+    needs: prepare
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     env:
-      MAVEN_CLI_OPTS: "-s ci/ci_maven_settings.xml --batch-mode --errors --fail-at-end --show-version --no-transfer-progress -DinstallAtEnd=true -DdeployAtEnd=true"
+      MAVEN_CLI_OPTS: "-s ci/ci_maven_settings.xml --batch-mode --errors --fail-at-end --show-version --no-transfer-progress -T 1C -DinstallAtEnd=true -DdeployAtEnd=true"
       COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
     strategy:
+      fail-fast: false
       matrix:
         build: [
           {
@@ -36,8 +93,6 @@ jobs:
         ]
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -47,6 +102,7 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
       - uses: s4u/maven-settings-action@v2.8.0
+        if: needs.prepare.outputs.should_snapshot_deploy == 'true' || needs.prepare.outputs.should_release_deploy == 'true'
         with:
           path: ci/ci_maven_settings.xml
           githubServer: false
@@ -67,37 +123,21 @@ jobs:
               "password": "${{secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD}}"
             }
           ]'
-      - name: Detect semantic version tag on current commit
-        id: tag_check
-        shell: bash
-        run: |
-          git fetch --tags --force
-          SEMVER_REGEX='^v?(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'
-
-          HAS_SEMVER_TAG=false
-          while IFS= read -r tag; do
-            if [[ "$tag" =~ $SEMVER_REGEX ]]; then
-              HAS_SEMVER_TAG=true
-              break
-            fi
-          done < <(git tag --points-at "$GITHUB_SHA")
-
-          echo "has_version_tag=$HAS_SEMVER_TAG" >> "$GITHUB_OUTPUT"
       - name: Build '${{ matrix.build.type }}' snapshots with Maven and push Docker Images
-        if: github.event_name != 'pull_request' && github.ref_name == 'develop'
-        run: mvn -Psnapshot $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' deploy
+        if: needs.prepare.outputs.should_snapshot_deploy == 'true'
+        run: mvn -Psnapshot $MAVEN_CLI_OPTS "-Dmaven.central.deployment.name=build-core-${{ github.run_id }}-${{ github.run_attempt }}" --projects '${{ matrix.build.maven-projects }}' deploy
 
       - name: Build '${{ matrix.build.type }}' release artifacts with Maven and push Docker Images
-        if: github.event_name != 'pull_request' && github.ref_name == 'main' && steps.tag_check.outputs.has_version_tag == 'true'
-        run: mvn -Prelease $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' deploy
+        if: needs.prepare.outputs.should_release_deploy == 'true'
+        run: mvn -Prelease $MAVEN_CLI_OPTS "-Dmaven.central.deployment.name=build-core-${{ github.run_id }}-${{ github.run_attempt }}" --projects '${{ matrix.build.maven-projects }}' deploy
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       - name: Build '${{ matrix.build.type }}' with Maven
-        if: github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/') || startsWith(github.ref_name, 'release/') || (github.ref_name == 'main' && steps.tag_check.outputs.has_version_tag == 'false')
+        if: needs.prepare.outputs.should_verify == 'true'
         run: mvn -Psnapshot $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' verify
       - name: Build Coveralls Report
-        if: ${{ env.COVERALLS_REPO_TOKEN != '' && matrix.build.type == 'backend' && (github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')) }}
-        run: mvn jacoco-aggregator:report-aggregate-all coveralls:report -DrepoToken=$COVERALLS_REPO_TOKEN
+        if: ${{ env.COVERALLS_REPO_TOKEN != '' && matrix.build.type == 'backend' && needs.prepare.outputs.should_verify == 'true' && (github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')) }}
+        run: mvn -Psnapshot --batch-mode --errors --no-transfer-progress jacoco-aggregator:report-aggregate-all coveralls:report -DrepoToken=$COVERALLS_REPO_TOKEN
         env:
           GITHUB_TOKEN: ${{ github.token }}
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
@@ -106,8 +146,8 @@ jobs:
         run: find . -type f -path "*test-reports/*-output.txt" -exec tail -n +1 {} +
 
   deploy-staging-environment:
-    needs: build
-    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main')
+    needs: [prepare, build]
+    if: needs.prepare.outputs.should_run_staging == 'true'
     runs-on: self-hosted
     env:
       STAGING_VM_IP: ${{ github.ref_name == 'develop' && '10.17.165.36' || '10.17.166.74' }}
@@ -157,8 +197,8 @@ jobs:
             mvn test -Dtest=DockerStackTests
 
   test-external-components:
-    needs: deploy-staging-environment
-    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main')
+    needs: [prepare, deploy-staging-environment]
+    if: needs.prepare.outputs.should_run_staging == 'true'
     runs-on: self-hosted
     container:
       image: maven:3.9-eclipse-temurin-21-noble
@@ -188,18 +228,20 @@ jobs:
     env:
       TARGET_HOST: ${{ github.ref_name == 'develop' && '10.17.165.36' || '10.17.166.74' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run tests for '${{ matrix.tests.component }}' with Maven
         run: |
           cd tests/backend
           mvn test -Dtest=${{ matrix.tests.test-class }}
 
   test-internal-components:
-    needs: test-external-components
-    if: github.event_name != 'pull_request' && (github.ref_name == 'develop' || github.ref_name == 'main')
+    needs: [prepare, test-external-components]
+    if: needs.prepare.outputs.should_run_staging == 'true'
     runs-on: self-hosted
     container:
       image: maven:3.9-eclipse-temurin-21-noble
+      volumes:
+        - /tmp/.m2:/root/.m2
     strategy:
       matrix:
         tests: [
@@ -219,7 +261,7 @@ jobs:
     env:
       TARGET_HOST: ${{ github.ref_name == 'develop' && '10.17.165.36' || '10.17.166.74' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run tests for '${{ matrix.tests.component }}' with Maven
         run: |
           cd tests/backend
