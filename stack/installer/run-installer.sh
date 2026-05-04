@@ -141,6 +141,10 @@ EOF
   host_ips="$(hostname -I 2>/dev/null | tr ' ' '\n' | sed '/^$/d' | sort -u)"
   if [[ -n "${host_ips}" ]]; then
     while IFS= read -r ip; do
+      # Skip typical Docker bridge gateway addresses like 172.17.0.1, 172.18.0.1, ...
+      if [[ "${ip}" =~ ^172\.(1[7-9]|2[0-9]|3[0-1])\.0\.1$ ]]; then
+        continue
+      fi
       echo "  http://${ip}:6060"
     done <<< "${host_ips}"
   fi
@@ -154,8 +158,10 @@ fi
 
 echo "Starting non-interactive installer with:"
 echo "MODE=${INSTALLER_MODE}"
-echo "SLM_HOSTNAME=${SLM_HOSTNAME:-n/a}"
-echo "SLM_IP=${SLM_IP:-n/a}"
+if [[ "${INSTALLER_MODE}" == "install" ]]; then
+  echo "SLM_HOSTNAME=${SLM_HOSTNAME}"
+  echo "SLM_IP=${SLM_IP}"
+fi
 echo "SLM_VERSION=${SLM_VERSION}"
 
 if [[ "${INSTALLER_MODE}" == "install" ]]; then

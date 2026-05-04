@@ -2,9 +2,12 @@ services:
   installer-api:
     image: ghcr.io/eclipse-slm/slm/installer-api:${SLM_VERSION}
     environment:
+      INSTALLER_COMPOSE_PROJECT_NAME: eclipse-slm-installer
       SLM_HOSTNAME: ${SLM_HOSTNAME:-}
       SLM_IP: ${SLM_IP:-}
-      INSTALLER_COMPOSE_PROJECT_NAME: eclipse-slm-installer
+      DEPLOYMENT_HOST_HOSTNAME: ${DEPLOYMENT_HOST_HOSTNAME:localhost}
+      DEPLOYMENT_HOST_USER: ${DEPLOYMENT_HOST_USER:}
+      DEPLOYMENT_HOST_PASSWORD: ${DEPLOYMENT_HOST_PASSWORD:}
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
 
