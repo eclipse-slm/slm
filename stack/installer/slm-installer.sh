@@ -31,9 +31,9 @@ echo "Eclipse Service Lifecycle Management | Installer | Version: ${SLM_VERSION}
 
 if [[ -z "${INSTALLER_MODE}" ]]; then
   echo "Select installer mode:"
-  echo "  1) UI mode"
-  echo "  2) Non-interactive install"
-  echo "  3) Non-interactive uninstall"
+  echo "  1) UI mode (with web interface)"
+  echo "  2) Install (CLI)"
+  echo "  3) Uninstall (CLI)"
   read -r -p "Enter choice [1-3]: " mode_choice
   case "${mode_choice}" in
     1) INSTALLER_MODE="ui" ;;
