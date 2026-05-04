@@ -1,0 +1,16 @@
+services:
+  installer-api:
+    image: ghcr.io/eclipse-slm/slm/installer-api:${SLM_VERSION}
+    environment:
+      SLM_HOSTNAME: ${SLM_HOSTNAME:-}
+      SLM_IP: ${SLM_IP:-}
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  installer-ui:
+    image: ghcr.io/eclipse-slm/slm/installer-ui:${SLM_VERSION}
+    depends_on:
+      - installer-api
+    ports:
+      - "8080:80"
+

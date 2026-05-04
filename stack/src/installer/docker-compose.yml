@@ -1,20 +1,35 @@
 services:
 
-  installer:
-    build: .
-    image: ghcr.io/eclipse-slm/slm/installer:${SLM_VERSION}
+  installer-api:
+    image: ghcr.io/eclipse-slm/slm/installer-api:${SLM_VERSION}
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     environment:
       SLM_HOSTNAME: ${SLM_HOSTNAME}
       SLM_IP: ${SLM_IP}
       DEPLOYMENT_HOST_HOSTNAME: ${DEPLOYMENT_HOST_HOSTNAME}
       DEPLOYMENT_HOST_USER: ${DEPLOYMENT_HOST_USER}
       DEPLOYMENT_HOST_PASSWORD: ${DEPLOYMENT_HOST_PASSWORD}
-      ANSIBLE_CMD_PARAMETERS: -v
     volumes:
       - "//var/run/docker.sock:/var/run/docker.sock"
-      - "./env.yml:/env/env.yml"
-      - "./env.override.yml:/env/env.override.yml"
-      - "./src:/src"
+      - "./ansible/installer/env.yml:/env/env.yml"
+      - "./ansible/installer/env.override.yml:/env/env.override.yml"
+      - "./ansible/installer/src:/ansible/installer/src"
+      - "./ansible/uninstaller/src:/ansible/uninstaller/src"
       - "./result_compose:/compose"
+      - "./backend:/app/backend"
+    ports:
+      - "8080:8080"
     extra_hosts:
       - "${SLM_HOSTNAME}:host-gateway"
+
+  installer-ui:
+    image: ghcr.io/eclipse-slm/slm/installer-ui:${SLM_VERSION}
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - installer-api

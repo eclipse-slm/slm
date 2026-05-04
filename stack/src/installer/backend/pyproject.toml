@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slm-installer-backend"
+version = "0.1.0"
+description = "Shared API and CLI runner for the SLM installer"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "fastapi==0.116.1",
+    "uvicorn[standard]==0.35.0",
+    "pydantic==2.11.7",
+    "ansible-runner==2.4.1",
+]
+
+[tool.setuptools]
+packages = ["backend"]
+
+[tool.setuptools.package-dir]
+backend = "."
+

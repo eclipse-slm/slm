@@ -1,0 +1,110 @@
+@use 'variables' as *
+
+html,
+body,
+#app
+  min-height: 100%
+
+body
+  background: #eeeeee
+
+.v-application
+  font-family: Roboto, Arial, sans-serif
+  background: #eeeeee
+  color: #3c4858
+
+.v-main
+  background: #eeeeee
+
+.v-toolbar__content
+  padding: 0 24px
+  min-height: 72px !important
+
+.v-app-bar
+  backdrop-filter: blur(8px)
+
+.v-card
+  border-radius: 6px !important
+  margin-top: 30px
+  margin-bottom: 15px
+  box-shadow: 0 2px 12px rgba(60, 72, 88, 0.14) !important
+
+.v-card-title
+  font-size: 18px !important
+  padding-top: 10px
+  padding-bottom: 6px
+
+.v-card-subtitle
+  opacity: 1 !important
+
+.v-card-text
+  font-size: $card-text-font-size
+
+.v-btn.v-btn--size-default:not(.v-btn--icon):not(.v-btn--fab),
+.v-btn.v-btn--size-large:not(.v-btn--icon):not(.v-btn--fab)
+  padding: 0 30px !important
+  letter-spacing: 0
+  text-transform: none
+
+.v-field
+  border-radius: 6px
+
+.v-field__input,
+.v-label
+  font-size: $font-size-root
+
+.v-alert
+  border-radius: 6px
+
+.v-dialog > .v-overlay__content > .v-card
+  margin-top: 0
+  margin-bottom: 0
+
+.v-dialog .v-card__actions
+  padding: 0 24px 20px
+
+.installer-page
+  min-height: 100vh
+
+.installer-page__content
+  max-width: 1180px
+
+.installer-hero
+  margin-top: 0
+  margin-bottom: 0
+  overflow: hidden
+  background: #004263 !important
+  color: #ffffff
+
+.installer-hero .v-card-text,
+.installer-hero .v-card-title,
+.installer-hero .v-card-subtitle
+  color: inherit !important
+
+.installer-panel
+  margin-top: 24px
+
+.installer-panel__heading
+  margin: -34px 24px 0
+  border-radius: 6px
+  padding: 18px 20px
+  background: #00a0e3
+  color: #ffffff
+  box-shadow: 0 8px 20px rgba(0, 160, 227, 0.25)
+
+.installer-panel__heading--logs
+  margin-top: 36px
+  background: #004263
+
+.installer-panel__body
+  padding-top: 12px
+  padding-bottom: 8px
+
+.installer-log-surface
+  border: 1px solid rgba(0, 66, 99, 0.08)
+  border-radius: 6px
+  background: #f8fafc
+
+  .log-window
+    box-shadow: inset 0 1px 2px rgba(60, 72, 88, 0.08)
+

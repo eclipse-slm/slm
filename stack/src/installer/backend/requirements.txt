@@ -1,0 +1,3 @@
+# Install from the local backend package metadata.
+-e .
+
