@@ -30,3 +30,11 @@ Examples:
 ./run-installer.sh --mode uninstall
 ```
 
+## API endpoints (UI mode)
+
+When running in `ui` mode, the backend is exposed through the frontend host under `/api`.
+
+- Swagger UI: `http://<installer-host>:8080/api/docs`
+- OpenAPI JSON: `http://<installer-host>:8080/api/openapi.json`
+- ReDoc: `http://<installer-host>:8080/api/redoc`
+

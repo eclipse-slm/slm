@@ -8,7 +8,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any, Dict, Optional
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict, Field
 from starlette.websockets import WebSocketState
@@ -16,7 +16,15 @@ from starlette.websockets import WebSocketState
 from backend.job_manager import JobManager
 from backend.runner import PlaybookRunOptions, create_runner
 
-app = FastAPI(title="SLM Installer API", version="1.0.0")
+API_PREFIX = "/api"
+
+app = FastAPI(
+    title="SLM Installer API",
+    version="1.0.0",
+    docs_url=f"{API_PREFIX}/docs",
+    redoc_url=f"{API_PREFIX}/redoc",
+    openapi_url=f"{API_PREFIX}/openapi.json",
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -27,6 +35,7 @@ app.add_middleware(
 
 job_manager = JobManager()
 FIXED_SLM_VERSION = "1.5.0-SNAPSHOT"
+api_router = APIRouter(prefix=API_PREFIX)
 
 
 class LogLevelName(StrEnum):
@@ -196,7 +205,7 @@ def _start_background_job(record: Any, runner: Any, options: Any, failure_messag
     threading.Thread(target=run_job, daemon=True).start()
 
 
-@app.post("/api/install", response_model=JobResponse, status_code=201)
+@api_router.post("/install", response_model=JobResponse, status_code=201)
 async def start_install(request: JobCreateRequest) -> JobResponse:
     _raise_if_active_job_exists()
     request_data = request.model_dump()
@@ -222,7 +231,7 @@ async def start_install(request: JobCreateRequest) -> JobResponse:
     return _record_to_response(latest.to_dict())
 
 
-@app.post("/api/uninstall", response_model=JobResponse, status_code=201)
+@api_router.post("/uninstall", response_model=JobResponse, status_code=201)
 async def start_uninstall(request: UninstallRequest) -> JobResponse:
     _raise_if_active_job_exists()
 
@@ -247,7 +256,7 @@ async def start_uninstall(request: UninstallRequest) -> JobResponse:
     return _record_to_response(latest.to_dict())
 
 
-@app.get("/api/job", response_model=JobResponse)
+@api_router.get("/job", response_model=JobResponse)
 async def get_job() -> JobResponse:
     record = _get_active_job_record()
     if not record:
@@ -255,7 +264,7 @@ async def get_job() -> JobResponse:
     return _record_to_response(record.to_dict())
 
 
-@app.get("/api/logs", response_model=JobLogsResponse)
+@api_router.get("/logs", response_model=JobLogsResponse)
 async def get_job_logs() -> JobLogsResponse:
     record = _get_active_job_record()
     if not record:
@@ -263,7 +272,7 @@ async def get_job_logs() -> JobLogsResponse:
     return JobLogsResponse(logs=record.logs)
 
 
-@app.post("/api/cancel", response_model=JobResponse)
+@api_router.post("/cancel", response_model=JobResponse)
 async def cancel_job() -> JobResponse:
     record = job_manager.get_active_job()
     if not record:
@@ -276,7 +285,7 @@ async def cancel_job() -> JobResponse:
     return _record_to_response(updated.to_dict())
 
 
-@app.websocket("/api/stream")
+@api_router.websocket("/stream")
 async def stream_job(websocket: WebSocket) -> None:
     record = _get_active_job_record()
     if not record:
@@ -325,5 +334,8 @@ async def stream_job(websocket: WebSocket) -> None:
         if websocket.application_state == WebSocketState.CONNECTED:
             with suppress(RuntimeError):
                 await websocket.close(code=1000)
+
+
+app.include_router(api_router)
 
 

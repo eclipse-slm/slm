@@ -18,6 +18,8 @@ The existing Ansible playbook remains the deployment source of truth in `ansible
 
 ## Job API
 
+All installer backend endpoints are served under the `/api` prefix.
+
 ### REST
 
 - `POST /api/install`: start the installer playbook
@@ -50,6 +52,12 @@ The UI checks the active job on startup and resumes streaming when a job is runn
 ### WebSocket
 
 - `GET /api/stream`: stream live events as JSON
+
+### API documentation
+
+- Swagger UI: `/api/docs`
+- OpenAPI JSON: `/api/openapi.json`
+- ReDoc: `/api/redoc`
 
 Event schema:
 
