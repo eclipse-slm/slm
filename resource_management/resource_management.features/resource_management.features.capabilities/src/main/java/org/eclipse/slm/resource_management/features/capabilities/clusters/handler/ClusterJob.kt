@@ -1,6 +1,6 @@
 package org.eclipse.slm.resource_management.features.capabilities.clusters.handler
 
-import org.eclipse.slm.common.awx.client.observer.AwxJobObserver
+import org.eclipse.slm.awx.client.observer.AwxJobObserver
 import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService
 import org.eclipse.slm.resource_management.features.capabilities.clusters.ScaleOperation
 import org.eclipse.slm.resource_management.features.capabilities.clusters.model.ClusterCreateRequest

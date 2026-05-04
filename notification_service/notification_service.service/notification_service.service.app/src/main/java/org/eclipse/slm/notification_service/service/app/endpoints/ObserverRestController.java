@@ -1,6 +1,6 @@
 package org.eclipse.slm.notification_service.service.app.endpoints;
 
-import org.eclipse.slm.common.awx.client.observer.*;
+import org.eclipse.slm.awx.client.observer.*;
 import org.eclipse.slm.notification_service.communication.websocket.NotificationWsService;
 import org.eclipse.slm.notification_service.model.*;
 import org.eclipse.slm.notification_service.persistence.api.NotificationRepository;

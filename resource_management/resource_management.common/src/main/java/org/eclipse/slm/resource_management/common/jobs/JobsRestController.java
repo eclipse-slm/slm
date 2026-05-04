@@ -1,8 +1,8 @@
 package org.eclipse.slm.resource_management.common.jobs;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.eclipse.slm.common.awx.client.AwxClient;
-import org.eclipse.slm.common.awx.model.Job;
+import org.eclipse.slm.awx.client.AwxClient;
+import org.eclipse.slm.awx.model.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;

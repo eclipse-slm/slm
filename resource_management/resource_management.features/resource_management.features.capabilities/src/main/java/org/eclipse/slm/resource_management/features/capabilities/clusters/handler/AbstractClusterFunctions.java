@@ -1,10 +1,10 @@
 package org.eclipse.slm.resource_management.features.capabilities.clusters.handler;
 
-import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
+import org.eclipse.slm.awx.client.observer.AwxJobObserver;
 import org.eclipse.slm.common.consul.client.*;
 import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
-import org.eclipse.slm.common.awx.client.observer.AwxJobExecutor;
-import org.eclipse.slm.common.awx.client.observer.AwxJobObserverInitializer;
+import org.eclipse.slm.awx.client.observer.AwxJobExecutor;
+import org.eclipse.slm.awx.client.observer.AwxJobObserverInitializer;
 import org.eclipse.slm.common.vault.client.VaultClient;
 import org.eclipse.slm.common.vault.client.VaultClientFactory;
 import org.eclipse.slm.notification_service.messaging.NotificationMessageSender;

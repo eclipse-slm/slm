@@ -1,8 +1,8 @@
 package org.eclipse.slm.service_management.service.app.service_deployment;
 
-import org.eclipse.slm.common.awx.client.AwxCredential;
-import org.eclipse.slm.common.awx.client.observer.*;
-import org.eclipse.slm.common.awx.model.ExtraVars;
+import org.eclipse.slm.awx.client.AwxCredential;
+import org.eclipse.slm.awx.client.observer.*;
+import org.eclipse.slm.awx.model.ExtraVars;
 import org.eclipse.slm.resource_management.features.capabilities.model.Capability;
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType;
 import org.eclipse.slm.resource_management.features.capabilities.model.awx.AwxAction;

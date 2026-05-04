@@ -2,9 +2,9 @@
 //
 //import com.fasterxml.jackson.databind.ObjectMapper;
 //import dasniko.testcontainers.keycloak.KeycloakContainer;
-//import org.eclipse.slm.common.awx.client.observer.AwxJobExecutor;
-//import org.eclipse.slm.common.awx.client.observer.AwxJobObserver;
-//import org.eclipse.slm.common.awx.client.observer.AwxJobObserverInitializer;
+//import org.eclipse.slm.awx.client.observer.AwxJobExecutor;
+//import org.eclipse.slm.awx.client.observer.AwxJobObserver;
+//import org.eclipse.slm.awx.client.observer.AwxJobObserverInitializer;
 //import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 //import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 //import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;

@@ -1,14 +1,14 @@
 package org.eclipse.slm.resource_management.features.profiler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.eclipse.slm.common.awx.client.AwxClient;
-import org.eclipse.slm.common.awx.client.AwxCredential;
-import org.eclipse.slm.common.awx.client.AwxProjectUpdateFailedException;
-import org.eclipse.slm.common.awx.client.observer.*;
-import org.eclipse.slm.common.awx.model.ExtraVars;
-import org.eclipse.slm.common.awx.model.JobTemplate;
-import org.eclipse.slm.common.awx.model.Survey;
-import org.eclipse.slm.common.awx.model.SurveyItem;
+import org.eclipse.slm.awx.client.AwxClient;
+import org.eclipse.slm.awx.client.AwxCredential;
+import org.eclipse.slm.awx.client.AwxProjectUpdateFailedException;
+import org.eclipse.slm.awx.client.observer.*;
+import org.eclipse.slm.awx.model.ExtraVars;
+import org.eclipse.slm.awx.model.JobTemplate;
+import org.eclipse.slm.awx.model.Survey;
+import org.eclipse.slm.awx.model.SurveyItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

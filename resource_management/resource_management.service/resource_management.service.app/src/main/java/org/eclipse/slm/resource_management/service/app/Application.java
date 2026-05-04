@@ -44,7 +44,7 @@ import java.util.concurrent.Executor;
         "org.eclipse.slm.platform_management.service.client",
         "org.eclipse.slm.notification_service.messaging",
         "org.eclipse.slm.aas",
-        "org.eclipse.slm.common.awx",
+        "org.eclipse.slm.awx",
         "org.eclipse.slm.common.consul",
         "org.eclipse.slm.common.credentials",
         "org.eclipse.slm.common.keycloak",

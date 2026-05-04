@@ -1,8 +1,8 @@
 package org.eclipse.slm.service_management.service.app.service_deployment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.eclipse.slm.common.awx.client.observer.*;
-import org.eclipse.slm.common.awx.model.ExtraVars;
+import org.eclipse.slm.awx.client.observer.*;
+import org.eclipse.slm.awx.model.ExtraVars;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;

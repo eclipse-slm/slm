@@ -89,14 +89,12 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>common.awx.client</artifactId>
-            <version>${project.version}</version>
+            <artifactId>awx.client</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>common.awx.model</artifactId>
-            <version>${project.version}</version>
+            <artifactId>awx.model</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
