@@ -74,7 +74,7 @@ docker run \
   --env SLM_IP=$SLM_IP \
   --volume /var/run/docker.sock:/var/run/docker.sock \
   --add-host $SLM_HOSTNAME:host-gateway \
-  ghcr.io/eclipse-slm/slm/installer-api:$SLM_VERSION
+  ghcr.io/eclipse-slm/slm/installer-api:$SLM_VERSION \
   install
 ```
 ==

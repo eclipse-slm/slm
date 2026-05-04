@@ -5,7 +5,8 @@ ENV INSTALLER_WORKING_DIR=/ansible/installer/src \
 	INSTALLER_UNINSTALL_WORKING_DIR=/ansible/uninstaller/src \
 	INSTALLER_UNINSTALL_PLAYBOOK=main.yml \
 	INSTALLER_ENV_FILE=/env/env.yml \
-	INSTALLER_RUNNER_MODE=subprocess
+	INSTALLER_RUNNER_MODE=subprocess \
+	DEPLOYMENT_HOST_HOSTNAME=localhost
 
 RUN curl -fL https://dl.min.io/client/mc/release/linux-amd64/mc \
       --create-dirs \
