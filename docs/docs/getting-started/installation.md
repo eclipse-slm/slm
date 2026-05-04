@@ -57,9 +57,9 @@ docker run \
 ==
 == installer script
 ```shell
-wget https://raw.githubusercontent.com/eclipse-slm/slm/main/stack/run-installer.sh
+curl -fsSL -o run-installer.sh https://raw.githubusercontent.com/eclipse-slm/slm/develop/stack/installer/run-installer.sh
 chmod +x run-installer.sh
-./run-installer.sh
+./run-installer.sh --mode ui
 ```
 ==
 ::::

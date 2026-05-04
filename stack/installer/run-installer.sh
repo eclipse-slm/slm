@@ -148,3 +148,4 @@ sudo docker run \
   --add-host "${SLM_HOSTNAME}:host-gateway" \
   ghcr.io/eclipse-slm/slm/installer-api:${SLM_VERSION} \
   "${INSTALLER_MODE}"
+
