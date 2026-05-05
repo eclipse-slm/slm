@@ -20,7 +20,7 @@ jobs:
         run: echo VERSION_PATH=/version/$(echo $GITHUB_REF | cut -d / -f 3 | cut -d v -f 2- | cut -d . -f 1,2)/ >> $GITHUB_ENV
 
       - name: Checkout
-        uses: actions/checkout@v2.3.1
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -36,7 +36,7 @@ jobs:
           yarn build
 
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: github-pages                          # The branch the action should deploy to
