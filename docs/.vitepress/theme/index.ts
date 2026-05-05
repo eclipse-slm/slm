@@ -104,7 +104,7 @@ export default <Theme>{
                 shell_registry: '2.0.0-milestone-07',
                 sm_registry: '2.0.0-milestone-07',
                 env: '2.0.0-milestone-07',
-                gui: 'v2-251001',
+                gui: 'v2-260505',
             },
             ports: {
                 discovery: '8084',
