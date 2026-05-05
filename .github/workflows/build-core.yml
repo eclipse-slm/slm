@@ -101,7 +101,7 @@ jobs:
           cache: maven
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
-      - uses: s4u/maven-settings-action@v4
+      - uses: s4u/maven-settings-action@v4.0.0
         if: needs.prepare.outputs.should_snapshot_deploy == 'true' || needs.prepare.outputs.should_release_deploy == 'true'
         with:
           path: ci/ci_maven_settings.xml
