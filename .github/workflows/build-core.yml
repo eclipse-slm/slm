@@ -27,7 +27,7 @@ jobs:
       should_verify: ${{ steps.evaluate.outputs.should_verify }}
       should_run_staging: ${{ steps.evaluate.outputs.should_run_staging }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Determine workflow mode
@@ -92,16 +92,16 @@ jobs:
           }
         ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
-      - uses: s4u/maven-settings-action@v2.8.0
+      - uses: s4u/maven-settings-action@v4
         if: needs.prepare.outputs.should_snapshot_deploy == 'true' || needs.prepare.outputs.should_release_deploy == 'true'
         with:
           path: ci/ci_maven_settings.xml
@@ -154,7 +154,7 @@ jobs:
       STAGING_VM_HOSTNAME: ${{ github.ref_name == 'develop' && 'develop.staging.slm.local' || 'main.staging.slm.local' }}
     steps:
       - name: Deploy stack von staging VM
-        uses: appleboy/ssh-action@v0.1.10
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{env.STAGING_VM_IP}}
           username: operation
@@ -190,7 +190,7 @@ jobs:
               install
 
       - name: Test stack running on staging VM
-        uses: appleboy/ssh-action@v0.1.10
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{env.STAGING_VM_IP}}
           username: operation
@@ -231,7 +231,7 @@ jobs:
     env:
       TARGET_HOST: ${{ github.ref_name == 'develop' && '10.17.165.36' || '10.17.166.74' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run tests for '${{ matrix.tests.component }}' with Maven
         run: |
           cd tests/backend
@@ -264,7 +264,7 @@ jobs:
     env:
       TARGET_HOST: ${{ github.ref_name == 'develop' && '10.17.165.36' || '10.17.166.74' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run tests for '${{ matrix.tests.component }}' with Maven
         run: |
           cd tests/backend
