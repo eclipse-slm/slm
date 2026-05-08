@@ -14,7 +14,7 @@ public class ResourceAas extends DefaultAssetAdministrationShell {
             .type(ReferenceTypes.EXTERNAL_REFERENCE)
             .keys(
                 new DefaultKey.Builder()
-                        .type(KeyTypes.CONCEPT_DESCRIPTION)
+                        .type(KeyTypes.GLOBAL_REFERENCE)
                         .value("http://eclipse.dev/slm/aas/ResourceId").build())
                 .build();
 
@@ -22,8 +22,13 @@ public class ResourceAas extends DefaultAssetAdministrationShell {
         this.id = AAS_ID_PREFIX + resource.getId();
         this.idShort = AAS_ID_PREFIX + resource.getId();
 
+        if (resource.getAssetId() == null || resource.getAssetId().isEmpty()) {
+            resource.setAssetId(resource.getId().toString());
+        }
+
         this.assetInformation = new DefaultAssetInformation.Builder()
                 .assetKind(AssetKind.INSTANCE)
+                .globalAssetId(resource.getAssetId())
                 .specificAssetIds(new DefaultSpecificAssetId.Builder()
                         .name("Eclipse SLM Resource Id")
                         .value(resource.getId().toString())

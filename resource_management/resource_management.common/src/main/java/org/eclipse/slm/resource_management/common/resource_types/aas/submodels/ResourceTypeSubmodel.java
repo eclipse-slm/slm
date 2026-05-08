@@ -15,7 +15,7 @@ public class ResourceTypeSubmodel extends DefaultSubmodel {
     public static final Reference SEMANTIC_ID = new DefaultReference.Builder()
             .type(ReferenceTypes.EXTERNAL_REFERENCE)
             .keys(new DefaultKey.Builder()
-                    .type(KeyTypes.CONCEPT_DESCRIPTION)
+                    .type(KeyTypes.GLOBAL_REFERENCE)
                     .value(SEMANTIC_ID_VALUE).build()).build();
 
     private final ResourceType resourceType;
