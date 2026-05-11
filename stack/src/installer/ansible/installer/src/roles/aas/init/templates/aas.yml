@@ -125,16 +125,10 @@ services:
 #    ports:
 #      - "{{ ENV.AAS.AAS_GUI.PORT.EXTERNAL }}:{{ ENV.AAS.AAS_GUI.PORT.INTERNAL }}"
     environment:
-      AAS_DISCOVERY_PATH: "{{ aas.aas_discovery.url.proxy }}"
-      AAS_REGISTRY_PATH: "{{aas.aas_registry.url.proxy }}"
-      SUBMODEL_REGISTRY_PATH: "{{ aas.submodel_registry.url.proxy }}"
-      AAS_REPO_PATH: "{{ aas.aas_repository.url.proxy }}/shells"
-      SUBMODEL_REPO_PATH: "{{ aas.submodel_repository.url.proxy }}/submodels"
-      CD_REPO_PATH: "{{ aas.concept_description_repository.url.proxy }}/concept-descriptions"
-      KEYCLOAK_URL: "{{ keycloak.url.external_without_port }}"
-      KEYCLOAK_REALM: "{{ ENV.KEYCLOAK.REALM }}"
-      KEYCLOAK_CLIENT_ID: "ui"
       BASE_PATH: "{{ AAS.AAS_GUI.PATH.INTERNAL }}"
+      ENDPOINT_CONFIG_AVAILABLE: false
+    volumes:
+      - "{{ INSTALL_DIRECTORY }}/config/aas-gui/basyx-infra.yml:/basyx-infra.yml:ro"
     networks:
       default:
         aliases:

@@ -1,0 +1,24 @@
+infrastructures:
+  default: slm-aas-infra
+
+  slm-aas-infra:
+    name: SLM AAS Infrastructure
+    components:
+      aasDiscovery:
+        baseUrl: "{{ aas.aas_discovery.url.proxy }}"
+      aasRegistry:
+        baseUrl: "{{aas.aas_registry.url.proxy }}"
+      submodelRegistry:
+        baseUrl: "{{ aas.submodel_registry.url.proxy }}"
+      aasRepository:
+        baseUrl: "{{ aas.aas_repository.url.proxy }}/shells"
+      submodelRepository:
+        baseUrl: "{{ aas.submodel_repository.url.proxy }}/submodels"
+      conceptDescriptionRepository:
+        baseUrl: "{{ aas.concept_description_repository.url.proxy }}/concept-descriptions"
+    security:
+      type: oauth2
+      config:
+        flow: auth_code
+        issuer: "{{ keycloak.url.external_without_port }}/realms/{{ ENV.KEYCLOAK.REALM }}"
+        clientId: "ui"

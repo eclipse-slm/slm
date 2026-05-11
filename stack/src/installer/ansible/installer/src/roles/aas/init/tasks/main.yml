@@ -1,6 +1,21 @@
 - set_fact:
     aas_compose: "{{ lookup('template', 'aas.yml') }}"
 
+- name: "Add configuration for AAS GUI"
+  block:
+  - name: "Ensure AAS GUI config directory exists"
+    delegate_to: "{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}"
+    ansible.builtin.file:
+      path: "/install/config/aas-gui"
+      state: directory
+      mode: "0755"
+  - name: "Write basyx-infra.yml for AAS GUI"
+    delegate_to: "{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}"
+    ansible.builtin.template:
+      src: "basyx-infra.yml"
+      dest: "/install/config/aas-gui/basyx-infra.yml"
+      mode: "0644"
+
 - name: "Start containers"
   delegate_to: "{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}"
   community.docker.docker_compose_v2:
