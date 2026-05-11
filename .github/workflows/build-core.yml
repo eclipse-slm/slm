@@ -165,6 +165,7 @@ jobs:
             git clone -b ${{github.ref_name}} https://github.com/${{github.repository}}.git
             cd ~/staging/tmp/slm
             CORE_VERSION=$(cat pom.xml | grep -oPm1 "(?<=<revision>)[^<]+")
+            INSTALL_DIRECTORY=/opt/eclipse-slm
             
             echo ${{secrets.GITHUB_TOKEN}} | docker login -u${{github.actor}} --password-stdin ghcr.io
             
@@ -173,6 +174,7 @@ jobs:
               --rm \
               --pull=always \
               --volume /var/run/docker.sock:/var/run/docker.sock \
+              --volume $INSTALL_DIRECTORY:/install \
               ghcr.io/eclipse-slm/slm/installer-api:$CORE_VERSION \
               uninstall
             docker system prune -f
@@ -184,7 +186,9 @@ jobs:
               --pull=always \
               --env SLM_HOSTNAME=$STAGING_VM_HOSTNAME \
               --env SLM_IP=$STAGING_VM_IP \
+              --env INSTALL_DIRECTORY=$INSTALL_DIRECTORY \
               --volume /var/run/docker.sock:/var/run/docker.sock \
+              --volume $INSTALL_DIRECTORY:/install \
               --add-host $STAGING_VM_HOSTNAME:host-gateway \
               ghcr.io/eclipse-slm/slm/installer-api:$CORE_VERSION \
               install
