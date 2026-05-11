@@ -14,6 +14,10 @@ public class ServiceOfferingVersionAas extends DefaultAssetAdministrationShell {
     public ServiceOfferingVersionAas(ServiceOfferingVersion serviceOfferingVersion) {
         this.id = AAS_ID_PREFIX + serviceOfferingVersion.getId();
         this.idShort = AAS_ID_PREFIX + serviceOfferingVersion.getServiceOffering().getName() + "-" + serviceOfferingVersion.getVersion();
+        this.idShort = this.idShort.replace(" ", "_")
+                            .replace(".", "_")
+                            .replace("(", "")
+                            .replace(")", "");
 
         this.assetInformation = new DefaultAssetInformation.Builder()
                     .assetKind(AssetKind.INSTANCE)

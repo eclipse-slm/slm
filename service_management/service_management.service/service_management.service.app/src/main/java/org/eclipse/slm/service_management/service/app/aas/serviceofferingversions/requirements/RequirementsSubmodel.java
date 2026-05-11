@@ -24,7 +24,11 @@ public class RequirementsSubmodel extends DefaultSubmodel {
     public RequirementsSubmodel(ServiceOfferingVersion serviceOfferingVersion)  {
         super();
         this.id = RequirementsSubmodel.getSubmodelIdForServiceOfferingVersionId(serviceOfferingVersion.getId());
-        this.idShort = RequirementsSubmodel.getSubmodelIdShortForServiceOfferingVersion(serviceOfferingVersion);
+        this.idShort = RequirementsSubmodel.getSubmodelIdShortForServiceOfferingVersion(serviceOfferingVersion)
+                .replace(" ", "_")
+                .replace(".", "_")
+                .replace("(", "")
+                .replace(")", "");
         this.setSemanticId(SEMANTIC_ID);
 
         for (ServiceRequirement requirement : serviceOfferingVersion.getServiceRequirements()){

@@ -22,7 +22,11 @@ public class SoftwareNameplateSubmodel extends DefaultSubmodel {
     public SoftwareNameplateSubmodel(ServiceOfferingVersion serviceOfferingVersion)  {
         super();
         this.id = SoftwareNameplateSubmodel.getSubmodelIdForServiceOfferingVersionId(serviceOfferingVersion.getId());
-        this.idShort = SoftwareNameplateSubmodel.getSubmodelIdShortForServiceOfferingVersion(serviceOfferingVersion);
+        this.idShort = SoftwareNameplateSubmodel.getSubmodelIdShortForServiceOfferingVersion(serviceOfferingVersion)
+                .replace(" ", "_")
+                .replace(".", "_")
+                .replace("(", "")
+                .replace(")", "");
         this.setSemanticId(SoftwareNameplateSubmodel.SEMANTIC_ID);
 
         var smesSoftwareNameplateType = new ArrayList<SubmodelElement>();
