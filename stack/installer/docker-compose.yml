@@ -5,6 +5,7 @@ services:
     restart: unless-stopped
     environment:
       INSTALLER_COMPOSE_PROJECT_NAME: eclipse-slm-installer
+      INSTALL_DIRECTORY: ${INSTALL_DIRECTORY:-/opt/eclipse-slm}
       SLM_HOSTNAME: ${SLM_HOSTNAME:-}
       SLM_IP: ${SLM_IP:-}
       DEPLOYMENT_HOST_HOSTNAME: ${DEPLOYMENT_HOST_HOSTNAME:-localhost}
@@ -12,6 +13,7 @@ services:
       DEPLOYMENT_HOST_PASSWORD: ${DEPLOYMENT_HOST_PASSWORD:-}
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - "${INSTALL_DIRECTORY:-/opt/eclipse-slm}:/install"
 
   installer-ui:
     image: ghcr.io/eclipse-slm/slm/installer-ui:${SLM_VERSION}
@@ -21,4 +23,3 @@ services:
       - installer-api
     ports:
       - "6060:80"
-

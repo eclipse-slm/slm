@@ -23,6 +23,7 @@ INSTALLER_MODE="${MODE_ARG:-${INSTALLER_MODE:-}}"
 INSTALLER_DOWNLOAD_REF="${INSTALLER_DOWNLOAD_REF:-develop}"
 INSTALLER_COMPOSE_PROJECT_NAME="eclipse-slm-installer"
 SLM_VERSION="1.5.0-SNAPSHOT"
+INSTALL_DIRECTORY="${INSTALL_DIRECTORY:-/opt/eclipse-slm}"
 DEPLOYMENT_HOST_HOSTNAME="${DEPLOYMENT_HOST_HOSTNAME:-localhost}"
 DEPLOYMENT_HOST_USER="${DEPLOYMENT_HOST_USER:-}"
 DEPLOYMENT_HOST_PASSWORD="${DEPLOYMENT_HOST_PASSWORD:-}"
@@ -106,6 +107,10 @@ prompt_required_with_default() {
   done
 }
 
+if [[ -z "${INSTALL_DIRECTORY}" ]]; then
+  prompt_required_with_default "INSTALL_DIRECTORY" "INSTALL_DIRECTORY"
+fi
+
 if [[ "${INSTALLER_MODE}" == "ui" ]]; then
   if ! docker compose version >/dev/null 2>&1; then
     echo "Error: 'docker compose' is not available. Please install Docker Compose v2." >&2
@@ -131,6 +136,7 @@ if [[ "${INSTALLER_MODE}" == "ui" ]]; then
 SLM_HOSTNAME=${SLM_HOSTNAME:-}
 SLM_IP=${SLM_IP:-}
 SLM_VERSION=${SLM_VERSION}
+INSTALL_DIRECTORY=${INSTALL_DIRECTORY}
 DEPLOYMENT_HOST_HOSTNAME=${DEPLOYMENT_HOST_HOSTNAME}
 DEPLOYMENT_HOST_USER=${DEPLOYMENT_HOST_USER}
 DEPLOYMENT_HOST_PASSWORD=${DEPLOYMENT_HOST_PASSWORD}
@@ -164,6 +170,7 @@ fi
 
 echo "Starting non-interactive installer with:"
 echo "MODE=${INSTALLER_MODE}"
+echo "INSTALL_DIRECTORY=${INSTALL_DIRECTORY}"
 if [[ "${INSTALLER_MODE}" == "install" ]]; then
   echo "SLM_HOSTNAME=${SLM_HOSTNAME}"
   echo "SLM_IP=${SLM_IP}"
@@ -178,10 +185,12 @@ if [[ "${INSTALLER_MODE}" == "install" ]]; then
     --pull=always \
     --env "SLM_HOSTNAME=${SLM_HOSTNAME}" \
     --env "SLM_IP=${SLM_IP}" \
+    --env "INSTALL_DIRECTORY=${INSTALL_DIRECTORY}" \
     --env "DEPLOYMENT_HOST_HOSTNAME=${DEPLOYMENT_HOST_HOSTNAME}" \
     --env "DEPLOYMENT_HOST_USER=${DEPLOYMENT_HOST_USER}" \
     --env "DEPLOYMENT_HOST_PASSWORD=${DEPLOYMENT_HOST_PASSWORD}" \
     --volume /var/run/docker.sock:/var/run/docker.sock \
+    --volume "${INSTALL_DIRECTORY}:/install" \
     --add-host "${SLM_HOSTNAME}:host-gateway" \
     ghcr.io/eclipse-slm/slm/installer-api:${SLM_VERSION} \
     install
@@ -189,8 +198,12 @@ else
   sudo docker run \
     --rm \
     --pull=always \
+    --env "INSTALL_DIRECTORY=${INSTALL_DIRECTORY}" \
     --volume /var/run/docker.sock:/var/run/docker.sock \
+    --volume "${INSTALL_DIRECTORY}:/install" \
     ghcr.io/eclipse-slm/slm/installer-api:${SLM_VERSION} \
     uninstall
-fi
 
+  # Remove installer-generated files after successful uninstall
+  sudo rm -rf "${INSTALL_DIRECTORY}"
+fi

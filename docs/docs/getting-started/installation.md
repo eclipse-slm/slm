@@ -44,11 +44,12 @@ sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.rsyslogd
 ```
 :::
 
-Set in your current shell the environment variables `SLM_HOSTNAME`, `SLM_IP` and `SLM_VERSION` for the host where the SLM will be installed. E.g.:
+Set in your current shell the environment variables `SLM_HOSTNAME`, `SLM_IP`, `SLM_VERSION` and `INSTALL_DIRECTORY` for the host where the SLM will be installed. E.g.:
 ```sh
 export SLM_HOSTNAME=myhost.local
 export SLM_IP=172.17.0.1
 export SLM_VERSION=1.5.0-SNAPSHOT
+export INSTALL_DIRECTORY=/opt/eclipse-slm
 ```
 ::: warning ATTENTION
 **Use lowercase for the hostname to avoid case problems (e.g. with token authentication)**
@@ -72,7 +73,9 @@ docker run \
   --pull=always \
   --env SLM_HOSTNAME=$SLM_HOSTNAME \
   --env SLM_IP=$SLM_IP \
+  --env INSTALL_DIRECTORY=$INSTALL_DIRECTORY \
   --volume /var/run/docker.sock:/var/run/docker.sock \
+  --volume $INSTALL_DIRECTORY:/install \
   --add-host $SLM_HOSTNAME:host-gateway \
   ghcr.io/eclipse-slm/slm/installer-api:$SLM_VERSION \
   install
@@ -96,12 +99,19 @@ chmod +x slm-installer.sh
 ```
 ==
 == Docker
+Set in your current shell the environment variables `SLM_VERSION` and `INSTALL_DIRECTORY`, e.g.:
+```sh
+export SLM_VERSION=1.5.0-SNAPSHOT
+export INSTALL_DIRECTORY=/opt/eclipse-slm
+```
+
 Run the following docker command to start the uninstallation of the SLM:
 ```sh
 docker run \
   --rm \
   --volume /var/run/docker.sock:/var/run/docker.sock \
-  ghcr.io/eclipse-slm/slm/installer-api:1.5.0-SNAPSHOT \
+  --volume $INSTALL_DIRECTORY:/install \
+  ghcr.io/eclipse-slm/slm/installer-api:$SLM_VERSION \
   uninstall
 ```
 ==

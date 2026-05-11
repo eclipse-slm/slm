@@ -8,16 +8,17 @@ services:
     environment:
       SLM_HOSTNAME: ${SLM_HOSTNAME}
       SLM_IP: ${SLM_IP}
+      INSTALL_DIRECTORY: ${INSTALL_DIRECTORY}
       DEPLOYMENT_HOST_HOSTNAME: ${DEPLOYMENT_HOST_HOSTNAME}
       DEPLOYMENT_HOST_USER: ${DEPLOYMENT_HOST_USER}
       DEPLOYMENT_HOST_PASSWORD: ${DEPLOYMENT_HOST_PASSWORD}
     volumes:
       - "//var/run/docker.sock:/var/run/docker.sock"
+      - "${INSTALL_DIRECTORY}:/install"
       - "./ansible/installer/env.yml:/env/env.yml"
       - "./ansible/installer/env.override.yml:/env/env.override.yml"
       - "./ansible/installer/src:/ansible/installer/src"
       - "./ansible/uninstaller/src:/ansible/uninstaller/src"
-      - "./result_compose:/compose"
       - "./backend:/app/backend"
     ports:
       - "8080:8080"

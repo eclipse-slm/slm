@@ -6,6 +6,7 @@ ENV INSTALLER_WORKING_DIR=/ansible/installer/src \
 	INSTALLER_UNINSTALL_PLAYBOOK=main.yml \
 	INSTALLER_ENV_FILE=/env/env.yml \
 	INSTALLER_RUNNER_MODE=subprocess \
+	INSTALL_DIRECTORY=/opt/eclipse-slm \
 	DEPLOYMENT_HOST_HOSTNAME=localhost
 
 RUN curl -fL https://dl.min.io/client/mc/release/linux-amd64/mc \
@@ -27,7 +28,6 @@ COPY ansible/installer/src /ansible/installer/src
 COPY ansible/uninstaller/src /ansible/uninstaller/src
 COPY ansible/installer/env.yml /env/env.yml
 COPY ansible/installer/env.override.yml /env/env.override.yml
-RUN mkdir -p /compose
 
 RUN ansible-galaxy install -r /ansible/installer/src/requirements.yml
 RUN ansible-galaxy install -r /ansible/uninstaller/src/requirements.yml
@@ -37,4 +37,3 @@ WORKDIR /app
 EXPOSE 8080
 
 ENTRYPOINT ["/app/entrypoint-api.sh"]
-

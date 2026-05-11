@@ -48,3 +48,14 @@
       community.docker.docker_network:
         name: "{{ compose_project_name }}_default"
         state: absent
+
+    - name: Remove directories of SLM installation
+      ansible.builtin.file:
+        path: "/install/{{ item }}"
+        state: absent
+      with_items:
+        - deployment
+        - config
+
+    - debug:
+        msg: "Eclipse Service Lifecycle Management version '{{ ENV.SLM_VERSION }}' successfully uninstalled"

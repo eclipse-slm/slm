@@ -6,8 +6,6 @@ ENV CONSUL_URL=http://consul:8500 \
     DEPLOYMENT_HOST_HOSTNAME=localhost \
     ANSIBLE_CMD_PARAMETERS="-v"
 
-RUN mkdir /compose
-
 RUN curl -fL https://dl.min.io/client/mc/release/linux-amd64/mc \
       --create-dirs \
       -o /usr/local/bin/mc

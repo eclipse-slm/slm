@@ -41,6 +41,7 @@
     - set_fact:
         SLM_HOSTNAME: "{{ lookup('ansible.builtin.env', 'SLM_HOSTNAME') }}"
         SLM_IP: "{{ lookup('ansible.builtin.env', 'SLM_IP') }}"
+        INSTALL_DIRECTORY: "{{ lookup('ansible.builtin.env', 'INSTALL_DIRECTORY') }}"
     - name: "Import config from env.yml"
       include_vars:
         file: "/env/env.yml"
@@ -73,6 +74,14 @@
         ENV: "{{ ENV | combine({
                     'SLM_HOSTNAME': lookup('ansible.builtin.env', 'SLM_HOSTNAME')
                 }, recursive=True) }}"
+    - name: "Create directories required by installer"
+      ansible.builtin.file:
+        path: "/install/{{ item }}"
+        state: directory
+        mode: "0755"
+      with_items:
+        - config
+        - deployment
   tasks:
     - name: "Define global variables"
       block:
@@ -264,21 +273,21 @@
       include_role:
         name: vault/init
       vars:
-        _store_compose_dir: /compose/
+        _store_compose_dir: "/install/deployment"
 
     - name: "Start Consul"
       include_role:
         name: consul/init
         tasks_from: start.yml
       vars:
-        _store_compose_dir: /compose/
+        _store_compose_dir: "/install/deployment"
 
     - name: "Start Traefik"
       include_role:
         name: traefik/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: /compose/
+        _store_compose_dir: "/install/deployment"
         _vault_root_token: "{{ vault_root_token }}"
 
     - name: "Start Keycloak"
@@ -286,7 +295,7 @@
         name: keycloak/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: /compose/
+        _store_compose_dir: "/install/deployment"
 
     - name: "Init Vault after Keycloak available"
       include_role:
@@ -307,14 +316,14 @@
         name: rabbitmq/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: /compose/
+        _store_compose_dir: "/install/deployment"
 
     - name: "Start Minio"
       include_role:
         name: minio/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: /compose/
+        _store_compose_dir: "/install/deployment"
 
     - name: "Start AWX"
       include_role:
@@ -322,28 +331,28 @@
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _vault_token: "{{ vault_root_token }}"
-        _store_compose_dir: /compose/
+        _store_compose_dir: "/install/deployment"
 
     - name: "Start AAS infrastructure"
       include_role:
         name: aas/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: /compose/
+        _store_compose_dir: "/install/deployment"
 
     - name: "Start monitoring"
       ansible.builtin.include_role:
         name: monitoring/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: /compose/
+        _store_compose_dir: "/install/deployment"
 
     - name: "Start discovery"
       ansible.builtin.include_role:
         name: discovery/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: /compose/
+        _store_compose_dir: "/install/deployment"
 
     - name: "Start IRS"
       include_role:
@@ -351,7 +360,7 @@
         tasks_from: main.yml
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: /compose/
+        _store_compose_dir: "/install/deployment"
       when: ENV.IRS.ENABLED
 
     - name: "Start internal SLM components"
@@ -360,7 +369,7 @@
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _vault_token: "{{ vault_root_token }}"
-        _store_compose_dir: /compose/
+        _store_compose_dir: "/install/deployment"
 
     - name: "Store resulting environment file"
       include_role:
@@ -368,7 +377,9 @@
         tasks_from: copy_result_compose_env
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_env_file: /compose/.env
+        _store_env_file: "/install/deployment/.env"
 
     - debug:
-        msg: "Eclipse Service Lifecycle Management version '{{ ENV.SLM_VERSION }}' successfully installed. Your Consul master token: {{ ENV.CONSUL.MASTER_TOKEN }}"
+        msg: "Eclipse Service Lifecycle Management version '{{ ENV.SLM_VERSION }}' successfully installed: Consul Master Token: {{ ENV.CONSUL.MASTER_TOKEN }} | Install Directory: {{ INSTALL_DIRECTORY }}"
+
+
