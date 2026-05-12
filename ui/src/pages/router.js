@@ -183,6 +183,12 @@ const routes = [
         component: () => import('@/pages/AdminServiceVendorsPage.vue'),
         meta: { adminPermissionRequired: true },
       },
+      {
+        name: 'AdminUsers',
+        path: '/admin/users',
+        component: () => import('@/pages/AdminUsersPage.vue'),
+        meta: { adminPermissionRequired: true },
+      },
     ],
   }
 ];

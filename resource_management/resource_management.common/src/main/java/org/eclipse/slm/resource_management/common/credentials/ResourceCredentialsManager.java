@@ -5,7 +5,7 @@ import org.eclipse.slm.common.credentials.model.Credential;
 import org.eclipse.slm.common.credentials.model.CredentialData;
 import org.eclipse.slm.common.credentials.model.CredentialEntityLinkCreateDTO;
 import org.eclipse.slm.common.restclient.feign.FeignResponseException;
-import org.eclipse.slm.platform_management.service.api.credentials.CredentialCreateRequest;
+import org.eclipse.slm.platform_management.features.credentials_management.api.CredentialCreateRequest;
 import org.eclipse.slm.platform_management.service.client.PlatformManagementClient;
 import org.eclipse.slm.platform_management.service.client.PlatformManagementClientFactory;
 import org.eclipse.slm.platform_management.service.client.PlatformManagementCredentialsClient;

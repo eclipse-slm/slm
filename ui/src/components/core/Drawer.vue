@@ -282,6 +282,13 @@ export default {
                 icon: 'mdi-treasure-chest',
                 to: 'service-vendors',
                 visible: this.userStore.userRoles.includes('slm-admin'),
+              },
+              {
+                id: 'main-menu-button-admin-users',
+                title: 'User Management',
+                icon: 'mdi-account-cog',
+                to: 'users',
+                visible: this.userStore.userRoles.includes('slm-admin'),
               }
             ],
           },

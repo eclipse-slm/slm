@@ -51,6 +51,13 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Keycloak !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.utils.keycloak</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- Device Driver !-->
         <dependency>
             <groupId>org.eclipse.slm</groupId>

@@ -17,7 +17,6 @@
     <modules>
         <module>platform_management.service.app</module>
         <module>platform_management.service.client</module>
-        <module>platform_management.service.api</module>
     </modules>
 
 </project>
