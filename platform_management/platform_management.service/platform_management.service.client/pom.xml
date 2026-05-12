@@ -18,7 +18,7 @@
         <!-- Platform Management Service API !-->
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>platform_management.service.api</artifactId>
+            <artifactId>platform_management.common.api</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

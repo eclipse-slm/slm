@@ -101,6 +101,13 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Keycloak !-->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.utils.keycloak</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- Platform Management Service Client !-->
         <dependency>
             <groupId>org.eclipse.slm</groupId>

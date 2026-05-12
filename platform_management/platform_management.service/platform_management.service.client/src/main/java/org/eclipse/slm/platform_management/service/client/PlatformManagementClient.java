@@ -2,7 +2,7 @@ package org.eclipse.slm.platform_management.service.client;
 
 import org.eclipse.slm.common.parent.client.AbstractApiClient;
 import org.eclipse.slm.common.restclient.feign.auth.AuthRequestInterceptor;
-import org.eclipse.slm.platform_management.service.api.credentials.CredentialManagementRestApiConfig;
+import org.eclipse.slm.platform_management.features.credentials_management.api.CredentialManagementRestApiConfig;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 
