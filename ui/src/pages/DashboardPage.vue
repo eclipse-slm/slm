@@ -113,7 +113,7 @@
           <v-card-text v-else>
             <v-data-table
               id="jobsDashboardTable"
-              :sort-by.sync="sortBy"
+              v-model:sort-by="sortBy"
               :hide-default-footer="true"
               :footer-props="{'items-per-page-options':[jobCount]}"
               :headers="DataTableHeaders"

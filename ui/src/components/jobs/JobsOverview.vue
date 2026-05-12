@@ -24,7 +24,7 @@
         <v-data-table
           v-if="jobs && jobs.length > 0"
           id="jobsTable"
-          :sort-by.sync="sortBy"
+          v-model:sort-by="sortBy"
           :footer-props="{
             'items-per-page-options': [5, 10, 20, -1],
           }"

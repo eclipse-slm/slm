@@ -55,8 +55,9 @@
       <v-divider />
 
       <v-data-table
+        v-if="notifications && notifications.length > 0"
         id="notificationsTable"
-        :sort-by.sync="sortBy"
+        v-model:sort-by="sortBy"
         :footer-props="{
           'items-per-page-options': [5, 10, 20, -1],
         }"
@@ -102,7 +103,7 @@ import NotificationTextGenerator from '@/utils/notificationTextGenerator'
 const { t } = useI18n()
 const notificationStore = useNotificationStore()
 
-const sortBy = ref(['id'])
+const sortBy = ref([{ key: 'id', order: 'desc' }])
 const sortDesc = ref(true)
 const filterRead = ref(null)
 

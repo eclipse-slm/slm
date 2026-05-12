@@ -60,6 +60,13 @@ const filteredResources = computed(() => {
   });
 });
 
+const tableItems = computed(() => {
+  return filteredResources.value.map(resource => ({
+    ...resource,
+    product: DeviceUtils.getProduct(resource.id),
+    manufacturer: DeviceUtils.getManufacturer(resource.id),
+  }));
+});
 
 const locations = computed(() => resourceDevicesStore.locations);
 const profiler = computed(() => resourceDevicesStore.profiler);
@@ -231,9 +238,9 @@ const colorRowItem = (row) => {
       :model-value="selectedResourcesIds"
       @update:model-value="val => selectedResourcesIds = val"
       :headers="tableHeaders"
-      :items="filteredResources"
+      :items="tableItems"
       :search="searchResources"
-      :sort-by.sync="sortBy"
+      v-model:sort-by="sortBy"
       item-key="id"
       :items-per-page="25"
       :loading="apiState === ApiState.LOADING || apiState === ApiState.UPDATING"
@@ -254,13 +261,13 @@ const colorRowItem = (row) => {
 
       <template #item.product="{ item }">
         <div>
-          {{ DeviceUtils.getProduct(item.id) }}
+          {{ item.product }}
         </div>
       </template>
 
       <template #item.manufacturer="{ item }">
         <div>
-          {{ DeviceUtils.getManufacturer(item.id) }}
+          {{ item.manufacturer }}
         </div>
       </template>
 
