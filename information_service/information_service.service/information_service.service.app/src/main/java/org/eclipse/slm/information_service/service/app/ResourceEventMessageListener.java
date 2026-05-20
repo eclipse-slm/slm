@@ -59,8 +59,8 @@ public class ResourceEventMessageListener extends GenericMessageListener<Resourc
         this.submodelRepositoryClient = submodelRepositoryClientFactory.getClient();
         this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
 
-        this.irsAasRepositoryClient = new AasRepositoryClient(this.irsUrlInternal + "/api/shell_repo");
-        this.irsSubmodelRegistryClient = new SubmodelRegistryClient(this.irsUrlInternal + "/api/submodel_registry", null);
+        this.irsAasRepositoryClient = new AasRepositoryClient(this.irsUrlInternal);
+        this.irsSubmodelRegistryClient = new SubmodelRegistryClient(this.irsUrlInternal, null);
     }
 
     @Override
@@ -124,13 +124,20 @@ public class ResourceEventMessageListener extends GenericMessageListener<Resourc
             var uriOfTheProductBase64Encoded = Base64.getEncoder().encodeToString(assetId.getBytes());
             String[] shellIds = new String[0];
             try {
-                shellIds = webClient.get()
-                        .uri(uriBuilder -> uriBuilder.path("/api/shell_discovery/lookup/shells")
-                                .queryParam("assetId", uriOfTheProductBase64Encoded)
+                var lookupResponse = webClient.get()
+                        .uri(uriBuilder -> uriBuilder.path("/lookup/shells")
+                                .queryParam("assetIds", uriOfTheProductBase64Encoded)
                                 .build())
                         .retrieve()
-                        .bodyToMono(String[].class)
+                        .bodyToMono(ShellLookupResponse.class)
                         .block();
+
+                if (lookupResponse == null || lookupResponse.getResult() == null) {
+                    LOG.info("No shells found for asset id '{}', skipping information retrieval", assetId);
+                    return;
+                }
+
+                shellIds = lookupResponse.getResult().toArray(String[]::new);
             } catch (WebClientResponseException.NotFound e) {
                 LOG.info("No shells found for asset id '{}', skipping information retrieval", assetId);
                 return;
@@ -175,7 +182,7 @@ public class ResourceEventMessageListener extends GenericMessageListener<Resourc
                 }
 
                 // Register submodel of IRS at submodel registry of SLM
-                var submodelEndpoint = irsUrlExternal + "/api/submodel_repo/submodels/" + Base64.getEncoder().encodeToString(submodelDescriptor.getId().getBytes());
+                var submodelEndpoint = irsUrlExternal + "/submodels/" + Base64.getEncoder().encodeToString(submodelDescriptor.getId().getBytes());
                 String semanticId = null;
                 if (submodelDescriptor.getSemanticId() != null) {
                     if (!submodelDescriptor.getSemanticId().getKeys().isEmpty()) {
@@ -208,6 +215,15 @@ public class ResourceEventMessageListener extends GenericMessageListener<Resourc
             LOG.error("Error while processing resourceCreatedMessage created message: {} | Stack Trace: {}", e.getMessage(),  buffer);
         }
     }
+    private static class ShellLookupResponse {
+        private List<String> result;
 
+        public List<String> getResult() {
+            return result;
+        }
 
+        public void setResult(List<String> result) {
+            this.result = result;
+        }
+    }
 }
