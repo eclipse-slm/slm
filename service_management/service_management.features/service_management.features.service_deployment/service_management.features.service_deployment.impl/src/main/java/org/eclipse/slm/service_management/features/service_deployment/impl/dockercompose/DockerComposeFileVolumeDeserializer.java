@@ -1,0 +1,42 @@
+package org.eclipse.slm.service_management.features.service_deployment.impl.dockercompose;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.module.kotlin.KotlinModule;
+
+import java.io.IOException;
+
+public class DockerComposeFileVolumeDeserializer extends StdDeserializer<DockerComposeFileVolume> {
+
+    public DockerComposeFileVolumeDeserializer() {
+        this(null);
+    }
+
+    public DockerComposeFileVolumeDeserializer(Class<?> vc) {
+        super(vc);
+    }
+
+    @Override
+    public DockerComposeFileVolume deserialize(JsonParser jp, DeserializationContext ctxt)
+            throws IOException {
+        JsonNode node = jp.getCodec().readTree(jp);
+
+        if (node instanceof ObjectNode) {
+            var mapper = new ObjectMapper(new YAMLFactory());
+            KotlinModule kotlinModule = new KotlinModule.Builder()
+                    .build();
+            mapper.registerModule(kotlinModule);
+            return mapper.readValue(node.traverse(), DockerComposeFileVolume.class);
+        }
+        else {
+            var volumeString = node.textValue();
+            return new DockerComposeFileVolume(volumeString);
+        }
+    }
+}
+

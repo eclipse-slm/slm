@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.slm.aas.clients.base.FeignResponseException;
 import org.eclipse.slm.common.utils.files.FilesUtil;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
-import org.eclipse.slm.service_management.model.vendors.ServiceVendor;
-import org.eclipse.slm.service_management.model.vendors.ServiceVendorDTOApi;
-import org.eclipse.slm.service_management.model.vendors.ServiceVendorDTOFileImport;
+import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendor;
+import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendorDTOApi;
+import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendorDTOFileImport;
 import org.eclipse.slm.service_management.service.client.ServiceManagementClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,3 +67,4 @@ public class ServiceVendorsInitializer extends AbstractInitializer {
         }
     }
 }
+

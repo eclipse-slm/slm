@@ -7,13 +7,13 @@ import org.eclipse.slm.common.utils.files.FilesUtil;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
 import org.eclipse.slm.common.utils.serviceofferingimport.ServiceOfferingUtil;
 import org.eclipse.slm.common.utils.serviceofferingimport.ServiceOfferingVersionUtil;
-import org.eclipse.slm.service_management.model.exceptions.ServiceOfferingReferencedFileNotFound;
-import org.eclipse.slm.service_management.model.offerings.ServiceCategory;
-import org.eclipse.slm.service_management.model.offerings.ServiceOfferingDTOFileImport;
-import org.eclipse.slm.service_management.model.offerings.ServiceOfferingVersionDTOApi;
-import org.eclipse.slm.service_management.model.offerings.exceptions.ServiceOfferingVersionCreateException;
-import org.eclipse.slm.service_management.model.vendors.exceptions.ServiceVendorNotFoundException;
-import org.eclipse.slm.service_management.service.app.service_categories.ServiceCategoryNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategory;
+import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOfferingReferencedFileNotFound;
+import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOfferingDTOFileImport;
+import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersionDTOApi;
+import org.eclipse.slm.service_management.features.service_offerings.api.offerings.exceptions.ServiceOfferingVersionCreateException;
+import org.eclipse.slm.service_management.features.service_offerings.api.vendors.exceptions.ServiceVendorNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceCategoryNotFoundException;
 import org.eclipse.slm.service_management.service.client.ServiceManagementClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class ServiceOfferingInitializer extends AbstractInitializer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServiceOfferingInitializer.class);
 
-    private List<ServiceCategory> serviceCategories;
+    private List<ServiceOfferingCategory> serviceCategories;
 
     public ServiceOfferingInitializer(ServiceManagementClientFactory serviceManagementClientFactory) {
         super(serviceManagementClientFactory);
@@ -187,3 +187,4 @@ public class ServiceOfferingInitializer extends AbstractInitializer {
         }
     }
 }
+

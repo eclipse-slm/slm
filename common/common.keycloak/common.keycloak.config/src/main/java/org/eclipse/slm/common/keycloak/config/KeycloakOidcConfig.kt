@@ -24,7 +24,7 @@ class KeycloakOidcConfig @JsonCreator constructor(
     val confidentialPort: Int
 
 ) {
-    val authServerUrlIncludingRealm: String = this.authServerUrl + "realms/" + this.realm;
+    val authServerUrlIncludingRealm: String = this.authServerUrl + "realms/" + this.realm
 
     val tokenServerUrl: String = this.authServerUrlIncludingRealm + "/protocol/openid-connect/token"
 }

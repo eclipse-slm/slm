@@ -52,7 +52,7 @@ class CapabilityJob(id: UUID? = null,
     : this(null, null, null)
 
     fun addLogMessage(message: String) {
-            logMessages.add(message);
+            logMessages.add(message)
     }
 
  }

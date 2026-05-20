@@ -1,0 +1,160 @@
+package org.eclipse.slm.service_management.features.service_offerings.impl.serviceofferingversions;
+
+import org.eclipse.digitaltwin.aas4j.v3.model.Property;
+import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
+import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection;
+import org.eclipse.slm.aas.clients.shellrepository.AasRepositoryClient;
+import org.eclipse.slm.aas.clients.shellrepository.AasRepositoryClientFactory;
+import org.eclipse.slm.aas.clients.submodelregistry.SubmodelRegistryClient;
+import org.eclipse.slm.aas.clients.submodelregistry.SubmodelRegistryClientFactory;
+import org.eclipse.slm.aas.clients.submodelrepository.SubmodelRepositoryClientFactory;
+import org.eclipse.slm.aas.clients.submodelservice.SubmodelServiceClient;
+import org.eclipse.slm.resource_management.common.aas.ResourceAas;
+import org.eclipse.slm.service_management.features.service_offerings.api.offerings.RequirementLogicType;
+import org.eclipse.slm.service_management.features.service_offerings.api.offerings.RequirementProperty;
+import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceRequirement;
+import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceRequirementLogic;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Component
+public class ServiceOfferingVersionRequirementsHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceOfferingVersionRequirementsHandler.class);
+
+    private final AasRepositoryClient aasRepositoryClient;
+
+    private final SubmodelRegistryClient submodelRegistryClient;
+
+    public ServiceOfferingVersionRequirementsHandler(AasRepositoryClientFactory aasRepositoryClientFactory,
+                                                     SubmodelRegistryClientFactory submodelRegistryClientFactory) {
+        this.aasRepositoryClient = aasRepositoryClientFactory.getClient();
+        this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
+    }
+
+    public boolean isRequirementFulfilledByResource(ServiceRequirement serviceRequirement,
+                                                    UUID resourceId,
+                                                    JwtAuthenticationToken jwtAuthenticationToken) {
+        var resourceAasOptional = this.aasRepositoryClient.getAas(ResourceAas.createAasIdFromResourceId(resourceId));
+        var resourceAas = resourceAasOptional.get();
+
+        var resourceSubmodels = new ArrayList<Submodel>();
+        for (var submodelRef: resourceAas.getSubmodels()) {
+            if (submodelRef.getKeys().isEmpty()) {
+                LOG.debug("No submodel ref keys found, skipping for requirements check: {}", submodelRef);
+                continue;
+            }
+            var submodelId = submodelRef.getKeys().get(0).getValue();
+            var submodelDescriptor = this.submodelRegistryClient.getSubmodelDescriptor(submodelId);
+            if (submodelDescriptor.isEmpty()) {
+                LOG.debug("Submodel descriptor '{}' not found, skipping for requirements check", submodelId);
+                continue;
+            }
+
+            var submodelEndpoint = submodelDescriptor.get().getEndpoints().get(0).getProtocolInformation().getHref();
+
+            if (submodelEndpoint.contains("/submodels/")) {
+                var scopedSubmodelRepositoryClient = SubmodelRepositoryClientFactory.FromSubmodelDescriptor(submodelDescriptor.get(), jwtAuthenticationToken);
+                var submodel = scopedSubmodelRepositoryClient.getSubmodelOrThrow(submodelDescriptor.get().getId());
+                if (submodel != null) {
+                    resourceSubmodels.add(submodel);
+                }
+            } else if (submodelEndpoint.endsWith("/submodel")) {
+                var submodelServiceClient = SubmodelServiceClient.FromSubmodelDescriptor(submodelDescriptor.get(), jwtAuthenticationToken);
+                var submodelOptional = submodelServiceClient.getSubmodel();
+                submodelOptional.ifPresent(resourceSubmodels::add);
+            }
+        }
+
+        // Check if requirement logic is fulfilled by submodels
+        return this.isRequirementFulfilledBySubmodels(serviceRequirement, resourceSubmodels);
+
+    }
+
+    public boolean isRequirementFulfilledBySubmodels(ServiceRequirement serviceRequirement, List<Submodel> submodels) {
+        return serviceRequirement.getLogics().stream().allMatch(logic -> isLogicFulfilledBySubmodels(logic, submodels));
+    }
+
+    public boolean isLogicFulfilledBySubmodels(ServiceRequirementLogic logic, List<Submodel> submodels) {
+        var propertiesFulfilled = new ArrayList<Boolean>();
+        for (RequirementProperty requirementProperty : logic.getProperties()) {
+            boolean propertyFulfilled = false;
+            for (Submodel submodel : submodels) {
+                propertyFulfilled = isRequirementPropertyFulfilledBySubmodel(requirementProperty, submodel);
+                if (propertyFulfilled) {
+                    break;
+                }
+            }
+            propertiesFulfilled.add(propertyFulfilled);
+        }
+        if (logic.getType() == RequirementLogicType.ALL) {
+            return propertiesFulfilled.stream().allMatch(Boolean::valueOf);
+        } else if (logic.getType() == RequirementLogicType.ANY) {
+            return propertiesFulfilled.stream().anyMatch(Boolean::valueOf);
+        }
+        return false;
+    }
+
+    public boolean isRequirementPropertyFulfilledBySubmodel(RequirementProperty requirementProperty, Submodel submodel) {
+        if (!isCorrectParentSubmodel(requirementProperty, submodel)) {
+            return false;
+        }
+        var property = findPropertyInSubmodel(submodel, requirementProperty.getSemanticId());
+        return property != null && property.getValue().equals(requirementProperty.getValue());
+    }
+
+    public boolean isCorrectParentSubmodel(RequirementProperty property, Submodel submodel) {
+        for (String parentSemanticId: property.getParentSubmodelsSemanticIds()) {
+            if (submodel.getSemanticId() != null) {
+                for (var key : submodel.getSemanticId().getKeys()) {
+                    if (key.getValue().equals(parentSemanticId)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public Property findPropertyInSubmodel(Submodel submodel, String semanticId) {
+        for (var submodelElement : submodel.getSubmodelElements()) {
+            if (submodelElement instanceof SubmodelElementCollection) {
+                Property property = findPropertyInSubmodelElementCollection((SubmodelElementCollection) submodelElement, semanticId);
+                if (property != null) {
+                    return property;
+                }
+            } else if (submodelElement instanceof Property) {
+                Property property = (Property) submodelElement;
+                var keys = property.getSemanticId().getKeys();
+                if (keys.size() > 0 && keys.get(0).getValue().equals(semanticId)) {
+                    return property;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Property findPropertyInSubmodelElementCollection(SubmodelElementCollection smc, String semanticId) {
+        for (var submodelElement : smc.getValue()) {
+            if (submodelElement instanceof SubmodelElementCollection) {
+                Property property = findPropertyInSubmodelElementCollection((SubmodelElementCollection) submodelElement, semanticId);
+                if (property != null) {
+                    return property;
+                }
+            } else if (submodelElement instanceof Property) {
+                var property = (Property) submodelElement;
+                var keys = property.getSemanticId().getKeys();
+                if (keys.size() > 0 && keys.get(0).getValue().equals(semanticId)) {
+                    return property;
+                }
+            }
+        }
+        return null;
+    }
+}
+

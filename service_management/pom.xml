@@ -15,8 +15,8 @@
     </parent>
 
     <modules>
-        <module>service_management.model</module>
-        <module>service_management.persistence</module>
+        <module>service_management.common</module>
+        <module>service_management.features</module>
         <module>service_management.service</module>
     </modules>
 

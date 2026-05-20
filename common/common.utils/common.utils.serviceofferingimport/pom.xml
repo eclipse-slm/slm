@@ -16,7 +16,13 @@
     <dependencies>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>service_management.model</artifactId>
+            <artifactId>service_management.common.api</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>service_management.features.service_offerings.api</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

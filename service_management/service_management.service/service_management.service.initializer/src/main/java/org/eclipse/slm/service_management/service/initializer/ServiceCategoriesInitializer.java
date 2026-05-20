@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.slm.common.restclient.feign.FeignResponseException;
 import org.eclipse.slm.common.utils.files.FilesUtil;
-import org.eclipse.slm.service_management.model.offerings.ServiceCategory;
+import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategory;
 import org.eclipse.slm.service_management.service.client.ServiceManagementClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ public class ServiceCategoriesInitializer extends AbstractInitializer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServiceCategoriesInitializer.class);
 
-    private Map<String, ServiceCategory> serviceCategories = new HashMap<>();
+    private Map<String, ServiceOfferingCategory> serviceCategories = new HashMap<>();
 
     protected ServiceCategoriesInitializer(ServiceManagementClientFactory serviceManagementClientFactory) {
         super(serviceManagementClientFactory);
@@ -34,7 +34,7 @@ public class ServiceCategoriesInitializer extends AbstractInitializer {
             var serviceCategoriesInitFile = files[0];
             var alreadyExistingServiceCategories = this.serviceManagementClient.serviceCategories().getServiceCategories();
 
-            List<ServiceCategory> serviceCategories = FilesUtil.loadFromFile(serviceCategoriesInitFile, new TypeReference<List<ServiceCategory>>() {
+            List<ServiceOfferingCategory> serviceCategories = FilesUtil.loadFromFile(serviceCategoriesInitFile, new TypeReference<List<ServiceOfferingCategory>>() {
             });
             for (var serviceCategory : serviceCategories) {
                 try {
@@ -60,3 +60,4 @@ public class ServiceCategoriesInitializer extends AbstractInitializer {
         }
     }
 }
+
