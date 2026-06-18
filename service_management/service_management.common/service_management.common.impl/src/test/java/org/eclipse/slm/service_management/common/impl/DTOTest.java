@@ -1,10 +1,11 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.common.impl;
+package org.eclipse.slm.service_management.common.impl;
 
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
-import org.eclipse.slm.service_management.offerings.ServiceOfferingCategory;
-import org.eclipse.slm.service_management.offerings.ServiceOffering;
-import org.eclipse.slm.service_management.offerings.ServiceOfferingDTOApi;
-import org.eclipse.slm.service_management.model.vendors.ServiceVendor;
+import org.eclipse.slm.service_management.common.impl.DTOConfig;
+import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategory;
+import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOffering;
+import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOfferingDTOApi;
+import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendor;
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
@@ -55,4 +56,3 @@ public class DTOTest {
         }
     }
 }
-
