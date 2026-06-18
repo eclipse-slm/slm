@@ -3,7 +3,7 @@ package org.eclipse.slm.service_management.features.service_deployment.impl.serv
 import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUser;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstancesGroupsRestApi;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstancesGroupsRestApiConfig;
-import org.eclipse.slm.service_management.features.service_deployment.api.services.ServiceInstanceGroup;
+import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstanceGroup;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

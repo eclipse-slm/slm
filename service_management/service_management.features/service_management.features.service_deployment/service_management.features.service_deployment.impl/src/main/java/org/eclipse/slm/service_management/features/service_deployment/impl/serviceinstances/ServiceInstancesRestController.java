@@ -2,21 +2,21 @@ package org.eclipse.slm.service_management.features.service_deployment.impl.serv
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
-import org.eclipse.slm.service_management.features.service_deployment.api.AvailableServiceInstanceVersionChange;
+import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.AvailableServiceInstanceVersionChange;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.CapabilityServiceNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstancesRestApi;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstancesRestApiConfig;
-import org.eclipse.slm.service_management.features.service_deployment.api.services.ServiceInstance;
+import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstance;
 import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOptionNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstanceRuntimeException;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrder;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.exceptions.InvalidServiceOfferingDefinitionException;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.exceptions.ServiceOfferingNotFoundException;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.exceptions.ServiceOfferingVersionNotFoundException;
-import org.eclipse.slm.service_management.features.service_deployment.api.services.ServiceInstanceDetails;
+import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstanceDetails;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstanceGroupNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstanceNotFoundException;
-import org.eclipse.slm.service_management.features.service_deployment.api.services.exceptions.ServiceInstanceUpdateException;
+import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstanceUpdateException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

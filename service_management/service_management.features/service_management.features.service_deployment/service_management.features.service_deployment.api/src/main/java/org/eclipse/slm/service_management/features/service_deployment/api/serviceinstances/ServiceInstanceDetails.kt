@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_deployment.api.services
+package org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances
 
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrder
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.options.ServiceOptionWithCurrentValue

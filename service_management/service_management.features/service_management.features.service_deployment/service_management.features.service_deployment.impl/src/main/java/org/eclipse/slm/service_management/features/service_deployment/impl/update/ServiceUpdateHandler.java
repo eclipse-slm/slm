@@ -10,7 +10,7 @@ import org.eclipse.slm.resource_management.features.capabilities.model.Deploymen
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementClientFactory;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.CapabilityServiceNotFoundException;
-import org.eclipse.slm.service_management.features.service_deployment.api.services.ServiceInstance;
+import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstance;
 import org.eclipse.slm.service_management.features.service_deployment.impl.ServiceInstanceEventType;
 import org.eclipse.slm.service_management.features.service_deployment.impl.deployment.AbstractServiceDeploymentHandler;
 import org.eclipse.slm.service_management.features.service_deployment.impl.deployment.ServiceOrderJpaRepository;

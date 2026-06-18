@@ -7,7 +7,7 @@ import org.eclipse.slm.common.consul.model.acl.policies.Policy;
 import org.eclipse.slm.common.consul.model.catalog.CatalogRegistration;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstanceNotFoundException;
-import org.eclipse.slm.service_management.features.service_deployment.api.services.ServiceInstance;
+import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

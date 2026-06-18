@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_deployment.api.services
+package org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
