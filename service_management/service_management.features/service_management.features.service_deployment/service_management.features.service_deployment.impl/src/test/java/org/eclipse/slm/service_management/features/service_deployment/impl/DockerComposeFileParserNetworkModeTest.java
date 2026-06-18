@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.features.service_deployment.impl;
+package org.eclipse.slm.service_management.features.service_deployment.impl;
 
 import org.eclipse.slm.service_management.features.service_deployment.api.*;
 
@@ -21,7 +21,7 @@ public class DockerComposeFileParserNetworkModeTest {
         public void parseLabelsDefinedAsArray() throws JsonProcessingException {
             var composeFile = """
                     version: "3"
-                                        
+
                     services:
                       test-service:
                         image: "test-image:1.0.0"
@@ -34,4 +34,3 @@ public class DockerComposeFileParserNetworkModeTest {
         }
     }
 }
-

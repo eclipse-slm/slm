@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.features.service_deployment.impl;
+package org.eclipse.slm.service_management.features.service_deployment.impl;
 
 
 import org.eclipse.slm.service_management.features.service_deployment.impl.KubernetesManifestFile;
@@ -223,30 +223,4 @@ public class KubernetesManifestFileParserTest {
         return incomingFileContent;
     }
 
-
-//    private static List<Map<String, Object>> findSubtree(Object yamlObject, String searchKey) {
-//        List<Map<String, Object>> results = new ArrayList<>();
-//
-//        if (yamlObject instanceof Map) {
-//            Map<String, Object> yamlMap = (Map<String, Object>) yamlObject;
-//
-//            if (yamlMap.containsKey(searchKey)) {
-//                results.add(yamlMap);
-//            }
-//
-//            for (Object value : yamlMap.values()) {
-//                results.addAll(findSubtree(value, searchKey));
-//            }
-//        } else if (yamlObject instanceof List) {
-//            List<Object> yamlList = (List<Object>) yamlObject;
-//
-//            for (Object element : yamlList) {
-//                results.addAll(findSubtree(element, searchKey));
-//            }
-//        }
-//
-//        return results;
-//    }
-
 }
-

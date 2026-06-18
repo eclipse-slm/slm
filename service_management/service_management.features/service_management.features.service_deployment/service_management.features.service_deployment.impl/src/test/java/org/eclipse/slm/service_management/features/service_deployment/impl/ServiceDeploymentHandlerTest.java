@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.features.service_deployment.impl;
+package org.eclipse.slm.service_management.features.service_deployment.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -200,4 +200,3 @@ public class ServiceDeploymentHandlerTest {
     }
 
 }
-

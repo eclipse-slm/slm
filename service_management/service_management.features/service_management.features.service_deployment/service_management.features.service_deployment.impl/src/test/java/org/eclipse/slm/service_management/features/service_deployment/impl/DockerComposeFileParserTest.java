@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.features.service_deployment.impl;
+package org.eclipse.slm.service_management.features.service_deployment.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.options.*;
@@ -22,9 +22,9 @@ public class DockerComposeFileParserTest {
     @Test
     public void generateDeployableComposeFileForServiceOffering() throws JsonProcessingException, ServiceOptionNotFoundException, JSONException, InvalidServiceOfferingDefinitionException {
         //region Expected Result
-        String EXPECTED_COMPOSE_FILE = """                
+        String EXPECTED_COMPOSE_FILE = """
             services:
-            
+
               service1:
                 image: https://sample-registry.org/test-image-service1:1.0.0
                 restart: always
@@ -53,7 +53,7 @@ public class DockerComposeFileParserTest {
                   - /dev/device1
                 depends_on:
                   - service2
-                  
+
               service2:
                 image: https://sample-registry.org/test-image-service2:1.2.3
                 restart: always
@@ -76,11 +76,11 @@ public class DockerComposeFileParserTest {
                 depends_on:
                   service1:
                     condition: service_healthy
-            
+
             networks:
               backend:
               frontend:
-              
+
             volumes:
               my_custom_vol:
                 external: true
@@ -91,9 +91,9 @@ public class DockerComposeFileParserTest {
         //region Files
         final var DOCKER_COMPOSE_FILE_INCOMING = """
             version: '3'
-                
+
             services:
-            
+
               service1:
                 image: ${REGISTRY_HOST}/test-image-service1:${SERVICE1_VERSION}
                 restart: always
@@ -117,7 +117,7 @@ public class DockerComposeFileParserTest {
                   - /dev/device1
                 depends_on:
                   - service2
-                  
+
               service2:
                 image: ${REGISTRY_HOST}/test-image-service2:${SERVICE2_VERSION}
                 restart: always
@@ -138,11 +138,11 @@ public class DockerComposeFileParserTest {
                 depends_on:
                   service1:
                     condition: service_healthy
-            
-            networks:     
+
+            networks:
               backend:
               frontend:
-              
+
             volumes:
               my_custom_vol:
                 external: true
@@ -152,7 +152,7 @@ public class DockerComposeFileParserTest {
             REGISTRY_HOST=https://sample-registry.org
             SERVICE1_VERSION=1.0.0
             SERVICE2_VERSION=1.2.3
-            ROOT_PW=password     
+            ROOT_PW=password
         """;
 
         final var ENV1_LIST = """
@@ -248,12 +248,12 @@ public class DockerComposeFileParserTest {
         @Test
         @DisplayName("Parse compose without version definition")
         public void parseWithoutVersionDefinition() throws JsonProcessingException, JSONException {
-            var composeFileExpected = """    
+            var composeFileExpected = """
                     services:
                       test-service:
                         image: "test-image:1.0.0"
                     """;
-            var composeFileIncoming = """    
+            var composeFileIncoming = """
                     services:
                       test-service:
                         image: "test-image:1.0.0"
@@ -267,14 +267,14 @@ public class DockerComposeFileParserTest {
         @Test
         @DisplayName("Parse compose without version definition")
         public void parseWithVersionDefinition() throws JsonProcessingException, JSONException {
-            var composeFileExpected = """    
+            var composeFileExpected = """
                     services:
                       test-service:
                         image: "test-image:1.0.0"
                     """;
-            var composeFileIncoming = """    
+            var composeFileIncoming = """
                     version: '3'
-                    
+
                     services:
                       test-service:
                         image: "test-image:1.0.0"
@@ -286,4 +286,3 @@ public class DockerComposeFileParserTest {
         }
     }
 }
-

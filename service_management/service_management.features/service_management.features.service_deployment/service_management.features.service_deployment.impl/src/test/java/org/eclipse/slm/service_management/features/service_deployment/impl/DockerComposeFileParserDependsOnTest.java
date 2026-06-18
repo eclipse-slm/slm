@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.features.service_deployment.impl;
+package org.eclipse.slm.service_management.features.service_deployment.impl;
 
 import org.eclipse.slm.service_management.features.service_deployment.api.*;
 
@@ -25,7 +25,7 @@ public class DockerComposeFileParserDependsOnTest {
         public void deserializeDependsOnDefinedAsMap() throws JsonProcessingException {
             var composeFile = """
                     version: "3"
-                                        
+
                     services:
                       test-service:
                         image: "test-image:1.0.0"
@@ -52,7 +52,7 @@ public class DockerComposeFileParserDependsOnTest {
         public void deserializeDependsOnDefinedAsArray() throws JsonProcessingException {
             var composeFile = """
                     version: "3"
-                                        
+
                     services:
                       test-service:
                         image: "test-image:1.0.0"
@@ -78,7 +78,7 @@ public class DockerComposeFileParserDependsOnTest {
         @Test
         @DisplayName("Serialize depends_on with condition")
         public void serializeDependsOnWithCondition() throws JsonProcessingException, JSONException {
-            var expectedCompose = """ 
+            var expectedCompose = """
                     services:
                       test-service:
                         image: "test-image:1.0.0"
@@ -105,7 +105,7 @@ public class DockerComposeFileParserDependsOnTest {
         @Test
         @DisplayName("Serialize depends_on without condition")
         public void serializeDependsOnWithoutCondition() throws JsonProcessingException, JSONException {
-            var expectedCompose = """ 
+            var expectedCompose = """
                     services:
                       test-service:
                         image: "test-image:1.0.0"
@@ -128,4 +128,3 @@ public class DockerComposeFileParserDependsOnTest {
         }
     }
 }
-

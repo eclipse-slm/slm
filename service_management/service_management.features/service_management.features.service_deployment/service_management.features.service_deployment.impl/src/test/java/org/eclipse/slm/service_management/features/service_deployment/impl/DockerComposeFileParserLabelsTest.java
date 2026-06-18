@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.features.service_deployment.impl;
+package org.eclipse.slm.service_management.features.service_deployment.impl;
 
 import org.eclipse.slm.service_management.features.service_deployment.api.*;
 
@@ -44,7 +44,7 @@ public class DockerComposeFileParserLabelsTest {
         public void parseLabelsDefinedAsMap() throws JsonProcessingException {
             var composeFile = """
                     version: "3"
-                                        
+
                     services:
                       test-service:
                         image: "test-image:1.0.0"
@@ -67,7 +67,7 @@ public class DockerComposeFileParserLabelsTest {
         public void parseLabelsDefinedAsArray() throws JsonProcessingException {
             var composeFile = """
                     version: "3"
-                                        
+
                     services:
                       test-service:
                         image: "test-image:1.0.0"
@@ -95,14 +95,14 @@ public class DockerComposeFileParserLabelsTest {
             //region Expected Results
             var expectedComposeFile = """
                         services:
-                        
+
                           service1:
                             image: testImage:latest
                             labels:
                               label1: val1
                               label2: service1LabelVal2
                               label3: val3
-                              
+
                           service2:
                             image: testImage2:latest
                             labels:
@@ -115,16 +115,16 @@ public class DockerComposeFileParserLabelsTest {
             //region Test Input
             var incomingComposeFile = DockerComposeFileParser.parseComposeFile("""
                         version: '3'
-                            
+
                         services:
-                        
+
                           service1:
                             image: testImage:latest
                             labels:
                               label1: service1LabelVal1
                               label2: service1LabelVal2
                               label3: service1LabelVal3
-                              
+
                           service2:
                             image: testImage2:latest
                             labels:
@@ -144,4 +144,3 @@ public class DockerComposeFileParserLabelsTest {
         }
     }
 }
-

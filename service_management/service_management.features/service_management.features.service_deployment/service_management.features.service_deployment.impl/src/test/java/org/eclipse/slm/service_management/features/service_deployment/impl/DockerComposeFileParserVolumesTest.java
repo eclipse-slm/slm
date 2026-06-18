@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.features.service_deployment.impl;
+package org.eclipse.slm.service_management.features.service_deployment.impl;
 
 import org.eclipse.slm.service_management.features.service_deployment.api.*;
 
@@ -26,7 +26,7 @@ public class DockerComposeFileParserVolumesTest {
         public void parseVolumesWithShortSyntax() throws JsonProcessingException {
             var composeFile = """
                     version: "3"
-                                        
+
                     services:
                       test-service:
                         image: "test-image:1.0.0"
@@ -65,7 +65,7 @@ public class DockerComposeFileParserVolumesTest {
         public void parseVolumesWithLongSyntax() throws JsonProcessingException {
             var composeFile = """
                     version: "3"
-                                        
+
                     services:
                       test-service:
                         image: "test-image:1.0.0"
@@ -124,12 +124,12 @@ public class DockerComposeFileParserVolumesTest {
             //region Expected Results
             var expectedComposeFile = """
                         services:
-                        
+
                           service1:
                             volumes:
                               - /my/custom/path/from/option:/var/lib/data
                               - my_custom_volume:/var/lib/config
-                              
+
                           service2:
                             volumes:
                               - my_custom_volume2:/var/lib/config
@@ -140,15 +140,15 @@ public class DockerComposeFileParserVolumesTest {
             //region Test Input
             var incomingComposeFile = DockerComposeFileParser.parseComposeFile("""
                         version: '3'
-                            
+
                         services:
-                        
+
                           service1:
                             image: testImage:latest
                             volumes:
                               - /my/path/volume:/var/lib/data
                               - my_named_volume:/var/lib/config
-                              
+
                           service2:
                             image: testImage2:latest
                             volumes:
@@ -168,4 +168,3 @@ public class DockerComposeFileParserVolumesTest {
 
     }
 }
-

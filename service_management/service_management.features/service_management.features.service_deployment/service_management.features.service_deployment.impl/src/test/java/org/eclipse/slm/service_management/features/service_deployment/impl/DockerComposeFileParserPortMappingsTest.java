@@ -1,10 +1,9 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.features.service_deployment.impl;
+package org.eclipse.slm.service_management.features.service_deployment.impl;
 
 import org.eclipse.slm.service_management.features.service_deployment.api.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.options.*;
-import org.eclipse.slm.service_management.offerings.options.*;
 import org.json.JSONException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,15 +28,15 @@ public class DockerComposeFileParserPortMappingsTest {
         @DisplayName("Replace service options values for port mappings")
         public void replaceServiceOptionValuesForPortMappings() throws JSONException, JsonProcessingException {
             //region Expected Results
-            var expectedComposeFile = """                            
+            var expectedComposeFile = """
                         services:
-                        
+
                           service1:
                             image: testImage:latest
                             ports:
                               - "8080:8080"
                               - "7070:9090"
-                              
+
                           service2:
                             image: testImage2:latest
                             ports:
@@ -49,15 +48,15 @@ public class DockerComposeFileParserPortMappingsTest {
             //region Test Input
             var incomingComposeFile = DockerComposeFileParser.parseComposeFile("""
                         version: '3'
-                            
+
                         services:
-                        
+
                           service1:
                             image: testImage:latest
                             ports:
                               - "8080:8080"
                               - "9090:9090"
-                              
+
                           service2:
                             image: testImage2:latest
                             ports:
@@ -89,4 +88,3 @@ public class DockerComposeFileParserPortMappingsTest {
         }
     }
 }
-
