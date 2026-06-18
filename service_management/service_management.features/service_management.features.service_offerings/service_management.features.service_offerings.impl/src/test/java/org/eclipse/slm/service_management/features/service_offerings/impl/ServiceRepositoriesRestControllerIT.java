@@ -4,7 +4,7 @@ import com.c4_soft.springaddons.security.oauth2.test.annotations.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.eclipse.slm.common.vault.client.VaultClient;
 import org.eclipse.slm.common.vault.testing.VaultTestContainer;
-import org.eclipse.slm.service_management.AbstractRestControllerIT;
+import org.eclipse.slm.service_management.common.impl.AbstractRestControllerIT;
 import org.eclipse.slm.service_management.features.service_offerings.api.service_repositories.ServiceRepository;
 import org.eclipse.slm.service_management.features.service_offerings.api.service_repositories.ServiceRepositoryType;
 import org.eclipse.slm.service_management.features.service_offerings.api.vendors.exceptions.ServiceVendorAccessDenied;

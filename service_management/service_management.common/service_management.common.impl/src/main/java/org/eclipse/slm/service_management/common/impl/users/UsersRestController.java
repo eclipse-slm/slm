@@ -2,7 +2,7 @@ package org.eclipse.slm.service_management.common.impl.users;
 
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
-import org.eclipse.slm.service_management.MultiTenancyUtil;
+import org.eclipse.slm.service_management.common.impl.MultiTenancyUtil;
 import org.eclipse.slm.service_management.common.api.users.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.slm.service_management.common.api.users.UsersRestApi;

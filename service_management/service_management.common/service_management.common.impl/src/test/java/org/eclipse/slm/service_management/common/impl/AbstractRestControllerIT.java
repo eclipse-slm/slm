@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management;
+package org.eclipse.slm.service_management.common.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,4 +17,3 @@ public abstract class AbstractRestControllerIT {
     }
 
 }
-

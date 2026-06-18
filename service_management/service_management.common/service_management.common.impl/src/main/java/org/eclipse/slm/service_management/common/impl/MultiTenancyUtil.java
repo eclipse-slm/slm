@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management;
+package org.eclipse.slm.service_management.common.impl;
 
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
@@ -18,4 +18,3 @@ public class MultiTenancyUtil {
         return UUID.fromString(subject);
     }
 }
-

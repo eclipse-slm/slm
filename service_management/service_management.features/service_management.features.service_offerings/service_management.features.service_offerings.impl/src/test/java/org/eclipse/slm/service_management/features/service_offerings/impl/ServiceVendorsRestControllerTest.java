@@ -3,7 +3,7 @@ package org.eclipse.slm.service_management.features.service_offerings.impl;
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.eclipse.slm.service_management.AbstractRestControllerIT;
+import org.eclipse.slm.service_management.common.impl.AbstractRestControllerIT;
 import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendor;
 import org.eclipse.slm.service_management.features.service_offerings.api.vendors.exceptions.ServiceVendorNotFoundException;
 import org.eclipse.slm.service_management.features.service_offerings.impl.vendors.ServiceVendorRepository;

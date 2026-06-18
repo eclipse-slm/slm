@@ -2,7 +2,7 @@ package org.eclipse.slm.service_management.features.service_offerings.impl;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.eclipse.slm.service_management.AbstractRestControllerIT;
+import org.eclipse.slm.service_management.common.impl.AbstractRestControllerIT;
 import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceCategoryNotFoundException;
 import org.eclipse.slm.service_management.features.service_offerings.impl.categories.ServiceOfferingOfferingCategoriesRestController;
 import org.eclipse.slm.service_management.features.service_offerings.impl.categories.ServiceOfferingCategoryHandler;

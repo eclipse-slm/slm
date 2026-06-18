@@ -15,7 +15,7 @@ import org.eclipse.slm.service_management.features.service_offerings.api.offerin
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOfferingEnvironmentVariable;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.options.*;
 import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion;
-import org.eclipse.slm.service_management.AbstractRestControllerIT;
+import org.eclipse.slm.service_management.common.impl.AbstractRestControllerIT;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.compose.DockerComposeDeploymentDefinition;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.container.DockerContainerDeploymentDefinition;
 import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendor;
