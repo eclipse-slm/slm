@@ -8,6 +8,7 @@ import org.eclipse.slm.resource_management.common.adapters.RemoteAccessConsulCli
 import org.eclipse.slm.resource_management.common.adapters.RemoteAccessConsulClientFactory;
 import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialEntityType;
 import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialScope;
+import org.eclipse.slm.resource_management.common.access.UserContext;
 import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialsManager;
 import org.eclipse.slm.resource_management.common.resources.ResourceUpdatedListener;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -146,7 +148,7 @@ public class RemoteAccessManagerImpl implements RemoteAccessManager {
             }
             this.remoteAccessConsulAdminClient.removeRemoteAccess(resourceId, remoteAccessId);
             for (var listener : this.resourceUpdatedListeners) {
-                listener.onResourceUpdated(resourceId, new org.eclipse.slm.resource_management.common.access.UserContext(java.util.Set.of(), true));
+                listener.onResourceUpdated(resourceId, new UserContext(Set.of(), true));
             }
             LOG.info("Deleted remote access service '{}' of resource '{}'", remoteAccessId, resourceId);
         } catch (Exception e) {
@@ -168,7 +170,7 @@ public class RemoteAccessManagerImpl implements RemoteAccessManager {
             this.resourceCredentialsManager.addEntityLinksToCredential(remoteAccess.getCredentialId(), credentialEntityLinks, jwtAccessToken);
 
             for (var listener : this.resourceUpdatedListeners) {
-                listener.onResourceUpdated(resourceId, new org.eclipse.slm.resource_management.common.access.UserContext(java.util.Set.of(), true));
+                listener.onResourceUpdated(resourceId, new UserContext(Set.of(), true));
             }
 
             LOG.info("Added remote access '{}' for resource '{}'", remoteAccessCreated.getId(), resourceId);

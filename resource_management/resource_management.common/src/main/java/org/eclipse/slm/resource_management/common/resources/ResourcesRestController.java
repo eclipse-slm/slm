@@ -54,8 +54,6 @@ public class ResourcesRestController implements ResourcesRestApi {
 
     @Override
     public ResponseEntity<UUID> addExistingResource(CreateResourceRequest createResourceRequest) throws ResourceNotFoundException, ResourceDefinitionException {
-        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-
         UUID resourceId = UUID.randomUUID();
         this.resourcesManager.createResource(
                 resourceId,
@@ -73,8 +71,6 @@ public class ResourcesRestController implements ResourcesRestApi {
 
     @Override
     public ResponseEntity<Void> addExistingResourceWithId(UUID resourceId, CreateResourceRequest createResourceRequest) throws ResourceNotFoundException, ResourceDefinitionException {
-        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-
         this.resourcesManager.createResource(
                 resourceId,
                 null,

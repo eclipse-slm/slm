@@ -1,6 +1,7 @@
 package org.eclipse.slm.resource_management.common.access;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Set;
@@ -53,6 +54,7 @@ public class AccessControlService {
                 userContext.getGroups(), objectType));
     }
 
+    @Transactional
     public void removeObjectFromAllPolicies(
             AccessControlObjectType objectType, UUID objectId) {
         var policies = policyRepository.findByObject(objectType, objectId);
