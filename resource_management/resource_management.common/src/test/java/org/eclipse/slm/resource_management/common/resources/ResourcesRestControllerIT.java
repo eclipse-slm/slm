@@ -4,13 +4,10 @@ import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.assertj.core.api.Assertions;
-import org.eclipse.slm.common.consul.client.ConsulAclClient;
-import org.eclipse.slm.common.consul.client.ConsulNodesClient;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
+import org.eclipse.slm.resource_management.common.access.UserContext;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.resource_types.ResourceTypesManager;
 import org.eclipse.slm.resource_management.common.test_utils.AuthorizationHeaderRequestFactory;
-import org.eclipse.slm.resource_management.common.test_utils.TestUtils;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +27,8 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -40,10 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         ResourcesRestController.class,
         AuthorizationHeaderRequestFactory.class,
         ResourcesRestControllerITHelper.class,
-        ConsulNodesClient.class,
-        ConsulAclClient.class,
-        RestTemplate.class,
-        TestUtils.class
+        RestTemplate.class
 })
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
@@ -62,30 +58,16 @@ public class ResourcesRestControllerIT {
     private WireMockServer wireMockServer;
 
     @Autowired
-    private TestUtils testUtils;
-
-    @Autowired
     private ResourcesRestControllerITHelper resourcesRestControllerITHelper;
 
     @MockBean
     private ResourcesManager resourcesManager;
     @MockBean
     private ResourceTypesManager resourceTypesManager;
-    @MockBean
-    private ConsulNodesClient consulNodesClient;
-    @MockBean
-    private ConsulAclClient consulAclClient;
-
-    @BeforeEach
-    public void beforeEach() throws ConsulLoginFailedException {
-        this.testUtils.cleanConsul();
-        // Mock configuration
-    }
 
     @AfterEach
-    public void afterEach() throws ConsulLoginFailedException {
+    public void afterEach() {
         this.wireMockServer.resetAll();
-        this.testUtils.cleanConsul();
     }
 
     @Test
@@ -104,7 +86,7 @@ public class ResourcesRestControllerIT {
             var resourceId = UUID.randomUUID();
             var path = ResourcesRestApiConfig.BASE_PATH + "/" + resourceId;
 
-            when(resourcesManager.getResourceByIdOrThrow(eq(resourceId), anyString()))
+            when(resourcesManager.getResourceByIdOrThrow(eq(resourceId), any(UserContext.class)))
                     .thenThrow(new ResourceNotFoundException(resourceId));
 
             mockMvc.perform(
@@ -119,7 +101,7 @@ public class ResourcesRestControllerIT {
             var resourceId = UUID.randomUUID();
             var path = ResourcesRestApiConfig.BASE_PATH + "/" + resourceId;
 
-            when(resourcesManager.getResourceByIdOrThrow(eq(resourceId), anyString()))
+            when(resourcesManager.getResourceByIdOrThrow(eq(resourceId), any(UserContext.class)))
                     .thenThrow(new ResourceNotFoundException(resourceId));
 
             mockMvc.perform(
@@ -133,7 +115,7 @@ public class ResourcesRestControllerIT {
         @WithJwt("default_user.json")
         public void resourceExists() throws Exception {
             var testResource = ResourcesRestControllerITHelper.getTestResource();
-            when(resourcesManager.getResourceByIdOrThrow(eq(testResource.getId()), anyString()))
+            when(resourcesManager.getResourceByIdOrThrow(eq(testResource.getId()), any(UserContext.class)))
                     .thenReturn(testResource);
 
             var receivedResource = resourcesRestControllerITHelper.getResource(testResource.getId());
@@ -153,7 +135,7 @@ public class ResourcesRestControllerIT {
             var resourceId = UUID.randomUUID();
             var path = ResourcesRestApiConfig.BASE_PATH;
 
-            when(resourcesManager.getResourceByIdOrThrow(eq(resourceId), anyString()))
+            when(resourcesManager.getResourceByIdOrThrow(eq(resourceId), any(UserContext.class)))
                     .thenThrow(new ResourceNotFoundException(resourceId));
 
             mockMvc.perform(
@@ -176,7 +158,7 @@ public class ResourcesRestControllerIT {
         public void twoResourcesPresent() throws Exception {
             var testResource1 = ResourcesRestControllerITHelper.getTestResource();
             var testResource2 = ResourcesRestControllerITHelper.getTestResource();
-            when(resourcesManager.getResources(anyString()))
+            when(resourcesManager.getResources(any(UserContext.class)))
                     .thenReturn(List.of(testResource1, testResource2));
 
             var resources = resourcesRestControllerITHelper.getResources();
@@ -302,7 +284,7 @@ public class ResourcesRestControllerIT {
             var resourceId = UUID.randomUUID();
             var path = ResourcesRestApiConfig.BASE_PATH + "/" + resourceId;
             doThrow(new ResourceNotFoundException(resourceId))
-                    .when(resourcesManager).deleteResource(eq(resourceId), anyString());
+                    .when(resourcesManager).deleteResource(eq(resourceId), any(UserContext.class));
 
             mockMvc.perform(
                             delete(path).with(csrf()))
@@ -315,7 +297,7 @@ public class ResourcesRestControllerIT {
         @WithJwt("default_user.json")
         public void resourceExists() throws Exception {
             var testResource = ResourcesRestControllerITHelper.getTestResource();
-            when(resourcesManager.getResources(anyString()))
+            when(resourcesManager.getResources(any(UserContext.class)))
                     .thenReturn(List.of(testResource));
 
             var path = ResourcesRestApiConfig.BASE_PATH + "/" + testResource.getId();
@@ -325,7 +307,7 @@ public class ResourcesRestControllerIT {
 
             verify(resourcesManager).deleteResource(
                     eq(testResource.getId()),
-                    anyString()
+                    any(UserContext.class)
             );
         }
     }

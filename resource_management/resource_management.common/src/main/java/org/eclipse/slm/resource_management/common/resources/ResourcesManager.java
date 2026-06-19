@@ -1,6 +1,5 @@
 package org.eclipse.slm.resource_management.common.resources;
 
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.access.UserContext;
 import org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplate.DigitalNameplateV3;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceDefinitionException;
@@ -32,7 +31,7 @@ public interface ResourcesManager {
 
     void deleteResource(UUID resourceId, UserContext userContext) throws ResourceNotFoundException, ResourceRuntimeException;
 
-    void setLocationOfResource(UUID resourceId, UUID locationId, UserContext userContext) throws ConsulLoginFailedException;
+    void setLocationOfResource(UUID resourceId, UUID locationId, UserContext userContext);
 
     String getConnectionParametersOfResource(UUID resourceId);
 

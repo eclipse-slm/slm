@@ -1,5 +1,6 @@
 package org.eclipse.slm.resource_management.common.remote_access;
 
+import org.eclipse.slm.common.consul.model.catalog.Node;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.consul.testing.containers.ConsulTestContainer;
 import org.eclipse.slm.common.consul.testing.utils.ConsulTestClientFactory;
@@ -11,11 +12,9 @@ import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.common.vault.model.acl.GroupType;
 import org.eclipse.slm.common.vault.testing.VaultTestContainer;
 import org.eclipse.slm.resource_management.common.adapters.RemoteAccessConsulClientFactory;
-import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;
 import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialReadDTO;
 import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialScope;
 import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialsManager;
-import org.eclipse.slm.resource_management.common.resources.BasicResource;
 import org.junit.jupiter.api.*;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -43,8 +42,6 @@ class RemoteAccessManagerImplIT {
     @Container
     static KeycloakTestContainer keycloakContainer = new KeycloakTestContainer();
 
-    static ResourcesConsulClient resourcesConsulAdminClient;
-
     private static ResourceCredentialsManager resourceCredentialsManager;
     private static RemoteAccessManager remoteAccessManager;
 
@@ -55,7 +52,6 @@ class RemoteAccessManagerImplIT {
     static void setUp() throws ConsulLoginFailedException {
         var consulClientFactory = ConsulTestClientFactory.getConsulClientFactory(consulContainer);
         var remoteAccessConsulClientFactory = new RemoteAccessConsulClientFactory(consulClientFactory);
-        resourcesConsulAdminClient = new ResourcesConsulClient(consulClientFactory.createAdminClient());
 
         var vaultAdminClient = vaultContainer.getVaultAdminClient();
 
@@ -77,9 +73,13 @@ class RemoteAccessManagerImplIT {
         var jwt = new Jwt(accessToken, null, null, Map.of("dummy-header", "dummy-header-value"), Map.of("dummy-header", "dummy-header-value"));
         jwtAuthenticationToken = new JwtAuthenticationToken(jwt, new ArrayList<>(), KeycloakTestContainer.TEST_USER1_USERNAME);
 
-        // Create node for test resource
-        var basicResource = new BasicResource(TEST_RESOURCE_ID, "test-hostname", "1.2.3.4");
-        resourcesConsulAdminClient.addResource(basicResource, KeycloakTestContainer.TEST_USER1_GROUP_ID);
+        // Register a Consul node for the test resource (remote-access services are stored as Consul services on a node)
+        var consulAdminClient = ConsulTestClientFactory.getConsulClient(consulContainer);
+        var testResourceNode = Node.builder("test-hostname")
+                .id(TEST_RESOURCE_ID)
+                .address("1.2.3.4")
+                .build();
+        consulAdminClient.nodes().registerNode(testResourceNode);
     }
 
     protected ResourceCredentialReadDTO getResourceCredential(UUID credentialId) {

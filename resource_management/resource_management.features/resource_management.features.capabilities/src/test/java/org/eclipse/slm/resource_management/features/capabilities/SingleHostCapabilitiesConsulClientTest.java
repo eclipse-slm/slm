@@ -8,10 +8,10 @@ import org.eclipse.slm.common.consul.model.exceptions.ConsulPolicyNotFoundExcept
 import org.eclipse.slm.common.consul.testing.containers.ConsulTestContainer;
 import org.eclipse.slm.common.consul.testing.utils.ConsulTestClientFactory;
 import org.eclipse.slm.common.consul.testing.utils.ConsulTestContainerInitializer;
-import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;
-import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClientFactory;
+import org.eclipse.slm.common.consul.model.catalog.Node;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.resources.BasicResource;
+import org.eclipse.slm.resource_management.common.resources.ResourceJpaRepository;
 import org.eclipse.slm.resource_management.features.capabilities.model.*;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilitiesConsulClient;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilityJpaRepository;
@@ -45,35 +45,41 @@ public class SingleHostCapabilitiesConsulClientTest {
     private static ConsulClient adminConsulClient;
     private static CapabilitiesConsulClient capabilitiesConsulClient;
     private static SingleHostCapabilitiesConsulClient singleHostCapabilitiesConsulClient;
-    private static ResourcesConsulClient resourcesConsulAdminClient;
 
     private static CapabilityJpaRepository capabilityJpaRepository;
+    private static ResourceJpaRepository resourceJpaRepository;
 
     @BeforeAll
     public static void beforeAll() {
         capabilityJpaRepository = Mockito.mock(CapabilityJpaRepository.class);
+        resourceJpaRepository = Mockito.mock(ResourceJpaRepository.class);
 
         var consulTestInitializer = new ConsulTestContainerInitializer(consulContainer, false);
         consulTestInitializer.initUserGroup(TEST_GROUP_ID);
 
         var consulClientFactory = ConsulTestClientFactory.getConsulClientFactory(consulContainer);
         adminConsulClient = consulClientFactory.createAdminClient();
-        var resourceConsulClientFactory = new ResourcesConsulClientFactory(consulClientFactory);
 
         capabilitiesConsulClient = new CapabilitiesConsulClient(consulClientFactory, capabilityJpaRepository);
-        resourcesConsulAdminClient = new ResourcesConsulClient(consulClientFactory.createAdminClient());
 
         singleHostCapabilitiesConsulClient = new SingleHostCapabilitiesConsulClient(
                 consulClientFactory,
-                resourceConsulClientFactory,
+                resourceJpaRepository,
                 capabilityJpaRepository);
 
-        resourcesConsulAdminClient.addResource(SingleHostCapabilitiesConsulClientTestData.testResource1, TEST_GROUP_ID);
-        resourcesConsulAdminClient.addResource(SingleHostCapabilitiesConsulClientTestData.testResource2, TEST_GROUP_ID);
+        // Register Consul nodes for the test resources (capability services are stored as Consul services on nodes)
+        var consulAdminClient = ConsulTestClientFactory.getConsulClient(consulContainer);
+        var resource1 = SingleHostCapabilitiesConsulClientTestData.testResource1;
+        consulAdminClient.nodes().registerNode(Node.builder(resource1.getHostname()).id(resource1.getId()).address(resource1.getIp()).build());
+        var resource2 = SingleHostCapabilitiesConsulClientTestData.testResource2;
+        consulAdminClient.nodes().registerNode(Node.builder(resource2.getHostname()).id(resource2.getId()).address(resource2.getIp()).build());
 
         Mockito.lenient()
                 .when(capabilityJpaRepository.findById(SingleHostCapabilitiesConsulClientTestData.testSingleHostDeploymentCapability.getId()))
                 .thenReturn(Optional.ofNullable(SingleHostCapabilitiesConsulClientTestData.testSingleHostDeploymentCapability));
+        Mockito.lenient()
+                .when(resourceJpaRepository.findAll())
+                .thenReturn(List.of(resource1, resource2));
     }
 
     @Nested

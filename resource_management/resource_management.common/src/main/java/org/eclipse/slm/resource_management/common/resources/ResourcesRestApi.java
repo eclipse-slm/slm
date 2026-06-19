@@ -1,7 +1,6 @@
 package org.eclipse.slm.resource_management.common.resources;
 
 import io.swagger.v3.oas.annotations.Operation;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceDefinitionException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +49,7 @@ public interface ResourcesRestApi {
     ResponseEntity<Void> setLocationOfResource(
             @PathVariable(name = "resourceId") UUID resourceId,
             @RequestParam(name = "locationId", required = false) UUID locationId
-    ) throws ConsulLoginFailedException;
+    );
 
     @RequestMapping(value = "/{resourceId}/connection-parameters", method = RequestMethod.PUT)
     @Operation(summary = "Set connection parameters of resource with id")

@@ -3,7 +3,6 @@ package org.eclipse.slm.resource_management.common.aas.submodels.deviceinfo;
 import org.eclipse.digitaltwin.aas4j.v3.model.Submodel;
 import org.eclipse.slm.aas.repositories.submodels.AbstractSubmodelService;
 import org.eclipse.slm.common.keycloak.client.KeycloakServiceClient;
-import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.common.access.UserContext;
 import org.eclipse.slm.resource_management.common.aas.ResourceAas;
 import org.eclipse.slm.resource_management.common.resources.ResourcesManager;
@@ -47,10 +46,7 @@ public class DeviceInfoSubmodelService extends AbstractSubmodelService {
         } catch (SSLException e) {
             throw new RuntimeException(e);
         }
-        var userContext = new UserContext(
-                KeycloakTokenUtil.getGroups(resourceManagementJwtAuthentication),
-                KeycloakTokenUtil.isAdmin(resourceManagementJwtAuthentication),
-                KeycloakTokenUtil.getToken(resourceManagementJwtAuthentication));
+        var userContext = UserContext.fromJwt(resourceManagementJwtAuthentication);
 
         var resource = resourcesManager.getResourceByIdOrThrow(resourceId, userContext);
 
