@@ -16,6 +16,7 @@ import org.eclipse.slm.common.minio.client.MinioClient;
 import org.eclipse.slm.common.minio.model.exceptions.*;
 import org.eclipse.slm.common.utils.files.FileDownloader;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
+import org.eclipse.slm.resource_management.common.access.UserContext;
 import org.eclipse.slm.resource_management.common.aas.ResourceAas;
 import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialsManager;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceTypeNotFoundException;
@@ -115,8 +116,8 @@ public class FirmwareUpdateManager {
         updateInformation.setAvailableFirmwareVersions(availableFirmwareVersions);
 
         FirmwareVersionDetails currentFirmwareVersion = null;
-        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, accessToken);
+        var userContext = new UserContext(KeycloakTokenUtil.getGroups(jwtAuthenticationToken), KeycloakTokenUtil.isAdmin(jwtAuthenticationToken));
+        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, userContext);
 
         for (int i = 0; i < availableFirmwareVersions.size(); i++) {
             var firmwareVersion = availableFirmwareVersions.get(i);

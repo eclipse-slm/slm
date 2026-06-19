@@ -131,7 +131,7 @@ public class RemoteAccessManagerImpl implements RemoteAccessManager {
             }
             this.remoteAccessConsulAdminClient.removeRemoteAccess(resourceId, remoteAccessId);
             for (var listener : this.resourceUpdatedListeners) {
-                listener.onResourceUpdated(resourceId, jwtAccessToken);
+                listener.onResourceUpdated(resourceId, new org.eclipse.slm.resource_management.common.access.UserContext(java.util.Set.of(), true));
             }
             LOG.info("Deleted remote access service '{}' of resource '{}'", remoteAccessId, resourceId);
         } catch (Exception e) {
@@ -153,7 +153,7 @@ public class RemoteAccessManagerImpl implements RemoteAccessManager {
             this.resourceCredentialsManager.addEntityLinksToCredential(remoteAccess.getCredentialId(), credentialEntityLinks, jwtAccessToken);
 
             for (var listener : this.resourceUpdatedListeners) {
-                listener.onResourceUpdated(resourceId,jwtAccessToken);
+                listener.onResourceUpdated(resourceId, new org.eclipse.slm.resource_management.common.access.UserContext(java.util.Set.of(), true));
             }
 
             LOG.info("Added remote access '{}' for resource '{}'", remoteAccessCreated.getId(), resourceId);

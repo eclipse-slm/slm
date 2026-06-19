@@ -29,6 +29,8 @@ import reactor.core.publisher.Mono;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import org.eclipse.slm.resource_management.common.access.UserContext;
+
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -84,7 +86,8 @@ public class FirmwareUpdateJobServiceImpl implements FirmwareUpdateJobService, F
             throw new FirmwareUpdateAlreadyInProgressException(resourceId);
         }
         // Check if resource exists
-        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, accessToken);
+        // TODO(resource-mgmt-db): internal/system flow uses admin access context
+        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, new UserContext(java.util.Set.of(), true));
         // Get driver to check if it is available
         var driverId = resource.getDriverId();
         var driverInfo = this.driverRegistryClient.getRegisteredDriver(driverId);

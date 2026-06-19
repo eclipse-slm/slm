@@ -6,6 +6,7 @@ import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.model.exceptions.EventNotAcceptedException;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
+import org.eclipse.slm.resource_management.common.access.UserContext;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.resources.ResourceDTO;
 import org.eclipse.slm.resource_management.common.resources.ResourceEventInternalListener;
@@ -106,8 +107,8 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
                                   String fullPathOwnerGroupId) throws Exception {
         try {
             // Check if resource exists
-            var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-            var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, accessToken);
+            var userContext = new UserContext(KeycloakTokenUtil.getGroups(jwtAuthenticationToken), KeycloakTokenUtil.isAdmin(jwtAuthenticationToken));
+            var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, userContext);
             // Check if capability exists
             var capability = this.capabilitiesService.getCapabilityByIdOrThrow(capabilityId);
             // Check if capability is already installed on resource

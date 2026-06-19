@@ -15,14 +15,12 @@ import org.eclipse.slm.aas.clients.submodelregistry.SubmodelRegistryClient;
 import org.eclipse.slm.aas.clients.submodelregistry.SubmodelRegistryClientFactory;
 import org.eclipse.slm.aas.clients.submodelrepository.SubmodelRepositoryClient;
 import org.eclipse.slm.aas.clients.submodelrepository.SubmodelRepositoryClientFactory;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.aas.submodels.ResourcesSubmodelRepositoryHTTPApiController;
 import org.eclipse.slm.resource_management.common.aas.submodels.deviceinfo.DeviceInfoSubmodel;
 import org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplate.DigitalNameplateV3;
 import org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplate.DigitalNameplateV3Submodel;
-import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClientFactory;
 import org.eclipse.slm.resource_management.common.resources.ResourceEvent;
-import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;
+import org.eclipse.slm.resource_management.common.resources.ResourceJpaRepository;
 import org.eclipse.slm.resource_management.common.resources.BasicResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +49,7 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
 
     private final SubmodelRepositoryClient submodelRepositoryClient;
 
-    private final ResourcesConsulClientFactory resourcesConsulClientFactory;
-    private final ResourcesConsulClient resourcesConsulAdminClient;
+    private final ResourceJpaRepository resourceJpaRepository;
 
     private final String monitoringServiceUrl;
 
@@ -75,15 +72,14 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
                                AasRepositoryClientFactory aasRepositoryClientFactory,
                                SubmodelRegistryClientFactory submodelRegistryClientFactory,
                                SubmodelRepositoryClientFactory submodelRepositoryClientFactory,
-                               ResourcesConsulClientFactory resourcesConsulClientFactory,
+                               ResourceJpaRepository resourceJpaRepository,
                                @Value("${monitoring.service.url}") String monitoringServiceUrl,
                                @Value("${deployment.url}") String externalUrl) {
         this.aasRegistryClient = aasRegistryClientFactory.getClient();
         this.aasRepositoryClient = aasRepositoryClientFactory.getClient();
         this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
         this.submodelRepositoryClient = submodelRepositoryClientFactory.getClient();
-        this.resourcesConsulClientFactory = resourcesConsulClientFactory;
-        this.resourcesConsulAdminClient = resourcesConsulClientFactory.createAdminClient();
+        this.resourceJpaRepository = resourceJpaRepository;
         this.monitoringServiceUrl = monitoringServiceUrl;
         this.externalUrl = externalUrl;
     }
@@ -92,14 +88,12 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
     public void init() {
         // Create AAS for all resources
         try {
-            var resources = resourcesConsulAdminClient.getResources();
+            var resources = resourceJpaRepository.findAll();
 
             for (var resource: resources) {
                 var digitalNameplateV3 = new DigitalNameplateV3.Builder("N/A", "N/A", "N/A", "N/A").build();
                 this.createResourceAasAndSubmodels(resource, digitalNameplateV3);
             }
-        } catch (ConsulLoginFailedException e) {
-            throw new RuntimeException(e);
         } catch (RuntimeException e) {
             LOG.error(e.getMessage());
         }

@@ -5,8 +5,7 @@ import org.eclipse.slm.common.consul.client.*;
 import org.eclipse.slm.common.consul.model.acl.policies.Policy;
 import org.eclipse.slm.common.consul.model.catalog.CatalogRegistration;
 import org.eclipse.slm.common.consul.model.catalog.NodeService;
-import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;
-import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClientFactory;
+import org.eclipse.slm.resource_management.common.resources.ResourceJpaRepository;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.CapabilityUtil;
 import org.eclipse.slm.resource_management.features.capabilities.exceptions.CapabilityNotFoundException;
@@ -23,8 +22,7 @@ import java.util.*;
 public class SingleHostCapabilitiesConsulClient {
     private final static Logger LOG = LoggerFactory.getLogger(SingleHostCapabilitiesConsulClient.class);
 
-    private final ResourcesConsulClientFactory resourcesConsulClientFactory;
-    private final ResourcesConsulClient resourcesConsulAdminClient;
+    private final ResourceJpaRepository resourceJpaRepository;
 
     private final ConsulClientFactory consulClientFactory;
     private final ConsulClient adminConsulClient;
@@ -33,11 +31,10 @@ public class SingleHostCapabilitiesConsulClient {
 
     public SingleHostCapabilitiesConsulClient(
             ConsulClientFactory consulClientFactory,
-            ResourcesConsulClientFactory resourcesConsulClientFactory,
+            ResourceJpaRepository resourceJpaRepository,
             CapabilityJpaRepository capabilityJpaRepository
     ) {
-        this.resourcesConsulClientFactory = resourcesConsulClientFactory;
-        this.resourcesConsulAdminClient = resourcesConsulClientFactory.createAdminClient();
+        this.resourceJpaRepository = resourceJpaRepository;
         this.consulClientFactory = consulClientFactory;
         this.adminConsulClient = consulClientFactory.createAdminClient();
         this.capabilityJpaRepository = capabilityJpaRepository;
@@ -115,7 +112,7 @@ public class SingleHostCapabilitiesConsulClient {
     }
 
     public void removeCapabilityServiceFromAllConsulNodes(Capability capability) {
-        var existingResources = this.resourcesConsulAdminClient.getResources();
+        var existingResources = this.resourceJpaRepository.findAll();
         for (var existingResource : existingResources) {
             try {
                 this.removeSingleHostCapabilityFromNode(capability, existingResource.getId());

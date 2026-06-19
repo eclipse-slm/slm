@@ -22,6 +22,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedInputStream;
+import org.eclipse.slm.resource_management.common.access.UserContext;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -116,7 +118,8 @@ public class ImporterService {
                 }
 
                 if (device.locationId != null) {
-                    this.resourcesManager.setLocationOfResource(addedResource.getId(), device.locationId, userAccessToken);
+                    // TODO(resource-mgmt-db): internal/system flow uses admin access context
+                    this.resourcesManager.setLocationOfResource(addedResource.getId(), device.locationId, new UserContext(java.util.Set.of(), true));
                 }
             } catch (Exception e) {
                 throw new ResourceManagementImportRuntimeException("Error importing devices: " + e.getMessage());

@@ -1,6 +1,7 @@
 package org.eclipse.slm.resource_management.features.device_integration.discovery;
 
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
+import org.eclipse.slm.resource_management.common.access.UserContext;
 import org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplate.DigitalNameplateV3;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceDefinitionException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
@@ -135,8 +136,8 @@ public class DiscoveryService implements DiscoveryJobListener {
         discoveredResourceDTO.setResultId(discoveryJob.getId() + ":" + discoveredResourceDTO.getResourceId());
 
         try {
-            var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-            var existingResource = resourcesManager.getResourceByIdOrThrow(discoveredResourceDTO.getResourceId(), accessToken);
+            var userContext = new UserContext(KeycloakTokenUtil.getGroups(jwtAuthenticationToken), KeycloakTokenUtil.isAdmin(jwtAuthenticationToken));
+            var existingResource = resourcesManager.getResourceByIdOrThrow(discoveredResourceDTO.getResourceId(), userContext);
             if (existingResource != null) {
                 discoveredResourceDTO.setOnboarded(true);
             }

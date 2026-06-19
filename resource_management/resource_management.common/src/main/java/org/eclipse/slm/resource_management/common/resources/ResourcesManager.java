@@ -1,6 +1,7 @@
 package org.eclipse.slm.resource_management.common.resources;
 
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
+import org.eclipse.slm.resource_management.common.access.UserContext;
 import org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplate.DigitalNameplateV3;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceDefinitionException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
@@ -12,11 +13,11 @@ import java.util.UUID;
 
 public interface ResourcesManager {
 
-    List<BasicResource> getResources(String jwtAccessToken) throws ResourceNotFoundException, ResourceRuntimeException;
+    List<BasicResource> getResources(UserContext userContext) throws ResourceNotFoundException, ResourceRuntimeException;
 
-    Optional<BasicResource> getResourceById(UUID resourceId, String jwtAccessToken) throws ResourceRuntimeException;
+    Optional<BasicResource> getResourceById(UUID resourceId, UserContext userContext) throws ResourceRuntimeException;
 
-    BasicResource getResourceByIdOrThrow(UUID resourceId, String jwtAccessToken) throws ResourceRuntimeException, ResourceNotFoundException;
+    BasicResource getResourceByIdOrThrow(UUID resourceId, UserContext userContext) throws ResourceRuntimeException, ResourceNotFoundException;
 
     BasicResource createResource(
             UUID resourceId,
@@ -29,9 +30,9 @@ public interface ResourcesManager {
             String fullPathOwnerGroupId
     ) throws ResourceNotFoundException, ResourceRuntimeException, ResourceDefinitionException;
 
-    void deleteResource(UUID resourceId, String jwtAccessToken) throws ResourceNotFoundException, ResourceRuntimeException;
+    void deleteResource(UUID resourceId, UserContext userContext) throws ResourceNotFoundException, ResourceRuntimeException;
 
-    void setLocationOfResource(UUID resourceId, UUID locationId, String jwtAccessToken) throws ConsulLoginFailedException;
+    void setLocationOfResource(UUID resourceId, UUID locationId, UserContext userContext) throws ConsulLoginFailedException;
 
     String getConnectionParametersOfResource(UUID resourceId);
 
@@ -39,6 +40,6 @@ public interface ResourcesManager {
 
     void setFirmwareVersionOfResource(UUID resourceId, String firmwareVersion);
 
-    void updateResource(UUID resourceId, ResourceUpdateRequest updateResourceRequest, String jwtAccessToken)
+    void updateResource(UUID resourceId, ResourceUpdateRequest updateResourceRequest, UserContext userContext)
             throws ResourceNotFoundException, ResourceRuntimeException;
 }

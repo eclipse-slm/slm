@@ -2,6 +2,7 @@ package org.eclipse.slm.resource_management.common.resources;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
+import org.eclipse.slm.resource_management.common.access.UserContext;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceDefinitionException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.slf4j.Logger;
@@ -30,11 +31,17 @@ public class ResourcesRestController implements ResourcesRestApi {
         this.resourcesManager = resourcesManager;
     }
 
+    private UserContext currentUserContext() {
+        var jwtAuthenticationToken =
+                (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        return new UserContext(
+                KeycloakTokenUtil.getGroups(jwtAuthenticationToken),
+                KeycloakTokenUtil.isAdmin(jwtAuthenticationToken));
+    }
+
     @Override
     public ResponseEntity<List<ResourceDTO>> getResources() throws ResourceNotFoundException {
-        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-        var resources = this.resourcesManager.getResources(accessToken);
+        var resources = this.resourcesManager.getResources(currentUserContext());
         var resourceDTOs = ResourceMapper.INSTANCE.toDto(resources);
 
         return ResponseEntity.ok(resourceDTOs);
@@ -42,10 +49,7 @@ public class ResourcesRestController implements ResourcesRestApi {
 
     @Override
     public ResponseEntity<ResourceDTO> getResource(UUID resourceId) throws ResourceNotFoundException {
-        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-
-        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, accessToken);
+        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, currentUserContext());
         var resourceDTO = ResourceMapper.INSTANCE.toDto(resource);
 
         return ResponseEntity.ok(resourceDTO);
@@ -90,20 +94,14 @@ public class ResourcesRestController implements ResourcesRestApi {
 
     @Override
     public ResponseEntity<Void> deleteResource(UUID resourceId) {
-        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-
-        this.resourcesManager.deleteResource(resourceId, accessToken);
+        this.resourcesManager.deleteResource(resourceId, currentUserContext());
 
         return ResponseEntity.ok().build();
     }
 
     @Override
     public ResponseEntity<Void> setLocationOfResource(UUID resourceId, UUID locationId) {
-        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-
-        this.resourcesManager.setLocationOfResource(resourceId, locationId, accessToken);
+        this.resourcesManager.setLocationOfResource(resourceId, locationId, currentUserContext());
 
         return ResponseEntity.ok().build();
     }
@@ -117,10 +115,7 @@ public class ResourcesRestController implements ResourcesRestApi {
 
     @Override
     public ResponseEntity<Void> updateResource(UUID resourceId, ResourceUpdateRequest updateResourceRequest) {
-        var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
-
-        this.resourcesManager.updateResource(resourceId, updateResourceRequest, accessToken);
+        this.resourcesManager.updateResource(resourceId, updateResourceRequest, currentUserContext());
         return ResponseEntity.ok().build();
     }
 }

@@ -5,8 +5,9 @@ import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultLangStringTextType;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultMultiLanguageProperty;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
 import org.eclipse.slm.aas.model.shellrepository.exceptions.ShellNotFoundException;
-import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;
-import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClientFactory;
+import org.eclipse.slm.resource_management.common.access.AccessControlObjectType;
+import org.eclipse.slm.resource_management.common.access.AccessControlService;
+import org.eclipse.slm.resource_management.common.access.UserContext;
 import org.eclipse.slm.resource_management.common.adapters.ResourcesVaultClient;
 import org.eclipse.slm.resource_management.common.aas.ResourcesAasHandler;
 import org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplate.DigitalNameplateV3;
@@ -28,8 +29,8 @@ import java.util.*;
 public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedListener {
     private final static Logger LOG = LoggerFactory.getLogger(ResourcesManagerImpl.class);
 
-    private final ResourcesConsulClientFactory resourcesConsulClientFactory;
-    private final ResourcesConsulClient resourcesConsulAdminClient;
+    private final ResourceJpaRepository resourceJpaRepository;
+    private final AccessControlService accessControlService;
     private final ResourcesVaultClient resourcesVaultClient;
 
     private final Optional<ICapabilitiesManager> capabilitiesService;
@@ -46,7 +47,8 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
 
     @Autowired
     public ResourcesManagerImpl(
-            ResourcesConsulClientFactory resourcesConsulClientFactory,
+            ResourceJpaRepository resourceJpaRepository,
+            AccessControlService accessControlService,
             ResourcesVaultClient resourcesVaultClient,
             Optional<ICapabilitiesManager> capabilitiesService,
             LocationJpaRepository locationJpaRepository,
@@ -54,8 +56,8 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
             ResourceEventMessageSender resourceEventMessageSender,
             RemoteAccessManager remoteAccessManager
     ) {
-        this.resourcesConsulClientFactory = resourcesConsulClientFactory;
-        this.resourcesConsulAdminClient = resourcesConsulClientFactory.createAdminClient();
+        this.resourceJpaRepository = resourceJpaRepository;
+        this.accessControlService = accessControlService;
         this.resourcesVaultClient = resourcesVaultClient;
         this.capabilitiesService = capabilitiesService;
         this.locationJpaRepository = locationJpaRepository;
@@ -66,17 +68,20 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
         this.remoteAccessManager.registerResourceUpdatedListener(this);
     }
 
-    public List<BasicResource> getResources(String jwtAccessToken) throws ResourceNotFoundException, ResourceRuntimeException {
+    public List<BasicResource> getResources(UserContext userContext) throws ResourceNotFoundException, ResourceRuntimeException {
         try {
-            var resourcesConsulClient = this.resourcesConsulClientFactory.create(jwtAccessToken);
-            List<BasicResource> resources = resourcesConsulClient.getResources();
+            var accessibleIds = accessControlService.getAccessibleObjectIds(
+                    userContext, AccessControlObjectType.RESOURCE);
+            List<BasicResource> resources = accessibleIds
+                    .map(resourceJpaRepository::findByIdIn)
+                    .orElseGet(resourceJpaRepository::findAll);
 
             for (var resource : resources) {
-                this.addDetailsToResource(resource, jwtAccessToken);
+                this.addDetailsToResource(resource, userContext);
             }
 
             // remove resource if cluster // ToDo: clusters - include a more specific property to differentiate between cluster/non-clusters
-            resources.removeIf(r -> r.getIp().contains("-cluster"));
+            resources.removeIf(r -> r.getIp() != null && r.getIp().contains("-cluster"));
 
             return resources;
         } catch (Exception e) {
@@ -86,36 +91,26 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
     }
 
     @Override
-    public Optional<BasicResource> getResourceById(UUID resourceId, String jwtAccessToken) throws ResourceRuntimeException {
+    public Optional<BasicResource> getResourceById(UUID resourceId, UserContext userContext) throws ResourceRuntimeException {
         try {
-            return Optional.of(this.getResourceByIdOrThrow(resourceId, jwtAccessToken));
+            return Optional.of(this.getResourceByIdOrThrow(resourceId, userContext));
         } catch (ResourceNotFoundException e) {
             return Optional.empty();
         }
     }
 
 
-    public BasicResource getResourceByIdOrThrow(UUID resourceId, String jwtAccessToken) throws ResourceRuntimeException, ResourceNotFoundException {
-        try {
-            var resourcesConsulClient = this.resourcesConsulClientFactory.create(jwtAccessToken);
-            Optional<BasicResource> optionalResource = resourcesConsulClient.getResourceById(resourceId);
-
-            if (optionalResource.isEmpty()) {
-                throw new ResourceNotFoundException(resourceId);
-            }
-
-            var resource = this.addDetailsToResource(optionalResource.get(), jwtAccessToken);
-
-            return resource;
-        } catch (ResourceNotFoundException e) {
-            throw e;
+    public BasicResource getResourceByIdOrThrow(UUID resourceId, UserContext userContext) throws ResourceRuntimeException, ResourceNotFoundException {
+        if (!accessControlService.hasAccess(
+                AccessControlObjectType.RESOURCE, resourceId, userContext)) {
+            throw new ResourceNotFoundException(resourceId);
         }
-        catch (Exception e) {
-            throw new ResourceRuntimeException("Failed to get resource by id: " + resourceId + " - " + e.getMessage(), e);
-        }
+        var resource = resourceJpaRepository.findById(resourceId)
+                .orElseThrow(() -> new ResourceNotFoundException(resourceId));
+        return this.addDetailsToResource(resource, userContext);
     }
 
-    private BasicResource addDetailsToResource(BasicResource resource, String jwtAccessToken) {
+    private BasicResource addDetailsToResource(BasicResource resource, UserContext userContext) {
         if (this.capabilitiesService.isPresent()) {
             var capabilityServicesIds = this.capabilitiesService.get().getCapabilityServiceIdsOfResource(resource.getId());
             resource.setCapabilityServiceIds(capabilityServicesIds);
@@ -124,7 +119,8 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
             resource.setClusterMember(isClusterMember);
         }
 
-        var remoteAccessServicesIds = this.remoteAccessManager.getRemoteAccessIdsOfResource(resource.getId(), jwtAccessToken);
+        // Temporary seam: RemoteAccess is still Consul-backed; token param removed when RemoteAccess is migrated
+        var remoteAccessServicesIds = this.remoteAccessManager.getRemoteAccessIdsOfResource(resource.getId(), "");
         resource.setRemoteAccessIds(remoteAccessServicesIds);
 
         return resource;
@@ -159,7 +155,12 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
             resource.setAssetId(assetId);
             resource.setFirmwareVersion(firmwareVersion);
             resource.setDriverId(driverId);
-            resource = this.resourcesConsulAdminClient.addResource(resource, fullPathOwnerGroupId);
+            resource = this.resourceJpaRepository.save(resource);
+            this.accessControlService.createSingleObjectPolicy(
+                    "resource_" + resource.getId(),
+                    fullPathOwnerGroupId,
+                    AccessControlObjectType.RESOURCE,
+                    resource.getId());
 
             this.resourcesVaultClient.initResourceKV(resourceId, fullPathOwnerGroupId);
             this.resourcesVaultClient.createIntermediateCertificateAuthority(resource.getId(), resource.getIp(), resource.getHostname());
@@ -176,15 +177,17 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
         }
     }
 
-    public void deleteResource(UUID resourceId, String jwtAccessToken) throws ResourceNotFoundException, ResourceRuntimeException {
+    public void deleteResource(UUID resourceId, UserContext userContext) throws ResourceNotFoundException, ResourceRuntimeException {
         try {
-            var resource = this.getResourceByIdOrThrow(resourceId, jwtAccessToken);
+            var resource = this.getResourceByIdOrThrow(resourceId, userContext);
 
             for (var remoteAccessServiceId : resource.getRemoteAccessIds()) {
-                this.remoteAccessManager.deleteRemoteAccessById(resourceId, remoteAccessServiceId, jwtAccessToken, false);
+                this.remoteAccessManager.deleteRemoteAccessById(resourceId, remoteAccessServiceId, "", false);
             }
 
-            this.resourcesConsulAdminClient.deleteResource(resource);
+            this.resourceJpaRepository.deleteById(resourceId);
+            this.accessControlService.removeObjectFromAllPolicies(
+                    AccessControlObjectType.RESOURCE, resourceId);
             this.resourcesVaultClient.removeSecretsForResource(resource.getId());
             this.resourcesVaultClient.removeIntermediateCertificateAuthority(resource.getId());
 
@@ -197,11 +200,12 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
     }
 
     @Override
-    public void setLocationOfResource(UUID resourceId, UUID locationId, String jwtAccessToken)  {
-        this.getResourceByIdOrThrow(resourceId, jwtAccessToken); // check if resource exists and use has access - exception will be thrown if not
-        var optionalLocation = locationJpaRepository.findById(locationId);
-
-        this.resourcesConsulAdminClient.setResourceLocation(resourceId, optionalLocation.get());
+    public void setLocationOfResource(UUID resourceId, UUID locationId, UserContext userContext)  {
+        this.getResourceByIdOrThrow(resourceId, userContext); // check if resource exists and use has access - exception will be thrown if not
+        var location = locationJpaRepository.findById(locationId).orElseThrow();
+        var resource = resourceJpaRepository.findById(resourceId).orElseThrow();
+        resource.setLocationId(location.getId());
+        resourceJpaRepository.save(resource);
     }
 
     @Override
@@ -219,24 +223,19 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
 
     @Override
     public void setFirmwareVersionOfResource(UUID resourceId, String firmwareVersion) {
-        try {
-            this.resourcesConsulAdminClient.getResourceById(resourceId).ifPresentOrElse(
-                (resource) -> {
-                    resource.setFirmwareVersion(firmwareVersion);
-                        this.resourcesConsulAdminClient.updateResource(resource);
-                },
-                () -> {
-                    LOG.error("Resource with id: " + resourceId + " not found. Cannot set firmware version.");
-                });
-        } catch (ResourceRuntimeException e) {
-            LOG.error("Failed to set firmware version for resource with id: {}", resourceId, e);
-        }
+        resourceJpaRepository.findById(resourceId).ifPresentOrElse(
+            (resource) -> {
+                resource.setFirmwareVersion(firmwareVersion);
+                resourceJpaRepository.save(resource);
+            },
+            () -> LOG.error("Resource with id: " + resourceId
+                    + " not found. Cannot set firmware version."));
     }
 
     @Override
-    public void updateResource(UUID resourceId, ResourceUpdateRequest updateResourceRequest, String jwtAccessToken)
+    public void updateResource(UUID resourceId, ResourceUpdateRequest updateResourceRequest, UserContext userContext)
             throws ResourceNotFoundException, ResourceRuntimeException {
-        var resource = this.getResourceByIdOrThrow(resourceId, jwtAccessToken); // check if resource exists and use has access - exception will be thrown if not
+        var resource = this.getResourceByIdOrThrow(resourceId, userContext); // check if resource exists and use has access - exception will be thrown if not
 
         // TODO: Improve update of AAS Nameplate Submodel information - currently each property is updated separately and this class needs to know about the
         //  structure of the Nameplate Submodel. Maybe implement a method in the ResourcesAasHandler that takes care of updating the Nameplate Submodel based
@@ -282,26 +281,26 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
                     updatedSubmodelElement);
         }
 
-        var consulUpdateRequired = false;
+        var updateRequired = false;
         if (updateResourceRequest.getHostname() != null) {
             resource.setHostname(updateResourceRequest.getHostname());
-            consulUpdateRequired = true;
+            updateRequired = true;
         }
         if (updateResourceRequest.getIp() != null) {
             resource.setIp(updateResourceRequest.getIp());
-            consulUpdateRequired = true;
+            updateRequired = true;
         }
-        if (consulUpdateRequired) {
-            this.resourcesConsulAdminClient.updateResource(resource);
+        if (updateRequired) {
+            this.resourceJpaRepository.save(resource);
         }
 
-        this.onResourceUpdated(resourceId, jwtAccessToken);
+        this.onResourceUpdated(resourceId, userContext);
     }
 
     //region ResourceUpdatedListener
     @Override
-    public void onResourceUpdated(UUID resourceId, String jwtAccessToken) {
-        var resource = this.getResourceByIdOrThrow(resourceId, jwtAccessToken);
+    public void onResourceUpdated(UUID resourceId, UserContext userContext) {
+        var resource = this.getResourceByIdOrThrow(resourceId, userContext);
         this.resourceEventMessageSender.sendMessage(resource, ResourceEventType.UPDATED);
     }
     //endregion ResourceUpdatedListener
