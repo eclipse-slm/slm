@@ -1283,6 +1283,56 @@ git commit -m "test(resources): fix service-app wiring for DB-backed resources"
 
 ---
 
+## Task 17: Fix service_management resource-IP lookup (Consul → REST)
+
+**Context:** Task 1 verification found that `service_management`'s
+`ServiceOfferingOrderHandler.getResourceIpOfServiceHoster` reads the resource IP
+directly from Consul (`consulAdminClient.nodes().getNodeById(resourceId)`).
+After Task 14 removes resource node storage from Consul this returns empty and
+the IP becomes `"N/A"`, breaking service ordering. User decision: fix now via the
+already-injected `ResourceManagementClientFactory` (REST), threading the access
+token. `ResourceDTO` exposes `ip`.
+
+**Files:**
+- Modify: `service_management/service_management.service/service_management.service.app/src/main/java/org/eclipse/slm/service_management/service/app/service_offerings/ServiceOfferingOrderHandler.java`
+
+- [ ] **Step 1: Trace the access token through the call chain**
+
+Run: `grep -n "getResourceIpOfServiceHoster\|getResourceIdOfServiceHoster\|accessToken\|createWithBearerTokenAuth" service_management/service_management.service/service_management.service.app/src/main/java/org/eclipse/slm/service_management/service/app/service_offerings/ServiceOfferingOrderHandler.java`
+Identify the caller of `getResourceIpOfServiceHoster` and confirm an `accessToken` (or `ResourceManagementClient`) is available there. The class already builds clients via `resourceManagementClientFactory.createWithBearerTokenAuth(accessToken)` at lines ~118/129/159.
+
+- [ ] **Step 2: Replace the Consul read with a REST lookup**
+
+Change `getResourceIpOfServiceHoster` to take the access token (or an already-built `ResourceManagementClient`) and fetch the resource via REST instead of Consul. Resulting shape:
+```java
+    private String getResourceIpOfServiceHoster(CapabilityService capabilityService, String accessToken) {
+        var resourceId = this.getResourceIdOfServiceHoster(capabilityService);
+        var resourceManagementClient = resourceManagementClientFactory.createWithBearerTokenAuth(accessToken);
+        var resource = resourceManagementClient.getResourcesApiClient().getResource(resourceId);
+
+        String resourceIp = "N/A";
+        if (resource != null && resource.getBody() != null && resource.getBody().getIp() != null) {
+            resourceIp = resource.getBody().getIp();
+        }
+        return resourceIp;
+    }
+```
+Adapt the exact client accessor/return type to the actual `ResourceManagementClient` API (verify with `grep -n "getResource\|ResourcesApiClient\|public" resource_management/resource_management.service/resource_management.service.client/src/main/java/org/eclipse/slm/resource_management/service/client/ResourceManagementClient.java`). Update the call site to pass the token. Remove the now-unused Consul `Node` import and, if `consulAdminClient`/`consulClientFactory` become entirely unused in this class, remove those fields and constructor params too.
+
+- [ ] **Step 3: Compile service_management**
+
+Run: `cd /home/operation/Development/slm2 && mvn -q -pl service_management/service_management.service/service_management.service.app -am test-compile`
+Expected: PASS.
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add -A
+git commit -m "refactor(service-mgmt): resolve resource IP via REST instead of Consul"
+```
+
+---
+
 ## Self-Review Checklist (completed during planning)
 
 - **Spec coverage:** Phase 1 → Task 1. Phase 2 (access-control component, UserContext, KeycloakTokenUtil.getGroups, AccessControlService) → Tasks 2–9. Phase 3 (Resources → DB, manager/controller rewrite, Consul removal, tests) → Tasks 10–16. CapabilityServices/MultiHost/RemoteAccess (phases 4–6) and final Consul-dependency cleanup (phase 7) are intentionally deferred to follow-up plans.
