@@ -2,6 +2,7 @@ package org.eclipse.slm.resource_management.service.client;
 
 import org.eclipse.slm.common.parent.client.AbstractApiClient;
 import org.eclipse.slm.common.restclient.feign.auth.AuthRequestInterceptor;
+import org.eclipse.slm.resource_management.common.resources.ResourcesRestApiConfig;
 import org.eclipse.slm.resource_management.features.capabilities.CapabilitiesRestApiConfig;
 import org.eclipse.slm.resource_management.features.capabilities.providers.ProvidersRestApiConfig;
 import org.eclipse.slm.resource_management.features.profiler.ProfilerRestApiConfig;
@@ -13,6 +14,7 @@ public class ResourceManagementClient extends AbstractApiClient {
     private final ProfilerRestApiClient profilerRestApiClient;
     private final CapabilitiesApiClient capabilitiesApiClient;
     private final ProvidersApiClient providersApiClient;
+    private final ResourcesApiClient resourcesApiClient;
 
     public ResourceManagementClient(String resourceManagementBaseUrl,
                                     ObjectFactory<HttpMessageConverters> messageConverters,
@@ -25,6 +27,8 @@ public class ResourceManagementClient extends AbstractApiClient {
         this.capabilitiesApiClient = this.buildFeignClient(CapabilitiesApiClient.class, capabilitiesRestApiBaseUrl);
         var providersRestApiBaseUrl = this.baseUrl + ProvidersRestApiConfig.BASE_PATH;
         this.providersApiClient = this.buildFeignClient(ProvidersApiClient.class, providersRestApiBaseUrl);
+        var resourcesRestApiBaseUrl = this.baseUrl + ResourcesRestApiConfig.BASE_PATH;
+        this.resourcesApiClient = this.buildFeignClient(ResourcesApiClient.class, resourcesRestApiBaseUrl);
     }
 
     public ProfilerRestApiClient profiler() {
@@ -35,5 +39,9 @@ public class ResourceManagementClient extends AbstractApiClient {
     }
     public ProvidersApiClient providers() {
         return providersApiClient;
+    }
+
+    public ResourcesApiClient resources() {
+        return resourcesApiClient;
     }
 }
