@@ -22,8 +22,9 @@ import org.eclipse.slm.service_management.features.service_offerings.api.vendors
 import org.eclipse.slm.service_management.features.service_offerings.impl.categories.ServiceCategoryJpaRepository;
 import org.eclipse.slm.service_management.features.service_offerings.impl.serviceofferings.ServiceOfferingJpaRepository;
 import org.eclipse.slm.service_management.features.service_offerings.impl.vendors.ServiceVendorJpaRepository;
-import org.eclipse.slm.service_management.service.app.Application;
-import org.eclipse.slm.service_management.features.service_deployment.impl.ServiceDeploymentHandler;
+// Application and ServiceDeploymentHandler removed: adding them as test deps would create
+// a cyclic Maven dependency (service_deployment.impl and service.app both depend on service_offerings.impl).
+// This test is @Disabled; move it to service_management.service.app to re-enable properly.
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,16 +49,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(
-        classes = {
-                Application.class,
-        },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(
         classes = {
                 ServiceOfferingRestController.class,
                 ServiceOfferingHandler.class,
                 ServiceOfferingGitUpdater.class,
-                ServiceDeploymentHandler.class,
                 ServiceVendorHandler.class,
                 ServiceOfferingCategoryHandler.class,
                 ResourceManagementClientFactory.class

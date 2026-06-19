@@ -129,5 +129,15 @@
             <version>${springaddons-c4-soft.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>service_management.features.service_deployment.api</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- service_deployment.impl and service.app both depend on service_offerings.impl
+             (compile scope), so they cannot be added here as test deps without creating
+             a cyclic Maven reactor dependency. ServiceOfferingRestControllerIT is @Disabled
+             and should be moved to service_management.service.app to be re-enabled. -->
     </dependencies>
 </project>
