@@ -1,6 +1,6 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.persistence.mariadb.test;
+package org.eclipse.slm.service_management.features.service_offerings.impl.persistence.mariadb;
 
-import org.eclipse.slm.service_management.offerings.ServiceOfferingCategory;
+import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategory;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOffering;
 import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendor;
 import org.eclipse.slm.service_management.features.service_offerings.impl.serviceofferings.ServiceOfferingJpaRepository;
@@ -109,7 +109,7 @@ public class ServiceOfferingRepositoryIT {
 
             assertThat(exception.getMessage())
                     .contains("not-null property references a null or transient value")
-                    .contains("import org.eclipse.slm.service_management.offerings.ServiceOffering.serviceVendor");
+                    .contains("org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOffering.serviceVendor");
         }
 
         @Test
@@ -125,7 +125,7 @@ public class ServiceOfferingRepositoryIT {
 
             assertThat(exception.getMessage())
                     .contains("not-null property references a null or transient value")
-                    .contains("import org.eclipse.slm.service_management.offerings.ServiceOffering.serviceCategory");
+                    .contains("org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOffering.serviceCategory");
         }
 
         @Test
@@ -208,4 +208,3 @@ public class ServiceOfferingRepositoryIT {
         }
     }
 }
-

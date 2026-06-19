@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.persistence.mariadb.test;
+package org.eclipse.slm.service_management.features.service_offerings.impl.persistence.mariadb;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -13,4 +13,3 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(basePackages = "org.eclipse.slm.service_management")
 public class SpringTestConfiguration {
 }
-

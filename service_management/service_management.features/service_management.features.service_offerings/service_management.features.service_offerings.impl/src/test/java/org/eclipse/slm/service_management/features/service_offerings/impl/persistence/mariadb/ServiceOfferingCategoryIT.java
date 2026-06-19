@@ -1,6 +1,6 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.persistence.mariadb.test;
+package org.eclipse.slm.service_management.features.service_offerings.impl.persistence.mariadb;
 
-import org.eclipse.slm.service_management.offerings.ServiceOfferingCategory;
+import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategory;
 import org.eclipse.slm.service_management.features.service_offerings.impl.categories.ServiceCategoryJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -123,4 +123,3 @@ public class ServiceOfferingCategoryIT {
         assertThat(savedServiceCategory).isNull();
     }
 }
-

@@ -1,6 +1,6 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.persistence.mariadb.test;
+package org.eclipse.slm.service_management.features.service_offerings.impl.persistence.mariadb;
 
-import org.eclipse.slm.service_management.offerings.ServiceOfferingCategory;
+import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategory;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOffering;
 import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.compose.DockerComposeDeploymentDefinition;
@@ -151,7 +151,7 @@ public class ServiceOfferingVersionRepositoryIT {
 
             assertThat(exception.getMessage())
                     .contains("not-null property references a null or transient value")
-                    .contains("import org.eclipse.slm.service_management.offerings.ServiceOfferingVersion.deploymentDefinition");
+                    .contains("org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion.deploymentDefinition");
         }
 
         @Test
@@ -167,7 +167,7 @@ public class ServiceOfferingVersionRepositoryIT {
 
             assertThat(exception.getMessage())
                     .contains("not-null property references a null or transient value")
-                    .contains("import org.eclipse.slm.service_management.offerings.ServiceOfferingVersion.serviceOffering");
+                    .contains("org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion.serviceOffering");
         }
 
         @Test
@@ -272,4 +272,3 @@ public class ServiceOfferingVersionRepositoryIT {
         }
     }
 }
-

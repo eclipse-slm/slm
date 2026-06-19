@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.persistence.mariadb.test;
+package org.eclipse.slm.service_management.features.service_offerings.impl.persistence.mariadb;
 
 import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendor;
 import org.eclipse.slm.service_management.features.service_offerings.impl.vendors.ServiceVendorJpaRepository;
@@ -108,4 +108,3 @@ public class ServiceVendorIT {
         assertThat(savedServiceVendor).isNull();
     }
 }
-

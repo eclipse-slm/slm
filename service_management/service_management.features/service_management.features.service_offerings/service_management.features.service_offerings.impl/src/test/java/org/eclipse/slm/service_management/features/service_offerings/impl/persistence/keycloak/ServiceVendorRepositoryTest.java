@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.persistence.keycloak;
+package org.eclipse.slm.service_management.features.service_offerings.impl.persistence.keycloak;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.*;
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
@@ -402,4 +402,3 @@ public class ServiceVendorRepositoryTest {
     }
 
 }
-
