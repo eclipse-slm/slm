@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.service.initializer;
+package org.eclipse.slm.service_management.service.initializer;
 
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
 import org.eclipse.slm.common.utils.serviceofferingimport.DTOConfig;
@@ -43,4 +43,3 @@ public class DTOTest {
         var serviceOfferingVersionDTOApi = ObjectMapperUtils.map(serviceOfferingDTOFileImport.getVersion(), ServiceOfferingVersionDTOApi.class);
     }
 }
-

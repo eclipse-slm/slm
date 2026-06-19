@@ -3,7 +3,7 @@ package org.eclipse.slm.service_management.features.service_offerings.impl;
 import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceCategoryNotFoundException;
 import org.eclipse.slm.service_management.features.service_offerings.impl.categories.ServiceOfferingCategoryHandler;
 
-import org.eclipse.slm.service_management.offerings.ServiceOfferingCategory;
+import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategory;
 import org.eclipse.slm.service_management.features.service_offerings.impl.categories.ServiceCategoryJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

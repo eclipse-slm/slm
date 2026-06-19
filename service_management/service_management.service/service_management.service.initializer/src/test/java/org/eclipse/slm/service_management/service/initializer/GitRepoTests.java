@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_offerings.api.service.initializer;
+package org.eclipse.slm.service_management.service.initializer;
 
 import org.eclipse.slm.service_management.service.initializer.GitRepo;
 import org.junit.jupiter.api.DisplayName;
@@ -71,4 +71,3 @@ public class GitRepoTests {
         }
     }
 }
-
