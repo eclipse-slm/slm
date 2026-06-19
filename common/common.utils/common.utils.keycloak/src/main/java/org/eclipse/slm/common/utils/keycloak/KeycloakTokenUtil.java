@@ -15,11 +15,30 @@ import reactor.netty.http.client.HttpClient;
 import reactor.netty.tcp.TcpClient;
 
 import javax.net.ssl.SSLException;
+import java.util.Collection;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class KeycloakTokenUtil {
 
     private final static Logger LOG = LoggerFactory.getLogger(KeycloakTokenUtil.class);
+
+    public static final String ROLE_SLM_ADMIN = "ROLE_slm-admin";
+
+    @SuppressWarnings("unchecked")
+    public static Set<String> getGroups(JwtAuthenticationToken jwtAuthenticationToken) {
+        var claim = jwtAuthenticationToken.getToken().getClaim("groups");
+        if (claim instanceof Collection<?> collection) {
+            return collection.stream().map(Object::toString).collect(Collectors.toSet());
+        }
+        return Set.of();
+    }
+
+    public static boolean isAdmin(JwtAuthenticationToken jwtAuthenticationToken) {
+        return jwtAuthenticationToken.getAuthorities().stream()
+                .anyMatch(a -> ROLE_SLM_ADMIN.equals(a.getAuthority()));
+    }
 
     public static String getUserUuid(JwtAuthenticationToken jwtAuthenticationToken) {
         var userUuid = jwtAuthenticationToken.getToken().getSubject();
