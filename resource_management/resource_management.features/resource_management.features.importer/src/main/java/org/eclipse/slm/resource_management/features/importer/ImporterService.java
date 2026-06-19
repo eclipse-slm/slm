@@ -119,7 +119,7 @@ public class ImporterService {
 
                 if (device.locationId != null) {
                     // TODO(resource-mgmt-db): internal/system flow uses admin access context
-                    this.resourcesManager.setLocationOfResource(addedResource.getId(), device.locationId, new UserContext(java.util.Set.of(), true));
+                    this.resourcesManager.setLocationOfResource(addedResource.getId(), device.locationId, new UserContext(java.util.Set.of(), true, userAccessToken));
                 }
             } catch (Exception e) {
                 throw new ResourceManagementImportRuntimeException("Error importing devices: " + e.getMessage());

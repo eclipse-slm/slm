@@ -49,7 +49,8 @@ public class DeviceInfoSubmodelService extends AbstractSubmodelService {
         }
         var userContext = new UserContext(
                 KeycloakTokenUtil.getGroups(resourceManagementJwtAuthentication),
-                KeycloakTokenUtil.isAdmin(resourceManagementJwtAuthentication));
+                KeycloakTokenUtil.isAdmin(resourceManagementJwtAuthentication),
+                KeycloakTokenUtil.getToken(resourceManagementJwtAuthentication));
 
         var resource = resourcesManager.getResourceByIdOrThrow(resourceId, userContext);
 

@@ -107,7 +107,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
                                   String fullPathOwnerGroupId) throws Exception {
         try {
             // Check if resource exists
-            var userContext = new UserContext(KeycloakTokenUtil.getGroups(jwtAuthenticationToken), KeycloakTokenUtil.isAdmin(jwtAuthenticationToken));
+            var userContext = new UserContext(KeycloakTokenUtil.getGroups(jwtAuthenticationToken), KeycloakTokenUtil.isAdmin(jwtAuthenticationToken), KeycloakTokenUtil.getToken(jwtAuthenticationToken));
             var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, userContext);
             // Check if capability exists
             var capability = this.capabilitiesService.getCapabilityByIdOrThrow(capabilityId);

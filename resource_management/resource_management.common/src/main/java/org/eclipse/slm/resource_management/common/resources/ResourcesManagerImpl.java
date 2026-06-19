@@ -120,7 +120,7 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
         }
 
         // Temporary seam: RemoteAccess is still Consul-backed; token param removed when RemoteAccess is migrated
-        var remoteAccessServicesIds = this.remoteAccessManager.getRemoteAccessIdsOfResource(resource.getId(), "");
+        var remoteAccessServicesIds = this.remoteAccessManager.getRemoteAccessIdsOfResource(resource.getId());
         resource.setRemoteAccessIds(remoteAccessServicesIds);
 
         return resource;
@@ -182,7 +182,7 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
             var resource = this.getResourceByIdOrThrow(resourceId, userContext);
 
             for (var remoteAccessServiceId : resource.getRemoteAccessIds()) {
-                this.remoteAccessManager.deleteRemoteAccessById(resourceId, remoteAccessServiceId, "", false);
+                this.remoteAccessManager.deleteRemoteAccessById(resourceId, remoteAccessServiceId, userContext.getAccessToken(), false);
             }
 
             this.resourceJpaRepository.deleteById(resourceId);

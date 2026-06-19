@@ -51,6 +51,21 @@ public class RemoteAccessManagerImpl implements RemoteAccessManager {
     }
 
     @Override
+    public List<UUID> getRemoteAccessIdsOfResource(UUID resourceId) {
+        var remoteAccessServiceIds = new ArrayList<UUID>();
+        try {
+            var remoteAccesses = this.remoteAccessConsulAdminClient.getRemoteAccesses(resourceId);
+            for (var remoteAccess : remoteAccesses) {
+                remoteAccessServiceIds.add(remoteAccess.getId());
+            }
+        } catch (Exception e) {
+            throw new RemoteAccessRuntimeException(
+                "Error while retrieving remote access services of resource '" + resourceId + "': " + e.getMessage(), e);
+        }
+        return remoteAccessServiceIds;
+    }
+
+    @Override
     public List<UUID> getRemoteAccessIdsOfResource(UUID resourceId, String jwtAccessToken) {
         var remoteAccessServiceIds = new ArrayList<UUID>();
 

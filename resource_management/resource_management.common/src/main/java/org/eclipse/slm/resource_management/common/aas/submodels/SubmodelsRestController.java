@@ -47,7 +47,8 @@ public class SubmodelsRestController {
                 (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         return new UserContext(
                 KeycloakTokenUtil.getGroups(jwtAuthenticationToken),
-                KeycloakTokenUtil.isAdmin(jwtAuthenticationToken));
+                KeycloakTokenUtil.isAdmin(jwtAuthenticationToken),
+                KeycloakTokenUtil.getToken(jwtAuthenticationToken));
     }
 
     @RequestMapping(value = "/{resourceId}/submodels", method = RequestMethod.GET)

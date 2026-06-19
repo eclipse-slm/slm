@@ -9,6 +9,8 @@ public interface RemoteAccessManager {
 
     List<RemoteAccessDTOReadMinimal> getRemoteAccessesOfResource(UUID resourceId, String jwtAccessToken);
 
+    List<UUID> getRemoteAccessIdsOfResource(UUID resourceId);
+
     List<UUID> getRemoteAccessIdsOfResource(UUID resourceId, String jwtAccessToken);
 
     RemoteAccessDTOReadFull getRemoteAccessByIdOrThrow(UUID resourceId, UUID remoteAccessId, String jwtAccessToken) throws RemoteAccessRuntimeException;

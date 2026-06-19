@@ -116,7 +116,7 @@ public class FirmwareUpdateManager {
         updateInformation.setAvailableFirmwareVersions(availableFirmwareVersions);
 
         FirmwareVersionDetails currentFirmwareVersion = null;
-        var userContext = new UserContext(KeycloakTokenUtil.getGroups(jwtAuthenticationToken), KeycloakTokenUtil.isAdmin(jwtAuthenticationToken));
+        var userContext = new UserContext(KeycloakTokenUtil.getGroups(jwtAuthenticationToken), KeycloakTokenUtil.isAdmin(jwtAuthenticationToken), KeycloakTokenUtil.getToken(jwtAuthenticationToken));
         var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, userContext);
 
         for (int i = 0; i < availableFirmwareVersions.size(); i++) {

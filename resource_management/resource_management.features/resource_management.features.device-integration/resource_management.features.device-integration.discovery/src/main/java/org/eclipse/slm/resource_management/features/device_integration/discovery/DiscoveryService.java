@@ -136,7 +136,7 @@ public class DiscoveryService implements DiscoveryJobListener {
         discoveredResourceDTO.setResultId(discoveryJob.getId() + ":" + discoveredResourceDTO.getResourceId());
 
         try {
-            var userContext = new UserContext(KeycloakTokenUtil.getGroups(jwtAuthenticationToken), KeycloakTokenUtil.isAdmin(jwtAuthenticationToken));
+            var userContext = new UserContext(KeycloakTokenUtil.getGroups(jwtAuthenticationToken), KeycloakTokenUtil.isAdmin(jwtAuthenticationToken), KeycloakTokenUtil.getToken(jwtAuthenticationToken));
             var existingResource = resourcesManager.getResourceByIdOrThrow(discoveredResourceDTO.getResourceId(), userContext);
             if (existingResource != null) {
                 discoveredResourceDTO.setOnboarded(true);

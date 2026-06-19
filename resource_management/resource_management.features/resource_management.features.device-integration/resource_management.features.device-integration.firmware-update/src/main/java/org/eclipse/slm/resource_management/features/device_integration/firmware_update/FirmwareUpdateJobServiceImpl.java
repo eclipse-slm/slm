@@ -87,7 +87,7 @@ public class FirmwareUpdateJobServiceImpl implements FirmwareUpdateJobService, F
         }
         // Check if resource exists
         // TODO(resource-mgmt-db): internal/system flow uses admin access context
-        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, new UserContext(java.util.Set.of(), true));
+        var resource = this.resourcesManager.getResourceByIdOrThrow(resourceId, new UserContext(java.util.Set.of(), true, accessToken));
         // Get driver to check if it is available
         var driverId = resource.getDriverId();
         var driverInfo = this.driverRegistryClient.getRegisteredDriver(driverId);
