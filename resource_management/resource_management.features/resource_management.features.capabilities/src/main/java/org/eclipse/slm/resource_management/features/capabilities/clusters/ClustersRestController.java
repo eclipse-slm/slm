@@ -2,7 +2,6 @@ package org.eclipse.slm.resource_management.features.capabilities.clusters;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import org.eclipse.slm.common.consul.model.catalog.Service;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.dto.CapabilityDTOApi;
@@ -110,16 +109,14 @@ public class ClustersRestController {
         );
     }
 
-    //TODO: Use ClusterUUID instead
-    @RequestMapping(value = "/{clusterName}/members", method = RequestMethod.GET)
+    @RequestMapping(value = "/{clusterServiceId}/members", method = RequestMethod.GET)
     @Operation(summary = "Get members of cluster")
-    public List<Service> getClusterMembers(
-            @PathVariable(name = "clusterName") String clusterName
+    public List<UUID> getClusterMembers(
+            @PathVariable(name = "clusterServiceId") UUID clusterServiceId
     ) throws ConsulLoginFailedException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        var clusterNodes = this.clusterHandler.getClusterMembers( clusterName);
 
-        return clusterNodes;
+        return this.clusterHandler.getClusterMembers(clusterServiceId);
     }
 
     @RequestMapping(value = "/{clusterUuid}/members", method = RequestMethod.POST)

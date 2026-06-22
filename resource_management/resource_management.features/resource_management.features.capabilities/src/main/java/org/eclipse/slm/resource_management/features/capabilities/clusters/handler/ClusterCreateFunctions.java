@@ -5,7 +5,6 @@ import org.eclipse.slm.awx.client.observer.*;
 import org.eclipse.slm.awx.model.ExtraVars;
 
 import org.eclipse.slm.common.consul.client.ConsulClientFactory;
-import org.eclipse.slm.common.consul.model.acl.policies.Policy;
 import org.eclipse.slm.common.consul.model.catalog.CatalogRegistration;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
@@ -18,10 +17,10 @@ import org.eclipse.slm.notification_service.messaging.NotificationMessageSender;
 import org.eclipse.slm.notification_service.model.NotificationCategory;
 import org.eclipse.slm.notification_service.model.NotificationEventType;
 import org.eclipse.slm.notification_service.model.NotificationSubCategory;
-import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;
+import org.eclipse.slm.resource_management.common.access.AccessControlService;
 import org.eclipse.slm.resource_management.common.remote_access.RemoteAccessManager;
+import org.eclipse.slm.resource_management.common.resources.ResourceJpaRepository;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.KubernetesKubeConfig;
-import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilitiesConsulClient;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.model.ClusterCreateRequest;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityServiceStatus;
@@ -29,7 +28,7 @@ import org.eclipse.slm.resource_management.features.capabilities.model.actions.A
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionConfigParameterRequiredType;
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType;
 import org.eclipse.slm.resource_management.features.capabilities.model.awx.AwxAction;
-import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilitiesConsulClient;
+import org.eclipse.slm.resource_management.features.capabilities.persistence.MultiHostCapabilityServicePersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -49,8 +48,9 @@ public class ClusterCreateFunctions extends AbstractClusterFunctions implements 
             AwxJobExecutor awxJobExecutor,
             MultiTenantKeycloakRegistration multiTenantKeycloakRegistration,
             ConsulClientFactory consulClientFactory,
-            CapabilitiesConsulClient capabilitiesConsulClient,
-            MultiHostCapabilitiesConsulClient multiHostCapabilitiesConsulClient,
+            MultiHostCapabilityServicePersistence multiHostCapabilityServicePersistence,
+            ResourceJpaRepository resourceJpaRepository,
+            AccessControlService accessControlService,
             AwxJobObserverInitializer awxJobObserverInitializer,
             VaultClientFactory vaultClientFactory,
             RemoteAccessManager remoteAccessManager) {
@@ -59,8 +59,9 @@ public class ClusterCreateFunctions extends AbstractClusterFunctions implements 
                 awxJobExecutor,
                 multiTenantKeycloakRegistration,
                 consulClientFactory,
-                capabilitiesConsulClient,
-                multiHostCapabilitiesConsulClient,
+                multiHostCapabilityServicePersistence,
+                resourceJpaRepository,
+                accessControlService,
                 awxJobObserverInitializer,
                 vaultClientFactory,
                 remoteAccessManager);
@@ -81,7 +82,7 @@ public class ClusterCreateFunctions extends AbstractClusterFunctions implements 
         var capabilityAction = (AwxAction) capability.getActions().get(ActionType.INSTALL);
 
         var extraVarsMap = new HashMap<String, Object>();
-        String resourceId = multiHostCapabilityService.getId().toString();
+        String resourceId = multiHostCapabilityService.getServiceId().toString();
         extraVarsMap.put("resource_id", resourceId);
         extraVarsMap.put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
         extraVarsMap.put("service_name", multiHostCapabilityService.getServiceName());
@@ -114,18 +115,15 @@ public class ClusterCreateFunctions extends AbstractClusterFunctions implements 
             ClusterCreateRequest clusterCreateRequest
     ) throws SSLException, ConsulLoginFailedException {
         multiHostCapabilityService.setStatus(CapabilityServiceStatus.INSTALL);
-        this.multiHostCapabilitiesConsulClient.addMultiHostCapabilityService(
-                
-                multiHostCapabilityService
+        this.multiHostCapabilityServicePersistence.save(
+                multiHostCapabilityService,
+                clusterCreateRequest.getFullPathOwnerGroupId()
         );
 
-        multiHostCapabilitiesConsulClient.addReadRuleForCapabilityServiceToResourcePolicy(
-                
-                multiHostCapabilityService
-        );
+        // TODO(part2b): per-member read grants subsumed by owner access policy created in save(...)
 
         // initialize vault kv engine and add access for user
-        var capabilityServiceId = multiHostCapabilityService.getId().toString();
+        var capabilityServiceId = multiHostCapabilityService.getServiceId().toString();
         this.vaultAdminClient.kv("resources").addSecretsToKvEngine(
                 capabilityServiceId,
                 new HashMap<>()
@@ -189,7 +187,7 @@ public class ClusterCreateFunctions extends AbstractClusterFunctions implements 
                                                  ClusterCreateRequest clusterCreateRequest) {
         // Update capability status
         multiHostCapabilityService.setStatus(CapabilityServiceStatus.READY);
-        this.multiHostCapabilitiesConsulClient.updateMultiHostCapabilityService(multiHostCapabilityService);
+        this.multiHostCapabilityServicePersistence.update(multiHostCapabilityService);
         // If a cluster is managed, read config parameters from request and write to Vault
         if (multiHostCapabilityService.getManaged()) {
             this.readConfigParametersFromRequestAndWriteToVault(clusterCreateRequest, multiHostCapabilityService);
@@ -197,9 +195,9 @@ public class ClusterCreateFunctions extends AbstractClusterFunctions implements 
         // Reread config from Vault
         Map<String, String> secretsOfClusterFromVault = new HashMap<>();
         try {
-            secretsOfClusterFromVault = this.vaultAdminClient.kv("resources").getSecretsOfPathOrThrow(multiHostCapabilityService.getId().toString()).getData();
+            secretsOfClusterFromVault = this.vaultAdminClient.kv("resources").getSecretsOfPathOrThrow(multiHostCapabilityService.getServiceId().toString()).getData();
         } catch (VaultKvSecretsNotFoundException e) {
-            LOG.debug("Vault has no secrets for MultiHostCapabilityService '" + multiHostCapabilityService.getId() + "'. Proceeding ...");
+            LOG.debug("Vault has no secrets for MultiHostCapabilityService '" + multiHostCapabilityService.getServiceId() + "'. Proceeding ...");
         }
 
         // Prepare meta for consul
@@ -234,41 +232,31 @@ public class ClusterCreateFunctions extends AbstractClusterFunctions implements 
                 }
             }
         }
-        multiHostCapabilityService.setMeta(serviceMetaData);
 
         // Create Consul node and service representing cluster
         String dummyAddress = multiHostCapabilityService.getCapability().getName().toLowerCase() + "-cluster"; // ToDo: if changed from x+"-cluster" then check for other occurrences -> e.g. in ResourcesManager
         var clusterService = CatalogRegistration.Service.builder(multiHostCapabilityService.getServiceName())
-                .id(multiHostCapabilityService.getId())
+                .id(multiHostCapabilityService.getServiceId().toString())
                 .address(dummyAddress)
                 .tags(multiHostCapabilityService.getTags())
                 .meta(serviceMetaData)
                 .build();
         var consulNodeName = multiHostCapabilityService.getServiceName();
         Map<String, String> nodeMetaData = new HashMap<String, String>();
-        nodeMetaData.put("resource_id", multiHostCapabilityService.getId().toString());
+        nodeMetaData.put("resource_id", multiHostCapabilityService.getServiceId().toString());
         nodeMetaData.put("resource_managed", String.valueOf(multiHostCapabilityService.getManaged()));
         nodeMetaData.put("resource_type", "cluster"); // ToDo: change to generic ResourceType when introduced & then check for other occurrences -> e.g. in ResourcesManager
         nodeMetaData.putAll(serviceMetaData);
         var catalogRegistration = CatalogRegistration.builder()
                 .nodeName(consulNodeName)
-                .id(multiHostCapabilityService.getId().toString())
+                .id(multiHostCapabilityService.getServiceId().toString())
                 .address(dummyAddress)
                 .nodeMeta(nodeMetaData)
                 .service(clusterService)
                 .build();
         this.consulAdminClient.nodes().registerEntity(catalogRegistration);
-        // Create policy for resource
-        var resourcePolicyName = ResourcesConsulClient.getResourcePolicyName(multiHostCapabilityService.getServiceId());
-        var resourcePolicyRule =  "node \"" + multiHostCapabilityService.getId() + "\" { policy = \"read\" }";
-        var resourcePolicy = Policy.builder(resourcePolicyName)
-                .description("Access policy for resource '" + multiHostCapabilityService.getId() + "'")
-                .rules(resourcePolicyRule)
-                .build();
-        var createdPolicy = this.consulAdminClient.acl().createPolicy(resourcePolicy);
-        // Assign resource policy to owner group role
-        var roleName = clusterCreateRequest.getFullPathOwnerGroupId();
-        this.consulAdminClient.acl().addPolicyToRole(roleName, createdPolicy.getId());
+        // Access control for the cluster owner is handled via the AccessControlService
+        // policy created in MultiHostCapabilityServicePersistence.save(...)
         // Send notification
         this.notificationMessageSender.sendMessage(new NotificationEventMessage(
                 KeycloakTokenUtil.getUserUuid(jwtAuthenticationToken),
@@ -313,7 +301,7 @@ public class ClusterCreateFunctions extends AbstractClusterFunctions implements 
 
             // add secrets as kv pairs
             this.vaultAdminClient.kv("resources").addSecretsToKvEngine(
-                    multiHostCapabilityService.getId().toString(),
+                    multiHostCapabilityService.getServiceId().toString(),
                     configParametersForVault
             );
             LOG.info("Config parameters have been saved to vault");

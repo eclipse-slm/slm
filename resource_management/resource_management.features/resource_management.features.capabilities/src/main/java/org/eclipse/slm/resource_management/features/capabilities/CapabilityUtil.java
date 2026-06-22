@@ -2,7 +2,6 @@ package org.eclipse.slm.resource_management.features.capabilities;
 
 
 import org.eclipse.slm.common.consul.model.catalog.Service;
-import org.eclipse.slm.common.consul.model.catalog.NodeService;
 import org.eclipse.slm.resource_management.features.capabilities.model.*;
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionConfigParameter;
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionConfigParameterValueType;
@@ -101,10 +100,6 @@ public class CapabilityUtil {
             Map<String, String> configParameter
     ) {
         return CapabilityUtil.getConfigParameterFilteredBySecret(capability, configParameter, false);
-    }
-
-    public static Map<String, String> getCustomMeta(NodeService nodeService) throws IllegalAccessException {
-        return CapabilityUtil.getCustomMeta(nodeService.getMeta());
     }
 
     public static Map<String, String> getCustomMeta(Map<String, String> serviceMeta) throws IllegalAccessException {

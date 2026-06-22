@@ -13,13 +13,14 @@ import org.eclipse.slm.notification_service.messaging.NotificationMessageSender;
 import org.eclipse.slm.notification_service.model.NotificationCategory;
 import org.eclipse.slm.notification_service.model.NotificationEventType;
 import org.eclipse.slm.notification_service.model.NotificationSubCategory;
+import org.eclipse.slm.resource_management.common.access.AccessControlService;
 import org.eclipse.slm.resource_management.common.remote_access.RemoteAccessManager;
-import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilitiesConsulClient;
+import org.eclipse.slm.resource_management.common.resources.ResourceJpaRepository;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityServiceStatus;
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType;
 import org.eclipse.slm.resource_management.features.capabilities.model.awx.AwxAction;
-import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilitiesConsulClient;
+import org.eclipse.slm.resource_management.features.capabilities.persistence.MultiHostCapabilityServicePersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -38,8 +39,9 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
             AwxJobExecutor awxJobExecutor,
             MultiTenantKeycloakRegistration multiTenantKeycloakRegistration,
             ConsulClientFactory consulClientFactory,
-            CapabilitiesConsulClient capabilitiesConsulClient,
-            MultiHostCapabilitiesConsulClient multiHostCapabilitiesConsulClient,
+            MultiHostCapabilityServicePersistence multiHostCapabilityServicePersistence,
+            ResourceJpaRepository resourceJpaRepository,
+            AccessControlService accessControlService,
             AwxJobObserverInitializer awxJobObserverInitializer,
             VaultClientFactory vaultClientFactory,
             RemoteAccessManager remoteAccessManager) {
@@ -48,8 +50,9 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
                 awxJobExecutor,
                 multiTenantKeycloakRegistration,
                 consulClientFactory,
-                capabilitiesConsulClient,
-                multiHostCapabilitiesConsulClient,
+                multiHostCapabilityServicePersistence,
+                resourceJpaRepository,
+                accessControlService,
                 awxJobObserverInitializer,
                 vaultClientFactory,
                 remoteAccessManager);
@@ -63,7 +66,7 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
                 (AwxAction) multiHostCapabilityService.getCapability().getActions().get(ActionType.UNINSTALL);
 
         Map<String, Object> extraVarsMap = new HashMap<>();
-        extraVarsMap.put("resource_id",multiHostCapabilityService.getId().toString());
+        extraVarsMap.put("resource_id",multiHostCapabilityService.getServiceId().toString());
         extraVarsMap.put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
         extraVarsMap.put("service_name", multiHostCapabilityService.getServiceName());
         extraVarsMap.put("supported_connection_types", uninstallAction.getConnectionTypes());
@@ -92,14 +95,14 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
         clusterJob.setJwtAuthenticationToken(jwtAuthenticationToken);
         this.clusterJobMap.put(clusterJob.getAwxJobObserver(), clusterJob);
         multiHostCapabilityService.setStatus(CapabilityServiceStatus.UNINSTALL);
-        multiHostCapabilitiesConsulClient.updateMultiHostCapabilityService(
+        multiHostCapabilityServicePersistence.update(
                 multiHostCapabilityService
         );
     }
 
     public void delete(JwtAuthenticationToken jwtAuthenticationToken, UUID consulServiceUuid
     ) throws SSLException, ConsulLoginFailedException {
-        Optional<MultiHostCapabilityService> service = multiHostCapabilitiesConsulClient.getMultiHostCapabilityServiceOfUser(
+        Optional<MultiHostCapabilityService> service = multiHostCapabilityServicePersistence.getById(
                 consulServiceUuid
         );
 
@@ -128,7 +131,7 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
 
         if (jobGoal.equals(JobGoal.DELETE)) {
             // Remove read access for secret of awx policy
-            String resourceId = multiHostCapabilityService.getId().toString();
+            String resourceId = multiHostCapabilityService.getServiceId().toString();
             this.vaultAdminClient.acl().removeRuleFromPolicy(
                     "awx",
                     "resources/data/"+ resourceId
@@ -146,15 +149,10 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
                     "group_resource_" + resourceId
             );
 
-            // Delete cluster representation in consul
-            try {
-                multiHostCapabilitiesConsulClient.removeMultiHostCapabilityService(
-                        
-                        multiHostCapabilityService.getServiceId()
-                );
-            } catch (ConsulLoginFailedException e) {
-                LOG.error("Failed to delete MultiHostCapabilityService [id = '"+multiHostCapabilityService.getId()+"'] due to login error");
-            }
+            // Delete cluster representation from DB (and its access policy)
+            multiHostCapabilityServicePersistence.delete(
+                    multiHostCapabilityService.getServiceId()
+            );
 
             this.notificationMessageSender.sendMessage(new NotificationEventMessage(
                     jwtAuthenticationToken.getToken().getSubject(),

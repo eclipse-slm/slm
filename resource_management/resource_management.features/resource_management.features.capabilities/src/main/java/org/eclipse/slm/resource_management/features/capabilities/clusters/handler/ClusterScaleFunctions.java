@@ -14,13 +14,15 @@ import org.eclipse.slm.notification_service.messaging.NotificationMessageSender;
 import org.eclipse.slm.notification_service.model.NotificationCategory;
 import org.eclipse.slm.notification_service.model.NotificationEventType;
 import org.eclipse.slm.notification_service.model.NotificationSubCategory;
+import org.eclipse.slm.resource_management.common.access.AccessControlService;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.remote_access.RemoteAccessManager;
+import org.eclipse.slm.resource_management.common.resources.ResourceJpaRepository;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.*;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.model.ClusterMemberType;
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType;
 import org.eclipse.slm.resource_management.features.capabilities.model.awx.AwxAction;
-import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilitiesConsulClient;
+import org.eclipse.slm.resource_management.features.capabilities.persistence.MultiHostCapabilityServicePersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -39,8 +41,9 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
             AwxJobExecutor awxJobExecutor,
             MultiTenantKeycloakRegistration multiTenantKeycloakRegistration,
             ConsulClientFactory consulClientFactory,
-            CapabilitiesConsulClient capabilitiesConsulClient,
-            MultiHostCapabilitiesConsulClient multiHostCapabilitiesConsulClient,
+            MultiHostCapabilityServicePersistence multiHostCapabilityServicePersistence,
+            ResourceJpaRepository resourceJpaRepository,
+            AccessControlService accessControlService,
             AwxJobObserverInitializer awxJobObserverInitializer,
             VaultClientFactory vaultClientFactory,
             RemoteAccessManager remoteAccessManager) {
@@ -49,8 +52,9 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
                 awxJobExecutor,
                 multiTenantKeycloakRegistration,
                 consulClientFactory,
-                capabilitiesConsulClient,
-                multiHostCapabilitiesConsulClient,
+                multiHostCapabilityServicePersistence,
+                resourceJpaRepository,
+                accessControlService,
                 awxJobObserverInitializer,
                 vaultClientFactory,
                 remoteAccessManager);
@@ -62,8 +66,7 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
             UUID consulServiceUuid,
             UUID resourceId
     ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException {
-        Optional<MultiHostCapabilityService> serviceOptional = multiHostCapabilitiesConsulClient.getMultiHostCapabilityServiceOfUser(
-                
+        Optional<MultiHostCapabilityService> serviceOptional = multiHostCapabilityServicePersistence.getById(
                 consulServiceUuid
         );
 
@@ -79,7 +82,7 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
                 .findFirst();
 
         if(clusterMemberTypeOptional.isEmpty()) {
-            LOG.warn("Cluster with id = \""+service.getId()+"\" has no cluster member types which are scalable.");
+            LOG.warn("Cluster with id = \""+service.getServiceId()+"\" has no cluster member types which are scalable.");
             return -1;
         }
         JobTarget jobTarget = JobTarget.RESOURCE;
@@ -127,8 +130,7 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
     ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException {
         JobTarget jobTarget = JobTarget.RESOURCE;
         JobGoal jobGoal = JobGoal.MODIFY;
-        Optional<MultiHostCapabilityService> serviceOptional = multiHostCapabilitiesConsulClient.getMultiHostCapabilityServiceOfUser(
-                
+        Optional<MultiHostCapabilityService> serviceOptional = multiHostCapabilityServicePersistence.getById(
                 consulServiceUuid
         );
 
@@ -189,13 +191,18 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
 
         if (jobGoal.equals(JobGoal.MODIFY)) {
             ScaleOperation scaleOperation = clusterJob.getScaleOperation();
-            Class<? extends ScaleOperation> scaleClass = scaleOperation.getClass();
 
-            multiHostCapabilitiesConsulClient.scaleMultiHostCapabilityService(
-                    
-                    scaleOperation,
-                    multiHostCapabilityService.getServiceId()
-            );
+            Optional<MultiHostCapabilityService> serviceOptional =
+                    this.multiHostCapabilityServicePersistence.getById(multiHostCapabilityService.getServiceId());
+            if (serviceOptional.isPresent()) {
+                MultiHostCapabilityService service = serviceOptional.get();
+                if (scaleOperation instanceof ScaleUpOperation scaleUpOperation) {
+                    service.applyScaleUp(scaleUpOperation);
+                } else if (scaleOperation instanceof ScaleDownOperation && service.getMemberMapping() != null) {
+                    service.getMemberMapping().remove(scaleOperation.getResourceId());
+                }
+                this.multiHostCapabilityServicePersistence.update(service);
+            }
 
             this.notificationMessageSender.sendMessage(new NotificationEventMessage(
                     KeycloakTokenUtil.getUserUuid(jwtAuthenticationToken),
