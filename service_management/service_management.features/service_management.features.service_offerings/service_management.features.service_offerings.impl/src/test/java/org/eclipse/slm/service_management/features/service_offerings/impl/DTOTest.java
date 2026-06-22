@@ -1,7 +1,7 @@
-package org.eclipse.slm.service_management.common.impl;
+package org.eclipse.slm.service_management.features.service_offerings.impl;
 
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
-import org.eclipse.slm.service_management.common.impl.DTOConfig;
+import org.eclipse.slm.service_management.features.service_offerings.impl.DTOConfig;
 import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategory;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOffering;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOfferingDTOApi;

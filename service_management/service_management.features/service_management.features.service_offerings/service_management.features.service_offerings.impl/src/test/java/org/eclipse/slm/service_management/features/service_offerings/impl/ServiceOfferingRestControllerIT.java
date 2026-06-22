@@ -18,6 +18,7 @@ import org.eclipse.slm.service_management.features.service_offerings.api.offerin
 import org.eclipse.slm.service_management.common.impl.AbstractRestControllerIT;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.compose.DockerComposeDeploymentDefinition;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.container.DockerContainerDeploymentDefinition;
+import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategory;
 import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendor;
 import org.eclipse.slm.service_management.features.service_offerings.impl.categories.ServiceCategoryJpaRepository;
 import org.eclipse.slm.service_management.features.service_offerings.impl.serviceofferings.ServiceOfferingJpaRepository;

@@ -1,9 +1,6 @@
 package org.eclipse.slm.service_management.features.service_offerings.impl;
 
-import org.eclipse.slm.service_management.features.service_offerings.impl.repository.*;
-
 import org.eclipse.slm.service_management.features.service_offerings.api.*;
-import org.eclipse.slm.service_management.features.service_offerings.api.config.*;
 
 public class AwxMockedResponses {
 

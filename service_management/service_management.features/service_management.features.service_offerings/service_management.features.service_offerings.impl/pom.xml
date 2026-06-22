@@ -139,5 +139,23 @@
              (compile scope), so they cannot be added here as test deps without creating
              a cyclic Maven reactor dependency. ServiceOfferingRestControllerIT is @Disabled
              and should be moved to service_management.service.app to be re-enabled. -->
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.vault.testing</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock</artifactId>
+            <version>2.27.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-contract-wiremock</artifactId>
+            <version>${spring-cloud-contract-wiremock.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

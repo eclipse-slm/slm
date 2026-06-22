@@ -1,5 +1,7 @@
 package org.eclipse.slm.service_management.features.service_deployment.impl;
 
+import org.eclipse.slm.service_management.features.service_deployment.impl.dockercompose.*;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.eclipse.slm.service_management.features.service_offerings.api.offerings.options.*;
 import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOptionNotFoundException;
