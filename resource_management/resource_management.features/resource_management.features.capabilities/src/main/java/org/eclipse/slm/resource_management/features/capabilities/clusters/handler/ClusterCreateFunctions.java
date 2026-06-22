@@ -233,30 +233,9 @@ public class ClusterCreateFunctions extends AbstractClusterFunctions implements 
             }
         }
 
-        // Create Consul node and service representing cluster
-        String dummyAddress = multiHostCapabilityService.getCapability().getName().toLowerCase() + "-cluster"; // ToDo: if changed from x+"-cluster" then check for other occurrences -> e.g. in ResourcesManager
-        var clusterService = CatalogRegistration.Service.builder(multiHostCapabilityService.getServiceName())
-                .id(multiHostCapabilityService.getServiceId().toString())
-                .address(dummyAddress)
-                .tags(multiHostCapabilityService.getTags())
-                .meta(serviceMetaData)
-                .build();
-        var consulNodeName = multiHostCapabilityService.getServiceName();
-        Map<String, String> nodeMetaData = new HashMap<String, String>();
-        nodeMetaData.put("resource_id", multiHostCapabilityService.getServiceId().toString());
-        nodeMetaData.put("resource_managed", String.valueOf(multiHostCapabilityService.getManaged()));
-        nodeMetaData.put("resource_type", "cluster"); // ToDo: change to generic ResourceType when introduced & then check for other occurrences -> e.g. in ResourcesManager
-        nodeMetaData.putAll(serviceMetaData);
-        var catalogRegistration = CatalogRegistration.builder()
-                .nodeName(consulNodeName)
-                .id(multiHostCapabilityService.getServiceId().toString())
-                .address(dummyAddress)
-                .nodeMeta(nodeMetaData)
-                .service(clusterService)
-                .build();
-        this.consulAdminClient.nodes().registerEntity(catalogRegistration);
-        // Access control for the cluster owner is handled via the AccessControlService
-        // policy created in MultiHostCapabilityServicePersistence.save(...)
+        // Cluster persistence + owner access control are handled by
+        // MultiHostCapabilityServicePersistence.save(...) (DB); no Consul node/service
+        // registration is created for the cluster anymore.
         // Send notification
         this.notificationMessageSender.sendMessage(new NotificationEventMessage(
                 KeycloakTokenUtil.getUserUuid(jwtAuthenticationToken),
