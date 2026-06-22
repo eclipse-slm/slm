@@ -10,9 +10,10 @@ import org.eclipse.slm.resource_management.features.capabilities.CapabilityUtil;
 import org.eclipse.slm.resource_management.features.capabilities.exceptions.CapabilityRuntimeException;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityServiceStatus;
+import org.eclipse.slm.resource_management.features.capabilities.model.SingleHostCapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType;
 import org.eclipse.slm.resource_management.features.capabilities.model.awx.AwxAction;
-import org.eclipse.slm.resource_management.features.capabilities.persistence.SingleHostCapabilitiesConsulClient;
+import org.eclipse.slm.resource_management.features.capabilities.persistence.SingleHostCapabilityServicePersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +36,7 @@ public class CapabilityJobExecutor implements IAwxJobObserverListener {
 
     private final AwxJobObserverInitializer awxJobObserverInitializer;
 
-    private final SingleHostCapabilitiesConsulClient singleHostCapabilitiesConsulClient;
+    private final SingleHostCapabilityServicePersistence singleHostCapabilityServicePersistence;
 
     private final List<CapabilityJobExecutorListener> capabilityJobExecutorListeners = new ArrayList<>();
 
@@ -49,13 +50,13 @@ public class CapabilityJobExecutor implements IAwxJobObserverListener {
 
     public CapabilityJobExecutor(AwxJobExecutor awxJobExecutor,
                                  AwxJobObserverInitializer awxJobObserverInitializer,
-                                 SingleHostCapabilitiesConsulClient singleHostCapabilitiesConsulClient,
+                                 SingleHostCapabilityServicePersistence singleHostCapabilityServicePersistence,
                                  @NonNull CapabilityJob capabilityJob,
                                  @NonNull CapabilityService capabilityService,
                                  @Value("${resource-management.capabilities.awx-job-timeout-in-minutes:20}") int awxJobTimeoutInMin) {
         this.awxJobExecutor = awxJobExecutor;
         this.awxJobObserverInitializer = awxJobObserverInitializer;
-        this.singleHostCapabilitiesConsulClient = singleHostCapabilitiesConsulClient;
+        this.singleHostCapabilityServicePersistence = singleHostCapabilityServicePersistence;
         this.capabilityJob = capabilityJob;
         this.capabilityService = capabilityService;
         this.awxJobTimeoutInMin = awxJobTimeoutInMin;
@@ -151,7 +152,9 @@ public class CapabilityJobExecutor implements IAwxJobObserverListener {
             );
 
             capabilityService.setStatus(CapabilityServiceStatus.UNINSTALL);
-            singleHostCapabilitiesConsulClient.updateCapabilityService(resourceId, capabilityService);
+            if (capabilityService instanceof SingleHostCapabilityService singleHostCapabilityService) {
+                singleHostCapabilityServicePersistence.updateCapabilityService(singleHostCapabilityService);
+            }
 
             var awxJobObserver = this.awxJobObserverInitializer.initNewObserver(awxJobId, JobTarget.DEPLOYMENT_CAPABILITY, JobGoal.DELETE, this);
 

@@ -3,7 +3,7 @@ package org.eclipse.slm.resource_management.features.capabilities.jobs;
 import org.eclipse.slm.awx.client.observer.AwxJobExecutor;
 import org.eclipse.slm.awx.client.observer.AwxJobObserverInitializer;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
-import org.eclipse.slm.resource_management.features.capabilities.persistence.SingleHostCapabilitiesConsulClient;
+import org.eclipse.slm.resource_management.features.capabilities.persistence.SingleHostCapabilityServicePersistence;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,17 +14,17 @@ public class CapabilityJobExecutorFactory {
 
     private final AwxJobObserverInitializer awxJobObserverInitializer;
 
-    private final SingleHostCapabilitiesConsulClient singleHostCapabilitiesConsulClient;
+    private final SingleHostCapabilityServicePersistence singleHostCapabilityServicePersistence;
 
     private final int awxJobTimeoutInMin;
 
     public CapabilityJobExecutorFactory(AwxJobExecutor awxJobExecutor,
                                         AwxJobObserverInitializer awxJobObserverInitializer,
-                                        SingleHostCapabilitiesConsulClient singleHostCapabilitiesConsulClient,
+                                        SingleHostCapabilityServicePersistence singleHostCapabilityServicePersistence,
                                         @Value("${resource-management.capabilities.awx-job-timeout-in-minutes:20}") int awxJobTimeoutInMin) {
         this.awxJobExecutor = awxJobExecutor;
         this.awxJobObserverInitializer = awxJobObserverInitializer;
-        this.singleHostCapabilitiesConsulClient = singleHostCapabilitiesConsulClient;
+        this.singleHostCapabilityServicePersistence = singleHostCapabilityServicePersistence;
         this.awxJobTimeoutInMin = awxJobTimeoutInMin;
     }
 
@@ -33,7 +33,7 @@ public class CapabilityJobExecutorFactory {
         var capabilityJobExecutor = new CapabilityJobExecutor(
                 this.awxJobExecutor,
                 this.awxJobObserverInitializer,
-                this.singleHostCapabilitiesConsulClient,
+                this.singleHostCapabilityServicePersistence,
                 capabilityJob,
                 capabilityService,
                 awxJobTimeoutInMin

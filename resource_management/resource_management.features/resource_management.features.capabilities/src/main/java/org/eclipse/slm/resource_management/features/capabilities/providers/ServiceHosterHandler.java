@@ -6,7 +6,7 @@ import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiH
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.DeploymentCapability;
 import org.eclipse.slm.resource_management.features.capabilities.model.SingleHostCapabilityService;
-import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilitiesConsulClient;
+import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilityServiceQueryService;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -17,17 +17,17 @@ import java.util.stream.Collectors;
 @Component
 public class ServiceHosterHandler extends ProviderHandler {
 
-    public ServiceHosterHandler(CapabilitiesConsulClient capabilitiesConsulClient) {
+    public ServiceHosterHandler(CapabilityServiceQueryService capabilityServiceQueryService) {
         super(
                 DeploymentCapability.class,
-                capabilitiesConsulClient
+                capabilityServiceQueryService
         );
     }
     public List<ServiceHoster> getServiceHosters(
             Optional<ServiceHosterFilter> filter) throws ConsulLoginFailedException {
         List<ServiceHoster> serviceHosterList = new ArrayList<>();
 
-        List<CapabilityService> deploymentCapabilityServices = capabilitiesConsulClient.getCapabilityServicesByCapabilityClass(DeploymentCapability.class);
+        List<CapabilityService> deploymentCapabilityServices = capabilityServiceQueryService.getCapabilityServicesByCapabilityClass(DeploymentCapability.class);
 
         List<CapabilityService> filteredList = new ArrayList<>(deploymentCapabilityServices);
         if (filter.isPresent()) {

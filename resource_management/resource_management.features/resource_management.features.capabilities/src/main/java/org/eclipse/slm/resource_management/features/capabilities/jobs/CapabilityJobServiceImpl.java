@@ -14,7 +14,8 @@ import org.eclipse.slm.resource_management.features.capabilities.CapabilitiesMan
 import org.eclipse.slm.resource_management.features.capabilities.exceptions.CapabilityRuntimeException;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityServiceStatus;
-import org.eclipse.slm.resource_management.features.capabilities.persistence.SingleHostCapabilitiesConsulClient;
+import org.eclipse.slm.resource_management.features.capabilities.model.SingleHostCapabilityService;
+import org.eclipse.slm.resource_management.features.capabilities.persistence.SingleHostCapabilityServicePersistence;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.SingleHostCapabilitiesVaultClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +44,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
 
     private final CapabilityJobStateMachineFactory capabilityJobStateMachineFactory;
 
-    private final SingleHostCapabilitiesConsulClient singleHostCapabilitiesConsulClient;
+    private final SingleHostCapabilityServicePersistence singleHostCapabilityServicePersistence;
 
     private final SingleHostCapabilitiesVaultClient singleHostCapabilitiesVaultClient;
 
@@ -56,7 +57,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
                                     CapabilityJobExecutorFactory capabilityJobExecutorFactory,
                                     CapabilityJobJpaRepository capabilityJobJpaRepository,
                                     CapabilityJobStateMachineFactory capabilityJobStateMachineFactory,
-                                    SingleHostCapabilitiesConsulClient singleHostCapabilitiesConsulClient,
+                                    SingleHostCapabilityServicePersistence singleHostCapabilityServicePersistence,
                                     SingleHostCapabilitiesVaultClient singleHostCapabilitiesVaultClient,
                                     KeycloakAdminClient keycloakAdminClient) {
         this.resourcesManager = resourcesManager;
@@ -64,7 +65,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
         this.capabilityJobExecutorFactory = capabilityJobExecutorFactory;
         this.capabilityJobJpaRepository = capabilityJobJpaRepository;
         this.capabilityJobStateMachineFactory = capabilityJobStateMachineFactory;
-        this.singleHostCapabilitiesConsulClient = singleHostCapabilitiesConsulClient;
+        this.singleHostCapabilityServicePersistence = singleHostCapabilityServicePersistence;
         this.singleHostCapabilitiesVaultClient = singleHostCapabilitiesVaultClient;
         this.keycloakAdminClient = keycloakAdminClient;
     }
@@ -138,7 +139,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
             if (skipInstall) {
                 capabilityServiceStatus = CapabilityServiceStatus.READY;
             }
-            var newCapabilityService = this.singleHostCapabilitiesConsulClient.addSingleHostCapabilityToNode(
+            var newCapabilityService = this.singleHostCapabilityServicePersistence.addSingleHostCapability(
                     capability,
                     resourceId,
                     capabilityServiceStatus,
@@ -208,10 +209,8 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
     ) throws ConsulLoginFailedException {
         capabilityService.setStatus(newCapabilityServiceStatus);
 
-        singleHostCapabilitiesConsulClient.updateCapabilityService(
-                
-                resourceId,
-                capabilityService
+        singleHostCapabilityServicePersistence.updateCapabilityService(
+                (SingleHostCapabilityService) capabilityService
         );
     }
 
@@ -221,7 +220,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
             this.capabilityJobIdToJwtAuthToken.remove(capabilityJob.getId());
             var capabilityId = capabilityJob.getCapabilityId();
             var capability = this.capabilitiesService.getCapabilityByIdOrThrow(capabilityId);
-            var capabilityService = this.singleHostCapabilitiesConsulClient.getCapabilityServiceOfResourceByCapabilityId(capabilityId, capabilityJob.getResourceId());
+            var capabilityService = this.singleHostCapabilityServicePersistence.getCapabilityServiceOfResourceByCapabilityId(capabilityId, capabilityJob.getResourceId());
 
             var capabilityJobExecutor = this.capabilityJobExecutorFactory.create(capabilityJob, capabilityService, this);
             capabilityJobExecutor.installCapabilityOnResource(jwtAuthenticationToken, capabilityJob.getResourceId(), capabilityJob.getConfigParameters());
@@ -240,10 +239,10 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
             var capabilityId = capabilityJob.getCapabilityId();
             var capability = this.capabilitiesService.getCapabilityByIdOrThrow(capabilityId);
 
-            var capabilityService = this.singleHostCapabilitiesConsulClient.getCapabilityServiceOfResourceByCapabilityId(capabilityId, capabilityJob.getResourceId());
+            var capabilityService = this.singleHostCapabilityServicePersistence.getCapabilityServiceOfResourceByCapabilityId(capabilityId, capabilityJob.getResourceId());
             // If capability service is managed, skip install and remove capability service from node
             if (capabilityService.getManaged()) {
-                this.singleHostCapabilitiesConsulClient.removeSingleHostCapabilityFromNode( capability, capabilityJob.getResourceId());
+                this.singleHostCapabilityServicePersistence.removeSingleHostCapability( capability, capabilityJob.getResourceId());
 
                 singleHostCapabilitiesVaultClient.deleteSingleHostCapabilityServiceSecrets(capabilityService.getServiceId());
             }
@@ -298,14 +297,14 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
     }
 
     private void cleanupCapabilityServiceOfResource(UUID resourceId, UUID capabilityId) throws ConsulLoginFailedException, IllegalAccessException {
-        var capabilityService = singleHostCapabilitiesConsulClient.getCapabilityServiceOfResourceByCapabilityId(capabilityId, resourceId);
+        var capabilityService = singleHostCapabilityServicePersistence.getCapabilityServiceOfResourceByCapabilityId(capabilityId, resourceId);
         if(capabilityService == null) {
             LOG.info("Resource [id=" + resourceId + " has no CapabilityService => Skip removal of capability");
             return;
         }
 
         this.singleHostCapabilitiesVaultClient.deleteSingleHostCapabilityServiceSecrets(capabilityService.getServiceId());
-        this.singleHostCapabilitiesConsulClient.removeSingleHostCapabilityFromNode( capabilityService.getCapability(), resourceId);
+        this.singleHostCapabilityServicePersistence.removeSingleHostCapability( capabilityService.getCapability(), resourceId);
     }
 
     //region CapabilityJobStateMachineListener
@@ -318,7 +317,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
                 }
 
                 case INSTALLED -> {
-                    var capabilityService = this.singleHostCapabilitiesConsulClient
+                    var capabilityService = this.singleHostCapabilityServicePersistence
                             .getCapabilityServiceOfResourceByCapabilityId(capabilityJob.getCapabilityId(), capabilityJob.getResourceId());
                     this.updateCapabilityServiceStatus(capabilityJob.getResourceId(), capabilityService, CapabilityServiceStatus.READY);
                     LOG.info("Capability [id= " + capabilityJob.getId() + "] successfully installed on resource [id= " + capabilityJob.getResourceId() + "]");

@@ -17,9 +17,9 @@ import org.eclipse.slm.resource_management.features.capabilities.model.Capabilit
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityServiceDTO;
 import org.eclipse.slm.resource_management.features.capabilities.model.awx.AwxAction;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityServiceMapper;
-import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilitiesConsulClient;
+import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilityServiceQueryService;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilityJpaRepository;
-import org.eclipse.slm.resource_management.features.capabilities.persistence.SingleHostCapabilitiesConsulClient;
+import org.eclipse.slm.resource_management.features.capabilities.persistence.SingleHostCapabilityServicePersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +37,8 @@ import java.util.stream.Collectors;
 public class CapabilitiesManager implements ICapabilitiesManager {
     private final static Logger LOG = LoggerFactory.getLogger(CapabilitiesManager.class);
 
-    private final CapabilitiesConsulClient capabilitiesConsulClient;
-    private final SingleHostCapabilitiesConsulClient singleHostCapabilitiesConsulClient;
+    private final CapabilityServiceQueryService capabilityServiceQueryService;
+    private final SingleHostCapabilityServicePersistence singleHostCapabilityServicePersistence;
     private final AwxClient awxClient;
     private final CapabilityJpaRepository capabilityJpaRepository;
     private final MultiHostCapabilitiesConsulClient multiHostCapabilitiesConsulClient;
@@ -50,15 +50,15 @@ public class CapabilitiesManager implements ICapabilitiesManager {
 
     @Autowired
     public CapabilitiesManager(
-        CapabilitiesConsulClient capabilitiesConsulClient,
-        SingleHostCapabilitiesConsulClient singleHostCapabilitiesConsulClient,
+        CapabilityServiceQueryService capabilityServiceQueryService,
+        SingleHostCapabilityServicePersistence singleHostCapabilityServicePersistence,
         MultiHostCapabilitiesConsulClient multiHostCapabilitiesConsulClient,
         AwxClient awxClient,
         CapabilityJpaRepository capabilityJpaRepository
     ) {
-        this.singleHostCapabilitiesConsulClient = singleHostCapabilitiesConsulClient;
+        this.singleHostCapabilityServicePersistence = singleHostCapabilityServicePersistence;
         this.multiHostCapabilitiesConsulClient = multiHostCapabilitiesConsulClient;
-        this.capabilitiesConsulClient = capabilitiesConsulClient;
+        this.capabilityServiceQueryService = capabilityServiceQueryService;
         this.awxClient = awxClient;
         this.capabilityJpaRepository = capabilityJpaRepository;
     }
@@ -251,8 +251,7 @@ public class CapabilitiesManager implements ICapabilitiesManager {
 
     private void deleteCapability(Capability capability)
             throws ConsulLoginFailedException {
-        this.singleHostCapabilitiesConsulClient.removeCapabilityServiceFromAllConsulNodes(
-                
+        this.singleHostCapabilityServicePersistence.removeCapabilityServiceFromAllResources(
                 capability
         );
         this.capabilityJpaRepository.delete(capability);
@@ -277,7 +276,7 @@ public class CapabilitiesManager implements ICapabilitiesManager {
 
     public List<CapabilityServiceDTO> getAllCapabilityServices(JwtAuthenticationToken jwtAuthenticationToken) throws ResourceNotFoundException {
         try {
-            var capabilityServicesOfResource = this.capabilitiesConsulClient.getCapabilityServices();
+            var capabilityServicesOfResource = this.capabilityServiceQueryService.getCapabilityServices();
             var dtos = CapabilityServiceMapper.INSTANCE.toDtoList(capabilityServicesOfResource);
 
             return dtos;
@@ -290,7 +289,7 @@ public class CapabilitiesManager implements ICapabilitiesManager {
 
     public List<CapabilityServiceDTO> getCapabilityServicesOfResource(UUID resourceId) throws ResourceNotFoundException {
         try {
-            var capabilityServicesOfResource = this.capabilitiesConsulClient.getCapabilityServicesOfResource(resourceId);
+            var capabilityServicesOfResource = this.capabilityServiceQueryService.getCapabilityServicesOfResource(resourceId);
             var dtos = CapabilityServiceMapper.INSTANCE.toDtoList(capabilityServicesOfResource);
 
             return dtos;
