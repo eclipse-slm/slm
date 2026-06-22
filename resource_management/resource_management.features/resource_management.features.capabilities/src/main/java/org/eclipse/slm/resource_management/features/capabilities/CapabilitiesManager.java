@@ -10,7 +10,7 @@ import org.eclipse.slm.resource_management.common.exceptions.ResourceNotCreatedE
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceRuntimeException;
 import org.eclipse.slm.resource_management.common.ports.ICapabilitiesManager;
-import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilitiesConsulClient;
+import org.eclipse.slm.resource_management.features.capabilities.persistence.MultiHostCapabilityServicePersistence;
 import org.eclipse.slm.resource_management.features.capabilities.exceptions.CapabilityNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.model.Capability;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityFilter;
@@ -41,7 +41,7 @@ public class CapabilitiesManager implements ICapabilitiesManager {
     private final SingleHostCapabilityServicePersistence singleHostCapabilityServicePersistence;
     private final AwxClient awxClient;
     private final CapabilityJpaRepository capabilityJpaRepository;
-    private final MultiHostCapabilitiesConsulClient multiHostCapabilitiesConsulClient;
+    private final MultiHostCapabilityServicePersistence multiHostCapabilityServicePersistence;
 
     private final List<String> jobTemplateCredentialNames = List.of("Consul", "HashiCorp Vault", "Minio");
 
@@ -52,12 +52,12 @@ public class CapabilitiesManager implements ICapabilitiesManager {
     public CapabilitiesManager(
         CapabilityServiceQueryService capabilityServiceQueryService,
         SingleHostCapabilityServicePersistence singleHostCapabilityServicePersistence,
-        MultiHostCapabilitiesConsulClient multiHostCapabilitiesConsulClient,
+        MultiHostCapabilityServicePersistence multiHostCapabilityServicePersistence,
         AwxClient awxClient,
         CapabilityJpaRepository capabilityJpaRepository
     ) {
         this.singleHostCapabilityServicePersistence = singleHostCapabilityServicePersistence;
-        this.multiHostCapabilitiesConsulClient = multiHostCapabilitiesConsulClient;
+        this.multiHostCapabilityServicePersistence = multiHostCapabilityServicePersistence;
         this.capabilityServiceQueryService = capabilityServiceQueryService;
         this.awxClient = awxClient;
         this.capabilityJpaRepository = capabilityJpaRepository;
@@ -322,14 +322,7 @@ public class CapabilitiesManager implements ICapabilitiesManager {
 
     @Override
     public boolean isResourceClusterMember(UUID resourceId) throws ResourceNotFoundException {
-        try {
-            var multihostCapabilities = this.multiHostCapabilitiesConsulClient.getMultiHostCapabilityServicesOfResource( resourceId);
-
-            return multihostCapabilities.size() > 0;
-
-        } catch (ConsulLoginFailedException e) {
-            throw new RuntimeException(e);
-        }
+        return !this.multiHostCapabilityServicePersistence.getServicesOfResource(resourceId).isEmpty();
     }
     //endregion ICapabilitiesService
 }

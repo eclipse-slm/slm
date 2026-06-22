@@ -33,7 +33,9 @@ public class CapabilityServiceQueryService {
     }
 
     private CapabilityService toDomain(CapabilityServiceEntity entity) {
-        // Part 2a: only SINGLE_HOST entities are persisted; MULTI_HOST mapping is added in Part 2b.
+        if (entity.getServiceClass() == CapabilityServiceClass.MULTI_HOST) {
+            return mapper.toMultiHostDomain(entity);
+        }
         return mapper.toSingleHostDomain(entity);
     }
 }

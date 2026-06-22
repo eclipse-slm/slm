@@ -56,4 +56,23 @@ public class CapabilityServiceQueryServiceTest {
         assertEquals(1, result.size());
         assertEquals(resourceId, result.get(0).getResourceId());
     }
+
+    @Test
+    public void getCapabilityServicesMapsMultiHostByDiscriminator() {
+        org.eclipse.slm.resource_management.features.capabilities.model.Capability capability =
+                new org.eclipse.slm.resource_management.features.capabilities.model.DeploymentCapability();
+        capability.setId(java.util.UUID.randomUUID());
+        CapabilityServiceEntity entity = new CapabilityServiceEntity(java.util.UUID.randomUUID());
+        entity.setResourceId(java.util.UUID.randomUUID());
+        entity.setCapabilityId(capability.getId());
+        entity.setServiceClass(CapabilityServiceClass.MULTI_HOST);
+        entity.setMemberMapping(new java.util.HashMap<>());
+        when(repository.findAll()).thenReturn(java.util.List.of(entity));
+        when(capabilityJpaRepository.findById(capability.getId())).thenReturn(java.util.Optional.of(capability));
+
+        var result = queryService.getCapabilityServices();
+
+        assertEquals(1, result.size());
+        assertTrue(result.get(0) instanceof org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService);
+    }
 }
