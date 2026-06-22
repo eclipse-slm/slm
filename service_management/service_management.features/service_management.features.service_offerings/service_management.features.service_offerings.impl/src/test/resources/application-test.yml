@@ -1,0 +1,45 @@
+spring:
+  config:
+    import: "optional:consul:"
+  cloud:
+    consul:
+      enabled: false
+      discovery:
+        enabled: false
+      config:
+        enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      database-platform: org.hibernate.dialect.MariaDB105Dialect
+    properties:
+      hibernate:
+        id.new_generator_mappings: false
+        type:
+          preferred_uuid_jdbc_type: CHAR
+  datasource:
+    driver-class-name: 'org.testcontainers.jdbc.ContainerDatabaseDriver'
+    url: jdbc:tc:mariadb:10.5:///${database.schema}?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: ${database.username}
+    password: ${database.password}
+
+database:
+  host: localhost
+  port: 3320
+  schema: services
+  username: service-management
+  password: password
+
+keycloak:
+  config:
+    auth-white-list:
+    tenants:
+      config-path: keycloak/
+      client-registration-enable: false
+      client-update-enable: false
+      resolve-by-path: true
+      resolve-by-header: true
+      resolver-base-path: /
+      resolver-header: Realm
+      redirect-uris:
+      web-origins:

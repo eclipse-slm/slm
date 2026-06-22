@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
         ServiceOfferingCategoryHandler.class,
         ServiceCategoryJpaRepository.class
 })
-@EntityScan( basePackages = { "org.eclipse.slm.service_management.model" })
+@EntityScan( basePackages = { "org.eclipse.slm.service_management.features.service_offerings.api" })
 @EnableJpaRepositories(basePackages = "org.eclipse.slm.service_management.features.service_offerings.impl")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")

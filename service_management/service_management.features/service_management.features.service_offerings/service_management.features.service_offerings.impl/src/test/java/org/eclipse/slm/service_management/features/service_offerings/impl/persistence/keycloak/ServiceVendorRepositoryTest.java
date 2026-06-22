@@ -42,7 +42,7 @@ import static org.mockito.Mockito.*;
         ServiceVendorJpaRepository.class,
         KeycloakAdminClient.class
 })
-@EntityScan( basePackages = { "org.eclipse.slm.service_management.model" })
+@EntityScan( basePackages = { "org.eclipse.slm.service_management.features.service_offerings.api" })
 @EnableJpaRepositories(basePackages = "org.eclipse.slm.service_management.features.service_offerings.impl")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
