@@ -1,12 +1,10 @@
 package org.eclipse.slm.notification_service.service.app.messaging.resources;
 
-import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.messaging.AbstractEventMessage;
 import org.eclipse.slm.common.messaging.GenericMessageListener;
 import org.eclipse.slm.notification_service.communication.websocket.NotificationWsService;
 import org.eclipse.slm.notification_service.persistence.api.NotificationRepository;
 import org.eclipse.slm.notification_service.service.app.messaging.UserUtils;
-import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient;
 import org.eclipse.slm.resource_management.features.device_integration.firmware_update.messaging.FirmwareUpdateJobEventMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +12,8 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Date;
+import java.util.Set;
 
 @Component
 public class FirmwareUpdateJobEventMessageListener extends GenericMessageListener<FirmwareUpdateJobEventMessage> {
@@ -22,9 +21,7 @@ public class FirmwareUpdateJobEventMessageListener extends GenericMessageListene
     private final static Logger LOG = LoggerFactory.getLogger(FirmwareUpdateJobEventMessageListener.class);
 
     private final UserUtils userUtils;
-
     private final NotificationRepository notificationRepository;
-
     private final NotificationWsService notificationWsService;
 
     protected FirmwareUpdateJobEventMessageListener(ConnectionFactory connectionFactory,
@@ -42,23 +39,17 @@ public class FirmwareUpdateJobEventMessageListener extends GenericMessageListene
     @Override
     public void onMessageReceived(FirmwareUpdateJobEventMessage eventMessage) {
         try {
-            var firmwareUpdateJob = eventMessage.getFirmwareUpdateJob();
-            var resourceId = firmwareUpdateJob.getResourceId();
-
-            var resourceConsulPolicyName = ResourcesConsulClient.getResourcePolicyName(resourceId);
-            var userIds = this.userUtils.getUserIdsAssociatedToPolicy(resourceConsulPolicyName);
+            var ownerGroups = eventMessage.getOwnerGroups() != null ? eventMessage.getOwnerGroups() : Set.<String>of();
+            var userIds = userUtils.getUserIdsFromGroups(ownerGroups);
 
             for (var userId : userIds) {
                 var timestamp = new Date();
                 var eventNotification = FirmwareUpdateJobEventMessageToNotificationMapper.INSTANCE.toNotification(eventMessage, userId, timestamp);
-
-//                notificationRepository.save(notification);
                 notificationWsService.notifyFrontend(eventNotification);
                 LOG.info("Created new notification: " + eventNotification);
             }
         } catch (Exception e) {
-            LOG.error("Error processing CapabilityJobEventMessage: {}", e.getMessage(), e);
+            LOG.error("Error processing FirmwareUpdateJobEventMessage: {}", e.getMessage(), e);
         }
     }
-
 }
