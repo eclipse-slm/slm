@@ -167,7 +167,7 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
 
             this.resourcesAasHandler.createResourceAasAndSubmodels(resource, digitalNameplateV3);
 
-            this.resourceEventMessageSender.sendMessage(resource, ResourceEventType.CREATED);
+            this.resourceEventMessageSender.sendMessage(resource, ResourceEventType.CREATED, Set.of(fullPathOwnerGroupId));
 
             return resource;
         }
@@ -185,13 +185,14 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
                 this.remoteAccessManager.deleteRemoteAccessById(resourceId, remoteAccessServiceId, userContext.getAccessToken(), false);
             }
 
+            var ownerGroups = accessControlService.getSubjectsForObject(AccessControlObjectType.RESOURCE, resourceId);
             this.resourceJpaRepository.deleteById(resourceId);
             this.accessControlService.removeObjectFromAllPolicies(
                     AccessControlObjectType.RESOURCE, resourceId);
             this.resourcesVaultClient.removeSecretsForResource(resource.getId());
             this.resourcesVaultClient.removeIntermediateCertificateAuthority(resource.getId());
 
-            this.resourceEventMessageSender.sendMessage(resource, ResourceEventType.DELETED);
+            this.resourceEventMessageSender.sendMessage(resource, ResourceEventType.DELETED, ownerGroups);
             this.applicationEventPublisher.publishEvent(new ResourceEvent(this, resourceId, ResourceEvent.Operation.DELETE));
         } catch (ShellNotFoundException ignored) {
         } catch (Exception e) {
@@ -301,7 +302,8 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
     @Override
     public void onResourceUpdated(UUID resourceId, UserContext userContext) {
         var resource = this.getResourceByIdOrThrow(resourceId, userContext);
-        this.resourceEventMessageSender.sendMessage(resource, ResourceEventType.UPDATED);
+        var ownerGroups = accessControlService.getSubjectsForObject(AccessControlObjectType.RESOURCE, resourceId);
+        this.resourceEventMessageSender.sendMessage(resource, ResourceEventType.UPDATED, ownerGroups);
     }
     //endregion ResourceUpdatedListener
 }
