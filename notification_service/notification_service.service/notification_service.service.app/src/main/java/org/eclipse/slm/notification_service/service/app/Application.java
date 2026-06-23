@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
         "org.eclipse.slm.common.parent.service",
         "org.eclipse.slm.awx.client",
         "org.eclipse.slm.common.keycloak",
-        "org.eclipse.slm.common.consul.client",
     }
 )
 @EntityScan(basePackages = { "org.eclipse.slm.notification_service.model" })
