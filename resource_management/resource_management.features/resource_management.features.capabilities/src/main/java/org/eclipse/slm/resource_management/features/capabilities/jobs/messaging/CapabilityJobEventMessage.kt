@@ -7,7 +7,9 @@ import java.io.Serializable
 
 class CapabilityJobEventMessage @JsonCreator constructor(
 
-    @field:JsonProperty("capabilityJob") val capabilityJob: CapabilityJobDTO?
+    @field:JsonProperty("capabilityJob") val capabilityJob: CapabilityJobDTO?,
+
+    @field:JsonProperty("ownerGroups") val ownerGroups: Set<String>? = null
 
 ) :
     org.eclipse.slm.common.messaging.AbstractEventMessage<CapabilityJobEventType>(EXCHANGE_NAME, ROUTING_KEY_PREFIX, CapabilityJobEventType.CHANGED), Serializable {

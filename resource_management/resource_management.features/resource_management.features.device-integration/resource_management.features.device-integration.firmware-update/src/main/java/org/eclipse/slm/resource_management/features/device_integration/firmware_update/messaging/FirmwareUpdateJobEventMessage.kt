@@ -8,7 +8,9 @@ import java.io.Serializable
 
 class FirmwareUpdateJobEventMessage @JsonCreator constructor(
 
-    @JsonProperty("firmwareUpdateJob") val firmwareUpdateJob: FirmwareUpdateJobDTO?
+    @JsonProperty("firmwareUpdateJob") val firmwareUpdateJob: FirmwareUpdateJobDTO?,
+
+    @JsonProperty("ownerGroups") val ownerGroups: Set<String>? = null
 
 ) :
     AbstractEventMessage<FirmwareUpdateJobEventType>(EXCHANGE_NAME, ROUTING_KEY_PREFIX, FirmwareUpdateJobEventType.CHANGED), Serializable {

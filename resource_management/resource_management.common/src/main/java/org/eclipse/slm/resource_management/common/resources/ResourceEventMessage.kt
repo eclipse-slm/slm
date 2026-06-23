@@ -5,11 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import org.eclipse.slm.common.messaging.AbstractEventMessage
 import java.io.Serializable
 
-class ResourceEventMessage @JsonCreator constructor(
+class ResourceEventMessage @JsonCreator @JvmOverloads constructor(
 
     @field:JsonProperty("resource") val resource: ResourceDTO?,
 
-    @field:JsonProperty("eventType") eventType: ResourceEventType?
+    @field:JsonProperty("eventType") eventType: ResourceEventType?,
+
+    @field:JsonProperty("ownerGroups") val ownerGroups: Set<String>? = null
 
 ) : AbstractEventMessage<ResourceEventType>(EXCHANGE_NAME, ROUTING_KEY_PREFIX, eventType), Serializable {
 

@@ -54,6 +54,10 @@ public class AccessControlService {
                 userContext.getGroups(), objectType));
     }
 
+    public Set<String> getSubjectsForObject(AccessControlObjectType objectType, UUID objectId) {
+        return policyRepository.findSubjectsByObject(objectType, objectId);
+    }
+
     @Transactional
     public void removeObjectFromAllPolicies(
             AccessControlObjectType objectType, UUID objectId) {

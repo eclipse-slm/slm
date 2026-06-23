@@ -25,6 +25,12 @@ public interface AccessControlPolicyRepository extends JpaRepository<AccessContr
             @Param("objectType") AccessControlObjectType objectType,
             @Param("objectId") UUID objectId);
 
+    @Query("SELECT DISTINCT s FROM AccessControlPolicy p JOIN p.subjects s JOIN p.objects o " +
+           "WHERE o.objectType = :objectType AND o.objectId = :objectId")
+    Set<String> findSubjectsByObject(
+            @Param("objectType") AccessControlObjectType objectType,
+            @Param("objectId") UUID objectId);
+
     @Query("SELECT COUNT(p) FROM AccessControlPolicy p " +
            "JOIN p.objects o JOIN p.subjects s " +
            "WHERE s IN :groups AND o.objectType = :objectType AND o.objectId = :objectId")

@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class KeycloakAdminClient {
@@ -333,5 +334,35 @@ public class KeycloakAdminClient {
         var realmResource = this.getKeycloakRealmResource(realm);
 
         realmResource.users().get(keycloakUserId).remove();
+    }
+
+    public List<String> getUserIdsByGroupPath(String realm, String groupPath) {
+        var realmResource = getKeycloakRealmResource(realm);
+        var allGroups = realmResource.groups().groups();
+        var group = findGroupByPath(allGroups, groupPath);
+        if (group == null) {
+            LOG.warn("Group not found by path '{}' in realm '{}'", groupPath, realm);
+            return List.of();
+        }
+        return realmResource.groups().group(group.getId()).members()
+                .stream()
+                .map(UserRepresentation::getId)
+                .collect(Collectors.toList());
+    }
+
+    private GroupRepresentation findGroupByPath(
+            List<GroupRepresentation> groups, String path) {
+        for (var group : groups) {
+            if (path.equals(group.getPath())) {
+                return group;
+            }
+            if (group.getSubGroups() != null && !group.getSubGroups().isEmpty()) {
+                var found = findGroupByPath(group.getSubGroups(), path);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 }
