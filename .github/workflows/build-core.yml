@@ -26,6 +26,8 @@ jobs:
       should_release_deploy: ${{ steps.evaluate.outputs.should_release_deploy }}
       should_verify: ${{ steps.evaluate.outputs.should_verify }}
       should_run_staging: ${{ steps.evaluate.outputs.should_run_staging }}
+      should_branch_deploy: ${{ steps.evaluate.outputs.should_branch_deploy }}
+      branch_tag: ${{ steps.evaluate.outputs.branch_tag }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -63,11 +65,20 @@ jobs:
             SHOULD_VERIFY=true
           fi
 
+          SHOULD_BRANCH_DEPLOY=false
+          BRANCH_TAG=""
+          if [[ "$GITHUB_REF_NAME" =~ ^feature/ || "$GITHUB_REF_NAME" =~ ^fix/ ]]; then
+            SHOULD_BRANCH_DEPLOY=true
+            BRANCH_TAG=$(echo "$GITHUB_REF_NAME" | tr '/' '-')
+          fi
+
           echo "has_release_tag=$HAS_RELEASE_TAG" >> "$GITHUB_OUTPUT"
           echo "should_snapshot_deploy=$SHOULD_SNAPSHOT_DEPLOY" >> "$GITHUB_OUTPUT"
           echo "should_release_deploy=$SHOULD_RELEASE_DEPLOY" >> "$GITHUB_OUTPUT"
           echo "should_verify=$SHOULD_VERIFY" >> "$GITHUB_OUTPUT"
           echo "should_run_staging=$SHOULD_RUN_STAGING" >> "$GITHUB_OUTPUT"
+          echo "should_branch_deploy=$SHOULD_BRANCH_DEPLOY" >> "$GITHUB_OUTPUT"
+          echo "branch_tag=$BRANCH_TAG" >> "$GITHUB_OUTPUT"
 
   build:
     needs: prepare
