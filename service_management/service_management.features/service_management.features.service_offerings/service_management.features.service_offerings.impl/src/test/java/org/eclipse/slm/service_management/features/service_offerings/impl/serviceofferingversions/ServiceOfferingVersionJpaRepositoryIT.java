@@ -1,14 +1,12 @@
 package org.eclipse.slm.service_management.features.service_offerings.impl.serviceofferingversions;
 
-import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategory;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOffering;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.compose.DockerComposeDeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.container.DockerContainerDeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.container.DockerRestartPolicy;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendor;
-import org.eclipse.slm.service_management.features.service_offerings.impl.persistence.mariadb.SpringTestConfiguration;
-import org.eclipse.slm.service_management.features.service_offerings.impl.serviceofferings.ServiceOfferingJpaRepository;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicecategories.ServiceOfferingCategory;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceOffering;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.compose.DockerComposeDeploymentDefinition;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.container.DockerContainerDeploymentDefinition;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.container.DockerRestartPolicy;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.ServiceVendor;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -26,16 +24,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 @DataJpaTest
-@ContextConfiguration(classes = { SpringTestConfiguration.class })
+@ContextConfiguration(classes = { ServiceOfferingVersionJpaRepositoryTestConfig.class })
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 public class ServiceOfferingVersionJpaRepositoryIT {
 
     @Autowired
     protected ServiceOfferingVersionJpaRepository serviceOfferingVersionJpaRepository;
-
-    @Autowired
-    protected ServiceOfferingJpaRepository serviceOfferingJpaRepository;
 
     @Autowired
     private TestEntityManager entityManager;
@@ -132,11 +127,11 @@ public class ServiceOfferingVersionJpaRepositoryIT {
                     UUID.randomUUID(), null, "1.0.0", null);
 
             Exception exception = assertThrows(DataIntegrityViolationException.class, () -> {
-                serviceOfferingVersionJpaRepository.save(testServiceOfferingVersion);
+                serviceOfferingVersionJpaRepository.saveAndFlush(testServiceOfferingVersion);
             });
 
             assertThat(exception.getMessage())
-                    .contains("not-null property references a null or transient value");
+                    .contains("cannot be null");
         }
 
         @Test
@@ -146,12 +141,12 @@ public class ServiceOfferingVersionJpaRepositoryIT {
                     UUID.randomUUID(), sampleServiceOffering1, "1.0.0", null);
 
             Exception exception = assertThrows(DataIntegrityViolationException.class, () -> {
-                serviceOfferingVersionJpaRepository.save(testServiceOfferingVersion);
+                serviceOfferingVersionJpaRepository.saveAndFlush(testServiceOfferingVersion);
             });
 
             assertThat(exception.getMessage())
-                    .contains("not-null property references a null or transient value")
-                    .contains("org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion.deploymentDefinition");
+                    .contains("cannot be null")
+                    .contains("deployment_definition");
         }
 
         @Test
@@ -162,12 +157,12 @@ public class ServiceOfferingVersionJpaRepositoryIT {
                     UUID.randomUUID(), null, "1.0.0", deploymentDefinition);
 
             Exception exception = assertThrows(DataIntegrityViolationException.class, () -> {
-                serviceOfferingVersionJpaRepository.save(testServiceOfferingVersion);
+                serviceOfferingVersionJpaRepository.saveAndFlush(testServiceOfferingVersion);
             });
 
             assertThat(exception.getMessage())
-                    .contains("not-null property references a null or transient value")
-                    .contains("org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion.serviceOffering");
+                    .contains("cannot be null")
+                    .contains("service_offering_id");
         }
 
         @Test
