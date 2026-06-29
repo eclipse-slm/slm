@@ -2,16 +2,16 @@ package org.eclipse.slm.service_management.service.client;
 
 import org.eclipse.slm.common.parent.client.AbstractApiClient;
 import org.eclipse.slm.common.restclient.feign.auth.AuthRequestInterceptor;
-import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategoriesRestApi;
-import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategoriesRestApiConfig;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOfferingRestApi;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOfferingRestApiConfig;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersionsRestApi;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersionsRestApiConfig;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceRepositoriesRestApi;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceRepositoriesRestApiConfig;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendorsRestApi;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendorsRestApiConfig;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicecategories.ServiceOfferingCategoriesRestApi;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicecategories.ServiceOfferingCategoriesRestApiConfig;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceOfferingRestApi;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceOfferingRestApiConfig;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersionsRestApi;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersionsRestApiConfig;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceRepositoriesRestApi;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceRepositoriesRestApiConfig;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.ServiceVendorsRestApi;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.ServiceVendorsRestApiConfig;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 

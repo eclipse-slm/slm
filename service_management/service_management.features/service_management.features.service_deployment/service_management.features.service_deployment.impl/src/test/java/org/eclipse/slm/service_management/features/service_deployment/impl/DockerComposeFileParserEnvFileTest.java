@@ -3,9 +3,9 @@ package org.eclipse.slm.service_management.features.service_deployment.impl;
 import org.eclipse.slm.service_management.features.service_deployment.impl.dockercompose.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.options.*;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOptionNotFoundException;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.options.*;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOptionNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
 import org.json.JSONException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

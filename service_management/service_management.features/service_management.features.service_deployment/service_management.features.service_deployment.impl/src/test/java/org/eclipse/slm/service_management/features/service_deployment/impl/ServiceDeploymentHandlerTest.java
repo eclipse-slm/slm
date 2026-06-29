@@ -16,12 +16,12 @@ import org.eclipse.slm.service_management.features.service_deployment.impl.deplo
 import org.eclipse.slm.service_management.features.service_deployment.impl.deployment.ServiceOrderJpaRepository;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstanceEventMessageSender;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancesConsulClient;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOptionNotFoundException;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOffering;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOptionNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceOffering;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrder;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.container.DockerContainerDeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.exceptions.InvalidServiceOfferingDefinitionException;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.container.DockerContainerDeploymentDefinition;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.InvalidServiceOfferingDefinitionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;

@@ -3,7 +3,7 @@ package org.eclipse.slm.service_management.features.service_offerings.impl.servi
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetKind;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultAssetAdministrationShell;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultAssetInformation;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
 
 import java.util.UUID;
 

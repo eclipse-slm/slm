@@ -3,10 +3,10 @@ package org.eclipse.slm.service_management.features.service_offerings.impl.requi
 import org.eclipse.digitaltwin.aas4j.v3.model.*;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.*;
 import org.eclipse.slm.aas.repositories.submodels.SubmodelUtils;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.RequirementProperty;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceRequirement;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceRequirementLogic;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.RequirementProperty;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceRequirement;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceRequirementLogic;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,13 +1,13 @@
 package org.eclipse.slm.service_management.features.service_offerings.impl.serviceofferings;
 
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOffering;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOfferingCreateOrUpdateRequest;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersionDTOApi;
-import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceCategoryNotFoundException;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.exceptions.ServiceOfferingNotFoundException;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.exceptions.ServiceOfferingVersionCreateException;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.exceptions.ServiceOfferingVersionNotFoundException;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.exceptions.ServiceVendorNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceOffering;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceOfferingCreateOrUpdateRequest;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersionDTOApi;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicecategories.ServiceCategoryNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.ServiceOfferingNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.ServiceOfferingVersionCreateException;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.ServiceOfferingVersionNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.exceptions.ServiceVendorNotFoundException;
 
 import java.util.List;
 import java.util.UUID;

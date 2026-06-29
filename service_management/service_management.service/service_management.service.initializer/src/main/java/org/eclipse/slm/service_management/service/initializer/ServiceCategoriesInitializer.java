@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.slm.common.restclient.feign.FeignResponseException;
 import org.eclipse.slm.common.utils.files.FilesUtil;
-import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategory;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicecategories.ServiceOfferingCategory;
 import org.eclipse.slm.service_management.service.client.ServiceManagementClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

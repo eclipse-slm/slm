@@ -7,19 +7,19 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementClientFactory;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrder;
 import org.eclipse.slm.service_management.features.service_offerings.impl.AwxMockedResponses;
-import org.eclipse.slm.service_management.features.service_offerings.impl.categories.ServiceOfferingCategoryHandler;
-import org.eclipse.slm.service_management.features.service_offerings.impl.vendors.ServiceVendorHandler;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOffering;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOfferingEnvironmentVariable;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.options.*;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion;
+import org.eclipse.slm.service_management.features.service_offerings.impl.servicecategories.ServiceOfferingCategoryHandler;
+import org.eclipse.slm.service_management.features.service_offerings.impl.servicevendors.ServiceVendorHandler;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceOffering;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceOfferingEnvironmentVariable;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.options.*;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
 import org.eclipse.slm.service_management.common.impl.AbstractRestControllerIT;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.compose.DockerComposeDeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.container.DockerContainerDeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategory;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendor;
-import org.eclipse.slm.service_management.features.service_offerings.impl.categories.ServiceCategoryJpaRepository;
-import org.eclipse.slm.service_management.features.service_offerings.impl.vendors.ServiceVendorJpaRepository;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.compose.DockerComposeDeploymentDefinition;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.container.DockerContainerDeploymentDefinition;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicecategories.ServiceOfferingCategory;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.ServiceVendor;
+import org.eclipse.slm.service_management.features.service_offerings.impl.servicecategories.ServiceCategoryJpaRepository;
+import org.eclipse.slm.service_management.features.service_offerings.impl.servicevendors.ServiceVendorJpaRepository;
 // Application and ServiceDeploymentHandler removed: adding them as test deps would create
 // a cyclic Maven dependency (service_deployment.impl and service.app both depend on service_offerings.impl).
 // This test is @Disabled; move it to service_management.service.app to re-enable properly.

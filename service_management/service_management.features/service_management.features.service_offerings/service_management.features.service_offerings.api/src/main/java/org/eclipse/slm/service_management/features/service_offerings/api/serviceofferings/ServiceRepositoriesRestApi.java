@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.eclipse.slm.service_management.features.service_offerings.api.servicerepositories.ServiceRepository;
 import org.eclipse.slm.service_management.features.service_offerings.api.servicerepositories.ServiceRepositoryCreateResponse;
 import org.eclipse.slm.service_management.features.service_offerings.api.servicerepositories.ServiceRepositoryDTOApiRead;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.exceptions.ServiceVendorAccessDenied;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.exceptions.ServiceVendorAccessDenied;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

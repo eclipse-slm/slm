@@ -1,11 +1,10 @@
 package org.eclipse.slm.service_management.features.service_offerings.impl;
 
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
-import org.eclipse.slm.service_management.features.service_offerings.impl.DTOConfig;
-import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategory;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOffering;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceOfferingDTOApi;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendor;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicecategories.ServiceOfferingCategory;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceOffering;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceOfferingDTOApi;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.ServiceVendor;
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;

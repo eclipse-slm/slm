@@ -1,7 +1,7 @@
 package org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.responses
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion
 import java.util.*
 
 class ServiceOfferingVersionCreateResponse {

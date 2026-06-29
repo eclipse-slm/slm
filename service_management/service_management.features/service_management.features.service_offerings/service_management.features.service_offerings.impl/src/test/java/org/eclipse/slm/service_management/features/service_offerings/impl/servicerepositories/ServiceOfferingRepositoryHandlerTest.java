@@ -4,7 +4,7 @@ import org.eclipse.slm.common.vault.client.VaultClient;
 import org.eclipse.slm.common.vault.model.exceptions.KvValueNotFound;
 import org.eclipse.slm.common.vault.model.kv.KvSecrets;
 import org.eclipse.slm.common.vault.testing.VaultTestContainer;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceRepositoryNotFound;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceRepositoryNotFound;
 import org.eclipse.slm.service_management.features.service_offerings.api.servicerepositories.ServiceRepository;
 import org.eclipse.slm.service_management.features.service_offerings.api.servicerepositories.ServiceRepositoryType;
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;

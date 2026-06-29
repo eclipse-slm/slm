@@ -1,12 +1,12 @@
 package org.eclipse.slm.service_management.features.service_deployment.impl.dockercontainer;
 
 import org.eclipse.slm.service_management.features.service_deployment.impl.dockercompose.*;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrder;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.container.DockerContainerDeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.options.ServiceOption;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.options.ServiceOptionType;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.options.ServiceOptionValue;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.container.DockerContainerDeploymentDefinition;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.options.ServiceOption;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.options.ServiceOptionType;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.options.ServiceOptionValue;
 
 import java.util.ArrayList;
 import java.util.HashMap;

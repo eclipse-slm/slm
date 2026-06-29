@@ -2,11 +2,11 @@ package org.eclipse.slm.service_management.features.service_deployment.impl.kube
 
 import org.eclipse.slm.service_management.features.service_deployment.impl.KubernetesGenericObject;
 import org.eclipse.slm.service_management.features.service_deployment.impl.KubernetesManifestFile;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.exceptions.InvalidServiceOfferingDefinitionException;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.kubernetes.KubernetesDeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.options.ServiceOptionType;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.options.ServiceOptionValue;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.InvalidServiceOfferingDefinitionException;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.kubernetes.KubernetesDeploymentDefinition;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.options.ServiceOptionType;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.options.ServiceOptionValue;
 import io.kubernetes.client.openapi.models.*;
 import io.kubernetes.client.util.ModelMapper;
 import io.kubernetes.client.util.Yaml;

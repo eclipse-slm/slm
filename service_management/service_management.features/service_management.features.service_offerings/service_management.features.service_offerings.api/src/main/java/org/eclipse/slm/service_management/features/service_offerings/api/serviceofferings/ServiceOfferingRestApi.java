@@ -3,12 +3,12 @@ package org.eclipse.slm.service_management.features.service_offerings.api.servic
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import org.eclipse.slm.common.model.DeploymentType;
-import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceCategoryNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicecategories.ServiceCategoryNotFoundException;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.ServiceOfferingNotFoundException;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.ServiceOfferingVersionCreateException;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.ServiceOfferingVersionNotFoundException;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.responses.ServiceOfferingCreateResponse;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.exceptions.ServiceVendorNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.exceptions.ServiceVendorNotFoundException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;

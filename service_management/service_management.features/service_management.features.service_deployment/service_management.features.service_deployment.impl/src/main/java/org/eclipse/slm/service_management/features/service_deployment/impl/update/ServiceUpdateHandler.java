@@ -19,11 +19,11 @@ import org.eclipse.slm.service_management.features.service_deployment.impl.docke
 import org.eclipse.slm.service_management.features.service_deployment.impl.dockercontainer.DockerContainerServiceOfferingOrderUtil;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstanceEventMessageSender;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancesConsulClient;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOptionNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOptionNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrder;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrderResult;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.exceptions.InvalidServiceOfferingDefinitionException;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.InvalidServiceOfferingDefinitionException;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstanceNotFoundException;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;

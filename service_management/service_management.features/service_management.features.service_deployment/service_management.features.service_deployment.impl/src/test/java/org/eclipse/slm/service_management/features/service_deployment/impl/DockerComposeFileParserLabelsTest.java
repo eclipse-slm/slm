@@ -4,7 +4,7 @@ import org.eclipse.slm.service_management.features.service_deployment.impl.docke
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.options.ServiceOptionValue;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.options.ServiceOptionValue;
 import org.json.JSONException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

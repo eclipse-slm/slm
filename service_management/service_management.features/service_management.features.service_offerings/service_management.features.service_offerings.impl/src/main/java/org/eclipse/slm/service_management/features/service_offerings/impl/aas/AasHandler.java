@@ -12,11 +12,11 @@ import org.eclipse.slm.aas.clients.submodelregistry.SubmodelRegistryClientFactor
 import org.eclipse.slm.aas.clients.submodelrepository.SubmodelRepositoryClient;
 import org.eclipse.slm.aas.clients.submodelrepository.SubmodelRepositoryClientFactory;
 import org.eclipse.slm.service_management.features.service_offerings.impl.requirements.RequirementsSubmodel;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
 import org.eclipse.slm.service_management.features.service_offerings.impl.serviceofferingversions.ServiceOfferingVersionJpaRepository;
 import org.eclipse.slm.service_management.features.service_offerings.impl.serviceofferingversions.ServiceOfferingVersionAas;
 import org.eclipse.slm.service_management.features.service_offerings.impl.serviceofferingversions.ServiceOfferingVersionsSubmodelRepositoryHTTPApiController;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersionEvent;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

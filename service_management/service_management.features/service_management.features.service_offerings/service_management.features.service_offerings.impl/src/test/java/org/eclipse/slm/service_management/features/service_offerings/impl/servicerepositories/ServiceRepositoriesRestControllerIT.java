@@ -7,7 +7,7 @@ import org.eclipse.slm.common.vault.testing.VaultTestContainer;
 import org.eclipse.slm.service_management.common.impl.AbstractRestControllerIT;
 import org.eclipse.slm.service_management.features.service_offerings.api.servicerepositories.ServiceRepository;
 import org.eclipse.slm.service_management.features.service_offerings.api.servicerepositories.ServiceRepositoryType;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.exceptions.ServiceVendorAccessDenied;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.exceptions.ServiceVendorAccessDenied;
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -3,7 +3,7 @@ package org.eclipse.slm.service_management.features.service_offerings.api.servic
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersionDTOFileImport
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersionDTOFileImport
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*

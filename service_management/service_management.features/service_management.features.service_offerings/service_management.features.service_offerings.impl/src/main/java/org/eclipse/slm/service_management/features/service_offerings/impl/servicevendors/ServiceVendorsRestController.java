@@ -6,9 +6,9 @@ import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmAdminOrApiKe
 import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUserOrApiKey;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.*;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.exceptions.ServiceVendorNotFoundException;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.responses.ServiceVendorCreateResponse;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.*;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.exceptions.ServiceVendorNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.responses.ServiceVendorCreateResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

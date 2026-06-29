@@ -1,7 +1,7 @@
 package org.eclipse.slm.service_management.features.service_offerings.impl.servicerepositories;
 
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceRepositoryNotFound;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendor;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceRepositoryNotFound;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.ServiceVendor;
 
 import org.eclipse.slm.common.vault.client.VaultClient;
 import org.eclipse.slm.common.vault.client.VaultClientFactory;

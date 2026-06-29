@@ -1,7 +1,7 @@
 package org.eclipse.slm.service_management.features.service_offerings.impl.servicevendors;
 
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendor;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.exceptions.ServiceVendorNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.ServiceVendor;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.exceptions.ServiceVendorNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

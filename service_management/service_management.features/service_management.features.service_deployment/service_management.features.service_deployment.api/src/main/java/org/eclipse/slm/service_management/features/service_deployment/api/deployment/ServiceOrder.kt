@@ -2,7 +2,7 @@ package org.eclipse.slm.service_management.features.service_deployment.api.deplo
 
 import jakarta.persistence.*
 import org.eclipse.slm.common.model.AbstractBaseEntityUuid
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.options.ServiceOptionValue
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.options.ServiceOptionValue
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
 import java.util.*

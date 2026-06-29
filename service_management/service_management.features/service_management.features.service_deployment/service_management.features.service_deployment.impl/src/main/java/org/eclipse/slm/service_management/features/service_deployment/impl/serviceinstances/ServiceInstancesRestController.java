@@ -7,12 +7,12 @@ import org.eclipse.slm.service_management.features.service_deployment.api.deploy
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstancesRestApi;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstancesRestApiConfig;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstance;
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOptionNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOptionNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstanceRuntimeException;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrder;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.exceptions.InvalidServiceOfferingDefinitionException;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.exceptions.ServiceOfferingNotFoundException;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.exceptions.ServiceOfferingVersionNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.InvalidServiceOfferingDefinitionException;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.ServiceOfferingNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.ServiceOfferingVersionNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstanceDetails;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstanceGroupNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstanceNotFoundException;

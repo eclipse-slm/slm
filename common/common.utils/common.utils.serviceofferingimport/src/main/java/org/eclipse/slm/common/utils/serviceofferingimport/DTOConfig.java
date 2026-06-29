@@ -1,15 +1,15 @@
 package org.eclipse.slm.common.utils.serviceofferingimport;
 
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.DeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.DeploymentDefinitionDTOFileImport;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.compose.DockerComposeDeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.compose.DockerComposeDeploymentDefinitionDTOFileImport;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.container.DockerContainerDeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.container.DockerContainerDeploymentDefinitionDTOFileImport;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.container.DockerRestartPolicy;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.kubernetes.KubernetesDeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.kubernetes.KubernetesDeploymentDefinitionDTOFileImport;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.DeploymentDefinition;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.DeploymentDefinitionDTOFileImport;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.compose.DockerComposeDeploymentDefinition;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.compose.DockerComposeDeploymentDefinitionDTOFileImport;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.container.DockerContainerDeploymentDefinition;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.container.DockerContainerDeploymentDefinitionDTOFileImport;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.container.DockerRestartPolicy;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.kubernetes.KubernetesDeploymentDefinition;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.kubernetes.KubernetesDeploymentDefinitionDTOFileImport;
 import org.modelmapper.Converter;
 import org.modelmapper.spi.MappingContext;
 

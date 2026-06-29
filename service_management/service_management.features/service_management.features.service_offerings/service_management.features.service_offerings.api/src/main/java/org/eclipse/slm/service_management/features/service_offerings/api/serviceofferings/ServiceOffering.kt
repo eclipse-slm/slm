@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import jakarta.persistence.*
 import org.eclipse.slm.common.model.AbstractBaseEntityUuid
-import org.eclipse.slm.service_management.features.service_offerings.api.categories.ServiceOfferingCategory
+import org.eclipse.slm.service_management.features.service_offerings.api.servicecategories.ServiceOfferingCategory
 import org.eclipse.slm.service_management.common.api.utils.ByteArrayDeserializer
-import org.eclipse.slm.service_management.features.service_offerings.api.offeringversions.ServiceOfferingVersion
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendor
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.ServiceVendor
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.transaction.annotation.Transactional

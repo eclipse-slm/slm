@@ -4,10 +4,10 @@ import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakGroupNotFoundEx
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.keycloak.config.exceptions.KeycloakUserNotFoundException;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendorRuntimeException;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendor;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendorDeveloper;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.exceptions.ServiceVendorNotFoundException;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.ServiceVendorRuntimeException;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.ServiceVendor;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.ServiceVendorDeveloper;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.exceptions.ServiceVendorNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

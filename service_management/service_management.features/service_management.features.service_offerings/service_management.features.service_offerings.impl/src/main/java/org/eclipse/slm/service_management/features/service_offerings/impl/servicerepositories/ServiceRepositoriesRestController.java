@@ -3,13 +3,13 @@ package org.eclipse.slm.service_management.features.service_offerings.impl.servi
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUserOrApiKey;
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceRepositoriesRestApi;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceRepositoriesRestApiConfig;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceRepositoryNotFound;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceRepositoriesRestApi;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceRepositoriesRestApiConfig;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceRepositoryNotFound;
 import org.eclipse.slm.service_management.features.service_offerings.api.servicerepositories.ServiceRepository;
 import org.eclipse.slm.service_management.features.service_offerings.api.servicerepositories.ServiceRepositoryCreateResponse;
 import org.eclipse.slm.service_management.features.service_offerings.api.servicerepositories.ServiceRepositoryDTOApiRead;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.exceptions.ServiceVendorAccessDenied;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.exceptions.ServiceVendorAccessDenied;
 import org.modelmapper.TypeToken;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

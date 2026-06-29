@@ -10,10 +10,10 @@ import org.eclipse.slm.aas.clients.submodelregistry.SubmodelRegistryClientFactor
 import org.eclipse.slm.aas.clients.submodelrepository.SubmodelRepositoryClientFactory;
 import org.eclipse.slm.aas.clients.submodelservice.SubmodelServiceClient;
 import org.eclipse.slm.resource_management.common.aas.ResourceAas;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.RequirementLogicType;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.RequirementProperty;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceRequirement;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceRequirementLogic;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.RequirementLogicType;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.RequirementProperty;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceRequirement;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceRequirementLogic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;

@@ -1,10 +1,10 @@
 package org.eclipse.slm.service_management.features.service_offerings.impl;
 
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.DeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.compose.DockerComposeDeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.docker.container.DockerContainerDeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_offerings.api.vendors.ServiceVendorDeveloper;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.DeploymentDefinition;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.compose.DockerComposeDeploymentDefinition;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.container.DockerContainerDeploymentDefinition;
+import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.ServiceVendorDeveloper;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;

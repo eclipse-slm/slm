@@ -8,10 +8,10 @@ import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultReference;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodel;
 import org.eclipse.slm.aas.clients.shellrepository.AasRepositoryClientFactory;
 import org.eclipse.slm.aas.clients.submodelregistry.SubmodelRegistryClientFactory;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceRequirementLogic;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.RequirementLogicType;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.RequirementProperty;
-import org.eclipse.slm.service_management.features.service_offerings.api.offerings.ServiceRequirement;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceRequirementLogic;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.RequirementLogicType;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.RequirementProperty;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceRequirement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
