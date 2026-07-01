@@ -69,6 +69,7 @@ jobs:
           PACKAGE_SCOPE="repo"
           mapfile -t PACKAGES < <(
             gh api --paginate \
+              --method GET \
               "/repos/${REPO}/packages" \
               -f package_type=container \
               -f per_page=100 \
@@ -81,6 +82,7 @@ jobs:
             PACKAGE_SCOPE="org"
             mapfile -t PACKAGES < <(
               gh api --paginate \
+                --method GET \
                 "/orgs/${ORG}/packages" \
                 -f package_type=container \
                 -f per_page=100 \
@@ -114,6 +116,7 @@ jobs:
 
               mapfile -t VERSION_IDS < <(
                 gh api --paginate \
+                  --method GET \
                   "${VERSIONS_ENDPOINT}" \
                   -f per_page=100 \
                   --jq ".[] | select(.metadata.container.tags // [] | index(\"${BRANCH_TAG}\") != null) | .id" \
