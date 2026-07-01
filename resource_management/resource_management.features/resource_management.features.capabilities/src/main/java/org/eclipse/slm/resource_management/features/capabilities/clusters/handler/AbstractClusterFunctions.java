@@ -1,7 +1,6 @@
 package org.eclipse.slm.resource_management.features.capabilities.clusters.handler;
 
 import org.eclipse.slm.awx.client.observer.AwxJobObserver;
-import org.eclipse.slm.common.consul.client.*;
 import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
 import org.eclipse.slm.awx.client.observer.AwxJobExecutor;
 import org.eclipse.slm.awx.client.observer.AwxJobObserverInitializer;
@@ -31,8 +30,6 @@ class AbstractClusterFunctions {
 
     protected final AwxJobExecutor awxJobExecutor;
 
-    protected final ConsulClient consulAdminClient;
-
     protected final VaultClient vaultAdminClient;
 
     protected final RemoteAccessManager remoteAccessManager;
@@ -48,7 +45,6 @@ class AbstractClusterFunctions {
     public AbstractClusterFunctions(NotificationMessageSender notificationMessageSender,
                                     AwxJobExecutor awxJobExecutor,
                                     MultiTenantKeycloakRegistration multiTenantKeycloakRegistration,
-                                    ConsulClientFactory consulClientFactory,
                                     MultiHostCapabilityServicePersistence multiHostCapabilityServicePersistence,
                                     ResourceJpaRepository resourceJpaRepository,
                                     AccessControlService accessControlService,
@@ -57,7 +53,6 @@ class AbstractClusterFunctions {
         this.notificationMessageSender = notificationMessageSender;
         this.awxJobExecutor = awxJobExecutor;
         this.multiTenantKeycloakRegistration = multiTenantKeycloakRegistration;
-        this.consulAdminClient = consulClientFactory.createAdminClient();
         this.multiHostCapabilityServicePersistence = multiHostCapabilityServicePersistence;
         this.resourceJpaRepository = resourceJpaRepository;
         this.accessControlService = accessControlService;

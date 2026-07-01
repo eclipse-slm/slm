@@ -4,9 +4,6 @@ import org.eclipse.slm.awx.client.AwxCredential;
 import org.eclipse.slm.awx.client.observer.*;
 import org.eclipse.slm.awx.model.ExtraVars;
 
-import org.eclipse.slm.common.consul.client.ConsulClientFactory;
-import org.eclipse.slm.common.consul.model.catalog.CatalogRegistration;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.common.vault.client.VaultClientFactory;
@@ -47,7 +44,6 @@ public class ClusterCreateFunctions extends AbstractClusterFunctions implements 
             NotificationMessageSender notificationMessageSender,
             AwxJobExecutor awxJobExecutor,
             MultiTenantKeycloakRegistration multiTenantKeycloakRegistration,
-            ConsulClientFactory consulClientFactory,
             MultiHostCapabilityServicePersistence multiHostCapabilityServicePersistence,
             ResourceJpaRepository resourceJpaRepository,
             AccessControlService accessControlService,
@@ -58,7 +54,6 @@ public class ClusterCreateFunctions extends AbstractClusterFunctions implements 
                 notificationMessageSender,
                 awxJobExecutor,
                 multiTenantKeycloakRegistration,
-                consulClientFactory,
                 multiHostCapabilityServicePersistence,
                 resourceJpaRepository,
                 accessControlService,
@@ -113,7 +108,7 @@ public class ClusterCreateFunctions extends AbstractClusterFunctions implements 
             MultiHostCapabilityService multiHostCapabilityService,
             JwtAuthenticationToken jwtAuthenticationToken,
             ClusterCreateRequest clusterCreateRequest
-    ) throws SSLException, ConsulLoginFailedException {
+    ) throws SSLException {
         multiHostCapabilityService.setStatus(CapabilityServiceStatus.INSTALL);
         this.multiHostCapabilityServicePersistence.save(
                 multiHostCapabilityService,
@@ -302,15 +297,11 @@ public class ClusterCreateFunctions extends AbstractClusterFunctions implements 
 
         if (finalState.equals(JobFinalState.SUCCESSFUL)) {
             if (jobGoal.equals(JobGoal.CREATE)) {
-                try {
-                    this.processSuccessfulClusterInstall(
-                            jwtAuthenticationToken,
-                            multiHostCapabilityService,
-                            clusterCreateRequest
-                    );
-                } catch (ConsulLoginFailedException e) {
-                    throw new RuntimeException(e);
-                }
+                this.processSuccessfulClusterInstall(
+                        jwtAuthenticationToken,
+                        multiHostCapabilityService,
+                        clusterCreateRequest
+                );
                 this.clusterJobMap.remove(sender);
             }
         }

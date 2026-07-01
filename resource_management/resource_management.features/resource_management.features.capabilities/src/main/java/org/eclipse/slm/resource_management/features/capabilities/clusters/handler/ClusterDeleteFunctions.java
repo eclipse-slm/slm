@@ -4,8 +4,6 @@ import org.eclipse.slm.awx.client.AwxCredential;
 import org.eclipse.slm.awx.client.observer.*;
 import org.eclipse.slm.awx.model.ExtraVars;
 
-import org.eclipse.slm.common.consul.client.ConsulClientFactory;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
 import org.eclipse.slm.common.vault.client.VaultClientFactory;
 import org.eclipse.slm.notification_service.messaging.NotificationEventMessage;
@@ -38,7 +36,6 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
             NotificationMessageSender notificationMessageSender,
             AwxJobExecutor awxJobExecutor,
             MultiTenantKeycloakRegistration multiTenantKeycloakRegistration,
-            ConsulClientFactory consulClientFactory,
             MultiHostCapabilityServicePersistence multiHostCapabilityServicePersistence,
             ResourceJpaRepository resourceJpaRepository,
             AccessControlService accessControlService,
@@ -49,7 +46,6 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
                 notificationMessageSender,
                 awxJobExecutor,
                 multiTenantKeycloakRegistration,
-                consulClientFactory,
                 multiHostCapabilityServicePersistence,
                 resourceJpaRepository,
                 accessControlService,
@@ -86,7 +82,7 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
     }
 
     private void delete(JwtAuthenticationToken jwtAuthenticationToken, MultiHostCapabilityService multiHostCapabilityService
-    ) throws SSLException, ConsulLoginFailedException {
+    ) throws SSLException {
         var clusterJob = createClusterJob(
                 jwtAuthenticationToken,
                 multiHostCapabilityService
@@ -101,7 +97,7 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
     }
 
     public void delete(JwtAuthenticationToken jwtAuthenticationToken, UUID consulServiceUuid
-    ) throws SSLException, ConsulLoginFailedException {
+    ) throws SSLException {
         Optional<MultiHostCapabilityService> service = multiHostCapabilityServicePersistence.getById(
                 consulServiceUuid
         );

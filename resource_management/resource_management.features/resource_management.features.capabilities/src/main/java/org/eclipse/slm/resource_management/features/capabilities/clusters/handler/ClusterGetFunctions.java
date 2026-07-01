@@ -3,7 +3,6 @@ package org.eclipse.slm.resource_management.features.capabilities.clusters.handl
 import org.eclipse.slm.awx.client.observer.AwxJobExecutor;
 import org.eclipse.slm.awx.client.observer.AwxJobObserverInitializer;
 
-import org.eclipse.slm.common.consul.client.ConsulClientFactory;
 import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
 import org.eclipse.slm.common.vault.client.VaultClientFactory;
 import org.eclipse.slm.common.vault.client.exceptions.VaultRuntimeException;
@@ -28,7 +27,6 @@ public class ClusterGetFunctions extends AbstractClusterFunctions {
             NotificationMessageSender notificationMessageSender,
             AwxJobExecutor awxJobExecutor,
             MultiTenantKeycloakRegistration multiTenantKeycloakRegistration,
-            ConsulClientFactory consulClientFactory,
             MultiHostCapabilityServicePersistence multiHostCapabilityServicePersistence,
             ResourceJpaRepository resourceJpaRepository,
             AccessControlService accessControlService,
@@ -39,7 +37,6 @@ public class ClusterGetFunctions extends AbstractClusterFunctions {
                 notificationMessageSender,
                 awxJobExecutor,
                 multiTenantKeycloakRegistration,
-                consulClientFactory,
                 multiHostCapabilityServicePersistence,
                 resourceJpaRepository,
                 accessControlService,

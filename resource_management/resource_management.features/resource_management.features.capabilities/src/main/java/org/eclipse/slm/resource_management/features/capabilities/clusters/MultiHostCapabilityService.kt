@@ -24,41 +24,7 @@ class MultiHostCapabilityService : CapabilityService {
     //<NodeID, MemberTypeName>
     var memberMapping: MutableMap<UUID, String>? = null
 
-    fun getTagsByNodeId(nodeId: UUID): ArrayList<String> {
-        val serviceTags = ArrayList(tags)
-        val clusterMemberTypeName = memberMapping!![nodeId]
-        val clusterMemberType = capability.clusterMemberTypes.firstOrNull { it.name.equals(clusterMemberTypeName) }
-        serviceTags.add(clusterMemberTypeName!!)
-        serviceTags.add(clusterMemberType!!.prettyName!!)
-        return serviceTags
-    }
-
-    fun getServiceMetaByNodeId(nodeId: UUID): HashMap<String, String> {
-        val meta = meta.toMutableMap()
-        val clusterMemberTypeName = memberMapping!![nodeId]
-        if (clusterMemberTypeName != null) {
-            meta["clusterMemberType"] = clusterMemberTypeName
-        }
-        return meta as HashMap<String, String>
-
-        return meta as HashMap<String, String>
-    }
-
-    fun getMapOfNodeIdsAndCatalogServices(): HashMap<UUID, NodeService> {
-        var consulNodeServiceMap = HashMap<UUID, NodeService>()
-
-        memberMapping!!.forEach{ (key, value) ->
-            val catalogService = NodeService(this.id, this.serviceName, this.taggedAddresses,
-                this.getTagsByNodeId(key),
-                this.getServiceMetaByNodeId(key))
-
-            consulNodeServiceMap[key] = catalogService
-        }
-
     fun applyScaleUp(scaleUpOperation: ScaleUpOperation) {
-        return consulNodeServiceMap
-    }
-    fun applyScaleUp(scaleUpOperation : ScaleUpOperation) {
         this.memberMapping!![scaleUpOperation.resourceId] = scaleUpOperation.clusterMemberType.name
     }
 }

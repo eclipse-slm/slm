@@ -4,8 +4,6 @@ import org.eclipse.slm.awx.client.AwxCredential;
 import org.eclipse.slm.awx.client.observer.*;
 import org.eclipse.slm.awx.model.ExtraVars;
 
-import org.eclipse.slm.common.consul.client.ConsulClientFactory;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.common.vault.client.VaultClientFactory;
@@ -40,7 +38,6 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
             NotificationMessageSender notificationMessageSender,
             AwxJobExecutor awxJobExecutor,
             MultiTenantKeycloakRegistration multiTenantKeycloakRegistration,
-            ConsulClientFactory consulClientFactory,
             MultiHostCapabilityServicePersistence multiHostCapabilityServicePersistence,
             ResourceJpaRepository resourceJpaRepository,
             AccessControlService accessControlService,
@@ -51,7 +48,6 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
                 notificationMessageSender,
                 awxJobExecutor,
                 multiTenantKeycloakRegistration,
-                consulClientFactory,
                 multiHostCapabilityServicePersistence,
                 resourceJpaRepository,
                 accessControlService,
@@ -65,7 +61,7 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
             JwtAuthenticationToken jwtAuthenticationToken,
             UUID consulServiceUuid,
             UUID resourceId
-    ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException {
+    ) throws SSLException, ResourceNotFoundException {
         Optional<MultiHostCapabilityService> serviceOptional = multiHostCapabilityServicePersistence.getById(
                 consulServiceUuid
         );
@@ -127,7 +123,7 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
             JwtAuthenticationToken jwtAuthenticationToken,
             UUID consulServiceUuid,
             UUID resourceId
-    ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException {
+    ) throws SSLException, ResourceNotFoundException {
         JobTarget jobTarget = JobTarget.RESOURCE;
         JobGoal jobGoal = JobGoal.MODIFY;
         Optional<MultiHostCapabilityService> serviceOptional = multiHostCapabilityServicePersistence.getById(
