@@ -40,9 +40,25 @@ class MultiHostCapabilityService : CapabilityService {
             meta["clusterMemberType"] = clusterMemberTypeName
         }
         return meta as HashMap<String, String>
+
+        return meta as HashMap<String, String>
     }
 
+    fun getMapOfNodeIdsAndCatalogServices(): HashMap<UUID, NodeService> {
+        var consulNodeServiceMap = HashMap<UUID, NodeService>()
+
+        memberMapping!!.forEach{ (key, value) ->
+            val catalogService = NodeService(this.id, this.serviceName, this.taggedAddresses,
+                this.getTagsByNodeId(key),
+                this.getServiceMetaByNodeId(key))
+
+            consulNodeServiceMap[key] = catalogService
+        }
+
     fun applyScaleUp(scaleUpOperation: ScaleUpOperation) {
+        return consulNodeServiceMap
+    }
+    fun applyScaleUp(scaleUpOperation : ScaleUpOperation) {
         this.memberMapping!![scaleUpOperation.resourceId] = scaleUpOperation.clusterMemberType.name
     }
 }

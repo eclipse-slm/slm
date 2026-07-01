@@ -1,5 +1,7 @@
 package org.eclipse.slm.service_management.service.app;
 
+import org.eclipse.slm.service_management.features.service_offerings.impl.DTOConfig;
+
 import jakarta.transaction.Transactional;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -16,6 +18,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication(scanBasePackages = {
         "org.eclipse.slm.service_management",
+        "org.eclipse.slm.service_management.features.service_deployment",
+        "org.eclipse.slm.service_management.features.service_offerings",
         "org.eclipse.slm.notification_service.messaging",
         "org.eclipse.slm.resource_management.service.client",
         "org.eclipse.slm.aas",
@@ -30,10 +34,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         "org.eclipse.slm.common.parent.service"
 })
 @EntityScan(basePackages = {
-        "org.eclipse.slm.service_management.model"
+        "org.eclipse.slm.service_management.common",
+        "org.eclipse.slm.service_management.features.service_offerings",
+        "org.eclipse.slm.service_management.features.service_deployment"
 })
 @EnableJpaRepositories(basePackages = {
-        "org.eclipse.slm.service_management.persistence"
+        "org.eclipse.slm.service_management"
 })
 @EnableAsync
 @EnableTransactionManagement
@@ -57,3 +63,4 @@ public class Application {
     }
 
 }
+

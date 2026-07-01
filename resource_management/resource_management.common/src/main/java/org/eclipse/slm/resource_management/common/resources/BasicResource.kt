@@ -30,6 +30,7 @@ class BasicResource
     @field:Column(name = "hostname")
     var hostname: String? = null
 
+    var firmwareVersion: String? = null
     @field:Column(name = "firmware_version")
     var firmwareVersion: String? = null
 

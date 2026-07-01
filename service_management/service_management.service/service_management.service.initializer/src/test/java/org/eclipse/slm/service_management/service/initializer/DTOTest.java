@@ -2,11 +2,11 @@ package org.eclipse.slm.service_management.service.initializer;
 
 import org.eclipse.slm.common.utils.objectmapper.ObjectMapperUtils;
 import org.eclipse.slm.common.utils.serviceofferingimport.DTOConfig;
-import org.eclipse.slm.service_management.model.offerings.ServiceOfferingDTOApi;
-import org.eclipse.slm.service_management.model.offerings.ServiceOfferingDTOFileImport;
-import org.eclipse.slm.service_management.model.offerings.ServiceOfferingVersionDTOApi;
-import org.eclipse.slm.service_management.model.offerings.ServiceOfferingVersionDTOFileImport;
-import org.eclipse.slm.service_management.model.offerings.docker.container.DockerContainerDeploymentDefinitionDTOFileImport;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceOfferingDTOApi;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceOfferingDTOFileImport;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersionDTOApi;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersionDTOFileImport;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.container.DockerContainerDeploymentDefinitionDTOFileImport;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

@@ -565,7 +565,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ServiceCategory"
+                    "$ref": "#/components/schemas/ServiceOfferingCategory"
                   }
                 }
               }
@@ -583,7 +583,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ServiceCategory"
+                "$ref": "#/components/schemas/ServiceOfferingCategory"
               }
             }
           },
@@ -605,7 +605,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ServiceCategory"
+                "$ref": "#/components/schemas/ServiceOfferingCategory"
               }
             }
           },
@@ -2495,7 +2495,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServiceCategory"
+                  "$ref": "#/components/schemas/ServiceOfferingCategory"
                 }
               }
             }
@@ -3280,7 +3280,7 @@
           }
         }
       },
-      "ServiceCategory": {
+      "ServiceOfferingCategory": {
         "required": [
           "id",
           "name"
@@ -3409,7 +3409,7 @@
             "format": "byte"
           },
           "serviceCategory": {
-            "$ref": "#/components/schemas/ServiceCategory"
+            "$ref": "#/components/schemas/ServiceOfferingCategory"
           },
           "serviceVendor": {
             "$ref": "#/components/schemas/ServiceVendor"

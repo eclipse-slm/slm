@@ -25,7 +25,7 @@ class AwxAction(): Action(AwxAction::class.java.simpleName) {
     @JsonIgnore
     var password: String = ""
 
-    var parameter: List<SurveyItem>? = null;
+    var parameter: List<SurveyItem>? = null
 
     constructor(
          awxRepo: String,

@@ -1,0 +1,143 @@
+apiVersion: blubbeldibub/v1alpha1
+kind: ApplicationGroup
+metadata:
+  name: applicationgroup-demo-ipa
+  namespace: namespace_test
+spec:
+  minMember: 1
+---
+apiVersion: blubbeldibub/v1alpha1
+kind: Application
+metadata:
+  name: app1
+  namespace: namespace_test
+  labels:
+    application-group: applicationgroup-demo-ipa
+spec:
+  workloads:
+    - basename: w1
+      template:
+        metadata:
+          labels:
+            app: pause
+        spec:
+          containers:
+            - name: pause
+              image: k8s.gcr.io/pause:3.2
+              env:
+                - name: MY_ENV_VAR1
+                  value: ${{test_replace_1}}
+                - name: MY_ENV_VAR2
+                  value: "my value"
+                - name: MY_ENV_VAR3
+                  value: ${{test_replace_2}}
+      interfaces:
+        - otherWorkload:
+            basename: w2
+            applicationName: app1
+          bandwidth: "5M"
+          maxDelay: "1"
+    - basename: w2
+      template:
+        metadata:
+          labels:
+            app: pause
+        spec:
+          containers:
+            - name: pause
+              image: k8s.gcr.io/pause:3.2
+              env:
+                - name: MY_ENV_VAR1
+                  value: "my value"
+                - name: MY_ENV_VAR2
+                  value: ${{test_replace_2}}
+                - name: MY_ENV_VAR3
+                  value: "my value"
+      interfaces:
+        - otherWorkload:
+            basename: w1
+            applicationName: app1
+          bandwidth: "2M"
+          maxDelay: "1"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: my-app
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80
+          env:
+            - name: MY_ENV_VAR1
+              value: "my value"
+            - name: MY_ENV_VAR2
+              value: "my value"
+            - name: MY_ENV_VAR3
+              value: "my value"
+          volumeMounts:
+            - name: my-app-storage
+              mountPath: /data/my-app
+      volumes:
+        - name: my-app-storage
+          persistentVolumeClaim:
+            claimName: my-app-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-second-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: my-app
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80
+          env:
+            - name: MY_ENV_VAR1
+              value: "my value"
+            - name: MY_ENV_VAR2
+              value: "my value"
+            - name: MY_ENV_VAR3
+              value: "my value"
+          volumeMounts:
+            - name: my-app-storage
+              mountPath: /data/my-app
+      volumes:
+        - name: my-app-storage
+          persistentVolumeClaim:
+            claimName: my-app-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-service
+spec:
+  selector:
+    app: my-app
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP

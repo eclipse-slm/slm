@@ -2,7 +2,6 @@ package org.eclipse.slm.resource_management.features.device_integration.discover
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.eclipse.slm.common.messaging.AbstractEventMessage
 import org.eclipse.slm.resource_management.features.device_integration.discovery.dto.DiscoveryJobDTO
 import java.io.Serializable
 
