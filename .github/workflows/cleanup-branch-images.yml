@@ -20,33 +20,101 @@ jobs:
     permissions:
       packages: write
     steps:
+      - name: Ensure GitHub CLI is available
+        shell: bash
+        run: |
+          if command -v gh >/dev/null 2>&1; then
+            echo "gh already installed"
+            gh --version | head -n 1
+            exit 0
+          fi
+
+          echo "gh not found, installing..."
+          if command -v apt-get >/dev/null 2>&1; then
+            if command -v sudo >/dev/null 2>&1; then
+              sudo apt-get update
+              sudo apt-get install -y gh
+            else
+              apt-get update
+              apt-get install -y gh
+            fi
+          elif command -v apk >/dev/null 2>&1; then
+            apk add --no-cache github-cli
+          else
+            echo "Unsupported package manager for automatic gh installation"
+            exit 1
+          fi
+
+          gh --version | head -n 1
+
       - name: Delete branch Docker images from GHCR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
+          command -v gh >/dev/null 2>&1 || { echo "gh CLI is required but not installed"; exit 1; }
+
           BRANCH_REF="${{ github.event.ref }}"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.branch_ref }}" ]; then
             BRANCH_REF="${{ inputs.branch_ref }}"
           fi
 
           BRANCH_TAG=$(echo "${BRANCH_REF}" | tr '/' '-')
-          ORG="eclipse-slm"
+          REPO="${{ github.repository }}"
+          ORG="${REPO%%/*}"
 
           echo "Cleaning up images for branch ref: ${BRANCH_REF}"
           echo "Cleaning up images for branch tag: ${BRANCH_TAG}"
 
-          gh api --paginate \
-            "/orgs/${ORG}/packages" \
-            -f package_type=container \
-            -f per_page=100 \
-            --jq '.[].name' \
-          | while IFS= read -r pkg; do
+          PACKAGE_SCOPE="repo"
+          mapfile -t PACKAGES < <(
+            gh api --paginate \
+              "/repos/${REPO}/packages" \
+              -f package_type=container \
+              -f per_page=100 \
+              --jq '.[].name' \
+              2>/dev/null || true
+          )
+
+          if [ "${#PACKAGES[@]}" -eq 0 ]; then
+            echo "Repo-scoped package API returned no data, trying org-scoped API..."
+            PACKAGE_SCOPE="org"
+            mapfile -t PACKAGES < <(
+              gh api --paginate \
+                "/orgs/${ORG}/packages" \
+                -f package_type=container \
+                -f per_page=100 \
+                --jq '.[].name' \
+                2>/dev/null || true
+            )
+          fi
+
+          if [ "${#PACKAGES[@]}" -eq 0 ]; then
+            echo "No container packages found for cleanup."
+            exit 0
+          fi
+
+          for pkg in "${PACKAGES[@]}"; do
+              [ -z "$pkg" ] && continue
+              if [[ "$pkg" =~ [[:space:]{}] ]]; then
+                echo "Skipping unexpected package value: $pkg"
+                continue
+              fi
+
               # Package names containing '/' must be URL-encoded (/ -> %2F)
               ENCODED_PKG=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$pkg")
 
+              if [ "$PACKAGE_SCOPE" = "repo" ]; then
+                VERSIONS_ENDPOINT="/repos/${REPO}/packages/container/${ENCODED_PKG}/versions"
+                DELETE_ENDPOINT_PREFIX="/repos/${REPO}/packages/container/${ENCODED_PKG}/versions"
+              else
+                VERSIONS_ENDPOINT="/orgs/${ORG}/packages/container/${ENCODED_PKG}/versions"
+                DELETE_ENDPOINT_PREFIX="/orgs/${ORG}/packages/container/${ENCODED_PKG}/versions"
+              fi
+
               mapfile -t VERSION_IDS < <(
                 gh api --paginate \
-                  "/orgs/${ORG}/packages/container/${ENCODED_PKG}/versions" \
+                  "${VERSIONS_ENDPOINT}" \
                   -f per_page=100 \
                   --jq ".[] | select(.metadata.container.tags // [] | index(\"${BRANCH_TAG}\") != null) | .id" \
                   2>/dev/null || true
@@ -56,6 +124,6 @@ jobs:
                 [ -z "$VERSION_ID" ] && continue
                 echo "Deleting ${pkg}:${BRANCH_TAG} (id=${VERSION_ID})"
                 gh api --method DELETE \
-                  "/orgs/${ORG}/packages/container/${ENCODED_PKG}/versions/${VERSION_ID}"
+                  "${DELETE_ENDPOINT_PREFIX}/${VERSION_ID}"
               done
             done
