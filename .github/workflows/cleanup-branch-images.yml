@@ -2,12 +2,20 @@ name: Cleanup Branch Docker Images
 
 on:
   delete:
+  workflow_dispatch:
+    inputs:
+      branch_ref:
+        description: "Branch ref to cleanup (e.g. feature/my-branch). Optional for manual reruns."
+        required: false
+        type: string
 
 jobs:
   cleanup:
     if: |
-      github.event.ref_type == 'branch' &&
-      (startsWith(github.event.ref, 'feature/') || startsWith(github.event.ref, 'fix/'))
+      (github.event_name == 'delete' && github.event.ref_type == 'branch' &&
+      (startsWith(github.event.ref, 'feature/') || startsWith(github.event.ref, 'fix/'))) ||
+      (github.event_name == 'workflow_dispatch' &&
+      (startsWith(inputs.branch_ref, 'feature/') || startsWith(inputs.branch_ref, 'fix/')))
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -16,25 +24,38 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          BRANCH_TAG=$(echo "${{ github.event.ref }}" | tr '/' '-')
+          BRANCH_REF="${{ github.event.ref }}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.branch_ref }}" ]; then
+            BRANCH_REF="${{ inputs.branch_ref }}"
+          fi
+
+          BRANCH_TAG=$(echo "${BRANCH_REF}" | tr '/' '-')
           ORG="eclipse-slm"
 
+          echo "Cleaning up images for branch ref: ${BRANCH_REF}"
           echo "Cleaning up images for branch tag: ${BRANCH_TAG}"
 
-          gh api "/orgs/${ORG}/packages?package_type=container&per_page=100" \
+          gh api --paginate \
+            "/orgs/${ORG}/packages" \
+            -f package_type=container \
+            -f per_page=100 \
             --jq '.[].name' \
           | while IFS= read -r pkg; do
               # Package names containing '/' must be URL-encoded (/ -> %2F)
               ENCODED_PKG=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$pkg")
 
-              VERSION_ID=$(gh api \
-                "/orgs/${ORG}/packages/container/${ENCODED_PKG}/versions?per_page=100" \
-                --jq ".[] | select(.metadata.container.tags // [] | index(\"${BRANCH_TAG}\") != null) | .id" \
-                2>/dev/null || true)
+              mapfile -t VERSION_IDS < <(
+                gh api --paginate \
+                  "/orgs/${ORG}/packages/container/${ENCODED_PKG}/versions" \
+                  -f per_page=100 \
+                  --jq ".[] | select(.metadata.container.tags // [] | index(\"${BRANCH_TAG}\") != null) | .id" \
+                  2>/dev/null || true
+              )
 
-              if [ -n "$VERSION_ID" ]; then
+              for VERSION_ID in "${VERSION_IDS[@]}"; do
+                [ -z "$VERSION_ID" ] && continue
                 echo "Deleting ${pkg}:${BRANCH_TAG} (id=${VERSION_ID})"
                 gh api --method DELETE \
                   "/orgs/${ORG}/packages/container/${ENCODED_PKG}/versions/${VERSION_ID}"
-              fi
+              done
             done
