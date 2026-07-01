@@ -12,14 +12,14 @@ import org.eclipse.slm.resource_management.features.capabilities.model.actions.A
 import org.eclipse.slm.resource_management.service.client.ResourceManagementClientFactory;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.CapabilityServiceNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstance;
-import org.eclipse.slm.service_management.features.service_deployment.impl.DeploymentJobRun;
-import org.eclipse.slm.service_management.features.service_deployment.impl.KubernetesManifestFile;
+import org.eclipse.slm.service_management.features.service_deployment.api.deployment.DeploymentJobRun;
+import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.kubernetes.KubernetesManifestFile;
 import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.dockercompose.DockerComposeFile;
 import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.dockercompose.DockerComposeFileParser;
 import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.kubernetes.KubernetesManifestFileParser;
 import org.eclipse.slm.service_management.features.service_deployment.impl.deployment.dockercontainer.DockerContainerServiceOfferingOrderUtil;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstanceEventMessageSender;
-import org.eclipse.slm.service_management.features.service_deployment.impl.ServiceInstanceEventType;
+import org.eclipse.slm.service_management.features.service_deployment.api.events.ServiceInstanceEventType;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancesConsulClient;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOptionNotFoundException;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.codesys.CodesysDeploymentDefinition;

@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_deployment.impl
+package org.eclipse.slm.service_management.features.service_deployment.api.events
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty

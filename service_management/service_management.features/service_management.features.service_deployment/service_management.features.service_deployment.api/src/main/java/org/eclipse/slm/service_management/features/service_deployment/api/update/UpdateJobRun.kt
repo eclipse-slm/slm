@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_deployment.impl.update
+package org.eclipse.slm.service_management.features.service_deployment.api.update
 
 import org.eclipse.slm.awx.client.observer.AwxJobObserver
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion

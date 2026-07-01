@@ -1,7 +1,7 @@
 package org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.kubernetes;
 
-import org.eclipse.slm.service_management.features.service_deployment.impl.KubernetesGenericObject;
-import org.eclipse.slm.service_management.features.service_deployment.impl.KubernetesManifestFile;
+import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.kubernetes.KubernetesGenericObject;
+import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.kubernetes.KubernetesManifestFile;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.InvalidServiceOfferingDefinitionException;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.kubernetes.KubernetesDeploymentDefinition;

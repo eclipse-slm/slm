@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_deployment.impl
+package org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.kubernetes
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty

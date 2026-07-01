@@ -12,7 +12,8 @@ import org.eclipse.slm.resource_management.service.client.ResourceManagementClie
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.CapabilityServiceNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstance;
 import org.eclipse.slm.service_management.features.service_deployment.impl.deployment.AbstractServiceDeploymentHandler;
-import org.eclipse.slm.service_management.features.service_deployment.impl.ServiceInstanceEventType;
+import org.eclipse.slm.service_management.features.service_deployment.api.events.ServiceInstanceEventType;
+import org.eclipse.slm.service_management.features.service_deployment.api.undeployment.UndeploymentJobRun;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstanceEventMessageSender;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancesConsulClient;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.ServiceOfferingNotFoundException;
