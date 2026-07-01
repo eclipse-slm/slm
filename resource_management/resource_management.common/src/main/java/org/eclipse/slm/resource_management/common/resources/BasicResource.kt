@@ -17,7 +17,7 @@ class BasicResource
 
     var hostname: String? = null
 
-    var firmwareVersion: String? = null;
+    var firmwareVersion: String? = null
 
     var clusterMember = false
 
@@ -28,7 +28,7 @@ class BasicResource
     var driverId: String? = null
 
     constructor(id: UUID, hostname: String, ip: String) : this(id) {
-        this.hostname = hostname;
-        this.ip = ip;
+        this.hostname = hostname
+        this.ip = ip
     }
 }

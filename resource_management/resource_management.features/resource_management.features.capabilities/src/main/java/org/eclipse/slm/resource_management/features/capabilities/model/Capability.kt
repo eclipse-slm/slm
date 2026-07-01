@@ -61,7 +61,7 @@ abstract class Capability(id: UUID? = null) {
     open var executionEnvironment: ExecutionEnvironment? = null
 
     fun isCluster(): Boolean {
-        return clusterMemberTypes.isNotEmpty();
+        return clusterMemberTypes.isNotEmpty()
     }
 
     fun getConnectionTypes() : Set<ConnectionType> {

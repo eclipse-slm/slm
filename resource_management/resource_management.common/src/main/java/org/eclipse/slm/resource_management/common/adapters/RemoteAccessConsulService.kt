@@ -33,7 +33,7 @@ class RemoteAccessConsulService private constructor(
             val connectionType = ConnectionType.valueOf(meta[CONNECTION_TYPE_META_DATA_KEY] ?: ConnectionType.ssh.name)
             val credentialId = UUID.fromString(meta[CREDENTIAL_ID_META_DATA_KEY]
                 ?: throw IllegalArgumentException("Credential ID missing in service meta"))
-            var username: String? = null;
+            var username: String? = null
             if (meta.containsKey(USERNAME_META_DATA_KEY)) {
                 username = meta[USERNAME_META_DATA_KEY]
             }
@@ -50,7 +50,7 @@ class RemoteAccessConsulService private constructor(
             val connectionType = ConnectionType.valueOf(meta[CONNECTION_TYPE_META_DATA_KEY] ?: ConnectionType.ssh.name)
             val credentialId = UUID.fromString(meta[CREDENTIAL_ID_META_DATA_KEY]
                 ?: throw IllegalArgumentException("Credential ID missing in service meta"))
-            var username: String? = null;
+            var username: String? = null
             if (meta.containsKey(USERNAME_META_DATA_KEY)) {
                 username = meta[USERNAME_META_DATA_KEY]
             }

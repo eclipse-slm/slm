@@ -71,13 +71,27 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>service_management.model</artifactId>
+            <artifactId>service_management.common.api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>service_management.persistence.mariadb</artifactId>
+            <artifactId>service_management.common.impl</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>service_management.features.service_offerings.impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>service_management.features.service_deployment.impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
@@ -87,7 +101,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>service_management.persistence.keycloak</artifactId>
+            <artifactId>common.keycloak.config</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

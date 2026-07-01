@@ -117,11 +117,6 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>service_management.persistence.mariadb</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.slm</groupId>
             <artifactId>aas.repositories</artifactId>
             <version>${aas.sdk.version}</version>
             <scope>compile</scope>

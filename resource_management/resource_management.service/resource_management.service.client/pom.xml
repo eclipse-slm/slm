@@ -24,7 +24,13 @@
         <!-- Shared Modules !-->
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>resource_management.service.app</artifactId>
+            <artifactId>resource_management.common</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>resource_management.features.profiler</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

@@ -4,7 +4,6 @@ import org.eclipse.slm.common.utils.files.FilesUtil;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.eclipse.slm.service_management.service.initializer.GitRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,3 +68,4 @@ public class GitRepoInitializer {
         return clonedGitRepoDirectories;
     }
 }
+

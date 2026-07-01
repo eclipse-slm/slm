@@ -26,6 +26,8 @@ jobs:
       should_release_deploy: ${{ steps.evaluate.outputs.should_release_deploy }}
       should_verify: ${{ steps.evaluate.outputs.should_verify }}
       should_run_staging: ${{ steps.evaluate.outputs.should_run_staging }}
+      should_branch_deploy: ${{ steps.evaluate.outputs.should_branch_deploy }}
+      branch_tag: ${{ steps.evaluate.outputs.branch_tag }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -63,11 +65,20 @@ jobs:
             SHOULD_VERIFY=true
           fi
 
+          SHOULD_BRANCH_DEPLOY=false
+          BRANCH_TAG=""
+          if [[ "$GITHUB_REF_NAME" =~ ^feature/ || "$GITHUB_REF_NAME" =~ ^fix/ ]]; then
+            SHOULD_BRANCH_DEPLOY=true
+            BRANCH_TAG=$(echo "$GITHUB_REF_NAME" | tr '/' '-')
+          fi
+
           echo "has_release_tag=$HAS_RELEASE_TAG" >> "$GITHUB_OUTPUT"
           echo "should_snapshot_deploy=$SHOULD_SNAPSHOT_DEPLOY" >> "$GITHUB_OUTPUT"
           echo "should_release_deploy=$SHOULD_RELEASE_DEPLOY" >> "$GITHUB_OUTPUT"
           echo "should_verify=$SHOULD_VERIFY" >> "$GITHUB_OUTPUT"
           echo "should_run_staging=$SHOULD_RUN_STAGING" >> "$GITHUB_OUTPUT"
+          echo "should_branch_deploy=$SHOULD_BRANCH_DEPLOY" >> "$GITHUB_OUTPUT"
+          echo "branch_tag=$BRANCH_TAG" >> "$GITHUB_OUTPUT"
 
   build:
     needs: prepare
@@ -135,6 +146,29 @@ jobs:
       - name: Build '${{ matrix.build.type }}' with Maven
         if: needs.prepare.outputs.should_verify == 'true'
         run: mvn -Psnapshot $MAVEN_CLI_OPTS --projects '${{ matrix.build.maven-projects }}' verify
+      - name: Log in to GitHub Container Registry (branch deploy)
+        if: needs.prepare.outputs.should_branch_deploy == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Retag and push Docker images with branch tag
+        if: needs.prepare.outputs.should_branch_deploy == 'true'
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          BRANCH_TAG="${{ needs.prepare.outputs.branch_tag }}"
+
+          echo "Retagging images from :${VERSION} to :${BRANCH_TAG}"
+
+          docker images --format "{{.Repository}}:{{.Tag}}" \
+            | grep "^ghcr.io/eclipse-slm/.*:${VERSION}$" \
+            | while IFS= read -r image; do
+                REPO="${image%:*}"
+                docker tag "$image" "${REPO}:${BRANCH_TAG}"
+                docker push "${REPO}:${BRANCH_TAG}"
+                echo "Pushed ${REPO}:${BRANCH_TAG}"
+              done
       - name: Build Coveralls Report
         if: ${{ env.COVERALLS_REPO_TOKEN != '' && matrix.build.type == 'backend' && needs.prepare.outputs.should_verify == 'true' && (github.event_name == 'pull_request' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'fix/')) }}
         run: mvn -Psnapshot --batch-mode --errors --no-transfer-progress jacoco-aggregator:report-aggregate-all coveralls:report -DrepoToken=$COVERALLS_REPO_TOKEN

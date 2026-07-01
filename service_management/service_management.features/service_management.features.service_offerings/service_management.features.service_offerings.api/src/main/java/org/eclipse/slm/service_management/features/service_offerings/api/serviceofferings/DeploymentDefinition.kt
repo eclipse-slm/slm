@@ -1,0 +1,30 @@
+package org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings
+
+import com.fasterxml.jackson.annotation.*
+import jakarta.persistence.Column
+import org.eclipse.slm.common.model.DeploymentType
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.codesys.CodesysDeploymentDefinition
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.compose.DockerComposeDeploymentDefinition
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.container.DockerContainerDeploymentDefinition
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.kubernetes.KubernetesDeploymentDefinition
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "deploymentType")
+@JsonSubTypes(
+    JsonSubTypes.Type(value = DockerContainerDeploymentDefinition::class, name = "DOCKER_CONTAINER"),
+    JsonSubTypes.Type(value = DockerComposeDeploymentDefinition::class, name = "DOCKER_COMPOSE"),
+    JsonSubTypes.Type(value = KubernetesDeploymentDefinition::class, name = "KUBERNETES"),
+    JsonSubTypes.Type(value = CodesysDeploymentDefinition::class, name = "CODESYS"),
+)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+abstract class DeploymentDefinition(deploymentType: DeploymentType) {
+
+    @Transient
+    private val LOG: Logger = LoggerFactory.getLogger(DeploymentDefinition::class.java)
+
+    @Column(name = "deployment_type")
+    @JsonProperty("deploymentType")
+    var deploymentType: DeploymentType = deploymentType
+}
