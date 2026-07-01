@@ -18,6 +18,7 @@ jobs:
       (startsWith(inputs.branch_ref, 'feature/') || startsWith(inputs.branch_ref, 'fix/')))
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       packages: write
     steps:
       - name: Ensure GitHub CLI is available
@@ -49,10 +50,14 @@ jobs:
 
       - name: Delete branch Docker images from GHCR
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GHCR_CLEANUP_TOKEN != '' && secrets.GHCR_CLEANUP_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           command -v gh >/dev/null 2>&1 || { echo "gh CLI is required but not installed"; exit 1; }
+
+          successful_deletions=()
+          failed_deletions=()
+          attempted_deletions=0
 
           BRANCH_REF="${{ github.event.ref }}"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.branch_ref }}" ]; then
@@ -66,30 +71,20 @@ jobs:
           echo "Cleaning up images for branch ref: ${BRANCH_REF}"
           echo "Cleaning up images for branch tag: ${BRANCH_TAG}"
 
-          PACKAGE_SCOPE="repo"
-          mapfile -t PACKAGES < <(
-            gh api --paginate \
-              --method GET \
-              "/repos/${REPO}/packages" \
-              -f package_type=container \
-              -f per_page=100 \
-              --jq '.[].name' \
-              2>/dev/null || true
-          )
-
-          if [ "${#PACKAGES[@]}" -eq 0 ]; then
-            echo "Repo-scoped package API returned no data, trying org-scoped API..."
-            PACKAGE_SCOPE="org"
-            mapfile -t PACKAGES < <(
-              gh api --paginate \
-                --method GET \
-                "/orgs/${ORG}/packages" \
-                -f package_type=container \
-                -f per_page=100 \
-                --jq '.[].name' \
-                2>/dev/null || true
-            )
+          # GHCR container packages in this setup are org-owned; query org package inventory.
+          PACKAGES_RAW=""
+          if ! PACKAGES_RAW=$(gh api --paginate \
+            --method GET \
+            "/orgs/${ORG}/packages" \
+            -f package_type=container \
+            -f per_page=100 \
+            --jq '.[].name'); then
+            echo "Failed to list org container packages for '${ORG}'."
+            echo "If GITHUB_TOKEN is insufficient, add secret GHCR_CLEANUP_TOKEN with read:packages + delete:packages (and SSO enabled if required)."
+            exit 1
           fi
+
+          mapfile -t PACKAGES <<< "${PACKAGES_RAW}"
 
           if [ "${#PACKAGES[@]}" -eq 0 ]; then
             echo "No container packages found for cleanup."
@@ -98,35 +93,85 @@ jobs:
 
           for pkg in "${PACKAGES[@]}"; do
               [ -z "$pkg" ] && continue
-              if [[ "$pkg" =~ [[:space:]{}] ]]; then
-                echo "Skipping unexpected package value: $pkg"
-                continue
-              fi
 
               # Package names containing '/' must be URL-encoded (/ -> %2F)
               ENCODED_PKG=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$pkg")
 
-              if [ "$PACKAGE_SCOPE" = "repo" ]; then
-                VERSIONS_ENDPOINT="/repos/${REPO}/packages/container/${ENCODED_PKG}/versions"
-                DELETE_ENDPOINT_PREFIX="/repos/${REPO}/packages/container/${ENCODED_PKG}/versions"
+              REPO_DELETE_ENDPOINT_PREFIX="/repos/${REPO}/packages/container/${ENCODED_PKG}/versions"
+              ORG_DELETE_ENDPOINT_PREFIX="/orgs/${ORG}/packages/container/${ENCODED_PKG}/versions"
+
+              VERSION_IDS_RAW=""
+              DELETE_ENDPOINT_PREFIX=""
+
+              # Some GHCR packages are repo-scoped, others org-scoped. Detect the scope per package.
+              if VERSION_IDS_RAW=$(gh api --paginate \
+                --method GET \
+                "${REPO_DELETE_ENDPOINT_PREFIX}" \
+                -f per_page=100 \
+                --jq ".[] | select(.metadata.container.tags // [] | index(\"${BRANCH_TAG}\") != null) | .id" \
+                2>/dev/null); then
+                DELETE_ENDPOINT_PREFIX="${REPO_DELETE_ENDPOINT_PREFIX}"
+              elif VERSION_IDS_RAW=$(gh api --paginate \
+                --method GET \
+                "${ORG_DELETE_ENDPOINT_PREFIX}" \
+                -f per_page=100 \
+                --jq ".[] | select(.metadata.container.tags // [] | index(\"${BRANCH_TAG}\") != null) | .id" \
+                2>/dev/null); then
+                DELETE_ENDPOINT_PREFIX="${ORG_DELETE_ENDPOINT_PREFIX}"
               else
-                VERSIONS_ENDPOINT="/orgs/${ORG}/packages/container/${ENCODED_PKG}/versions"
-                DELETE_ENDPOINT_PREFIX="/orgs/${ORG}/packages/container/${ENCODED_PKG}/versions"
+                echo "Unable to list versions for package ${pkg}; skipping."
+                continue
               fi
 
-              mapfile -t VERSION_IDS < <(
-                gh api --paginate \
-                  --method GET \
-                  "${VERSIONS_ENDPOINT}" \
-                  -f per_page=100 \
-                  --jq ".[] | select(.metadata.container.tags // [] | index(\"${BRANCH_TAG}\") != null) | .id" \
-                  2>/dev/null || true
-              )
+              mapfile -t VERSION_IDS <<< "${VERSION_IDS_RAW}"
 
               for VERSION_ID in "${VERSION_IDS[@]}"; do
                 [ -z "$VERSION_ID" ] && continue
+                attempted_deletions=$((attempted_deletions + 1))
+                deletion_label="${pkg}:${BRANCH_TAG} (id=${VERSION_ID})"
                 echo "Deleting ${pkg}:${BRANCH_TAG} (id=${VERSION_ID})"
-                gh api --method DELETE \
-                  "${DELETE_ENDPOINT_PREFIX}/${VERSION_ID}"
+                if gh api --method DELETE \
+                  "${DELETE_ENDPOINT_PREFIX}/${VERSION_ID}" >/dev/null; then
+                  successful_deletions+=("${deletion_label}")
+                else
+                  echo "Primary delete endpoint failed for ${pkg}. Trying alternate scope..."
+                  alt_endpoint=""
+                  if [ "${DELETE_ENDPOINT_PREFIX}" = "${REPO_DELETE_ENDPOINT_PREFIX}" ]; then
+                    alt_endpoint="${ORG_DELETE_ENDPOINT_PREFIX}/${VERSION_ID}"
+                  else
+                    alt_endpoint="${REPO_DELETE_ENDPOINT_PREFIX}/${VERSION_ID}"
+                  fi
+
+                  if gh api --method DELETE "${alt_endpoint}" >/dev/null; then
+                    successful_deletions+=("${deletion_label}")
+                  else
+                    echo "Delete failed in both scopes for ${deletion_label}"
+                    failed_deletions+=("${deletion_label}")
+                  fi
+                fi
               done
             done
+
+          echo ""
+          echo "Cleanup summary for tag '${BRANCH_TAG}':"
+          echo "- Attempted deletions: ${attempted_deletions}"
+          echo "- Successful deletions: ${#successful_deletions[@]}"
+          echo "- Failed deletions: ${#failed_deletions[@]}"
+
+          echo "Successful deletions:"
+          if [ "${#successful_deletions[@]}" -eq 0 ]; then
+            echo "  (none)"
+          else
+            for item in "${successful_deletions[@]}"; do
+              echo "  - ${item}"
+            done
+          fi
+
+          echo "Failed deletions:"
+          if [ "${#failed_deletions[@]}" -eq 0 ]; then
+            echo "  (none)"
+          else
+            for item in "${failed_deletions[@]}"; do
+              echo "  - ${item}"
+            done
+          fi
