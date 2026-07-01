@@ -71,17 +71,24 @@ jobs:
           echo "Cleaning up images for branch ref: ${BRANCH_REF}"
           echo "Cleaning up images for branch tag: ${BRANCH_TAG}"
 
-          # GHCR container packages in this setup are org-owned; query org package inventory.
           PACKAGES_RAW=""
           if ! PACKAGES_RAW=$(gh api --paginate \
             --method GET \
-            "/orgs/${ORG}/packages" \
-            -f package_type=container \
-            -f per_page=100 \
-            --jq '.[].name'); then
-            echo "Failed to list org container packages for '${ORG}'."
-            echo "If GITHUB_TOKEN is insufficient, add secret GHCR_CLEANUP_TOKEN with read:packages + delete:packages (and SSO enabled if required)."
-            exit 1
+            "/repos/${REPO}/packages?package_type=container&per_page=100" \
+            --jq '.[].name' \
+            2>/tmp/gh-packages-repo.err); then
+            echo "Repo package listing failed, trying org package listing..."
+            cat /tmp/gh-packages-repo.err || true
+            if ! PACKAGES_RAW=$(gh api --paginate \
+              --method GET \
+              "/orgs/${ORG}/packages?package_type=container&per_page=100" \
+              --jq '.[].name' \
+              2>/tmp/gh-packages-org.err); then
+              echo "Failed to list container packages for repo '${REPO}' and org '${ORG}'."
+              cat /tmp/gh-packages-org.err || true
+              echo "If GITHUB_TOKEN is insufficient, add secret GHCR_CLEANUP_TOKEN with read:packages + delete:packages (and SSO enabled if required)."
+              exit 1
+            fi
           fi
 
           mapfile -t PACKAGES <<< "${PACKAGES_RAW}"
@@ -106,15 +113,13 @@ jobs:
               # Some GHCR packages are repo-scoped, others org-scoped. Detect the scope per package.
               if VERSION_IDS_RAW=$(gh api --paginate \
                 --method GET \
-                "${REPO_DELETE_ENDPOINT_PREFIX}" \
-                -f per_page=100 \
+                "${REPO_DELETE_ENDPOINT_PREFIX}?per_page=100" \
                 --jq ".[] | select(.metadata.container.tags // [] | index(\"${BRANCH_TAG}\") != null) | .id" \
                 2>/dev/null); then
                 DELETE_ENDPOINT_PREFIX="${REPO_DELETE_ENDPOINT_PREFIX}"
               elif VERSION_IDS_RAW=$(gh api --paginate \
                 --method GET \
-                "${ORG_DELETE_ENDPOINT_PREFIX}" \
-                -f per_page=100 \
+                "${ORG_DELETE_ENDPOINT_PREFIX}?per_page=100" \
                 --jq ".[] | select(.metadata.container.tags // [] | index(\"${BRANCH_TAG}\") != null) | .id" \
                 2>/dev/null); then
                 DELETE_ENDPOINT_PREFIX="${ORG_DELETE_ENDPOINT_PREFIX}"
