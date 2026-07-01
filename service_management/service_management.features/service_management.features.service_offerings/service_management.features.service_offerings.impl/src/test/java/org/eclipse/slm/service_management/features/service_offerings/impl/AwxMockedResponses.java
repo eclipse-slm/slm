@@ -1,7 +1,5 @@
 package org.eclipse.slm.service_management.features.service_offerings.impl;
 
-import org.eclipse.slm.service_management.features.service_offerings.api.*;
-
 public class AwxMockedResponses {
 
     public final static String GET_PROJECT_RESPONSE_JSON = """
