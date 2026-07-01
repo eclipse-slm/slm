@@ -87,7 +87,9 @@ jobs:
               echo "Failed to list container packages for repo '${REPO}' and org '${ORG}'."
               cat /tmp/gh-packages-org.err || true
               echo "If GITHUB_TOKEN is insufficient, add secret GHCR_CLEANUP_TOKEN with read:packages + delete:packages (and SSO enabled if required)."
-              exit 1
+              failed_deletions+=("PACKAGE_LISTING:${REPO}")
+              failed_deletions+=("PACKAGE_LISTING:${ORG}")
+              PACKAGES_RAW=""
             fi
           fi
 
@@ -95,7 +97,6 @@ jobs:
 
           if [ "${#PACKAGES[@]}" -eq 0 ]; then
             echo "No container packages found for cleanup."
-            exit 0
           fi
 
           for pkg in "${PACKAGES[@]}"; do
@@ -180,3 +181,32 @@ jobs:
               echo "  - ${item}"
             done
           fi
+
+          {
+            echo "## Cleanup Branch Docker Images"
+            echo ""
+            echo "- Branch ref: \\`${BRANCH_REF}\\`"
+            echo "- Branch tag: \\`${BRANCH_TAG}\\`"
+            echo "- Attempted deletions: ${attempted_deletions}"
+            echo "- Successful deletions: ${#successful_deletions[@]}"
+            echo "- Failed deletions: ${#failed_deletions[@]}"
+            echo ""
+            echo "### Successful deletions"
+            if [ "${#successful_deletions[@]}" -eq 0 ]; then
+              echo "- (none)"
+            else
+              for item in "${successful_deletions[@]}"; do
+                echo "- ${item}"
+              done
+            fi
+            echo ""
+            echo "### Failed deletions"
+            if [ "${#failed_deletions[@]}" -eq 0 ]; then
+              echo "- (none)"
+            else
+              for item in "${failed_deletions[@]}"; do
+                echo "- ${item}"
+              done
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
