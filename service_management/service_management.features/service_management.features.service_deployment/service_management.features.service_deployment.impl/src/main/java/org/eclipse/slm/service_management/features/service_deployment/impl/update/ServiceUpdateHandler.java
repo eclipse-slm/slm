@@ -14,9 +14,9 @@ import org.eclipse.slm.service_management.features.service_deployment.api.servic
 import org.eclipse.slm.service_management.features.service_deployment.impl.ServiceInstanceEventType;
 import org.eclipse.slm.service_management.features.service_deployment.impl.deployment.AbstractServiceDeploymentHandler;
 import org.eclipse.slm.service_management.features.service_deployment.impl.deployment.ServiceOrderJpaRepository;
-import org.eclipse.slm.service_management.features.service_deployment.impl.dockercompose.DockerComposeFile;
-import org.eclipse.slm.service_management.features.service_deployment.impl.dockercompose.DockerComposeFileParser;
-import org.eclipse.slm.service_management.features.service_deployment.impl.dockercontainer.DockerContainerServiceOfferingOrderUtil;
+import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.dockercompose.DockerComposeFile;
+import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.dockercompose.DockerComposeFileParser;
+import org.eclipse.slm.service_management.features.service_deployment.impl.deployment.dockercontainer.DockerContainerServiceOfferingOrderUtil;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstanceEventMessageSender;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancesConsulClient;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOptionNotFoundException;

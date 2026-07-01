@@ -11,7 +11,7 @@ public class TestConfig {
 
     // Common
     public static final String DOCKER_HOST = System.getenv().getOrDefault("DOCKER_HOST", "tcp://localhost:2375");
-    public static final String HOST = System.getenv().getOrDefault("TARGET_HOST", "develop.staging.slm.local");
+    public static final String HOST = System.getenv().getOrDefault("TARGET_HOST", "slm.dev-vm.local");
 
     /// Keycloak
     public static final String KEYCLOAK_REALM = System.getenv().getOrDefault("KEYCLOAK_REALM", "fabos");

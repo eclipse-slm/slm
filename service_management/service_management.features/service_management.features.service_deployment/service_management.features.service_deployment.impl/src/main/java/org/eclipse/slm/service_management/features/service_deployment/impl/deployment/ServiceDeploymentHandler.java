@@ -14,10 +14,10 @@ import org.eclipse.slm.service_management.features.service_deployment.api.deploy
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstance;
 import org.eclipse.slm.service_management.features.service_deployment.impl.DeploymentJobRun;
 import org.eclipse.slm.service_management.features.service_deployment.impl.KubernetesManifestFile;
-import org.eclipse.slm.service_management.features.service_deployment.impl.dockercompose.DockerComposeFile;
-import org.eclipse.slm.service_management.features.service_deployment.impl.dockercompose.DockerComposeFileParser;
-import org.eclipse.slm.service_management.features.service_deployment.impl.kubernetes.KubernetesManifestFileParser;
-import org.eclipse.slm.service_management.features.service_deployment.impl.dockercontainer.DockerContainerServiceOfferingOrderUtil;
+import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.dockercompose.DockerComposeFile;
+import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.dockercompose.DockerComposeFileParser;
+import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.kubernetes.KubernetesManifestFileParser;
+import org.eclipse.slm.service_management.features.service_deployment.impl.deployment.dockercontainer.DockerContainerServiceOfferingOrderUtil;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstanceEventMessageSender;
 import org.eclipse.slm.service_management.features.service_deployment.impl.ServiceInstanceEventType;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancesConsulClient;
