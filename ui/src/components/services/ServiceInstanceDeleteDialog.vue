@@ -19,7 +19,7 @@ const emit = defineEmits(['confirmed', 'canceled'])
   <ConfirmDialog
       :show="props.show"
       title="Delete Service Instance"
-      confirm-text="Delete"
+      confirm-button-label="Delete"
       :text="`Do you want to delete the service instance '${props.service?.id}'?`"
       :attention="true"
       @confirmed="emit('confirmed')"
