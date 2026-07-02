@@ -45,6 +45,18 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.keycloak.config</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.utils.keycloak</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
             <artifactId>notification_service.model</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
@@ -103,6 +115,12 @@
         <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>service_management.service.app</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
+            <artifactId>service_management.features.service_deployment.api</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

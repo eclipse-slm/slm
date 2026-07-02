@@ -1,10 +1,10 @@
 package org.eclipse.slm.notification_service.service.app.messaging.services;
 
-import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.messaging.AbstractEventMessage;
 import org.eclipse.slm.common.messaging.GenericMessageListener;
 import org.eclipse.slm.notification_service.communication.websocket.NotificationWsService;
 import org.eclipse.slm.notification_service.persistence.api.NotificationRepository;
+import org.eclipse.slm.notification_service.service.app.messaging.UserUtils;
 import org.eclipse.slm.service_management.features.service_deployment.api.events.ServiceInstanceEventMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +18,9 @@ import java.util.*;
 public class ServiceInstanceEventMessageListener extends GenericMessageListener<ServiceInstanceEventMessage> {
 
     private final static Logger LOG = LoggerFactory.getLogger(ServiceInstanceEventMessageListener.class);
+    private static final String POLICY_SERVICE_INSTANCE_PREFIX = "service-instance_";
 
-    private final KeycloakAdminClient keycloakAdminClient;
+    private final UserUtils userUtils;
 
     private final NotificationRepository notificationRepository;
 
@@ -29,25 +30,14 @@ public class ServiceInstanceEventMessageListener extends GenericMessageListener<
 
     protected ServiceInstanceEventMessageListener(ConnectionFactory connectionFactory,
                                                   RabbitTemplate rabbitTemplate,
-                                                  KeycloakAdminClient keycloakAdminClient,
+                                                  UserUtils userUtils,
                                                   NotificationRepository notificationRepository,
                                                   NotificationWsService notificationWsService) {
         super(ServiceInstanceEventMessage.EXCHANGE_NAME, AbstractEventMessage.getRoutingKeyAllEvents(ServiceInstanceEventMessage.ROUTING_KEY_PREFIX),
                 connectionFactory, rabbitTemplate);
-        this.keycloakAdminClient = keycloakAdminClient;
+        this.userUtils = userUtils;
         this.notificationRepository = notificationRepository;
         this.notificationWsService = notificationWsService;
-
-        var realmRoles = this.keycloakAdminClient.getAllRolesOfRealm();
-        // TODO: Refactor way to identify which users should receive notifications for which service instance events. Keyloak roles for each service instance
-        //       no longer exist, so this needs to be adapted.
-
-        for (var role : realmRoles) {
-//            if (role.getName().startsWith(ServiceInstancesConsulClient.KEYCLOAK_ROLE_SERVICE_INSTANCE_PREFIX)) {
-//                var serviceInstanceId = UUID.fromString(role.getName().substring(ServiceInstancesConsulClient.KEYCLOAK_ROLE_SERVICE_INSTANCE_PREFIX.length()));
-//                this.serviceInstanceIdToUserIdsCache.put(serviceInstanceId, this.keycloakAdminClient.getUserIdsAssignedToRole(role.getName()));
-//            }
-        }
     }
 
     @Override
@@ -55,11 +45,11 @@ public class ServiceInstanceEventMessageListener extends GenericMessageListener<
         try {
             List<String> userIds = new ArrayList<>();
             var serviceInstanceId = eventMessage.getServiceInstance().getId();
-//            var roleName = ServiceInstancesConsulClient.getServiceInstanceKeycloakRoleName(serviceInstanceId);
+            var serviceInstancePolicyName = POLICY_SERVICE_INSTANCE_PREFIX + serviceInstanceId;
 
             switch (eventMessage.getEventType()) {
-                case CREATED -> {
-//                    userIds = this.keycloakAdminClient.getUserIdsAssignedToRole(roleName);
+                case CREATED, UPDATED -> {
+                    userIds = this.userUtils.getUserIdsAssociatedToPolicy(serviceInstancePolicyName);
                     this.serviceInstanceIdToUserIdsCache.put(serviceInstanceId, userIds);
                 }
                 case DELETED -> {
