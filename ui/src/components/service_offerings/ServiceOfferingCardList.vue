@@ -10,7 +10,7 @@
   >
     <v-container>
       <v-list-item>
-        <v-list-item-avatar><v-img :src="'data:image/jpeg;base64,' + serviceVendorById(service.serviceVendorId).logo" /></v-list-item-avatar>
+        <v-list-item-avatar><v-img :src="getImageUrl(serviceVendorById(service.serviceVendorId)?.logo)" /></v-list-item-avatar>
         <v-list-item>
           <v-list-item-title class="text-h5">
             {{ service.title }}
@@ -58,6 +58,7 @@
 
 import {useServiceOfferingsStore} from "@/stores/serviceOfferingsStore";
 import {storeToRefs} from "pinia";
+import getImageUrl from "@/utils/imageUtil";
 
 export default {
     name: 'ServiceOfferingCardList',
@@ -75,6 +76,9 @@ export default {
     computed: {
     },
     methods: {
+      getImageUrl (imageData) {
+        return getImageUrl(imageData)
+      },
       serviceClicked (selectedService) {
         this.$router.push({ path: `/services/${selectedService.id}` })
       },
