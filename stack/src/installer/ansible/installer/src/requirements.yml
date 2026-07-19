@@ -4,3 +4,12 @@ collections:
   - community.rabbitmq
   - community.crypto
   - awx.awx
+  - name: https://github.com/eclipse-slm/ansible-collection-slm
+    type: git
+    version: main
+
+roles:
+  - name: eclipse-slm.consul_client
+    src: "git+https://github.com/eclipse-slm/slm-ansible-role-consul-client"
+    scm: git
+    version: main
