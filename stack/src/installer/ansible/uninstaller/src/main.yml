@@ -1,73 +1,86 @@
 - name: "Uninstall SLM"
   hosts: localhost
-  gather_facts: yes
+  gather_facts: true
   become: true
   vars:
     ansible_python_interpreter: /usr/bin/python3
-    compose_project_name: eclipse-slm
+    compose_project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
   pre_tasks:
-    - set_fact:
+    - name: "Set environment facts"
+      ansible.builtin.set_fact:
         ENV:
         SLM_HOSTNAME: "{{ lookup('ansible.builtin.env', 'SLM_HOSTNAME') }}"
         SLM_IP: "{{ lookup('ansible.builtin.env', 'SLM_IP') }}"
         INSTALL_DIRECTORY: "{{ lookup('ansible.builtin.env', 'INSTALL_DIRECTORY') }}"
+
     - name: "Import config from env.yml"
-      include_vars:
+      ansible.builtin.include_vars:
         file: "/env/env.yml"
       loop:
         - "/env/env.yml"
       register: include_vars_env
+
     - name: "Check if env.custom.yml exists"
       ansible.builtin.stat:
         path: "/env/env.custom.yml"
       register: env_custom_file
+
     - name: "Import config from env.custom.yml"
-      include_vars:
+      ansible.builtin.include_vars:
         file: "/env/env.custom.yml"
       when: env_custom_file.stat.exists
       register: include_vars_env_custom
-    - name: "Import config from env.yml"
-      include_vars:
+
+    - name: "Import config from env.override.yml"
+      ansible.builtin.include_vars:
         file: "{{ item }}"
       loop:
         - "/env/env.override.yml"
       register: include_vars_env_override
-    - set_fact:
+
+    - name: "Combine environment facts"
+      ansible.builtin.set_fact:
         ENV: "{{ ENV | combine(include_vars_env.results[0].ansible_facts, recursive=true) }}"
-    - set_fact:
+
+    - name: "Combine environment facts from env.custom.yml"
+      ansible.builtin.set_fact:
         ENV: "{{ ENV | combine(include_vars_env_custom.ansible_facts, recursive=true) }}"
       when: env_custom_file.stat.exists
-    - set_fact:
+
+    - name: "Combine environment facts from env.override.yml"
+      ansible.builtin.set_fact:
         ENV: "{{ ENV | combine(include_vars_env_override.results[0].ansible_facts, recursive=true) }}"
-    - set_fact:
+
+    - name: "Combine environment facts from environment variables"
+      ansible.builtin.set_fact:
         ENV: "{{ ENV | combine({
                     'SLM_HOSTNAME': lookup('ansible.builtin.env', 'SLM_HOSTNAME')
                 }, recursive=True) }}"
   tasks:
     - name: Get running containers, volumes and networks
       community.docker.docker_host_info:
-        containers: yes
+        containers: true
         containers_filters:
           label: "com.docker.compose.project={{ compose_project_name }}"
-        containers_all: yes
-        volumes: yes
+        containers_all: true
+        volumes: true
         volumes_filters:
           label: "com.docker.compose.project={{ compose_project_name }}"
-        networks: yes
+        networks: true
       register: docker_info
 
     - name: Remove containers
       community.docker.docker_container:
         name: "{{ item }}"
         state: absent
-        keep_volumes: no
+        keep_volumes: false
       loop: "{{ docker_info.containers | map(attribute='Id') | list }}"
       async: 60
       poll: 0
       register: async_loop
 
     - name: Wait until containers have been removed
-      async_status:
+      ansible.builtin.async_status:
         jid: "{{ item.ansible_job_id }}"
         mode: status
       retries: 120
@@ -95,5 +108,6 @@
         - deployment
         - config
 
-    - debug:
+    - name: "Display uninstallation success message"
+      ansible.builtin.debug:
         msg: "Eclipse Service Lifecycle Management version '{{ ENV.SLM_VERSION }}' successfully uninstalled"
