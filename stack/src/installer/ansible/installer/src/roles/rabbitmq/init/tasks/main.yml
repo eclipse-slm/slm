@@ -8,23 +8,27 @@
         token: "{{ _consul_token }}"
         key: "config/rabbitmq/data"
       register: rabbitmq_config_consul_response
-    - set_fact:
+
+    - name: "Set RabbitMQ config fact if config exists in Consul"
+      when: rabbitmq_config_consul_response.data.Value is defined
+      ansible.builtin.set_fact:
         app_configs: "{{ app_configs | default({}) | combine(
         { 
           'rabbitmq': rabbitmq_config_consul_response.data.Value | from_yaml
         }, recursive=true) }}"
-      when: rabbitmq_config_consul_response.data.Value is defined
+
     - name: "Update config dictionary and override default values"
-      set_fact:
+      ansible.builtin.set_fact:
         app_configs: "{{ app_configs | default({}) | combine(
           { 
             'rabbitmq': {
-              'host': RABBITMQ.HOST.INTERNAL,
-              'port': RABBITMQ.PORT.INTERNAL,
+              'host': ENV.RABBITMQ.HOST.INTERNAL,
+              'port': ENV.RABBITMQ.PORT.INTERNAL,
             }
           }, recursive=true) }}"
+
     - name: "Create admin user"
-      include_role:
+      ansible.builtin.include_role:
         name: utils
         tasks_from: app_config_add_user
       vars:
@@ -36,32 +40,33 @@
           password: "{{ ENV.RABBITMQ.ADMIN_PASSWORD }}"
 
     - name: "Store RabbitMQ config in Consul"
-      include_role:
-        name: consul/client
+      ansible.builtin.include_role:
+        name: eclipse-slm.consul_client
         tasks_from: store_app_config
       vars:
         _app_name: "rabbitmq"
 
-- set_fact:
+- name: "Generate RabbitMQ docker-compose file"
+  ansible.builtin.set_fact:
     rabbitmq_compose: "{{ lookup('template', 'rabbitmq.yml') }}"
 
 - name: "Start containers"
-  delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+  # delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
   community.docker.docker_compose_v2:
-    project_name: eclipse-slm
+    project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
     definition: "{{ rabbitmq_compose | from_yaml}}"
     state: present
     pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
 
 - name: "Store resulting compose file"
-  template:
+  ansible.builtin.template:
     src: "rabbitmq.yml"
     dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/rabbitmq.yml"
   when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
 
 - name: "Register RabbitMQ at Consul (discovery server)"
-  include_role:
-    name: consul/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
     tasks_from: register_service
   vars:
     _service_name: "{{ ENV.RABBITMQ.HOST.INTERNAL }}"

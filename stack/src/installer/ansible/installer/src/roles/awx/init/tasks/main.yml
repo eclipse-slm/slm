@@ -1,6 +1,6 @@
 ### Inputs
 - name: "Assert inputs of 'awx/init | main.yml'"
-  assert:
+  ansible.builtin.assert:
     that:
       - (vault.url.internal is defined) and (vault.url.internal|length > 0)
       - (_vault_token is defined) and (_vault_token|length > 0)
@@ -10,8 +10,28 @@
       - (_consul_token is defined) and (_consul_token|length > 0)
 
 ### ToDo: Generate separate Consul token for AWX
-- set_fact:
+- name: "AWX | Set AWX Consul token"
+  ansible.builtin.set_fact:
     _awx_consul_token: "{{ _consul_token }}"
+
+- name: "AWX | Disable Apparmor for rsyslogd"
+  when:
+    - (ansible_facts['distribution'] is defined) and (ansible_facts['distribution'] == "Ubuntu")
+    - (ansible_facts['distribution_version'] is defined) and (ansible_facts['distribution_version'] is version('24.04', '>='))
+    - (ansible_facts['virtualization_type'] is defined) and (ansible_facts['virtualization_type'] != "docker")
+  block:
+    - name: "AWX | Disable AppArmor for rsyslogd"
+      ansible.builtin.file:
+        src: /etc/apparmor.d/usr.sbin.rsyslogd
+        dest: /etc/apparmor.d/disable/usr.sbin.rsyslogd
+        state: link
+        force: true
+
+    - name: "AWX | Remove AppArmor profile for rsyslogd"
+      ansible.builtin.command: "apparmor_parser -R /etc/apparmor.d/usr.sbin.rsyslogd"
+      changed_when: false
+      failed_when: false
+
 
 - name: "Store AWX config in Consul"
   block:
@@ -23,14 +43,17 @@
         token: "{{ _consul_token }}"
         key: "config/awx/data"
       register: awx_config_consul_response
-    - set_fact:
+
+    - name: "AWX | Set app configs fact"
+      ansible.builtin.set_fact:
         app_configs: "{{ app_configs | default({}) | combine(
         { 
           'awx': awx_config_consul_response.data.Value | from_yaml
         }, recursive=true) }}"
       when: awx_config_consul_response.data.Value is defined
+
     - name: "AWX | Update config dictionary and override default values"
-      set_fact:
+      ansible.builtin.set_fact:
         app_configs: "{{ app_configs | default({}) | combine(
           { 
             'awx': {
@@ -42,37 +65,41 @@
               }
             }
           }, recursive=true) }}"
+
     - name: "AWX | Create passwords"
       block:
       - name: "AWX | Create AWX admin password"
-        set_fact:
+        ansible.builtin.set_fact:
           ENV: "{{ ENV | combine({
                   'AWX': {
                     'ENV.ADMIN_PASSWORD': lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) 
                     }
                   }, recursive=true) }}"
         when: (ENV.AWX.ADMIN_PASSWORD is not defined) or (ENV.AWX.ADMIN_PASSWORD | length == 0)
+
       - name: "AWX | Update config dictionary and override default values"
-        set_fact:
+        when: (app_configs.awx.users.admin.password is not defined) or (app_configs.awx.users.admin.password | length == 0)
+        ansible.builtin.set_fact:
           app_configs: "{{ app_configs | default({}) | combine(
             { 
               'awx': {
                 'users': { 
                   'admin': {
                     'username': 'admin',
-                    'password': AWX.ADMIN_PASSWORD
+                    'password': ENV.AWX.ADMIN_PASSWORD
                   }
                 }
               }
             }, recursive=true) }}"
-        when: (app_configs.awx.users.admin.password is not defined) or (app_configs.awx.users.admin.password | length == 0)
 
       - name: "AWX | Create AWX JWT Authenticator password"
-        set_fact:
-          awx_jwt_authenticator_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
         when: (app_configs.awx.users.jwt_authenticator.password is not defined) or (app_configs.awx.users.jwt_authenticator.password | length == 0)
+        ansible.builtin.set_fact:
+          awx_jwt_authenticator_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) }}"
+
       - name: "AWX | Update config dictionary and override default values"
-        set_fact:
+        when: (app_configs.awx.users.jwt_authenticator.password is not defined) or (app_configs.awx.users.jwt_authenticator.password | length == 0)
+        ansible.builtin.set_fact:
           app_configs: "{{ app_configs | default({}) | combine(
             { 
               'awx': {
@@ -84,7 +111,6 @@
                 }
               }
             }, recursive=true) }}"
-        when: (app_configs.awx.users.jwt_authenticator.password is not defined) or (app_configs.awx.users.jwt_authenticator.password | length == 0)
 
     - name: "AWX | Store AWX config in Consul"
       community.general.consul_kv:
@@ -94,17 +120,17 @@
         token: "{{ _consul_token }}"
         key: "{{ item.key }}"
         value: "{{ item.value }}"
-      with_items:
+      loop:
         - { key: "config/awx/data", value: "{{ app_configs.awx | to_yaml }}" }
 
     - name: "AWX | Create MINIO password"
-      include_tasks: awx_minio_create_credentials.yml
+      when: (app_configs.awx.minio is not defined)
+      ansible.builtin.include_tasks: awx_minio_create_credentials.yml
       vars:
         _app_name: "awx"
-      when: (app_configs.awx.minio is not defined)
 
     - name: "AWX | Decode Consul token"
-      set_fact:
+      ansible.builtin.set_fact:
         app_configs: "{{ app_configs | combine(
           { 
             'awx': {
@@ -114,17 +140,11 @@
             }
           }, recursive=true) }}"
 
-- debug:
-    var: app_configs
-
 - name: "Create AWX JWT Authenticator config"
-  include_tasks: awx_jwt_authenticator_create_config.yml
+  ansible.builtin.include_tasks: awx_jwt_authenticator_create_config.yml
   vars:
     _awx_jwt_authenticator_username: "{{ app_configs.awx.users.jwt_authenticator.username }}"
     _awx_jwt_authenticator_password: "{{ app_configs.awx.users.jwt_authenticator.password }}"
-
-- debug:
-    var: app_configs
 
 - debug:
     msg: "{{ app_configs.awx_jwt_authenticator }}"
@@ -135,17 +155,19 @@
 - name: "Start AWX"
   block:
     - name: "Create compose definition from template"
-      set_fact:
+      ansible.builtin.set_fact:
         awx_compose: "{{ lookup('template', 'awx.yml') }}"
+
     - name: "Start AWX containers"
-      delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+      # delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
       community.docker.docker_compose_v2:
-        project_name: eclipse-slm
+        project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
         definition: "{{ awx_compose | from_yaml}}"
         state: present
         pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+
     - name: "Wait for AWX ('{{ awx.url.internal }}') being up"
-      uri:
+      ansible.builtin.uri:
         url: "{{ awx.url.internal }}"
         status_code: 200
       register: result
@@ -154,13 +176,13 @@
       delay: 3
 
 - name: "Init AWX"
-  include_tasks: awx_init.yml
+  ansible.builtin.include_tasks: awx_init.yml
   vars:
     _awx_admin_username: "{{ app_configs.awx.users.admin.username }}"
     _awx_admin_password: "{{ app_configs.awx.users.admin.password }}"
 
 - name: "Init AWX JWT Authenticator"
-  include_tasks: awx_jwt_authenticator_init.yml
+  ansible.builtin.include_tasks: awx_jwt_authenticator_init.yml
   vars:
     _awx_admin_username: "{{ app_configs.awx.users.admin.username }}"
     _awx_admin_password: "{{ app_configs.awx.users.admin.password }}"
@@ -168,14 +190,14 @@
     _awx_jwt_authenticator_password: "{{ app_configs.awx.users.jwt_authenticator.password }}"
 
 - name: "Store resulting compose file"
-  template:
+  when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
+  ansible.builtin.template:
     src: "awx.yml"
     dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/awx.yml"
-  when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
 
 - name: "Register AWX instance at Consul (discovery server)"
-  include_role:
-    name: consul/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
     tasks_from: register_service
   vars:
     _service_name: awx
@@ -187,8 +209,8 @@
       - "exposed"
 
 - name: "Register AWX database at Consul (discovery server)"
-  include_role:
-    name: consul/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
     tasks_from: register_service
   vars:
     _service_name: awx-postgres

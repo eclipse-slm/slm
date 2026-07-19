@@ -109,15 +109,21 @@
       _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
       client_id: "{{ awx_keycloak_client.client_id }}"
 
-  - name: "Create OIDC JSON Object"
-    set_fact:
+  - name: "Create OIDC JSON Object (no-string)"
+    when: keycloak_oidc_json is not string
+    ansible.builtin.set_fact:
       keycloak_oidc_settings: "{{ keycloak_oidc_json }}"
 
+  - name: "Create OIDC JSON Object (string)"
+    when: keycloak_oidc_json is string
+    ansible.builtin.set_fact:
+      keycloak_oidc_settings: "{{ keycloak_oidc_json | from_json }}"
+
   - name: "Create OIDC Settings"
-    set_fact:
+    ansible.builtin.set_fact:
       new_oidc: "{{ lookup('template', 'oidc_settings.json.j2') }}"
 
-  - assert:
+  - ansible.builtin.assert:
       that:
         - (keycloak_oidc_settings is defined) and (keycloak_oidc_settings|length > 0)
       fail_msg: "Get of Keycloak OIDC settings failed"
@@ -128,10 +134,10 @@
       controller_username: "{{ _awx_admin_username }}"
       controller_password: "{{ _awx_admin_password }}"
       settings: "{{ new_oidc }}"
-      validate_certs: False
+      validate_certs: false
 
   - name: "Create Auth Mapping Settings"
-    set_fact:
+    ansible.builtin.set_fact:
       auth_mapping: "{{ lookup('template', 'auth_mapping_settings.json.j2') }}"
 
   - name: "Configure Auth Organization and Team Map "
@@ -140,4 +146,4 @@
       controller_username: "{{ _awx_admin_username }}"
       controller_password: "{{ _awx_admin_password }}"
       settings: "{{ auth_mapping }}"
-      validate_certs: False
+      validate_certs: false

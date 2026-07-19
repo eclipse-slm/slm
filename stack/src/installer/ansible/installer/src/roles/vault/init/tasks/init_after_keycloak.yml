@@ -1,10 +1,10 @@
 ### Inputs
 - name: "Assert inputs of 'vault/init | init_after_keycloak.yml'"
-  assert:
+  ansible.builtin.assert:
     that:
       - (vault.url.internal is defined) and (vault.url.internal|length > 0)                   # URL of the Vault instance
-      - (ENV.VAULT.SCHEME.INTERNAL is defined) and (ENV.CONSUL.SCHEME.INTERNAL|length > 0)    # Scheme of the Vault instance
-      - (ENV.VAULT.HOST.INTERNAL is defined) and (ENV.CONSUL.HOST.INTERNAL|length > 0)        # Host of the Vault instance
+      - (ENV.VAULT.SCHEME.INTERNAL is defined) and (ENV.VAULT.SCHEME.INTERNAL|length > 0)     # Scheme of the Vault instance
+      - (ENV.VAULT.HOST.INTERNAL is defined) and (ENV.VAULT.HOST.INTERNAL|length > 0)         # Host of the Vault instance
       - (ENV.VAULT.PORT.INTERNAL is defined)                                                  # Port of the Vault instance
       - (_vault_root_token is defined) and (_vault_root_token|length > 0)                     # Root token to authenticate with Vault
       - (keycloak.url.external_without_port is defined) and (keycloak.url.external_without_port|length > 0) # External URL of Keycloak without port (required for OIDC discovery URL)
@@ -12,10 +12,10 @@
 
 - name: "Store config"
   block:
-    - set_fact:
+    - ansible.builtin.set_fact:
         vault_config_consul:
-    - import_role:
-        name: consul/client
+    - ansible.builtin.import_role:
+        name: eclipse-slm.consul_client
         tasks_from: create_or_add_config
       vars:
         _config:
@@ -26,8 +26,8 @@
             root: "{{ _vault_root_token }}"
 
 - name: "Register Vault instance at Consul (discovery server)"
-  include_role:
-    name: consul/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
     tasks_from: register_service
   vars:
     _service_name: vault
@@ -38,7 +38,7 @@
       - "vault"
 
 - name: "Configure JWT auth via Keycloak"
-  import_role:
+  ansible.builtin.import_role:
     name: vault/client
     tasks_from: configure_keycloak_jwt_auth_method
   vars:

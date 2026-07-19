@@ -1,17 +1,18 @@
-- set_fact:
+---
+- name: "Generate docker-compose file"
+  ansible.builtin.set_fact:
     monitoring_compose: "{{ lookup('template', 'monitoring.yml') }}"
 
 - name: "Start containers"
-  delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
   community.docker.docker_compose_v2:
-    project_name: eclipse-slm
+    project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
     definition: "{{ monitoring_compose | from_yaml}}"
     state: present
     pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
 
 - name: "Store config in Consul"
-  include_role:
-    name: consul/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
     tasks_from: create_or_add_config
   vars:
     _app_name: "monitoring"
@@ -26,14 +27,14 @@
         port: "{{ ENV.MONITORING.PROMETHEUS_AAS.PORT.INTERNAL }}"
 
 - name: "Store resulting compose file"
-  template:
+  ansible.builtin.template:
     src: "monitoring.yml"
     dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/monitoring.yml"
   when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
 
 - name: "Register Prometheus instance at Consul (discovery server)"
-  include_role:
-    name: consul/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
     tasks_from: register_service
   vars:
     _service_name: prometheus

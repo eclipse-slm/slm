@@ -1,38 +1,41 @@
-- set_fact:
+---
+- name: "Generate AAS compose file"
+  ansible.builtin.set_fact:
     aas_compose: "{{ lookup('template', 'aas.yml') }}"
 
 - name: "Add configuration for AAS GUI"
   block:
   - name: "Ensure AAS GUI config directory exists"
-    delegate_to: "{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}"
+    # delegate_to: "{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}"
     ansible.builtin.file:
       path: "/install/config/aas-gui"
       state: directory
       mode: "0755"
+    
   - name: "Write basyx-infra.yml for AAS GUI"
-    delegate_to: "{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}"
+    # delegate_to: "{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}"
     ansible.builtin.template:
       src: "basyx-infra.yml"
       dest: "/install/config/aas-gui/basyx-infra.yml"
       mode: "0644"
 
 - name: "Start containers"
-  delegate_to: "{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}"
+  # delegate_to: "{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}"
   community.docker.docker_compose_v2:
-    project_name: eclipse-slm
+    project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
     definition: "{{ aas_compose | from_yaml}}"
     state: present
     pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
 
 - name: "Store resulting compose file"
-  template:
+  ansible.builtin.template:
     src: "aas.yml"
     dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/aas.yml"
   when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
 
 - name: "Register AAS components at Consul (discovery server)"
-  include_role:
-    name: consul/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
     tasks_from: register_service
   vars:
     _service_name: "{{ item.name }}"
@@ -109,13 +112,13 @@
       additional_tags:
         - "aas"
         - "exposed"
-        - "traefik.http.routers.aas-ui.rule=PathPrefix(`{{ AAS.AAS_GUI.PATH.EXTERNAL }}/`)"
+        - "traefik.http.routers.aas-ui.rule=PathPrefix(`{{ ENV.AAS.AAS_GUI.PATH.EXTERNAL }}/`)"
       meta:
         path: "{{ ENV.AAS.AAS_GUI.PATH.INTERNAL }}"
 
 - name: "Register AAS broker at Consul (discovery server)"
-  include_role:
-    name: consul/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
     tasks_from: register_service
   vars:
     _service_name: aas-broker
@@ -125,8 +128,8 @@
     _additional_tags: [ "aas" ]
 
 - name: "Register AAS database at Consul (discovery server)"
-  include_role:
-    name: consul/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
     tasks_from: register_service
   vars:
     _service_name: aas-database

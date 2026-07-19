@@ -1,0 +1,10 @@
+scheme: {{ ENV.KEYCLOAK.SCHEME.INTERNAL }}
+host: {{ ENV.KEYCLOAK.HOST.INTERNAL }}
+port: {{ ENV.KEYCLOAK.PORT.INTERNAL }}
+users:
+  admin:
+    username: admin
+    password: {{ ENV.KEYCLOAK.ADMIN_PASSWORD }}
+database:
+  password: {{ ENV.KEYCLOAK.DATABASE.PASSWORD }}
+  root_password: {{ ENV.KEYCLOAK.DATABASE.ROOT_PASSWORD }}

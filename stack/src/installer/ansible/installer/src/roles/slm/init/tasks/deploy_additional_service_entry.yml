@@ -18,7 +18,7 @@
     fail_msg: "ADDITIONAL_SERVICES.{{ additional_service_definition.key }}.COMPOSE_DEFINITION must be a compose mapping with at least one service."
 
 - name: "Start additional service stack '{{ additional_service_definition.key }}'"
-  delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+  # delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
   community.docker.docker_compose_v2:
     project_name: "{{ additional_service_definition.value.PROJECT_NAME | default(ENV.COMPOSE_PROJECT_NAME) }}"
     definition: "{{ additional_service_compose_definition }}"

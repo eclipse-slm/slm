@@ -1,6 +1,6 @@
 ### Inputs
 - name: "Assert inputs of 'vault/client | create_approle.yml'"
-  assert:
+  ansible.builtin.assert:
     that:
       - (vault.url.internal is defined) and (vault.url.internal|length > 0)           # URL of Vault
       - (_vault_token is defined) and (_vault_token|length > 0)     # Token to authenticate with Vault
@@ -9,9 +9,9 @@
       - (_approle_name is defined) and (_approle_name|length > 0)   # Name of the app rol to be created
 
 - name: "Create app role '{{ _approle_name }}'"
-  uri:
+  ansible.builtin.uri:
     url: "{{ vault.url.internal }}/v1/auth/approle/role/{{ _approle_name }}"
-    validate_certs: no
+    validate_certs: false
     method: POST
     headers:
       X-Vault-Token: "{{ _vault_token }}"
@@ -19,9 +19,9 @@
   no_log: false
 
 - name: "Set app role id to app role name '{{ _approle_name }}'"
-  uri:
+  ansible.builtin.uri:
     url: "{{ vault.url.internal }}/v1/auth/approle/role/{{ _approle_name }}/role-id"
-    validate_certs: no
+    validate_certs: false
     method: POST
     headers:
       X-Vault-Token: "{{ _vault_token }}"
@@ -32,9 +32,9 @@
   no_log: false
 
 - name: "Create secret id for app role with id '{{ _approle_name }}'"
-  uri:
+  ansible.builtin.uri:
     url: "{{ vault.url.internal }}/v1/auth/approle/role/{{ _approle_name }}/secret-id"
-    validate_certs: no
+    validate_certs: false
     method: POST
     headers:
       X-Vault-Token: "{{ _vault_token }}"
@@ -42,13 +42,14 @@
   register: request_secret_id
   no_log: false
 
-- set_fact:
+- name: "Set fact for role id and secret id of app role '{{ _approle_name }}'"
+  ansible.builtin.set_fact:
     role_id: "{{ _approle_name }}"
     secret_id: "{{ request_secret_id.json.data.secret_id }}"
 
 - name: "Store config for app role '{{ _approle_name }}' in Consul"
-  include_role:
-    name: consul/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
     tasks_from: create_or_add_config
   vars:
     _app_name: "{{ _approle_name }}"
@@ -59,6 +60,7 @@
           secret-id: '{{ secret_id}}'
 
 ### Outputs
-- set_fact:
+- name: "Set facts for outputs"
+  ansible.builtin.set_fact:
     vault_approle_role_id: "{{ role_id }}"        # Role id of the created app role
     vault_approle_secret_id: "{{ secret_id }}"    # Secret id of the created app role

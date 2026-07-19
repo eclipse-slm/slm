@@ -52,7 +52,7 @@
 
 - name: "Traefik | Start Traefik containers"
   community.docker.docker_compose_v2:
-    project_name: eclipse-slm
+    project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
     definition: "{{ traefik_compose | from_yaml}}"
     state: present
     pull: "{{ ENV.PULL_DOCKER_IMAGES }}"

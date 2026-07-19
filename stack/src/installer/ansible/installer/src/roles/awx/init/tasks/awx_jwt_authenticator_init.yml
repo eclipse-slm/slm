@@ -1,6 +1,6 @@
 ### Inputs
 - name: "Assert inputs of 'awx/init | awx_jwt_authenticator_init.yml'"
-  assert:
+  ansible.builtin.assert:
     that:
       - (awx.url.internal is defined) and (awx.url.internal|length > 0)
       - (_awx_admin_username is defined) and (_awx_admin_username|length > 0)
@@ -24,8 +24,8 @@
         superuser: yes
         state: present
     - name: "Add AWX JWT authenticator username and password in Consul"
-      include_role:
-        name: consul/client
+      ansible.builtin.include_role:
+        name: eclipse-slm.consul_client
         tasks_from: create_or_add_config
       vars:
         _config:
@@ -34,7 +34,7 @@
             password: '{{ _awx_jwt_authenticator_password}}'
 
 - name: "Create application 'awx_jwt_authenticator'"
-  include_role:
+  ansible.builtin.include_role:
     name: awx/client
     tasks_from: application_create.yml
   vars:

@@ -1,6 +1,6 @@
 ### Inputs
 - name: "Assert inputs of 'keycloak/init | main.yml'"
-  assert:
+  ansible.builtin.assert:
     that:
       - (keycloak.url.external is defined) and (keycloak.url.external|length > 0)
       - (ENV.KEYCLOAK.ADMIN_USERNAME is defined) and (ENV.KEYCLOAK.ADMIN_USERNAME|length > 0)
@@ -20,22 +20,25 @@
       key: "config/keycloak/data"
     register: keycloak_config_consul
 
-  - set_fact:
+  - name: "Set keycloak_config fact if config exists in Consul"
+    ansible.builtin.set_fact:
       keycloak_config: "{{ keycloak_config_consul.data.Value | from_yaml }}"
     when: keycloak_config_consul.data.Value is defined
 
   - name: "Create Keycloak config"
+    when: keycloak_config_consul.data.Value is not defined
     block:
     - name: "Create admin password"
-      set_fact:
+      ansible.builtin.set_fact:
         ENV: "{{ ENV | combine( {
                 'KEYCLOAK': { 
                     'ADMIN_PASSWORD': lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) 
                   }
                 }, recursive=true) }}"
       when: (ENV.KEYCLOAK.ADMIN_PASSWORD is not defined) or (ENV.KEYCLOAK.ADMIN_PASSWORD | default([]) | length == 0)
+
     - name: "Create database password"
-      set_fact:
+      ansible.builtin.set_fact:
         ENV: "{{ ENV | combine({
                 'KEYCLOAK':{ 
                   'DATABASE': { 
@@ -44,8 +47,9 @@
                   }
                 }, recursive=true) }}"
       when: (ENV.KEYCLOAK.DATABASE.PASSWORD is not defined) or (ENV.KEYCLOAK.DATABASE.PASSWORD | default([]) | length == 0)
+
     - name: "Create database root password"
-      set_fact:
+      ansible.builtin.set_fact:
         ENV: "{{ ENV | combine({
                 'KEYCLOAK': { 
                   'DATABASE': { 
@@ -54,24 +58,11 @@
                   }
                 }, recursive=true) }}"
       when: (ENV.KEYCLOAK.DATABASE.ROOT_PASSWORD is not defined) or (ENV.KEYCLOAK.DATABASE.ROOT_PASSWORD | default([]) | length == 0)
+
     - name: "Update keycloak_config dictionary and override default values"
-      set_fact:
-        keycloak_config: "{{ keycloak_config | combine(
-        { 'scheme': '{{ ENV.KEYCLOAK.SCHEME.INTERNAL }}',
-          'host': '{{ ENV.KEYCLOAK.HOST.INTERNAL }}',
-          'port': '{{ ENV.KEYCLOAK.PORT.INTERNAL }}',
-          'users': {
-            'admin': {
-              'username': 'admin',
-              'password': '{{ ENV.KEYCLOAK.ADMIN_PASSWORD }}'
-            }
-          },
-          'database': {
-            'password': '{{ ENV.KEYCLOAK.DATABASE.PASSWORD }}',
-            'root_password': '{{ ENV.KEYCLOAK.DATABASE.ROOT_PASSWORD }}'
-          }
-        }
-        , recursive=true) }}"
+      ansible.builtin.set_fact:
+        keycloak_config: "{{ keycloak_config | default({}) | combine( lookup('template', 'keycloak_config.j2') | from_yaml, recursive=true) }}"
+
     - name: "Store Keycloak config in Consul"
       community.general.consul_kv:
         scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
@@ -80,13 +71,12 @@
         token: "{{ _consul_token }}"
         key: "{{ item.key }}"
         value: "{{ item.value }}"
-      with_items:
+      loop:
         - { key: "config/keycloak/data", value: "{{ keycloak_config | to_yaml }}"  }
-    when: keycloak_config_consul.data.Value is not defined
 
 - name: "Register Keycloak instance at Consul (discovery server)"
-  include_role:
-    name: consul/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
     tasks_from: register_service
   vars:
     _service_name: auth
@@ -98,8 +88,8 @@
       - "exposed"
 
 - name: "Register Keycloak database at Consul (discovery server)"
-  include_role:
-    name: consul/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
     tasks_from: register_service
   vars:
     _service_name: "{{ ENV.KEYCLOAK.DATABASE.HOST.INTERNAL }}"
@@ -114,17 +104,19 @@
 - name: "Start Keycloak containers"
   block:
     - name: "Create compose definition from template"
-      set_fact:
+      ansible.builtin.set_fact:
         keycloak_compose: "{{ lookup('template', 'keycloak.yml') }}"
+
     - name: "Start containers"
-      delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+      # delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
       community.docker.docker_compose_v2:
-        project_name: eclipse-slm
+        project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
         definition: "{{ keycloak_compose | from_yaml}}"
         state: present
         pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+
     - name: "Wait for Keycloak ('{{ keycloak.url.external }}') being up"
-      uri:
+      ansible.builtin.uri:
         url: "{{ keycloak.url.external }}"
         validate_certs: false
         status_code: 200
@@ -136,12 +128,12 @@
 - name: "Initialize Keycloak"
   block:
   - name: "Get admin access token"
-    include_role:
+    ansible.builtin.include_role:
       name: keycloak/client
       tasks_from: authentication/get_admin_access_token.yml
 
   - name: "Create realms"
-    include_role:
+    ansible.builtin.include_role:
       name: "keycloak/client"
       tasks_from: realms/create_realm.yml
     vars:
@@ -150,27 +142,27 @@
     loop: "{{ keycloak_realms }}"
 
   - name: "Create realm roles"
-    include_role:
+    ansible.builtin.include_role:
       name: "keycloak/client"
       tasks_from: roles/create_realm_role.yml
     vars:
       _keycloak_access_token: "{{ keycloak_access_token }}"
       _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
       _keycloak_realm_role: "{{ item }}"
-    with_items: "{{ keycloak_realm_roles }}"
+    loop: "{{ keycloak_realm_roles }}"
 
   - name: "Create groups"
-    include_role:
+    ansible.builtin.include_role:
       name: "keycloak/client"
       tasks_from: groups/create_group.yml
     vars:
       _keycloak_access_token: "{{ keycloak_access_token }}"
       _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
       _keycloak_group: "{{ item }}"
-    with_items: "{{ keycloak_groups_top_level }}"
+    loop: "{{ keycloak_groups_top_level }}"
 
 - name: "Store resulting compose file"
-  template:
+  ansible.builtin.template:
     src: "keycloak.yml"
     dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/keycloak.yml"
   when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)

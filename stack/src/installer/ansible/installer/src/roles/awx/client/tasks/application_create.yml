@@ -9,6 +9,12 @@
 
 - include_tasks: organization_get.yml
 
+- debug:
+    var: awx_organization
+
+- debug:
+    var: awx_organization.id
+
 - name: "Delete application '{{ awx_application_name }}' if exists"
   awx.awx.application:
     controller_host: "{{ awx.url.internal }}"

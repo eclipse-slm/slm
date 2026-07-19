@@ -1,5 +1,6 @@
+---
 - name: "SLM | Create and store configs"
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: "create_and_store_config.yml"
   vars:
     _app_name: "{{ item.app_name }}"
@@ -13,7 +14,7 @@
     database_schema: "{{ item.app_name }}"
     security_auth_api_key_enabled: "{{ item.security_auth_api_key_enabled | default(false) }}"
     security_auth_api_key_value: "{{ item.security_auth_api_key_value | default('') }}"
-  with_items:
+  loop:
     - app_name: platform_management
       database_host: "{{ ENV.PLATFORM_MANAGEMENT.DATABASE.HOST.INTERNAL }}"
       database_port: "{{ ENV.PLATFORM_MANAGEMENT.DATABASE.PORT.INTERNAL }}"
@@ -59,36 +60,36 @@
       consul_app_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
 
 - name: "SLM | Create RabbitMQ exchanges"
-  include_role:
+  ansible.builtin.include_role:
     name: rabbitmq/client
     tasks_from: add_exchange
   vars:
-      _exchange_name: "{{ item }}"
+    _exchange_name: "{{ item }}"
   loop:
-      - "resources"
-      - "services"
-      - "notifications"
+    - "resources"
+    - "services"
+    - "notifications"
 
 - name: "Create Minio access"
-  include_tasks: "create_and_store_minio_config.yml"
+  ansible.builtin.include_tasks: "create_and_store_minio_config.yml"
   vars:
     _app_name: "{{ item }}"
-  with_items:
+  loop:
     - "service_management"
     - "resource_management"
 
 - name: "Get Keycloak admin access token"
-  include_role:
+  ansible.builtin.include_role:
     name: keycloak/client
     tasks_from: authentication/get_admin_access_token.yml
 
 - name: "Configure Keycloak"
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: "configure_keycloak.yml"
 
 - name: "Create Consul role for Keycloak clients"
-  include_role:
-    name: consul/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
     tasks_from: create_role
   vars:
     _role_name: "{{ item.consul_role.name }}"
@@ -98,22 +99,24 @@
   loop: "{{ keycloak_clients }}"
 
 - name: "Configure Vault"
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: "configure_vault.yml"
 
 - name: "Start SLM components | Platform Management"
   block:
-    - set_fact:
+    - name: "Set SLM compose fact"
+      ansible.builtin.set_fact:
         slm_compose: "{{ lookup('template', 'slm-platform-management.yml') }}"
+
     - name: "Start containers"
-      delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
       community.docker.docker_compose_v2:
-        project_name: eclipse-slm
+        project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
         definition: "{{ slm_compose | from_yaml }}"
         state: present
         pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+
     - name: "Store resulting compose files"
-      template:
+      ansible.builtin.template:
         src: "slm-platform-management.yml"
         dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/slm.platform-management.yml"
       when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
@@ -121,7 +124,7 @@
 - name: "Create SLM default users"
   block:
     - name: "Wait for Platform Management ('{{ platform_management.url.internal }}/actuator/health') being up"
-      uri:
+      ansible.builtin.uri:
         url: "{{ platform_management.url.internal }}/actuator/health"
         status_code: 200
         return_content: true
@@ -130,7 +133,7 @@
       retries: 120
       delay: 3
     - name: "Create user '{{ USER.USERNAME }}' via Platform Management API"
-      uri:
+      ansible.builtin.uri:
         url: "{{ platform_management.url.internal }}/users"
         method: POST
         body_format: json
@@ -151,34 +154,36 @@
 
 - name: "Start SLM components | Rest of SLM components"
   block:
-    - set_fact:
+    - name: "Set SLM compose fact"
+      ansible.builtin.set_fact:
         slm_compose: "{{ lookup('template', 'slm.yml') }}"
+
     - name: "Start containers"
-      delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
       community.docker.docker_compose_v2:
-        project_name: eclipse-slm
+        project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
         definition: "{{ slm_compose | from_yaml}}"
         state: present
         pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+
     - name: "Store resulting compose files"
-      template:
+      ansible.builtin.template:
         src: "slm.yml"
         dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/slm.yml"
       when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
 
 - name: "Start SLM components | Drivers (optional)"
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: "deploy_drivers.yml"
   when: ENV.RESOURCE_MANAGEMENT.DRIVERS.ENABLED | default(false)
 
 - name: "Start SLM components | Additional services (optional)"
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: "deploy_additional_services.yml"
   when: (ENV.ADDITIONAL_SERVICES | default({}) | length) > 0
 
 - name: "Register UI at Consul (discovery server)"
-  include_role:
-    name: consul/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
     tasks_from: register_service
   vars:
     _service_name: ui
@@ -191,6 +196,6 @@
       - "traefik.http.routers.ui.rule=PathPrefix(`/`)"
 
 - name: "Start SLM components | Catalog Service"
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: "deploy_catalog.yml"
   when: ENV.SLM_CATALOG_SERVICE.ENABLED | default(true)

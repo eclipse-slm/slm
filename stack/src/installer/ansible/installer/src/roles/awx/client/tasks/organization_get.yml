@@ -1,4 +1,4 @@
-- assert:
+- ansible.builtin.assert:
     that:
       - (awx.url.internal is defined) and (awx.url.internal|length > 0)
       - (awx_username is defined) and (awx_username|length > 0)
@@ -6,16 +6,17 @@
       - (awx_organization_name is defined) and (awx_organization_name|length > 0)
 
 - name: "Get organizations"
-  uri:
+  ansible.builtin.uri:
     url: "{{ awx.url.internal }}/api/v2/organizations"
     method: GET
-    force_basic_auth: yes
+    force_basic_auth: true
     url_username: "{{ awx_username }}"
     url_password: "{{ awx_password }}"
     status_code: 200
   register: output_get_organizations
 
-- set_fact:
-    awx_organization: "{{ output_get_organizations.json.results | json_query(query) | first }} "
+- name: "Set awx_organization fact for organization '{{ awx_organization_name }}'"
+  ansible.builtin.set_fact:
+    awx_organization: "{{ output_get_organizations.json.results | json_query(filter) | first }}"
   vars:
-    query: "[?name=='{{ awx_organization_name }}']"
+    filter: "[?name=='{{ awx_organization_name }}']"

@@ -7,8 +7,8 @@ services:
       options:
         max-file: "{{ ENV.LOGGING_MAX_FILE }}"
         max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
-#    ports:
-#      - "{{ ENV.KEYCLOAK.PORT.EXTERNAL }}:{{ ENV.KEYCLOAK.PORT.INTERNAL }}"
+    ports:
+      - "8080:{{ ENV.KEYCLOAK.PORT.INTERNAL }}"
     depends_on:
       - keycloak-database
     environment:

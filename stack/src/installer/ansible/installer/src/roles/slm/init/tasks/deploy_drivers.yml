@@ -41,7 +41,7 @@
     fail_msg: "RESOURCE_MANAGEMENT.DRIVERS.COMPOSE_DEFINITION must be a compose mapping with at least one service when RESOURCE_MANAGEMENT.DRIVERS.ENABLED is true."
 
 - name: "Start optional driver containers"
-  delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+  # delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
   community.docker.docker_compose_v2:
     project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
     definition: "{{ optional_driver_compose_definition }}"
