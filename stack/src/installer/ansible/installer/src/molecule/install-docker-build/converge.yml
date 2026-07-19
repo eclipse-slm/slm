@@ -1,0 +1,90 @@
+---
+# Purpose: bring the instance to the desired state by running the role under test.
+# Molecule calls this playbook with `molecule converge`.
+- name: Converge
+  hosts: slm
+  gather_facts: true # Disable if your role does not rely on facts
+  become: true
+  vars_files:
+    - defaults/main.yml
+  tasks:
+    - name: "Disable Apparmor for rsyslogd on target host (AWX Bug)"
+      when:
+        - (ansible_facts['distribution'] is defined) and (ansible_facts['distribution'] == "Ubuntu")
+        - (ansible_facts['distribution_version'] is defined) and (ansible_facts['distribution_version'] is version('24.04', '>='))
+        - (ansible_facts['virtualization_type'] is defined) and (ansible_facts['virtualization_type'] != "docker")
+      block:
+        - name: "Disable AppArmor for rsyslogd"
+          ansible.builtin.file:
+            src: /etc/apparmor.d/usr.sbin.rsyslogd
+            dest: /etc/apparmor.d/disable/usr.sbin.rsyslogd
+            state: link
+            force: true
+
+        - name: "Remove AppArmor profile for rsyslogd"
+          ansible.builtin.command: "apparmor_parser -R /etc/apparmor.d/usr.sbin.rsyslogd"
+          changed_when: false
+          failed_when: false
+
+    - name: Make sure target host src dir exists
+      ansible.builtin.file:
+        path: "{{ target_host_src_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Copy Installer src to target host
+      ansible.builtin.synchronize:
+      # ansible.builtin.copy:
+        src: "{{ control_node_src_dir }}"
+        dest: "{{ target_host_src_dir }}"
+        recursive: true
+        compress: true
+        delete: true
+        # owner: root
+        # group: root
+        # mode: "0755"
+        # remote_src: false
+
+    - name: Set INSTALLER_API_COMMAND
+      ansible.builtin.lineinfile:
+        path: "{{ target_host_src_dir }}/.env"
+        regexp: '^INSTALLER_API_COMMAND='
+        line: "INSTALLER_API_COMMAND=install"
+
+    - name: Build and start Installer container on target host
+      community.docker.docker_compose_v2:
+        project_src: "{{ target_host_docker_compose_base_dir }}"
+        build: always
+        state: present
+        recreate: always
+        services:
+          - installer-api
+        pull: never
+
+    - name: Install sshpass on control node
+      ansible.builtin.apt:
+        name: 
+          - sshpass
+          - tailspin
+        state: present
+        update_cache: true
+      delegate_to: localhost
+
+    - name: Print remote commands
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop:
+        - "{{ ssh_cmd }}"
+        - "alias mssh=\"{{ ssh_cmd }}\""
+        - "{{ ssh_cmd }} sudo docker ps"
+        - "alias dockerps=\"{{ ssh_cmd }} sudo docker ps\""
+        - "{{ ssh_cmd }} sudo docker logs -f  eclipse-slm-installer-installer-api-1 2>&1 | tailspin"
+        - "alias dockerlogs=\"{{ ssh_cmd }} sudo docker logs -f  eclipse-slm-installer-installer-api-1 2>&1 | tailspin\""
+      vars:
+        ssh_cmd: "sshpass -p '{{ ansible_password }}' ssh -o StrictHostKeyChecking=no {{ansible_user}}@{{ ansible_host }}"
+
+    # TODO: 
+    # Add Verify for successful installation
+    # Remove Deployment Host?

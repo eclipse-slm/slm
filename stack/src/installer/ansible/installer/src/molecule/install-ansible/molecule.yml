@@ -1,0 +1,76 @@
+---
+# Dependency management (download roles/collections)
+dependency:
+  name: galaxy
+  options:
+    ignore-certs: false
+    ignore-errors: false
+    role-file: requirements.yml
+    requirements-file: requirements.yml
+
+platforms:
+  - name: slm-install-ansible
+    image: quay.io/containerdisks/ubuntu:24.04
+    volume_size: 60Gi
+    instancetype: u1.xlarge
+    groups:
+      - slm
+      - slm-install-ansible
+
+ansible:
+  cfg:
+    defaults:
+      host_key_checking: false
+      verbosity: 1
+    ssh_connection:
+      pipelining: true
+  env:
+    # ANSIBLE-SPECIFIC:
+    ANSIBLE_FORCE_COLOR: "1"
+    ANSIBLE_LOAD_CALLBACK_PLUGINS: "1"
+
+    # ROLE-SPECIFIC:
+    SLM_HOSTNAME: myhost.local
+    SLM_IP: 172.17.0.1
+    SLM_VERSION: 1.5.0-SNAPSHOT
+    INSTALL_DIRECTORY: /opt/eclipse-slm
+    DEPLOYMENT_HOST_HOSTNAME: localhost
+    DEPLOYMENT_HOST_USER:
+    DEPLOYMENT_HOST_PASSWORD:
+
+  executor:
+    backend: ansible-playbook
+    args:
+      ansible_playbook:
+        - --diff
+        - --force-handlers
+        - -e target_host="slm"
+      ansible_navigator:
+        - --mode stdout
+        - --pull-policy missing
+        - --execution-environment-image ghcr.io/ansible/community-ansible-dev-tools:latest
+
+  playbooks:
+    create: ../default/create-kv.yml
+    converge: converge.yml
+    destroy: ../default/destroy-kv.yml
+    cleanup: cleanup.yml
+    prepare: ../default/prepare.yml
+    side_effect: side_effect.yml
+    verify: ../default/verify.yml
+
+scenario:
+  name: install-ansible
+  test_sequence:
+    - dependency
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - side_effect
+    - verify
+    - cleanup
+    - destroy

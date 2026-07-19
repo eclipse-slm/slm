@@ -1,0 +1,6 @@
+---
+roles:
+  - src: "git+https://github.com/eclipse-slm/molecule_kubevirt"
+    scm: git
+    version: main
+    name: fabos.molecule_kubevirt

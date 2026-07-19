@@ -1,0 +1,13 @@
+---
+# Purpose: bring the instance to the desired state by running the role under test.
+# Molecule calls this playbook with `molecule converge`.
+- name: Print Target Host of main.yml
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Display target host
+      ansible.builtin.debug:
+        msg: "Target host is set to: {{ target_host | default('localhost') }}"
+
+- name: Converge - Installer
+  ansible.builtin.import_playbook: ../../main.yml

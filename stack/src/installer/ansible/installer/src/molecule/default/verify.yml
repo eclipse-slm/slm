@@ -1,0 +1,73 @@
+---
+# Purpose: assert that the instance really ended up in the expected state.
+# Molecule calls this playbook with `molecule verify`.
+- name: Verify
+  hosts: slm
+  gather_facts: false # Quicker, if you do not need facts
+  become: true
+  vars:
+    container_name_installer: eclipse-slm-installer-installer-api-1
+    container_names:
+      - vault
+      - consul
+      - keycloak
+      - awx
+      - traefik
+      - minio
+      - aas-gui
+      - aas-environment
+      - aas-registry
+      - submodel-registry
+      - prometheus
+      - service-management
+      - platform-management
+      - resource-management
+      - notification-service
+      - catalog
+      - ui
+    exposed_ports:
+      - 80
+      - 443
+      - 8080
+      - 8081
+      - 8200
+      - 8500
+      - 9001
+      - 9010
+      - 9020
+      - 9080
+      - 9090
+  tasks:
+    - name: Wait for installer container to stop running
+      community.docker.docker_container_info:
+        name: "{{ container_name_installer }}"
+      register: installer_container_info
+      until: not installer_container_info.exists or installer_container_info.container.State.Status == "exited"
+      retries: 60
+      delay: 10
+      changed_when: false
+
+    - name: "Collect container information"
+      community.docker.docker_container_info:
+        name: "eclipse-slm-{{ item }}-1"
+      register: container_info
+      loop: "{{ container_names }}"
+      changed_when: false
+      no_log: true
+
+    - name: Assert Status of containers
+      ansible.builtin.assert:
+        that:
+          - item.container.State.Status in ["running", "healthy"]
+        fail_msg: "Container {{ item.container.Name }} is not running or healthy. Status: {{ item.container.State.Status }}"
+        success_msg: "Container {{ item.container.Name }} is running and healthy."
+      loop: "{{ container_info.results }}"
+      loop_control:
+        label: "{{ item.container.Name }}: {{ item.container.State.Status }}"
+
+    - name: "Check that all expected ports are exposed"
+      ansible.builtin.wait_for:
+        port: "{{ item }}"
+        state: present
+        timeout: 5
+      loop: "{{ exposed_ports }}"
