@@ -1,91 +1,69 @@
 - name: "Define inventory"
-  hosts: localhost
+  hosts: "{{ target_host | default('localhost') }}"
+  become: true
   pre_tasks:
-    - set_fact:
-        ENV:
+    - name: Include env role from eclipse.slm collection
+      ansible.builtin.include_role:
+        name: eclipse.slm.env
+
+    - name: "Set deployment host facts"
+      ansible.builtin.set_fact:
+        DEPLOYMENT_HOST:
           DEPLOYMENT_HOST_HOSTNAME: "{{ lookup('ansible.builtin.env', 'DEPLOYMENT_HOST_HOSTNAME') }}"
           DEPLOYMENT_HOST_USER: "{{ lookup('ansible.builtin.env', 'DEPLOYMENT_HOST_USER') }}"
           DEPLOYMENT_HOST_PASSWORD: "{{ lookup('ansible.builtin.env', 'DEPLOYMENT_HOST_PASSWORD') }}"
+
+    - name: "Combine ENV and deployment host facts"
+      ansible.builtin.set_fact: 
+        ENV: "{{ ENV | combine(DEPLOYMENT_HOST | default({}), recursive=True) }}"
   tasks:
-    - fail:
-        msg: "Deployment target is remote host, but environment variable 'DEPLOYMENT_HOST_HOSTNAME' is not set"
-      when: (ENV.DEPLOYMENT_HOST_HOSTNAME != 'localhost') and (ENV.DEPLOYMENT_HOST_HOSTNAME != '127.0.0.1') and (ENV.DEPLOYMENT_HOST_HOSTNAME != 'slm.local')
-            and ((ENV.DEPLOYMENT_HOST_USER is not defined) or (ENV.DEPLOYMENT_HOST_USER|length == 0))
-    - fail:
-        msg: "Deployment target is remote host, but environment Variable 'DEPLOYMENT_HOST_PASSWORD' is not set"
-      when: (ENV.DEPLOYMENT_HOST_HOSTNAME != 'localhost') and (ENV.DEPLOYMENT_HOST_HOSTNAME != '127.0.0.1') and (ENV.DEPLOYMENT_HOST_HOSTNAME != 'slm.local')
-        and ((ENV.DEPLOYMENT_HOST_PASSWORD is not defined) or (ENV.DEPLOYMENT_HOST_PASSWORD|length == 0))
-    - ansible.builtin.add_host:
-        name: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
-        groups: "slm"
-        ansible_host: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
-        ansible_ssh_user: '{{ ENV.DEPLOYMENT_HOST_USER }}'
-        ansible_ssh_pass: '{{ ENV.DEPLOYMENT_HOST_PASSWORD }}'
-        ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
-      when: (ENV.DEPLOYMENT_HOST_HOSTNAME != 'localhost') and (ENV.DEPLOYMENT_HOST_HOSTNAME != '127.0.0.1') and (ENV.DEPLOYMENT_HOST_HOSTNAME != 'slm.local')
-            and (ENV.DEPLOYMENT_HOST_USER is defined) and (ENV.DEPLOYMENT_HOST_USER|length > 0)
-            and (ENV.DEPLOYMENT_HOST_PASSWORD is defined) and (ENV.DEPLOYMENT_HOST_PASSWORD|length > 0)
-    - ansible.builtin.group_by:
+    - name: When DEPLOYMENT_HOST_HOSTNAME is not empty but not default hostname or localhost
+      when:
+        - ENV.DEPLOYMENT_HOST_HOSTNAME != 'localhost'
+        - ENV.DEPLOYMENT_HOST_HOSTNAME != '127.0.0.1'
+        - ENV.DEPLOYMENT_HOST_HOSTNAME != 'slm.local'
+        - ENV.DEPLOYMENT_HOST_HOSTNAME | length != 0
+      block:
+        - name: "Fail if DEPLOYMENT_HOST_USER is not set"
+          ansible.builtin.fail:
+            msg: "Deployment target is remote host, but environment variable 'DEPLOYMENT_HOST_USER' is not set"
+          when: (ENV.DEPLOYMENT_HOST_USER is not defined) or (ENV.DEPLOYMENT_HOST_USER|length == 0)
+
+        - name: "Fail if DEPLOYMENT_HOST_PASSWORD is not set"
+          ansible.builtin.fail:
+            msg: "Deployment target is remote host, but environment Variable 'DEPLOYMENT_HOST_PASSWORD' is not set"
+          when: (ENV.DEPLOYMENT_HOST_PASSWORD is not defined) or (ENV.DEPLOYMENT_HOST_PASSWORD|length == 0)
+
+        - name: "Add deployment host to inventory"
+          ansible.builtin.add_host:
+            name: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+            groups: "slm"
+            ansible_host: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+            ansible_ssh_user: '{{ ENV.DEPLOYMENT_HOST_USER }}'
+            ansible_ssh_pass: '{{ ENV.DEPLOYMENT_HOST_PASSWORD }}'
+            ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
+          when:
+            - (ENV.DEPLOYMENT_HOST_USER is defined) and (ENV.DEPLOYMENT_HOST_USER|length > 0)
+            - (ENV.DEPLOYMENT_HOST_PASSWORD is defined) and (ENV.DEPLOYMENT_HOST_PASSWORD|length > 0)
+
+    - name: "Add localhost to inventory group 'slm'"
+      ansible.builtin.group_by:
         key: 'slm'
       when: (ENV.DEPLOYMENT_HOST_HOSTNAME == 'localhost') or (ENV.DEPLOYMENT_HOST_HOSTNAME == '127.0.0.1') or (ENV.DEPLOYMENT_HOST_HOSTNAME == 'slm.local')
 
 - name: "Install Service Lifecycle Management"
-  hosts: localhost
-  gather_facts: yes
+  hosts: "{{ target_host | default('localhost') }}"
+  gather_facts: true
   become: true
   vars:
     ansible_python_interpreter: /usr/bin/python3
   vars_files:
     - config.yml
-  pre_tasks:
-    - set_fact:
-        SLM_HOSTNAME: "{{ lookup('ansible.builtin.env', 'SLM_HOSTNAME') }}"
-        SLM_IP: "{{ lookup('ansible.builtin.env', 'SLM_IP') }}"
-        INSTALL_DIRECTORY: "{{ lookup('ansible.builtin.env', 'INSTALL_DIRECTORY') }}"
-    - name: "Import config from env.yml"
-      include_vars:
-        file: "/env/env.yml"
-      loop:
-        - "/env/env.yml"
-      register: include_vars_env
-    - name: "Check if env.custom.yml exists"
-      ansible.builtin.stat:
-        path: "/env/env.custom.yml"
-      register: env_custom_file
-    - name: "Import config from env.custom.yml"
-      include_vars:
-        file: "/env/env.custom.yml"
-      when: env_custom_file.stat.exists
-      register: include_vars_env_custom
-    - name: "Import config from env.yml"
-      include_vars:
-        file: "{{ item }}"
-      loop:
-        - "/env/env.override.yml"
-      register: include_vars_env_override
-    - set_fact:
-        ENV: "{{ ENV | combine(include_vars_env.results[0].ansible_facts, recursive=true) }}"
-    - set_fact:
-        ENV: "{{ ENV | combine(include_vars_env_custom.ansible_facts, recursive=true) }}"
-      when: env_custom_file.stat.exists
-    - set_fact:
-        ENV: "{{ ENV | combine(include_vars_env_override.results[0].ansible_facts, recursive=true) }}"
-    - set_fact:
-        ENV: "{{ ENV | combine({
-                    'SLM_HOSTNAME': lookup('ansible.builtin.env', 'SLM_HOSTNAME')
-                }, recursive=True) }}"
-    - name: "Create directories required by installer"
-      ansible.builtin.file:
-        path: "/install/{{ item }}"
-        state: directory
-        mode: "0755"
-      with_items:
-        - config
-        - deployment
   tasks:
     - name: "Define global variables"
       block:
-        - set_fact:
+        - name: "Define global facts"
+          ansible.builtin.set_fact:
             traefik:
               url:
                 api: "{{ ENV.TRAEFIK.SCHEME.INTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.API_PORT }}"
@@ -124,18 +102,15 @@
                 internal: "{{ ENV.SERVICE_MANAGEMENT.SCHEME.INTERNAL }}://{{ ENV.SERVICE_MANAGEMENT.HOST.INTERNAL }}:{{ ENV.SERVICE_MANAGEMENT.PORT.INTERNAL }}{{ ENV.SERVICE_MANAGEMENT.PATH.INTERNAL }}"
                 external: "{{ ENV.SERVICE_MANAGEMENT.SCHEME.EXTERNAL }}://{{ ENV.SERVICE_MANAGEMENT.HOST.EXTERNAL }}:{{ ENV.SERVICE_MANAGEMENT.PORT.EXTERNAL }}{{ ENV.SERVICE_MANAGEMENT.PATH.EXTERNAL }}"
                 proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.SERVICE_MANAGEMENT.PATH.EXTERNAL }}"
-
             monitoring_service:
               url:
                 internal: "{{ ENV.MONITORING.PROMETHEUS_AAS.SCHEME.INTERNAL }}://{{ ENV.MONITORING.PROMETHEUS_AAS.HOST.INTERNAL }}:{{ ENV.MONITORING.PROMETHEUS_AAS.PORT.INTERNAL }}{{ ENV.MONITORING.PROMETHEUS_AAS.PATH.INTERNAL }}"
                 external: "{{ ENV.MONITORING.PROMETHEUS_AAS.SCHEME.EXTERNAL }}://{{ ENV.MONITORING.PROMETHEUS_AAS.HOST.EXTERNAL }}:{{ ENV.MONITORING.PROMETHEUS_AAS.PORT.EXTERNAL }}{{ ENV.MONITORING.PROMETHEUS_AAS.PATH.EXTERNAL }}"
                 proxy: "{{ ENV.TRAEFIK.SCHEME.EXTERNAL }}://{{ ENV.TRAEFIK.HOST.EXTERNAL }}:{{ ENV.TRAEFIK.HTTPS_PORT }}{{ ENV.MONITORING.PROMETHEUS_AAS.PATH.EXTERNAL }}"
-
             awx:
               url:
                 internal: "{{ ENV.AWX.SCHEME.INTERNAL }}://{{ ENV.AWX.HOST.INTERNAL }}:{{ ENV.AWX.PORT.INTERNAL }}{{ ENV.AWX.PATH.INTERNAL }}"
                 external: "{{ ENV.AWX.SCHEME.EXTERNAL }}://{{ ENV.AWX.HOST.EXTERNAL }}:{{ ENV.AWX.PORT.EXTERNAL }}{{ ENV.AWX.PATH.EXTERNAL }}"
-
             consul:
               url:
                 internal: "{{ ENV.CONSUL.SCHEME.INTERNAL }}://{{ ENV.CONSUL.HOST.INTERNAL }}:{{ ENV.CONSUL.PORT.INTERNAL }}{{ ENV.CONSUL.PATH.INTERNAL }}"
@@ -194,7 +169,8 @@
                   internal: "{{ ENV.MINIO.SCHEME.INTERNAL }}://{{ ENV.MINIO.HOST.INTERNAL }}:{{ ENV.MINIO.CONSOLE_PORT.INTERNAL }}"
                   external: "{{ ENV.MINIO.SCHEME.EXTERNAL }}://{{ ENV.MINIO.HOST.EXTERNAL }}:{{ ENV.MINIO.CONSOLE_PORT.EXTERNAL }}"
 
-        - debug:
+        - name: "Print global facts"
+          ansible.builtin.debug:
             msg:
               catalog_service_internal: "{{ catalog_service.url.internal }}"
               catalog_service_external: "{{ catalog_service.url.external }}"
@@ -231,8 +207,16 @@
               minio_console_internal: "{{ minio.url.console.internal }}"
               minio_console_external: "{{ minio.url.console.external }}"
 
+    - name: Add Service Hostnames to /etc/hosts
+      when:
+        - ansible_facts['virtualization_type'] is defined
+        - ansible_facts['virtualization_type'] not in ['docker', 'podman', 'containerd', 'lxc']
+      ansible.builtin.blockinfile:
+        path: /etc/hosts
+        block: "{{ lookup('template', 'hosts.j2') }}"
+
     - name: "Prepare docker registry logins"
-      set_fact:
+      ansible.builtin.set_fact:
         docker_registry_logins: "{{ ENV.DOCKER_IMAGE_REGISTRY_LOGINS | default([]) }}"
 
     - name: "Login to configured docker registries"
@@ -246,10 +230,11 @@
         ((item.username is defined) and (item.username|length > 0)) and
         ((item.password is defined) and (item.password|length > 0))
 
-    - block:
+    - name: "Create SLM docker network and add installer to it"
+      block:
       - name: "Create docker network for SLM"
         community.docker.docker_compose_v2:
-          project_name: "eclipse-slm"
+          project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
           definition:
             services:
               installer-helper:
@@ -259,31 +244,31 @@
 
       - name: "Add installer to SLM docker network"
         community.docker.docker_network:
-          name: "eclipse-slm_default"
+          name: "{{ ENV.COMPOSE_PROJECT_NAME }}_default"
           connected:
             - "{{ lookup('ansible.builtin.env', 'HOSTNAME') | default('eclipse-slm-installer', true) }}"
           appends: true
 
       - name: "Remove helper container for network creation"
         community.docker.docker_container:
-          name: eclipse-slm-installer-helper-1
+          name: "{{ ENV.COMPOSE_PROJECT_NAME }}-installer-helper-1"
           state: absent
 
     - name: "Start Vault"
-      include_role:
+      ansible.builtin.include_role:
         name: vault/init
       vars:
         _store_compose_dir: "/install/deployment"
 
     - name: "Start Consul"
-      include_role:
+      ansible.builtin.include_role:
         name: consul/init
         tasks_from: start.yml
       vars:
         _store_compose_dir: "/install/deployment"
 
     - name: "Start Traefik"
-      include_role:
+      ansible.builtin.include_role:
         name: traefik/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
@@ -291,14 +276,14 @@
         _vault_root_token: "{{ vault_root_token }}"
 
     - name: "Start Keycloak"
-      include_role:
+      ansible.builtin.include_role:
         name: keycloak/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_dir: "/install/deployment"
 
     - name: "Init Vault after Keycloak available"
-      include_role:
+      ansible.builtin.include_role:
         name: vault/init
         tasks_from: init_after_keycloak.yml
       vars:
@@ -306,27 +291,27 @@
         _vault_root_token: "{{ vault_root_token }}"
 
     - name: "Init Consul"
-      include_role:
+      ansible.builtin.include_role:
         name: consul/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
 
     - name: "Start RabbitMQ"
-      include_role:
+      ansible.builtin.include_role:
         name: rabbitmq/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_dir: "/install/deployment"
 
     - name: "Start Minio"
-      include_role:
+      ansible.builtin.include_role:
         name: minio/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_dir: "/install/deployment"
 
     - name: "Start AWX"
-      include_role:
+      ansible.builtin.include_role:
         name: awx/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
@@ -334,7 +319,7 @@
         _store_compose_dir: "/install/deployment"
 
     - name: "Start AAS infrastructure"
-      include_role:
+      ansible.builtin.include_role:
         name: aas/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
@@ -355,7 +340,7 @@
         _store_compose_dir: "/install/deployment"
 
     - name: "Start IRS"
-      include_role:
+      ansible.builtin.include_role:
         name: irs/init
         tasks_from: main.yml
       vars:
@@ -364,7 +349,7 @@
       when: ENV.IRS.ENABLED
 
     - name: "Start internal SLM components"
-      include_role:
+      ansible.builtin.include_role:
         name: slm/init
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
@@ -372,14 +357,13 @@
         _store_compose_dir: "/install/deployment"
 
     - name: "Store resulting environment file"
-      include_role:
+      ansible.builtin.include_role:
         name: common/utils
         tasks_from: copy_result_compose_env
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_env_file: "/install/deployment/.env"
 
-    - debug:
+    - name: "Display installation summary"
+      ansible.builtin.debug:
         msg: "Eclipse Service Lifecycle Management version '{{ ENV.SLM_VERSION }}' successfully installed: Consul Master Token: {{ ENV.CONSUL.MASTER_TOKEN }} | Install Directory: {{ INSTALL_DIRECTORY }}"
-
-
