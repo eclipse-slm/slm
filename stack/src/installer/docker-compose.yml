@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
+    command: "${INSTALLER_API_COMMAND}"
     environment:
       SLM_HOSTNAME: ${SLM_HOSTNAME}
       SLM_IP: ${SLM_IP}
@@ -12,6 +13,7 @@ services:
       DEPLOYMENT_HOST_HOSTNAME: ${DEPLOYMENT_HOST_HOSTNAME}
       DEPLOYMENT_HOST_USER: ${DEPLOYMENT_HOST_USER}
       DEPLOYMENT_HOST_PASSWORD: ${DEPLOYMENT_HOST_PASSWORD}
+      ANSIBLE_FORCE_COLOR: True
     volumes:
       - "//var/run/docker.sock:/var/run/docker.sock"
       - "${INSTALL_DIRECTORY}:/install"
@@ -21,7 +23,7 @@ services:
       - "./ansible/uninstaller/src:/ansible/uninstaller/src"
       - "./backend:/app/backend"
     ports:
-      - "8080:8080"
+      - "${INSTALLER_API_EXPOSED_PORT}:8080"
     extra_hosts:
       - "${SLM_HOSTNAME}:host-gateway"
 
