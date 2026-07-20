@@ -57,7 +57,7 @@
 
 - name: "Add RabbitMQ user for '{{ _app_name }}'"
   ansible.builtin.include_role:
-    name: rabbitmq/client
+    name: eclipse-slm.rabbitmq_client
     tasks_from: add_user
   vars:
     _username: "{{ _rabbitmq_username }}"

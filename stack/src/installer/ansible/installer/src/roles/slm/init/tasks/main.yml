@@ -61,7 +61,7 @@
 
 - name: "SLM | Create RabbitMQ exchanges"
   ansible.builtin.include_role:
-    name: rabbitmq/client
+    name: eclipse-slm.rabbitmq_client
     tasks_from: add_exchange
   vars:
     _exchange_name: "{{ item }}"
