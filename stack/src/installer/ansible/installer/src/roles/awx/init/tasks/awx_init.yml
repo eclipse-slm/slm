@@ -1,6 +1,6 @@
 ### Inputs
 - name: "Assert inputs of 'awx/init | awx_init.yml'"
-  assert:
+  ansible.builtin.assert:
     that:
       - (awx.url.internal is defined) and (awx.url.internal|length > 0)
       - (_awx_admin_username is defined) and (_awx_admin_username|length > 0)
@@ -8,12 +8,13 @@
       - (_consul_token is defined) and (_consul_token|length > 0)
       - (_awx_consul_token is defined) and (_awx_consul_token|length > 0)
 
-- set_fact:
+- name: "Set app name"
+  ansible.builtin.set_fact:
     _app_name: "awx"
 
 - name: "Create Vault App Roles"
-  include_role:
-    name: vault/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.vault_client
     tasks_from: create_approle_with_policies.yml
   vars:
     _vault_token: "{{ vault_root_token }}"
@@ -52,7 +53,7 @@
     state: present
 
 - name: "Remove demo data"
-  import_tasks: awx_remove_demo_data.yml
+  ansible.builtin.import_tasks: awx_remove_demo_data.yml
 
 - name: "Add credential types"
   awx.awx.credential_type:
@@ -65,7 +66,16 @@
     injectors: "{{ item.injectors }}"
     state: present
     validate_certs: false
-  with_items: "{{ awx_credential_types }}"
+  loop: "{{ awx_credential_types }}"
+  vars:
+    consul_token: "{{ _awx_consul_token }}"
+    consul_url: "{{ consul.url.internal }}"
+    vault_url: "{{ vault.url.internal }}"
+    vault_approle_role_id: "{{ app_configs.awx.vault['app-role']['role-id'] }}"
+    vault_approle_secret_id: "{{ app_configs.awx.vault['app-role']['secret-id'] }}"
+    minio_url: "{{ minio.url.api.internal }}"
+    minio_access_key: "{{ app_configs.awx.minio['access-key'] }}"
+    minio_secret_key: "{{ app_configs.awx.minio['secret-key'] }}"
 
 - name: "Add credentials"
   awx.awx.credential:
@@ -76,7 +86,7 @@
     credential_type: "{{ item.credential_type }}"
     organization: "{{ awx_slm_organization_name }}"
     inputs: "{{ item.inputs }}"
-  with_items: "{{ awx_credentials }}"
+  loop: "{{ awx_credentials }}"
 
 - name: "Add Execution Environment"
   awx.awx.execution_environment:
@@ -92,7 +102,7 @@
       var: awx
 
   - name: "Create Keycloak client for AWX"
-    include_role:
+    ansible.builtin.include_role:
       name: keycloak/client
       tasks_from: clients/create_client.yml
     vars:
@@ -101,7 +111,7 @@
       _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
 
   - name: "Get OIDC JSON for Keycloak client '{{ client_id }}'"
-    include_role:
+    ansible.builtin.include_role:
       name: keycloak/client
       tasks_from: clients/get_oidc-keycloak-json
     vars:

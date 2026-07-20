@@ -17,12 +17,12 @@
 
 - name: "Add common Vault config in Consul"
   ansible.builtin.include_role:
-    name: vault/client
+    name: eclipse-slm.vault_client
     tasks_from: add_vault_config_in_consul
 
 - name: "Create Vault app role for AWX JWT Authenticator"
   ansible.builtin.include_role:
-    name: vault/client
+    name: eclipse-slm.vault_client
     tasks_from: create_approle_with_policies
   vars:
     _approle_name: "{{ awx_jwt_authenticator.vault.approle.name }}"
@@ -30,7 +30,7 @@
 
 - name: "Create Vault secret engine for AWX JWT Authenticator"
   ansible.builtin.include_role:
-    name: vault/client
+    name: eclipse-slm.vault_client
     tasks_from: create_kv_secret_engine
   vars:
     _vault_token: "{{ vault_root_token }}"

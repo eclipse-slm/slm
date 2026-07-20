@@ -14,6 +14,7 @@
   block:
     - ansible.builtin.set_fact:
         vault_config_consul:
+
     - ansible.builtin.import_role:
         name: eclipse-slm.consul_client
         tasks_from: create_or_add_config
@@ -39,7 +40,7 @@
 
 - name: "Configure JWT auth via Keycloak"
   ansible.builtin.import_role:
-    name: vault/client
+    name: eclipse-slm.vault_client
     tasks_from: configure_keycloak_jwt_auth_method
   vars:
     _vault_token: "{{ _vault_root_token }}"

@@ -1,6 +1,6 @@
 - name: "Create Vault policies"
-  include_role:
-    name: vault/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.vault_client
     tasks_from: create_policy.yml
   vars:
     _policy_name: "{{ vault_policy.name }}"
@@ -10,8 +10,8 @@
     loop_var: vault_policy
 
 - name: "Create Vault groups"
-  include_role:
-    name: vault/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.vault_client
     tasks_from: create_group.yml
   vars:
     _group_name: "{{ vault_group.name }}"
@@ -22,8 +22,8 @@
     loop_var: vault_group
 
 - name: "Create Vault group aliases"
-  include_role:
-    name: vault/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.vault_client
     tasks_from: create_group_alias.yml
   vars:
     _group_name: "{{ vault_group.name }}"
@@ -35,8 +35,8 @@
   when: (vault_group.group_alias is defined) and (vault_group.group_alias|length > 0)
 
 - name: "Create Vault app roles"
-  include_role:
-    name: vault/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.vault_client
     tasks_from: create_approle_and_assign_policies.yml
   vars:
     _vault_token: "{{ vault_root_token }}"
@@ -45,11 +45,10 @@
   loop: "{{ vault_config.approles }}"
 
 - name: "Create Vault secret engine for AWX JWT Authenticator"
-  include_role:
-    name: vault/client
+  ansible.builtin.include_role:
+    name: eclipse-slm.vault_client
     tasks_from: create_kv_secret_engine
   vars:
     _vault_token: "{{ vault_root_token }}"
     _kv_secret_engine_name: "{{ item }}"
   loop: "{{ vault_config.kv_secret_engines }}"
-

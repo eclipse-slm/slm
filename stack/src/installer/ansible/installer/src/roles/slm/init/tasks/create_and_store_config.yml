@@ -7,7 +7,7 @@
 
 - name: "Add Vault config in Consul"
   ansible.builtin.include_role:
-    name: vault/client
+    name: eclipse-slm.vault_client
     tasks_from: add_vault_config_in_consul
 
 - name: "Add Consul config in Consul"
