@@ -86,7 +86,6 @@
         minio_compose: "{{ lookup('template', 'minio.yml') }}"
 
     - name: "MINIO | Start Minio containers"
-      # delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
       community.docker.docker_compose_v2:
         project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
         definition: "{{ minio_compose | from_yaml}}"
