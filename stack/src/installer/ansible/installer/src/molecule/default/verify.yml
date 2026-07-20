@@ -63,7 +63,7 @@
         success_msg: "Container {{ item.container.Name }} is running and healthy."
       loop: "{{ container_info.results }}"
       loop_control:
-        label: "{{ item.container.Name }}: {{ item.container.State.Status }}"
+        label: "{{ item.container.Name | default('<unknown>') }}: {{ item.container.State.Status | default('<unknown>') }}"
 
     - name: "Check that all expected ports are exposed"
       ansible.builtin.wait_for:
