@@ -32,7 +32,7 @@
 
 - name: "Assign realm roles to default users"
   include_role:
-    name: "keycloak/client"
+    name: "eclipse-slm.keycloak_client"
     tasks_from: roles/assign_realm_roles_to_user.yml
   vars:
     _keycloak_realm_name: "{{ ENV.KEYCLOAK.REALM }}"
@@ -54,7 +54,7 @@
 
   - name: "Create user group for default users"
     include_role:
-        name: "keycloak/client"
+        name: "eclipse-slm.keycloak_client"
         tasks_from: groups/create_child_group.yml
     vars:
         _keycloak_access_token: "{{ keycloak_access_token }}"

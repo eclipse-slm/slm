@@ -103,7 +103,7 @@
 
   - name: "Create Keycloak client for AWX"
     ansible.builtin.include_role:
-      name: keycloak/client
+      name: eclipse-slm.keycloak_client
       tasks_from: clients/create_client.yml
     vars:
       _keycloak_client: "{{ awx_keycloak_client }}"
@@ -112,7 +112,7 @@
 
   - name: "Get OIDC JSON for Keycloak client '{{ client_id }}'"
     ansible.builtin.include_role:
-      name: keycloak/client
+      name: eclipse-slm.keycloak_client
       tasks_from: clients/get_oidc-keycloak-json
     vars:
       _keycloak_access_token: "{{ keycloak_access_token }}"

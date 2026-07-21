@@ -129,12 +129,12 @@
   block:
   - name: "Get admin access token"
     ansible.builtin.include_role:
-      name: keycloak/client
+      name: eclipse-slm.keycloak_client
       tasks_from: authentication/get_admin_access_token.yml
 
   - name: "Create realms"
     ansible.builtin.include_role:
-      name: "keycloak/client"
+      name: "eclipse-slm.keycloak_client"
       tasks_from: realms/create_realm.yml
     vars:
       _keycloak_access_token: "{{ keycloak_access_token }}"
@@ -143,7 +143,7 @@
 
   - name: "Create realm roles"
     ansible.builtin.include_role:
-      name: "keycloak/client"
+      name: "eclipse-slm.keycloak_client"
       tasks_from: roles/create_realm_role.yml
     vars:
       _keycloak_access_token: "{{ keycloak_access_token }}"
@@ -153,7 +153,7 @@
 
   - name: "Create groups"
     ansible.builtin.include_role:
-      name: "keycloak/client"
+      name: "eclipse-slm.keycloak_client"
       tasks_from: groups/create_group.yml
     vars:
       _keycloak_access_token: "{{ keycloak_access_token }}"

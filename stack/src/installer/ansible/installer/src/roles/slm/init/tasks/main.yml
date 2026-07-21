@@ -80,7 +80,7 @@
 
 - name: "Get Keycloak admin access token"
   ansible.builtin.include_role:
-    name: keycloak/client
+    name: eclipse-slm.keycloak_client
     tasks_from: authentication/get_admin_access_token.yml
 
 - name: "Configure Keycloak"

@@ -63,12 +63,12 @@
 
 - name: "Get Keycloak admin access token"
   ansible.builtin.include_role:
-    name: keycloak/client
+    name: eclipse-slm.keycloak_client
     tasks_from: authentication/get_admin_access_token.yml
 
 - name: "Create Keycloak client for AWX JWT Authenticator"
   ansible.builtin.include_role:
-    name: keycloak/client
+    name: eclipse-slm.keycloak_client
     tasks_from: clients/create_client.yml
   vars:
     _keycloak_client: "{{ awx_jwt_authenticator.keycloak_client }}"
@@ -79,7 +79,7 @@
   block:
     - name: "Get client secret of awx-jwt-authenticator"
       ansible.builtin.include_role:
-        name: keycloak/client
+        name: eclipse-slm.keycloak_client
         tasks_from: clients/get_client_secret.yml
       vars:
         _client_id: "{{ awx_jwt_authenticator.keycloak_client.client_id }}"

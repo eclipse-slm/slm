@@ -1,6 +1,6 @@
 - name: "Create Keycloak clients"
   include_role:
-    name: "keycloak/client"
+    name: "eclipse-slm.keycloak_client"
     tasks_from: clients/create_client.yml
   vars:
     _keycloak_access_token: "{{ keycloak_access_token }}"
@@ -10,7 +10,7 @@
 
 - name: "Create Keycloak group for service account of clients"
   include_role:
-    name: "keycloak/client"
+    name: "eclipse-slm.keycloak_client"
     tasks_from: groups/create_child_group_and_assign_user.yml
   vars:
     _keycloak_access_token: "{{ keycloak_access_token }}"
