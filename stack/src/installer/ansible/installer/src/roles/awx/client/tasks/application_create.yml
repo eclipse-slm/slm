@@ -1,4 +1,7 @@
-- assert:
+---
+### Inputs:
+- name: "Assert Inputs of 'awx/client | application_create.yml'"
+  ansible.builtin.assert:
     that:
       - (awx.url.internal is defined) and (awx.url.internal|length > 0)
       - (awx_username is defined) and (awx_username|length > 0)
@@ -7,13 +10,8 @@
       - (awx_application_description is defined) and (awx_application_description|length > 0)
       - (awx_organization_name is defined) and (awx_organization_name|length > 0)
 
-- include_tasks: organization_get.yml
-
-- debug:
-    var: awx_organization
-
-- debug:
-    var: awx_organization.id
+- name: "Get AWX organization '{{ awx_organization_name }}'"
+  ansible.builtin.include_tasks: organization_get.yml
 
 - name: "Delete application '{{ awx_application_name }}' if exists"
   awx.awx.application:
@@ -25,10 +23,10 @@
     state: absent
 
 - name: "Create application '{{ awx_application_name }}'"
-  uri:
+  ansible.builtin.uri:
     url: "{{ awx.url.internal }}/api/v2/applications/"
     method: POST
-    force_basic_auth: yes
+    force_basic_auth: true
     url_username: "{{ awx_username }}"
     url_password: "{{ awx_password }}"
     body_format: json
@@ -44,6 +42,7 @@
   register: output_create_application
   changed_when: output_create_application.status == 201
 
-- set_fact:
+### Outputs:
+- ansible.builtin.set_fact:
     awx_application_client_id: "{{ output_create_application.json.client_id }}"
     awx_application_client_secret: "{{ output_create_application.json.client_secret }}"
