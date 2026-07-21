@@ -36,16 +36,11 @@
 
     - name: Copy Installer src to target host
       ansible.builtin.synchronize:
-      # ansible.builtin.copy:
         src: "{{ control_node_src_dir }}"
         dest: "{{ target_host_src_dir }}"
         recursive: true
         compress: true
         delete: true
-        # owner: root
-        # group: root
-        # mode: "0755"
-        # remote_src: false
 
     - name: Set INSTALLER_API_COMMAND
       ansible.builtin.lineinfile:
