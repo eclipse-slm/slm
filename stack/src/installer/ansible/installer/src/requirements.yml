@@ -14,6 +14,11 @@ roles:
     scm: git
     version: main
 
+  - name: eclipse-slm.keycloak_client
+    src: "git+https://github.com/eclipse-slm/slm-ansible-role-keycloak-client"
+    scm: git
+    version: main
+
   - name: eclipse-slm.minio_client
     src: "git+https://github.com/eclipse-slm/slm-ansible-role-minio-client"
     scm: git
