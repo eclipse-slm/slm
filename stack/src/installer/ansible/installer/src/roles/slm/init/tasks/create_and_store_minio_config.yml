@@ -21,7 +21,7 @@
 
     - name: "SLM | Minio | Create Minio user"
       ansible.builtin.include_role:
-        name: minio/client
+        name: eclipse-slm.minio_client
         tasks_from: add_user.yml
       vars:
         _alias: "slm"

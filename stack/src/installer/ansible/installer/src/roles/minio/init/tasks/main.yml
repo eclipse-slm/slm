@@ -123,7 +123,9 @@
   no_log: true
 
 - name: "MINIO | Install Minio Client"
-  ansible.builtin.include_tasks: config_minio.yml
+  ansible.builtin.include_role:
+    name: eclipse-slm.minio_client
+    tasks_from: install_mc.yml
   vars:
-    _minio_root_user: "admin"
+    _minio_root_user: "{{ ENV.MINIO.ADMIN_USERNAME }}"
     _minio_root_password: "{{ ENV.MINIO.ADMIN_PASSWORD }}"
