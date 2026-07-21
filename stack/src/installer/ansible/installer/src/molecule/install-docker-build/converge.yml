@@ -45,8 +45,13 @@
     - name: Set INSTALLER_API_COMMAND
       ansible.builtin.lineinfile:
         path: "{{ target_host_src_dir }}/.env"
-        regexp: '^INSTALLER_API_COMMAND='
-        line: "INSTALLER_API_COMMAND=install"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - regexp: '^INSTALLER_API_COMMAND='
+          line: "INSTALLER_API_COMMAND=install"
+        - regexp: '^INSTALL_DIRECTORY='
+          line: "INSTALL_DIRECTORY=/opt/installer"
 
     - name: Build and start Installer container on target host
       community.docker.docker_compose_v2:
@@ -60,7 +65,7 @@
 
     - name: Install sshpass on control node
       ansible.builtin.apt:
-        name: 
+        name:
           - sshpass
           - tailspin
         state: present
@@ -79,7 +84,3 @@
         - "alias dockerlogs=\"{{ ssh_cmd }} sudo docker logs -f  eclipse-slm-installer-installer-api-1 2>&1 | tailspin\""
       vars:
         ssh_cmd: "sshpass -p '{{ ansible_password }}' ssh -o StrictHostKeyChecking=no {{ansible_user}}@{{ ansible_host }}"
-
-    # TODO: 
-    # Add Verify for successful installation
-    # Remove Deployment Host?
