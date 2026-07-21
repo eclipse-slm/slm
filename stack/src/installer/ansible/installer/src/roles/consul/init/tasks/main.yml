@@ -1,13 +1,13 @@
 ### Inputs
 - name: "Assert inputs of 'consul/init | main.yml'"
-  assert:
+  ansible.builtin.assert:
     that:
       - (consul.url.internal is defined) and (consul.url.internal|length > 0)                 # URL of the Consul instance to be configured
       - (_consul_token is defined) and (_consul_token|length > 0)           # Token to authenticate with Consul
       - (keycloak.url.internal is defined) and (keycloak.url.internal|length > 0)   # Auth URL of the Keycloak instance used for auth method
 
 - name: "Consul Init | Wait for Keycloak ('{{ keycloak.url.internal }}') being up "
-  uri:
+  ansible.builtin.uri:
     url: "{{ keycloak.url.internal }}/realms/fabos/.well-known/openid-configuration"
     validate_certs: false
     status_code: 200
@@ -17,7 +17,7 @@
   delay: 3
 
 - name: "Consul Init | Create auth method for Keycloak"
-  uri:
+  ansible.builtin.uri:
     url: "{{ consul.url.internal }}/v1/acl/auth-method"
     method: PUT
     headers:
@@ -29,7 +29,7 @@
 
 - block:
   - name: "Consul Init | Create SLM node"
-    uri:
+    ansible.builtin.uri:
       url: "{{ consul.url.internal }}/v1/catalog/register"
       method: PUT
       headers:
