@@ -37,9 +37,9 @@ ansible:
     SLM_IP: 172.17.0.1
     SLM_VERSION: 1.5.0-SNAPSHOT
     INSTALL_DIRECTORY: /opt/eclipse-slm
-    DEPLOYMENT_HOST_HOSTNAME: localhost
-    DEPLOYMENT_HOST_USER:
-    DEPLOYMENT_HOST_PASSWORD:
+    # DEPLOYMENT_HOST_HOSTNAME: localhost
+    # DEPLOYMENT_HOST_USER:
+    # DEPLOYMENT_HOST_PASSWORD:
 
   executor:
     backend: ansible-playbook
@@ -53,12 +53,11 @@ ansible:
         - --execution-environment-image ghcr.io/ansible/community-ansible-dev-tools:latest
 
   playbooks:
-    create: ../default/create-os.yml
+    create: ../default/create-kv.yml
     converge: converge.yml
-    destroy: ../default/destroy-os.yml
+    destroy: ../default/destroy-kv.yml
     cleanup: cleanup.yml
     prepare: ../default/prepare.yml
-    side_effect: side_effect.yml
     verify: ../default/verify.yml
 
 scenario:
