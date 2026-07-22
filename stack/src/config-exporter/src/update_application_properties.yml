@@ -2,7 +2,7 @@
     var: _app_config
     
 - name: Set application-dev.yml path
-  set_fact:
+  ansible.builtin.set_fact:
     _application_dev_yml_file: "{{ _application_yml_file | dirname }}/application-{{ spring_profile }}.yml"
 
 - name: "Copy '{{ _application_yml_file }}' to '{{ _application_dev_yml_file }}'"

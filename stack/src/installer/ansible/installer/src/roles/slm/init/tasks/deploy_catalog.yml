@@ -1,8 +1,7 @@
-- set_fact:
+- ansible.builtin.set_fact:
     catalog_compose: "{{ lookup('template', 'catalog.yml') }}"
 
 - name: "Start containers"
-  # delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
   community.docker.docker_compose_v2:
     project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
     definition: "{{ catalog_compose | from_yaml }}"

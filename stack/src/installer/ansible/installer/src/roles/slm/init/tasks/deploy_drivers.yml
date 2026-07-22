@@ -1,5 +1,5 @@
 - name: "Normalize optional driver compose definition"
-  set_fact:
+  ansible.builtin.set_fact:
     optional_driver_compose_definition: >-
       {{
         (
@@ -10,7 +10,7 @@
       }}
 
 - name: "Ensure optional driver compose uses SLM default network"
-  set_fact:
+  ansible.builtin.set_fact:
     optional_driver_compose_definition: >-
       {{
         optional_driver_compose_definition
@@ -33,7 +33,7 @@
       }}
 
 - name: "Validate optional driver compose definition"
-  assert:
+  ansible.builtin.assert:
     that:
       - optional_driver_compose_definition is mapping
       - optional_driver_compose_definition.services is defined
@@ -49,7 +49,7 @@
     pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
 
 - name: "Store resulting compose file for optional driver containers"
-  copy:
+  ansible.builtin.copy:
     content: "{{ optional_driver_compose_definition | to_nice_yaml(indent=2) }}"
     dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/slm.drivers.yml"
   when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)

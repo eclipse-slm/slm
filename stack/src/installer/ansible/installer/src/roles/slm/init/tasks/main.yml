@@ -1,7 +1,6 @@
 ---
 - name: "SLM | Create and store configs"
-  ansible.builtin.include_tasks:
-    file: "create_and_store_config.yml"
+  ansible.builtin.include_tasks: "create_and_store_config.yml"
   vars:
     _app_name: "{{ item.app_name }}"
     scheme: "{{ item.scheme }}"
@@ -84,8 +83,7 @@
     tasks_from: authentication/get_admin_access_token.yml
 
 - name: "Configure Keycloak"
-  ansible.builtin.include_tasks:
-    file: "configure_keycloak.yml"
+  ansible.builtin.include_tasks: "configure_keycloak.yml"
 
 - name: "Create Consul role for Keycloak clients"
   ansible.builtin.include_role:
@@ -99,8 +97,7 @@
   loop: "{{ keycloak_clients }}"
 
 - name: "Configure Vault"
-  ansible.builtin.include_tasks:
-    file: "configure_vault.yml"
+  ansible.builtin.include_tasks: "configure_vault.yml"
 
 - name: "Start SLM components | Platform Management"
   block:
@@ -172,13 +169,11 @@
       when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
 
 - name: "Start SLM components | Drivers (optional)"
-  ansible.builtin.include_tasks:
-    file: "deploy_drivers.yml"
+  ansible.builtin.include_tasks: "deploy_drivers.yml"
   when: ENV.RESOURCE_MANAGEMENT.DRIVERS.ENABLED | default(false)
 
 - name: "Start SLM components | Additional services (optional)"
-  ansible.builtin.include_tasks:
-    file: "deploy_additional_services.yml"
+  ansible.builtin.include_tasks: "deploy_additional_services.yml"
   when: (ENV.ADDITIONAL_SERVICES | default({}) | length) > 0
 
 - name: "Register UI at Consul (discovery server)"
@@ -196,6 +191,5 @@
       - "traefik.http.routers.ui.rule=PathPrefix(`/`)"
 
 - name: "Start SLM components | Catalog Service"
-  ansible.builtin.include_tasks:
-    file: "deploy_catalog.yml"
+  ansible.builtin.include_tasks: "deploy_catalog.yml"
   when: ENV.SLM_CATALOG_SERVICE.ENABLED | default(true)

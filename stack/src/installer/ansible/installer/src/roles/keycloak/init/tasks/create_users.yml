@@ -1,5 +1,5 @@
 - name: "Set password for default user '{{ keycloak_default_user }}'"
-  set_fact:
+  ansible.builtin.set_fact:
     keycloak_default_user: "{{ keycloak_default_user | combine(updated_entry, recursive=true) }}"
   vars:
     updated_entry: { 'credentials': [ { 'type': 'password', 'value': '{{ ENV.KEYCLOAK.DEFAULT_USER_PASSWORD }}', 'temporary': false } ] }
@@ -7,7 +7,7 @@
 
 - block:
   - name: "Create default user"
-    uri:
+    ansible.builtin.uri:
       url: "{{ keycloak.url.external }}/admin/realms/{{ ENV.KEYCLOAK.REALM }}/users"
       validate_certs: no
       method: POST
@@ -19,7 +19,7 @@
     register: output_post_user
     changed_when: output_post_user.status == 201
   - name: "Get details of '{{ keycloak_default_user.username }}'"
-    uri:
+    ansible.builtin.uri:
       url: "{{ keycloak.url.external }}/admin/realms/{{ ENV.KEYCLOAK.REALM }}/users?search={{ keycloak_default_user.username }}"
       validate_certs: no
       method: GET
@@ -27,7 +27,7 @@
         authorization: "Bearer {{ keycloak_access_token }}"
       status_code: 200
     register: output_get_user
-  - set_fact:
+  - ansible.builtin.set_fact:
       __default_user_id: "{{ output_get_user.json[0].id }}"
 
 - name: "Assign realm roles to default users"
@@ -41,7 +41,7 @@
 
 - block:
   - name: "Get details of top level group 'users'"
-    uri:
+    ansible.builtin.uri:
       url: "{{ keycloak.url.external }}/admin/realms/{{ ENV.KEYCLOAK.REALM }}/groups?search=users"
       validate_certs: no
       method: GET
@@ -49,7 +49,7 @@
         authorization: "Bearer {{ keycloak_access_token }}"
       status_code: 200
     register: output_get_group_users
-  - set_fact:
+  - ansible.builtin.set_fact:
       __keycloak_users_parent_group_id: "{{ output_get_group_users.json[0].id }}"
 
   - name: "Create user group for default users"
@@ -65,7 +65,7 @@
           description: "Group for user '{{ keycloak_default_user.username }}'"
 
   - name: "Get details of users's child group '{{ __default_user_id }}'"
-    uri:
+    ansible.builtin.uri:
       url: "{{ keycloak.url.external }}/admin/realms/{{ ENV.KEYCLOAK.REALM }}/groups?search={{ __default_user_id }}"
       validate_certs: no
       method: GET
@@ -73,11 +73,11 @@
         authorization: "Bearer {{ keycloak_access_token }}"
       status_code: 200
     register: output_get_group_child_user
-  - set_fact:
+  - ansible.builtin.set_fact:
       __keycloak_user_child_group_id: "{{ (output_get_group_child_user.json[0].subGroups | selectattr('name', 'equalto', __default_user_id) | list | first).id }}"
 
   - name: "Assign user '{{ keycloak_default_user.username }}' to group 'users'"
-    uri:
+    ansible.builtin.uri:
       url: "{{ keycloak.url.external }}/admin/realms/{{ ENV.KEYCLOAK.REALM }}/users/{{ __default_user_id }}/groups/{{ __keycloak_user_child_group_id }}"
       validate_certs: no
       method: PUT

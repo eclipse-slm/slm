@@ -1,6 +1,6 @@
 ### Inputs
 - name: "Assert inputs of 'consul/client | create_role.yml'"
-  assert:
+  ansible.builtin.assert:
     that:
       - (_vault_url is defined) and (_vault_url|length > 0)                   # URL of the Vault server
       - (_vault_token is defined) and (_vault_token|length > 0)               # Authentication token for Vault
@@ -22,18 +22,18 @@
   register: vault_cert
 
 - name: Make sure directories exist
-  file:
+  ansible.builtin.file:
     state: directory
     path: "{{ item }}"
   loop: "{{ [_certificate_dest, _key_dest] | map('dirname') | unique | list }}"
 
 - name: Write certificate to file
-  copy:
+  ansible.builtin.copy:
     content: "{{ vault_cert.data.data.certificate }}"
     dest: "{{ _certificate_dest }}"
 
 - name: Write private key to file
-  copy:
+  ansible.builtin.copy:
     content: "{{ vault_cert.data.data.private_key }}"
     dest: "{{ _key_dest }}"
 
