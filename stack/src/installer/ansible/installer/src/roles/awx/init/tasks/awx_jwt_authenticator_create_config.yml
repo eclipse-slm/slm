@@ -1,5 +1,5 @@
 ### Inputs
-- name: "Assert inputs of 'awx/init | awx_create_config.yml'"
+- name: "Assert inputs of 'awx/init | awx_jwt_authenticator_create_config.yml'"
   ansible.builtin.assert:
     that:
       - (awx.url.internal is defined) and (awx.url.internal|length > 0)
@@ -7,12 +7,13 @@
       - (_awx_jwt_authenticator_password is defined) and (_awx_jwt_authenticator_password|length > 0)
       - (_consul_token is defined) and (_consul_token|length > 0)
 
-- set_fact:
+- name: "Set fact for app_name"
+  ansible.builtin.set_fact:
     _app_name: "awx_jwt_authenticator"
 
 - name: "Add AWX config in Consul"
   ansible.builtin.include_role:
-    name: awx/client
+    name: eclipse-slm.awx_client
     tasks_from: add_awx_config_in_consul
 
 - name: "Add common Vault config in Consul"

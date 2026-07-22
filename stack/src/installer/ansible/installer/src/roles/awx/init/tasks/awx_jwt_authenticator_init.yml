@@ -21,7 +21,7 @@
         email: "{{ _awx_jwt_authenticator_username }}@fab-os.org"
         first_name: AWX
         last_name: JWT Authenticator
-        superuser: yes
+        superuser: true
         state: present
     - name: "Add AWX JWT authenticator username and password in Consul"
       ansible.builtin.include_role:
@@ -35,7 +35,7 @@
 
 - name: "Create application 'awx_jwt_authenticator'"
   ansible.builtin.include_role:
-    name: awx/client
+    name: eclipse-slm.awx_client
     tasks_from: application_create.yml
   vars:
     awx_username: "{{ _awx_admin_username }}"
