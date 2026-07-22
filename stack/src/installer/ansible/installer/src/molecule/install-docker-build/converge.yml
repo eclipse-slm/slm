@@ -72,6 +72,16 @@
         update_cache: true
       delegate_to: localhost
 
+    - name: Define ssh base command (ssh password)
+      when: ansible_password is defined
+      ansible.builtin.set_fact:
+        ssh_cmd: "sshpass -p '{{ ansible_password }}' ssh -o StrictHostKeyChecking=no {{ansible_user}}@{{ ansible_host }}"
+
+    - name: Define ssh base command (ssh key file)
+      when: ansible_password is not defined
+      ansible.builtin.set_fact:
+        ssh_cmd: "ssh -i {{ ansible_ssh_private_key_file }} -o StrictHostKeyChecking=no {{ansible_user}}@{{ ansible_host }}"
+
     - name: Print remote commands
       ansible.builtin.debug:
         msg: "{{ item }}"
@@ -82,5 +92,3 @@
         - "alias dockerps=\"{{ ssh_cmd }} sudo docker ps\""
         - "{{ ssh_cmd }} sudo docker logs -f  eclipse-slm-installer-installer-api-1 2>&1 | tailspin"
         - "alias dockerlogs=\"{{ ssh_cmd }} sudo docker logs -f  eclipse-slm-installer-installer-api-1 2>&1 | tailspin\""
-      vars:
-        ssh_cmd: "sshpass -p '{{ ansible_password }}' ssh -o StrictHostKeyChecking=no {{ansible_user}}@{{ ansible_host }}"

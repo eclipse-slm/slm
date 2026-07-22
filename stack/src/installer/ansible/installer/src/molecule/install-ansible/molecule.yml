@@ -10,12 +10,16 @@ dependency:
 
 platforms:
   - name: slm-install-ansible
-    image: quay.io/containerdisks/ubuntu:24.04
-    volume_size: 60Gi
-    instancetype: u1.xlarge
     groups:
       - slm
       - slm-install-ansible
+    # Kubevirt
+    image: quay.io/containerdisks/ubuntu:24.04
+    volume_size: 60Gi
+    instancetype: u1.xlarge
+    # Openstack
+    image_name: Ubuntu 24.04 64-bit
+    flavor: m1.xlarge
 
 ansible:
   cfg:
@@ -51,9 +55,9 @@ ansible:
         - --execution-environment-image ghcr.io/ansible/community-ansible-dev-tools:latest
 
   playbooks:
-    create: ../default/create-kv.yml
+    create: ../default/create-os.yml
     converge: converge.yml
-    destroy: ../default/destroy-kv.yml
+    destroy: ../default/destroy-os.yml
     cleanup: cleanup.yml
     prepare: ../default/prepare.yml
     side_effect: side_effect.yml
