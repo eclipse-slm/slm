@@ -14,8 +14,7 @@
         INSTALL_DIRECTORY: "{{ lookup('ansible.builtin.env', 'INSTALL_DIRECTORY') }}"
 
     - name: "Import config from env.yml"
-      ansible.builtin.include_vars:
-        file: "/env/env.yml"
+      ansible.builtin.include_vars: "/env/env.yml"
       loop:
         - "/env/env.yml"
       register: include_vars_env
@@ -26,14 +25,12 @@
       register: env_custom_file
 
     - name: "Import config from env.custom.yml"
-      ansible.builtin.include_vars:
-        file: "/env/env.custom.yml"
+      ansible.builtin.include_vars: "/env/env.custom.yml"
       when: env_custom_file.stat.exists
       register: include_vars_env_custom
 
     - name: "Import config from env.override.yml"
-      ansible.builtin.include_vars:
-        file: "{{ item }}"
+      ansible.builtin.include_vars: "{{ item }}"
       loop:
         - "/env/env.override.yml"
       register: include_vars_env_override
