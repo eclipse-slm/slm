@@ -1,3 +1,4 @@
+eclipse-slm.awx_client
 eclipse-slm.consul_client
 eclipse-slm.keycloak_client
 eclipse-slm.minio_client
