@@ -1,56 +1,3 @@
-- name: "Define inventory"
-  hosts: "{{ target_host | default('localhost') }}"
-  become: true
-  pre_tasks:
-    - name: Include env role from eclipse.slm collection
-      ansible.builtin.include_role:
-        name: eclipse.slm.env
-
-    - name: "Set deployment host facts"
-      ansible.builtin.set_fact:
-        DEPLOYMENT_HOST:
-          DEPLOYMENT_HOST_HOSTNAME: "{{ lookup('ansible.builtin.env', 'DEPLOYMENT_HOST_HOSTNAME') }}"
-          DEPLOYMENT_HOST_USER: "{{ lookup('ansible.builtin.env', 'DEPLOYMENT_HOST_USER') }}"
-          DEPLOYMENT_HOST_PASSWORD: "{{ lookup('ansible.builtin.env', 'DEPLOYMENT_HOST_PASSWORD') }}"
-
-    - name: "Combine ENV and deployment host facts"
-      ansible.builtin.set_fact: 
-        ENV: "{{ ENV | combine(DEPLOYMENT_HOST | default({}), recursive=True) }}"
-  tasks:
-    - name: When DEPLOYMENT_HOST_HOSTNAME is not empty but not default hostname or localhost
-      when:
-        - ENV.DEPLOYMENT_HOST_HOSTNAME != 'localhost'
-        - ENV.DEPLOYMENT_HOST_HOSTNAME != '127.0.0.1'
-        - ENV.DEPLOYMENT_HOST_HOSTNAME != 'slm.local'
-        - ENV.DEPLOYMENT_HOST_HOSTNAME | length != 0
-      block:
-        - name: "Fail if DEPLOYMENT_HOST_USER is not set"
-          ansible.builtin.fail:
-            msg: "Deployment target is remote host, but environment variable 'DEPLOYMENT_HOST_USER' is not set"
-          when: (ENV.DEPLOYMENT_HOST_USER is not defined) or (ENV.DEPLOYMENT_HOST_USER|length == 0)
-
-        - name: "Fail if DEPLOYMENT_HOST_PASSWORD is not set"
-          ansible.builtin.fail:
-            msg: "Deployment target is remote host, but environment Variable 'DEPLOYMENT_HOST_PASSWORD' is not set"
-          when: (ENV.DEPLOYMENT_HOST_PASSWORD is not defined) or (ENV.DEPLOYMENT_HOST_PASSWORD|length == 0)
-
-        - name: "Add deployment host to inventory"
-          ansible.builtin.add_host:
-            name: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
-            groups: "slm"
-            ansible_host: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
-            ansible_ssh_user: '{{ ENV.DEPLOYMENT_HOST_USER }}'
-            ansible_ssh_pass: '{{ ENV.DEPLOYMENT_HOST_PASSWORD }}'
-            ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
-          when:
-            - (ENV.DEPLOYMENT_HOST_USER is defined) and (ENV.DEPLOYMENT_HOST_USER|length > 0)
-            - (ENV.DEPLOYMENT_HOST_PASSWORD is defined) and (ENV.DEPLOYMENT_HOST_PASSWORD|length > 0)
-
-    - name: "Add localhost to inventory group 'slm'"
-      ansible.builtin.group_by:
-        key: 'slm'
-      when: (ENV.DEPLOYMENT_HOST_HOSTNAME == 'localhost') or (ENV.DEPLOYMENT_HOST_HOSTNAME == '127.0.0.1') or (ENV.DEPLOYMENT_HOST_HOSTNAME == 'slm.local')
-
 - name: "Install Service Lifecycle Management"
   hosts: "{{ target_host | default('localhost') }}"
   gather_facts: true
@@ -59,6 +6,10 @@
     ansible_python_interpreter: /usr/bin/python3
   vars_files:
     - config.yml
+  pre_tasks:
+    - name: Include env role from eclipse.slm collection
+      ansible.builtin.include_role:
+        name: eclipse.slm.env
   tasks:
     - name: "Define global variables"
       block:
@@ -358,7 +309,7 @@
 
     - name: "Store resulting environment file"
       ansible.builtin.include_role:
-        name: common/utils
+        name: utils
         tasks_from: copy_result_compose_env
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
