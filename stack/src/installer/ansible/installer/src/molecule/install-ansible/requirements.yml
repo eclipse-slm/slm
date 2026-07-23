@@ -7,3 +7,8 @@ roles:
 
   - name: ipa-big.molecule_openstack
     version: 1.0.11
+
+  - src: "git+https://github.com/eclipse-slm/slm-ansible-role-docker"
+    scm: git
+    version: 1.0.8
+    name: fabos.slm-ansible-role-docker
