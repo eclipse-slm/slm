@@ -56,9 +56,8 @@ ansible:
     create: ../default/create-os.yml
     converge: converge.yml
     destroy: ../default/destroy-os.yml
-    cleanup: cleanup.yml
+    cleanup: ../default/cleanup.yml
     prepare: ../default/prepare.yml
-    side_effect: side_effect.yml
     verify: ../default/verify.yml
 
 scenario:
