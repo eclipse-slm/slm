@@ -1,0 +1,174 @@
+- name: "Install Service Lifecycle Management"
+  hosts: "{{ target_host | default('localhost') }}"
+  gather_facts: true
+  become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  vars_files:
+    - files/config.yml
+  pre_tasks:
+    - name: Include env role from eclipse.slm collection
+      ansible.builtin.include_role:
+        name: eclipse.slm.env
+
+# Make sure container hostnames are available on host:
+    - name: Add Service Hostnames to /etc/hosts if installer running not in container
+      when:
+        - ansible_facts['virtualization_type'] is defined
+        - ansible_facts['virtualization_type'] not in ['docker', 'podman', 'containerd', 'lxc']
+      ansible.builtin.blockinfile:
+        path: /etc/hosts
+        block: "{{ lookup('template', 'hosts.j2') }}"
+  tasks:
+    - name: "Prepare docker registry logins"
+      ansible.builtin.set_fact:
+        docker_registry_logins: "{{ ENV.DOCKER_IMAGE_REGISTRY_LOGINS | default([]) }}"
+
+    - name: "Login to configured docker registries"
+      community.docker.docker_login:
+        registry_url: "{{ item.registry_url }}"
+        username: "{{ item.username }}"
+        password: "{{ item.password }}"
+      loop: "{{ docker_registry_logins }}"
+      when: >
+        ((item.registry_url is defined) and (item.registry_url|length > 0)) and
+        ((item.username is defined) and (item.username|length > 0)) and
+        ((item.password is defined) and (item.password|length > 0))
+
+    - name: "Create SLM docker network and add installer to it"
+      block:
+      - name: "Create docker network for SLM"
+        community.docker.docker_compose_v2:
+          project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
+          definition:
+            services:
+              installer-helper:
+                image: hello-world
+                networks:
+                  default:
+
+      - name: "Add installer to SLM docker network"
+        community.docker.docker_network:
+          name: "{{ ENV.COMPOSE_PROJECT_NAME }}_default"
+          connected:
+            - "{{ lookup('ansible.builtin.env', 'HOSTNAME') | default('eclipse-slm-installer', true) }}"
+          appends: true
+
+      - name: "Remove helper container for network creation"
+        community.docker.docker_container:
+          name: "{{ ENV.COMPOSE_PROJECT_NAME }}-installer-helper-1"
+          state: absent
+
+    - name: "Start Vault"
+      ansible.builtin.include_role:
+        name: vault/init
+      vars:
+        _store_compose_dir: "/install/deployment"
+
+    - name: "Start Consul"
+      ansible.builtin.include_role:
+        name: consul/init
+        tasks_from: start.yml
+      vars:
+        _store_compose_dir: "/install/deployment"
+
+    - name: "Start Traefik"
+      ansible.builtin.include_role:
+        name: traefik/init
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_compose_dir: "/install/deployment"
+        _vault_root_token: "{{ vault_root_token }}"
+
+    - name: "Start Keycloak"
+      ansible.builtin.include_role:
+        name: keycloak/init
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_compose_dir: "/install/deployment"
+
+    - name: "Init Vault after Keycloak available"
+      ansible.builtin.include_role:
+        name: vault/init
+        tasks_from: init_after_keycloak.yml
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _vault_root_token: "{{ vault_root_token }}"
+
+    - name: "Init Consul"
+      ansible.builtin.include_role:
+        name: consul/init
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+
+    - name: "Start RabbitMQ"
+      ansible.builtin.include_role:
+        name: rabbitmq/init
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_compose_dir: "/install/deployment"
+
+    - name: "Start Minio"
+      ansible.builtin.include_role:
+        name: minio/init
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_compose_dir: "/install/deployment"
+
+    - name: "Start AWX"
+      ansible.builtin.include_role:
+        name: awx/init
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _vault_token: "{{ vault_root_token }}"
+        _store_compose_dir: "/install/deployment"
+
+    - name: "Start AAS infrastructure"
+      ansible.builtin.include_role:
+        name: aas/init
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_compose_dir: "/install/deployment"
+
+    - name: "Start monitoring"
+      ansible.builtin.include_role:
+        name: monitoring/init
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_compose_dir: "/install/deployment"
+
+    - name: "Start discovery"
+      ansible.builtin.include_role:
+        name: discovery/init
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_compose_dir: "/install/deployment"
+
+    - name: "Start IRS"
+      ansible.builtin.include_role:
+        name: irs/init
+        tasks_from: main.yml
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_compose_dir: "/install/deployment"
+      when: ENV.IRS.ENABLED
+
+    - name: "Start internal SLM components"
+      ansible.builtin.include_role:
+        name: slm/init
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _vault_token: "{{ vault_root_token }}"
+        _store_compose_dir: "/install/deployment"
+
+    - name: "Store resulting environment file"
+      ansible.builtin.include_role:
+        name: eclipse.slm.utils
+        tasks_from: copy_result_compose_env
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_env_file: "/install/deployment/.env"
+
+    - name: "Display installation summary"
+      ansible.builtin.debug:
+        msg: "Eclipse Service Lifecycle Management version '{{ ENV.SLM_VERSION }}' successfully installed: Consul Master Token: {{ ENV.CONSUL.MASTER_TOKEN }} | Install Directory: {{ INSTALL_DIRECTORY }}"
