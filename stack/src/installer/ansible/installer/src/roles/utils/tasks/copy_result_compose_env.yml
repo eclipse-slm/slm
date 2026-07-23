@@ -1,5 +1,0 @@
-- name: "Store resulting environment file"
-  template:
-    src: "result_compose.env"
-    dest: "{{ _store_env_file }}"
-  when: (_store_env_file is defined) and (_store_env_file|length > 0)

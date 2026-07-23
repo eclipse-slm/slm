@@ -67,6 +67,14 @@
         read_priv: ".*"
         write_priv: ".*"
 
+- name: "Add RabbitMQ user '{{ _rabbitmq_username }}' to app config of '{{ _app_name }}'"
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
+    tasks_from: app_config_add_user
+  vars:
+    _username: "{{ rabbitmq_new_user_username }}"
+    _password: "{{ rabbitmq_new_user_password }}"
+
 - name: "Store config in Consul"
   ansible.builtin.include_role:
     name: eclipse-slm.consul_client

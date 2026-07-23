@@ -55,7 +55,7 @@
 
 - name: "Add Consul token to app_configs['{{ _app_name }}']"
   ansible.builtin.include_role:
-    name: utils
+    name: eclipse-slm.consul_client
     tasks_from: add_to_app_config
   vars:
     _config:

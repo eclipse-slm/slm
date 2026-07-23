@@ -29,7 +29,7 @@
 
     - name: "Create admin user"
       ansible.builtin.include_role:
-        name: utils
+        name: eclipse-slm.consul_client
         tasks_from: app_config_add_user
       vars:
         _app_name: "rabbitmq"
