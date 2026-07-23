@@ -309,7 +309,7 @@
 
     - name: "Store resulting environment file"
       ansible.builtin.include_role:
-        name: utils
+        name: eclipse.slm.utils
         tasks_from: copy_result_compose_env
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
