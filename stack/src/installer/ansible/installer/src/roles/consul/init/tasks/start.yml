@@ -32,7 +32,7 @@
 
     - name: "Consul | Update consul_local_config dictionary and override default values"
       ansible.builtin.set_fact:
-        consul_local_config: "{{ consul_local_config | combine(
+        consul_local_config: "{{ consul_local_config | default({}) | combine(
         { 'acl': {
             'tokens': {
               'master': ENV.CONSUL.MASTER_TOKEN
@@ -43,7 +43,8 @@
 
 - name: "Consul | Start"
   block:
-    - debug:
+    - name: "Consul | Display ENV.CONSUL"
+      ansible.builtin.debug:
         var: ENV.CONSUL
 
     - name: "Consul | Create compose definition from template"
