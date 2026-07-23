@@ -39,9 +39,6 @@ ansible:
     SLM_IP: 172.17.0.1
     SLM_VERSION: 1.5.0-SNAPSHOT
     INSTALL_DIRECTORY: /opt/eclipse-slm
-    # DEPLOYMENT_HOST_HOSTNAME: localhost
-    # DEPLOYMENT_HOST_USER:
-    # DEPLOYMENT_HOST_PASSWORD:
 
   executor:
     backend: ansible-playbook
