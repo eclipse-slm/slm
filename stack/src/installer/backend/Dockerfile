@@ -1,7 +1,7 @@
 FROM ghcr.io/eclipse-slm/ansible:2.17.2
 
 ENV INSTALLER_WORKING_DIR=/ansible/installer/src \
-	INSTALLER_PLAYBOOK=main.yml \
+	INSTALLER_PLAYBOOK=install.yml \
 	INSTALLER_UNINSTALL_WORKING_DIR=/ansible/uninstaller/src \
 	INSTALLER_UNINSTALL_PLAYBOOK=main.yml \
 	INSTALLER_ENV_FILE=/env/env.yml \

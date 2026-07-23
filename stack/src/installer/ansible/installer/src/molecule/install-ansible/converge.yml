@@ -10,4 +10,4 @@
         msg: "Target host is set to: {{ target_host | default('localhost') }}"
 
 - name: Converge - Installer
-  ansible.builtin.import_playbook: ../../main.yml
+  ansible.builtin.import_playbook: ../../install.yml
