@@ -9,7 +9,7 @@ dependency:
     requirements-file: requirements.yml
 
 platforms:
-  - name: slm-install-ansible
+  - name: slm-traefik
     groups:
       - slm
       - traefik
