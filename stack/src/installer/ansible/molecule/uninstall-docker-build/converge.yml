@@ -6,7 +6,7 @@
   gather_facts: false # Disable if your role does not rely on facts
   become: true
   vars_files:
-    - ../default-docker-built/defaults/main.yml
+    - ../default-docker-build/defaults/main.yml
   tasks:
     - name: Make sure target host src dir exists
       ansible.builtin.file:

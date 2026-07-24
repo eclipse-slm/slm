@@ -54,7 +54,7 @@ ansible:
 
   playbooks:
     create: ../default/create-os.yml
-    converge: ../default-docker-built/converge.yml
+    converge: ../default-docker-build/converge.yml
     destroy: ../default/destroy-os.yml
     prepare: prepare.yml
     verify: ../default-uninstall/verify.yml
