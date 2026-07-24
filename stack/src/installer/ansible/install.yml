@@ -16,9 +16,9 @@
       when:
         - ansible_facts['virtualization_type'] is defined
         - ansible_facts['virtualization_type'] not in ['docker', 'podman', 'containerd', 'lxc']
-      ansible.builtin.blockinfile:
-        path: /etc/hosts
-        block: "{{ lookup('template', 'hosts.j2') }}"
+      ansible.builtin.include_role:
+        name: eclipse.slm.env
+        tasks_from: write_hosts
   tasks:
     - name: "Prepare docker registry logins"
       ansible.builtin.set_fact:
