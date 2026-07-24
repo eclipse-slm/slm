@@ -61,20 +61,20 @@
 
     - name: "Start Vault"
       ansible.builtin.include_role:
-        name: vault/init
+        name: vault
       vars:
         _store_compose_dir: "/install/deployment"
 
     - name: "Start Consul"
       ansible.builtin.include_role:
-        name: consul/init
+        name: consul
         tasks_from: start.yml
       vars:
         _store_compose_dir: "/install/deployment"
 
     - name: "Start Traefik"
       ansible.builtin.include_role:
-        name: traefik/init
+        name: traefik
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_dir: "/install/deployment"
@@ -82,14 +82,14 @@
 
     - name: "Start Keycloak"
       ansible.builtin.include_role:
-        name: keycloak/init
+        name: keycloak
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_dir: "/install/deployment"
 
     - name: "Init Vault after Keycloak available"
       ansible.builtin.include_role:
-        name: vault/init
+        name: vault
         tasks_from: init_after_keycloak.yml
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
@@ -97,27 +97,27 @@
 
     - name: "Init Consul"
       ansible.builtin.include_role:
-        name: consul/init
+        name: consul
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
 
     - name: "Start RabbitMQ"
       ansible.builtin.include_role:
-        name: rabbitmq/init
+        name: rabbitmq
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_dir: "/install/deployment"
 
     - name: "Start Minio"
       ansible.builtin.include_role:
-        name: minio/init
+        name: minio
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_dir: "/install/deployment"
 
     - name: "Start AWX"
       ansible.builtin.include_role:
-        name: awx/init
+        name: awx
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _vault_token: "{{ vault_root_token }}"
@@ -125,28 +125,28 @@
 
     - name: "Start AAS infrastructure"
       ansible.builtin.include_role:
-        name: aas/init
+        name: aas
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_dir: "/install/deployment"
 
     - name: "Start monitoring"
       ansible.builtin.include_role:
-        name: monitoring/init
+        name: monitoring
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_dir: "/install/deployment"
 
     - name: "Start discovery"
       ansible.builtin.include_role:
-        name: discovery/init
+        name: discovery
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_dir: "/install/deployment"
 
     - name: "Start IRS"
       ansible.builtin.include_role:
-        name: irs/init
+        name: irs
         tasks_from: main.yml
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
@@ -155,7 +155,7 @@
 
     - name: "Start internal SLM components"
       ansible.builtin.include_role:
-        name: slm/init
+        name: slm
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _vault_token: "{{ vault_root_token }}"
