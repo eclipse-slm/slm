@@ -9,10 +9,10 @@ dependency:
     requirements-file: requirements.yml
 
 platforms:
-  - name: slm-install-ansible
+  - name: slm-consul
     groups:
       - slm
-      - vault
+      - consul
     # Kubevirt
     image: quay.io/containerdisks/ubuntu:24.04
     volume_size: 60Gi
