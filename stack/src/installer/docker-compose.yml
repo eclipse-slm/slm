@@ -10,17 +10,14 @@ services:
       SLM_HOSTNAME: ${SLM_HOSTNAME}
       SLM_IP: ${SLM_IP}
       INSTALL_DIRECTORY: ${INSTALL_DIRECTORY}
-      DEPLOYMENT_HOST_HOSTNAME: ${DEPLOYMENT_HOST_HOSTNAME}
-      DEPLOYMENT_HOST_USER: ${DEPLOYMENT_HOST_USER}
-      DEPLOYMENT_HOST_PASSWORD: ${DEPLOYMENT_HOST_PASSWORD}
       ANSIBLE_FORCE_COLOR: "1"
     volumes:
       - "//var/run/docker.sock:/var/run/docker.sock"
       - "${INSTALL_DIRECTORY}:/install"
-      - "./ansible/installer/env.yml:/env/env.yml"
-      - "./ansible/installer/env.override.yml:/env/env.override.yml"
-      - "./ansible/installer/src:/ansible/installer/src"
-      - "./ansible/uninstaller/src:/ansible/uninstaller/src"
+      - "./ansible/files/env.yml:/env/env.yml"
+      - "./ansible/files/env.override.yml:/env/env.override.yml"
+      - "./ansible:/ansible/installer/src"
+      - "./ansible:/ansible/uninstaller/src"
       - "./backend:/app/backend"
     ports:
       - "${INSTALLER_API_EXPOSED_PORT}:8080"
