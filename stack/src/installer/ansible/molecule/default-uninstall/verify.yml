@@ -1,0 +1,34 @@
+---
+# Purpose: assert that the instance really ended up in the expected state.
+# Molecule calls this playbook with `molecule verify`.
+- name: Verify
+  hosts: "{{ target_host | default('localhost') }}"
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Gather Docker facts
+      community.docker.docker_host_info:
+        containers: true
+        images: true
+        volumes: true
+        networks: true
+      register: docker_info
+
+    - name: Verify all Docker resource lists are empty
+      ansible.builtin.assert:
+        that: "item.count == 0"
+        fail_msg: "Verification failed: Found {{ item.count }} Docker {{ item.type }}(s) on the host."
+        success_msg: "Clean: No Docker {{ item.type }} found."
+      loop:
+        - type: "containers"
+          count: "{{ docker_info.containers | length }}"
+          expected: 0
+        - type: "images"
+          count: "{{ docker_info.images | length }}"
+          expected: 0
+        - type: "volumes"
+          count: "{{ docker_info.volumes | length }}"
+          expected: 0
+        - type: "networks"
+          count: "{{ docker_info.networks | length }}"
+          expected: 3 # ["bridge", "host", "none"] are default networks that always exist

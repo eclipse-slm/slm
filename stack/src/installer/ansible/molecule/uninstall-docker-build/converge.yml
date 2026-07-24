@@ -1,0 +1,76 @@
+---
+# Purpose: bring the instance to the desired state by running the role under test.
+# Molecule calls this playbook with `molecule converge`.
+- name: Converge
+  hosts: all
+  gather_facts: false # Disable if your role does not rely on facts
+  become: true
+  vars_files:
+    - ../default-docker-built/defaults/main.yml
+  tasks:
+    - name: Make sure target host src dir exists
+      ansible.builtin.file:
+        path: "{{ target_host_src_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Copy Installer src to target host
+      ansible.builtin.synchronize:
+        src: "{{ control_node_src_dir }}"
+        dest: "{{ target_host_src_dir }}"
+        recursive: true
+        compress: true
+        delete: true
+
+    - name: Set INSTALLER_API_COMMAND
+      ansible.builtin.lineinfile:
+        path: "{{ target_host_src_dir }}/.env"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - regexp: '^INSTALLER_API_COMMAND='
+          line: "INSTALLER_API_COMMAND=uninstall"
+        - regexp: '^INSTALL_DIRECTORY='
+          line: "INSTALL_DIRECTORY=/opt/installer"
+
+    - name: Build and start Installer container on target host
+      community.docker.docker_compose_v2:
+        project_src: "{{ target_host_docker_compose_base_dir }}"
+        build: always
+        state: present
+        recreate: always
+        services:
+          - installer-api
+        pull: never
+
+    - name: Install sshpass on control node
+      ansible.builtin.apt:
+        name:
+          - sshpass
+          - tailspin
+        state: present
+        update_cache: true
+      delegate_to: localhost
+
+    - name: Define ssh base command (ssh password)
+      when: ansible_password is defined
+      ansible.builtin.set_fact:
+        ssh_cmd: "sshpass -p '{{ ansible_password }}' ssh -o StrictHostKeyChecking=no {{ansible_user}}@{{ ansible_host }}"
+
+    - name: Define ssh base command (ssh key file)
+      when: ansible_password is not defined
+      ansible.builtin.set_fact:
+        ssh_cmd: "ssh -i {{ ansible_ssh_private_key_file }} -o StrictHostKeyChecking=no {{ansible_user}}@{{ ansible_host }}"
+
+    - name: Print remote commands
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop:
+        - '{{ ssh_cmd }}'
+        - 'alias mssh="{{ ssh_cmd }}"'
+        - '{{ ssh_cmd }} sudo docker ps'
+        - 'alias dockerps="{{ ssh_cmd }} sudo docker ps"'
+        - '{{ ssh_cmd }} sudo docker logs -f  eclipse-slm-installer-installer-api-1 2>&1 | tailspin'
+        - 'alias dockerlogs="{{ ssh_cmd }} sudo docker logs -f  eclipse-slm-installer-installer-api-1 2>&1 | tailspin"'

@@ -1,0 +1,6 @@
+---
+- name: "Import Default Prepare"
+  import_playbook: ../default/prepare.yml
+
+- name: "Import Converge of install-ansible"
+  import_playbook: ../install-ansible/converge.yml

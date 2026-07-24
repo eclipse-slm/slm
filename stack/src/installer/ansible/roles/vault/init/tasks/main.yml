@@ -1,0 +1,127 @@
+### Inputs
+- name: "Assert inputs of 'vault/init | main.yml'"
+  ansible.builtin.assert:
+    that:
+      - (vault.url.internal is defined) and (vault.url.internal|length > 0)           # URL of the Vault instance
+
+- name: "Set app name"
+  ansible.builtin.set_fact:
+    _app_name: vault
+
+- name: "Start Vault"
+  block:
+  - name: "Create compose definition from template"
+    ansible.builtin.set_fact:
+      vault_compose: "{{ lookup('template', 'vault.yml') }}"
+
+  - name: "Start Vault containers"
+    # delegate_to: '{{ ENV.DEPLOYMENT_HOST_HOSTNAME }}'
+    community.docker.docker_compose_v2:
+      project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
+      definition: "{{ vault_compose | from_yaml }}"
+      state: present
+      pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+    register: vault_compose_start_output
+
+  - name: "Store resulting compose file"
+    ansible.builtin.template:
+      src: "vault.yml"
+      dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/vault.yml"
+    when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
+
+  - name: "Wait for Vault ('{{ vault.url.internal }}') being up"
+    ansible.builtin.uri:
+      url: "{{ vault.url.internal }}/v1/sys/health"
+      status_code: 200
+    register: result
+    until: result.status == 200
+    retries: 120
+    delay: 3
+
+  - name: "Get Vault root token"
+    community.docker.docker_container_exec:
+      container: "{{ vault_compose_start_output.images | community.general.json_query(query) | first }}"
+      command: "cat /vault/config/root/root_token"
+    vars:
+      query: "[?Repository.contains(@, 'vault')].ContainerName"
+    register: vault_root_token_line
+    until: "vault_root_token_line is not failed"
+    retries: 10
+    delay: 3
+    no_log: true
+
+  - name: "Set Vault root token"
+    ansible.builtin.set_fact:
+      vault_root_token: "{{ vault_root_token_line.stdout | trim }}"
+    no_log: true
+
+  - name: "Assert Vault root token"
+    ansible.builtin.assert:
+      that:
+        - vault_root_token is defined
+        - vault_root_token | length > 0
+      fail_msg: "Vault root token could not be read"
+    no_log: true
+
+- name: "Init Vault"
+  block:
+  - name: "Set Vault token"
+    ansible.builtin.set_fact:
+      vault_token: "{{ vault_root_token }}"
+    no_log: true
+
+  - name: "Create app role Auth Method 'approle'"
+    ansible.builtin.import_role:
+      name: eclipse-slm.vault_client
+      tasks_from: create_approle_auth_method
+    vars:
+      _vault_token: "{{ vault_root_token }}"
+
+- name: "Create root certificate authority (CA)"
+  ansible.builtin.include_role:
+    name: eclipse-slm.vault_client
+    tasks_from: ca/create_root_certificate_authority
+  vars:
+    _vault_token: "{{ vault_root_token }}"
+    _pki_name: "slm"
+    _common_name: "{{ ENV.VAULT.ROOT_CA.COMMON_NAME }}"
+    _issuer_name: "{{ ENV.VAULT.ROOT_CA.ISSUER_NAME }}"
+    _organization: "{{ ENV.VAULT.ROOT_CA.ORGANIZATION }}"
+    _country: "{{ ENV.VAULT.ROOT_CA.COUNTRY }}"
+    _ttl:  "{{ ENV.VAULT.ROOT_CA.TTL }}"
+    _role_name: "{{ ENV.VAULT.ROOT_CA.ROLE_NAME }}"
+
+- name: "Create intermediate ca"
+  ansible.builtin.include_role:
+    name: eclipse-slm.vault_client
+    tasks_from: ca/create_intermediate_ca
+  vars:
+    _vault_token: "{{ vault_root_token }}"
+    _root_pki_name: "pki_root_slm"
+    _pki_name: "slm"
+    _common_name: "{{ ENV.VAULT.INTERMEDIATE_CA.COMMON_NAME }}"
+    _issuer_name: "{{ ENV.VAULT.INTERMEDIATE_CA.ISSUER_NAME }}"
+    _organization: "{{ ENV.VAULT.INTERMEDIATE_CA.ORGANIZATION }}"
+    _country:  "{{ ENV.VAULT.INTERMEDIATE_CA.COUNTRY }}"
+    _ttl:  "{{ ENV.VAULT.INTERMEDIATE_CA.TTL }}"
+
+- name: "Restart Vault container to use and trust newly created root CA"
+  block:
+  - name: "Restart Vault container to use and trust newly created root CA"
+    community.docker.docker_container:
+      name: "{{ vault_compose_start_output.images | community.general.json_query(vault_query) | first }}"
+      restart: true
+    vars:
+      vault_query: "[?Repository.contains(@, 'vault')].ContainerName"
+
+  - name: "Wait for Vault ('{{ vault.url.internal }}') being up"
+    ansible.builtin.uri:
+      url: "{{ vault.url.internal }}/v1/sys/health"
+      status_code: 200
+    register: result
+    until: result.status == 200
+    retries: 120
+    delay: 3
+
+### Outputs
+# - vault_root_token

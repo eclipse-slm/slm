@@ -1,0 +1,85 @@
+---
+### Optional Inputs:
+# - _traefik_wait_for_up: true|false  # Wait for Traefik being up (default: true)
+
+- name: "Create Vault app role for Traefik"
+  ansible.builtin.include_role:
+    name: eclipse-slm.vault_client
+    tasks_from: create_approle_with_policies
+  vars:
+    _vault_token: "{{ vault_root_token }}"
+    _approle_name: "{{ vault_config.approle.name }}"
+    _approle_policies: "{{ vault_config.approle.policies }}"
+
+- name: "Create role name for Vault PKI intermediate CA"
+  ansible.builtin.include_role:
+    name: eclipse-slm.vault_client
+    tasks_from: ca/create_role_name
+  vars:
+    _vault_token: "{{ vault_root_token }}"
+    _pki_name: "{{ vault_config.pki_intermediate_ca.name }}"
+    _role_name: "{{ vault_config.pki_intermediate_ca.role_name }}"
+    _allowed_domains: "{{ vault_config.pki_intermediate_ca.allowed_domains }}"
+    _allow_any_name: "{{ vault_config.pki_intermediate_ca.allow_any_name }}"
+    _ttl: "{{ vault_config.pki_intermediate_ca.ttl }}"
+    _max_ttl: "{{ vault_config.pki_intermediate_ca.max_ttl }}"
+
+- name: "Traefik | Create and add additional config to Consul"
+  block:
+  - name: "Traefik | Init additional config"
+    ansible.builtin.set_fact:
+      _traefik_additional_config: {}
+    when: ENV.TRAEFIK.ADDITIONAL_CONFIG is not mapping
+
+  - name: "Traefik | Set additional config based on ENV"
+    ansible.builtin.set_fact:
+      _traefik_additional_config: "{{ ENV.TRAEFIK.ADDITIONAL_CONFIG | from_yaml }}"
+    when: ENV.TRAEFIK.ADDITIONAL_CONFIG is mapping
+
+  - name: "Traefik | Add default config to Consul"
+    community.general.consul_kv:
+      scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+      host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+      port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
+      token: "{{ _consul_token }}"
+      key: "traefik/{{ item.key | replace('.', '/') }}"
+      value: "{{ item.value }}"
+    loop: "{{ consul_kv | default({}) | dict2items }}"
+
+  - name: "Traefik | Add additional config to Consul"
+    community.general.consul_kv:
+      scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+      host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+      port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
+      token: "{{ _consul_token }}"
+      key: "traefik/{{ item.key | replace('.', '/') }}"
+      value: "{{ item.value }}"
+    loop: "{{ _traefik_additional_config | default({}) | dict2items }}"
+
+- name: "Traefik | Create compose definition from template"
+  ansible.builtin.set_fact:
+    traefik_compose: "{{ lookup('template', 'traefik.yml') }}"
+
+- name: "Traefik | Start Traefik containers"
+  community.docker.docker_compose_v2:
+    project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
+    definition: "{{ traefik_compose | from_yaml}}"
+    state: present
+    pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+  register: traefik_compose_start_output
+
+- name: "Traefik | Wait for Traefik ('{{ traefik.url.api }}') being up"
+  when: _traefik_wait_for_up | default(false)
+  ansible.builtin.uri:
+    url: "{{ traefik.url.api }}/"
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 120
+  delay: 3
+
+- name: "Traefik | Store resulting compose file"
+  ansible.builtin.template:
+    src: "traefik.yml"
+    dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/traefik.yml"
+  when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)

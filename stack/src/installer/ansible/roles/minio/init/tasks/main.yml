@@ -1,0 +1,135 @@
+### Inputs
+- name: "MINIO | Assert inputs of 'minio/init | main.yml'"
+  ansible.builtin.assert:
+    that:
+      - (minio.url.api.internal is defined) and (minio.url.api.internal|length > 0)           # URL of the Minio instance
+      - (minio.url.console.internal is defined) and (minio.url.console.internal|length > 0)   # URL of the Minio instance
+      - (ENV.CONSUL.SCHEME.INTERNAL is defined) and (ENV.CONSUL.SCHEME.INTERNAL|length > 0)           # Scheme of the Consul instance
+      - (ENV.CONSUL.HOST.INTERNAL is defined) and (ENV.CONSUL.HOST.INTERNAL|length > 0)               # Host of the Consul instance
+      - (ENV.CONSUL.PORT.INTERNAL is defined)                                                     # Port of the Consul instance
+      - (_consul_token is defined) and (_consul_token|length > 0)                             # Token to authenticate with Consul
+
+### Optional Inputs
+# _minio_wait_for_up: true|false # Whether to wait for Minio being up or not. Default: false
+
+- name: "MINIO | Get config"
+  block:
+    - name: "MINIO | Check if config exists in Consul"
+      community.general.consul_kv:
+        scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+        host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+        port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
+        token: "{{ _consul_token }}"
+        key: "config/minio/data"
+      register: minio_config_consul
+      no_log: true
+
+    - name: "MINIO | Set minio_config"
+      ansible.builtin.set_fact:
+        minio_config: "{{ minio_config_consul.data.Value | from_yaml }}"
+      when: minio_config_consul.data.Value is defined
+
+    - name: "MINIO | Set Minio config"
+      when: minio_config_consul.data.Value is defined
+      no_log: true
+      block:
+        - name: "MINIO | Set admin password"
+          ansible.builtin.set_fact:
+            ENV: "{{ ENV | combine({
+                    'MINIO': {
+                      'ADMIN_PASSWORD': minio_config.users.admin.password 
+                      }
+                    }, recursive=true) }}"
+          when: (ENV.MINIO.ADMIN_PASSWORD is not defined) or (ENV.MINIO.ADMIN_PASSWORD | default([]) | length == 0)
+
+    - name: "MINIO | Create Minio config"
+      when: minio_config_consul.data.Value is not defined
+      no_log: true
+      block:
+        - name: "MINIO | Create admin password"
+          when: (ENV.MINIO.ADMIN_PASSWORD is not defined) or (ENV.MINIO.ADMIN_PASSWORD | default([]) | length == 0)
+          ansible.builtin.set_fact:
+            ENV: "{{ ENV | combine({
+                    'MINIO': {
+                      'ADMIN_PASSWORD': lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits'], length=24) 
+                      }
+                    }, recursive=true) }}"
+
+        - name: "MINIO | Update minio_config dictionary and override default values"
+          ansible.builtin.set_fact:
+            minio_config: "{{ minio_config | combine(
+            { 'scheme': ENV.MINIO.SCHEME.INTERNAL,
+              'host': ENV.MINIO.HOST.INTERNAL,
+              'console-port': ENV.MINIO.CONSOLE_PORT.INTERNAL,
+              'api-port': ENV.MINIO.API_PORT.INTERNAL,
+              'users': {
+                'admin': {
+                  'username': 'admin',
+                  'password': ENV.MINIO.ADMIN_PASSWORD
+                }            
+              }
+            }
+        , recursive=true) }}"
+
+        - name: "MINIO | Store Minio config in Consul"
+          community.general.consul_kv:
+            scheme: "{{ ENV.CONSUL.SCHEME.INTERNAL }}"
+            host: "{{ ENV.CONSUL.HOST.INTERNAL }}"
+            port: "{{ ENV.CONSUL.PORT.INTERNAL }}"
+            token: "{{ _consul_token }}"
+            key: "{{ item.key }}"
+            value: "{{ item.value }}"
+          loop:
+            - { key: "config/minio/data", value: "{{ minio_config | to_yaml }}"  }
+
+- name: "MINIO | Start Minio"
+  block:
+    - name: "MINIO | Create compose definition from template"
+      ansible.builtin.set_fact:
+        minio_compose: "{{ lookup('template', 'minio.yml') }}"
+
+    - name: "MINIO | Start Minio containers"
+      community.docker.docker_compose_v2:
+        project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
+        definition: "{{ minio_compose | from_yaml}}"
+        state: present
+        pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
+      register: minio_compose_start_output
+
+    - name: "MINIO | Wait for Minio ('{{ minio.url.console.internal }}') being up"
+      when: _minio_wait_for_up | default(false)
+      ansible.builtin.uri:
+        url: "{{ minio.url.console.internal }}"
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 120
+      delay: 3
+
+- name: "MINIO | Store resulting compose file"
+  ansible.builtin.template:
+    src: "minio.yml"
+    dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/minio.yml"
+  when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
+  no_log: true
+
+- name: "MINIO | Register Minio instance at Consul (discovery server)"
+  ansible.builtin.include_role:
+    name: eclipse-slm.consul_client
+    tasks_from: register_service
+  vars:
+    _service_name: minio
+    _service_port: "{{ ENV.MINIO.API_PORT.INTERNAL }}"
+    _service_address: "{{ ENV.MINIO.HOST.INTERNAL }}"
+    _http: "{{ minio.url.api.internal }}/minio/health/live"
+    _additional_tags:
+      - "minio"
+  no_log: true
+
+- name: "MINIO | Install Minio Client"
+  ansible.builtin.include_role:
+    name: eclipse-slm.minio_client
+    tasks_from: install_mc.yml
+  vars:
+    _minio_root_user: "{{ ENV.MINIO.ADMIN_USERNAME }}"
+    _minio_root_password: "{{ ENV.MINIO.ADMIN_PASSWORD }}"
