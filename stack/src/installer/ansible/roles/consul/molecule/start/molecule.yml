@@ -1,0 +1,75 @@
+---
+# Dependency management (download roles/collections)
+dependency:
+  name: galaxy
+  options:
+    ignore-certs: false
+    ignore-errors: false
+    role-file: requirements.yml
+    requirements-file: requirements.yml
+
+platforms:
+  - name: slm-consul
+    groups:
+      - slm
+      - consul
+    # Kubevirt
+    image: quay.io/containerdisks/ubuntu:24.04
+    volume_size: 60Gi
+    instancetype: u1.xlarge
+    # Openstack
+    image_name: Ubuntu 24.04 64-bit
+    flavor: m1.xlarge
+
+
+ansible:
+  cfg:
+    defaults:
+      host_key_checking: false
+      verbosity: 1
+    ssh_connection:
+      pipelining: true
+  env:
+    # ANSIBLE-SPECIFIC:
+    ANSIBLE_FORCE_COLOR: "1"
+    ANSIBLE_LOAD_CALLBACK_PLUGINS: "1"
+
+    # ROLE-SPECIFIC:
+    SLM_HOSTNAME: myhost.local
+    SLM_IP: 172.17.0.1
+    SLM_VERSION: 1.5.0-SNAPSHOT
+    INSTALL_DIRECTORY: /opt/eclipse-slm
+
+  executor:
+    backend: ansible-playbook
+    args:
+      ansible_playbook:
+        - --diff
+        - --force-handlers
+      ansible_navigator:
+        - --mode stdout
+        - --pull-policy missing
+        - --execution-environment-image ghcr.io/ansible/community-ansible-dev-tools:latest
+
+  playbooks:
+    create: ../default/create-os.yml
+    converge: converge.yml
+    destroy: ../default/destroy-os.yml
+    prepare: ../default/prepare.yml
+    verify: verify.yml
+
+scenario:
+  name: start
+  test_sequence:
+    - dependency
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - side_effect
+    - verify
+    - cleanup
+    - destroy
