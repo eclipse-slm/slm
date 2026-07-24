@@ -1,0 +1,17 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: true
+  become: true
+  pre_tasks:
+    - name: Include env role from eclipse.slm collection
+      ansible.builtin.include_role:
+        name: eclipse.slm.env
+        tasks_from: "{{ item }}"
+      with_items:
+        - main
+        - write_hosts
+  tasks:
+    - name: Apply roles
+      ansible.builtin.include_role:
+        name: fabos.slm-ansible-role-docker
