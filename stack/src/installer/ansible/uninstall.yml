@@ -1,0 +1,123 @@
+- name: "Uninstall SLM"
+  hosts: "{{ target_host | default('localhost') }}"
+  gather_facts: true
+  become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    compose_project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
+  pre_tasks:
+    - name: "Set environment facts"
+      ansible.builtin.set_fact:
+        SLM_HOSTNAME: "{{ lookup('ansible.builtin.env', 'SLM_HOSTNAME') }}"
+        SLM_IP: "{{ lookup('ansible.builtin.env', 'SLM_IP') }}"
+        INSTALL_DIRECTORY: "{{ lookup('ansible.builtin.env', 'INSTALL_DIRECTORY') }}"
+
+    - name: Include env role from eclipse.slm collection
+      ansible.builtin.include_role:
+        name: eclipse.slm.env
+
+    # - name: "Import config from env.yml"
+    #   ansible.builtin.include_vars: "/env/env.yml"
+    #   loop:
+    #     - "/env/env.yml"
+    #   register: include_vars_env
+
+    # - name: "Check if env.custom.yml exists"
+    #   ansible.builtin.stat:
+    #     path: "/env/env.custom.yml"
+    #   register: env_custom_file
+
+    # - name: "Import config from env.custom.yml"
+    #   ansible.builtin.include_vars: "/env/env.custom.yml"
+    #   when: env_custom_file.stat.exists
+    #   register: include_vars_env_custom
+
+    # - name: "Import config from env.override.yml"
+    #   ansible.builtin.include_vars: "{{ item }}"
+    #   loop:
+    #     - "/env/env.override.yml"
+    #   register: include_vars_env_override
+
+    # - name: "Combine environment facts"
+    #   ansible.builtin.set_fact:
+    #     ENV: "{{ ENV | combine(include_vars_env.results[0].ansible_facts, recursive=true) }}"
+
+    # - name: "Combine environment facts from env.custom.yml"
+    #   ansible.builtin.set_fact:
+    #     ENV: "{{ ENV | combine(include_vars_env_custom.ansible_facts, recursive=true) }}"
+    #   when: env_custom_file.stat.exists
+
+    # - name: "Combine environment facts from env.override.yml"
+    #   ansible.builtin.set_fact:
+    #     ENV: "{{ ENV | combine(include_vars_env_override.results[0].ansible_facts, recursive=true) }}"
+
+    # - name: "Combine environment facts from environment variables"
+    #   ansible.builtin.set_fact:
+    #     ENV: "{{ ENV | combine({
+    #                 'SLM_HOSTNAME': lookup('ansible.builtin.env', 'SLM_HOSTNAME')
+    #             }, recursive=True) }}"
+  tasks:
+    - name: Get running containers, volumes and networks
+      community.docker.docker_host_info:
+        containers: true
+        containers_filters:
+          label: "com.docker.compose.project={{ compose_project_name }}"
+        containers_all: true
+        volumes: true
+        volumes_filters:
+          label: "com.docker.compose.project={{ compose_project_name }}"
+        networks: true
+      register: docker_info
+
+    - name: Remove containers
+      community.docker.docker_container:
+        name: "{{ item }}"
+        state: absent
+        keep_volumes: false
+      loop: "{{ docker_info.containers | map(attribute='Id') | list }}"
+      async: 60
+      poll: 0
+      register: async_loop
+
+    - name: Wait until containers have been removed
+      ansible.builtin.async_status:
+        jid: "{{ item.ansible_job_id }}"
+        mode: status
+      retries: 120
+      delay: 1
+      loop: "{{ async_loop.results }}"
+      register: async_loop_jobs
+      until: async_loop_jobs.finished
+
+    - name: Remove volumes
+      community.docker.docker_volume:
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ docker_info.volumes | map(attribute='Name') | list }}"
+
+    - name: Remove network
+      community.docker.docker_network:
+        name: "{{ compose_project_name }}_default"
+        state: absent
+
+    - name: Remove all unused Docker objects (system prune)
+      community.docker.docker_prune:
+        containers: true
+        images: true
+        images_filters:
+          dangling: false
+        networks: true
+        volumes: true
+        builder_cache: true
+
+    - name: Remove directories of SLM installation
+      ansible.builtin.file:
+        path: "/install/{{ item }}"
+        state: absent
+      with_items:
+        - deployment
+        - config
+
+    - name: "Display uninstallation success message"
+      ansible.builtin.debug:
+        msg: "Eclipse Service Lifecycle Management version '{{ ENV.SLM_VERSION }}' successfully uninstalled"
