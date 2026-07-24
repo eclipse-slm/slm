@@ -12,7 +12,7 @@ services:
         max-file: "{{ ENV.LOGGING_MAX_FILE }}"
         max-size: "{{ ENV.LOGGING_MAX_SIZE }}"
     environment:
-      KC_HOSTNAME: {{ ENV.SLM_HOSTNAME }}
+      KC_HOSTNAME: "{{ ENV.SLM_HOSTNAME }}"
       MINIO_ROOT_USER: "{{ ENV.MINIO.ADMIN_USERNAME }}"
       MINIO_ROOT_PASSWORD: "{{ ENV.MINIO.ADMIN_PASSWORD }}"
       MINIO_VOLUMES: "/mnt/data"
