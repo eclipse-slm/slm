@@ -82,7 +82,7 @@
 
 - name: "Consul | Create Consul config dictionary and override default values"
   ansible.builtin.set_fact:
-    consul_config: "{{ consul_config | combine(
+    consul_config: "{{ consul_config | default({}) | combine(
     { 'scheme': '{{ ENV.CONSUL.SCHEME.INTERNAL }}',
       'host': '{{ ENV.CONSUL.HOST.INTERNAL }}',
       'port': '{{ ENV.CONSUL.PORT.INTERNAL }}',
