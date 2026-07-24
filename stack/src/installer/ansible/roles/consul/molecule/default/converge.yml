@@ -1,0 +1,20 @@
+---
+# Purpose: bring the instance to the desired state by running the role under test.
+# Molecule calls this playbook with `molecule converge`.
+- name: Converge
+  hosts: slm
+  gather_facts: true # Disable if your role does not rely on facts
+  become: true
+  pre_tasks:
+    - name: Include env role from eclipse.slm collection
+      ansible.builtin.include_role:
+        name: eclipse.slm.env
+        tasks_from: "{{ item }}"
+      with_items:
+        - main
+        - write_hosts
+  tasks:
+    - name: Apply role under test
+      ansible.builtin.include_role:
+        name: ../../../consul
+        tasks_from: start

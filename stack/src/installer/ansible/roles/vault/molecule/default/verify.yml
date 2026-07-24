@@ -1,0 +1,59 @@
+---
+# Purpose: assert that the instance really ended up in the expected state.
+# Molecule calls this playbook with `molecule verify`.
+- name: Verify
+  hosts: slm
+  gather_facts: false
+  become: true
+  pre_tasks:
+    - name: Include env role from eclipse.slm collection
+      ansible.builtin.include_role:
+        name: eclipse.slm.env
+  tasks:
+    - name: "Get Vault container information"
+      community.docker.docker_container_info:
+        name: "{{ ENV.COMPOSE_PROJECT_NAME }}-vault-1"
+      register: vault_container
+
+    - name: "Assert Vault container is running and healthy"
+      ansible.builtin.assert:
+        that:
+          - vault_container.container.State.Status == "running"
+          - vault_container.container.State.Health.Status == "healthy"
+        fail_msg: "Vault container is not running or healthy. Status: {{ vault_container.container.State.Status }}, Health: {{ vault_container.container.State.Health.Status | default('no health check') }}"
+        success_msg: "Vault container is running and healthy."
+
+    - name: "Get Vault external port from ENV"
+      ansible.builtin.set_fact:
+        vault_external_port: "{{ ENV.VAULT.PORT.EXTERNAL | default(8200) }}"
+
+    - name: "Wait for Vault to be accessible on external port"
+      ansible.builtin.wait_for:
+        port: "{{ vault_external_port }}"
+        state: started
+        timeout: 30
+      register: vault_port_check
+
+    - name: "Assert Vault is accessible via external port"
+      ansible.builtin.assert:
+        that:
+          - vault_port_check.state == "started"
+        fail_msg: "Vault is not accessible on port {{ vault_external_port }}"
+        success_msg: "Vault is accessible on port {{ vault_external_port }}."
+
+    - name: "Check Vault health endpoint"
+      ansible.builtin.uri:
+        url: "http://localhost:{{ vault_external_port }}/v1/sys/health"
+        method: GET
+        status_code: 200
+        return_content: true
+      register: vault_health
+      failed_when: vault_health.json is not defined or vault_health.json.initialized is not defined
+
+    - name: "Assert Vault is initialized and unsealed"
+      ansible.builtin.assert:
+        that:
+          - vault_health.json.initialized == true
+          - vault_health.json.sealed == false
+        fail_msg: "Vault is not properly initialized and unsealed. Initialized: {{ vault_health.json.initialized | default('unknown') }}, Sealed: {{ vault_health.json.sealed | default('unknown') }}"
+        success_msg: "Vault is initialized and unsealed."

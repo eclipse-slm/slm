@@ -1,0 +1,19 @@
+---
+collections:
+  - name: https://github.com/eclipse-slm/ansible-collection-slm
+    type: git
+    version: main
+
+roles:
+  - src: "git+https://github.com/eclipse-slm/molecule_kubevirt"
+    scm: git
+    version: main
+    name: fabos.molecule_kubevirt
+
+  - name: ipa-big.molecule_openstack
+    version: 1.0.11
+
+  - src: "git+https://github.com/eclipse-slm/slm-ansible-role-docker"
+    scm: git
+    version: 1.0.8
+    name: fabos.slm-ansible-role-docker
