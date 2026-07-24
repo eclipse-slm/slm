@@ -1,0 +1,5 @@
+minio_config:
+  users:
+    admin:
+      username: admin
+      password: 'password'

@@ -20,11 +20,11 @@ awx_config:
 #   http:
 #     relative_path: /auth
 
-minio_config:
-  users:
-    admin:
-      username: admin
-      password: 'password'
+# minio_config:
+#   users:
+#     admin:
+#       username: admin
+#       password: 'password'
 
 
 # consul_config:
