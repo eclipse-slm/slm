@@ -6,9 +6,9 @@
   gather_facts: true # Disable if your role does not rely on facts
   become: true
   vars_files:
-    - ../default-docker-built/defaults/main.yml
+    - ../default-docker-build/defaults/main.yml
   tasks:
-    - name: "Assert inputs of 'molecule/default-docker-built/converge.yml'"
+    - name: "Assert inputs of 'molecule/default-docker-build/converge.yml'"
       ansible.builtin.assert:
         that:
           - (INSTALLER_API_COMMAND is defined) and (INSTALLER_API_COMMAND|length > 0)
