@@ -9,7 +9,7 @@ dependency:
     requirements-file: requirements.yml
 
 platforms:
-  - name: slm-install-ansible
+  - name: slm-vault-start
     groups:
       - slm
       - vault
@@ -52,16 +52,15 @@ ansible:
         - --execution-environment-image ghcr.io/ansible/community-ansible-dev-tools:latest
 
   playbooks:
-    create: "create-os.yml"
+    create: "../default/create-os.yml"
     converge: converge.yml
-    destroy: "destroy-os.yml"
+    destroy: "../default/destroy-os.yml"
     cleanup: cleanup.yml
-    prepare: prepare.yml
-    side_effect: side_effect.yml
+    prepare: "../default/prepare.yml"
     verify: verify.yml
 
 scenario:
-  name: default
+  name: start
   test_sequence:
     - dependency
     - cleanup
