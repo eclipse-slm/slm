@@ -1,4 +1,15 @@
 # Definition of realm: https://www.keycloak.org/docs-api/22.0.1/rest-api/index.html#RealmRepresentation
+keycloak_config:
+  database:
+    host: keycloak-database
+    url_host: keycloak-database
+    schema: keycloak
+    username: keycloak
+    password: ''
+    root_password: ''
+  http:
+    relative_path: /auth
+
 keycloak_realms:
   - realm: "fabos"
     displayName: ""
