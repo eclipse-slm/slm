@@ -98,6 +98,8 @@
 
 - name: "Configure Vault"
   ansible.builtin.include_tasks: "configure_vault.yml"
+  vars:
+    _vault_root_token: "{{ vault_root_token }}"
 
 - name: "Start SLM components | Platform Management"
   block:

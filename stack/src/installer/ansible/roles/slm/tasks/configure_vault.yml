@@ -1,19 +1,27 @@
-- name: "Create Vault policies"
+---
+- name: "SLM | Assert inputs of 'configure_vault.yml'"
+  ansible.builtin.assert:
+    that:
+      - (_vault_root_token is defined) and (_vault_root_token|length > 0)
+
+- name: "SLM | Create Vault policies"
   ansible.builtin.include_role:
     name: eclipse-slm.vault_client
     tasks_from: create_policy.yml
   vars:
+    _vault_token: "{{ _vault_root_token }}"
     _policy_name: "{{ vault_policy.name }}"
     _policy_content: "{{ vault_policy.policy }}"
   loop: "{{ vault_config.policies }}"
   loop_control:
     loop_var: vault_policy
 
-- name: "Create Vault groups"
+- name: "SLM | Create Vault groups"
   ansible.builtin.include_role:
     name: eclipse-slm.vault_client
     tasks_from: create_group.yml
   vars:
+    _vault_token: "{{ _vault_root_token }}"
     _group_name: "{{ vault_group.name }}"
     _group_type: "external"
     _group_policies: "{{ vault_group.policies }}"
@@ -21,11 +29,12 @@
   loop_control:
     loop_var: vault_group
 
-- name: "Create Vault group aliases"
+- name: "SLM | Create Vault group aliases"
   ansible.builtin.include_role:
     name: eclipse-slm.vault_client
     tasks_from: create_group_alias.yml
   vars:
+    _vault_token: "{{ _vault_root_token }}"
     _group_name: "{{ vault_group.name }}"
     _alias_name: "{{ vault_group.group_alias }}"
     _mount_accessor_name: "{{ vault_config.jwt_auth_method_name }}"
@@ -34,21 +43,21 @@
     loop_var: vault_group
   when: (vault_group.group_alias is defined) and (vault_group.group_alias|length > 0)
 
-- name: "Create Vault app roles"
+- name: "SLM | Create Vault app roles"
   ansible.builtin.include_role:
     name: eclipse-slm.vault_client
     tasks_from: create_approle_and_assign_policies.yml
   vars:
-    _vault_token: "{{ vault_root_token }}"
+    _vault_token: "{{ _vault_root_token }}"
     _approle_name: "{{ item.name }}"
     _approle_policy_names: "{{ item.policies }}"
   loop: "{{ vault_config.approles }}"
 
-- name: "Create Vault secret engine for AWX JWT Authenticator"
+- name: "SLM | Create Vault secret engine for AWX JWT Authenticator"
   ansible.builtin.include_role:
     name: eclipse-slm.vault_client
     tasks_from: create_kv_secret_engine
   vars:
-    _vault_token: "{{ vault_root_token }}"
+    _vault_token: "{{ _vault_root_token }}"
     _kv_secret_engine_name: "{{ item }}"
   loop: "{{ vault_config.kv_secret_engines }}"
