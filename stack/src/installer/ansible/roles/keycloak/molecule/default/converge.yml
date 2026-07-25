@@ -6,14 +6,6 @@
   gather_facts: true # Disable if your role does not rely on facts
   become: true
   pre_tasks:
-    - name: Include env role from eclipse.slm collection
-      ansible.builtin.include_role:
-        name: eclipse.slm.env
-        tasks_from: "{{ item }}"
-      with_items:
-        - main
-        - write_hosts
-
     - name: Apply roles
       ansible.builtin.include_role:
         name: "{{ item.role }}"
@@ -23,6 +15,9 @@
         _store_compose_dir: "/install/deployment"
         _vault_root_token: "{{ vault_root_token | default('') }}"
       loop:
+        - role: eclipse.slm.env
+        - role: eclipse.slm.env
+          tasks_from: write_hosts
         - role: ../../../vault
         - role: ../../../consul
           tasks_from: start
