@@ -6,6 +6,7 @@
       - (_awx_jwt_authenticator_username is defined) and (_awx_jwt_authenticator_username|length > 0)
       - (_awx_jwt_authenticator_password is defined) and (_awx_jwt_authenticator_password|length > 0)
       - (_consul_token is defined) and (_consul_token|length > 0)
+      - (_vault_root_token is defined) and (_vault_root_token|length > 0)
 
 - name: "Set fact for app_name"
   ansible.builtin.set_fact:
@@ -26,6 +27,7 @@
     name: eclipse-slm.vault_client
     tasks_from: create_approle_with_policies
   vars:
+    _vault_token: "{{ _vault_root_token }}"
     _approle_name: "{{ awx_jwt_authenticator.vault.approle.name }}"
     _approle_policies: "{{ awx_jwt_authenticator.vault.approle.policies }}"
 
@@ -34,7 +36,7 @@
     name: eclipse-slm.vault_client
     tasks_from: create_kv_secret_engine
   vars:
-    _vault_token: "{{ vault_root_token }}"
+    _vault_token: "{{_vault_root_token }}"
     _kv_secret_engine_name: "{{ item }}"
   loop: "{{ awx_jwt_authenticator.vault.kv_secret_engines }}"
 
