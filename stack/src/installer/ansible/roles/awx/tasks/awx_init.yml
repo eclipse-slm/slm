@@ -98,9 +98,6 @@
     organization: "{{ awx_slm_organization_name }}"
 
 - block:
-  - debug:
-      var: awx
-
   - name: "Create Keycloak client for AWX"
     ansible.builtin.include_role:
       name: eclipse-slm.keycloak_client
