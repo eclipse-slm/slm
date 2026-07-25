@@ -1,13 +1,13 @@
-awx_config:
-  users:
-    admin:
-      username: admin
-      password: 'password'
-    jwt_authenticator:
-      username: awx_jwt_authenticator
-      password: ''
-  consul:
-    token:
+# awx_config:
+#   users:
+#     admin:
+#       username: admin
+#       password: 'password'
+#     jwt_authenticator:
+#       username: awx_jwt_authenticator
+#       password: ''
+#   consul:
+#     token:
 
 # keycloak_config:
 #   database:
