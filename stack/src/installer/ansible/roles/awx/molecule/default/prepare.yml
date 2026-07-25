@@ -1,0 +1,9 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Apply Docker role
+      ansible.builtin.include_role:
+        name: fabos.slm-ansible-role-docker
