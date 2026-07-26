@@ -1,0 +1,40 @@
+---
+# Purpose: bring the instance to the desired state by running the role under test.
+# Molecule calls this playbook with `molecule converge`.
+- name: Converge
+  hosts: all
+  gather_facts: true # Disable if your role does not rely on facts
+  become: true
+  vars_files:
+    - "../../../awx/defaults/main.yml"
+  pre_tasks:
+    - name: Apply roles
+      ansible.builtin.include_role:
+        name: "{{ item.role }}"
+        tasks_from: "{{ item.tasks_from | default('main') }}"
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _store_compose_dir: "/install/deployment"
+        _vault_root_token: "{{ vault_root_token | default('') }}"
+      loop:
+        - role: eclipse.slm.env
+        - role: eclipse.slm.env
+          tasks_from: write_hosts
+        - role: ../../../vault
+        - role: ../../../consul
+          tasks_from: start
+        - role: ../../../traefik
+        - role: ../../../keycloak
+        - role: ../../../vault
+          tasks_from: init_after_keycloak
+        - role: ../../../consul
+        - role: ../../../rabbitmq
+        - role: ../../../minio
+  tasks:
+    - name: Apply role under test
+      ansible.builtin.include_role:
+        name: ../../../slm
+      vars:
+        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
+        _vault_token: "{{ vault_root_token }}"
+        _store_compose_dir: "/install/deployment"

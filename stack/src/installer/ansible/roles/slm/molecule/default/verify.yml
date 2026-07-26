@@ -1,0 +1,11 @@
+---
+# Purpose: assert that the instance really ended up in the expected state.
+# Molecule calls this playbook with `molecule verify`.
+- name: Verify
+  hosts: slm
+  gather_facts: false # Quicker, if you do not need facts
+  become: true
+  tasks:
+    - name: "TODO - Implement"
+      ansible.builtin.fail:
+        msg: "Verification not implemented yet. Please implement the verification tasks in this playbook."

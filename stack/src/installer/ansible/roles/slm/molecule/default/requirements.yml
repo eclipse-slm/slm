@@ -1,0 +1,40 @@
+collections:
+  - community.general
+  - community.docker
+  - community.rabbitmq
+  - community.crypto
+  - awx.awx
+  - name: https://github.com/eclipse-slm/ansible-collection-slm
+    type: git
+    version: main
+
+roles:
+  - name: eclipse-slm.awx_client
+    src: "git+https://github.com/eclipse-slm/slm-ansible-role-awx-client"
+    scm: git
+    version: main
+
+  - name: eclipse-slm.consul_client
+    src: "git+https://github.com/eclipse-slm/slm-ansible-role-consul-client"
+    scm: git
+    version: main
+
+  - name: eclipse-slm.keycloak_client
+    src: "git+https://github.com/eclipse-slm/slm-ansible-role-keycloak-client"
+    scm: git
+    version: main
+
+  - name: eclipse-slm.minio_client
+    src: "git+https://github.com/eclipse-slm/slm-ansible-role-minio-client"
+    scm: git
+    version: main
+
+  - name: eclipse-slm.rabbitmq_client
+    src: "git+https://github.com/eclipse-slm/slm-ansible-role-rabbitmq-client"
+    scm: git
+    version: main
+
+  - name: eclipse-slm.vault_client
+    src: "git+https://github.com/eclipse-slm/slm-ansible-role-vault-client"
+    scm: git
+    version: main
