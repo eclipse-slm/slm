@@ -12,6 +12,7 @@
       ansible.builtin.assert:
         that:
           - (INSTALLER_API_COMMAND is defined) and (INSTALLER_API_COMMAND|length > 0)
+          - (BUILD_INSTALLER_API_IMAGE is defined) and (BUILD_INSTALLER_API_IMAGE|length > 0)
 
     - name: "Disable Apparmor for rsyslogd on target host (AWX Bug)"
       when:
@@ -61,12 +62,12 @@
     - name: Build and start Installer container on target host
       community.docker.docker_compose_v2:
         project_src: "{{ target_host_docker_compose_base_dir }}"
-        build: always
+        build: "{{ 'always' if (BUILD_INSTALLER_API_IMAGE | bool) else 'never' }}"
         state: present
         recreate: always
         services:
           - installer-api
-        pull: never
+        pull: "{{ 'never' if (BUILD_INSTALLER_API_IMAGE | bool) else 'always' }}"
 
     - name: Install sshpass on control node
       ansible.builtin.apt:

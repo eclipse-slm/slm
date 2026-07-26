@@ -46,7 +46,7 @@ ansible:
         - --diff
         - --force-handlers
         - -e INSTALLER_API_COMMAND="install"
-        - -e BUILD_INSTALLER_API_IMAGE="true"
+        - -e BUILD_INSTALLER_API_IMAGE="false"
       ansible_navigator:
         - --mode stdout
         - --pull-policy missing
@@ -61,7 +61,7 @@ ansible:
     verify: ../default/verify.yml
 
 scenario:
-  name: install-docker-build
+  name: install-docker
   test_sequence:
     - dependency
     - cleanup
