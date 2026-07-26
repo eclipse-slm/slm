@@ -1,0 +1,11 @@
+---
+roles:
+  - name: eclipse-slm.consul_client
+    src: "git+https://github.com/eclipse-slm/slm-ansible-role-consul-client"
+    scm: git
+    version: main
+
+  - name: eclipse-slm.vault_client
+    src: "git+https://github.com/eclipse-slm/slm-ansible-role-vault-client"
+    scm: git
+    version: main

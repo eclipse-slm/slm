@@ -1,0 +1,6 @@
+---
+roles:
+  - name: eclipse-slm.vault_client
+    src: "git+https://github.com/eclipse-slm/slm-ansible-role-vault-client"
+    scm: git
+    version: main
