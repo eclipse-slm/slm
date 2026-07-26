@@ -53,7 +53,12 @@
     state: present
 
 - name: "Remove demo data"
-  ansible.builtin.import_tasks: awx_remove_demo_data.yml
+  ansible.builtin.include_role:
+    name: eclipse-slm.awx_client
+    tasks_from: demo_data_remove
+  vars:
+    awx_username: "{{ _awx_admin_username }}"
+    awx_password: "{{ _awx_admin_password }}"
 
 - name: "Add credential types"
   awx.awx.credential_type:
