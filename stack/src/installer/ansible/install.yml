@@ -4,8 +4,6 @@
   become: true
   vars:
     ansible_python_interpreter: /usr/bin/python3
-  vars_files:
-    - files/config.yml
   pre_tasks:
     - name: Include env role from eclipse.slm collection
       ansible.builtin.include_role:
