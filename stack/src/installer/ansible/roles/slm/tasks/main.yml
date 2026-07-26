@@ -72,6 +72,7 @@
 - name: "Create Minio access"
   ansible.builtin.include_tasks: "create_and_store_minio_config.yml"
   vars:
+    _minio_root_user: "{{ ENV.MINIO.ADMIN_USERNAME }}"
     _app_name: "{{ item }}"
   loop:
     - "service_management"

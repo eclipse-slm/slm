@@ -24,6 +24,8 @@
         name: eclipse-slm.minio_client
         tasks_from: add_user.yml
       vars:
+        _minio_root_user: "{{ ENV.MINIO.ADMIN_USERNAME }}"
+        _minio_root_password: "{{ ENV.MINIO.ADMIN_PASSWORD }}"
         _alias: "slm"
         _user: "{{ _app_name }}"
         _password: "{{ minio_password }}"
