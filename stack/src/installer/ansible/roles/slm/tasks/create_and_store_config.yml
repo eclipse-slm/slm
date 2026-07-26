@@ -36,6 +36,7 @@
       database_user_password: "{{ app_configs[_app_name]['database']['password'] }}"
 
 - name: "Create or get API key"
+  when: security_auth_api_key_enabled | default(false) | bool
   block:
     - name: "Determine existing API key value"
       ansible.builtin.set_fact:
@@ -49,7 +50,6 @@
             if (__existing_api_key_value | length > 0)
             else lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'ascii_uppercase', 'digits', '-_.~'], length=40)
           }}
-  when: security_auth_api_key_enabled | default(false) | bool
 
 - name: "Create RabbitMQ user for '{{ _app_name }}'"
   ansible.builtin.set_fact:
