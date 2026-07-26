@@ -59,107 +59,30 @@
           name: "{{ ENV.COMPOSE_PROJECT_NAME }}-installer-helper-1"
           state: absent
 
-    - name: "Start Vault"
+    - name: Start SLM and Backend Services
+      when: item.when | default(true)
       ansible.builtin.include_role:
-        name: vault
-      vars:
-        _store_compose_dir: "/install/deployment"
-
-    - name: "Start Consul"
-      ansible.builtin.include_role:
-        name: consul
-        tasks_from: start.yml
-      vars:
-        _store_compose_dir: "/install/deployment"
-
-    - name: "Start Traefik"
-      ansible.builtin.include_role:
-        name: traefik
+        name: "{{ item.name }}"
+        tasks_from: "{{ item.tasks_from | default(omit) }}"
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
         _store_compose_dir: "/install/deployment"
         _vault_root_token: "{{ vault_root_token }}"
-
-    - name: "Start Keycloak"
-      ansible.builtin.include_role:
-        name: keycloak
-      vars:
-        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: "/install/deployment"
-
-    - name: "Init Vault after Keycloak available"
-      ansible.builtin.include_role:
-        name: vault
-        tasks_from: init_after_keycloak.yml
-      vars:
-        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _vault_root_token: "{{ vault_root_token }}"
-
-    - name: "Init Consul"
-      ansible.builtin.include_role:
-        name: consul
-      vars:
-        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-
-    - name: "Start RabbitMQ"
-      ansible.builtin.include_role:
-        name: rabbitmq
-      vars:
-        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: "/install/deployment"
-
-    - name: "Start Minio"
-      ansible.builtin.include_role:
-        name: minio
-      vars:
-        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: "/install/deployment"
-
-    - name: "Start AWX"
-      ansible.builtin.include_role:
-        name: awx
-      vars:
-        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _vault_token: "{{ vault_root_token }}"
-        _store_compose_dir: "/install/deployment"
-
-    - name: "Start AAS infrastructure"
-      ansible.builtin.include_role:
-        name: aas
-      vars:
-        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: "/install/deployment"
-
-    - name: "Start monitoring"
-      ansible.builtin.include_role:
-        name: monitoring
-      vars:
-        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: "/install/deployment"
-
-    - name: "Start discovery"
-      ansible.builtin.include_role:
-        name: discovery
-      vars:
-        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: "/install/deployment"
-
-    - name: "Start IRS"
-      ansible.builtin.include_role:
-        name: irs
-        tasks_from: main.yml
-      vars:
-        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: "/install/deployment"
-      when: ENV.IRS.ENABLED
-
-    - name: "Start internal SLM components"
-      ansible.builtin.include_role:
-        name: slm
-      vars:
-        _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _vault_token: "{{ vault_root_token }}"
-        _store_compose_dir: "/install/deployment"
+      loop:
+        - { name: "vault" }
+        - { name: "consul",     tasks_from: "start.yml" }
+        - { name: "traefik" }
+        - { name: "keycloak" }
+        - { name: "vault",      tasks_from: "init_after_keycloak.yml" }
+        - { name: "consul" }
+        - { name: "rabbitmq" }
+        - { name: "minio" }
+        - { name: "awx" }
+        - { name: "aas" }
+        - { name: "monitoring" }
+        - { name: "discovery" }
+        - { name: "irs", when: "{{ ENV.IRS.ENABLED | bool }}" }
+        - { name: "slm" }
 
     - name: "Store resulting environment file"
       ansible.builtin.include_role:
