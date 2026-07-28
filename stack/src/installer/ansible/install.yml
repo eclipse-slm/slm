@@ -51,6 +51,10 @@
           connected:
             - "{{ lookup('ansible.builtin.env', 'HOSTNAME') | default('eclipse-slm-installer', true) }}"
           appends: true
+        register: network_add_result
+        failed_when:
+          - network_add_result is failed
+          - "'already exists' not in network_add_result.msg"
 
       - name: "Remove helper container for network creation"
         community.docker.docker_container:
