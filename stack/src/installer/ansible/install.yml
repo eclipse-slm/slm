@@ -67,12 +67,12 @@
         _store_compose_dir: "/install/deployment"
         _vault_root_token: "{{ vault_root_token }}"
       loop:
-        - { name: "vault" }
-        - { name: "consul",     tasks_from: "start.yml" }
-        - { name: "traefik" }
+        - { name: "eclipse.slm.vault" }
+        - { name: "eclipse.slm.consul",     tasks_from: "start.yml" }
+        - { name: "eclipse.slm.traefik" }
         - { name: "keycloak" }
-        - { name: "vault",      tasks_from: "init_after_keycloak.yml" }
-        - { name: "consul" }
+        - { name: "eclipse.slm.vault",      tasks_from: "init_after_keycloak.yml" }
+        - { name: "eclipse.slm.consul" }
         - { name: "rabbitmq" }
         - { name: "minio" }
         - { name: "awx" }
