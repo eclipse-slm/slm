@@ -108,18 +108,18 @@
       ansible.builtin.set_fact:
         slm_compose: "{{ lookup('template', 'slm-platform-management.yml') }}"
 
+    - name: "Store resulting compose files"
+      ansible.builtin.template:
+        src: "slm-platform-management.yml"
+        dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/slm.platform-management.yml"
+      when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
+
     - name: "Start containers"
       community.docker.docker_compose_v2:
         project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
         definition: "{{ slm_compose | from_yaml }}"
         state: present
         pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
-
-    - name: "Store resulting compose files"
-      ansible.builtin.template:
-        src: "slm-platform-management.yml"
-        dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/slm.platform-management.yml"
-      when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
 
 - name: "Create SLM default users"
   block:
@@ -160,18 +160,18 @@
       ansible.builtin.set_fact:
         slm_compose: "{{ lookup('template', 'slm.yml') }}"
 
+    - name: "Store resulting compose files"
+      ansible.builtin.template:
+        src: "slm.yml"
+        dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/slm.yml"
+      when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
+
     - name: "Start containers"
       community.docker.docker_compose_v2:
         project_name: "{{ ENV.COMPOSE_PROJECT_NAME }}"
         definition: "{{ slm_compose | from_yaml}}"
         state: present
         pull: "{{ ENV.PULL_DOCKER_IMAGES }}"
-
-    - name: "Store resulting compose files"
-      ansible.builtin.template:
-        src: "slm.yml"
-        dest: "{{ _store_compose_dir | regex_replace('/+$', '') }}/slm.yml"
-      when: (_store_compose_dir is defined) and (_store_compose_dir|length > 0)
 
 - name: "Start SLM components | Drivers (optional)"
   ansible.builtin.include_tasks: "deploy_drivers.yml"
