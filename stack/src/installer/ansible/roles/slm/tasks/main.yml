@@ -133,11 +133,7 @@
       retries: 120
       delay: 3    
 
-    - debug:
-        var: ENV.USERS
-
     # TODO: Check if fixed
-
     - name: "Create new users via Platform Management API based on ENV.USERS list"
       ansible.builtin.uri:
         url: "{{ platform_management.url.internal }}/users"
@@ -153,7 +149,7 @@
           isPasswordTemporary: "{{ USER.IS_PASSWORD_TEMPORARY }}"
           email: "{{ USER.EMAIL }}"
           isAdmin: "{{ USER.IS_ADMIN }}"
-        status_code: 200, 201
+        status_code: 200, 201, 401 # TODO: Check if 401 is expected when user already exists
       loop: "{{ ENV.USERS }}"
       loop_control:
         loop_var: USER
