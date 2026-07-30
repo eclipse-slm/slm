@@ -68,6 +68,7 @@
         services:
           - installer-api
         pull: "{{ 'never' if (BUILD_INSTALLER_API_IMAGE | bool) else 'always' }}"
+      register: installer_compose_result
 
     - name: Install sshpass on control node
       ansible.builtin.apt:
@@ -96,5 +97,5 @@
         - 'alias mssh="{{ ssh_cmd }}"'
         - '{{ ssh_cmd }} sudo docker ps'
         - 'alias dockerps="{{ ssh_cmd }} sudo docker ps"'
-        - '{{ ssh_cmd }} sudo docker logs -f  eclipse-slm-installer-installer-api-1 2>&1 | tailspin'
-        - 'alias dockerlogs="{{ ssh_cmd }} sudo docker logs -f  eclipse-slm-installer-installer-api-1 2>&1 | tailspin"'
+        - '{{ ssh_cmd }} sudo docker logs -f  eclipse-slm-installer-installer-api-1 2>&1 | tailspin' # TODO: make container-name dynamic in future
+        - 'alias dockerlogs="{{ ssh_cmd }} sudo docker logs -f  eclipse-slm-installer-installer-api-1 2>&1 | tailspin"' # TODO: make container-name dynamic in future
