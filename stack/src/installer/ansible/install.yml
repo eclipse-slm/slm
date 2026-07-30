@@ -74,7 +74,7 @@
         - { name: "eclipse.slm.vault" }
         - { name: "eclipse.slm.consul",     tasks_from: "start.yml" }
         - { name: "eclipse.slm.traefik" }
-        - { name: "keycloak" }
+        - { name: "eclipse.slm.keycloak" }
         - { name: "eclipse.slm.vault",      tasks_from: "init_after_keycloak.yml" }
         - { name: "eclipse.slm.consul" }
         - { name: "rabbitmq" }
