@@ -1,4 +1,8 @@
 ---
+- name: Lookup INSTALL_DIRECTORY
+  ansible.builtin.set_fact:
+    INSTALL_DIRECTORY: "{{ lookup('env', 'INSTALL_DIRECTORY') }}"
+
 - name: "Generate AAS compose file"
   ansible.builtin.set_fact:
     aas_compose: "{{ lookup('template', 'aas.yml') }}"
