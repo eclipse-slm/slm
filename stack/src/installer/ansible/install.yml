@@ -81,7 +81,7 @@
         - { name: "minio" }
         - { name: "awx" }
         - { name: "aas" }
-        - { name: "monitoring" }
+        - { name: "eclipse.slm.monitoring" }
         - { name: "discovery" }
         - { name: "irs", when: "{{ ENV.IRS.ENABLED | bool }}" }
         - { name: "slm" }
