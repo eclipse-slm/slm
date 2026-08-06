@@ -91,7 +91,7 @@
 
     - name: Print remote commands
       ansible.builtin.debug:
-        msg: "{{ item }}"
+        msg: "" # Ansible prints items, too. So no Message required + special chars are not escaped in item text.
       loop:
         - '{{ ssh_cmd }}'
         - 'alias mssh="{{ ssh_cmd }}"'
