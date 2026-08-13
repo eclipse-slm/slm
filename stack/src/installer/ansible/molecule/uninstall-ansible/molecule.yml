@@ -5,8 +5,8 @@ dependency:
   options:
     ignore-certs: false
     ignore-errors: false
-    role-file: requirements.yml
-    requirements-file: requirements.yml
+    role-file: ${MOLECULE_SCENARIO_DIRECTORY}/../default/requirements.yml
+    requirements-file: ${MOLECULE_SCENARIO_DIRECTORY}/../default/requirements.yml
 
 platforms:
   - name: slm-uninstall-ansible
