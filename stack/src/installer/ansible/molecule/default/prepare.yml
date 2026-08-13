@@ -6,4 +6,4 @@
   tasks:
     - name: Apply Docker role
       ansible.builtin.include_role:
-        name: fabos.slm-ansible-role-docker
+        name: eclipse-slm.docker

@@ -9,5 +9,5 @@
       ansible.builtin.debug:
         msg: "Target host is set to: {{ target_host | default('localhost') }}"
 
-- name: Converge - Installer
+- name: CONVERGE - INSTALL-ANSIBLE
   ansible.builtin.import_playbook: ../../install.yml

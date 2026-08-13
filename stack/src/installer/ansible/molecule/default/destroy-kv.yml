@@ -7,5 +7,5 @@
   tasks:
     - name: Destroy via kubevirt
       ansible.builtin.include_role:
-        name: fabos.molecule_kubevirt
+        name: eclipse-slm.molecule_kubevirt
         tasks_from: destroy.yml
