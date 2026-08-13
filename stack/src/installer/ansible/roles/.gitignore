@@ -1,6 +1,2 @@
-eclipse-slm.awx_client
-eclipse-slm.consul_client
-eclipse-slm.keycloak_client
-eclipse-slm.minio_client
-eclipse-slm.rabbitmq_client
-eclipse-slm.vault_client
+eclipse-slm.*
+ipa-big.*
