@@ -68,7 +68,7 @@
         tasks_from: "{{ item.tasks_from | default(omit) }}"
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_compose_dir: "/install/deployment"
+        _store_compose_dir: "{{ INSTALL_DIRECTORY }}/deployment"
         _vault_root_token: "{{ vault_root_token }}"
       loop:
         - { name: "eclipse.slm.vault" }
@@ -77,14 +77,14 @@
         - { name: "eclipse.slm.keycloak" }
         - { name: "eclipse.slm.vault",      tasks_from: "init_after_keycloak.yml" }
         - { name: "eclipse.slm.consul" }
-        - { name: "rabbitmq" }
-        - { name: "minio" }
-        - { name: "awx" }
-        - { name: "aas" }
+        - { name: "eclipse.slm.rabbitmq" }
+        - { name: "eclipse.slm.minio" }
+        - { name: "eclipse.slm.awx" }
+        - { name: "eclipse.slm.aas" }
         - { name: "eclipse.slm.monitoring" }
-        - { name: "discovery" }
-        - { name: "irs", when: "{{ ENV.IRS.ENABLED | bool }}" }
-        - { name: "slm" }
+        - { name: "eclipse.slm.discovery" }
+        - { name: "eclipse.slm.irs", when: "{{ ENV.IRS.ENABLED | bool }}" }
+        - { name: "eclipse.slm.slm" }
 
     - name: "Store resulting environment file"
       ansible.builtin.include_role:
@@ -92,7 +92,7 @@
         tasks_from: copy_result_compose_env
       vars:
         _consul_token: "{{ ENV.CONSUL.MASTER_TOKEN }}"
-        _store_env_file: "/install/deployment/.env"
+        _store_env_file: "{{ INSTALL_DIRECTORY }}/deployment/.env"
 
     - name: "Display installation summary"
       ansible.builtin.debug:
