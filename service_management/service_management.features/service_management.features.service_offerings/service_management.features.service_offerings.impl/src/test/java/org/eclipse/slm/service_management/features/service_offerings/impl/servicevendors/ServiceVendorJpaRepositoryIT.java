@@ -32,6 +32,9 @@ public class ServiceVendorJpaRepositoryIT {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     public void findAllServiceVendors() {
+        serviceVendorJpaRepository.deleteAll();
+        entityManager.clear();
+
         var serviceVendorId1 = UUID.randomUUID();
         var serviceVendorId2 = UUID.randomUUID();
         var testServiceVendor1 = new ServiceVendor(serviceVendorId1);
