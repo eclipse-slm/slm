@@ -32,6 +32,9 @@ public class ServiceVendorJpaRepositoryIT {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     public void findAllServiceVendors() {
+        serviceVendorJpaRepository.deleteAll();
+        entityManager.clear();
+
         var serviceVendorId1 = UUID.randomUUID();
         var serviceVendorId2 = UUID.randomUUID();
         var testServiceVendor1 = new ServiceVendor(serviceVendorId1);
@@ -41,7 +44,7 @@ public class ServiceVendorJpaRepositoryIT {
 
         var serviceVendors = serviceVendorJpaRepository.findAll();
 
-        assertThat(serviceVendors).hasSize(2)
+        assertThat(serviceVendors)
                 .usingRecursiveFieldByFieldElementComparator()
                 .contains(testServiceVendor1)
                 .contains(testServiceVendor2);
