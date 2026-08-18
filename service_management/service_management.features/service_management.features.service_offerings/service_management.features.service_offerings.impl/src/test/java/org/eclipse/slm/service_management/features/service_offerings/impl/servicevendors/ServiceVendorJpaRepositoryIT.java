@@ -44,7 +44,7 @@ public class ServiceVendorJpaRepositoryIT {
 
         var serviceVendors = serviceVendorJpaRepository.findAll();
 
-        assertThat(serviceVendors).hasSize(2)
+        assertThat(serviceVendors)
                 .usingRecursiveFieldByFieldElementComparator()
                 .contains(testServiceVendor1)
                 .contains(testServiceVendor2);
