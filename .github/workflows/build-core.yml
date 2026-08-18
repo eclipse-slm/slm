@@ -193,6 +193,7 @@ jobs:
           host: ${{env.STAGING_VM_IP}}
           username: operation
           key: ${{secrets.RUNNER_PRIVATE_KEY}}
+          command_timeout: 45m
           envs: STAGING_VM_HOSTNAME,STAGING_VM_IP
           script: |
             rm -r ~/staging/tmp || true && mkdir -p ~/staging/tmp && cd ~/staging/tmp
