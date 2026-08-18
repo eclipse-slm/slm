@@ -13,7 +13,7 @@ RUN chmod +x /usr/local/bin/mc
 RUN /usr/local/bin/mc --version
 
 COPY src /src
-RUN touch /env/env.override.yml
+RUN mkdir -p /env && touch /env/env.override.yml
 
 WORKDIR src
 
