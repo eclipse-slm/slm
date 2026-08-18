@@ -207,6 +207,7 @@ jobs:
             docker run \
               --rm \
               --pull=always \
+              --env SLM_VERSION=$CORE_VERSION \
               --env SLM_HOSTNAME=$STAGING_VM_HOSTNAME \
               --env SLM_IP=$STAGING_VM_IP \
               --env INSTALL_DIRECTORY=$INSTALL_DIRECTORY \
