@@ -24,8 +24,7 @@ COPY backend/entrypoint-api.sh /app/entrypoint-api.sh
 RUN chmod +x /app/entrypoint-api.sh
 
 COPY ansible /ansible/installer/src
-COPY ansible/files/env.yml /env/env.yml
-COPY ansible/files/env.override.yml /env/env.override.yml
+RUN touch /env/env.override.yml
 
 RUN ansible-galaxy install -r /ansible/installer/src/requirements.yml
 
