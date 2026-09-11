@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.annotation.PostConstruct;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
@@ -144,13 +145,13 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
                 var submodelId = submodelRef.getKeys().get(0).getValue();
                 var optionalSubmodelDescriptor = this.submodelRegistryClient.getSubmodelDescriptor(submodelId);
                 optionalSubmodelDescriptor.ifPresent(submodelDescriptor -> {
-                    if (submodelDescriptor.getSemanticId() != null) {
+                    if (submodelDescriptor.getSemanticId() != null && !submodelDescriptor.getSemanticId().getKeys().isEmpty()) {
                         var semanticId = submodelDescriptor.getSemanticId().getKeys().get(0).getValue();
                         if (semanticId.equals(IDTASubmodelTemplates.NAMEPLATE_V2_SUBMODEL_SEMANTIC_ID)
                                 || semanticId.equals(IDTASubmodelTemplates.NAMEPLATE_V3_SUBMODEL_SEMANTIC_ID)) {
                             digitalNameplateSubmodelExists.set(true);
-                            LOG.info("DigitalNameplate submodel already exists for resource [id='" + resource.getId() + "'], " +
-                                    "skipping registration of digital nameplate submodel");
+                            LOG.info("DigitalNameplate submodel [id='{}'] already exists for resource [id='{}'], skipping creation",
+                                    submodelId, resource.getId());
                         }
                     }
                 });
@@ -158,6 +159,7 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
 
             if (!digitalNameplateSubmodelExists.get()) {
                 var digitalNameplateSubmodelId = DigitalNameplateV3Submodel.SUBMODEL_IDSHORT + "-" + resource.getId();
+                LOG.info("Creating DigitalNameplate submodel [id='{}'] for resource [id='{}']", digitalNameplateSubmodelId, resource.getId());
                 var digitalNameplateSubmodel = new DigitalNameplateV3Submodel(digitalNameplateSubmodelId, digitalNameplateV3);
                 this.submodelRepositoryClient.createOrUpdateSubmodel(digitalNameplateSubmodel);
                 this.aasRepositoryClient.addSubmodelReferenceToAas(resourceAAS.getId(), digitalNameplateSubmodelId);
@@ -184,10 +186,9 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
                     deviceInfoSubmodelId,
                     deviceInfoSubmodelId,
                     DeviceInfoSubmodel.SEMANTIC_ID_VALUE);
-
         }
         catch (FeignResponseException e) {
-            LOG.error("Unable to create AAS and submodels for resource [id='" + resource.getId() + "']: " + e.getMessage());
+            LOG.error("Unable to create AAS and submodels for resource [id='" + resource.getId() + "']: " + e.getMessage(), e);
         }
     }
 
@@ -209,11 +210,13 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
                     if (submodelDescriptorOptional.isPresent()) {
                         var endpoint = submodelDescriptorOptional.get().getEndpoints().get(0).getProtocolInformation().getHref();
 
-                        if (endpoint.startsWith(this.submodelRepositoryClient.getSubmodelRepositoryUrl())) {
+                        if (isHostedInSubmodelRepository(endpoint)) {
+                            LOG.info("Deleting submodel [id='{}'] from submodel repository (registry endpoint='{}')", submodelId, endpoint);
                             this.submodelRepositoryClient.deleteSubmodel(submodelId);
                         }
                         else {
                             try {
+                                LOG.info("Unregistering externally hosted submodel [id='{}'] (registry endpoint='{}')", submodelId, endpoint);
                                 this.submodelRegistryClient.unregisterSubmodel(submodelId);
                             } catch (FeignResponseException e) {
                                 LOG.error("Unable to unregister submodel [id='" + submodelId + "']: " + e.getMessage());
@@ -223,17 +226,46 @@ public class ResourcesAasHandler implements ApplicationListener<ResourceEvent> {
                     // If submodel descriptor was not found try to delete submodel in the default submodel repository
                     else {
                         try {
+                            LOG.info("No descriptor found in registry for submodel [id='{}'], deleting it from default submodel repository", submodelId);
                             this.submodelRepositoryClient.deleteSubmodel(submodelId);
                         }
                         catch (Exception e) {
-                            LOG.debug("Unable to cleanup submodel [id='" + submodelId + "'] in default submodel repository: " + e.getMessage(), e);
+                            LOG.warn("Unable to cleanup submodel [id='{}'] in default submodel repository: {}", submodelId, e.getMessage(), e);
                         }
                     }
                 }
             }
             this.aasRepositoryClient.deleteAAS(resourceAasId);
+            LOG.info("Deleted resource AAS [id='{}'] and cleaned up its submodels", resourceAasId);
         } catch (Exception e) {
+            LOG.error("Failed to delete AAS and submodels for resource [id='{}']: {}", resourceId, e.getMessage(), e);
             throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Determines whether a submodel is physically stored in the (BaSyx) submodel repository by comparing the
+     * <em>path</em> of the registered endpoint with the submodel repository path.
+     * <p>
+     * The comparison is intentionally path-based: the endpoint auto-registered by the submodel repository uses
+     * the externally reachable host/scheme/port, which differs from the internally configured submodel repository
+     * URL used by this service. A full-URL comparison therefore misclassifies repository-hosted submodels (e.g. the
+     * Digital Nameplate) as externally hosted, which would only unregister them instead of deleting their data -
+     * leaving orphaned submodel data behind.
+     */
+    private boolean isHostedInSubmodelRepository(String endpoint) {
+        var submodelRepositoryUrl = this.submodelRepositoryClient.getSubmodelRepositoryUrl();
+        try {
+            var repositoryPath = URI.create(submodelRepositoryUrl).getPath();
+            if (repositoryPath == null || repositoryPath.isBlank() || repositoryPath.equals("/")) {
+                // No meaningful repository path configured -> fall back to full-URL comparison
+                return endpoint.startsWith(submodelRepositoryUrl);
+            }
+            var endpointPath = URI.create(endpoint).getPath();
+            return endpointPath != null && endpointPath.startsWith(repositoryPath);
+        } catch (IllegalArgumentException e) {
+            // Malformed URL -> fall back to the original full-URL comparison
+            return endpoint.startsWith(submodelRepositoryUrl);
         }
     }
 

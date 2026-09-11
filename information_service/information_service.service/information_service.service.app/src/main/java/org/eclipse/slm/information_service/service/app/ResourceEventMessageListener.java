@@ -11,6 +11,7 @@ import org.eclipse.slm.aas.clients.submodelrepository.SubmodelRepositoryClient;
 import org.eclipse.slm.aas.clients.submodelrepository.SubmodelRepositoryClientFactory;
 import org.eclipse.slm.common.messaging.AbstractEventMessage;
 import org.eclipse.slm.common.messaging.GenericMessageListener;
+import org.eclipse.slm.resource_management.common.aas.submodels.digitalnameplate.DigitalNameplateV3Submodel;
 import org.eclipse.slm.resource_management.common.resources.ResourceEventMessage;
 import org.eclipse.slm.resource_management.common.resources.ResourceEventType;
 import org.slf4j.Logger;
@@ -27,7 +28,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 @Component
@@ -80,30 +81,14 @@ public class ResourceEventMessageListener extends GenericMessageListener<Resourc
             }
             var resourceAas = resourceAasOptional.get();
 
-            var semanticIdToSubmodelDescriptors = new HashMap<String, List<SubmodelDescriptor>>();
-
-            // Get all submodel descriptors of submodels contained in the AAS
+            // Collect the ids of all submodels currently referenced by the AAS. This is used further down to
+            // keep processing idempotent (skip already imported submodels) and to check whether the Resource
+            // Management Nameplate still needs to be replaced.
+            var existingSubmodelIds = new HashSet<String>();
             for (var submodelRef : resourceAas.getSubmodels()) {
                 var submodelRefKey = submodelRef.getKeys().get(0);
                 if (submodelRefKey.getType().equals(KeyTypes.SUBMODEL)) {
-                    var submodelDescriptor = submodelRegistryClient.getSubmodelDescriptor(submodelRefKey.getValue());
-
-                    if (submodelDescriptor.isPresent()) {
-                        if (submodelDescriptor.get().getSemanticId() == null) {
-                            LOG.info("No semantic ID found for existing submodel '{}', skipping", submodelDescriptor.get().getId());
-                            continue;
-                        }
-
-                        var semanticIdKey = submodelDescriptor.get().getSemanticId().getKeys().get(0);
-
-                        if (semanticIdToSubmodelDescriptors.containsKey(semanticIdKey.getValue())) {
-                            semanticIdToSubmodelDescriptors.get(semanticIdKey.getValue())
-                                    .add(submodelDescriptor.get());
-                        } else {
-                            semanticIdToSubmodelDescriptors.computeIfAbsent(semanticIdKey.getValue(), k -> new ArrayList<>())
-                                    .add(submodelDescriptor.get());
-                        }
-                    }
+                    existingSubmodelIds.add(submodelRefKey.getValue());
                 }
             }
 
@@ -161,33 +146,41 @@ public class ResourceEventMessageListener extends GenericMessageListener<Resourc
                 });
             }
 
-            var duplicateSubmodelIdsToDelete = new ArrayList<String>();
+            // The Digital Nameplate that Resource Management created during onboarding. It is meant to be
+            // replaced by the (richer) Nameplate imported from the IRS - but ONLY this specific submodel may
+            // ever be deleted, never an already imported one.
+            var rmNameplateSubmodelId = DigitalNameplateV3Submodel.SUBMODEL_IDSHORT + "-" + resourceEventMessage.getResource().getId();
+
+            // Collect the ids of the received submodels and detect whether a Nameplate is among them. The id
+            // set is used as a guard so we never delete a submodel that we are importing/keeping.
+            var receivedSubmodelIds = new HashSet<String>();
+            var receivedNameplatePresent = false;
             for (var submodelDescriptor : receivedSubmodelDescriptors) {
-                if (submodelDescriptor.getSemanticId() == null) {
-                    LOG.info("No semantic ID found for received submodelDescriptor '{}', skipping duplicate check", submodelDescriptor.getId());
-                }
-                else {
+                receivedSubmodelIds.add(submodelDescriptor.getId());
+                if (submodelDescriptor.getSemanticId() != null && !submodelDescriptor.getSemanticId().getKeys().isEmpty()) {
                     var semanticId = submodelDescriptor.getSemanticId().getKeys().get(0).getValue();
-                    if ((semanticId.equals(IDTASubmodelTemplates.NAMEPLATE_V2_SUBMODEL_SEMANTIC_ID)
-                            || semanticId.equals(IDTASubmodelTemplates.NAMEPLATE_V3_SUBMODEL_SEMANTIC_ID))
-                            && (semanticIdToSubmodelDescriptors.containsKey(IDTASubmodelTemplates.NAMEPLATE_V2_SUBMODEL_SEMANTIC_ID)
-                            || semanticIdToSubmodelDescriptors.containsKey(IDTASubmodelTemplates.NAMEPLATE_V3_SUBMODEL_SEMANTIC_ID))) {
-                        if (semanticIdToSubmodelDescriptors.containsKey(IDTASubmodelTemplates.NAMEPLATE_V2_SUBMODEL_SEMANTIC_ID)) {
-                            duplicateSubmodelIdsToDelete.add(semanticIdToSubmodelDescriptors.get(IDTASubmodelTemplates.NAMEPLATE_V2_SUBMODEL_SEMANTIC_ID).get(0).getId());
-                        }
-                        if (semanticIdToSubmodelDescriptors.containsKey(IDTASubmodelTemplates.NAMEPLATE_V3_SUBMODEL_SEMANTIC_ID)) {
-                            duplicateSubmodelIdsToDelete.add(semanticIdToSubmodelDescriptors.get(IDTASubmodelTemplates.NAMEPLATE_V3_SUBMODEL_SEMANTIC_ID).get(0).getId());
-                        }
+                    if (semanticId.equals(IDTASubmodelTemplates.NAMEPLATE_V2_SUBMODEL_SEMANTIC_ID)
+                            || semanticId.equals(IDTASubmodelTemplates.NAMEPLATE_V3_SUBMODEL_SEMANTIC_ID)) {
+                        receivedNameplatePresent = true;
                     }
+                }
+            }
+
+            // Register the received submodels at the SLM registry and add references to the resource AAS.
+            // Submodels that are already referenced are skipped so that a re-delivery / re-processing of the
+            // same event does not create duplicate references (idempotency).
+            var addedSubmodelCount = 0;
+            for (var submodelDescriptor : receivedSubmodelDescriptors) {
+                if (existingSubmodelIds.contains(submodelDescriptor.getId())) {
+                    LOG.info("Submodel '{}' already referenced by AAS '{}', skipping", submodelDescriptor.getId(), resourceAasId);
+                    continue;
                 }
 
                 // Register submodel of IRS at submodel registry of SLM
                 var submodelEndpoint = irsUrlExternal + "/submodels/" + Base64.getEncoder().encodeToString(submodelDescriptor.getId().getBytes());
                 String semanticId = null;
-                if (submodelDescriptor.getSemanticId() != null) {
-                    if (!submodelDescriptor.getSemanticId().getKeys().isEmpty()) {
-                        semanticId = submodelDescriptor.getSemanticId().getKeys().get(0).getValue();
-                    }
+                if (submodelDescriptor.getSemanticId() != null && !submodelDescriptor.getSemanticId().getKeys().isEmpty()) {
+                    semanticId = submodelDescriptor.getSemanticId().getKeys().get(0).getValue();
                 }
                 submodelRegistryClient.registerSubmodel(
                         submodelEndpoint,
@@ -196,17 +189,22 @@ public class ResourceEventMessageListener extends GenericMessageListener<Resourc
                         semanticId);
 
                 aasRepositoryClient.addSubmodelReferenceToAas(resourceAas.getId(), submodelDescriptor.getId());
-                // Add submodelDescriptor refs to existing resourceCreatedMessage AAS
-                aasRepositoryClient.addSubmodelReferenceToAas(resourceAas.getId(), submodelDescriptor.getId());
+                existingSubmodelIds.add(submodelDescriptor.getId());
+                addedSubmodelCount++;
             }
 
-            for (var submodelIdToDelete : duplicateSubmodelIdsToDelete) {
-                aasRepositoryClient.removeSubmodelReferenceFromAas(resourceAasId, submodelIdToDelete);
-                submodelRepositoryClient.deleteSubmodel(submodelIdToDelete);
-                LOG.info("Deleted duplicate submodel '{}' from AAS '{}'", submodelIdToDelete, resourceAasId);
+            // Replace the Resource Management Nameplate with the one imported from the IRS. Only the RM-created
+            // Nameplate is deleted, and only if it still exists and is not itself one of the imported submodels.
+            // This keeps the step idempotent: on re-processing the RM Nameplate is already gone, so nothing happens.
+            if (receivedNameplatePresent
+                    && existingSubmodelIds.contains(rmNameplateSubmodelId)
+                    && !receivedSubmodelIds.contains(rmNameplateSubmodelId)) {
+                aasRepositoryClient.removeSubmodelReferenceFromAas(resourceAasId, rmNameplateSubmodelId);
+                submodelRepositoryClient.deleteSubmodel(rmNameplateSubmodelId);
+                LOG.info("Replaced Resource Management Nameplate '{}' on AAS '{}' with Nameplate imported from IRS", rmNameplateSubmodelId, resourceAasId);
             }
 
-            LOG.info("Successfully added {} submodels to AAS '{}'", receivedSubmodelDescriptors.size(), resourceAasId);
+            LOG.info("Successfully added {} submodels to AAS '{}'", addedSubmodelCount, resourceAasId);
         }
         catch (Exception e) {
             Writer buffer = new StringWriter();
