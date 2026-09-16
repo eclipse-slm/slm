@@ -52,24 +52,24 @@ public class ClusterHandler {
 
     public void delete(
             JwtAuthenticationToken jwtAuthenticationToken,
-            UUID consulServiceUuid
+            UUID clusterServiceId
     ) throws SSLException {
-        this.clusterDeleteFunctions.delete(jwtAuthenticationToken, consulServiceUuid);
+        this.clusterDeleteFunctions.delete(jwtAuthenticationToken, clusterServiceId);
     }
 
     public int scaleUp(
             JwtAuthenticationToken jwtAuthenticationToken,
-            UUID consulServiceUuid,
+            UUID clusterServiceId,
             UUID resourceId
     ) throws SSLException, ResourceNotFoundException {
-        return this.clusterScaleFunctions.scaleUp(jwtAuthenticationToken, consulServiceUuid, resourceId);
+        return this.clusterScaleFunctions.scaleUp(jwtAuthenticationToken, clusterServiceId, resourceId);
     }
 
     public int scaleDown(
             JwtAuthenticationToken jwtAuthenticationToken,
-            UUID consulServiceUuid,
+            UUID clusterServiceId,
             UUID resourceId
     ) throws SSLException, ResourceNotFoundException {
-        return this.clusterScaleFunctions.scaleDown(jwtAuthenticationToken, consulServiceUuid, resourceId);
+        return this.clusterScaleFunctions.scaleDown(jwtAuthenticationToken, clusterServiceId, resourceId);
     }
 }

@@ -99,12 +99,12 @@ public class ClustersRestController {
     @RequestMapping(value = "/{clusterUuid}", method = RequestMethod.DELETE)
     @Operation(summary = "Delete cluster resource")
     public void deleteClusterResource(
-            @PathVariable(name = "clusterUuid") UUID consulServiceUuid
+            @PathVariable(name = "clusterUuid") UUID clusterServiceId
     ) throws SSLException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         clusterHandler.delete(
                 jwtAuthenticationToken,
-                consulServiceUuid
+                clusterServiceId
         );
     }
 
@@ -121,13 +121,13 @@ public class ClustersRestController {
     @RequestMapping(value = "/{clusterUuid}/members", method = RequestMethod.POST)
     @Operation(summary = "Add new Member to cluster")
     public void addClusterMember(
-            @PathVariable(name = "clusterUuid") UUID consulServiceUuid,
+            @PathVariable(name = "clusterUuid") UUID clusterServiceId,
             @RequestParam(name = "resourceId") UUID resourceId
     ) throws SSLException, ResourceNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         clusterHandler.scaleUp(
                 jwtAuthenticationToken,
-                consulServiceUuid,
+                clusterServiceId,
                 resourceId
         );
     }
@@ -136,13 +136,13 @@ public class ClustersRestController {
     @RequestMapping(value = "/{clusterUuid}/members", method = RequestMethod.DELETE)
     @Operation(summary = "Remove member of cluster")
     public void removeClusterMember(
-            @PathVariable(name = "clusterUuid") UUID consulServiceUuid,
+            @PathVariable(name = "clusterUuid") UUID clusterServiceId,
             @RequestParam(name = "resourceId") UUID resourceId
     ) throws SSLException, ResourceNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         clusterHandler.scaleDown(
                 jwtAuthenticationToken,
-                consulServiceUuid,
+                clusterServiceId,
                 resourceId
         );
     }

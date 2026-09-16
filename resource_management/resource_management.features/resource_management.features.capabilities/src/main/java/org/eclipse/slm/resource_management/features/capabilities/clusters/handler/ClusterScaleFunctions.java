@@ -59,15 +59,15 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
     //TODO: Make one function for scaleUp/scaleDown because scaleUp/Down almost identical
     public int scaleUp(
             JwtAuthenticationToken jwtAuthenticationToken,
-            UUID consulServiceUuid,
+            UUID clusterServiceId,
             UUID resourceId
     ) throws SSLException, ResourceNotFoundException {
         Optional<MultiHostCapabilityService> serviceOptional = multiHostCapabilityServicePersistence.getById(
-                consulServiceUuid
+                clusterServiceId
         );
 
         if(serviceOptional.isEmpty()) {
-            LOG.warn("Cluster with id = \""+consulServiceUuid+"\" has no been found.");
+            LOG.warn("Cluster with id = \""+clusterServiceId+"\" has no been found.");
             return -1;
         }
 
@@ -121,13 +121,13 @@ public class ClusterScaleFunctions extends AbstractClusterFunctions implements I
 
     public int scaleDown(
             JwtAuthenticationToken jwtAuthenticationToken,
-            UUID consulServiceUuid,
+            UUID clusterServiceId,
             UUID resourceId
     ) throws SSLException, ResourceNotFoundException {
         JobTarget jobTarget = JobTarget.RESOURCE;
         JobGoal jobGoal = JobGoal.MODIFY;
         Optional<MultiHostCapabilityService> serviceOptional = multiHostCapabilityServicePersistence.getById(
-                consulServiceUuid
+                clusterServiceId
         );
 
         if(serviceOptional.isEmpty())

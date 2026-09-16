@@ -96,10 +96,10 @@ public class ClusterDeleteFunctions extends AbstractClusterFunctions implements 
         );
     }
 
-    public void delete(JwtAuthenticationToken jwtAuthenticationToken, UUID consulServiceUuid
+    public void delete(JwtAuthenticationToken jwtAuthenticationToken, UUID clusterServiceId
     ) throws SSLException {
         Optional<MultiHostCapabilityService> service = multiHostCapabilityServicePersistence.getById(
-                consulServiceUuid
+                clusterServiceId
         );
 
         if(service.isPresent()) {
