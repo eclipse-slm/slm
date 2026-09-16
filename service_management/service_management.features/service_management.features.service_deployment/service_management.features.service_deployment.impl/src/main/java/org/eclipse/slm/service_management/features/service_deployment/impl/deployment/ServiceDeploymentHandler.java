@@ -3,8 +3,6 @@ package org.eclipse.slm.service_management.features.service_deployment.impl.depl
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.eclipse.slm.awx.client.observer.*;
 import org.eclipse.slm.awx.model.ExtraVars;
-import org.eclipse.slm.common.consul.client.ConsulClient;
-import org.eclipse.slm.common.consul.client.ConsulClientFactory;
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.features.capabilities.model.SingleHostCapabilityService;
@@ -20,7 +18,7 @@ import org.eclipse.slm.service_management.features.service_deployment.api.deploy
 import org.eclipse.slm.service_management.features.service_deployment.impl.deployment.dockercontainer.DockerContainerServiceOfferingOrderUtil;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstanceEventMessageSender;
 import org.eclipse.slm.service_management.features.service_deployment.api.events.ServiceInstanceEventType;
-import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancesConsulClient;
+import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancePersistence;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOptionNotFoundException;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.codesys.CodesysDeploymentDefinition;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrder;
@@ -45,9 +43,6 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
 
     private final ServiceInstanceEventMessageSender serviceInstanceEventMessageSender;
 
-    private final ConsulClientFactory consulClientFactory;
-    private final ConsulClient consulAdminClient;
-
     private final KeycloakAdminClient keycloakAdminClient;
 
     private final ServiceOrderJpaRepository serviceOrderJpaRepository;
@@ -57,15 +52,12 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
 
     public ServiceDeploymentHandler(AwxJobObserverInitializer awxJobObserverInitializer,
                                     AwxJobExecutor awxJobExecutor,
-                                    ConsulClientFactory consulClientFactory,
                                     KeycloakAdminClient keycloakAdminClient,
                                     ResourceManagementClientFactory resourceManagementClientFactory,
                                     ServiceOrderJpaRepository serviceOrderJpaRepository,
-                                    ServiceInstancesConsulClient serviceInstancesConsulClient,
+                                    ServiceInstancePersistence serviceInstancePersistence,
                                     ServiceInstanceEventMessageSender serviceInstanceEventMessageSender) {
-        super(resourceManagementClientFactory, serviceInstancesConsulClient, awxJobObserverInitializer, awxJobExecutor);
-        this.consulClientFactory = consulClientFactory;
-        this.consulAdminClient = consulClientFactory.createAdminClient();
+        super(resourceManagementClientFactory, serviceInstancePersistence, awxJobObserverInitializer, awxJobExecutor);
         this.keycloakAdminClient = keycloakAdminClient;
         this.serviceOrderJpaRepository = serviceOrderJpaRepository;
         this.serviceInstanceEventMessageSender = serviceInstanceEventMessageSender;
@@ -309,11 +301,11 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                     var userId = jwtAuthenticationToken.getToken().getSubject();
                     this.keycloakAdminClient.createRealmRoleAndAssignToUser(userId, serviceKeycloakRoleName);
 
-                    // Add consul service for new service instance
-                    this.serviceInstancesConsulClient.registerConsulServiceForServiceInstance(serviceInstance, fullPathOwnerGroupId);
+                    this.serviceInstancePersistence.create(serviceInstance, fullPathOwnerGroupId);
 
                     serviceOrder.setServiceOrderResult(ServiceOrderResult.SUCCESSFULL);
-                    this.serviceInstanceEventMessageSender.sendMessage(serviceInstance, ServiceInstanceEventType.CREATED);
+                    this.serviceInstanceEventMessageSender.sendMessage(
+                            serviceInstance, ServiceInstanceEventType.CREATED, Set.of(fullPathOwnerGroupId));
                 }
 
                 default -> {

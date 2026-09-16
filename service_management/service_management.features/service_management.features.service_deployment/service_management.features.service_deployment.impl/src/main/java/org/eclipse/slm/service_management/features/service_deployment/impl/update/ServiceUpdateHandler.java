@@ -3,7 +3,6 @@ package org.eclipse.slm.service_management.features.service_deployment.impl.upda
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.eclipse.slm.awx.client.observer.*;
 import org.eclipse.slm.awx.model.ExtraVars;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.features.capabilities.model.DeploymentCapability;
@@ -19,13 +18,12 @@ import org.eclipse.slm.service_management.features.service_deployment.api.deploy
 import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.dockercompose.DockerComposeFileParser;
 import org.eclipse.slm.service_management.features.service_deployment.impl.deployment.dockercontainer.DockerContainerServiceOfferingOrderUtil;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstanceEventMessageSender;
-import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancesConsulClient;
+import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancePersistence;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOptionNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrder;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrderResult;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.InvalidServiceOfferingDefinitionException;
-import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstanceNotFoundException;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,9 +50,9 @@ public class ServiceUpdateHandler extends AbstractServiceDeploymentHandler imple
                                 KeycloakAdminClient keycloakAdminClient,
                                 ResourceManagementClientFactory resourceManagementClientFactory,
                                 ServiceOrderJpaRepository serviceOrderJpaRepository,
-                                ServiceInstancesConsulClient serviceInstancesConsulClient,
+                                ServiceInstancePersistence serviceInstancePersistence,
                                 ServiceInstanceEventMessageSender serviceInstanceEventMessageSender) {
-        super(resourceManagementClientFactory, serviceInstancesConsulClient, awxJobObserverInitializer, awxJobExecutor);
+        super(resourceManagementClientFactory, serviceInstancePersistence, awxJobObserverInitializer, awxJobExecutor);
         this.serviceOrderJpaRepository = serviceOrderJpaRepository;
         this.serviceInstanceEventMessageSender = serviceInstanceEventMessageSender;
     }
@@ -164,18 +162,21 @@ public class ServiceUpdateHandler extends AbstractServiceDeploymentHandler imple
             var serviceOrder = jobDetails.getServiceOrder();
             if (finalState == JobFinalState.SUCCESSFUL)
             {
-                // Update consul service of service instance
-                try {
-                    var serviceInstance = this.serviceInstancesConsulClient.getServiceInstance(jobDetails.getServiceInstanceId());
+                var optionalServiceInstance = this.serviceInstancePersistence
+                        .getByIdUnfiltered(jobDetails.getServiceInstanceId());
+                if (optionalServiceInstance.isPresent()) {
+                    var serviceInstance = optionalServiceInstance.get();
                     serviceInstance.setServiceOfferingVersionId(jobDetails.getServiceOfferingVersion().getId());
-                    this.serviceInstancesConsulClient.updateConsulServiceForServiceInstance(serviceInstance);
+                    this.serviceInstancePersistence.update(serviceInstance);
 
                     LOG.info("Service '" + serviceInstanceId + "' update for user '" + userUuid + "' to version '" + serviceOfferingVersion.getVersion() + "' successful");
 
                     serviceOrder.setServiceOrderResult(ServiceOrderResult.SUCCESSFULL);
-                    this.serviceInstanceEventMessageSender.sendMessage(serviceInstance, ServiceInstanceEventType.UPDATED);
-                } catch (ConsulLoginFailedException | ServiceInstanceNotFoundException e) {
-                    LOG.error(e.getMessage());
+                    this.serviceInstanceEventMessageSender.sendMessage(
+                            serviceInstance, ServiceInstanceEventType.UPDATED,
+                            this.serviceInstancePersistence.getOwnerGroups(serviceInstanceId));
+                } else {
+                    LOG.error("Service instance '" + serviceInstanceId + "' not found, skipping update");
                 }
             }
             else {

@@ -10,7 +10,7 @@ import org.eclipse.slm.resource_management.features.capabilities.providers.Servi
 import org.eclipse.slm.resource_management.features.capabilities.providers.ServiceHosterFilter;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementClientFactory;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.CapabilityServiceNotFoundException;
-import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancesConsulClient;
+import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancePersistence;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import javax.net.ssl.SSLException;
@@ -20,15 +20,15 @@ public class AbstractServiceDeploymentHandler {
 
     protected final ResourceManagementClientFactory resourceManagementClientFactory;
 
-    protected final ServiceInstancesConsulClient serviceInstancesConsulClient;
+    protected final ServiceInstancePersistence serviceInstancePersistence;
 
     protected final AwxJobObserverInitializer awxJobObserverInitializer;
 
     protected final AwxJobExecutor awxJobExecutor;
 
-    public AbstractServiceDeploymentHandler(ResourceManagementClientFactory resourceManagementClientFactory, ServiceInstancesConsulClient serviceInstancesConsulClient, AwxJobObserverInitializer awxJobObserverInitializer, AwxJobExecutor awxJobExecutor) {
+    public AbstractServiceDeploymentHandler(ResourceManagementClientFactory resourceManagementClientFactory, ServiceInstancePersistence serviceInstancePersistence, AwxJobObserverInitializer awxJobObserverInitializer, AwxJobExecutor awxJobExecutor) {
         this.resourceManagementClientFactory = resourceManagementClientFactory;
-        this.serviceInstancesConsulClient = serviceInstancesConsulClient;
+        this.serviceInstancePersistence = serviceInstancePersistence;
         this.awxJobObserverInitializer = awxJobObserverInitializer;
         this.awxJobExecutor = awxJobExecutor;
     }

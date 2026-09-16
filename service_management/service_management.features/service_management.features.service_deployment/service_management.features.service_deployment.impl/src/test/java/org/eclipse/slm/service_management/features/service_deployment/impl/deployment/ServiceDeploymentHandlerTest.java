@@ -13,7 +13,7 @@ import org.eclipse.slm.awx.client.observer.AwxJobObserverInitializer;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementClientFactory;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.CapabilityServiceNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstanceEventMessageSender;
-import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancesConsulClient;
+import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancePersistence;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOptionNotFoundException;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.ServiceOffering;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrder;
@@ -77,7 +77,7 @@ public class ServiceDeploymentHandlerTest {
     private ServiceOrderJpaRepository serviceOrderJpaRepository;
 
     @Mock
-    private ServiceInstancesConsulClient serviceInstancesConsulClient;
+    private ServiceInstancePersistence serviceInstancePersistence;
 
     private JwtAuthenticationToken jwtAuthenticationToken;
 
@@ -153,11 +153,10 @@ public class ServiceDeploymentHandlerTest {
         this.serviceDeploymentHandler = new ServiceDeploymentHandler(
                 awxJobObserverInitializer,
                 awxJobExecutor,
-                ConsulTestClientFactory.getConsulClientFactory(consulContainer),
                 keycloakAdminClient,
                 resourceManagementClientFactory,
                 serviceOrderJpaRepository,
-                serviceInstancesConsulClient,
+                serviceInstancePersistence,
                 serviceInstanceEventMessageSender);
     }
 

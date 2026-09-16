@@ -3,10 +3,7 @@ package org.eclipse.slm.service_management.features.service_deployment.impl.serv
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.eclipse.slm.common.consul.client.ConsulClient;
-import org.eclipse.slm.common.consul.client.ConsulClientFactory;
-import org.eclipse.slm.common.consul.model.catalog.Service;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
+import org.eclipse.slm.common.access.UserContext;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.AvailableServiceInstanceVersionChange;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.AvailableServiceInstanceVersionChangeType;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.CapabilityServiceNotFoundException;
@@ -30,10 +27,8 @@ import org.eclipse.slm.service_management.features.service_deployment.api.servic
 import org.eclipse.slm.service_management.features.service_offerings.impl.serviceofferings.ServiceOfferingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.net.ssl.SSLException;
 import java.util.*;
@@ -43,10 +38,6 @@ import java.util.stream.Collectors;
 public class ServiceInstancesHandler {
 
     private final static Logger LOG = LoggerFactory.getLogger(ServiceInstancesHandler.class);
-
-    private final ConsulClientFactory consulClientFactory;
-
-    private final ConsulClient consulAdminClient;
 
     private final ServiceUndeploymentHandler serviceUndeploymentHandler;
 
@@ -58,88 +49,48 @@ public class ServiceInstancesHandler {
 
     private final ServiceOrderJpaRepository serviceOrderJpaRepository;
 
-    private final ServiceInstancesConsulClient serviceInstancesConsulClient;
+    private final ServiceInstancePersistence serviceInstancePersistence;
 
     private final ServiceInstanceGroupJpaRepository serviceInstanceGroupJpaRepository;
 
-    public ServiceInstancesHandler(ConsulClientFactory consulClientFactory,
-                                   ServiceUndeploymentHandler serviceUndeploymentHandler,
+    public ServiceInstancesHandler(ServiceUndeploymentHandler serviceUndeploymentHandler,
                                    ServiceUpdateHandler serviceUpdateHandler, ServiceOfferingVersionHandler serviceOfferingVersionHandler,
-                                   ServiceOfferingHandler serviceOfferingHandler, ServiceOrderJpaRepository serviceOrderJpaRepository, ServiceInstancesConsulClient serviceInstancesConsulClient, ServiceInstanceGroupJpaRepository serviceInstanceGroupJpaRepository, ObjectMapper objectMapper) {
-        this.consulClientFactory = consulClientFactory;
-        this.consulAdminClient = consulClientFactory.createAdminClient();
+                                   ServiceOfferingHandler serviceOfferingHandler, ServiceOrderJpaRepository serviceOrderJpaRepository, ServiceInstancePersistence serviceInstancePersistence, ServiceInstanceGroupJpaRepository serviceInstanceGroupJpaRepository, ObjectMapper objectMapper) {
         this.serviceUndeploymentHandler = serviceUndeploymentHandler;
         this.serviceUpdateHandler = serviceUpdateHandler;
         this.serviceOfferingVersionHandler = serviceOfferingVersionHandler;
         this.serviceOfferingHandler = serviceOfferingHandler;
         this.serviceOrderJpaRepository = serviceOrderJpaRepository;
-        this.serviceInstancesConsulClient = serviceInstancesConsulClient;
+        this.serviceInstancePersistence = serviceInstancePersistence;
         this.serviceInstanceGroupJpaRepository = serviceInstanceGroupJpaRepository;
     }
 
-    public List<ServiceInstance> getServiceInstancesOfUser(JwtAuthenticationToken jwtAuthenticationToken) throws ConsulLoginFailedException {
-        Map<String,List<String>> allCatalogServicesOfUser = this.consulAdminClient.services().getServices(
-                
-        );
-
-        var deployedServicesOfUser = allCatalogServicesOfUser.entrySet().stream()
-                .filter(entry -> entry.getValue().contains("service"))
-                .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
-
-        var deployedServicesWithDetails = this.consulAdminClient.services()
-                .getServicesByName( deployedServicesOfUser.keySet());
-        var serviceInstances = new ArrayList<ServiceInstance>();
-        for (var consulService : deployedServicesWithDetails.values())
-        {
-            if (consulService.size() > 0) {
-                var serviceInstance = this.convertConsulServiceToServiceInstance(consulService.get(0));
-                serviceInstances.add(serviceInstance);
-            }
-        }
-
-        return serviceInstances;
+    public List<ServiceInstance> getServiceInstancesOfUser(JwtAuthenticationToken jwtAuthenticationToken) {
+        var userContext = UserContext.fromJwt(jwtAuthenticationToken);
+        return this.serviceInstancePersistence.getAccessible(userContext);
     }
 
     public ServiceInstance getServiceInstanceOfUser(UUID serviceInstanceId, JwtAuthenticationToken jwtAuthenticationToken)
-            throws ConsulLoginFailedException, ServiceInstanceNotFoundException {
-
-        var consulCatalogServiceOptional = this.consulAdminClient.services().getServiceById(
-                 serviceInstanceId
-        );
-
-        if (consulCatalogServiceOptional.isPresent()) {
-            var serviceInstance = this.convertConsulServiceToServiceInstance(consulCatalogServiceOptional.get());
-            return serviceInstance;
-        }
-        else {
-            throw new ServiceInstanceNotFoundException(serviceInstanceId);
-        }
+            throws ServiceInstanceNotFoundException {
+        var userContext = UserContext.fromJwt(jwtAuthenticationToken);
+        return this.serviceInstancePersistence.getById(serviceInstanceId, userContext)
+                .orElseThrow(() -> new ServiceInstanceNotFoundException(serviceInstanceId));
     }
 
     public void deleteServiceInstanceOfUser(UUID serviceInstanceId, JwtAuthenticationToken jwtAuthenticationToken)
-            throws ConsulLoginFailedException, ServiceInstanceNotFoundException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, SSLException, CapabilityServiceNotFoundException {
+            throws ServiceInstanceNotFoundException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, SSLException, CapabilityServiceNotFoundException {
 
-        var consulServiceName = ServiceInstancesConsulClient.getServiceInstancePolicyName(serviceInstanceId);
-        var optionalConsulService = this.consulAdminClient.services()
-                .getServiceByName( consulServiceName);
+        var userContext = UserContext.fromJwt(jwtAuthenticationToken);
+        var serviceInstance = this.serviceInstancePersistence.getById(serviceInstanceId, userContext)
+                .orElseThrow(() -> new ServiceInstanceNotFoundException(serviceInstanceId));
 
-        if (optionalConsulService.isPresent()) {
-            if (!optionalConsulService.get().isEmpty()) {
-                this.serviceUndeploymentHandler.deleteService(jwtAuthenticationToken, optionalConsulService.get());
-            }
-            else {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Service instance '" + serviceInstanceId + "' known, but not sub-services registered");
-            }
-        }
-        else {
-            throw new ServiceInstanceNotFoundException(serviceInstanceId);
-        }
+        this.serviceUndeploymentHandler.deleteService(jwtAuthenticationToken, serviceInstance);
     }
 
     public List<AvailableServiceInstanceVersionChange> getAvailableVersionChangesForServiceInstance(
             UUID serviceInstanceId,
             JwtAuthenticationToken jwtAuthenticationToken)
-            throws ConsulLoginFailedException, ServiceInstanceNotFoundException,
+            throws ServiceInstanceNotFoundException,
             ServiceOfferingNotFoundException {
         var serviceInstance = this.getServiceInstanceOfUser(serviceInstanceId, jwtAuthenticationToken);
         var serviceOffering = serviceOfferingHandler.getServiceOfferingById(serviceInstance.getServiceOfferingId());
@@ -176,7 +127,7 @@ public class ServiceInstancesHandler {
 
     public void updateServiceInstanceToVersion(UUID serviceInstanceId, UUID targetServiceOfferingVersionId,
                                                JwtAuthenticationToken jwtAuthenticationToken)
-            throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException, ServiceInstanceUpdateException, SSLException,
+            throws ServiceInstanceNotFoundException, ServiceOfferingNotFoundException, ServiceInstanceUpdateException, SSLException,
             JsonProcessingException, ServiceOptionNotFoundException,  InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException {
         var serviceInstance = this.getServiceInstanceOfUser(serviceInstanceId, jwtAuthenticationToken);
         var serviceOffering = serviceOfferingHandler.getServiceOfferingById(serviceInstance.getServiceOfferingId());
@@ -192,22 +143,13 @@ public class ServiceInstancesHandler {
         }
     }
 
-    private ServiceInstance convertConsulServiceToServiceInstance(Service consulService) {
-        var serviceTags = consulService.getServiceTags();
-        serviceTags = new ArrayList<>(new HashSet<>(serviceTags)); // Remove duplicates
-        var serviceMetaData = consulService.getServiceMeta();
-
-        var serviceInstance = ServiceInstance.Companion.ofMetaDataAndTags(serviceMetaData, serviceTags);
-        return serviceInstance;
-    }
-
     public List<ServiceOrder> getOrdersOfServiceInstance(UUID serviceInstanceId) {
         var orders = this.serviceOrderJpaRepository.findByServiceInstanceId(serviceInstanceId);
         return orders;
     }
 
     public ServiceInstanceDetails getServiceInstanceDetails(JwtAuthenticationToken jwtAuthenticationToken, UUID serviceInstanceId)
-            throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, ServiceInstanceRuntimeException {
+            throws ServiceInstanceNotFoundException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, ServiceInstanceRuntimeException {
 
         var serviceInstance = this.getServiceInstanceOfUser(serviceInstanceId, jwtAuthenticationToken);
         var orders = this.getOrdersOfServiceInstance(serviceInstanceId);
@@ -250,7 +192,7 @@ public class ServiceInstancesHandler {
     }
 
     public void setGroupsForServiceInstance(JwtAuthenticationToken jwtAuthenticationToken, List<UUID> groupIds, UUID serviceInstanceId)
-            throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceInstanceGroupNotFoundException {
+            throws ServiceInstanceNotFoundException, ServiceInstanceGroupNotFoundException {
         var serviceInstance = this.getServiceInstanceOfUser(serviceInstanceId, jwtAuthenticationToken);
 
         for (var groupId : groupIds) {
@@ -261,7 +203,7 @@ public class ServiceInstancesHandler {
         }
         serviceInstance.setGroupIds(groupIds);
 
-        this.serviceInstancesConsulClient.updateConsulServiceForServiceInstance(serviceInstance);
+        this.serviceInstancePersistence.update(serviceInstance);
     }
 }
 

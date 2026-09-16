@@ -3,8 +3,6 @@ package org.eclipse.slm.service_management.features.service_deployment.impl.unde
 import org.eclipse.slm.awx.client.AwxCredential;
 import org.eclipse.slm.awx.client.observer.*;
 import org.eclipse.slm.awx.model.ExtraVars;
-import org.eclipse.slm.common.consul.model.catalog.Service;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType;
@@ -15,11 +13,10 @@ import org.eclipse.slm.service_management.features.service_deployment.impl.deplo
 import org.eclipse.slm.service_management.features.service_deployment.api.events.ServiceInstanceEventType;
 import org.eclipse.slm.service_management.features.service_deployment.api.undeployment.UndeploymentJobRun;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstanceEventMessageSender;
-import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancesConsulClient;
+import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancePersistence;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.ServiceOfferingNotFoundException;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.ServiceOfferingVersionNotFoundException;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.kubernetes.KubernetesDeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstanceNotFoundException;
 import org.eclipse.slm.service_management.features.service_offerings.impl.serviceofferingversions.ServiceOfferingVersionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,26 +45,17 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
             KeycloakAdminClient keycloakAdminClient,
             ResourceManagementClientFactory resourceManagementClientFactory,
             ServiceOfferingVersionHandler serviceOfferingVersionHandler,
-            ServiceInstancesConsulClient serviceInstancesConsulClient,
+            ServiceInstancePersistence serviceInstancePersistence,
             ServiceInstanceEventMessageSender serviceInstanceEventMessageSender
     ) {
-        super(resourceManagementClientFactory, serviceInstancesConsulClient, awxJobObserverInitializer, awxJobExecutor);
+        super(resourceManagementClientFactory, serviceInstancePersistence, awxJobObserverInitializer, awxJobExecutor);
         this.keycloakAdminClient = keycloakAdminClient;
         this.serviceOfferingVersionHandler = serviceOfferingVersionHandler;
         this.serviceInstanceEventMessageSender = serviceInstanceEventMessageSender;
     }
 
-    public void deleteService(JwtAuthenticationToken jwtAuthenticationToken, List<Service> consulService)
+    public void deleteService(JwtAuthenticationToken jwtAuthenticationToken, ServiceInstance serviceInstance)
             throws SSLException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, CapabilityServiceNotFoundException {
-        if (consulService.isEmpty())
-        {
-            throw new RuntimeException("List contains no services");
-        }
-
-        var serviceMetaData = consulService.get(0).getServiceMeta();
-        var serviceTags = consulService.get(0).getServiceTags();
-        var serviceInstance = ServiceInstance.Companion.ofMetaDataAndTags(new HashMap<>(serviceMetaData), new ArrayList<>(serviceTags));
-
         var serviceOfferingVersion = serviceOfferingVersionHandler
                 .getServiceOfferingVersionById(serviceInstance.getServiceOfferingId(), serviceInstance.getServiceOfferingVersionId());
 
@@ -119,13 +107,15 @@ public class ServiceUndeploymentHandler extends AbstractServiceDeploymentHandler
                     var serviceKeycloakRoleName = "service_" + serviceInstanceId;
                     this.keycloakAdminClient.deleteRealmRole(serviceKeycloakRoleName);
 
-                    // Remove Consul service of service instance
-                    try {
-                        var serviceInstance = this.serviceInstancesConsulClient.getServiceInstance(serviceInstanceId);
-                        this.serviceInstancesConsulClient.deregisterConsulServiceForServiceInstance(serviceInstance);
-                        this.serviceInstanceEventMessageSender.sendMessage(serviceInstance, ServiceInstanceEventType.DELETED);
-                    } catch (ConsulLoginFailedException | ServiceInstanceNotFoundException e) {
-                        LOG.error(e.getMessage());
+                    var optionalServiceInstance = this.serviceInstancePersistence.getByIdUnfiltered(serviceInstanceId);
+                    if (optionalServiceInstance.isPresent()) {
+                        var serviceInstance = optionalServiceInstance.get();
+                        var ownerGroups = this.serviceInstancePersistence.getOwnerGroups(serviceInstanceId);
+                        this.serviceInstancePersistence.delete(serviceInstanceId);
+                        this.serviceInstanceEventMessageSender.sendMessage(
+                                serviceInstance, ServiceInstanceEventType.DELETED, ownerGroups);
+                    } else {
+                        LOG.error("Service instance '" + serviceInstanceId + "' not found, skipping deletion");
                     }
                 }
 
