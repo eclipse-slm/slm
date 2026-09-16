@@ -1,4 +1,4 @@
-package org.eclipse.slm.resource_management.common.access;
+package org.eclipse.slm.common.access;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,18 +17,18 @@ public interface AccessControlPolicyRepository extends JpaRepository<AccessContr
            "WHERE s IN :groups AND o.objectType = :objectType")
     Set<UUID> findAccessibleObjectIds(
             @Param("groups") Set<String> groups,
-            @Param("objectType") AccessControlObjectType objectType);
+            @Param("objectType") String objectType);
 
     @Query("SELECT p FROM AccessControlPolicy p JOIN p.objects o " +
            "WHERE o.objectType = :objectType AND o.objectId = :objectId")
     List<AccessControlPolicy> findByObject(
-            @Param("objectType") AccessControlObjectType objectType,
+            @Param("objectType") String objectType,
             @Param("objectId") UUID objectId);
 
     @Query("SELECT DISTINCT s FROM AccessControlPolicy p JOIN p.subjects s JOIN p.objects o " +
            "WHERE o.objectType = :objectType AND o.objectId = :objectId")
     Set<String> findSubjectsByObject(
-            @Param("objectType") AccessControlObjectType objectType,
+            @Param("objectType") String objectType,
             @Param("objectId") UUID objectId);
 
     @Query("SELECT COUNT(p) FROM AccessControlPolicy p " +
@@ -36,6 +36,6 @@ public interface AccessControlPolicyRepository extends JpaRepository<AccessContr
            "WHERE s IN :groups AND o.objectType = :objectType AND o.objectId = :objectId")
     long countAccessGranting(
             @Param("groups") Set<String> groups,
-            @Param("objectType") AccessControlObjectType objectType,
+            @Param("objectType") String objectType,
             @Param("objectId") UUID objectId);
 }

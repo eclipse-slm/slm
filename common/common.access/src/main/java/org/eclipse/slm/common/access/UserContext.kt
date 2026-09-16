@@ -1,4 +1,4 @@
-package org.eclipse.slm.resource_management.common.access
+package org.eclipse.slm.common.access
 
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken

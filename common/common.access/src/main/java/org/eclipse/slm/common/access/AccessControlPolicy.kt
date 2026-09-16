@@ -1,4 +1,4 @@
-package org.eclipse.slm.resource_management.common.access
+package org.eclipse.slm.common.access
 
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column

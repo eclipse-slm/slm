@@ -1,4 +1,4 @@
-package org.eclipse.slm.resource_management.common.access;
+package org.eclipse.slm.common.access;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +18,7 @@ public class AccessControlService {
 
     public AccessControlPolicy createSingleObjectPolicy(
             String name, String subjectGroup,
-            AccessControlObjectType objectType, UUID objectId) {
+            String objectType, UUID objectId) {
         AccessControlPolicy policy = new AccessControlPolicy();
         policy.setName(name);
         policy.getSubjects().add(subjectGroup);
@@ -27,7 +27,7 @@ public class AccessControlService {
     }
 
     public boolean hasAccess(
-            AccessControlObjectType objectType, UUID objectId, UserContext userContext) {
+            String objectType, UUID objectId, UserContext userContext) {
         if (userContext.isAdmin()) {
             return true;
         }
@@ -43,7 +43,7 @@ public class AccessControlService {
      *         otherwise the set of object ids the user's groups may access.
      */
     public Optional<Set<UUID>> getAccessibleObjectIds(
-            UserContext userContext, AccessControlObjectType objectType) {
+            UserContext userContext, String objectType) {
         if (userContext.isAdmin()) {
             return Optional.empty();
         }
@@ -54,17 +54,17 @@ public class AccessControlService {
                 userContext.getGroups(), objectType));
     }
 
-    public Set<String> getSubjectsForObject(AccessControlObjectType objectType, UUID objectId) {
+    public Set<String> getSubjectsForObject(String objectType, UUID objectId) {
         return policyRepository.findSubjectsByObject(objectType, objectId);
     }
 
     @Transactional
     public void removeObjectFromAllPolicies(
-            AccessControlObjectType objectType, UUID objectId) {
+            String objectType, UUID objectId) {
         var policies = policyRepository.findByObject(objectType, objectId);
         for (AccessControlPolicy policy : policies) {
             policy.getObjects().removeIf(
-                ref -> ref.getObjectType() == objectType && ref.getObjectId().equals(objectId));
+                ref -> ref.getObjectType().equals(objectType) && ref.getObjectId().equals(objectId));
             if (policy.getObjects().isEmpty()) {
                 policyRepository.delete(policy);
             } else {
