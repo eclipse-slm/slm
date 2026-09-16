@@ -71,7 +71,10 @@ class ServiceInstance(
         const val META_DATA_KEY_CAPABILITY_SERVICE_ID = "capability_service_id"
         const val META_DATA_KEY_PORTS = "ports"
         const val META_DATA_KEY_GROUPS = "groups"
+        @JvmField
         val PREDEFINED_TAGS = listOf("service")
+
+        @JvmField
         val PREDEFINED_META_DATA_KEYS = listOf(
             META_DATA_KEY_RESOURCE_ID,
             META_DATA_KEY_SERVICE_INSTANCE_ID,
