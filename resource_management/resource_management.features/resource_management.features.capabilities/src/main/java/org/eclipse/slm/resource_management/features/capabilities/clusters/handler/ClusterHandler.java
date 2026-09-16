@@ -1,7 +1,6 @@
 package org.eclipse.slm.resource_management.features.capabilities.clusters.handler;
 
 
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.model.Cluster;
@@ -47,14 +46,14 @@ public class ClusterHandler {
             MultiHostCapabilityService multiHostCapabilityService,
             JwtAuthenticationToken jwtAuthenticationToken,
             ClusterCreateRequest clusterCreateRequest
-    ) throws SSLException, ConsulLoginFailedException {
+    ) throws SSLException {
         return this.clusterCreateFunctions.create(multiHostCapabilityService, jwtAuthenticationToken, clusterCreateRequest);
     }
 
     public void delete(
             JwtAuthenticationToken jwtAuthenticationToken,
             UUID consulServiceUuid
-    ) throws SSLException, ConsulLoginFailedException {
+    ) throws SSLException {
         this.clusterDeleteFunctions.delete(jwtAuthenticationToken, consulServiceUuid);
     }
 
@@ -62,7 +61,7 @@ public class ClusterHandler {
             JwtAuthenticationToken jwtAuthenticationToken,
             UUID consulServiceUuid,
             UUID resourceId
-    ) throws ConsulLoginFailedException, SSLException, ResourceNotFoundException {
+    ) throws SSLException, ResourceNotFoundException {
         return this.clusterScaleFunctions.scaleUp(jwtAuthenticationToken, consulServiceUuid, resourceId);
     }
 
@@ -70,7 +69,7 @@ public class ClusterHandler {
             JwtAuthenticationToken jwtAuthenticationToken,
             UUID consulServiceUuid,
             UUID resourceId
-    ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException {
+    ) throws SSLException, ResourceNotFoundException {
         return this.clusterScaleFunctions.scaleDown(jwtAuthenticationToken, consulServiceUuid, resourceId);
     }
 }

@@ -2,7 +2,6 @@ package org.eclipse.slm.resource_management.features.capabilities;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotCreatedException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.dto.CapabilityDTOApi;
@@ -50,7 +49,7 @@ public class CapabilitiesRestController implements CapabilitiesRestApi {
 
     public ResponseEntity<Void> createCapability(
             CapabilityDTOApi capabilityDTOApi
-    ) throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, ResourceNotCreatedException, JsonProcessingException {
+    ) throws ResourceNotFoundException, IllegalAccessException, ResourceNotCreatedException, JsonProcessingException {
         Capability capability = CapabilityMapper.INSTANCE.toModel(capabilityDTOApi);
         capabilitiesService.addCapability(capability);
         LOG.info("Added capability: " + capabilityDTOApi.toString());
@@ -60,7 +59,7 @@ public class CapabilitiesRestController implements CapabilitiesRestApi {
 
     public ResponseEntity<Object> deleteCapability(
             UUID capabilityId
-    ) throws ConsulLoginFailedException {
+    ) {
         if (this.capabilitiesService.deleteCapability(capabilityId))
             return ResponseEntity.ok().build();
         else

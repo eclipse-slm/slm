@@ -5,7 +5,6 @@ import org.eclipse.slm.awx.client.AwxClient;
 import org.eclipse.slm.awx.client.AwxProjectUpdateFailedException;
 import org.eclipse.slm.awx.model.*;
 
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotCreatedException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceRuntimeException;
@@ -106,7 +105,7 @@ public class CapabilitiesManager implements ICapabilitiesManager {
     }
 
     public void addCapability(Capability capability)
-            throws ConsulLoginFailedException, ResourceNotFoundException, IllegalAccessException, ResourceNotCreatedException, JsonProcessingException, ResourceRuntimeException {
+            throws ResourceNotFoundException, IllegalAccessException, ResourceNotCreatedException, JsonProcessingException, ResourceRuntimeException {
 
         var ee = createExecutionEnvironment(capability);
 
@@ -238,7 +237,7 @@ public class CapabilitiesManager implements ICapabilitiesManager {
         return credential;
     }
 
-    public boolean deleteCapability(UUID capabilityId) throws ConsulLoginFailedException {
+    public boolean deleteCapability(UUID capabilityId) {
         var capabilityOptional = this.capabilityJpaRepository.findById(capabilityId);
         if (capabilityOptional.isPresent()) {
             deleteCapability(capabilityOptional.get());
@@ -249,8 +248,7 @@ public class CapabilitiesManager implements ICapabilitiesManager {
         }
     }
 
-    private void deleteCapability(Capability capability)
-            throws ConsulLoginFailedException {
+    private void deleteCapability(Capability capability) {
         this.singleHostCapabilityServicePersistence.removeCapabilityServiceFromAllResources(
                 capability
         );

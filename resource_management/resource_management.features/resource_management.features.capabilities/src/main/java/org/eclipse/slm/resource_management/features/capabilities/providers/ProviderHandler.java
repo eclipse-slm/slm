@@ -1,7 +1,6 @@
 package org.eclipse.slm.resource_management.features.capabilities.providers;
 
 
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilityServiceQueryService;
 
@@ -21,7 +20,7 @@ public class ProviderHandler {
         this.capabilityServiceQueryService = capabilityServiceQueryService;
     }
 
-    protected List<Provider> getProvider() throws ConsulLoginFailedException {
+    protected List<Provider> getProvider() {
         List<Provider> provider = new ArrayList<>();
 
         List<CapabilityService> capabilityServices = capabilityServiceQueryService.getCapabilityServicesByCapabilityClass(capabilityClass);

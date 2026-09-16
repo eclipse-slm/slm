@@ -119,7 +119,6 @@ public class ResourcesManagerImpl implements ResourcesManager, ResourceUpdatedLi
             resource.setClusterMember(isClusterMember);
         }
 
-        // Temporary seam: RemoteAccess is still Consul-backed; token param removed when RemoteAccess is migrated
         var remoteAccessServicesIds = this.remoteAccessManager.getRemoteAccessIdsOfResource(resource.getId());
         resource.setRemoteAccessIds(remoteAccessServicesIds);
 

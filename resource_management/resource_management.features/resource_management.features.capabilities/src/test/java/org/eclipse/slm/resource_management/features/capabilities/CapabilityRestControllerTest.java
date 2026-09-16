@@ -44,9 +44,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
             RestTemplate.class
     }
 )
-@ComponentScan(basePackages = {
-    "org.eclipse.slm.common.consul.client",
-})
 @AutoConfigureMockMvc(addFilters = false)
 @WithMockJwtAuth(
     claims = @OpenIdClaims(

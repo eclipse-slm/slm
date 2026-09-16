@@ -2,7 +2,6 @@ package org.eclipse.slm.resource_management.features.capabilities.jobs;
 
 import jakarta.annotation.PostConstruct;
 
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.model.exceptions.EventNotAcceptedException;
 import org.eclipse.slm.resource_management.common.access.UserContext;
@@ -206,7 +205,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
             UUID resourceId,
             CapabilityService capabilityService,
             CapabilityServiceStatus newCapabilityServiceStatus
-    ) throws ConsulLoginFailedException {
+    ) {
         capabilityService.setStatus(newCapabilityServiceStatus);
 
         singleHostCapabilityServicePersistence.updateCapabilityService(
@@ -287,16 +286,12 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
             }
         } catch (ResourceNotFoundException e) {
             LOG.warn("Resource [id=" + capabilityJob.getResourceId() + "] does not exist => Skip removal of capability");
-        } catch (ConsulLoginFailedException e) {
-            LOG.error("Unable to remove capability [id=" + capabilityJob.getId() + "] from resource [id= " + capabilityJob.getResourceId() + "], " +
-                    "because login to Consul failed: " + e.getMessage());
         } catch (IllegalAccessException e) {
-            LOG.error("Unable to remove capability [id=" + capabilityJob.getId() + "] from resource [id= " + capabilityJob.getResourceId() + "], " +
-                    "because access to Consul is not allowed: " + e.getMessage());
+            LOG.error("Unable to remove capability [id=" + capabilityJob.getId() + "] from resource [id= " + capabilityJob.getResourceId() + "]: " + e.getMessage());
         }
     }
 
-    private void cleanupCapabilityServiceOfResource(UUID resourceId, UUID capabilityId) throws ConsulLoginFailedException, IllegalAccessException {
+    private void cleanupCapabilityServiceOfResource(UUID resourceId, UUID capabilityId) throws IllegalAccessException {
         var capabilityService = singleHostCapabilityServicePersistence.getCapabilityServiceOfResourceByCapabilityId(capabilityId, resourceId);
         if(capabilityService == null) {
             LOG.info("Resource [id=" + resourceId + " has no CapabilityService => Skip removal of capability");

@@ -111,12 +111,6 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>common.consul.client</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.slm</groupId>
             <artifactId>aas.repositories</artifactId>
             <version>${aas.sdk.version}</version>
             <scope>compile</scope>

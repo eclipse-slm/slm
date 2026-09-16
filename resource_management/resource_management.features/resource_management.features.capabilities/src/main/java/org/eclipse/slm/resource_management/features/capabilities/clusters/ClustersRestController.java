@@ -2,7 +2,6 @@ package org.eclipse.slm.resource_management.features.capabilities.clusters;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.dto.CapabilityDTOApi;
 import org.eclipse.slm.resource_management.features.capabilities.model.Capability;
@@ -73,7 +72,7 @@ public class ClustersRestController {
     @RequestMapping(value = "", method = RequestMethod.POST)
     @Operation(summary = "Create a cluster")
     public void createClusterResource(@RequestBody ClusterCreateRequest clusterCreateRequest)
-            throws SSLException, ConsulLoginFailedException {
+            throws SSLException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         Optional<Capability> clusterCapability = capabilityJpaRepository.findById(clusterCreateRequest.getClusterTypeId());
@@ -101,7 +100,7 @@ public class ClustersRestController {
     @Operation(summary = "Delete cluster resource")
     public void deleteClusterResource(
             @PathVariable(name = "clusterUuid") UUID consulServiceUuid
-    ) throws SSLException, ConsulLoginFailedException {
+    ) throws SSLException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         clusterHandler.delete(
                 jwtAuthenticationToken,
@@ -113,7 +112,7 @@ public class ClustersRestController {
     @Operation(summary = "Get members of cluster")
     public List<UUID> getClusterMembers(
             @PathVariable(name = "clusterServiceId") UUID clusterServiceId
-    ) throws ConsulLoginFailedException {
+    ) {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         return this.clusterHandler.getClusterMembers(clusterServiceId);
@@ -124,7 +123,7 @@ public class ClustersRestController {
     public void addClusterMember(
             @PathVariable(name = "clusterUuid") UUID consulServiceUuid,
             @RequestParam(name = "resourceId") UUID resourceId
-    ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException {
+    ) throws SSLException, ResourceNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         clusterHandler.scaleUp(
                 jwtAuthenticationToken,
@@ -139,7 +138,7 @@ public class ClustersRestController {
     public void removeClusterMember(
             @PathVariable(name = "clusterUuid") UUID consulServiceUuid,
             @RequestParam(name = "resourceId") UUID resourceId
-    ) throws SSLException, ConsulLoginFailedException, ResourceNotFoundException {
+    ) throws SSLException, ResourceNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         clusterHandler.scaleDown(
                 jwtAuthenticationToken,

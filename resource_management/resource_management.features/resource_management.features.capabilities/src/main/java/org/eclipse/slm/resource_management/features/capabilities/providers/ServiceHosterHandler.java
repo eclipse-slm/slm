@@ -1,7 +1,6 @@
 package org.eclipse.slm.resource_management.features.capabilities.providers;
 
 
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.DeploymentCapability;
@@ -24,7 +23,7 @@ public class ServiceHosterHandler extends ProviderHandler {
         );
     }
     public List<ServiceHoster> getServiceHosters(
-            Optional<ServiceHosterFilter> filter) throws ConsulLoginFailedException {
+            Optional<ServiceHosterFilter> filter) {
         List<ServiceHoster> serviceHosterList = new ArrayList<>();
 
         List<CapabilityService> deploymentCapabilityServices = capabilityServiceQueryService.getCapabilityServicesByCapabilityClass(DeploymentCapability.class);

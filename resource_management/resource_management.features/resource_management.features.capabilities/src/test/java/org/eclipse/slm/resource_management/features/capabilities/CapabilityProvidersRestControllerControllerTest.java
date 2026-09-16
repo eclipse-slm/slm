@@ -48,13 +48,6 @@ public class CapabilityProvidersRestControllerControllerTest {
     @MockBean
     private ServiceHosterHandler serviceHosterHandler;
 
-    private static int CONSUL_PORT = 8500;
-
-//    @Container
-//    private final GenericContainer<?> consulDockerContainer = new GenericContainer<>(DockerImageName.parse("consul:1.14"))
-//            .withExposedPorts(CONSUL_PORT)
-//            .withEnv("CONSUL_LOCAL_CONFIG", "{\"datacenter\": \"fabos\", \"domain\": \".fabos\", \"bind_addr\": \"0.0.0.0\", \"retry_join\": [\"0.0.0.0\"], \"acl\":{\"enabled\": true, \"default_policy\": \"allow\", \"tokens\":{\"master\": \"root\"}}}");
-
     @Nested
     @Order(10)
     @DisplayName("Pretests")
