@@ -1,10 +1,10 @@
 package org.eclipse.slm.notification_service.service.app.messaging.services;
 
-import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.messaging.AbstractEventMessage;
 import org.eclipse.slm.common.messaging.GenericMessageListener;
 import org.eclipse.slm.notification_service.communication.websocket.NotificationWsService;
 import org.eclipse.slm.notification_service.persistence.api.NotificationRepository;
+import org.eclipse.slm.notification_service.service.app.messaging.UserUtils;
 import org.eclipse.slm.service_management.features.service_deployment.api.events.ServiceInstanceEventMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,74 +12,45 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Component
 public class ServiceInstanceEventMessageListener extends GenericMessageListener<ServiceInstanceEventMessage> {
 
     private final static Logger LOG = LoggerFactory.getLogger(ServiceInstanceEventMessageListener.class);
 
-    private final KeycloakAdminClient keycloakAdminClient;
-
+    private final UserUtils userUtils;
     private final NotificationRepository notificationRepository;
-
     private final NotificationWsService notificationWsService;
-
-    private final Map<UUID, List<String>> serviceInstanceIdToUserIdsCache = new HashMap<>();
 
     protected ServiceInstanceEventMessageListener(ConnectionFactory connectionFactory,
                                                   RabbitTemplate rabbitTemplate,
-                                                  KeycloakAdminClient keycloakAdminClient,
+                                                  UserUtils userUtils,
                                                   NotificationRepository notificationRepository,
                                                   NotificationWsService notificationWsService) {
         super(ServiceInstanceEventMessage.EXCHANGE_NAME, AbstractEventMessage.getRoutingKeyAllEvents(ServiceInstanceEventMessage.ROUTING_KEY_PREFIX),
                 connectionFactory, rabbitTemplate);
-        this.keycloakAdminClient = keycloakAdminClient;
+        this.userUtils = userUtils;
         this.notificationRepository = notificationRepository;
         this.notificationWsService = notificationWsService;
-
-        var realmRoles = this.keycloakAdminClient.getAllRolesOfRealm();
-        // TODO: Refactor way to identify which users should receive notifications for which service instance events. Keyloak roles for each service instance
-        //       no longer exist, so this needs to be adapted.
-
-        for (var role : realmRoles) {
-//            if (role.getName().startsWith(ServiceInstancesConsulClient.KEYCLOAK_ROLE_SERVICE_INSTANCE_PREFIX)) {
-//                var serviceInstanceId = UUID.fromString(role.getName().substring(ServiceInstancesConsulClient.KEYCLOAK_ROLE_SERVICE_INSTANCE_PREFIX.length()));
-//                this.serviceInstanceIdToUserIdsCache.put(serviceInstanceId, this.keycloakAdminClient.getUserIdsAssignedToRole(role.getName()));
-//            }
-        }
     }
 
     @Override
     public void onMessageReceived(ServiceInstanceEventMessage eventMessage) {
         try {
-            List<String> userIds = new ArrayList<>();
-            var serviceInstanceId = eventMessage.getServiceInstance().getId();
-//            var roleName = ServiceInstancesConsulClient.getServiceInstanceKeycloakRoleName(serviceInstanceId);
+            Set<String> ownerGroups = eventMessage.getOwnerGroups() != null ? eventMessage.getOwnerGroups() : Set.of();
+            List<String> userIdsToNotify = userUtils.getUserIdsFromGroups(ownerGroups);
 
-            switch (eventMessage.getEventType()) {
-                case CREATED -> {
-//                    userIds = this.keycloakAdminClient.getUserIdsAssignedToRole(roleName);
-                    this.serviceInstanceIdToUserIdsCache.put(serviceInstanceId, userIds);
-                }
-                case DELETED -> {
-                    userIds = this.serviceInstanceIdToUserIdsCache.getOrDefault(serviceInstanceId, new ArrayList<>());
-                    this.serviceInstanceIdToUserIdsCache.remove(serviceInstanceId);
-                }
-            }
-
-            for (var userId : userIds) {
+            for (var userId : userIdsToNotify) {
                 var timestamp = new Date();
                 var eventNotification = ServiceInstanceEventMessageToNotificationMapper.INSTANCE.toNotification(eventMessage, userId, timestamp);
-
-//                notificationRepository.save(notification);
                 notificationWsService.notifyFrontend(eventNotification);
                 LOG.info("Created new notification: " + eventNotification);
             }
-
         } catch (Exception e) {
-            LOG.error("Error processing ResourceEventMessage: {}", e.getMessage(), e);
+            LOG.error("Error processing ServiceInstanceEventMessage: {}", e.getMessage(), e);
         }
     }
-
 }
