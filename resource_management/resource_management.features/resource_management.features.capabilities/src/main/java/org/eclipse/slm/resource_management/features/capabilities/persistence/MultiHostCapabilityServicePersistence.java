@@ -1,7 +1,7 @@
 package org.eclipse.slm.resource_management.features.capabilities.persistence;
 
 import org.eclipse.slm.resource_management.common.access.AccessControlObjectType;
-import org.eclipse.slm.resource_management.common.access.AccessControlService;
+import org.eclipse.slm.common.access.AccessControlService;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService;
 import org.springframework.stereotype.Component;
 

@@ -45,6 +45,7 @@ import java.util.concurrent.Executor;
         "org.eclipse.slm.notification_service.messaging",
         "org.eclipse.slm.aas",
         "org.eclipse.slm.awx",
+        "org.eclipse.slm.common.access",
         "org.eclipse.slm.common.credentials",
         "org.eclipse.slm.common.keycloak",
         "org.eclipse.slm.common.minio",
@@ -56,6 +57,7 @@ import java.util.concurrent.Executor;
 }
 )
 @EntityScan(basePackages = {
+        "org.eclipse.slm.common.access",
         "org.eclipse.slm.common.credentials",
         "org.eclipse.slm.resource_management.common",
         "org.eclipse.slm.resource_management.features.capabilities",
@@ -66,6 +68,7 @@ import java.util.concurrent.Executor;
         "org.eclipse.slm.resource_management.features.importer",
 })
 @EnableJpaRepositories(basePackages = {
+        "org.eclipse.slm.common.access",
         "org.eclipse.slm.common.credentials",
         "org.eclipse.slm.resource_management.common",
         "org.eclipse.slm.resource_management.features.capabilities",

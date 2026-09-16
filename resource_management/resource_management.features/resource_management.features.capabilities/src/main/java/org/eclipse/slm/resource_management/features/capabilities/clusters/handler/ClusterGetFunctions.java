@@ -7,7 +7,7 @@ import org.eclipse.slm.common.keycloak.config.MultiTenantKeycloakRegistration;
 import org.eclipse.slm.common.vault.client.VaultClientFactory;
 import org.eclipse.slm.common.vault.client.exceptions.VaultRuntimeException;
 import org.eclipse.slm.notification_service.messaging.NotificationMessageSender;
-import org.eclipse.slm.resource_management.common.access.AccessControlService;
+import org.eclipse.slm.common.access.AccessControlService;
 import org.eclipse.slm.resource_management.common.remote_access.RemoteAccessManager;
 import org.eclipse.slm.resource_management.common.resources.ResourceJpaRepository;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService;

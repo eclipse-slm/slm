@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.core.DeserializationException;
-import org.eclipse.slm.resource_management.common.access.UserContext;
+import org.eclipse.slm.common.access.UserContext;
 import org.eclipse.slm.resource_management.common.aas.ResourceAas;
 import org.eclipse.slm.resource_management.common.aas.ResourcesSubmodelManager;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;

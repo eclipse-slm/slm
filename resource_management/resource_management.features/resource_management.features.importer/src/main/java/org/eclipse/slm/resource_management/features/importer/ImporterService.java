@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedInputStream;
-import org.eclipse.slm.resource_management.common.access.UserContext;
+import org.eclipse.slm.common.access.UserContext;
 
 import java.util.List;
 import java.util.Map;

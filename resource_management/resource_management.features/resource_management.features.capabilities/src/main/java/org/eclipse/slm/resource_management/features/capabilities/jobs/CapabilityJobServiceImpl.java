@@ -4,7 +4,7 @@ import jakarta.annotation.PostConstruct;
 
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.model.exceptions.EventNotAcceptedException;
-import org.eclipse.slm.resource_management.common.access.UserContext;
+import org.eclipse.slm.common.access.UserContext;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.resources.ResourceDTO;
 import org.eclipse.slm.resource_management.common.resources.ResourceEventInternalListener;

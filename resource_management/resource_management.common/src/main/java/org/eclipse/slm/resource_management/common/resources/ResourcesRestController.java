@@ -1,7 +1,7 @@
 package org.eclipse.slm.resource_management.common.resources;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.eclipse.slm.resource_management.common.access.UserContext;
+import org.eclipse.slm.common.access.UserContext;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceDefinitionException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.slf4j.Logger;

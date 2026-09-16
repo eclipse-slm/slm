@@ -1,5 +1,8 @@
 package org.eclipse.slm.resource_management.common.access;
 
+import org.eclipse.slm.common.access.AccessControlObjectRef;
+import org.eclipse.slm.common.access.AccessControlPolicy;
+import org.eclipse.slm.common.access.AccessControlPolicyRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;

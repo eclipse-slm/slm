@@ -5,8 +5,8 @@ import org.eclipse.slm.common.credentials.model.CredentialDataUsernamePasswordRe
 import org.eclipse.slm.common.credentials.model.CredentialEntityLinkCreateDTO;
 import org.eclipse.slm.common.restclient.feign.FeignResponseException;
 import org.eclipse.slm.resource_management.common.access.AccessControlObjectType;
-import org.eclipse.slm.resource_management.common.access.AccessControlService;
-import org.eclipse.slm.resource_management.common.access.UserContext;
+import org.eclipse.slm.common.access.AccessControlService;
+import org.eclipse.slm.common.access.UserContext;
 import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialEntityType;
 import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialScope;
 import org.eclipse.slm.resource_management.common.credentials.ResourceCredentialsManager;

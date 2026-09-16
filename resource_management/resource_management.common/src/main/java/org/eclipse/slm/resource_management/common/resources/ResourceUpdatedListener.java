@@ -1,6 +1,6 @@
 package org.eclipse.slm.resource_management.common.resources;
 
-import org.eclipse.slm.resource_management.common.access.UserContext;
+import org.eclipse.slm.common.access.UserContext;
 
 import java.util.UUID;
 

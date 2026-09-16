@@ -4,7 +4,7 @@ import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.assertj.core.api.Assertions;
-import org.eclipse.slm.resource_management.common.access.UserContext;
+import org.eclipse.slm.common.access.UserContext;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.resource_types.ResourceTypesManager;
 import org.eclipse.slm.resource_management.common.test_utils.AuthorizationHeaderRequestFactory;

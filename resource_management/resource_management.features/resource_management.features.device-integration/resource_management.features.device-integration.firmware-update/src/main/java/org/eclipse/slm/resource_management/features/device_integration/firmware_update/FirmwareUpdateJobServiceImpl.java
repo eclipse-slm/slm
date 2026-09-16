@@ -29,7 +29,7 @@ import reactor.core.publisher.Mono;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import org.eclipse.slm.resource_management.common.access.UserContext;
+import org.eclipse.slm.common.access.UserContext;
 
 import java.util.Date;
 import java.util.List;

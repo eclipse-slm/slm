@@ -2,7 +2,7 @@ package org.eclipse.slm.resource_management.features.device_integration.firmware
 
 import org.eclipse.slm.common.messaging.GenericMessageSender;
 import org.eclipse.slm.resource_management.common.access.AccessControlObjectType;
-import org.eclipse.slm.resource_management.common.access.AccessControlService;
+import org.eclipse.slm.common.access.AccessControlService;
 import org.eclipse.slm.resource_management.features.device_integration.firmware_update.dto.FirmwareUpdateJobMapper;
 import org.eclipse.slm.resource_management.features.device_integration.firmware_update.model.FirmwareUpdateJob;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
