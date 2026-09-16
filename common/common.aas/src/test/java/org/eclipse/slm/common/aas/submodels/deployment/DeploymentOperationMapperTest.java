@@ -1,5 +1,8 @@
 package org.eclipse.slm.common.aas.submodels.deployment;
 
+import org.eclipse.digitaltwin.aas4j.v3.model.DataTypeDefXsd;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultOperationVariable;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
 import org.eclipse.slm.common.model.DeploymentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -103,5 +106,30 @@ class DeploymentOperationMapperTest {
         assertThatThrownBy(() -> DeploymentOperationMapper.toDeployRequest(variables))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("HELM");
+    }
+
+    @Test
+    @DisplayName("A deployment descriptor that is not a Blob is rejected with a clear message")
+    void nonBlobDeploymentDescriptorIsRejected() {
+        var variables = DeploymentOperationMapper.fromDeployRequest(new DeployRequest(
+                UUID.randomUUID(), DeploymentType.DOCKER_COMPOSE,
+                "{}".getBytes(StandardCharsets.UTF_8), "application/json", List.of()));
+
+        for (int i = 0; i < variables.length; i++) {
+            if (DeploymentSubmodelTemplate.VAR_DEPLOYMENT_DESCRIPTOR.equals(variables[i].getValue().getIdShort())) {
+                variables[i] = new DefaultOperationVariable.Builder()
+                        .value(new DefaultProperty.Builder()
+                                .idShort(DeploymentSubmodelTemplate.VAR_DEPLOYMENT_DESCRIPTOR)
+                                .valueType(DataTypeDefXsd.STRING)
+                                .value("not-a-blob")
+                                .build())
+                        .build();
+            }
+        }
+
+        assertThatThrownBy(() -> DeploymentOperationMapper.toDeployRequest(variables))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("DeploymentDescriptor")
+                .hasMessageContaining("Blob");
     }
 }

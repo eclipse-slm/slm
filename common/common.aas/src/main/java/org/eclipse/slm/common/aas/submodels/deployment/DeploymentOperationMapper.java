@@ -4,7 +4,6 @@ import org.eclipse.digitaltwin.aas4j.v3.model.*;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.*;
 import org.eclipse.slm.common.model.DeploymentType;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,7 +56,7 @@ public final class DeploymentOperationMapper {
                     + "', expected one of " + Arrays.toString(DeploymentType.values()));
         }
 
-        var blob = (Blob) requiredElement(variables, VAR_DEPLOYMENT_DESCRIPTOR);
+        var blob = requiredBlob(variables, VAR_DEPLOYMENT_DESCRIPTOR);
         var credentialReferences = new ArrayList<String>();
         var credentialsElement = optionalElement(variables, VAR_CREDENTIAL_REFERENCES);
         if (credentialsElement instanceof SubmodelElementList list) {
@@ -171,6 +170,14 @@ public final class DeploymentOperationMapper {
                     + "' must be a Property with a value");
         }
         return property.getValue();
+    }
+
+    private static Blob requiredBlob(OperationVariable[] variables, String idShort) {
+        var element = requiredElement(variables, idShort);
+        if (!(element instanceof Blob blob)) {
+            throw new IllegalArgumentException("Operation variable '" + idShort + "' must be a Blob");
+        }
+        return blob;
     }
 
     private static String optionalString(OperationVariable[] variables, String idShort) {
