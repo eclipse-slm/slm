@@ -63,6 +63,12 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.aas</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
             <artifactId>awx.client</artifactId>
             <scope>compile</scope>
         </dependency>
