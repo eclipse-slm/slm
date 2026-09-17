@@ -75,4 +75,15 @@ public class TestConfig {
 
     // Test Service Vendor
     public static final TestServiceVendor TEST_SERVICE_VENDOR =  new TestServiceVendor("fabos");
+
+    // Submodel Registry
+    // NOTE: best-effort inference. The submodel-registry's externally reachable base path is not
+    // pinned down anywhere in this repo (its own compose/traefik routing lives outside this
+    // codebase). This mirrors the internal proxy convention every other AAS-facing service here
+    // uses (see e.g. service_management.service.app's application.yml: "aas.submodel-registry.proxy"
+    // resolves to "${deployment.scheme}://${deployment.hostname}:${deployment.port}/aas/submodel-registry",
+    // i.e. the same gateway host/port as every other service, with the service's own internal path).
+    public static final int SUBMODEL_REGISTRY_PORT = Integer.parseInt(System.getenv().getOrDefault("SUBMODEL_REGISTRY_PORT", "443"));
+    public static final String SUBMODEL_REGISTRY_BASE_URL = "https://" + TestConfig.HOST;
+    public static final String SUBMODEL_REGISTRY_BASE_PATH = "/aas/submodel-registry";
 }
