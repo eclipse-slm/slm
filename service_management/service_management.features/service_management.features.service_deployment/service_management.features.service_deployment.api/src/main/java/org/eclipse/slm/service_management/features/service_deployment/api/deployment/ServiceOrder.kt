@@ -20,8 +20,11 @@ class ServiceOrder(id: UUID? = null) : AbstractBaseEntityUuid(id) {
     @Column(columnDefinition = "LONGTEXT")
     var serviceOptionValues: List<ServiceOptionValue> = ArrayList()
 
-    @Column(length = 36, nullable = false)
-    var deploymentCapabilityServiceId: UUID? = null
+    @Column(name = "deployment_target_submodel_id", length = 255, nullable = true)
+    var deploymentTargetSubmodelId: String? = null
+
+    @Column(name = "deployment_job_id", length = 255, nullable = true)
+    var deploymentJobId: String? = null
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

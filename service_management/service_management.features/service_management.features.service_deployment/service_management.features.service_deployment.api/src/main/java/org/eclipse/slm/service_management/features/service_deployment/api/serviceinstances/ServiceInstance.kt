@@ -13,9 +13,9 @@ class ServiceInstance(
 
     metaData: Map<String, String>,
 
-    var resourceId: UUID,
+    var resourceId: UUID?,
 
-    var capabilityServiceId: UUID,
+    var capabilityServiceId: UUID?,
 
     var serviceOfferingId: UUID,
 
@@ -46,11 +46,11 @@ class ServiceInstance(
         get () {
             var objectMapper = ObjectMapper()
             var allMetaData = this.customMetaData.toMutableMap()
-            allMetaData[META_DATA_KEY_RESOURCE_ID] = this.resourceId.toString()
+            this.resourceId?.let { allMetaData[META_DATA_KEY_RESOURCE_ID] = it.toString() }
             allMetaData[META_DATA_KEY_SERVICE_INSTANCE_ID] = this.id.toString()
             allMetaData[META_DATA_KEY_SERVICE_OFFERING_ID] = this.serviceOfferingId.toString()
             allMetaData[META_DATA_KEY_SERVICE_OFFERING_VERSION_ID] = this.serviceOfferingVersionId.toString()
-            allMetaData[META_DATA_KEY_CAPABILITY_SERVICE_ID] = this.capabilityServiceId.toString()
+            this.capabilityServiceId?.let { allMetaData[META_DATA_KEY_CAPABILITY_SERVICE_ID] = it.toString() }
             allMetaData[META_DATA_KEY_PORTS] = objectMapper.writeValueAsString(this.ports)
             allMetaData[META_DATA_KEY_GROUPS] = objectMapper.writeValueAsString(this.groupIds)
 
@@ -85,7 +85,7 @@ class ServiceInstance(
             var mutableTags = tags.toMutableList()
 
             val JSON = jacksonObjectMapper()
-            var resourceId = UUID.fromString(metaData[META_DATA_KEY_RESOURCE_ID])
+            var resourceId = metaData[META_DATA_KEY_RESOURCE_ID]?.let { UUID.fromString(it) }
             metaData.remove(META_DATA_KEY_RESOURCE_ID)
             var id = UUID.fromString(metaData[META_DATA_KEY_SERVICE_INSTANCE_ID])
             metaData.remove(META_DATA_KEY_SERVICE_INSTANCE_ID)
@@ -93,7 +93,7 @@ class ServiceInstance(
             metaData.remove(META_DATA_KEY_SERVICE_OFFERING_ID)
             var serviceOfferingVersionId = UUID.fromString(metaData[META_DATA_KEY_SERVICE_OFFERING_VERSION_ID])
             metaData.remove(META_DATA_KEY_SERVICE_OFFERING_VERSION_ID)
-            var capabilityServiceId = UUID.fromString(metaData[META_DATA_KEY_CAPABILITY_SERVICE_ID])
+            var capabilityServiceId = metaData[META_DATA_KEY_CAPABILITY_SERVICE_ID]?.let { UUID.fromString(it) }
             metaData.remove(META_DATA_KEY_CAPABILITY_SERVICE_ID)
             var ports = JSON.readValue(metaData[META_DATA_KEY_PORTS], object: TypeReference<List<Int>>() {})
             metaData.remove(META_DATA_KEY_PORTS)

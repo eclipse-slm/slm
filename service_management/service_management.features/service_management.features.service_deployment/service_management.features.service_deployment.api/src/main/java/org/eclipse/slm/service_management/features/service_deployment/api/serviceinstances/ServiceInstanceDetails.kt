@@ -25,7 +25,7 @@ data class ServiceInstanceDetails(
 
     val serviceOptions: List<ServiceOptionWithCurrentValue>,
 
-    val deploymentCapabilityServiceId: UUID,
+    val deploymentTargetSubmodelId: String?,
 
     val orderHistory: List<ServiceOrder>
 ) {

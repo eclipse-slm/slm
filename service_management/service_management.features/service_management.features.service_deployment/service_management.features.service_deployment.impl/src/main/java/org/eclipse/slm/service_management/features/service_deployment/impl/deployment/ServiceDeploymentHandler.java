@@ -1,134 +1,171 @@
 package org.eclipse.slm.service_management.features.service_deployment.impl.deployment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.eclipse.slm.awx.client.observer.*;
-import org.eclipse.slm.awx.model.ExtraVars;
 import org.eclipse.slm.common.aas.submodels.deployment.DeployRequest;
-import org.eclipse.slm.common.consul.client.ConsulClient;
-import org.eclipse.slm.common.consul.client.ConsulClientFactory;
+import org.eclipse.slm.common.aas.submodels.deployment.DeploymentJobState;
+import org.eclipse.slm.common.aas.submodels.deployment.DeploymentStatus;
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
-import org.eclipse.slm.resource_management.features.capabilities.aas.DeploymentExtraVarsBuilder;
-import org.eclipse.slm.resource_management.features.capabilities.model.SingleHostCapabilityService;
-import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType;
-import org.eclipse.slm.resource_management.service.client.ResourceManagementClientFactory;
-import org.eclipse.slm.service_management.features.service_deployment.api.deployment.CapabilityServiceNotFoundException;
-import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstance;
-import org.eclipse.slm.service_management.features.service_deployment.api.deployment.DeploymentJobRun;
-import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstanceEventMessageSender;
-import org.eclipse.slm.service_management.features.service_deployment.api.events.ServiceInstanceEventType;
-import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancesConsulClient;
-import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOptionNotFoundException;
+import org.eclipse.slm.resource_management.common.aas.ResourceAas;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrder;
-import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrderResult;
+import org.eclipse.slm.service_management.features.service_deployment.api.events.ServiceInstanceEventType;
+import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstance;
+import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstanceEventMessageSender;
+import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancesConsulClient;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
+import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOptionNotFoundException;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.InvalidServiceOfferingDefinitionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
-import javax.net.ssl.SSLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
+/**
+ * Orchestriert das Deployment: rendern, Ziel pruefen, Operation aufrufen, Abschluss nachbereiten.
+ * Kennt weder AWX noch Capabilities.
+ */
 @Component
-public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler implements IAwxJobObserverListener {
+public class ServiceDeploymentHandler {
 
     private final static Logger LOG = LoggerFactory.getLogger(ServiceDeploymentHandler.class);
 
-    private final ServiceInstanceEventMessageSender serviceInstanceEventMessageSender;
-
-    private final ConsulClientFactory consulClientFactory;
-    private final ConsulClient consulAdminClient;
-
+    private final DeploymentDescriptorRenderer descriptorRenderer;
+    private final DeploymentTargetHandler deploymentTargetHandler;
+    private final AasDeploymentClient deploymentClient;
+    private final DeploymentJobPoller deploymentJobPoller;
     private final KeycloakAdminClient keycloakAdminClient;
-
+    private final ServiceInstancesConsulClient serviceInstancesConsulClient;
+    private final ServiceInstanceEventMessageSender serviceInstanceEventMessageSender;
     private final ServiceOrderJpaRepository serviceOrderJpaRepository;
 
-    private final DeploymentDescriptorRenderer deploymentDescriptorRenderer;
-
-    private final DeploymentExtraVarsBuilder deploymentExtraVarsBuilder;
-
-    private Map<AwxJobObserver, DeploymentJobRun> observedAwxJobsToDeploymentJobDetails = new HashMap<>();
-
-
-    public ServiceDeploymentHandler(AwxJobObserverInitializer awxJobObserverInitializer,
-                                    AwxJobExecutor awxJobExecutor,
-                                    ConsulClientFactory consulClientFactory,
+    public ServiceDeploymentHandler(DeploymentDescriptorRenderer descriptorRenderer,
+                                    DeploymentTargetHandler deploymentTargetHandler,
+                                    AasDeploymentClient deploymentClient,
+                                    DeploymentJobPoller deploymentJobPoller,
                                     KeycloakAdminClient keycloakAdminClient,
-                                    ResourceManagementClientFactory resourceManagementClientFactory,
-                                    ServiceOrderJpaRepository serviceOrderJpaRepository,
                                     ServiceInstancesConsulClient serviceInstancesConsulClient,
                                     ServiceInstanceEventMessageSender serviceInstanceEventMessageSender,
-                                    DeploymentDescriptorRenderer deploymentDescriptorRenderer,
-                                    DeploymentExtraVarsBuilder deploymentExtraVarsBuilder) {
-        super(resourceManagementClientFactory, serviceInstancesConsulClient, awxJobObserverInitializer, awxJobExecutor);
-        this.consulClientFactory = consulClientFactory;
-        this.consulAdminClient = consulClientFactory.createAdminClient();
+                                    ServiceOrderJpaRepository serviceOrderJpaRepository) {
+        this.descriptorRenderer = descriptorRenderer;
+        this.deploymentTargetHandler = deploymentTargetHandler;
+        this.deploymentClient = deploymentClient;
+        this.deploymentJobPoller = deploymentJobPoller;
         this.keycloakAdminClient = keycloakAdminClient;
-        this.serviceOrderJpaRepository = serviceOrderJpaRepository;
+        this.serviceInstancesConsulClient = serviceInstancesConsulClient;
         this.serviceInstanceEventMessageSender = serviceInstanceEventMessageSender;
-        this.deploymentDescriptorRenderer = deploymentDescriptorRenderer;
-        this.deploymentExtraVarsBuilder = deploymentExtraVarsBuilder;
+        this.serviceOrderJpaRepository = serviceOrderJpaRepository;
     }
 
-    public DeploymentJobRun deployServiceOfferingToResource(
-            JwtAuthenticationToken jwtAuthenticationToken,
-            ServiceOfferingVersion serviceOfferingVersion,
-            ServiceOrder serviceOrder)
-            throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException {
+    public ServiceOrder deployServiceOfferingToTarget(JwtAuthenticationToken jwtAuthenticationToken,
+                                                      ServiceOfferingVersion serviceOfferingVersion,
+                                                      ServiceOrder serviceOrder)
+            throws JsonProcessingException, ServiceOptionNotFoundException, InvalidServiceOfferingDefinitionException {
 
-        var serviceId = UUID.randomUUID();
-        serviceOrder.setServiceInstanceId(serviceId);
-        var serviceOfferingDeploymentType = serviceOfferingVersion.getDeploymentType();
-        var serviceHoster = this.getServiceHoster(jwtAuthenticationToken, serviceOrder.getDeploymentCapabilityServiceId());
-        serviceOrder.setDeploymentCapabilityServiceId(serviceOrder.getDeploymentCapabilityServiceId());
-        var awxCapabilityAction = this.getAwxDeployCapabilityAction(ActionType.DEPLOY, serviceHoster.getCapabilityService().getCapability());
+        var serviceInstanceId = UUID.randomUUID();
+        serviceOrder.setServiceInstanceId(serviceInstanceId);
 
-        var rendered = this.deploymentDescriptorRenderer.render(serviceOfferingVersion, serviceOrder);
-        var deployRequest = new DeployRequest(
-                serviceId,
-                serviceOfferingDeploymentType,
-                rendered.content(),
-                rendered.contentType(),
+        var deploymentType = serviceOfferingVersion.getDeploymentType();
+        var target = this.deploymentTargetHandler
+                .getDeploymentTargetOrThrow(serviceOrder.getDeploymentTargetSubmodelId());
+
+        if (!target.supports(deploymentType)) {
+            throw new IllegalArgumentException("Deployment target '" + target.displayName()
+                    + "' does not support deployment type '" + deploymentType + "'");
+        }
+
+        var rendered = this.descriptorRenderer.render(serviceOfferingVersion, serviceOrder);
+        var accessToken = jwtAuthenticationToken.getToken().getTokenValue();
+
+        var deployRequest = new DeployRequest(serviceInstanceId, deploymentType,
+                rendered.content(), rendered.contentType(),
                 this.getCredentialReferences(serviceOfferingVersion));
 
-        var extraVars = new ExtraVars(this.deploymentExtraVarsBuilder.build(
-                deployRequest,
-                serviceOrder.getDeploymentCapabilityServiceId(),
-                serviceHoster.getCapabilityService().getServiceName(),
-                awxCapabilityAction.getConnectionTypes(),
-                jwtAuthenticationToken.getToken().getTokenValue()));
-
-        var awxJobObserver = this.runAwxCapabilityAction(
-                awxCapabilityAction, jwtAuthenticationToken, extraVars, JobGoal.CREATE, this);
-
-        var serviceMetaData = rendered.serviceMetaData();
-        var servicePorts = rendered.servicePorts();
-
-        UUID resourceId;
-        if (serviceHoster.getCapabilityService() instanceof SingleHostCapabilityService) {
-            resourceId = ((SingleHostCapabilityService)serviceHoster.getCapabilityService()).getResourceId();
+        var deployResult = this.deploymentClient.deploy(target, deployRequest, accessToken);
+        if (!deployResult.accepted()) {
+            serviceOrder.setServiceOrderResult(ServiceOrderResult.FAILED);
+            this.serviceOrderJpaRepository.save(serviceOrder);
+            throw new IllegalStateException("Deployment target '" + target.displayName()
+                    + "' rejected the deployment: " + deployResult.message());
         }
-        else {
-            resourceId = serviceHoster.getCapabilityService().getResourceId();
-        }
+
+        serviceOrder.setDeploymentJobId(deployResult.jobId());
+        this.serviceOrderJpaRepository.save(serviceOrder);
+
         var serviceInstance = new ServiceInstance(
-                serviceId,
+                serviceInstanceId,
                 new ArrayList<>(),
-                serviceMetaData,
-                resourceId,
-                serviceHoster.getCapabilityService().getServiceId(),
+                rendered.serviceMetaData(),
+                this.resourceIdFromTarget(target),
+                null,
                 serviceOfferingVersion.getServiceOffering().getId(),
                 serviceOfferingVersion.getId(),
-                servicePorts,
-                new ArrayList<>()
-        );
+                rendered.servicePorts(),
+                new ArrayList<>());
 
-        var deploymentJobRun = new DeploymentJobRun(awxJobObserver, jwtAuthenticationToken, serviceInstance, serviceOrder);
-        this.observedAwxJobsToDeploymentJobDetails.put(awxJobObserver, deploymentJobRun);
+        this.deploymentJobPoller.awaitTerminalState(target, deployResult.jobId(), accessToken,
+                status -> this.onDeploymentFinished(status, jwtAuthenticationToken, serviceInstance, serviceOrder));
 
-        return deploymentJobRun;
+        return serviceOrder;
+    }
+
+    /**
+     * Leitet die SLM-Resource-UUID aus der AAS-Id des Ziels ab, falls es sich um eine
+     * SLM-verwaltete Resource handelt. Fuer ein Fremd-Asset (keine SLM-AAS-Id) gibt es
+     * keine solche UUID -- null.
+     */
+    private UUID resourceIdFromTarget(DeploymentTarget target) {
+        if (!target.aasId().startsWith(ResourceAas.AAS_ID_PREFIX)) {
+            return null;
+        }
+        try {
+            return UUID.fromString(ResourceAas.getResourceIdFromAasId(target.aasId()));
+        } catch (IllegalArgumentException e) {
+            LOG.warn("AAS id '{}' looks SLM-managed but its resource id is not a valid UUID: {}",
+                    target.aasId(), e.getMessage());
+            return null;
+        }
+    }
+
+    private void onDeploymentFinished(DeploymentStatus status,
+                                      JwtAuthenticationToken jwtAuthenticationToken,
+                                      ServiceInstance serviceInstance,
+                                      ServiceOrder serviceOrder) {
+        var userUuid = KeycloakTokenUtil.getUserUuid(jwtAuthenticationToken);
+        // TODO: Get full path owner group id from REST call that initiated the service deployment
+        var fullPathOwnerGroupId = "/users/" + userUuid;
+
+        if (status.state() == DeploymentJobState.SUCCEEDED) {
+            LOG.info("Service '{}' deployed for user '{}'", serviceInstance.getId(), userUuid);
+
+            this.keycloakAdminClient.createRealmRoleAndAssignToUser(
+                    jwtAuthenticationToken.getToken().getSubject(), "service_" + serviceInstance.getId());
+
+            if (serviceInstance.getResourceId() != null) {
+                this.serviceInstancesConsulClient.registerConsulServiceForServiceInstance(
+                        serviceInstance, fullPathOwnerGroupId);
+            } else {
+                LOG.info("Service '{}' was deployed to a foreign target with no Consul node; "
+                        + "skipping Consul service registration", serviceInstance.getId());
+            }
+
+            serviceOrder.setServiceOrderResult(ServiceOrderResult.SUCCESSFULL);
+            this.serviceInstanceEventMessageSender.sendMessage(serviceInstance, ServiceInstanceEventType.CREATED);
+        } else {
+            if (status.state() == DeploymentJobState.UNKNOWN) {
+                LOG.warn("Deployment target lost track of the job for service '{}' of user '{}': {}",
+                        serviceInstance.getId(), userUuid, status.message());
+            } else {
+                LOG.info("Service not deployed for user '{}': {}", userUuid, status.message());
+            }
+            serviceOrder.setServiceOrderResult(ServiceOrderResult.FAILED);
+        }
+
+        this.serviceOrderJpaRepository.save(serviceOrder);
     }
 
     private List<String> getCredentialReferences(ServiceOfferingVersion serviceOfferingVersion) {
@@ -139,48 +176,4 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
         }
         return vaultPaths;
     }
-
-    @Override
-    public void onJobStateChanged(AwxJobObserver sender, JobState newState) {
-    }
-
-    @Override
-    public void onJobStateFinished(AwxJobObserver sender, JobFinalState finalState) {
-        if (this.observedAwxJobsToDeploymentJobDetails.containsKey(sender))
-        {
-            var jobDetails = this.observedAwxJobsToDeploymentJobDetails.get(sender);
-            var jwtAuthenticationToken = jobDetails.getJwtAuthenticationToken();
-            var userUuid = KeycloakTokenUtil.getUserUuid(jwtAuthenticationToken);
-            var serviceInstance = jobDetails.getServiceInstance();
-            var serviceOrder = jobDetails.getServiceOrder();
-            // TODO: Get full path owner group id from REST call that initiated the service deployment instead of reconstructing / assuming it here
-            var fullPathOwnerGroupId = "/users/" + userUuid;
-
-            switch (finalState) {
-                case SUCCESSFUL -> {
-                    LOG.info("Service '" + serviceInstance.getId() + "' deployed for user '" + userUuid + "'");
-
-                    // Add role for new service instance in Keycloak
-                    var serviceKeycloakRoleName = "service_" + serviceInstance.getId();
-                    var userId = jwtAuthenticationToken.getToken().getSubject();
-                    this.keycloakAdminClient.createRealmRoleAndAssignToUser(userId, serviceKeycloakRoleName);
-
-                    // Add consul service for new service instance
-                    this.serviceInstancesConsulClient.registerConsulServiceForServiceInstance(serviceInstance, fullPathOwnerGroupId);
-
-                    serviceOrder.setServiceOrderResult(ServiceOrderResult.SUCCESSFULL);
-                    this.serviceInstanceEventMessageSender.sendMessage(serviceInstance, ServiceInstanceEventType.CREATED);
-                }
-
-                default -> {
-                    serviceOrder.setServiceOrderResult(ServiceOrderResult.FAILED);
-                    LOG.info("Service not deployed for user '" + userUuid + "', because job '" + sender.jobId +"' " + finalState);
-                }
-            }
-
-            this.serviceOrderJpaRepository.save(serviceOrder);
-            this.observedAwxJobsToDeploymentJobDetails.remove(sender);
-        }
-    }
 }
-

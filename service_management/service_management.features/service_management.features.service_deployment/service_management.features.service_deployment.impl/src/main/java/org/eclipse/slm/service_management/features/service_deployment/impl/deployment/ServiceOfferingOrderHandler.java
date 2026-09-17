@@ -7,6 +7,7 @@ import org.eclipse.slm.common.consul.model.catalog.Node;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.parent.service.controller.SystemVariableHandler;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
+import org.eclipse.slm.resource_management.common.aas.ResourceAas;
 import org.eclipse.slm.resource_management.common.model.MatchingResourceDTO;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.MultiHostCapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
@@ -50,6 +51,8 @@ public class ServiceOfferingOrderHandler implements ServiceOfferingOrderService 
 
     private final ServiceDeploymentHandler serviceDeploymentHandler;
 
+    private final DeploymentTargetHandler deploymentTargetHandler;
+
     private final ResourceManagementClientFactory resourceManagementClientFactory;
 
     private final ServiceOfferingVersionRequirementsHandler serviceOfferingVersionRequirementsHandler;
@@ -62,6 +65,7 @@ public class ServiceOfferingOrderHandler implements ServiceOfferingOrderService 
     public ServiceOfferingOrderHandler(ServiceOfferingHandler serviceOfferingHandler,
                                        ServiceOfferingVersionHandler serviceOfferingVersionHandler,
                                        ServiceDeploymentHandler serviceDeploymentHandler,
+                                       DeploymentTargetHandler deploymentTargetHandler,
                                        ResourceManagementClientFactory resourceManagementClientFactory,
                                        ServiceOfferingVersionRequirementsHandler serviceOfferingVersionRequirementsHandler,
                                        SystemVariableHandler systemVariableHandler,
@@ -69,6 +73,7 @@ public class ServiceOfferingOrderHandler implements ServiceOfferingOrderService 
         this.serviceOfferingHandler = serviceOfferingHandler;
         this.serviceOfferingVersionHandler = serviceOfferingVersionHandler;
         this.serviceDeploymentHandler = serviceDeploymentHandler;
+        this.deploymentTargetHandler = deploymentTargetHandler;
         this.resourceManagementClientFactory = resourceManagementClientFactory;
         this.serviceOfferingVersionRequirementsHandler = serviceOfferingVersionRequirementsHandler;
         this.systemVariableHandler = systemVariableHandler;
@@ -118,23 +123,13 @@ public class ServiceOfferingOrderHandler implements ServiceOfferingOrderService 
                                 var accessToken = KeycloakTokenUtil.getToken(jwtAuthenticationToken);
                                 switch (deploymentVariable) {
                                     case TARGET_RESOURCE_ID -> {
-                                        var resourceManagementClient = resourceManagementClientFactory.createWithBearerTokenAuth(accessToken);
-
-                                        var serviceHosterFilter = new ServiceHosterFilter.Builder()
-                                                .capabilityServiceId(serviceOrder.getDeploymentCapabilityServiceId())
-                                                .build();
-                                        var serviceHosters = resourceManagementClient.providers().getServiceHosters(serviceHosterFilter);
-                                        var resourceId = this.getResourceIdOfServiceHoster(serviceHosters.get(0).getCapabilityService());
+                                        var resourceId = this.getResourceIdOfDeploymentTarget(serviceOrder.getDeploymentTargetSubmodelId());
                                         optionalServiceOptionValue.get().setValue(resourceId);
                                     }
 
                                     case TARGET_RESOURCE_IP -> {
-                                        var resourceManagementClient = resourceManagementClientFactory.createWithBearerTokenAuth(accessToken);
-                                        var serviceHosterFilter = new ServiceHosterFilter.Builder()
-                                                .capabilityServiceId(serviceOrder.getDeploymentCapabilityServiceId())
-                                                .build();
-                                        var serviceHosters = resourceManagementClient.providers().getServiceHosters(serviceHosterFilter);
-                                        var resourceIp = this.getResourceIpOfServiceHoster(serviceHosters.get(0).getCapabilityService());
+                                        var resourceId = this.getResourceIdOfDeploymentTarget(serviceOrder.getDeploymentTargetSubmodelId());
+                                        var resourceIp = this.getResourceIpOfResource(resourceId);
                                         optionalServiceOptionValue.get().setValue(resourceIp);
                                     }
                                 }
@@ -146,7 +141,42 @@ public class ServiceOfferingOrderHandler implements ServiceOfferingOrderService 
             }
         }
 
-        this.serviceDeploymentHandler.deployServiceOfferingToResource(jwtAuthenticationToken, serviceOfferingVersion, serviceOrder);
+        this.serviceDeploymentHandler.deployServiceOfferingToTarget(jwtAuthenticationToken, serviceOfferingVersion, serviceOrder);
+    }
+
+    /**
+     * Loest die SLM-Resource-UUID eines Deployment-Ziels auf, das ueber das Deployment-Submodel
+     * identifiziert wird. Nur SLM-verwaltete Ziele (AAS-Id folgt dem Schema 'Resource_<uuid>')
+     * haben eine solche UUID; ein Fremd-Asset hat keine, und diese Deployment-Variable kann dafuer
+     * nicht aufgeloest werden.
+     */
+    private UUID getResourceIdOfDeploymentTarget(String deploymentTargetSubmodelId) {
+        var target = this.deploymentTargetHandler.getDeploymentTargetOrThrow(deploymentTargetSubmodelId);
+
+        if (!target.aasId().startsWith(ResourceAas.AAS_ID_PREFIX)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Deployment target '" + target.displayName() + "' is not an SLM-managed resource; "
+                            + "'TARGET_RESOURCE_ID'/'TARGET_RESOURCE_IP' deployment variables require an SLM-managed target");
+        }
+
+        try {
+            return UUID.fromString(ResourceAas.getResourceIdFromAasId(target.aasId()));
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Deployment target '" + target.displayName() + "' looks SLM-managed but its resource id "
+                            + "is not a valid UUID: " + e.getMessage());
+        }
+    }
+
+    private String getResourceIpOfResource(UUID resourceId) throws ConsulLoginFailedException {
+        Optional<Node> optionalNode = consulAdminClient.nodes().getNodeById(resourceId);
+
+        String resourceIp = "N/A";
+        if (optionalNode.isPresent()) {
+            resourceIp = optionalNode.get().getAddress();
+        }
+
+        return resourceIp;
     }
 
     public List<MatchingResourceDTO> getCapabilityServicesMatchingServiceRequirements(UUID serviceOfferingId,
@@ -211,19 +241,6 @@ public class ServiceOfferingOrderHandler implements ServiceOfferingOrderService 
         }
 
         return resourceId;
-    }
-
-    private String getResourceIpOfServiceHoster(CapabilityService capabilityService) throws ConsulLoginFailedException {
-        var resourceId = this.getResourceIdOfServiceHoster(capabilityService);
-        Optional<Node> optionalNode = consulAdminClient.nodes().getNodeById( resourceId);
-
-        String resourceIp = "N/A";
-        if (optionalNode.isPresent()) {
-            resourceIp = optionalNode.get().getAddress();
-
-        }
-
-        return resourceIp;
     }
 }
 

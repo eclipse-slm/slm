@@ -243,7 +243,7 @@ public class ServiceInstancesHandler {
                 serviceInstance.getGroupIds(),
                 serviceInstance.getMetaData(),
                 serviceOptionWithValues,
-                lastOrder.getDeploymentCapabilityServiceId(),
+                lastOrder.getDeploymentTargetSubmodelId(),
                 orders);
 
         return details;
