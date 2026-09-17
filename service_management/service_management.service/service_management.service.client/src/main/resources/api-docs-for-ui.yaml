@@ -4401,7 +4401,6 @@
       },
       "ServiceInstanceDetails": {
         "required": [
-          "deploymentCapabilityServiceId",
           "groupIds",
           "id",
           "initialCreation",
@@ -4460,9 +4459,9 @@
               "$ref": "#/components/schemas/ServiceOptionWithCurrentValue"
             }
           },
-          "deploymentCapabilityServiceId": {
+          "deploymentTargetSubmodelId": {
             "type": "string",
-            "format": "uuid"
+            "nullable": true
           },
           "orderHistory": {
             "type": "array",
