@@ -116,6 +116,7 @@ export const useNotificationStore = defineStore('notificationStore', {
           const serviceInstancesStore = useServiceInstancesStore();
           serviceInstancesStore.updateStore();
           $toast.info(NotificationTextGenerator.generateLocalizedText(eventNotification, i18n.global))
+          break;
         }
 
         default: {

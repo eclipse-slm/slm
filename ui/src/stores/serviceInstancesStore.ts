@@ -28,8 +28,11 @@ export const useServiceInstancesStore = defineStore('serviceInstancesStore', {
 
     actions: {
         setServices (services) {
-            this.services = services
+            this.services = (services ?? []).filter(service => service != null)
             this.servicesMarkedForDelete.forEach(serviceMarkedForDelete => {
+                if (serviceMarkedForDelete == null) {
+                    return
+                }
                 const filteredServices = this.services.find(service => service.id === serviceMarkedForDelete.id)
                 if (filteredServices) {
                     filteredServices.markedForDelete = true
@@ -39,6 +42,9 @@ export const useServiceInstancesStore = defineStore('serviceInstancesStore', {
         },
 
         setServiceMarkedForDelete (serviceToDelete) {
+            if (serviceToDelete == null) {
+                return
+            }
             if (this.servicesMarkedForDelete.indexOf(serviceToDelete) === -1) { this.servicesMarkedForDelete.push(serviceToDelete) }
             this.services.forEach(service => {
                 if (service.id === serviceToDelete.id) {

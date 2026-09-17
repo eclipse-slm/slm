@@ -15,11 +15,11 @@
     >
       <v-row no-gutters>
         <v-col>
-          <v-list-item :prepend-avatar="getImageUrl(serviceVendorById(serviceOffering.serviceVendorId).logo)">
+          <v-list-item :prepend-avatar="getImageUrl(serviceVendorById(serviceOffering.serviceVendorId)?.logo)">
             <v-list-item-title class="text-h5">
               {{ serviceOffering.name }}
             </v-list-item-title>
-            <v-list-item-subtitle>{{ serviceVendorById(serviceOffering.serviceVendorId).name }}</v-list-item-subtitle>
+            <v-list-item-subtitle>{{ serviceVendorById(serviceOffering.serviceVendorId)?.name }}</v-list-item-subtitle>
           </v-list-item>
         </v-col>
       </v-row>

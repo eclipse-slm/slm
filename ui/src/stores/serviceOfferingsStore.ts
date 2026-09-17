@@ -176,7 +176,7 @@ export const useServiceOfferingsStore = defineStore('serviceOfferingStore', {
         },
 
         async getServiceVendors () {
-            return await ServiceManagementClient.serviceVendorsApi.getServiceVendors()
+            return await ServiceManagementClient.serviceVendorsApi.getServiceVendors(true)
                 .then(
                     response => {
                         this.serviceVendors = response.data

@@ -1,0 +1,3 @@
+---
+- name: SLM | Run install playbook
+  ansible.builtin.import_playbook: eclipse.slm.install

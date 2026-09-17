@@ -1,0 +1,11 @@
+---
+- name: Destroy
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  no_log: "{{ molecule_no_log }}"
+  tasks:
+    - name: Destroy via openstack
+      ansible.builtin.include_role:
+        name: ipa-big.molecule_openstack
+        tasks_from: destroy.yml

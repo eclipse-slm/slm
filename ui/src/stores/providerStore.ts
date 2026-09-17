@@ -23,7 +23,7 @@ export const useProviderStore = defineStore('providerStore', {
 
   actions: {
     async getServiceHosters () {
-      return await ResourceManagementClient.capabilityProvidersApi.getServiceHosters()
+      return await ResourceManagementClient.capabilityProvidersApi.getServiceHosters({})
           .then(response => {
             if(response.data){
               this.serviceHosters = response.data;

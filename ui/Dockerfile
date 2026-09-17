@@ -5,7 +5,7 @@ WORKDIR /app
 # Copy the package.json
 COPY package*.json ./
 # Install system dependencies
-RUN apt update && apt install wget unzip
+RUN apt update && apt install -y wget unzip
 RUN wget https://releases.hashicorp.com/consul-template/0.32.0/consul-template_0.32.0_linux_amd64.zip && \
     unzip consul-template_0.32.0_linux_amd64.zip
 # Install npm dependencies

@@ -255,18 +255,56 @@ export default {
       },
 
     },
+    watch: {
+      services: {
+        handler () {
+          this.rebuildGroupedServices()
+          this.updateAvailableVersionChanges()
+        },
+        immediate: true,
+        deep: true,
+      },
+      groupByServiceInstanceGroups () {
+        this.rebuildGroupedServices()
+      }
+    },
     created() {
-
-      this.groupedServices = this.services
-      this.services.forEach(service => {
-        ServiceManagementClient.serviceInstancesApi.getAvailableVersionChangesForServiceInstance(service.id).then(response => {
-          if (response.data && response.data.length > 0) {
-            this.availableVersionChangesOfServices[service.id] = response.data;
-          }
-        }).catch(logRequestError)
-      })
+      this.rebuildGroupedServices()
+      this.updateAvailableVersionChanges()
     },
     methods: {
+      rebuildGroupedServices () {
+        if (this.groupByServiceInstanceGroups === 1) {
+          this.groupedServices = []
+          this.services.forEach(service => {
+            if (service.groupIds.length === 0) {
+              let serviceWithGroup = JSON.parse(JSON.stringify(service))
+              serviceWithGroup.groupName = 'No group'
+              serviceWithGroup.rowId = service.id + "_ungrouped"
+              this.groupedServices.push(serviceWithGroup)
+            } else {
+              service.groupIds.forEach(groupId => {
+                let serviceWithGroup = JSON.parse(JSON.stringify(service))
+                serviceWithGroup.groupName = this.serviceInstanceGroupById(groupId).name
+                serviceWithGroup.rowId = service.id + "_" + serviceWithGroup.groupName
+                this.groupedServices.push(serviceWithGroup)
+              })
+            }
+          })
+        } else {
+          this.groupedServices = this.services
+        }
+      },
+      updateAvailableVersionChanges () {
+        this.availableVersionChangesOfServices = {}
+        this.services.forEach(service => {
+          ServiceManagementClient.serviceInstancesApi.getAvailableVersionChangesForServiceInstance(service.id).then(response => {
+            if (response.data && response.data.length > 0) {
+              this.availableVersionChangesOfServices[service.id] = response.data;
+            }
+          }).catch(logRequestError)
+        })
+      },
       onDeleteClicked (clickedService) {
         this.serviceToDelete = clickedService
       },
@@ -274,10 +312,12 @@ export default {
         this.serviceToDelete = null
       },
       onServiceDeleteConfirmed () {
-        ServiceManagementClient.serviceInstancesApi.deleteServiceInstance(this.serviceToDelete.id).then().catch(logRequestError)
-        this.serviceInstancesStore.setServiceMarkedForDelete(this.serviceToDelete);
-        this.serviceToDelete = null
-        this.$toast.info('Service deletion started')
+        ServiceManagementClient.serviceInstancesApi.deleteServiceInstance(this.serviceToDelete.id).then(() => {
+          this.serviceInstancesStore.setServiceMarkedForDelete(this.serviceToDelete);
+          this.serviceInstancesStore.updateStore()
+          this.serviceToDelete = null
+          this.$toast.info('Service deletion started')
+        }).catch(logRequestError)
       },
 
       onServiceOfferingTextClicked (serviceOfferingId) {
@@ -306,27 +346,7 @@ export default {
       },
 
       onGroupByServiceInstanceGroupsClicked () {
-        if (this.groupByServiceInstanceGroups === 1) {
-          this.groupedServices = []
-          this.services.forEach(service => {
-            if (service.groupIds.length === 0) {
-              let serviceWithGroup = JSON.parse(JSON.stringify(service))
-              serviceWithGroup.groupName = 'No group'
-              serviceWithGroup.rowId = service.id + "_ungrouped"
-              this.groupedServices.push(serviceWithGroup)
-            } else {
-              service.groupIds.forEach(groupId => {
-                let serviceWithGroup = JSON.parse(JSON.stringify(service))
-                serviceWithGroup.groupName = this.serviceInstanceGroupById(groupId).name
-                serviceWithGroup.rowId = service.id + "_" + serviceWithGroup.groupName
-                this.groupedServices.push(serviceWithGroup)
-              })
-            }
-          })
-        }
-        else {
-          this.groupedServices = this.services
-        }
+        this.rebuildGroupedServices()
       },
 
       rowClass (item) {

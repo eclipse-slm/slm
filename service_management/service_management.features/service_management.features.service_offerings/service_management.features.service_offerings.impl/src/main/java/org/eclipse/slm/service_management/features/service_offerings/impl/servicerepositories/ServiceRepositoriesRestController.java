@@ -12,6 +12,7 @@ import org.eclipse.slm.service_management.features.service_offerings.api.service
 import org.eclipse.slm.service_management.features.service_offerings.api.servicevendors.exceptions.ServiceVendorAccessDenied;
 import org.modelmapper.TypeToken;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -143,7 +144,7 @@ public class ServiceRepositoriesRestController implements ServiceRepositoriesRes
 
             return false;
         }
-        else if  (authentication instanceof UsernamePasswordAuthentication) {
+        else if (authentication instanceof UsernamePasswordAuthenticationToken) {
             return true;
         }
 

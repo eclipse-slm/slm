@@ -193,6 +193,7 @@ jobs:
           host: ${{env.STAGING_VM_IP}}
           username: operation
           key: ${{secrets.RUNNER_PRIVATE_KEY}}
+          command_timeout: 45m
           envs: STAGING_VM_HOSTNAME,STAGING_VM_IP
           script: |
             rm -r ~/staging/tmp || true && mkdir -p ~/staging/tmp && cd ~/staging/tmp
@@ -207,6 +208,10 @@ jobs:
             docker run \
               --rm \
               --pull=always \
+              --env SLM_VERSION=$CORE_VERSION \
+              --env SLM_HOSTNAME=$STAGING_VM_HOSTNAME \
+              --env SLM_IP=$STAGING_VM_IP \
+              --env INSTALL_DIRECTORY=$INSTALL_DIRECTORY \
               --volume /var/run/docker.sock:/var/run/docker.sock \
               --volume $INSTALL_DIRECTORY:/install \
               ghcr.io/eclipse-slm/slm/installer-api:$CORE_VERSION \
@@ -218,6 +223,7 @@ jobs:
               --rm \
               --name eclipse-slm-installer \
               --pull=always \
+              --env SLM_VERSION=$CORE_VERSION \
               --env SLM_HOSTNAME=$STAGING_VM_HOSTNAME \
               --env SLM_IP=$STAGING_VM_IP \
               --env INSTALL_DIRECTORY=$INSTALL_DIRECTORY \

@@ -90,3 +90,6 @@ site/
 **/.terraform
 **/.terraform.lock.hcl
 **/*.tfstate*
+
+# Lola-ai
+.lola/
