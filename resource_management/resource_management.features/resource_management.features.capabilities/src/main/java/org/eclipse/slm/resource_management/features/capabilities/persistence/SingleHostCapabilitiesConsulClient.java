@@ -9,6 +9,7 @@ import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient
 import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClientFactory;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.CapabilityUtil;
+import org.eclipse.slm.resource_management.features.capabilities.aas.DeploymentSubmodelRegistrar;
 import org.eclipse.slm.resource_management.features.capabilities.exceptions.CapabilityNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.exceptions.CapabilityServiceNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.exceptions.CapabilityServiceRuntimeException;
@@ -31,16 +32,20 @@ public class SingleHostCapabilitiesConsulClient {
 
     private final CapabilityJpaRepository capabilityJpaRepository;
 
+    private final DeploymentSubmodelRegistrar deploymentSubmodelRegistrar;
+
     public SingleHostCapabilitiesConsulClient(
             ConsulClientFactory consulClientFactory,
             ResourcesConsulClientFactory resourcesConsulClientFactory,
-            CapabilityJpaRepository capabilityJpaRepository
+            CapabilityJpaRepository capabilityJpaRepository,
+            DeploymentSubmodelRegistrar deploymentSubmodelRegistrar
     ) {
         this.resourcesConsulClientFactory = resourcesConsulClientFactory;
         this.resourcesConsulAdminClient = resourcesConsulClientFactory.createAdminClient();
         this.consulClientFactory = consulClientFactory;
         this.adminConsulClient = consulClientFactory.createAdminClient();
         this.capabilityJpaRepository = capabilityJpaRepository;
+        this.deploymentSubmodelRegistrar = deploymentSubmodelRegistrar;
     }
 
     public CapabilityService addSingleHostCapabilityToNode(
@@ -94,7 +99,7 @@ public class SingleHostCapabilitiesConsulClient {
         this.adminConsulClient.services().registerService(nodeId, serviceRegistration);
     }
 
-    public void removeSingleHostCapabilityFromNode(Capability capability, UUID resourceId) throws ResourceNotFoundException {
+    public Optional<CapabilityService> removeSingleHostCapabilityFromNode(Capability capability, UUID resourceId) throws ResourceNotFoundException {
         // Get capability service on Consul node of resource
         var nodeServices = this.adminConsulClient.services().getNodeServicesByNodeId(resourceId);
         Optional<NodeService> capabilityNodeService = nodeServices.stream()
@@ -103,7 +108,7 @@ public class SingleHostCapabilitiesConsulClient {
                 .findFirst();
 
         if(capabilityNodeService.isEmpty()) {
-            return; // No capability service for the capability found on this node, nothing to remove
+            return Optional.empty(); // No capability service for the capability found on this node, nothing to remove
         }
         // Unregister capability service from Consul node
         var capabilityService = SingleHostCapabilityService.createFromNodeService(capabilityNodeService.get(), resourceId, capability);
@@ -112,13 +117,17 @@ public class SingleHostCapabilitiesConsulClient {
         var policyName = CapabilitiesConsulClient.getCapabilityServicePolicyName(capabilityService.getServiceId());
         var policy = this.adminConsulClient.acl().getPolicyByNameOrThrow(policyName);
         this.adminConsulClient.acl().deletePolicyById(policy.getId());
+
+        return Optional.of(capabilityService);
     }
 
     public void removeCapabilityServiceFromAllConsulNodes(Capability capability) {
         var existingResources = this.resourcesConsulAdminClient.getResources();
         for (var existingResource : existingResources) {
             try {
-                this.removeSingleHostCapabilityFromNode(capability, existingResource.getId());
+                var removedCapabilityService = this.removeSingleHostCapabilityFromNode(capability, existingResource.getId());
+                removedCapabilityService.ifPresent(capabilityService ->
+                        this.deploymentSubmodelRegistrar.unregister(existingResource.getId(), capabilityService.getServiceId()));
             } catch (Exception e) {
                 throw new CapabilityServiceRuntimeException("Unable to remove capability service from resource with id = '" + existingResource.getId() + "'", e);
             }

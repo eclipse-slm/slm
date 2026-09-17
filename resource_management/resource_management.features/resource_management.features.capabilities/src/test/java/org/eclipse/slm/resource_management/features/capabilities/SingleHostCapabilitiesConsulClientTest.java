@@ -12,6 +12,7 @@ import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClient
 import org.eclipse.slm.resource_management.common.adapters.ResourcesConsulClientFactory;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.common.resources.BasicResource;
+import org.eclipse.slm.resource_management.features.capabilities.aas.DeploymentSubmodelRegistrar;
 import org.eclipse.slm.resource_management.features.capabilities.model.*;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilitiesConsulClient;
 import org.eclipse.slm.resource_management.features.capabilities.persistence.CapabilityJpaRepository;
@@ -48,10 +49,12 @@ public class SingleHostCapabilitiesConsulClientTest {
     private static ResourcesConsulClient resourcesConsulAdminClient;
 
     private static CapabilityJpaRepository capabilityJpaRepository;
+    private static DeploymentSubmodelRegistrar deploymentSubmodelRegistrar;
 
     @BeforeAll
     public static void beforeAll() {
         capabilityJpaRepository = Mockito.mock(CapabilityJpaRepository.class);
+        deploymentSubmodelRegistrar = Mockito.mock(DeploymentSubmodelRegistrar.class);
 
         var consulTestInitializer = new ConsulTestContainerInitializer(consulContainer, false);
         consulTestInitializer.initUserGroup(TEST_GROUP_ID);
@@ -66,7 +69,8 @@ public class SingleHostCapabilitiesConsulClientTest {
         singleHostCapabilitiesConsulClient = new SingleHostCapabilitiesConsulClient(
                 consulClientFactory,
                 resourceConsulClientFactory,
-                capabilityJpaRepository);
+                capabilityJpaRepository,
+                deploymentSubmodelRegistrar);
 
         resourcesConsulAdminClient.addResource(SingleHostCapabilitiesConsulClientTestData.testResource1, TEST_GROUP_ID);
         resourcesConsulAdminClient.addResource(SingleHostCapabilitiesConsulClientTestData.testResource2, TEST_GROUP_ID);
@@ -237,11 +241,20 @@ public class SingleHostCapabilitiesConsulClientTest {
             singleHostCapabilitiesConsulClient.removeCapabilityServiceFromAllConsulNodes(
                 SingleHostCapabilitiesConsulClientTestData.testSingleHostDeploymentCapability
             );
-            // Assert
+            // Assert | Consul services removed
             for (BasicResource resource : batchResources) {
                 var nodeServicesAfter = adminConsulClient.services().getNodeServicesByNodeId(resource.getId());
                 assertThat(nodeServicesAfter).isEmpty();
             }
+            // Assert | Deployment submodel unregistered for every resource that had the capability installed
+            Mockito.verify(deploymentSubmodelRegistrar).unregister(
+                    SingleHostCapabilitiesConsulClientTestData.testResource1.getId(),
+                    capabilityServiceOnResource1.getServiceId()
+            );
+            Mockito.verify(deploymentSubmodelRegistrar).unregister(
+                    SingleHostCapabilitiesConsulClientTestData.testResource2.getId(),
+                    capabilityServiceOnResource2.getServiceId()
+            );
         }
     }
 }
