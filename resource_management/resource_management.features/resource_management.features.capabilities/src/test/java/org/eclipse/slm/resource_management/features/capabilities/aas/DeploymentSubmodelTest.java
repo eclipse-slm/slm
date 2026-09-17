@@ -32,6 +32,18 @@ class DeploymentSubmodelTest {
                 .build();
     }
 
+    private CapabilityService dockerCapabilityServiceWithoutCustomMeta() {
+        var capability = new DeploymentCapability();
+        capability.setName("Docker");
+        capability.setSupportedDeploymentTypes(
+                List.of(DeploymentType.DOCKER_CONTAINER, DeploymentType.DOCKER_COMPOSE));
+
+        return CapabilityService.builder(RESOURCE_ID, CAPABILITY_SERVICE_ID, capability)
+                .status(CapabilityServiceStatus.READY)
+                .customMeta(Map.of())
+                .build();
+    }
+
     private SubmodelElement elementByIdShort(Submodel submodel, String idShort) {
         return submodel.getSubmodelElements().stream()
                 .filter(element -> idShort.equals(element.getIdShort()))
@@ -96,6 +108,20 @@ class DeploymentSubmodelTest {
         assertThat(properties.getValue())
                 .extracting(SubmodelElement::getIdShort)
                 .contains("version");
+    }
+
+    @Test
+    @DisplayName("Empty custom meta produces an empty mechanism properties collection without throwing")
+    void emptyCustomMetaProducesEmptyMechanismProperties() {
+        var submodel = new DeploymentSubmodel(dockerCapabilityServiceWithoutCustomMeta());
+
+        var mechanism = (SubmodelElementCollection) elementByIdShort(
+                submodel, DeploymentSubmodelTemplate.SMC_MECHANISM);
+        var properties = (SubmodelElementCollection) mechanism.getValue().stream()
+                .filter(element -> DeploymentSubmodelTemplate.SMC_MECHANISM_PROPERTIES.equals(element.getIdShort()))
+                .findFirst().orElseThrow();
+
+        assertThat(properties.getValue()).isEmpty();
     }
 
     @Test

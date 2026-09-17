@@ -22,7 +22,13 @@ public class DeploymentSubmodel extends DefaultSubmodel {
     public DeploymentSubmodel(CapabilityService capabilityService) {
         super();
 
-        var capability = (DeploymentCapability) capabilityService.getCapability();
+        var rawCapability = capabilityService.getCapability();
+        if (!(rawCapability instanceof DeploymentCapability)) {
+            throw new IllegalArgumentException("Capability service '" + capabilityService.getServiceId()
+                    + "' does not wrap a DeploymentCapability, but a "
+                    + rawCapability.getClass().getName());
+        }
+        var capability = (DeploymentCapability) rawCapability;
 
         this.id = DeploymentSubmodelTemplate.submodelIdFor(capabilityService.getServiceId());
         this.idShort = DeploymentSubmodelTemplate.idShortFor(capability.getName());
@@ -33,7 +39,7 @@ public class DeploymentSubmodel extends DefaultSubmodel {
         elements.add(mechanism(capabilityService, capability));
         elements.add(supportedDeploymentTypes(capability));
         elements.add(deployOperation());
-        elements.add(getDeploymentStatusOperation());
+        elements.add(deploymentStatusOperation());
 
         this.setSubmodelElements(elements);
     }
@@ -63,6 +69,8 @@ public class DeploymentSubmodel extends DefaultSubmodel {
                 .idShort(SMC_MECHANISM)
                 .value(List.of(
                         stringProperty(SME_MECHANISM_NAME, capability.getName()),
+                        // "version" is deliberately duplicated below: it is both a first-class field here
+                        // and part of the complete, unfiltered customMeta passthrough in SMC_MECHANISM_PROPERTIES.
                         stringProperty(SME_MECHANISM_VERSION,
                                 capabilityService.getCustomMeta().getOrDefault("version", "")),
                         new DefaultSubmodelElementCollection.Builder()
@@ -109,7 +117,7 @@ public class DeploymentSubmodel extends DefaultSubmodel {
                 .build();
     }
 
-    private Operation getDeploymentStatusOperation() {
+    private Operation deploymentStatusOperation() {
         return new DefaultOperation.Builder()
                 .idShort(OP_GET_DEPLOYMENT_STATUS)
                 .inputVariables(List.of(stringVariable(VAR_JOB_ID)))
