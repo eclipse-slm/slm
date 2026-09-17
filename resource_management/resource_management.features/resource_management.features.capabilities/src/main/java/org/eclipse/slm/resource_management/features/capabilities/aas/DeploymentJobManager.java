@@ -45,6 +45,7 @@ public class DeploymentJobManager implements IAwxJobObserverListener {
     private final DeploymentJobStore jobStore;
 
     private final ConcurrentHashMap<AwxJobObserver, String> jobIdByObserver = new ConcurrentHashMap<>();
+    // Disambiguates repeated/retry deploy attempts for the same serviceInstanceId so their job ids never collide.
     private final AtomicLong jobCounter = new AtomicLong();
 
     public DeploymentJobManager(CapabilitiesConsulClient capabilitiesConsulClient,
@@ -95,19 +96,20 @@ public class DeploymentJobManager implements IAwxJobObserverListener {
         var jobId = "deploy-" + this.jobCounter.incrementAndGet() + "-" + request.serviceInstanceId();
         this.jobStore.put(jobId, DeploymentStatus.of(DeploymentJobState.RUNNING));
 
+        AwxJobObserver observer;
         try {
             var awxJobId = this.awxJobExecutor.executeJob(
                     new AwxCredential(jwtAuthenticationToken),
                     awxAction.getAwxRepo(), awxAction.getAwxBranch(), awxAction.getPlaybook(),
                     new ExtraVars(extraVars));
-            var observer = this.awxJobObserverInitializer.initNewObserver(
+            observer = this.awxJobObserverInitializer.initNewObserver(
                     awxJobId, JobTarget.SERVICE, JobGoal.CREATE, this);
-            this.jobIdByObserver.put(observer, jobId);
         } catch (Exception e) {
-            LOG.error("Failed to start deployment job '{}': {}", jobId, e.getMessage());
+            LOG.error("Failed to start deployment job '{}': {}", jobId, e.getMessage(), e);
             this.jobStore.put(jobId, new DeploymentStatus(DeploymentJobState.FAILED, e.getMessage()));
             return DeployResult.rejected("Failed to start deployment: " + e.getMessage());
         }
+        this.jobIdByObserver.put(observer, jobId);
 
         return DeployResult.accepted(jobId);
     }
