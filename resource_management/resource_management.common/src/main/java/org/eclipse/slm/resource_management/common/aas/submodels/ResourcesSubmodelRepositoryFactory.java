@@ -8,6 +8,8 @@ import org.eclipse.slm.aas.repositories.submodels.SubmodelRepositoryFactory;
 import org.eclipse.slm.resource_management.common.aas.submodels.deviceinfo.DeviceInfoSubmodelServiceFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class ResourcesSubmodelRepositoryFactory implements SubmodelRepositoryFactory {
 
@@ -21,16 +23,20 @@ public class ResourcesSubmodelRepositoryFactory implements SubmodelRepositoryFac
 
     private final DeviceInfoSubmodelServiceFactory deviceInfoSubmodelServiceFactory;
 
+    private final List<ResourceSubmodelContributor> contributors;
+
     public ResourcesSubmodelRepositoryFactory(AasRegistryClientFactory aasRegistryClientFactory,
                                               AasRepositoryClientFactory aasRepositoryClientFactory,
                                               SubmodelRegistryClientFactory submodelRegistryClientFactory,
                                               SubmodelRepositoryClientFactory submodelRepositoryClientFactory,
-                                              DeviceInfoSubmodelServiceFactory deviceInfoSubmodelServiceFactory) {
+                                              DeviceInfoSubmodelServiceFactory deviceInfoSubmodelServiceFactory,
+                                              List<ResourceSubmodelContributor> contributors) {
         this.aasRegistryClientFactory = aasRegistryClientFactory;
         this.aasRepositoryClientFactory = aasRepositoryClientFactory;
         this.submodelRegistryClientFactory = submodelRegistryClientFactory;
         this.submodelRepositoryClientFactory = submodelRepositoryClientFactory;
         this.deviceInfoSubmodelServiceFactory = deviceInfoSubmodelServiceFactory;
+        this.contributors = contributors;
     }
 
     public ResourcesSubmodelRepository getSubmodelRepository(String resourceId) {
@@ -38,7 +44,8 @@ public class ResourcesSubmodelRepositoryFactory implements SubmodelRepositoryFac
                 resourceId,
                 aasRegistryClientFactory, aasRepositoryClientFactory,
                 submodelRegistryClientFactory, submodelRepositoryClientFactory,
-                deviceInfoSubmodelServiceFactory);
+                deviceInfoSubmodelServiceFactory,
+                contributors);
     }
 
 }

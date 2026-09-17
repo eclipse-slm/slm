@@ -42,13 +42,20 @@ ResourcesSubmodelRepository extends AbstractSubmodelRepository {
                                        AasRepositoryClientFactory aasRepositoryClientFactory,
                                        SubmodelRegistryClientFactory submodelRegistryClientFactory,
                                        SubmodelRepositoryClientFactory submodelRepositoryClientFactory,
-                                       DeviceInfoSubmodelServiceFactory deviceInfoSubmodelServiceFactory) {
+                                       DeviceInfoSubmodelServiceFactory deviceInfoSubmodelServiceFactory,
+                                       List<ResourceSubmodelContributor> contributors) {
         super(aasId);
         this.aasRegistryClient = aasRegistryClientFactory.getClient();
         this.aasRepositoryClient = aasRepositoryClientFactory.getClient();
         this.submodelRegistryClient = submodelRegistryClientFactory.getClient();
         this.submodelRepositoryClient = submodelRepositoryClientFactory.getClient();
         this.addSubmodelServiceFactory("DeviceInfo", deviceInfoSubmodelServiceFactory);
+
+        var submodelRepositoryFactories = new HashMap<>(this.getSubmodelRepositoryFactories());
+        for (var contributor : contributors) {
+            submodelRepositoryFactories.put(contributor.getContributorKey(), contributor);
+        }
+        this.setSubmodelRepositoryFactories(submodelRepositoryFactories);
     }
 
     @Override
