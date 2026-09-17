@@ -1506,6 +1506,40 @@
         }
       }
     },
+    "/services/offerings/deployment-targets": {
+      "get": {
+        "tags": [
+          "Service Offering Versions"
+        ],
+        "summary": "Get deployment targets that can deploy the given deployment type",
+        "operationId": "getDeploymentTargets",
+        "parameters": [
+          {
+            "name": "deploymentType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/DeploymentType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DeploymentTarget"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/file/{fileName}": {
       "get": {
         "tags": [
@@ -3365,12 +3399,61 @@
               "$ref": "#/components/schemas/ServiceOptionValue"
             }
           },
-          "deploymentCapabilityServiceId": {
+          "deploymentTargetSubmodelId": {
             "type": "string",
-            "format": "uuid"
+            "nullable": true
+          },
+          "deploymentJobId": {
+            "type": "string",
+            "nullable": true
           },
           "serviceOrderResult": {
             "$ref": "#/components/schemas/ServiceOrderResult"
+          }
+        }
+      },
+      "DeploymentTarget": {
+        "required": [
+          "aasId",
+          "displayName",
+          "mechanismName",
+          "mechanismProperties",
+          "mechanismVersion",
+          "submodelEndpoint",
+          "submodelId",
+          "supportedDeploymentTypes"
+        ],
+        "type": "object",
+        "properties": {
+          "submodelId": {
+            "type": "string"
+          },
+          "submodelEndpoint": {
+            "type": "string"
+          },
+          "aasId": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "mechanismName": {
+            "type": "string"
+          },
+          "mechanismVersion": {
+            "type": "string"
+          },
+          "supportedDeploymentTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeploymentType"
+            }
+          },
+          "mechanismProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         }
       },
