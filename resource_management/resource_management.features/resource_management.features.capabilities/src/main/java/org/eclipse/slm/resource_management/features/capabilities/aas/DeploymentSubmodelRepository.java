@@ -73,6 +73,11 @@ public class DeploymentSubmodelRepository extends AbstractSubmodelRepository {
     private List<CapabilityService> deploymentCapabilityServices() {
         var resourceId = UUID.fromString(ResourceAas.getResourceIdFromAasId(this.aasId));
 
+        // Deliberately left unguarded: sibling submodel repositories (e.g.
+        // ResourcesSubmodelRepository#getAllSubmodels calling aasRepositoryClient.getAas,
+        // ResourceTypesSubmodelRepository#getAllSubmodels calling resourceTypesManager.getResourceTypes)
+        // likewise let backend/registry connectivity failures propagate raw rather than wrapping them,
+        // so this keeps the same, consistent error-handling behavior across the codebase.
         return this.capabilitiesConsulClient.getCapabilityServicesOfResource(resourceId).stream()
                 .filter(capabilityService -> capabilityService.getCapability() instanceof DeploymentCapability)
                 .toList();

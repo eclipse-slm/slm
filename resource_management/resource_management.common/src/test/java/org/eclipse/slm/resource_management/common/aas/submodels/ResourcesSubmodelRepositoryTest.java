@@ -50,6 +50,24 @@ class ResourcesSubmodelRepositoryTest {
         }
     }
 
+    private static class OtherStubContributor implements ResourceSubmodelContributor {
+        private final String key;
+
+        OtherStubContributor(String key) {
+            this.key = key;
+        }
+
+        @Override
+        public String getContributorKey() {
+            return key;
+        }
+
+        @Override
+        public SubmodelRepository getSubmodelRepository(String aasId) {
+            return null;
+        }
+    }
+
     private ResourcesSubmodelRepository repository(List<ResourceSubmodelContributor> contributors) {
         lenient().when(aasRegistryClientFactory.getClient()).thenReturn(null);
         lenient().when(aasRepositoryClientFactory.getClient()).thenReturn(null);
@@ -81,7 +99,7 @@ class ResourcesSubmodelRepositoryTest {
     @DisplayName("Two contributors claiming the same key fail fast with a clear message")
     void duplicateKeyFailsFast() {
         var first = new StubContributor("Deployment");
-        var second = new StubContributor("Deployment");
+        var second = new OtherStubContributor("Deployment");
 
         assertThatThrownBy(() -> repository(List.of(first, second)))
                 .isInstanceOf(IllegalStateException.class)
