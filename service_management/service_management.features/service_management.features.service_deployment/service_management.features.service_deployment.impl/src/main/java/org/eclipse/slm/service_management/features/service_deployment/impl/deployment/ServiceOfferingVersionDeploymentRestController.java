@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
+import org.eclipse.slm.common.model.DeploymentType;
 import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUser;
 import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUserOrApiKey;
 import org.eclipse.slm.resource_management.common.model.MatchingResourceDTO;
@@ -24,11 +25,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.net.ssl.SSLException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -38,9 +41,12 @@ import java.util.UUID;
 public class ServiceOfferingVersionDeploymentRestController {
 
     private final ServiceOfferingOrderService serviceOfferingOrderHandler;
+    private final DeploymentTargetHandler deploymentTargetHandler;
 
-    public ServiceOfferingVersionDeploymentRestController(ServiceOfferingOrderService serviceOfferingOrderHandler) {
+    public ServiceOfferingVersionDeploymentRestController(ServiceOfferingOrderService serviceOfferingOrderHandler,
+                                                            DeploymentTargetHandler deploymentTargetHandler) {
         this.serviceOfferingOrderHandler = serviceOfferingOrderHandler;
+        this.deploymentTargetHandler = deploymentTargetHandler;
     }
 
     @RequestMapping(value = "/{serviceOfferingId}/versions/{serviceOfferingVersionId}/order", method = RequestMethod.POST)
@@ -83,6 +89,14 @@ public class ServiceOfferingVersionDeploymentRestController {
         var matchingResources = this.serviceOfferingOrderHandler
                 .getCapabilityServicesMatchingServiceRequirements(serviceOfferingId, serviceOfferingVersionId, jwtAuthenticationToken);
         return ResponseEntity.ok(matchingResources);
+    }
+
+    @RequestMapping(value = "/deployment-targets", method = RequestMethod.GET)
+    @Operation(summary = "Get deployment targets that can deploy the given deployment type")
+    public ResponseEntity<List<DeploymentTarget>> getDeploymentTargets(
+            @RequestParam(value = "deploymentType", required = false) DeploymentType deploymentType) {
+        return ResponseEntity.ok(
+                this.deploymentTargetHandler.getDeploymentTargets(Optional.ofNullable(deploymentType)));
     }
 }
 
