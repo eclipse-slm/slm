@@ -11,6 +11,7 @@ import org.eclipse.slm.resource_management.common.resources.ResourceDTO;
 import org.eclipse.slm.resource_management.common.resources.ResourceEventInternalListener;
 import org.eclipse.slm.resource_management.common.resources.ResourcesManager;
 import org.eclipse.slm.resource_management.features.capabilities.CapabilitiesManager;
+import org.eclipse.slm.resource_management.features.capabilities.aas.DeploymentSubmodelRegistrar;
 import org.eclipse.slm.resource_management.features.capabilities.exceptions.CapabilityRuntimeException;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityServiceStatus;
@@ -49,6 +50,8 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
 
     private final KeycloakAdminClient keycloakAdminClient;
 
+    private final DeploymentSubmodelRegistrar deploymentSubmodelRegistrar;
+
     private final Map<UUID, JwtAuthenticationToken> capabilityJobIdToJwtAuthToken = new HashMap<>();
 
     public CapabilityJobServiceImpl(ResourcesManager resourcesManager,
@@ -58,7 +61,8 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
                                     CapabilityJobStateMachineFactory capabilityJobStateMachineFactory,
                                     SingleHostCapabilitiesConsulClient singleHostCapabilitiesConsulClient,
                                     SingleHostCapabilitiesVaultClient singleHostCapabilitiesVaultClient,
-                                    KeycloakAdminClient keycloakAdminClient) {
+                                    KeycloakAdminClient keycloakAdminClient,
+                                    DeploymentSubmodelRegistrar deploymentSubmodelRegistrar) {
         this.resourcesManager = resourcesManager;
         this.capabilitiesService = capabilitiesService;
         this.capabilityJobExecutorFactory = capabilityJobExecutorFactory;
@@ -67,6 +71,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
         this.singleHostCapabilitiesConsulClient = singleHostCapabilitiesConsulClient;
         this.singleHostCapabilitiesVaultClient = singleHostCapabilitiesVaultClient;
         this.keycloakAdminClient = keycloakAdminClient;
+        this.deploymentSubmodelRegistrar = deploymentSubmodelRegistrar;
     }
 
     @PostConstruct
@@ -246,6 +251,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
                 this.singleHostCapabilitiesConsulClient.removeSingleHostCapabilityFromNode( capability, capabilityJob.getResourceId());
 
                 singleHostCapabilitiesVaultClient.deleteSingleHostCapabilityServiceSecrets(capabilityService.getServiceId());
+                this.deploymentSubmodelRegistrar.unregister(capabilityJob.getResourceId(), capabilityService.getServiceId());
             }
 
             var capabilityJobExecutor = this.capabilityJobExecutorFactory.create(capabilityJob, capabilityService, this);
@@ -306,6 +312,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
 
         this.singleHostCapabilitiesVaultClient.deleteSingleHostCapabilityServiceSecrets(capabilityService.getServiceId());
         this.singleHostCapabilitiesConsulClient.removeSingleHostCapabilityFromNode( capabilityService.getCapability(), resourceId);
+        this.deploymentSubmodelRegistrar.unregister(resourceId, capabilityService.getServiceId());
     }
 
     //region CapabilityJobStateMachineListener
@@ -321,6 +328,7 @@ public class CapabilityJobServiceImpl implements CapabilityJobService, Capabilit
                     var capabilityService = this.singleHostCapabilitiesConsulClient
                             .getCapabilityServiceOfResourceByCapabilityId(capabilityJob.getCapabilityId(), capabilityJob.getResourceId());
                     this.updateCapabilityServiceStatus(capabilityJob.getResourceId(), capabilityService, CapabilityServiceStatus.READY);
+                    this.deploymentSubmodelRegistrar.register(capabilityService);
                     LOG.info("Capability [id= " + capabilityJob.getId() + "] successfully installed on resource [id= " + capabilityJob.getResourceId() + "]");
                 }
 
