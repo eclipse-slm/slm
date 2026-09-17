@@ -53,7 +53,13 @@ ResourcesSubmodelRepository extends AbstractSubmodelRepository {
 
         var submodelRepositoryFactories = new HashMap<>(this.getSubmodelRepositoryFactories());
         for (var contributor : contributors) {
-            submodelRepositoryFactories.put(contributor.getContributorKey(), contributor);
+            var existing = submodelRepositoryFactories.putIfAbsent(contributor.getContributorKey(), contributor);
+            if (existing != null) {
+                throw new IllegalStateException("Duplicate ResourceSubmodelContributor key '"
+                        + contributor.getContributorKey() + "': already registered by "
+                        + existing.getClass().getName() + ", also claimed by "
+                        + contributor.getClass().getName());
+            }
         }
         this.setSubmodelRepositoryFactories(submodelRepositoryFactories);
     }
