@@ -6,7 +6,10 @@ import org.eclipse.slm.common.messaging.AbstractEventMessage
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstance
 import java.io.Serializable
 
-class ServiceInstanceEventMessage @JsonCreator @JvmOverloads constructor(
+// No @JvmOverloads: Kotlin copies @JsonCreator onto the generated overload too, and Jackson then
+// rejects the type with "Conflicting property-based creators". ServiceInstanceEventMessageSender
+// provides the two-argument convenience overload instead.
+class ServiceInstanceEventMessage @JsonCreator constructor(
 
     @JsonProperty("serviceInstance") val serviceInstance: ServiceInstance?,
 
