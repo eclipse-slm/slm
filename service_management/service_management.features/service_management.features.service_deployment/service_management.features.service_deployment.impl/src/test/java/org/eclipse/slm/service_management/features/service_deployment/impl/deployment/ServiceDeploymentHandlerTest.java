@@ -10,6 +10,7 @@ import org.eclipse.slm.common.consul.testing.utils.ConsulTestClientFactory;
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.awx.client.observer.AwxJobExecutor;
 import org.eclipse.slm.awx.client.observer.AwxJobObserverInitializer;
+import org.eclipse.slm.resource_management.features.capabilities.aas.DeploymentExtraVarsBuilder;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementClientFactory;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.CapabilityServiceNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstanceEventMessageSender;

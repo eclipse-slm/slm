@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_deployment.impl.deployment;
+package org.eclipse.slm.resource_management.features.capabilities.aas;
 
 import org.eclipse.slm.common.aas.submodels.deployment.DeployRequest;
 import org.eclipse.slm.common.model.DeploymentType;

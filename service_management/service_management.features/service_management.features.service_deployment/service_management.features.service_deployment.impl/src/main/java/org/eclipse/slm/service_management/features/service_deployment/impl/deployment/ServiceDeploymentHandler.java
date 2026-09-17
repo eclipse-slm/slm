@@ -8,6 +8,7 @@ import org.eclipse.slm.common.consul.client.ConsulClient;
 import org.eclipse.slm.common.consul.client.ConsulClientFactory;
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.common.utils.keycloak.KeycloakTokenUtil;
+import org.eclipse.slm.resource_management.features.capabilities.aas.DeploymentExtraVarsBuilder;
 import org.eclipse.slm.resource_management.features.capabilities.model.SingleHostCapabilityService;
 import org.eclipse.slm.resource_management.features.capabilities.model.actions.ActionType;
 import org.eclipse.slm.resource_management.service.client.ResourceManagementClientFactory;

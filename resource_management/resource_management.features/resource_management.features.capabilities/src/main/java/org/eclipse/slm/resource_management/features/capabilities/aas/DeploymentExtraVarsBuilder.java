@@ -1,4 +1,4 @@
-package org.eclipse.slm.service_management.features.service_deployment.impl.deployment;
+package org.eclipse.slm.resource_management.features.capabilities.aas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
