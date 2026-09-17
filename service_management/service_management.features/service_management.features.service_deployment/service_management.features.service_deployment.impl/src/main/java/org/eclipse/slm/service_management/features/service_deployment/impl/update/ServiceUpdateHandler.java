@@ -97,6 +97,7 @@ public class ServiceUpdateHandler extends AbstractServiceDeploymentHandler imple
                 var updateServiceOrder = new ServiceOrder();
                 updateServiceOrder.setServiceInstanceId(latestServiceOrder.getServiceInstanceId());
                 updateServiceOrder.setServiceOptionValues(latestServiceOrder.getServiceOptionValues());
+                updateServiceOrder.setDeploymentTargetSubmodelId(latestServiceOrder.getDeploymentTargetSubmodelId());
                 var updateJobRun = new UpdateJobRun(
                         awxJobObserver, jwtAuthenticationToken, serviceInstance.getId(), updateServiceOrder,
                         serviceInstance.getResourceId(), serviceOfferingVersion);
