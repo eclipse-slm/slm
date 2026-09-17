@@ -81,12 +81,10 @@ public class DeploymentDescriptorRenderer {
     }
 
     // Die folgenden vier Methoden sind unveraendert aus ServiceDeploymentHandler uebernommen
-    // (dort Zeilen 181-284). Sichtbarkeit ist package-private statt private, damit
-    // ServiceDeploymentHandler beim Aufbau der AWX-ExtraVars weiterhin die rohen
-    // DockerComposeFile/KubernetesManifestFile-Objekte erhalten kann (Objekt-Pfad bleibt
-    // fuer AWX vorerst unveraendert, siehe Task 6).
+    // (dort Zeilen 181-284). Seit Task 6 laeuft die Produktion ausschliesslich ueber render(),
+    // daher sind sie wieder private.
 
-    Map<String, String> getServiceMetaData(ServiceOfferingVersion serviceOfferingVersion,
+    private Map<String, String> getServiceMetaData(ServiceOfferingVersion serviceOfferingVersion,
                                             DockerComposeFile deployableComposeFile) {
         var serviceMetaData = new HashMap<String, String>();
         switch (serviceOfferingVersion.getDeploymentType()) {
@@ -111,7 +109,7 @@ public class DeploymentDescriptorRenderer {
         return serviceMetaData;
     }
 
-    List<Integer> getServicePorts(ServiceOfferingVersion serviceOfferingVersion,
+    private List<Integer> getServicePorts(ServiceOfferingVersion serviceOfferingVersion,
                                    DockerComposeFile deployableComposeFile) {
         List<Integer> servicePorts = new ArrayList<Integer>();
         switch (serviceOfferingVersion.getDeploymentType()) {
@@ -132,7 +130,7 @@ public class DeploymentDescriptorRenderer {
         return servicePorts;
     }
 
-    DockerComposeFile getDeployableComposeFile(ServiceOfferingVersion serviceOfferingVersion, ServiceOrder serviceOrder)
+    private DockerComposeFile getDeployableComposeFile(ServiceOfferingVersion serviceOfferingVersion, ServiceOrder serviceOrder)
             throws JsonProcessingException, ServiceOptionNotFoundException, InvalidServiceOfferingDefinitionException {
         DockerComposeFile deployableComposeFile = null;
         switch (serviceOfferingVersion.getDeploymentType())
@@ -158,7 +156,7 @@ public class DeploymentDescriptorRenderer {
     }
 
 
-    KubernetesManifestFile getDeployableManifestFile(ServiceOfferingVersion serviceOfferingVersion, ServiceOrder serviceOrder)
+    private KubernetesManifestFile getDeployableManifestFile(ServiceOfferingVersion serviceOfferingVersion, ServiceOrder serviceOrder)
             throws InvalidServiceOfferingDefinitionException {
         KubernetesManifestFile deployableManifestFile = null;
         switch (serviceOfferingVersion.getDeploymentType())

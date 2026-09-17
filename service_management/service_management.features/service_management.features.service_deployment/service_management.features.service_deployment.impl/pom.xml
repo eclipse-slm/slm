@@ -44,6 +44,11 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
+            <artifactId>common.aas</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.slm</groupId>
             <artifactId>notification_service.messaging</artifactId>
             <version>${project.version}</version>
         </dependency>

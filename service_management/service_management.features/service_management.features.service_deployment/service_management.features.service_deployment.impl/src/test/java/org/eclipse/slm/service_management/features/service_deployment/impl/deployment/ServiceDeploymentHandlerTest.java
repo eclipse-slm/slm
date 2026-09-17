@@ -159,7 +159,8 @@ public class ServiceDeploymentHandlerTest {
                 serviceOrderJpaRepository,
                 serviceInstancesConsulClient,
                 serviceInstanceEventMessageSender,
-                new DeploymentDescriptorRenderer());
+                new DeploymentDescriptorRenderer(),
+                new DeploymentExtraVarsBuilder());
     }
 
     @Test

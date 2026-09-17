@@ -3,6 +3,7 @@ package org.eclipse.slm.service_management.features.service_deployment.impl.depl
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.eclipse.slm.awx.client.observer.*;
 import org.eclipse.slm.awx.model.ExtraVars;
+import org.eclipse.slm.common.aas.submodels.deployment.DeployRequest;
 import org.eclipse.slm.common.consul.client.ConsulClient;
 import org.eclipse.slm.common.consul.client.ConsulClientFactory;
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
@@ -13,17 +14,14 @@ import org.eclipse.slm.resource_management.service.client.ResourceManagementClie
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.CapabilityServiceNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstance;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.DeploymentJobRun;
-import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.kubernetes.KubernetesManifestFileParser;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstanceEventMessageSender;
 import org.eclipse.slm.service_management.features.service_deployment.api.events.ServiceInstanceEventType;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancesConsulClient;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOptionNotFoundException;
-import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.codesys.CodesysDeploymentDefinition;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrder;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrderResult;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.InvalidServiceOfferingDefinitionException;
-import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -48,6 +46,8 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
 
     private final DeploymentDescriptorRenderer deploymentDescriptorRenderer;
 
+    private final DeploymentExtraVarsBuilder deploymentExtraVarsBuilder;
+
     private Map<AwxJobObserver, DeploymentJobRun> observedAwxJobsToDeploymentJobDetails = new HashMap<>();
 
 
@@ -59,7 +59,8 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                                     ServiceOrderJpaRepository serviceOrderJpaRepository,
                                     ServiceInstancesConsulClient serviceInstancesConsulClient,
                                     ServiceInstanceEventMessageSender serviceInstanceEventMessageSender,
-                                    DeploymentDescriptorRenderer deploymentDescriptorRenderer) {
+                                    DeploymentDescriptorRenderer deploymentDescriptorRenderer,
+                                    DeploymentExtraVarsBuilder deploymentExtraVarsBuilder) {
         super(resourceManagementClientFactory, serviceInstancesConsulClient, awxJobObserverInitializer, awxJobExecutor);
         this.consulClientFactory = consulClientFactory;
         this.consulAdminClient = consulClientFactory.createAdminClient();
@@ -67,6 +68,7 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
         this.serviceOrderJpaRepository = serviceOrderJpaRepository;
         this.serviceInstanceEventMessageSender = serviceInstanceEventMessageSender;
         this.deploymentDescriptorRenderer = deploymentDescriptorRenderer;
+        this.deploymentExtraVarsBuilder = deploymentExtraVarsBuilder;
     }
 
     public DeploymentJobRun deployServiceOfferingToResource(
@@ -82,74 +84,26 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
         serviceOrder.setDeploymentCapabilityServiceId(serviceOrder.getDeploymentCapabilityServiceId());
         var awxCapabilityAction = this.getAwxDeployCapabilityAction(ActionType.DEPLOY, serviceHoster.getCapabilityService().getCapability());
 
-        AwxJobObserver awxJobObserver;
-        Map<String, String> serviceMetaData = new HashMap<>();
-        List<Integer> servicePorts = new ArrayList<>();
-        switch (serviceOfferingDeploymentType) {
-            case DOCKER_CONTAINER:
-            case DOCKER_COMPOSE: {
-                var deployableComposeFile = this.deploymentDescriptorRenderer.getDeployableComposeFile(serviceOfferingVersion, serviceOrder);
-                serviceMetaData = this.deploymentDescriptorRenderer.getServiceMetaData(serviceOfferingVersion, deployableComposeFile);
-                servicePorts = this.deploymentDescriptorRenderer.getServicePorts(serviceOfferingVersion, deployableComposeFile);
+        var rendered = this.deploymentDescriptorRenderer.render(serviceOfferingVersion, serviceOrder);
+        var deployRequest = new DeployRequest(
+                serviceId,
+                serviceOfferingDeploymentType,
+                rendered.content(),
+                rendered.contentType(),
+                this.getCredentialReferences(serviceOfferingVersion));
 
-                HashMap<String, Object> extraVarsMap = new HashMap<>() {{
-                    put("service_id", serviceId);
-                    put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
-                    put("service_name", serviceHoster.getCapabilityService().getServiceName());
-                    put("supported_connection_types", awxCapabilityAction.getConnectionTypes());
-                    put("docker_compose_file", deployableComposeFile);
-                }};
-                extraVarsMap = this.addExtraVarsForServiceRepositories(extraVarsMap, serviceOfferingVersion);
+        var extraVars = new ExtraVars(this.deploymentExtraVarsBuilder.build(
+                deployRequest,
+                serviceOrder.getDeploymentCapabilityServiceId(),
+                serviceHoster.getCapabilityService().getServiceName(),
+                awxCapabilityAction.getConnectionTypes(),
+                jwtAuthenticationToken.getToken().getTokenValue()));
 
-                if (serviceHoster.getCapabilityService().getCapability().getName().toLowerCase().contains("transferapp")) {
-                    Map<String, String> configYaml = new HashMap<>() {{
-                        put("Name", serviceOfferingVersion.getServiceOffering().getName());
-                        put("Description", serviceOfferingVersion.getServiceOffering().getShortDescription());
-                        put("Version", serviceOfferingVersion.getVersion());
-                    }};
-                    extraVarsMap.put("config_yml", configYaml);
-                }
-                var extraVars = new ExtraVars(extraVarsMap);
+        var awxJobObserver = this.runAwxCapabilityAction(
+                awxCapabilityAction, jwtAuthenticationToken, extraVars, JobGoal.CREATE, this);
 
-                awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, jwtAuthenticationToken, extraVars, JobGoal.CREATE, this);
-                break;
-            }
-            case KUBERNETES: {
-                var deployableManifestFile = this.deploymentDescriptorRenderer.getDeployableManifestFile(serviceOfferingVersion, serviceOrder);
-
-                HashMap<String, Object> extraVarsMap = new HashMap<>() {{
-                    put("resource_id", serviceOrder.getDeploymentCapabilityServiceId());
-                    put("service_id", serviceId);
-                    put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
-                    put("service_name", serviceHoster.getCapabilityService().getServiceName());
-                    put("supported_connection_types", awxCapabilityAction.getConnectionTypes());
-                    put("manifest_file", KubernetesManifestFileParser.manifestFinalizer(deployableManifestFile));
-                }};
-
-                extraVarsMap = this.addExtraVarsForServiceRepositories(extraVarsMap, serviceOfferingVersion);
-
-                awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, jwtAuthenticationToken, new ExtraVars(extraVarsMap), JobGoal.CREATE, this);
-                break;
-            }
-
-            case CODESYS:{
-                var codesysDeploymentDefinition = (CodesysDeploymentDefinition)serviceOfferingVersion.getDeploymentDefinition();
-                HashMap<String, Object> extraVarsMap = new HashMap<>() {{
-                    put("service_id", serviceId);
-                    put("keycloak_token", jwtAuthenticationToken.getToken().getTokenValue());
-                    put("service_name", serviceHoster.getCapabilityService().getServiceName());
-                    put("supported_connection_types", awxCapabilityAction.getConnectionTypes());
-                    put("application_path", codesysDeploymentDefinition.getApplicationPath());
-                }};
-
-                extraVarsMap = this.addExtraVarsForServiceRepositories(extraVarsMap, serviceOfferingVersion);
-
-                awxJobObserver = this.runAwxCapabilityAction(awxCapabilityAction, jwtAuthenticationToken, new ExtraVars(extraVarsMap), JobGoal.CREATE, this);
-            }
-            break;
-            default:
-                throw new NotImplementedException("Deployment Type '" + serviceOfferingDeploymentType + "' not supported");
-        }
+        var serviceMetaData = rendered.serviceMetaData();
+        var servicePorts = rendered.servicePorts();
 
         UUID resourceId;
         if (serviceHoster.getCapabilityService() instanceof SingleHostCapabilityService) {
@@ -176,16 +130,13 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
         return deploymentJobRun;
     }
 
-    private HashMap<String, Object> addExtraVarsForServiceRepositories(HashMap<String, Object> extraVarsMap, ServiceOfferingVersion serviceOfferingVersion) {
-        if (serviceOfferingVersion.getServiceRepositories().size() > 0) {
-            var dockerRegistriesVaultPaths = new ArrayList<String>();
-            for (var serviceRepositoryId : serviceOfferingVersion.getServiceRepositories()) {
-                dockerRegistriesVaultPaths.add("vendor_" + serviceOfferingVersion.getServiceOffering().getServiceVendor().getId() + "/" + serviceRepositoryId);
-            }
-            extraVarsMap.put("docker_registries_vault_paths", dockerRegistriesVaultPaths);
+    private List<String> getCredentialReferences(ServiceOfferingVersion serviceOfferingVersion) {
+        var vaultPaths = new ArrayList<String>();
+        for (var serviceRepositoryId : serviceOfferingVersion.getServiceRepositories()) {
+            vaultPaths.add("vendor_" + serviceOfferingVersion.getServiceOffering().getServiceVendor().getId()
+                    + "/" + serviceRepositoryId);
         }
-
-        return extraVarsMap;
+        return vaultPaths;
     }
 
     @Override
