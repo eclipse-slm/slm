@@ -2,7 +2,6 @@ package org.eclipse.slm.service_management.features.service_deployment.api.servi
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.CapabilityServiceNotFoundException;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOptionNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrder;
@@ -24,27 +23,27 @@ public interface ServiceInstancesRestApi {
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     @Operation(summary = "Get all services of user")
-    ResponseEntity<List<ServiceInstance>> getServicesOfUser() throws ConsulLoginFailedException;
+    ResponseEntity<List<ServiceInstance>> getServicesOfUser();
 
     @RequestMapping(value = "/{serviceInstanceId}", method = RequestMethod.DELETE)
     @Operation(summary = "Delete a service instance")
     ResponseEntity<Void> deleteServiceInstance(
             @PathVariable(name = "serviceInstanceId") UUID serviceInstanceId
-    ) throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException,
+    ) throws ServiceInstanceNotFoundException, ServiceOfferingNotFoundException,
             ServiceOfferingVersionNotFoundException, SSLException, CapabilityServiceNotFoundException;
 
     @RequestMapping(value = "/{serviceInstanceId}/versions", method = RequestMethod.GET)
     @Operation(summary = "Get available version changes for service instance")
     ResponseEntity<List<AvailableServiceInstanceVersionChange>> getAvailableVersionChangesForServiceInstance(
             @PathVariable(name = "serviceInstanceId") UUID serviceInstanceId
-    ) throws ConsulLoginFailedException, ServiceInstanceNotFoundException, ServiceOfferingNotFoundException;
+    ) throws ServiceInstanceNotFoundException, ServiceOfferingNotFoundException;
 
     @RequestMapping(value = "/{serviceInstanceId}/versions", method = RequestMethod.POST)
     @Operation(summary = "Change service instance to version")
     ResponseEntity<Void> updateServiceInstanceToVersion(
             @PathVariable(name = "serviceInstanceId") UUID serviceInstanceId,
             @RequestParam(name = "targetServiceOfferingVersionId") UUID targetServiceOfferingVersionId
-    ) throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException,
+    ) throws ServiceInstanceNotFoundException, ServiceOfferingNotFoundException,
             ServiceInstanceUpdateException, SSLException, JsonProcessingException, ServiceOptionNotFoundException,
             InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException;
 
@@ -58,7 +57,7 @@ public interface ServiceInstancesRestApi {
     @Operation(summary = "Get details of service instance")
     ResponseEntity<ServiceInstanceDetails> getServiceInstanceDetails(
             @PathVariable(name = "serviceInstanceId") UUID serviceInstanceId
-    ) throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException,
+    ) throws ServiceInstanceNotFoundException, ServiceOfferingNotFoundException,
             ServiceOfferingVersionNotFoundException, ServiceInstanceRuntimeException;
 
     @RequestMapping(value = "/{serviceInstanceId}/groups", method = RequestMethod.PUT)
@@ -66,6 +65,6 @@ public interface ServiceInstancesRestApi {
     ResponseEntity<Void> setGroupsOfServiceInstance(
             @PathVariable(name = "serviceInstanceId") UUID serviceInstanceId,
             @RequestBody List<UUID> groupIds
-    ) throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceInstanceGroupNotFoundException;
+    ) throws ServiceInstanceNotFoundException, ServiceInstanceGroupNotFoundException;
 }
 

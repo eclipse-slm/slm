@@ -4,9 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.eclipse.slm.awx.client.observer.JobFinalState;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
-import org.eclipse.slm.common.consul.testing.containers.ConsulTestContainer;
-import org.eclipse.slm.common.consul.testing.utils.ConsulTestClientFactory;
 import org.eclipse.slm.common.keycloak.config.KeycloakAdminClient;
 import org.eclipse.slm.awx.client.observer.AwxJobExecutor;
 import org.eclipse.slm.awx.client.observer.AwxJobObserverInitializer;
@@ -51,9 +48,6 @@ import static org.mockito.Mockito.*;
 public class ServiceDeploymentHandlerTest {
 
     private final static Logger LOG = LoggerFactory.getLogger(ServiceDeploymentHandlerTest.class);
-
-    @Container
-    private final static ConsulTestContainer consulContainer = new ConsulTestContainer();
 
     private ServiceDeploymentHandler serviceDeploymentHandler;
 
@@ -164,7 +158,7 @@ public class ServiceDeploymentHandlerTest {
     @DisplayName("Deploy Docker Container service offering")
     @Disabled
     public void deployDockerContainerServiceOffering()
-            throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, ConsulLoginFailedException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException {
+            throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException {
         var resourceId = UUID.randomUUID();
 
         var deploymentDefinition = new DockerContainerDeploymentDefinition();

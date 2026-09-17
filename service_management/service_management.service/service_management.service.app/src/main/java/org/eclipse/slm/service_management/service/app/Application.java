@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         "org.eclipse.slm.resource_management.service.client",
         "org.eclipse.slm.aas",
         "org.eclipse.slm.awx",
-        "org.eclipse.slm.common.consul",
+        "org.eclipse.slm.common.access",
         "org.eclipse.slm.common.keycloak",
         "org.eclipse.slm.common.minio",
         "org.eclipse.slm.common.model",
@@ -36,10 +36,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EntityScan(basePackages = {
         "org.eclipse.slm.service_management.common",
         "org.eclipse.slm.service_management.features.service_offerings",
-        "org.eclipse.slm.service_management.features.service_deployment"
+        "org.eclipse.slm.service_management.features.service_deployment",
+        "org.eclipse.slm.common.access"
 })
 @EnableJpaRepositories(basePackages = {
-        "org.eclipse.slm.service_management"
+        "org.eclipse.slm.service_management",
+        "org.eclipse.slm.common.access"
 })
 @EnableAsync
 @EnableTransactionManagement

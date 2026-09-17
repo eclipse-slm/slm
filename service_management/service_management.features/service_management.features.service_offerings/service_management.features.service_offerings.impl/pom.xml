@@ -54,11 +54,6 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>common.consul.client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.slm</groupId>
             <artifactId>common.minio.client</artifactId>
             <version>${project.version}</version>
         </dependency>

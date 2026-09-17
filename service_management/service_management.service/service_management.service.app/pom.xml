@@ -51,11 +51,6 @@
         <!-- Shared Modules !-->
         <dependency>
             <groupId>org.eclipse.slm</groupId>
-            <artifactId>common.consul.client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.slm</groupId>
             <artifactId>common.minio.client</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -169,19 +164,6 @@
         <dependency>
             <groupId>org.eclipse.slm</groupId>
             <artifactId>common.vault.testing</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- Testing | Consul !-->
-        <dependency>
-            <groupId>org.eclipse.slm</groupId>
-            <artifactId>common.consul.testing.containers</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.slm</groupId>
-            <artifactId>common.consul.testing.utils</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

@@ -1,7 +1,6 @@
 package org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.AvailableServiceInstanceVersionChange;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.CapabilityServiceNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstancesRestApi;
@@ -40,8 +39,7 @@ public class ServiceInstancesRestController implements ServiceInstancesRestApi {
     }
 
     @Override
-    public ResponseEntity<List<ServiceInstance>> getServicesOfUser()
-            throws ConsulLoginFailedException {
+    public ResponseEntity<List<ServiceInstance>> getServicesOfUser() {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var serviceInstances = this.serviceInstancesHandler.getServiceInstancesOfUser(jwtAuthenticationToken);
 
@@ -51,7 +49,7 @@ public class ServiceInstancesRestController implements ServiceInstancesRestApi {
     @Override
     public ResponseEntity<Void> deleteServiceInstance(
         UUID serviceInstanceId)
-            throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException,
+            throws ServiceInstanceNotFoundException, ServiceOfferingNotFoundException,
             ServiceOfferingVersionNotFoundException, SSLException, CapabilityServiceNotFoundException {
 
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
@@ -63,7 +61,7 @@ public class ServiceInstancesRestController implements ServiceInstancesRestApi {
     @Override
     public ResponseEntity<List<AvailableServiceInstanceVersionChange>> getAvailableVersionChangesForServiceInstance(
             UUID serviceInstanceId
-    ) throws ConsulLoginFailedException, ServiceInstanceNotFoundException,
+    ) throws ServiceInstanceNotFoundException,
             ServiceOfferingNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         var availableVersionChanges = this.serviceInstancesHandler
@@ -76,7 +74,7 @@ public class ServiceInstancesRestController implements ServiceInstancesRestApi {
     public ResponseEntity<Void> updateServiceInstanceToVersion(
             UUID serviceInstanceId,
             UUID targetServiceOfferingVersionId
-    ) throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException,
+    ) throws ServiceInstanceNotFoundException, ServiceOfferingNotFoundException,
             ServiceInstanceUpdateException, SSLException, JsonProcessingException, ServiceOptionNotFoundException,
             InvalidServiceOfferingDefinitionException, CapabilityServiceNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
@@ -96,7 +94,7 @@ public class ServiceInstancesRestController implements ServiceInstancesRestApi {
     @Override
     public ResponseEntity<ServiceInstanceDetails> getServiceInstanceDetails(
             UUID serviceInstanceId
-    ) throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, ServiceInstanceRuntimeException {
+    ) throws ServiceInstanceNotFoundException, ServiceOfferingNotFoundException, ServiceOfferingVersionNotFoundException, ServiceInstanceRuntimeException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         var serviceInstanceDetails = this.serviceInstancesHandler
@@ -109,7 +107,7 @@ public class ServiceInstancesRestController implements ServiceInstancesRestApi {
     public ResponseEntity<Void> setGroupsOfServiceInstance(
             UUID serviceInstanceId,
             List<UUID> groupIds
-    ) throws ServiceInstanceNotFoundException, ConsulLoginFailedException, ServiceInstanceGroupNotFoundException {
+    ) throws ServiceInstanceNotFoundException, ServiceInstanceGroupNotFoundException {
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         this.serviceInstancesHandler.setGroupsForServiceInstance(jwtAuthenticationToken, groupIds, serviceInstanceId);

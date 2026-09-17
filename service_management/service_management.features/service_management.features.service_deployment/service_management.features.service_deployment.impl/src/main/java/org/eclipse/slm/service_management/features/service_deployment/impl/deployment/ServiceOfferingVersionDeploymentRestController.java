@@ -3,7 +3,6 @@ package org.eclipse.slm.service_management.features.service_deployment.impl.depl
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException;
 import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUser;
 import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmUserOrApiKey;
 import org.eclipse.slm.resource_management.common.model.MatchingResourceDTO;
@@ -51,7 +50,7 @@ public class ServiceOfferingVersionDeploymentRestController {
             @PathVariable(name = "serviceOfferingVersionId") UUID serviceOfferingVersionId,
             @RequestBody ServiceOrder serviceOrder
     ) throws SSLException, JsonProcessingException, ServiceOptionNotFoundException, ServiceOfferingNotFoundException,
-            ServiceOfferingVersionNotFoundException, InvalidServiceOfferingDefinitionException, ConsulLoginFailedException {
+            ServiceOfferingVersionNotFoundException, InvalidServiceOfferingDefinitionException {
 
         var jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         try {
