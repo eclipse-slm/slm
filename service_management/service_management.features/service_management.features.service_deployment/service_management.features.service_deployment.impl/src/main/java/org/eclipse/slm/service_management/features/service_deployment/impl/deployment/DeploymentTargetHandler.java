@@ -36,6 +36,9 @@ public class DeploymentTargetHandler {
     }
 
     public DeploymentTarget getDeploymentTargetOrThrow(String submodelId) {
+        if (submodelId == null) {
+            throw new DeploymentTargetNotFoundException(submodelId);
+        }
         return this.getDeploymentTargets(Optional.empty()).stream()
                 .filter(target -> submodelId.equals(target.submodelId()))
                 .findFirst()

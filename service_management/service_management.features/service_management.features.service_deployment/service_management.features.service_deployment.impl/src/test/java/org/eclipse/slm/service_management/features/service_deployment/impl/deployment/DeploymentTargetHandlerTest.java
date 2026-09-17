@@ -80,4 +80,12 @@ class DeploymentTargetHandlerTest {
                 .isInstanceOf(DeploymentTargetNotFoundException.class)
                 .hasMessageContaining("Deployment-nope");
     }
+
+    @Test
+    @DisplayName("A null submodel id is reported as not found instead of throwing a NullPointerException")
+    void nullSubmodelIdIsReportedAsNotFound() {
+        assertThatThrownBy(() -> handler().getDeploymentTargetOrThrow(null))
+                .isInstanceOf(DeploymentTargetNotFoundException.class)
+                .isNotInstanceOf(NullPointerException.class);
+    }
 }
