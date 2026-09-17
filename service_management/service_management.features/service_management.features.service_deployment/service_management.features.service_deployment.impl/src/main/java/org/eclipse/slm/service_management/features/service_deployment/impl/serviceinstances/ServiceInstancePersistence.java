@@ -4,6 +4,7 @@ import org.eclipse.slm.common.access.AccessControlService;
 import org.eclipse.slm.common.access.UserContext;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstance;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,9 @@ public class ServiceInstancePersistence {
         this.accessControlService = accessControlService;
     }
 
+    // Row and owner policy must land together: an instance without a policy is invisible to its
+    // owner forever, a policy without an instance grants access to nothing.
+    @Transactional
     public ServiceInstance create(ServiceInstance serviceInstance, String fullPathOwnerGroupId) {
         var entity = mapper.toEntity(serviceInstance);
         repository.save(entity);
@@ -42,6 +46,7 @@ public class ServiceInstancePersistence {
         repository.save(mapper.toEntity(serviceInstance));
     }
 
+    @Transactional
     public void delete(UUID serviceInstanceId) {
         repository.deleteById(serviceInstanceId);
         accessControlService.removeObjectFromAllPolicies(

@@ -1,7 +1,6 @@
 package org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.eclipse.slm.common.access.UserContext;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.AvailableServiceInstanceVersionChange;
@@ -55,7 +54,7 @@ public class ServiceInstancesHandler {
 
     public ServiceInstancesHandler(ServiceUndeploymentHandler serviceUndeploymentHandler,
                                    ServiceUpdateHandler serviceUpdateHandler, ServiceOfferingVersionHandler serviceOfferingVersionHandler,
-                                   ServiceOfferingHandler serviceOfferingHandler, ServiceOrderJpaRepository serviceOrderJpaRepository, ServiceInstancePersistence serviceInstancePersistence, ServiceInstanceGroupJpaRepository serviceInstanceGroupJpaRepository, ObjectMapper objectMapper) {
+                                   ServiceOfferingHandler serviceOfferingHandler, ServiceOrderJpaRepository serviceOrderJpaRepository, ServiceInstancePersistence serviceInstancePersistence, ServiceInstanceGroupJpaRepository serviceInstanceGroupJpaRepository) {
         this.serviceUndeploymentHandler = serviceUndeploymentHandler;
         this.serviceUpdateHandler = serviceUpdateHandler;
         this.serviceOfferingVersionHandler = serviceOfferingVersionHandler;

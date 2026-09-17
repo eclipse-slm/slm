@@ -10,10 +10,10 @@ import org.springframework.test.context.ActiveProfiles;
 /**
  * Minimal Spring Boot config for {@code @DataJpaTest}s in this package.
  *
- * <p>The {@code serviceinstances} package also contains {@link ServiceInstanceGroupJpaRepository},
- * which is a pre-existing repository over {@code ServiceInstanceGroup} (not yet a JPA
- * {@code @Entity} - that is Consul-backed and out of scope here). It is excluded from repository
- * scanning so it does not break context loading for these tests.
+ * <p>{@link ServiceInstanceGroupJpaRepository} lives in this package but maps
+ * {@code ServiceInstanceGroup} from the {@code api} package, which this narrow {@code @EntityScan}
+ * does not cover. It is excluded from repository scanning so context loading does not fail on an
+ * unmanaged type. Widening the scan instead would pull in unrelated entities.
  */
 @SpringBootApplication(scanBasePackages = {
         "org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances",
