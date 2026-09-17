@@ -13,11 +13,7 @@ import org.eclipse.slm.resource_management.service.client.ResourceManagementClie
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.CapabilityServiceNotFoundException;
 import org.eclipse.slm.service_management.features.service_deployment.api.serviceinstances.ServiceInstance;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.DeploymentJobRun;
-import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.kubernetes.KubernetesManifestFile;
-import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.dockercompose.DockerComposeFile;
-import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.dockercompose.DockerComposeFileParser;
 import org.eclipse.slm.service_management.features.service_deployment.api.deploymentdefinitions.kubernetes.KubernetesManifestFileParser;
-import org.eclipse.slm.service_management.features.service_deployment.impl.deployment.dockercontainer.DockerContainerServiceOfferingOrderUtil;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstanceEventMessageSender;
 import org.eclipse.slm.service_management.features.service_deployment.api.events.ServiceInstanceEventType;
 import org.eclipse.slm.service_management.features.service_deployment.impl.serviceinstances.ServiceInstancesConsulClient;
@@ -26,8 +22,6 @@ import org.eclipse.slm.service_management.features.service_offerings.api.service
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrder;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferingversions.ServiceOfferingVersion;
 import org.eclipse.slm.service_management.features.service_deployment.api.deployment.ServiceOrderResult;
-import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.compose.DockerComposeDeploymentDefinition;
-import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.docker.container.DockerContainerDeploymentDefinition;
 import org.eclipse.slm.service_management.features.service_offerings.api.serviceofferings.exceptions.InvalidServiceOfferingDefinitionException;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
@@ -52,6 +46,8 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
 
     private final ServiceOrderJpaRepository serviceOrderJpaRepository;
 
+    private final DeploymentDescriptorRenderer deploymentDescriptorRenderer;
+
     private Map<AwxJobObserver, DeploymentJobRun> observedAwxJobsToDeploymentJobDetails = new HashMap<>();
 
 
@@ -62,13 +58,15 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                                     ResourceManagementClientFactory resourceManagementClientFactory,
                                     ServiceOrderJpaRepository serviceOrderJpaRepository,
                                     ServiceInstancesConsulClient serviceInstancesConsulClient,
-                                    ServiceInstanceEventMessageSender serviceInstanceEventMessageSender) {
+                                    ServiceInstanceEventMessageSender serviceInstanceEventMessageSender,
+                                    DeploymentDescriptorRenderer deploymentDescriptorRenderer) {
         super(resourceManagementClientFactory, serviceInstancesConsulClient, awxJobObserverInitializer, awxJobExecutor);
         this.consulClientFactory = consulClientFactory;
         this.consulAdminClient = consulClientFactory.createAdminClient();
         this.keycloakAdminClient = keycloakAdminClient;
         this.serviceOrderJpaRepository = serviceOrderJpaRepository;
         this.serviceInstanceEventMessageSender = serviceInstanceEventMessageSender;
+        this.deploymentDescriptorRenderer = deploymentDescriptorRenderer;
     }
 
     public DeploymentJobRun deployServiceOfferingToResource(
@@ -90,9 +88,9 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
         switch (serviceOfferingDeploymentType) {
             case DOCKER_CONTAINER:
             case DOCKER_COMPOSE: {
-                var deployableComposeFile = this.getDeployableComposeFile(serviceOfferingVersion, serviceOrder);
-                serviceMetaData = this.getServiceMetaData(serviceOfferingVersion, serviceOrder, deployableComposeFile);
-                servicePorts = this.getServicePorts(serviceOfferingVersion, serviceOrder, deployableComposeFile);
+                var deployableComposeFile = this.deploymentDescriptorRenderer.getDeployableComposeFile(serviceOfferingVersion, serviceOrder);
+                serviceMetaData = this.deploymentDescriptorRenderer.getServiceMetaData(serviceOfferingVersion, deployableComposeFile);
+                servicePorts = this.deploymentDescriptorRenderer.getServicePorts(serviceOfferingVersion, deployableComposeFile);
 
                 HashMap<String, Object> extraVarsMap = new HashMap<>() {{
                     put("service_id", serviceId);
@@ -117,7 +115,7 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
                 break;
             }
             case KUBERNETES: {
-                KubernetesManifestFile deployableManifestFile = this.getDeployableManifestFile(serviceOfferingVersion, serviceOrder);
+                var deployableManifestFile = this.deploymentDescriptorRenderer.getDeployableManifestFile(serviceOfferingVersion, serviceOrder);
 
                 HashMap<String, Object> extraVarsMap = new HashMap<>() {{
                     put("resource_id", serviceOrder.getDeploymentCapabilityServiceId());
@@ -178,52 +176,6 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
         return deploymentJobRun;
     }
 
-    private Map<String, String> getServiceMetaData(ServiceOfferingVersion serviceOfferingVersion, ServiceOrder serviceOrder,
-                                                   DockerComposeFile deployableComposeFile) {
-        var serviceMetaData = new HashMap<String, String>();
-        switch (serviceOfferingVersion.getDeploymentType()) {
-            case DOCKER_CONTAINER:
-                var dockerContainerServiceOffering = (DockerContainerDeploymentDefinition) serviceOfferingVersion.getDeploymentDefinition();
-                serviceMetaData = DockerContainerServiceOfferingOrderUtil
-                        .getServiceMetaData(dockerContainerServiceOffering);
-                break;
-
-            case DOCKER_COMPOSE:
-                var dockerComposeServiceOffering = (DockerComposeDeploymentDefinition) serviceOfferingVersion.getDeploymentDefinition();
-                serviceMetaData = DockerComposeFileParser.getServiceMetaData(deployableComposeFile);
-                break;
-
-            case KUBERNETES:
-                break;
-
-            default:
-                throw new NotImplementedException("Deployment Type '" + serviceOfferingVersion.getDeploymentType() + "' not supported");
-        }
-
-        return serviceMetaData;
-    }
-
-    private List<Integer> getServicePorts(ServiceOfferingVersion serviceOfferingVersion, ServiceOrder serviceOrder,
-                                                   DockerComposeFile deployableComposeFile) {
-        List<Integer> servicePorts = new ArrayList<Integer>();
-        switch (serviceOfferingVersion.getDeploymentType()) {
-            case DOCKER_CONTAINER:
-            case DOCKER_COMPOSE:
-                servicePorts = DockerComposeFileParser.getServicePorts(deployableComposeFile);
-                break;
-
-            case KUBERNETES:
-                break;
-
-            default:
-                throw new NotImplementedException("Deployment Type '" + serviceOfferingVersion.getDeploymentType() + "' not supported");
-        }
-
-        servicePorts.addAll(serviceOfferingVersion.getServicePorts());
-
-        return servicePorts;
-    }
-
     private HashMap<String, Object> addExtraVarsForServiceRepositories(HashMap<String, Object> extraVarsMap, ServiceOfferingVersion serviceOfferingVersion) {
         if (serviceOfferingVersion.getServiceRepositories().size() > 0) {
             var dockerRegistriesVaultPaths = new ArrayList<String>();
@@ -235,54 +187,6 @@ public class ServiceDeploymentHandler  extends AbstractServiceDeploymentHandler 
 
         return extraVarsMap;
     }
-
-    private DockerComposeFile getDeployableComposeFile(ServiceOfferingVersion serviceOfferingVersion, ServiceOrder serviceOrder)
-            throws JsonProcessingException, ServiceOptionNotFoundException, InvalidServiceOfferingDefinitionException {
-        DockerComposeFile deployableComposeFile = null;
-        switch (serviceOfferingVersion.getDeploymentType())
-        {
-            case DOCKER_CONTAINER:
-                deployableComposeFile = DockerContainerServiceOfferingOrderUtil
-                        .generateDockerComposeFile(serviceOfferingVersion, serviceOrder);
-                break;
-
-            case DOCKER_COMPOSE:
-                deployableComposeFile = DockerComposeFileParser.generateDeployableComposeFileForServiceOffering(
-                        serviceOfferingVersion, serviceOrder.getServiceOptionValues());
-                break;
-        }
-
-        if (deployableComposeFile == null) {
-            throw new RuntimeException("Unable to create deployable Docker Compose File for order of service offering '"
-                    + serviceOfferingVersion.getId() + "' version '" + serviceOfferingVersion.getVersion() + "'");
-        }
-        else {
-            return deployableComposeFile;
-        }
-    }
-
-
-    private KubernetesManifestFile getDeployableManifestFile(ServiceOfferingVersion serviceOfferingVersion, ServiceOrder serviceOrder)
-            throws InvalidServiceOfferingDefinitionException {
-        KubernetesManifestFile deployableManifestFile = null;
-        switch (serviceOfferingVersion.getDeploymentType())
-        {
-            case KUBERNETES:
-                deployableManifestFile = KubernetesManifestFileParser.generateDeployableManifestFileForServiceOffering(
-                        serviceOfferingVersion, serviceOrder.getServiceOptionValues()
-                );
-                break;
-        }
-
-        if (deployableManifestFile == null) {
-            throw new RuntimeException("Unable to create deployable Docker Compose File for order of service offering '"
-                    + serviceOfferingVersion.getId() + "' version '" + serviceOfferingVersion.getVersion() + "'");
-        }
-        else {
-            return deployableManifestFile;
-        }
-    }
-
 
     @Override
     public void onJobStateChanged(AwxJobObserver sender, JobState newState) {

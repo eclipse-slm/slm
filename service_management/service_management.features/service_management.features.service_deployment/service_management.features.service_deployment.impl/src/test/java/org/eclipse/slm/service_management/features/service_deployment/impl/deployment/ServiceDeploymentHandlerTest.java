@@ -158,7 +158,8 @@ public class ServiceDeploymentHandlerTest {
                 resourceManagementClientFactory,
                 serviceOrderJpaRepository,
                 serviceInstancesConsulClient,
-                serviceInstanceEventMessageSender);
+                serviceInstanceEventMessageSender,
+                new DeploymentDescriptorRenderer());
     }
 
     @Test
