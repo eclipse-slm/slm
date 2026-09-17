@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import org.eclipse.slm.common.messaging.AbstractEventMessage
 import java.io.Serializable
 
-class ResourceEventMessage @JsonCreator @JvmOverloads constructor(
+// No @JvmOverloads: Kotlin copies @JsonCreator onto the generated overload too, and Jackson then
+// rejects the type with "Conflicting property-based creators", which breaks every notification.
+class ResourceEventMessage @JsonCreator constructor(
 
     @field:JsonProperty("resource") val resource: ResourceDTO?,
 
