@@ -87,7 +87,12 @@ jobs:
       contents: read
       packages: write
     env:
-      MAVEN_CLI_OPTS: "-s ci/ci_maven_settings.xml --batch-mode --errors --fail-at-end --show-version --no-transfer-progress -T 1C -DinstallAtEnd=true -DdeployAtEnd=true"
+      # -Dmaven.repository.credentialScope=id restores legacy id-only credential matching.
+      # Maven 3.10 (on the runners since 2026-10) scopes a settings.xml server's credentials to the
+      # origins of that server id; id "central" defaults to https://repo.maven.apache.org, so the
+      # snapshot upload to https://central.sonatype.com/repository/maven-snapshots/ was sent without
+      # credentials and failed with HTTP 401. Workaround until setup-java handles this.
+      MAVEN_CLI_OPTS: "-s ci/ci_maven_settings.xml --batch-mode --errors --fail-at-end --show-version --no-transfer-progress -T 1C -DinstallAtEnd=true -DdeployAtEnd=true -Dmaven.repository.credentialScope=id"
       COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
     strategy:
       fail-fast: false
