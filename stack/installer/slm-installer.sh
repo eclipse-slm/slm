@@ -75,12 +75,36 @@ fi
 # Disable rsyslog AppArmor profile only on Ubuntu 24+ hosts.
 if [[ -r /etc/os-release ]]; then
   . /etc/os-release
-  os_major="${VERSION_ID%%.*}"
-  if [[ "${ID:-}" == "ubuntu" && "${os_major}" =~ ^[0-9]+$ && "${os_major}" -ge 24 ]]; then
-    sudo ln -sf /etc/apparmor.d/usr.sbin.rsyslogd /etc/apparmor.d/disable/
-    sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.rsyslogd
+  os_major="${VERSION_ID:-}"
+  os_major="${os_major%%.*}"
+
+  if [[ "${ID:-}" == "ubuntu" &&
+        "${os_major}" =~ ^[0-9]+$ &&
+        "${os_major}" -ge 24 ]]; then
+
+    profile="/etc/apparmor.d/usr.sbin.rsyslogd"
+    loaded_profiles="/sys/kernel/security/apparmor/profiles"
+
+    if [[ ! -f "$profile" ]]; then
+      printf 'Skipping AppArmor change: profile not found: %s\n' \
+        "$profile" >&2
+    else
+      mkdir -p /etc/apparmor.d/disable/ &&
+        ln -sfn "$profile" /etc/apparmor.d/disable/usr.sbin.rsyslogd
+
+      if [[ -r "$loaded_profiles" ]]; then
+        if grep -qE '^rsyslogd \(' "$loaded_profiles"; then
+          apparmor_parser -R "$profile"
+        else
+          printf 'AppArmor profile rsyslogd is already unloaded; skipping removal.\n'
+        fi
+      else
+        printf 'Cannot inspect loaded AppArmor profiles; skipping runtime removal.\n' >&2
+      fi
+    fi
   fi
 fi
+
 
 prompt_required_with_default() {
   local var_name="$1"
