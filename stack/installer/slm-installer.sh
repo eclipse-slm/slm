@@ -133,6 +133,15 @@ prompt_required_with_default() {
   done
 }
 
+# Reads a top-level scalar from the env.yml that the install writes (ENV | to_nice_yaml).
+read_env_yml_value() {
+  local file="$1"
+  local key="$2"
+
+  # Print the first top-level "<key>: <value>" entry, trimmed and unquoted.
+  sed -n -e "s/^${key}:[[:space:]]*//" -e 'T' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//" -e 'p' -e 'q' "${file}"
+}
+
 if [[ -z "${INSTALL_DIRECTORY}" ]]; then
   prompt_required_with_default "INSTALL_DIRECTORY" "INSTALL_DIRECTORY"
 fi
@@ -192,14 +201,41 @@ fi
 if [[ "${INSTALLER_MODE}" == "install" ]]; then
   prompt_required_with_default "SLM_HOSTNAME" "SLM_HOSTNAME"
   prompt_required_with_default "SLM_IP" "SLM_IP"
+elif [[ "${INSTALLER_MODE}" == "uninstall" ]]; then
+  # uninstall.yml includes the eclipse.slm.env role, which asserts SLM_HOSTNAME and SLM_IP although
+  # the uninstall itself only reads COMPOSE_PROJECT_NAME and SLM_VERSION from ENV. Recover the
+  # values recorded at install time and fall back to this host's identity, so that uninstall stays
+  # non-interactive.
+  ENV_YML="${INSTALL_DIRECTORY}/env.yml"
+  if [[ -r "${ENV_YML}" ]]; then
+    if [[ -z "${SLM_HOSTNAME}" ]]; then
+      SLM_HOSTNAME="$(read_env_yml_value "${ENV_YML}" "SLM_HOSTNAME")"
+    fi
+    if [[ -z "${SLM_IP}" ]]; then
+      SLM_IP="$(read_env_yml_value "${ENV_YML}" "SLM_IP")"
+    fi
+  fi
+
+  if [[ -z "${SLM_HOSTNAME}" ]]; then
+    SLM_HOSTNAME="$(hostname -f 2>/dev/null || hostname)"
+  fi
+  if [[ -z "${SLM_IP}" ]]; then
+    SLM_IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
+  fi
+
+  if [[ -z "${SLM_HOSTNAME}" || -z "${SLM_IP}" ]]; then
+    echo "Error: could not determine SLM_HOSTNAME and SLM_IP for uninstall." >&2
+    echo "Set them as environment variables and run the installer again." >&2
+    exit 1
+  fi
 fi
 
 echo "Starting non-interactive installer with:"
 echo "MODE=${INSTALLER_MODE}"
 echo "INSTALL_DIRECTORY=${INSTALL_DIRECTORY}"
+echo "SLM_HOSTNAME=${SLM_HOSTNAME}"
+echo "SLM_IP=${SLM_IP}"
 if [[ "${INSTALLER_MODE}" == "install" ]]; then
-  echo "SLM_HOSTNAME=${SLM_HOSTNAME}"
-  echo "SLM_IP=${SLM_IP}"
   echo "DEPLOYMENT_HOST_HOSTNAME=${DEPLOYMENT_HOST_HOSTNAME}"
   echo "DEPLOYMENT_HOST_USER=${DEPLOYMENT_HOST_USER}"
 fi
@@ -223,19 +259,14 @@ if [[ "${INSTALLER_MODE}" == "install" ]]; then
     ghcr.io/eclipse-slm/slm/installer-api:${SLM_VERSION} \
     install
 else
+  # SLM_HOSTNAME and SLM_IP are required by the eclipse.slm.env role included by uninstall.yml.
   uninstall_env_args=(
     --env "INSTALL_DIRECTORY=${INSTALL_DIRECTORY}"
     --env "SLM_VERSION=${SLM_VERSION}"
     --env "INSTALLER_FIXED_SLM_VERSION=${SLM_VERSION}"
+    --env "SLM_HOSTNAME=${SLM_HOSTNAME}"
+    --env "SLM_IP=${SLM_IP}"
   )
-
-  # Uninstall does not require these, but forward them when they are known.
-  if [[ -n "${SLM_HOSTNAME}" ]]; then
-    uninstall_env_args+=(--env "SLM_HOSTNAME=${SLM_HOSTNAME}")
-  fi
-  if [[ -n "${SLM_IP}" ]]; then
-    uninstall_env_args+=(--env "SLM_IP=${SLM_IP}")
-  fi
 
   sudo docker run \
     --rm \
