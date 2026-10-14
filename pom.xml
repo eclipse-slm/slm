@@ -164,7 +164,7 @@
         <netty.version>4.1.73.Final</netty.version>
         <reactor.netty.version>1.0.15</reactor.netty.version>
         <jgit.version>7.3.0.202506031305-r</jgit.version>
-        <basyx.version>2.0.0-milestone-07</basyx.version>
+        <basyx.version>2.0.0-milestone-15</basyx.version>
         <aas.aas4j.version>1.0.2</aas.aas4j.version>
         <aas.sdk.version>1.0.0-SNAPSHOT</aas.sdk.version>
         <minio.version>8.5.7</minio.version>
@@ -247,6 +247,31 @@
                         <artifactId>spring-boot-health</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <!-- BaSyx -->
+            <!-- The published aas.sdk 1.0.0-SNAPSHOT resolves most BaSyx modules via its own
+                 basyx.version (2.0.0-milestone-15), but aas.repositories pins
+                 basyx.submodelrepository-client to 2.0.0-milestone-07. Maven's nearest-wins then
+                 puts the milestone-07 basyx.client on the classpath, while the milestone-15
+                 basyx.aasservice-client needs ApiClientPool, which only exists since milestone-15
+                 (NoClassDefFoundError org/eclipse/digitaltwin/basyx/client/internal/ApiClientPool
+                 on startup). Force a single, consistent BaSyx version.
+                 Fixed upstream on aas-sdk main, but only in 1.1.0-SNAPSHOT (Spring Boot 4), so it
+                 has to be managed here until SLM moves to that version. !-->
+            <dependency>
+                <groupId>org.eclipse.digitaltwin.basyx</groupId>
+                <artifactId>basyx.submodelrepository-client</artifactId>
+                <version>${basyx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.digitaltwin.basyx</groupId>
+                <artifactId>basyx.client</artifactId>
+                <version>${basyx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.digitaltwin.basyx</groupId>
+                <artifactId>basyx.authorization</artifactId>
+                <version>${basyx.version}</version>
             </dependency>
             <!-- Kotlin !-->
             <dependency>
