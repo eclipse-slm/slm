@@ -225,6 +225,10 @@ else
     --env "INSTALL_DIRECTORY=${INSTALL_DIRECTORY}" \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume "${INSTALL_DIRECTORY}:/install" \
+    --env "SLM_HOSTNAME=${SLM_HOSTNAME}" \
+    --env "SLM_IP=${SLM_IP}" \
+    --env "INSTALL_DIRECTORY=${INSTALL_DIRECTORY}" \
+    --env "SLM_VERSION=${SLM_VERSION}" \
     ghcr.io/eclipse-slm/slm/installer-api:${SLM_VERSION} \
     uninstall
 
