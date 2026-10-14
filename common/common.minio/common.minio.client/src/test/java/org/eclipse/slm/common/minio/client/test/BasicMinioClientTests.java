@@ -51,7 +51,7 @@ public class BasicMinioClientTests {
     }
 
     static {
-        minioDockerContainer = new GenericContainer<>(DockerImageName.parse("quay.io/minio/minio:RELEASE.2023-12-20T01-00-02Z"))
+        minioDockerContainer = new GenericContainer<>(DockerImageName.parse("ghcr.io/eclipse-slm/minio:RELEASE.2023-12-20T01-00-02Z"))
                 .withEnv("MINIO_ACCESS_KEY", "admin")
                 .withEnv("MINIO_SECRET_KEY", "password")
                 .withCommand("server /data")
