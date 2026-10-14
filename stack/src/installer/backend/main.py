@@ -17,6 +17,7 @@ from starlette.websockets import WebSocketState
 
 from backend.job_manager import JobManager
 from backend.runner import PlaybookRunOptions, create_runner
+from backend.version import slm_version
 
 API_PREFIX = "/api"
 
@@ -36,7 +37,7 @@ app.add_middleware(
 )
 
 job_manager = JobManager()
-FIXED_SLM_VERSION = "1.5.0-SNAPSHOT"
+FIXED_SLM_VERSION = slm_version()
 INSTALLER_COMPOSE_PROJECT_NAME = "eclipse-slm-installer"
 api_router = APIRouter(prefix=API_PREFIX)
 

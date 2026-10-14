@@ -5,8 +5,11 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
+      args:
+        SLM_VERSION: ${SLM_VERSION}
     command: "${INSTALLER_API_COMMAND}"
     environment:
+      INSTALLER_FIXED_SLM_VERSION: ${SLM_VERSION}
       SLM_HOSTNAME: ${SLM_HOSTNAME}
       SLM_IP: ${SLM_IP}
       INSTALL_DIRECTORY: ${INSTALL_DIRECTORY}

@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-FIXED_SLM_VERSION="${INSTALLER_FIXED_SLM_VERSION:-1.5.0-SNAPSHOT}"
 INSTALLER_WORKING_DIR="${INSTALLER_WORKING_DIR:-/ansible/installer/src}"
 INSTALLER_PLAYBOOK="${INSTALLER_PLAYBOOK:-install.yml}"
 INSTALLER_UNINSTALL_WORKING_DIR="${INSTALLER_UNINSTALL_WORKING_DIR:-/ansible/installer/src}"
@@ -28,9 +27,11 @@ import json
 import os
 import sys
 
+from backend.version import slm_version
+
 mode = sys.argv[1]
 payload = {
-    "SLM_VERSION": os.getenv("INSTALLER_FIXED_SLM_VERSION", "1.5.0-SNAPSHOT")
+    "SLM_VERSION": slm_version()
 }
 
 if mode == "install":

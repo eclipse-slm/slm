@@ -23,6 +23,8 @@ INSTALLER_MODE="${MODE_ARG:-${INSTALLER_MODE:-}}"
 INSTALLER_DOWNLOAD_REF="${INSTALLER_DOWNLOAD_REF:-develop}"
 INSTALLER_COMPOSE_PROJECT_NAME="eclipse-slm-installer"
 SLM_VERSION="1.5.0-SNAPSHOT"
+SLM_HOSTNAME="${SLM_HOSTNAME:-}"
+SLM_IP="${SLM_IP:-}"
 INSTALL_DIRECTORY="${INSTALL_DIRECTORY:-/opt/eclipse-slm}"
 DEPLOYMENT_HOST_HOSTNAME="${DEPLOYMENT_HOST_HOSTNAME:-localhost}"
 DEPLOYMENT_HOST_USER="${DEPLOYMENT_HOST_USER:-}"
@@ -157,8 +159,8 @@ if [[ "${INSTALLER_MODE}" == "ui" ]]; then
   fi
 
   cat > "${ENV_FILE}" <<EOF
-SLM_HOSTNAME=${SLM_HOSTNAME:-}
-SLM_IP=${SLM_IP:-}
+SLM_HOSTNAME=${SLM_HOSTNAME}
+SLM_IP=${SLM_IP}
 SLM_VERSION=${SLM_VERSION}
 INSTALL_DIRECTORY=${INSTALL_DIRECTORY}
 DEPLOYMENT_HOST_HOSTNAME=${DEPLOYMENT_HOST_HOSTNAME}
@@ -209,6 +211,8 @@ if [[ "${INSTALLER_MODE}" == "install" ]]; then
     --pull=always \
     --env "SLM_HOSTNAME=${SLM_HOSTNAME}" \
     --env "SLM_IP=${SLM_IP}" \
+    --env "SLM_VERSION=${SLM_VERSION}" \
+    --env "INSTALLER_FIXED_SLM_VERSION=${SLM_VERSION}" \
     --env "INSTALL_DIRECTORY=${INSTALL_DIRECTORY}" \
     --env "DEPLOYMENT_HOST_HOSTNAME=${DEPLOYMENT_HOST_HOSTNAME}" \
     --env "DEPLOYMENT_HOST_USER=${DEPLOYMENT_HOST_USER}" \
@@ -219,16 +223,26 @@ if [[ "${INSTALLER_MODE}" == "install" ]]; then
     ghcr.io/eclipse-slm/slm/installer-api:${SLM_VERSION} \
     install
 else
+  uninstall_env_args=(
+    --env "INSTALL_DIRECTORY=${INSTALL_DIRECTORY}"
+    --env "SLM_VERSION=${SLM_VERSION}"
+    --env "INSTALLER_FIXED_SLM_VERSION=${SLM_VERSION}"
+  )
+
+  # Uninstall does not require these, but forward them when they are known.
+  if [[ -n "${SLM_HOSTNAME}" ]]; then
+    uninstall_env_args+=(--env "SLM_HOSTNAME=${SLM_HOSTNAME}")
+  fi
+  if [[ -n "${SLM_IP}" ]]; then
+    uninstall_env_args+=(--env "SLM_IP=${SLM_IP}")
+  fi
+
   sudo docker run \
     --rm \
     --pull=always \
-    --env "INSTALL_DIRECTORY=${INSTALL_DIRECTORY}" \
+    "${uninstall_env_args[@]}" \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume "${INSTALL_DIRECTORY}:/install" \
-    --env "SLM_HOSTNAME=${SLM_HOSTNAME}" \
-    --env "SLM_IP=${SLM_IP}" \
-    --env "INSTALL_DIRECTORY=${INSTALL_DIRECTORY}" \
-    --env "SLM_VERSION=${SLM_VERSION}" \
     ghcr.io/eclipse-slm/slm/installer-api:${SLM_VERSION} \
     uninstall
 

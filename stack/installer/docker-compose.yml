@@ -8,6 +8,8 @@ services:
       INSTALL_DIRECTORY: ${INSTALL_DIRECTORY:-/opt/eclipse-slm}
       SLM_HOSTNAME: ${SLM_HOSTNAME:-}
       SLM_IP: ${SLM_IP:-}
+      SLM_VERSION: ${SLM_VERSION}
+      INSTALLER_FIXED_SLM_VERSION: ${SLM_VERSION}
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "${INSTALL_DIRECTORY:-/opt/eclipse-slm}:/install"

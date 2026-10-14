@@ -33,6 +33,11 @@ RUN ansible-galaxy install -r /ansible/installer/src/requirements.yml
 
 WORKDIR /app
 
+# Keep the version used by the playbooks in sync with the image tag. Empty means
+# "fall back to backend.version.DEFAULT_SLM_VERSION", the only hardcoded value.
+ARG SLM_VERSION=""
+ENV INSTALLER_FIXED_SLM_VERSION=${SLM_VERSION}
+
 EXPOSE 8080
 
 ENTRYPOINT ["/app/entrypoint-api.sh"]

@@ -329,16 +329,19 @@ def _event(
 
 def _merged_env(env_file: Optional[str], overrides: Optional[Dict[str, str]] = None) -> Dict[str, str]:
     merged = dict(os.environ)
-    if not env_file or not os.path.exists(env_file):
-        return merged
 
-    with open(env_file, "r", encoding="utf-8") as handle:
-        for line in handle:
-            entry = line.strip()
-            if not entry or entry.startswith("#") or "=" not in entry:
-                continue
-            key, value = entry.split("=", 1)
-            merged.setdefault(key.strip(), value.strip())
+    # The env file is optional: the installer image ships only /env/env.override.yml,
+    # so overrides must still be applied when the file is absent. isfile() also
+    # covers the dev compose bind mount, which turns a missing env.yml into a
+    # directory that exists() would happily accept.
+    if env_file and os.path.isfile(env_file):
+        with open(env_file, "r", encoding="utf-8") as handle:
+            for line in handle:
+                entry = line.strip()
+                if not entry or entry.startswith("#") or "=" not in entry:
+                    continue
+                key, value = entry.split("=", 1)
+                merged.setdefault(key.strip(), value.strip())
 
     if overrides:
         for key, value in overrides.items():

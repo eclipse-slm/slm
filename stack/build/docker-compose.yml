@@ -5,6 +5,8 @@ services:
     build:
       context: ../src/installer
       dockerfile: backend/Dockerfile
+      args:
+        SLM_VERSION: ${SLM_VERSION}
 
   installer-ui:
     image: ${DOCKER_IMAGE_REGISTRY}/slm/installer-ui:${SLM_VERSION}
