@@ -221,6 +221,33 @@
                 <version>${common.awx.client.version}</version>
                 <scope>compile</scope>
             </dependency>
+            <!-- AAS SDK !-->
+            <!-- BaSyx (pulled in transitively) targets Spring Boot 4 and depends on the Boot 4 only
+                 module spring-boot-health, which is not managed by spring-boot-dependencies 3.x.
+                 Its auto configurations are picked up by Boot 3 and break the application context
+                 ("EndpointCondition must be used on @Bean methods when the endpoint is not specified"). !-->
+            <dependency>
+                <groupId>org.eclipse.slm</groupId>
+                <artifactId>aas.clients</artifactId>
+                <version>${aas.sdk.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-health</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.slm</groupId>
+                <artifactId>aas.repositories</artifactId>
+                <version>${aas.sdk.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-health</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
             <!-- Kotlin !-->
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
