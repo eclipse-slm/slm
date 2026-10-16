@@ -1,6 +1,6 @@
 - debug:
     var: _app_config
-    
+
 - name: Set application-dev.yml path
   ansible.builtin.set_fact:
     _application_dev_yml_file: "{{ _application_yml_file | dirname }}/application-{{ spring_profile }}.yml"
@@ -9,6 +9,7 @@
   ansible.builtin.copy:
     src: "{{ _application_yml_file }}"
     dest: "{{ _application_dev_yml_file }}"
+  ignore_errors: yes
 
 - name: "Update Consul config in file '{{ _application_dev_yml_file }}'"
   ansible.builtin.lineinfile:
