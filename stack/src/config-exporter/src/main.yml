@@ -170,13 +170,14 @@
           consul_service_name:
 
     - name: "Copy application properties"
-      template:
+      ansible.builtin.template:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
-      with_items:
+      loop:
         - src: /templates/ui/.env.development
           dest: /project/ui/.env.development
       when: CONFIGURE_CORE_PROJECT|default(false)|bool == true
+      ignore_errors: true
 
     - name: "Generate certificate for UI"
       include_tasks: get_vault_pki_cert.yml
