@@ -7,11 +7,11 @@
 
 - name: Stat application-dev.yml file
   ansible.builtin.stat:
-    path: "{{ _application_dev_yml_file }}"
-  register: application_dev_yml_file_stat
+    path: "{{ _application_yml_file }}"
+  register: application_yml_file_stat
 
 - name: "Update'{{ _application_dev_yml_file }}'"
-  when: application_dev_yml_file_stat.stat.exists
+  when: application_yml_file_stat.stat.exists
   block:
     - name: "Copy '{{ _application_yml_file }}' to '{{ _application_dev_yml_file }}'"
       ansible.builtin.copy:
@@ -39,7 +39,7 @@
       when: (_consul_service_name is defined) and (_consul_service_name | length > 0)
       ansible.builtin.lineinfile:
         path: "{{ _application_dev_yml_file }}"
-        insertafter : 'consul:'
+        insertafter: 'consul:'
         regexp: "name: {{ _consul_service_name }}.*"
         line: '    name: {{ _consul_service_name }}-external'
 
@@ -48,7 +48,7 @@
         path: "{{ _application_dev_yml_file }}"
         regexp: "### Deployment"
         state: absent
-      check_mode: yes
+      check_mode: true
       changed_when: false
       register: deployment_section
 
