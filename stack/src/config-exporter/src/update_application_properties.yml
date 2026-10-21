@@ -17,8 +17,7 @@
       ansible.builtin.copy:
         src: "{{ _application_yml_file }}"
         dest: "{{ _application_dev_yml_file }}"
-        owner: "{{ application_yml_file_stat.stat.pw_name }}"
-        group: "{{ application_yml_file_stat.stat.gr_name }}"
+        mode: "0666"
       ignore_errors: true
 
     - name: "Update Consul config in file '{{ _application_dev_yml_file }}'"
