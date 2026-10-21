@@ -538,6 +538,8 @@
                             </goals>
                             <configuration>
                                 <classifier>exec</classifier>
+                                <!-- Fat jar is only needed locally for Docker images, don't publish it !-->
+                                <attach>false</attach>
                             </configuration>
                         </execution>
                     </executions>
@@ -679,6 +681,8 @@
                     <systemPropertyVariables>
                         <api.version>1.44</api.version> <!-- Fix for https://github.com/testcontainers/testcontainers-java/issues/11212 !-->
                     </systemPropertyVariables>
+                    <!-- Kill forked JVMs that hang on shutdown sooner (default 30s) !-->
+                    <forkedProcessExitTimeoutInSeconds>5</forkedProcessExitTimeoutInSeconds>
                 </configuration>
             </plugin>
             <plugin>
@@ -689,6 +693,8 @@
                     <systemPropertyVariables>
                         <api.version>1.44</api.version> <!-- Fix for https://github.com/testcontainers/testcontainers-java/issues/11212 !-->
                     </systemPropertyVariables>
+                    <!-- Kill forked JVMs that hang on shutdown sooner (default 30s) !-->
+                    <forkedProcessExitTimeoutInSeconds>5</forkedProcessExitTimeoutInSeconds>
                 </configuration>
                 <executions>
                     <execution>
