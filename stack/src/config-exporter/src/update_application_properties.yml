@@ -61,3 +61,25 @@
         regexp: " hostname:"
         line: "  hostname: {{ LOCAL_HOSTNAME }}"
       when: deployment_section.found
+
+    - name: "Set spring.config.import in file '{{ _application_dev_yml_file }}'"
+      ansible.builtin.replace:
+        path: "{{ _application_dev_yml_file }}"
+        regexp: '^([ \t]*)#?[ \t]*config:[ \t]*\n[ \t]*#?[ \t]*import:.*$'
+        replace: '\1config:\n\1  import: "consul:"'
+
+    - name: "Check if spring.config.import exists in '{{ _application_dev_yml_file }}'"
+      ansible.builtin.lineinfile:
+        path: "{{ _application_dev_yml_file }}"
+        regexp: '^[ \t]*import: "consul:"[ \t]*$'
+        state: absent
+      check_mode: true
+      changed_when: false
+      register: spring_config_import
+
+    - name: "Add spring.config.import in file '{{ _application_dev_yml_file }}'"
+      ansible.builtin.replace:
+        path: "{{ _application_dev_yml_file }}"
+        regexp: '^spring:[ \t]*$'
+        replace: 'spring:\n  config:\n    import: "consul:"'
+      when: not spring_config_import.found
