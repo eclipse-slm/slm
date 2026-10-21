@@ -671,6 +671,19 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
+            <!-- Sign and publish this root POM only (not inherited). The central-publishing plugin cleans its shared
+                 work directory in the first reactor project declaring it; making that the root ensures the cleanup
+                 is done before any module starts, instead of racing with parallel modules (-T) !-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <inherited>false</inherited>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <inherited>false</inherited>
+            </plugin>
             <!-- Testing !-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
