@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Packs @eclipse-slm/ui, builds test-consumer against the tarball in an isolated temp dir and checks the override markers.
+# Packs @eclipse-slm/ui, builds test-consumer against the tarball in an isolated temp dir and checks the override markers,
+# then runs the consumer dev server and loads the app in a headless browser (scripts/browser-smoke.mjs, needs Playwright's
+# Chromium: npx --prefix ui playwright install chromium).
 # The consumer is built OUTSIDE the repo so that undeclared dependencies of the package cannot resolve via ui/node_modules.
 # The consumer install is deliberately a fresh resolution (no lock file): it mirrors what real consumers get and
 # catches breakage from newer dependency versions.
@@ -45,8 +47,12 @@ done
 echo "OK: all consumer markers found"
 
 # Dev-mode smoke test: the dev server must start and serve the package entry plus an overridden module.
+# Keycloak points at an unreachable address: the browser smoke test only checks that the app tries to redirect there.
+KEYCLOAK_URL="http://127.0.0.1:9/auth"
+printf '%s\n' "VITE_APP_KEYCLOAK_URL=$KEYCLOAK_URL" VITE_APP_KEYCLOAK_REALM=slm-smoke VITE_APP_KEYCLOAK_CLIENT_ID=ui >.env.development
 PORT="$(node -e "const s=require('net').createServer().listen(0,()=>{console.log(s.address().port);s.close()})")"
-npx vite --port "$PORT" --strictPort >"$TMP/vite-dev.log" 2>&1 &
+# Run the binary directly (not via npx) so that $VITE_PID is vite itself and the kill below stops it.
+./node_modules/.bin/vite --port "$PORT" --strictPort >"$TMP/vite-dev.log" 2>&1 &
 VITE_PID=$!
 dev_fail() { echo "FAIL: dev smoke test: $1" >&2; echo "--- vite dev log ---" >&2; cat "$TMP/vite-dev.log" >&2; exit 1; }
 
@@ -67,5 +73,7 @@ grep -q SLM_CONSUMER_FOOTER "$TMP/body" || dev_fail "Footer override marker SLM_
 sleep 3
 kill -0 "$VITE_PID" 2>/dev/null || dev_fail "vite dev server died after serving requests"
 if grep -qi "error during dependency optimization" "$TMP/vite-dev.log"; then dev_fail "dependency optimization error"; fi
+# Load the app in a headless browser: the module graph must evaluate without errors up to the Keycloak redirect.
+node "$UI_DIR/scripts/browser-smoke.mjs" "$BASE/" "$KEYCLOAK_URL" 60000 || dev_fail "browser smoke test failed"
 kill "$VITE_PID"; wait "$VITE_PID" 2>/dev/null || true; VITE_PID=""
 echo "OK: dev server smoke test passed"

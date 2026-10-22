@@ -214,6 +214,8 @@ jobs:
         run: npm --prefix ui run test:plugin
       - name: Build UI
         run: npm --prefix ui run build
+      - name: Install Playwright Chromium (browser smoke test)
+        run: npx --prefix ui playwright install --with-deps chromium
       - name: Verify package with isolated test consumer
         run: ui/scripts/verify-consumer.sh
       - name: Set npm version
