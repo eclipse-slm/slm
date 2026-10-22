@@ -50,9 +50,17 @@ describe('overridesPlugin', () => {
     expect(await build('basic')).toContain('UPSTREAM_ROW')
   })
   it('serves all SFC sub-requests from the override', async () => {
+    expect(await build('basic')).toContain('.override-sfc')
+  })
+  it('keeps the original SFC blocks when an override wraps it via @slm-original', async () => {
     const code = await build('basic')
     expect(code).toContain('.override-sfc')
-    expect(code).not.toContain('.upstream-sfc')
+    expect(code).toContain('.upstream-sfc')
+  })
+  it('applies overrides for imports through the @ alias', async () => {
+    const code = await build('basic')
+    expect(code).toContain('OVERRIDE_B')
+    expect(code).not.toContain('UPSTREAM_B')
   })
   it('applies overrides when the package dir is a symlink', async () => {
     expect(await buildViaSymlink('basic')).toContain('OVERRIDE_A')

@@ -2,4 +2,6 @@ import a from './components/A'
 import row from './components/Row'
 import Sfc from './components/Sfc.vue'
 
-console.log(a, row, Sfc)
+import b from '@/components/B'
+
+console.log(a, row, Sfc, b)

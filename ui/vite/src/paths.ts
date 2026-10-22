@@ -31,6 +31,6 @@ export function resolveSlmPaths(options: SlmUiOptions, consumerRoot: string, pac
     packageRoot: root,
     packageSrc: path.join(root, 'src'),
     overridesDir: options.overridesDir ? real(path.resolve(consumerRoot, options.overridesDir)) : undefined,
-    apiClientsDir: real(path.resolve(consumerRoot, options.apiClientsDir ?? 'api-clients')),
+    apiClientsDir: real(path.resolve(consumerRoot, options.apiClientsDir ?? 'src/api')),
   }
 }

@@ -4,7 +4,6 @@ import type { Plugin } from 'vite'
 import type { SlmPaths } from './paths.js'
 
 const ORIGINAL_PREFIX = '@slm-original/'
-const ALIAS_PREFIX = '@/'
 
 function splitQuery(id: string): [string, string] {
   const i = id.indexOf('?')
@@ -27,10 +26,13 @@ function realIfExists(file: string): string {
 export function overridesPlugin(paths: SlmPaths): Plugin {
   const { packageSrc, overridesDir } = paths
 
-  function toOverride(resolvedId: string): string | undefined {
+  function toOverride(resolvedId: string, importer?: string): string | undefined {
     if (!overridesDir) return undefined
     const [file, query] = splitQuery(resolvedId)
     const real = realIfExists(file)
+    // A package file requesting its own sub-block (SFC ?vue&type=...) must stay on the package file,
+    // e.g. when the original was pulled in through @slm-original.
+    if (query && importer && realIfExists(splitQuery(importer)[0]) === real) return undefined
     if (!isInside(real, packageSrc)) return undefined
     const candidate = path.join(overridesDir, path.relative(packageSrc, real))
     return fs.existsSync(candidate) ? realIfExists(candidate) + query : undefined
@@ -50,10 +52,6 @@ export function overridesPlugin(paths: SlmPaths): Plugin {
 
       if (!overridesDir) return null
 
-      if (source.startsWith(ALIAS_PREFIX)) {
-        source = path.join(packageSrc, source.slice(ALIAS_PREFIX.length))
-      }
-
       if (importer && source.startsWith('.')) {
         const importerFile = realIfExists(splitQuery(importer)[0])
         if (isInside(importerFile, overridesDir)) {
@@ -62,13 +60,13 @@ export function overridesPlugin(paths: SlmPaths): Plugin {
           if (inOverrides) return inOverrides
           const inPackage = await this.resolve(path.join(packageSrc, dir, source), importer, skip)
           if (!inPackage) return null
-          return toOverride(inPackage.id) ?? inPackage
+          return toOverride(inPackage.id, importer) ?? inPackage
         }
       }
 
       const resolved = await this.resolve(source, importer, skip)
       if (!resolved || resolved.external) return resolved
-      const override = toOverride(resolved.id)
+      const override = toOverride(resolved.id, importer)
       return override ? { ...resolved, id: override } : resolved
     },
   }
