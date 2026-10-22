@@ -1,0 +1,12 @@
+name: OIDC check
+on: { push: { branches: [ 'feature/npm-publish' ] } }
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions: { id-token: write, contents: read }
+    steps:
+      - run: |
+          test -n "$ACTIONS_ID_TOKEN_REQUEST_URL" || { echo "id-token NOT available"; exit 1; }
+          curl -sf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=npm:registry.npmjs.org" | jq -r '.value' | cut -c1-20
+          echo "OIDC token issued"
