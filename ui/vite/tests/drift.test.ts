@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { driftCheckPlugin, findOrphanedOverrides, formatDriftError } from '../src/drift'
-import { resolveSlmPaths } from '../src/paths'
+import { driftCheckPlugin, findOrphanedOverrides, formatDriftError } from '../src/drift.js'
+import { resolveSlmPaths } from '../src/paths.js'
 import { buildFixture, fixturesDir } from './helpers'
 
 function paths(fixture: string) {

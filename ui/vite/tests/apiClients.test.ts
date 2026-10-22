@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { apiClientsPlugin } from '../src/apiClients'
-import { resolveSlmPaths } from '../src/paths'
+import { apiClientsPlugin } from '../src/apiClients.js'
+import { resolveSlmPaths } from '../src/paths.js'
 import { buildFixture, fixturesDir } from './helpers'
 
 function buildClients(variant: string) {

@@ -3,8 +3,8 @@ import os from 'node:os'
 import path from 'node:path'
 import vue from '@vitejs/plugin-vue'
 import { afterAll, describe, expect, it } from 'vitest'
-import { overridesPlugin } from '../src/overrides'
-import { resolveSlmPaths, type SlmUiOptions } from '../src/paths'
+import { overridesPlugin } from '../src/overrides.js'
+import { resolveSlmPaths, type SlmUiOptions } from '../src/paths.js'
 import { buildFixture, fixturesDir } from './helpers'
 
 const tmpDirs: string[] = []

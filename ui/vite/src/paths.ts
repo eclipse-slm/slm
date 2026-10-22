@@ -34,3 +34,10 @@ export function resolveSlmPaths(options: SlmUiOptions, consumerRoot: string, pac
     apiClientsDir: real(path.resolve(consumerRoot, options.apiClientsDir ?? 'src/api')),
   }
 }
+
+/** Paths, or a getter for them (the consumer root is only known once Vite's `config` hook has run). */
+export type SlmPathsSource = SlmPaths | (() => SlmPaths)
+
+export function readPaths(source: SlmPathsSource): SlmPaths {
+  return typeof source === 'function' ? source() : source
+}

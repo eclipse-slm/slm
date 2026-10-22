@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import type { Plugin } from 'vite'
-import type { SlmPaths } from './paths.js'
+import { readPaths, type SlmPaths, type SlmPathsSource } from './paths.js'
 
 function listFiles(dir: string, base = dir): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -43,11 +43,12 @@ export function formatDriftError(orphans: string[], packageSrc: string, version:
     .join('\n')
 }
 
-export function driftCheckPlugin(paths: SlmPaths, opts: { allowNewFiles: boolean; version: string }): Plugin {
+export function driftCheckPlugin(pathsSource: SlmPathsSource, opts: { allowNewFiles: boolean; version: string }): Plugin {
   return {
     name: 'slm-ui:drift-check',
     buildStart() {
       if (opts.allowNewFiles) return
+      const paths = readPaths(pathsSource)
       const orphans = findOrphanedOverrides(paths)
       if (orphans.length > 0) this.error(formatDriftError(orphans, paths.packageSrc, opts.version))
     },

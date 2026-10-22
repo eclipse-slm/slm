@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import type { Plugin } from 'vite'
-import type { SlmPaths } from './paths.js'
+import { readPaths, type SlmPathsSource } from './paths.js'
 
 export const API_SERVICES = [
   'resource-management',
@@ -19,15 +19,15 @@ function realIfExists(file: string): string {
 }
 
 /** Redirects the (gitignored, generated) API clients of the package to the consumer's own generated clients. */
-export function apiClientsPlugin(paths: SlmPaths): Plugin {
-  const { packageSrc, apiClientsDir } = paths
-  const packageApi = path.join(packageSrc, 'api')
+export function apiClientsPlugin(pathsSource: SlmPathsSource): Plugin {
   const pattern = new RegExp(`^(${API_SERVICES.join('|')})/client(/.*)?$`)
 
   return {
     name: 'slm-ui:api-clients',
     enforce: 'pre',
     async resolveId(source, importer, opts) {
+      const { packageSrc, apiClientsDir } = readPaths(pathsSource)
+      const packageApi = path.join(packageSrc, 'api')
       if (source.startsWith('\0')) return null
       let abs: string
       if (path.isAbsolute(source)) {

@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { build } from 'vite'
 import { afterAll, describe, expect, it } from 'vitest'
-import { slmUi } from '../src/index'
+import { slmUi } from '../src/index.js'
 import { fixturesDir } from './helpers'
 
 const consumer = path.join(fixturesDir, 'basic', 'consumer')

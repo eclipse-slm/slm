@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import type { Plugin } from 'vite'
-import type { SlmPaths } from './paths.js'
+import { readPaths, type SlmPathsSource } from './paths.js'
 
 const ORIGINAL_PREFIX = '@slm-original/'
 
@@ -23,10 +23,9 @@ function realIfExists(file: string): string {
   }
 }
 
-export function overridesPlugin(paths: SlmPaths): Plugin {
-  const { packageSrc, overridesDir } = paths
-
+export function overridesPlugin(pathsSource: SlmPathsSource): Plugin {
   function toOverride(resolvedId: string, importer?: string): string | undefined {
+    const { packageSrc, overridesDir } = readPaths(pathsSource)
     if (!overridesDir) return undefined
     const [file, query] = splitQuery(resolvedId)
     const real = realIfExists(file)
@@ -42,6 +41,7 @@ export function overridesPlugin(paths: SlmPaths): Plugin {
     name: 'slm-ui:overrides',
     enforce: 'pre',
     async resolveId(source, importer, opts) {
+      const { packageSrc, overridesDir } = readPaths(pathsSource)
       if (source.startsWith('\0')) return null
       const skip = { ...opts, skipSelf: true }
 
