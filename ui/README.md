@@ -121,7 +121,7 @@ consumer project builds the SLM UI itself and can shadow individual files, so a 
   "type": "module",
   "scripts": { "dev": "vite", "build": "vite build" },
   "dependencies": {
-    "@eclipse-slm/ui": "^2.1.0",
+    "@eclipse-slm/ui": "^1.5.0",
     "pinia": "^2.1.4",
     "vite": "^7.3.1",
     "vue": "^3.4.27",
@@ -249,7 +249,7 @@ consumer's `npm ci && npm run build`.
 ### 6. Upgrading
 
 - npm dist-tags: `latest` is the last release (`X.Y.Z`), `next` is the latest `develop` snapshot
-  (`X.Y.Z-snapshot.<run_number>`). Pin a range such as `^2.1.0` or install `@eclipse-slm/ui@next` to try snapshots.
+  (`X.Y.Z-snapshot.<run_number>`). Use a range such as `^1.5.0` for releases. Caret ranges do not match prereleases, so to try a snapshot install `@eclipse-slm/ui@next` or an exact `1.5.0-snapshot.N`.
 - After an upgrade, run a build. The drift check reports overrides whose upstream file was renamed or removed.
 - Compatibility promise: any shadowable file may change in a minor release, and the drift check surfaces that.
   Changes to **plugin options, hook signatures or `NavItem`** are breaking and only happen in a major release.
@@ -263,7 +263,10 @@ the root `pom.xml` (never edit `ui/package.json`'s version by hand): `develop` p
 
 Bootstrap (once): trusted publishing can only be configured for an existing package, so
 
-1. publish the first version manually with a personal npm account that can publish to the `@eclipse-slm` scope
-   (`npm --prefix ui publish --access public`);
+1. publish the first version manually with a personal npm account that can publish to the `@eclipse-slm` scope.
+   Do not publish the checked-in `ui/package.json` version. Set the version first, exactly as CI does, and use the
+   printed dist-tag:
+   `node ui/scripts/npm-version.mjs <revision> <n>` (prints `dist_tag=...`), then
+   `npm --prefix ui publish --access public --tag <dist_tag>` (a snapshot revision gives `--tag next`);
 2. on npmjs.com, open the package settings, add a **trusted publisher** (GitHub Actions) with repository
    `eclipse-slm/slm` and workflow `build-core.yml`.

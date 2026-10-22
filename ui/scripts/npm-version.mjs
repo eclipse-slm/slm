@@ -6,10 +6,10 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 export function toNpmVersion(revision, runNumber) {
-  const match = /^(\d+\.\d+\.\d+)(-SNAPSHOT)?$/.exec(revision)
+  const match = /^(\d+\.\d+\.\d+)(-SNAPSHOT|-RELEASE)?$/.exec(revision)
   if (!match) throw new Error(`Unsupported revision "${revision}"`)
   const [, base, snapshot] = match
-  return snapshot
+  return snapshot === '-SNAPSHOT'
     ? { version: `${base}-snapshot.${runNumber}`, distTag: 'next' }
     : { version: base, distTag: 'latest' }
 }

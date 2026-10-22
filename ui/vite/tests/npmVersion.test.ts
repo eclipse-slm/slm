@@ -9,6 +9,9 @@ describe('toNpmVersion', () => {
   it('maps a release revision to itself on the latest tag', () => {
     expect(toNpmVersion('1.5.0', 42)).toEqual({ version: '1.5.0', distTag: 'latest' })
   })
+  it('maps the legacy X.Y.Z-RELEASE revision to X.Y.Z on the latest tag', () => {
+    expect(toNpmVersion('1.4.0-RELEASE', 7)).toEqual({ version: '1.4.0', distTag: 'latest' })
+  })
   it('rejects unsupported revisions', () => {
     expect(() => toNpmVersion('1.5', 1)).toThrow('Unsupported revision "1.5"')
   })
