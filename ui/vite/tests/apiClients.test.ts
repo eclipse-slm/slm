@@ -25,8 +25,10 @@ describe('apiClientsPlugin', () => {
     expect(await buildClients('complete')).toContain('CONSUMER_NS_CLIENT')
   })
   it('fails with the verbatim message when a client is missing', async () => {
+    const expected = path.join(fixturesDir, 'clients/missing-service-management/consumer/src/api/service-management/client')
     await expect(buildClients('missing-service-management')).rejects.toThrow(
-      'Missing generated API client for "service-management": expected')
+      `Missing generated API client for "service-management": expected ${expected}/index.ts. ` +
+        'Generate it with openapi-generator (generator "typescript-axios").')
   })
   it('is the identity when apiClientsDir is the package api dir', async () => {
     const root = path.join(fixturesDir, 'clients', 'identity')

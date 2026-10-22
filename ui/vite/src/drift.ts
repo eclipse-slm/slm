@@ -36,7 +36,7 @@ function siblingWithOtherExtension(rel: string, packageSrc: string): string | un
 export function formatDriftError(orphans: string[], packageSrc: string, version: string): string {
   return orphans
     .map((rel) => {
-      const line = `Override "${rel}" has no upstream file (renamed or removed in @eclipse-slm/ui@${version}?).`
+      const line = `Override "${rel}" has no upstream file (renamed or removed in @eclipse-slm/ui@${version}?)`
       const sibling = siblingWithOtherExtension(rel, packageSrc)
       return sibling ? `${line} Upstream has "${sibling}".` : line
     })

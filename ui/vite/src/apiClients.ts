@@ -47,7 +47,7 @@ export function apiClientsPlugin(paths: SlmPaths): Plugin {
       if (!fs.existsSync(path.join(clientDir, 'index.ts'))) {
         this.error(
           `Missing generated API client for "${service}": expected ${path.join(clientDir, 'index.ts')}. ` +
-            `Generate the API clients into "${apiClientsDir}" (apiClientsDir option).`,
+            'Generate it with openapi-generator (generator "typescript-axios").',
         )
       }
       const target = path.join(clientDir, rest)

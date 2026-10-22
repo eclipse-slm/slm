@@ -28,8 +28,9 @@ describe('drift check', () => {
   })
   it('formats the verbatim message and hints at the extension', () => {
     const msg = formatDriftError(['pages/router.ts'], pkgSrc('drift'), '1.6.0')
-    expect(msg).toContain('Override "pages/router.ts" has no upstream file (renamed or removed in @eclipse-slm/ui@1.6.0?)')
-    expect(msg).toContain('Upstream has "pages/router.js".')
+    expect(msg).toBe(
+      'Override "pages/router.ts" has no upstream file (renamed or removed in @eclipse-slm/ui@1.6.0?) Upstream has "pages/router.js".',
+    )
   })
   it('fails the build on orphans and passes with allowNewFiles', async () => {
     await expect(buildDrift({ allowNewFiles: false })).rejects.toThrow('components/Gone.vue')
