@@ -184,6 +184,48 @@ jobs:
         if: failure() || cancelled()
         run: find . -type f -path "*test-reports/*-output.txt" -exec tail -n +1 {} +
 
+  ui-package:
+    needs: prepare
+    if: needs.prepare.outputs.should_verify == 'true' || needs.prepare.outputs.should_snapshot_deploy == 'true' || needs.prepare.outputs.should_release_deploy == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # npm trusted publishing (OIDC) and provenance
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install npm >= 11.5 (required for trusted publishing)
+        run: npm i -g npm@^11.5
+      - name: Generate API clients
+        run: mvn -q generate-sources -pl ui
+      - name: Install dependencies
+        run: npm --prefix ui ci
+      - name: Test Vite plugin
+        run: npm --prefix ui run test:plugin
+      - name: Build UI
+        run: npm --prefix ui run build
+      - name: Verify package with isolated test consumer
+        run: ui/scripts/verify-consumer.sh
+      - name: Set npm version
+        id: npm_version
+        if: needs.prepare.outputs.should_snapshot_deploy == 'true' || needs.prepare.outputs.should_release_deploy == 'true'
+        run: |
+          REV=$(mvn -q help:evaluate -Dexpression=revision -DforceStdout)
+          node ui/scripts/npm-version.mjs "$REV" "${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+      - name: Publish to npmjs.com
+        if: needs.prepare.outputs.should_snapshot_deploy == 'true' || needs.prepare.outputs.should_release_deploy == 'true'
+        run: npm --prefix ui publish --provenance --tag "${{ steps.npm_version.outputs.dist_tag }}"
+
   deploy-staging-environment:
     needs: [prepare, build]
     if: needs.prepare.outputs.should_run_staging == 'true'
