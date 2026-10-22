@@ -31,3 +31,4 @@ yarn-error.log*
 
 # Certificates
 certs/
+/vite/dist

@@ -6,7 +6,9 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "lint": "eslint --fix src"
+    "lint": "eslint --fix src",
+    "test:plugin": "vitest run --config vite/vitest.config.ts",
+    "build:plugin": "tsc -p vite/tsconfig.json"
   },
   "dependencies": {
     "@dsb-norge/vue-keycloak-js": "3.0.3",
@@ -64,6 +66,7 @@
     "eslint-plugin-vuetify": "^2.4.0",
     "sass": "^1.85.1",
     "vee-validate": "^4.12.6",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vitest": "^5.0.5"
   }
 }
