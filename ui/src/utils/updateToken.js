@@ -1,4 +1,4 @@
-import {globals} from "@/main";
+import {globals} from "@/app/appInstance";
 
 export default async function () {
     if(globals.$keycloak?.keycloak?.updateToken !== undefined) {

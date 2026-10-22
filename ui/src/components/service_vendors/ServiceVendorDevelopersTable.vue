@@ -94,7 +94,7 @@ import {storeToRefs} from "pinia";
 import ServiceManagementClient from "@/api/service-management/service-management-client";
 import logRequestError from "@/api/restApiHelper";
 import updateToken from "@/utils/updateToken";
-import {globals} from "@/main";
+import {globals} from "@/app/appInstance";
 
 export default {
     name: 'ServiceVendorDevelopersTable',

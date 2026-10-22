@@ -28,6 +28,18 @@ describe('config hook', () => {
   it('excludes the package aliases from dependency optimization', () => {
     expect(setup({}).result.optimizeDeps?.exclude).toEqual(expect.arrayContaining(['@', '@slm-original']))
   })
+  it('scans the package src and the overrides as root-relative dependency-optimization entries', () => {
+    expect(setup({}).result.optimizeDeps?.entries).toEqual([
+      'src/**/*.{vue,ts,js}',
+      '../consumer/overrides/**/*.{vue,ts,js}',
+    ])
+    expect(setup({}, '').result.optimizeDeps?.entries).toEqual(['src/**/*.{vue,ts,js}'])
+  })
+  it('escapes glob syntax in the overrides entry', () => {
+    expect(setup({}, 'my (custom) [ui]').result.optimizeDeps?.entries).toContain(
+      '../consumer/my \\(custom\\) \\[ui\\]/**/*.{vue,ts,js}',
+    )
+  })
   it('warns when overridesDir does not exist', () => {
     const { plugin } = setup({}, 'nope')
     const warn = vi.fn()

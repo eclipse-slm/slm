@@ -143,6 +143,9 @@ export default defineConfig({
 })
 ```
 
+`npm run dev` and `npm run build` work with this configuration alone; the plugin sets up dependency pre-bundling for
+the package source in `node_modules`, so no extra `optimizeDeps` or CommonJS settings are needed.
+
 Plugin options:
 
 | Option          | Default   | Meaning                                                                                  |
@@ -214,6 +217,10 @@ export default function customizeApp(app: App): void {
   app.component('MyWidget', MyWidget)
 }
 ```
+
+The app instance itself lives in `@/app/appInstance` (`app`, and `globals` = `app.config.globalProperties`, e.g.
+`globals.$keycloak`). `@/main` still re-exports `globals` for backward compatibility, but new code and overrides should
+import from `@/app/appInstance`: any module importing `@/main` makes the dev server evaluate the entry a second time.
 
 **`theme.ts`** (`src/customization/theme.ts`) is a default export `{ colors, variables }` used for the Vuetify theme:
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {globals} from "@/main";
+import {globals} from "@/app/appInstance";
 import {useEnvStore} from "@/stores/environmentStore";
 import updateToken from "@/utils/updateToken";
 

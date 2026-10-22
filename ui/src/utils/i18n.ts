@@ -1,14 +1,16 @@
 import { createI18n } from 'vue-i18n';
 import {de, en} from "vuetify/locale";
 import customizeMessages from "@/customization/customizeMessages";
+import enMessages from "@/localisation/en.json";
+import deMessages from "@/localisation/de.json";
 
 const messages = customizeMessages({
     en: {
-        ...require('@/localisation/en.json'),
+        ...enMessages,
         $vuetify: en,
     },
     de: {
-        ...require('@/localisation/de.json'),
+        ...deMessages,
         $vuetify: de,
     },
 });

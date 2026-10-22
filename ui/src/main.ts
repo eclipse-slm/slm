@@ -1,5 +1,4 @@
-import {createApp} from 'vue';
-import App from './App.vue'
+import {app} from '@/app/appInstance';
 
 import router from './pages/router';
 import 'chartist/dist/chartist.min.css';
@@ -45,8 +44,6 @@ import updateToken from "@/utils/updateToken";
 import {useCapabilitiesStore} from "@/stores/capabilitiesStore";
 
 console.log("App Mode: " + import.meta.env.MODE)
-
-const app = createApp(App);
 
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
@@ -166,5 +163,5 @@ app.mount('#app');
 
 yup.addMethod(yup.string, 'ipv4', yupValidateIPv4);
 
-const globals = app.config.globalProperties
-export { globals }
+// Kept for backward compatibility; import `globals` from '@/app/appInstance' instead.
+export { globals } from '@/app/appInstance'

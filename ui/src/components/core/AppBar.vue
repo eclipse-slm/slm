@@ -217,7 +217,7 @@
 import {useTheme} from "vuetify";
 import {useNotificationStore} from "@/stores/notificationStore";
 import {useStore} from "@/stores/store";
-import {globals} from "@/main";
+import {globals} from "@/app/appInstance";
 
 export default {
     name: 'DashboardCoreAppBar',

@@ -180,10 +180,9 @@ import DockerContainerEnvironmentVariables
   from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerEnvironmentVariables'
 import 'vue-json-pretty/lib/styles.css'
 import { parseDocument, parse as parseYaml } from 'yaml'
+import { parse } from 'dot-properties'
 import ServiceRepositorySelect
   from '@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect'
-
-const { parse } = require('dot-properties')
 
   export default {
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionDockerCompose',

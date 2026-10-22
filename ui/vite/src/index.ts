@@ -18,6 +18,15 @@ const commonjs = commonjsModule as unknown as typeof commonjsModule.default
 /** Internal, test-only: not part of the public `SlmUiOptions`. */
 type InternalOptions = SlmUiOptions & { __packageRoot?: string }
 
+const SCAN_EXTENSIONS = '{vue,ts,js}'
+
+/** Escapes glob syntax in a literal path (mirrors tinyglobby's `escapePath`, which Vite uses for entries). */
+function escapeGlob(p: string): string {
+  return p.replace(/(?<!\\)([()[\]{}*?|]|^!|[!+@](?=\()|\\(?![()[\]{}!*+?@|]))/g, '\\$&')
+}
+
+const toPosix = (p: string) => p.split(path.sep).join('/')
+
 export function slmUi(options: SlmUiOptions = {}): PluginOption[] {
   const packageRoot =
     (options as InternalOptions).__packageRoot ?? path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
@@ -33,6 +42,8 @@ export function slmUi(options: SlmUiOptions = {}): PluginOption[] {
       state.consumerRoot = consumerRoot
       state.paths = resolveSlmPaths(options, consumerRoot, packageRoot)
       const { packageSrc } = state.paths
+      // Lexical (not realpath'd) like `root`, so the root-relative entry glob below stays valid.
+      const overridesDir = options.overridesDir && path.resolve(consumerRoot, options.overridesDir)
       return {
         root: packageRoot,
         envDir: consumerRoot,
@@ -46,9 +57,21 @@ export function slmUi(options: SlmUiOptions = {}): PluginOption[] {
           alias: { '@': packageSrc },
           extensions: ['.js', '.json', '.jsx', '.mjs', '.ts', '.tsx', '.vue'],
         },
-        // The package src lives under node_modules, so without this Vite's dep scanner would prebundle raw `@/...`
-        // imports with esbuild, bypassing the slm plugins (API-client redirect, overrides).
-        optimizeDeps: { exclude: ['@', '@slm-original'] },
+        optimizeDeps: {
+          // The package src lives under node_modules, so without this Vite's dep scanner would prebundle raw `@/...`
+          // imports with esbuild, bypassing the slm plugins (API-client redirect, overrides).
+          exclude: ['@', '@slm-original'],
+          // That exclude stops the scanner at every `@/...` import, so it would never reach the package's third-party
+          // (often CommonJS) imports and they would be served unbundled. Scanning every source file as an entry finds
+          // them again. Patterns are relative to the root (the package itself): Vite's `**/node_modules/**` entry
+          // ignore is matched against root-relative paths, so it does not hit the package src under node_modules.
+          entries: [
+            `src/**/*.${SCAN_EXTENSIONS}`,
+            ...(overridesDir
+              ? [`${escapeGlob(toPosix(path.relative(packageRoot, overridesDir)))}/**/*.${SCAN_EXTENSIONS}`]
+              : []),
+          ],
+        },
         server: { fs: { allow: [packageRoot, consumerRoot] } },
       }
     },
@@ -76,7 +99,8 @@ export function slmUi(options: SlmUiOptions = {}): PluginOption[] {
     overridesPlugin(paths),
     driftCheckPlugin(paths, { allowNewFiles: options.allowNewFiles ?? false, version }),
     vue({ template: { transformAssetUrls } }),
-    commonjs(),
+    // vite-plugin-commonjs skips every id containing node_modules, which is where consumers have the package src.
+    commonjs({ filter: (id) => (id.startsWith(toPosix(paths().packageSrc) + '/') ? true : undefined) }),
     vuetify({ autoImport: true }),
   ]
 }

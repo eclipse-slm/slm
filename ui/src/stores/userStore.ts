@@ -1,6 +1,6 @@
 import ApiState from '@/api/apiState'
 import {defineStore} from "pinia";
-import {globals} from "@/main";
+import {globals} from "@/app/appInstance";
 
 interface KeycloakLike {
     authenticated?: boolean,

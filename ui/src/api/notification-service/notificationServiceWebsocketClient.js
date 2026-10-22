@@ -1,7 +1,7 @@
 import SockJS from 'sockjs-client/dist/sockjs';
 import Stomp from 'stomp-websocket';
 import {useNotificationStore} from "@/stores/notificationStore";
-import { globals } from '@/main.ts';
+import { globals } from '@/app/appInstance';
 
 const API_URL = '/notification-service';
 

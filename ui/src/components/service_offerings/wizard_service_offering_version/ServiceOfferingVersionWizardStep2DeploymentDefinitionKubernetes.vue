@@ -103,12 +103,11 @@
 <script>
 import 'vue-json-pretty/lib/styles.css'
 import YAML from 'yaml'
+import { parse } from 'dot-properties'
 import DockerContainerEnvironmentVariables
   from '@/components/service_offerings/wizard_service_offering_version/Docker/DockerEnvironmentVariables'
 import ServiceRepositorySelect
   from "@/components/service_offerings/wizard_service_offering_version/ServiceRepositorySelect.vue";
-
-const { parse } = require('dot-properties')
 
 export default {
     name: 'ServiceOfferingVersionWizardStep2DeploymentDefinitionKubernetes',
