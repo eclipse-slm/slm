@@ -36,7 +36,8 @@ import {useJobsStore} from "@/stores/jobsStore";
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import * as yup from "yup";
 import i18nInstance from '@/utils/i18n'
-import {de, en} from "vuetify/locale";
+import theme from "@/customization/theme";
+import customizeApp from "@/customization/customizeApp";
 import yupValidateIPv4 from "@/utils/yup.custom";
 import {VueKeycloakInstance} from "@dsb-norge/vue-keycloak-js/dist/types";
 import {useEnvStore} from "@/stores/environmentStore";
@@ -131,21 +132,6 @@ app.config.globalProperties.moment = moment;
 
 app.use(enums);
 
-const theme = {
-    colors: {
-        primary: '#004263',
-        secondary: '#00A0E3',
-        accent: '#17A6A6',
-        error: '#FF7A5A',
-        warning: '#F39430',
-        info: '#71BD86',
-        success: '#00A0E3',
-        disable: '#BBBBBBD1'
-    },
-    variables:{
-        'theme-on-info': '#fff',
-    }
-};
 
 const vuetify = createVuetify({
     // lang: {
@@ -166,17 +152,6 @@ app.use(cors)
 app.use(router);
 
 
-const messages = {
-    en: {
-        ...require('@/localisation/en.json'),
-        $vuetify: en,
-    },
-    de: {
-        ...require('@/localisation/de.json'),
-        $vuetify: de,
-    },
-};
-
 
 app.use(i18nInstance);
 
@@ -186,6 +161,7 @@ app.use(VueToast,{
     dismissible: true,}
 );
 
+customizeApp(app);
 app.mount('#app');
 
 yup.addMethod(yup.string, 'ipv4', yupValidateIPv4);

@@ -1,7 +1,8 @@
 import { createI18n } from 'vue-i18n';
 import {de, en} from "vuetify/locale";
+import customizeMessages from "@/customization/customizeMessages";
 
-const messages = {
+const messages = customizeMessages({
     en: {
         ...require('@/localisation/en.json'),
         $vuetify: en,
@@ -10,7 +11,7 @@ const messages = {
         ...require('@/localisation/de.json'),
         $vuetify: de,
     },
-};
+});
 
 const instance  = createI18n({
     globalInjection: true,
