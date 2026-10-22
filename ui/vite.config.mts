@@ -1,8 +1,5 @@
 import { defineConfig, loadEnv } from 'vite';
-import Vue from '@vitejs/plugin-vue'
-import { URL, fileURLToPath } from 'node:url'
-import commonjs from "vite-plugin-commonjs";
-import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+import { slmUi } from './vite/src/index.ts'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -51,43 +48,6 @@ export default defineConfig(({ mode }) => {
                 },
             },
         },
-        plugins: [
-            Vue({
-                template: {transformAssetUrls},
-            }),
-            commonjs(),
-            vuetify({
-                autoImport: true
-            })
-        ],
-        resolve:
-            {
-                alias: {
-                    "@":
-                        fileURLToPath(new URL("./src", import.meta.url)),
-                }
-                ,
-                extensions: [
-                    '.js',
-                    '.json',
-                    '.jsx',
-                    '.mjs',
-                    '.ts',
-                    '.tsx',
-                    '.vue',
-                ],
-            },
-        build: {
-            commonjsOptions: {
-                transformMixedEsModules: true
-            },
-        },
-        css: {
-            preprocessorOptions: {
-                scss: {
-                    api: 'modern-compiler'
-                }
-            }
-        }
+        plugins: slmUi(),
     }
 });
