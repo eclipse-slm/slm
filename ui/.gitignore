@@ -32,3 +32,9 @@ yarn-error.log*
 # Certificates
 certs/
 /vite/dist
+
+# test consumer / packed tarball
+/test-consumer/node_modules
+/test-consumer/dist
+/test-consumer/package-lock.json
+/eclipse-slm-ui.tgz

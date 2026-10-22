@@ -31,13 +31,13 @@ export default {
 </script>
 
 <style lang="sass">
-  .v-tabs--pill
+.v-tabs--pill
+  .v-tab,
+  .v-tab:before
+    border-radius: 24px
+
+  &.v-tabs--icons-and-text
     .v-tab,
     .v-tab:before
-      border-radius: 24px
-
-    &.v-tabs--icons-and-text
-      .v-tab,
-      .v-tab:before
-        border-radius: 4px
+      border-radius: 4px
 </style>

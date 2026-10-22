@@ -57,15 +57,15 @@
 </script>
 
 <style lang="sass">
-  .v-snackbar--material
-    margin-top: 32px
-    margin-bottom: 32px
+.v-snackbar--material
+  margin-top: 32px
+  margin-bottom: 32px
 
-    .v-alert--material,
-    .v-snack__wrapper
-      border-radius: 4px
+  .v-alert--material,
+  .v-snack__wrapper
+    border-radius: 4px
 
-    .v-snack__content
-      overflow: visible
-      padding: 0
+  .v-snack__content
+    overflow: visible
+    padding: 0
 </style>

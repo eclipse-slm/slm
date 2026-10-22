@@ -1,0 +1,17 @@
+{
+  "name": "slm-ui-test-consumer",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@eclipse-slm/ui": "file:../eclipse-slm-ui.tgz",
+    "pinia": "^2.1.4",
+    "vite": "^7.3.1",
+    "vue": "^3.4.27",
+    "vue-i18n": "^11.2.8",
+    "vue-router": "^4.3.2",
+    "vuetify": "^3.6.9"
+  }
+}
