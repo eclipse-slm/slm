@@ -151,10 +151,6 @@ Plugin options:
 | `apiClientsDir` | `src/api` | Directory containing the generated API clients (see "API clients").                      |
 | `allowNewFiles` | `false`   | Allow files in `overridesDir` that have no upstream counterpart (disables the drift check). |
 
-Known limitation: a **relative** `build.outDir` in the consumer's Vite config currently resolves against the package
-root, not the consumer. Use an absolute path (for example `path.resolve(__dirname, 'out')`) or keep the default
-`dist` (which is placed in the consumer root).
-
 ### 2. Overrides and `@slm-original`
 
 A file in `overridesDir` replaces the package file with the same path relative to the package `src`. For example
@@ -239,6 +235,9 @@ The package does **not** ship the generated API clients. The consumer must gener
 
 `ui/pom.xml` in this repository is the reference configuration (generator, input specs and output directories). If a
 client is missing, the build fails with `Missing generated API client for "<service>": expected <path>`.
+
+The generated clients import `axios` from the consumer's directory, so add `axios` as a **direct dependency** of your
+project (required with strict layouts such as pnpm, where the package's own `axios` is not visible to your files).
 
 ### 5. Docker
 

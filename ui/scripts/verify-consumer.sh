@@ -15,7 +15,12 @@ for s in $SERVICES; do
 done
 
 TMP="$(mktemp -d)"
-trap 'rm -rf "$TMP"' EXIT
+VITE_PID=""
+cleanup() {
+  if [ -n "$VITE_PID" ]; then kill "$VITE_PID" 2>/dev/null || true; wait "$VITE_PID" 2>/dev/null || true; fi
+  rm -rf "$TMP"
+}
+trap cleanup EXIT
 
 cd "$UI_DIR"
 TARBALL="$(npm pack --json --pack-destination "$TMP" | node -e "process.stdout.write(JSON.parse(require('fs').readFileSync(0,'utf8'))[0].filename)")"
@@ -38,3 +43,29 @@ for marker in SLM_CONSUMER_FOOTER SLM_CONSUMER_PAGE '#123456' SLM_CONSUMER_BASE_
   fi
 done
 echo "OK: all consumer markers found"
+
+# Dev-mode smoke test: the dev server must start and serve the package entry plus an overridden module.
+PORT="$(node -e "const s=require('net').createServer().listen(0,()=>{console.log(s.address().port);s.close()})")"
+npx vite --port "$PORT" --strictPort >"$TMP/vite-dev.log" 2>&1 &
+VITE_PID=$!
+dev_fail() { echo "FAIL: dev smoke test: $1" >&2; echo "--- vite dev log ---" >&2; cat "$TMP/vite-dev.log" >&2; exit 1; }
+
+BASE="http://localhost:$PORT"
+ready=""
+for _ in $(seq 1 60); do
+  kill -0 "$VITE_PID" 2>/dev/null || dev_fail "vite dev server exited during startup"
+  if curl -sf -o /dev/null "$BASE/src/main.ts"; then ready=1; break; fi
+  sleep 1
+done
+[ -n "$ready" ] || dev_fail "dev server did not answer within 60s"
+
+# Fetching a module also triggers dependency optimization / import analysis; give it a moment to surface crashes.
+fetch() { curl -s -o "$TMP/body" -w '%{http_code}' "$BASE$1"; }
+[ "$(fetch /src/main.ts)" = "200" ] || dev_fail "GET /src/main.ts did not return 200"
+[ "$(fetch /src/components/core/Footer.vue)" = "200" ] || dev_fail "GET /src/components/core/Footer.vue did not return 200"
+grep -q SLM_CONSUMER_FOOTER "$TMP/body" || dev_fail "Footer override marker SLM_CONSUMER_FOOTER missing from served Footer.vue"
+sleep 3
+kill -0 "$VITE_PID" 2>/dev/null || dev_fail "vite dev server died after serving requests"
+if grep -qi "error during dependency optimization" "$TMP/vite-dev.log"; then dev_fail "dependency optimization error"; fi
+kill "$VITE_PID"; wait "$VITE_PID" 2>/dev/null || true; VITE_PID=""
+echo "OK: dev server smoke test passed"

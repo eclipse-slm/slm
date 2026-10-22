@@ -4,10 +4,13 @@ import type { Plugin } from 'vite'
 import { readPaths, type SlmPaths, type SlmPathsSource } from './paths.js'
 
 function listFiles(dir: string, base = dir): string[] {
-  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    const full = path.join(dir, entry.name)
-    return entry.isDirectory() ? listFiles(full, base) : [path.relative(base, full).split(path.sep).join('/')]
-  })
+  return fs
+    .readdirSync(dir, { withFileTypes: true })
+    .filter((entry) => !entry.name.startsWith('.'))
+    .flatMap((entry) => {
+      const full = path.join(dir, entry.name)
+      return entry.isDirectory() ? listFiles(full, base) : [path.relative(base, full).split(path.sep).join('/')]
+    })
 }
 
 /** Override files (posix, relative to `overridesDir`) that have no same-path file in the package `src/`. */

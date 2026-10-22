@@ -23,6 +23,10 @@ describe('drift check', () => {
   it('lists orphaned overrides', () => {
     expect(findOrphanedOverrides(paths('drift'))).toEqual(['components/Gone.vue', 'pages/router.ts'])
   })
+  it('ignores dotfiles and dot-directories in overrides', () => {
+    expect(findOrphanedOverrides(paths('drift'))).not.toContain('.DS_Store')
+    expect(findOrphanedOverrides(paths('drift')).some((f) => f.startsWith('.'))).toBe(false)
+  })
   it('returns nothing without an overridesDir', () => {
     expect(findOrphanedOverrides({ ...paths('drift'), overridesDir: undefined })).toEqual([])
   })

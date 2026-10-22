@@ -22,7 +22,7 @@ export function slmUi(options: SlmUiOptions = {}): PluginOption[] {
   const packageRoot =
     (options as InternalOptions).__packageRoot ?? path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
   const version: string = JSON.parse(fs.readFileSync(path.join(packageRoot, 'package.json'), 'utf8')).version
-  const state: { paths?: SlmPaths } = {}
+  const state: { paths?: SlmPaths; consumerRoot?: string } = {}
   // The consumer root is only known in `config`, so sub-plugins get a getter and read paths when hooks run.
   const paths = () => state.paths!
 
@@ -30,6 +30,7 @@ export function slmUi(options: SlmUiOptions = {}): PluginOption[] {
     name: 'slm-ui:config',
     config(userConfig) {
       const consumerRoot = path.resolve(userConfig.root ?? process.cwd())
+      state.consumerRoot = consumerRoot
       state.paths = resolveSlmPaths(options, consumerRoot, packageRoot)
       const { packageSrc } = state.paths
       return {
@@ -37,15 +38,24 @@ export function slmUi(options: SlmUiOptions = {}): PluginOption[] {
         envDir: consumerRoot,
         publicDir: path.join(packageRoot, 'public'),
         build: {
-          outDir: userConfig.build?.outDir ?? path.join(consumerRoot, 'dist'),
-          emptyOutDir: true,
+          outDir: path.resolve(consumerRoot, userConfig.build?.outDir ?? 'dist'),
+          emptyOutDir: userConfig.build?.emptyOutDir ?? true,
           commonjsOptions: { transformMixedEsModules: true },
         },
         resolve: {
           alias: { '@': packageSrc },
           extensions: ['.js', '.json', '.jsx', '.mjs', '.ts', '.tsx', '.vue'],
         },
+        // The package src lives under node_modules, so without this Vite's dep scanner would prebundle raw `@/...`
+        // imports with esbuild, bypassing the slm plugins (API-client redirect, overrides).
+        optimizeDeps: { exclude: ['@', '@slm-original'] },
         server: { fs: { allow: [packageRoot, consumerRoot] } },
+      }
+    },
+    configResolved(config) {
+      const dir = options.overridesDir && path.resolve(state.consumerRoot!, options.overridesDir)
+      if (dir && !fs.existsSync(dir)) {
+        config.logger.warn(`[slm-ui] overridesDir "${options.overridesDir}" does not exist (resolved to ${dir}); no overrides will be applied.`)
       }
     },
     configureServer(server) {
