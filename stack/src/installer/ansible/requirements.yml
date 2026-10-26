@@ -28,6 +28,11 @@ roles:
     src: "git+https://github.com/eclipse-slm/slm-ansible-role-minio-client"
     scm: git
     version: main
+    
+  - name: molecule_generic
+    src: https://github.com/eclipse-slm/molecule_generic.git
+    scm: git
+    version: main
 
   - name: eclipse-slm.rabbitmq_client
     src: "git+https://github.com/eclipse-slm/slm-ansible-role-rabbitmq-client"

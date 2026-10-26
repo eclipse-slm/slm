@@ -1,0 +1,31 @@
+---
+- name: Destroy
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  no_log: "{{ molecule_no_log }}"
+  vars:
+    molecule_generic_driver: "{{ lookup('env', 'MOLECULE_DRIVER') }}"
+  tasks:
+    - name: Destroy via molecule_generic
+      ansible.builtin.include_role:
+        name: molecule_generic
+        tasks_from: destroy.yml
+
+    # molecule_kubevirt deletes without waiting; a create right after would
+    # update the terminating VM instead of creating a new one
+    - name: Wait until KubeVirt VMs and VMIs are deleted
+      when: molecule_generic_driver == 'kubevirt'
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ lookup('env', 'KUBECONFIG') | default(lookup('env', 'HOME') + '/.kube/config', true) }}"
+        api_version: kubevirt.io/v1
+        kind: "{{ item[0] }}"
+        name: "{{ item[1].name }}"
+        namespace: "{{ molecule_namespace | default('molecule') }}"
+      register: __destroy_kv_remaining
+      until: __destroy_kv_remaining.resources | length == 0
+      retries: 60
+      delay: 5
+      loop: "{{ ['VirtualMachine', 'VirtualMachineInstance'] | product(molecule_yml.platforms | default([])) | list }}"
+      loop_control:
+        label: "{{ item[0] }}/{{ item[1].name }}"

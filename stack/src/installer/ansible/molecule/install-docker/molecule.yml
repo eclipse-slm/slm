@@ -32,6 +32,8 @@ ansible:
     # ANSIBLE-SPECIFIC:
     ANSIBLE_FORCE_COLOR: "1"
     ANSIBLE_LOAD_CALLBACK_PLUGINS: "1"
+    # kubevirt by default; MOLECULE_DRIVER=openstack selects the fallback
+    MOLECULE_DRIVER: ${MOLECULE_DRIVER:-kubevirt}
 
     # ROLE-SPECIFIC:
     SLM_HOSTNAME: myhost.local
@@ -47,10 +49,6 @@ ansible:
         - --force-handlers
         - -e INSTALLER_API_COMMAND="install"
         - -e BUILD_INSTALLER_API_IMAGE="false"
-      ansible_navigator:
-        - --mode stdout
-        - --pull-policy missing
-        - --execution-environment-image ghcr.io/ansible/community-ansible-dev-tools:latest
 
   playbooks:
     create: ../default/create-kv.yml
