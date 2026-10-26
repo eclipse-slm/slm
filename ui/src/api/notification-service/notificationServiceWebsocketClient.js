@@ -38,13 +38,13 @@ class NotificationServiceWebsocketClient {
              Issuer: `${globals.$keycloak.keycloak.authServerUrl}/realms/${globals.$keycloak.keycloak.realm}`
          },
          () => {
-             this.stompClient.subscribe('/user/topic/notifications', NotificationServiceWebsocketClient.processNotificationMessage);
-
-             // direct topic fallback for convertAndSend("/topic/notifications/{userId}", ...)
+             // The backend publishes every notification to both destinations, so subscribe to only one
+             // of them, otherwise each notification is processed (and toasted) twice
              if (userId) {
                  this.stompClient.subscribe(subscriptionName, NotificationServiceWebsocketClient.processNotificationMessage);
              } else {
-                 console.warn('Unable to resolve websocket user id for /topic/notifications/{userId} subscription')
+                 console.warn('Unable to resolve websocket user id, falling back to /user/topic/notifications subscription')
+                 this.stompClient.subscribe('/user/topic/notifications', NotificationServiceWebsocketClient.processNotificationMessage);
              }
          },
          (error) => {
