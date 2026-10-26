@@ -231,7 +231,8 @@ jobs:
           fi
       - name: Publish to npmjs.com
         if: needs.prepare.outputs.should_snapshot_deploy == 'true' || needs.prepare.outputs.should_release_deploy == 'true'
-        run: npm --prefix ui publish --provenance --tag "${{ steps.npm_version.outputs.dist_tag }}"
+        working-directory: ui
+        run: npm publish --provenance --tag "${{ steps.npm_version.outputs.dist_tag }}"
 
   deploy-staging-environment:
     needs: [prepare, build]
