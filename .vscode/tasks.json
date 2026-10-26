@@ -1,0 +1,14 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "config-exporter (docker-compose)",
+            "type": "shell",
+            "command": "docker compose --env-file .env.dev up --force-recreate",
+            "options": {
+                "cwd": "${workspaceFolder}/stack/config-exporter"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
