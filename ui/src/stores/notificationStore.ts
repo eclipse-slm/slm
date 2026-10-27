@@ -14,7 +14,8 @@ import {
   EventType, FirmwareUpdateJobEventNotification,
   Notification,
   NotificationCategory,
-  NotificationSubCategory, EVENTCLASS, ResourceEventNotification, ResourceEventType
+  NotificationSubCategory, EVENTCLASS, ResourceEventNotification, ResourceEventType,
+  AasEventNotification, AasEventType, AasElementKind
 } from "@/api/notification-service/client";
 import NotificationTextGenerator from "@/utils/notificationTextGenerator";
 import i18n from '@/utils/i18n';
@@ -115,6 +116,19 @@ export const useNotificationStore = defineStore('notificationStore', {
         case EVENTCLASS.ServiceInstanceEvent: {
           const serviceInstancesStore = useServiceInstancesStore();
           serviceInstancesStore.updateStore();
+          $toast.info(NotificationTextGenerator.generateLocalizedText(eventNotification, i18n.global))
+          break;
+        }
+
+        case EVENTCLASS.AasEvent: {
+          const aasEventNotification = eventNotification as unknown as AasEventNotification;
+          // A deleted resource shell usually means the resource is gone, refreshing it would fail
+          const shellDeleted = aasEventNotification.elementKind === AasElementKind.Shell
+              && aasEventNotification.eventType === AasEventType.Deleted;
+          if (!shellDeleted) {
+            const resourceDevicesStore = useResourceDevicesStore();
+            resourceDevicesStore.getResourceById(aasEventNotification.resourceId);
+          }
           $toast.info(NotificationTextGenerator.generateLocalizedText(eventNotification, i18n.global))
           break;
         }

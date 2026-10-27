@@ -6,7 +6,8 @@ import {
     FirmwareUpdateJobEventNotification,
     DiscoveryJobEventNotification,
     CapabilityJobEventNotification,
-    ServiceInstanceEventNotification, ServiceInstanceEventType
+    ServiceInstanceEventNotification, ServiceInstanceEventType,
+    AasEventNotification, AasEventType, AasElementKind
 } from "@/api/notification-service/client";
 import {useCapabilitiesStore} from "@/stores/capabilitiesStore";
 import {useResourceDevicesStore} from "@/stores/resourceDevicesStore";
@@ -69,6 +70,31 @@ class NotificationTextGenerator {
                         return `Service '${serviceInstanceEventNotification.serviceInstance.id}' updated`
                     }
                 }
+            }
+
+            case EVENTCLASS.AasEvent: {
+                const aasEventNotification = eventNotification as unknown as AasEventNotification;
+                const resourceDevicesStore = useResourceDevicesStore();
+                const resource = resourceDevicesStore.resourceById(aasEventNotification.resourceId);
+                const resourceName = resource?.hostname ?? aasEventNotification.resourceId;
+                const submodelName = aasEventNotification.submodelIdShort ?? aasEventNotification.submodelId;
+                const action = aasEventNotification.eventType.toLowerCase();
+
+                switch (aasEventNotification.elementKind) {
+                    case AasElementKind.Shell: {
+                        return `AAS of resource '${resourceName}' ${action}`
+                    }
+                    case AasElementKind.Submodel: {
+                        return `Submodel '${submodelName}' of resource '${resourceName}' ${action}`
+                    }
+                    case AasElementKind.SubmodelReference: {
+                        if (aasEventNotification.eventType === AasEventType.Created) {
+                            return `Submodel '${submodelName}' added to resource '${resourceName}'`
+                        }
+                        return `Submodel '${submodelName}' removed from resource '${resourceName}'`
+                    }
+                }
+                break;
             }
 
             default:

@@ -190,6 +190,48 @@ components:
       - "CAPABILITY"
       - "DISCOVERY"
       - "FIRMWARE_UPDATE"
+    AasElementKind:
+      type: "string"
+      enum:
+      - "SHELL"
+      - "SUBMODEL"
+      - "SUBMODEL_REFERENCE"
+    AasEventNotification:
+      required:
+      - "elementKind"
+      - "eventType"
+      - "resourceId"
+      - "shellId"
+      - "timestamp"
+      - "userId"
+      type: "object"
+      properties:
+        userId:
+          type: "string"
+        timestamp:
+          type: "string"
+          format: "date-time"
+        eventType:
+          $ref: "#/components/schemas/AasEventType"
+        elementKind:
+          $ref: "#/components/schemas/AasElementKind"
+        resourceId:
+          type: "string"
+          format: "uuid"
+        shellId:
+          type: "string"
+        submodelId:
+          type: "string"
+        submodelIdShort:
+          type: "string"
+        semanticId:
+          type: "string"
+    AasEventType:
+      type: "string"
+      enum:
+      - "CREATED"
+      - "UPDATED"
+      - "DELETED"
     CapabilityJobDTO:
       required:
       - "capabilityId"
@@ -364,6 +406,7 @@ components:
       - "CAPABILITY_JOB_EVENT"
       - "FIRMWARE_UPDATE_JOB_EVENT"
       - "SERVICE_INSTANCE_EVENT"
+      - "AAS_EVENT"
     EventNotification:
       required:
       - "eventType"
@@ -397,6 +440,7 @@ components:
           - $ref: "#/components/schemas/FirmwareUpdateJobEventNotification"
           - $ref: "#/components/schemas/ResourceEventNotification"
           - $ref: "#/components/schemas/ServiceInstanceEventNotification"
+          - $ref: "#/components/schemas/AasEventNotification"
         resourceEventNotification:
           $ref: "#/components/schemas/ResourceEventNotification"
         capabilityJobEventNotification:
@@ -407,6 +451,8 @@ components:
           $ref: "#/components/schemas/FirmwareUpdateJobEventNotification"
         serviceInstanceEventNotification:
           $ref: "#/components/schemas/ServiceInstanceEventNotification"
+        aasEventNotification:
+          $ref: "#/components/schemas/AasEventNotification"
     EventType:
       type: "object"
     FirmwareUpdateJobDTO:
