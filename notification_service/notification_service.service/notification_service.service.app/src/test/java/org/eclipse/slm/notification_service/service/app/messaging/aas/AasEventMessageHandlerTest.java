@@ -79,7 +79,7 @@ class AasEventMessageHandlerTest {
     void submodelEventResolvesViaIndex() {
         index.put("sm-1", shell);
 
-        handler.handle("submodel-repository/r/submodels/updated",
+        handler.handle("sm-repository/r/submodels/updated",
                 "{\"id\":\"sm-1\",\"idShort\":\"Nameplate\",\"semanticId\":{\"keys\":[{\"type\":\"GlobalReference\",\"value\":\"urn:np\"}]}}");
 
         var n = firstSent();
@@ -94,7 +94,7 @@ class AasEventMessageHandlerTest {
 
     @Test
     void submodelIndexMissSendsNothing() {
-        handler.handle("submodel-repository/r/submodels/updated", "{\"id\":\"unknown\"}");
+        handler.handle("sm-repository/r/submodels/updated", "{\"id\":\"unknown\"}");
 
         verifyNoInteractions(ws);
     }
@@ -103,7 +103,7 @@ class AasEventMessageHandlerTest {
     void submodelDeletedRemovesIndexEntry() {
         index.put("sm-1", shell);
 
-        handler.handle("submodel-repository/r/submodels/deleted", "{\"id\":\"sm-1\"}");
+        handler.handle("sm-repository/r/submodels/deleted", "{\"id\":\"sm-1\"}");
 
         verify(ws, times(2)).notifyFrontend(any(IEventNotification.class));
         assertThat(index.getShellId("sm-1")).isEmpty();
@@ -165,7 +165,7 @@ class AasEventMessageHandlerTest {
     void emptySemanticIdKeysYieldsNull() {
         index.put("sm-1", shell);
 
-        handler.handle("submodel-repository/r/submodels/created", "{\"id\":\"sm-1\",\"semanticId\":{\"keys\":[]}}");
+        handler.handle("sm-repository/r/submodels/created", "{\"id\":\"sm-1\",\"semanticId\":{\"keys\":[]}}");
 
         assertThat(firstSent().getSemanticId()).isNull();
     }

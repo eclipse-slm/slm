@@ -24,7 +24,7 @@ class BasyxTopicParserTest {
 
     @Test
     void submodelLifecycle() {
-        assertThat(parse("submodel-repository/r/submodels/deleted"))
+        assertThat(parse("sm-repository/r/submodels/deleted"))
                 .contains(new BasyxTopic(AasElementKind.SUBMODEL, AasEventType.DELETED, null, null));
     }
 
@@ -51,7 +51,7 @@ class BasyxTopicParserTest {
     @ValueSource(strings = {
             "aas-repository/r/shells/patched",
             "aas-repository/r/shells/submodels/c20tMQ/updated",
-            "submodel-repository/r/submodels/x/submodelElements/a/updated",
+            "sm-repository/r/submodels/x/submodelElements/a/updated",
             "concept-description-repository/r/conceptDescriptions/created",
             "aas-repository/r/shells",
             "aas-repository/r/shells/%%%/submodelReferences/created",

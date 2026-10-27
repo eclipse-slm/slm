@@ -130,7 +130,7 @@ aas:
       - aas-repository/+/shells/+
       - aas-repository/+/shells/submodels/+/+
       - aas-repository/+/shells/+/submodelReferences/+
-      - submodel-repository/+/submodels/+
+      - sm-repository/+/submodels/+
   aas-repository:
     scheme: http
     host: localhost

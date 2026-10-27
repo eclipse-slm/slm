@@ -11,7 +11,7 @@ import java.util.Set;
  *     <li>{@code aas-repository/{repo}/shells/{created|updated|deleted}}</li>
  *     <li>{@code aas-repository/{repo}/shells/submodels/{smIdB64}/{created|deleted}}</li>
  *     <li>{@code aas-repository/{repo}/shells/{shellIdB64}/submodelReferences/{created|deleted}}</li>
- *     <li>{@code submodel-repository/{repo}/submodels/{created|updated|deleted}}</li>
+ *     <li>{@code sm-repository/{repo}/submodels/{created|updated|deleted}}</li>
  * </ul>
  */
 public final class BasyxTopicParser {
@@ -30,7 +30,7 @@ public final class BasyxTopicParser {
                 return eventType(segments[3], LIFECYCLE_EVENTS)
                         .map(eventType -> new BasyxTopic(AasElementKind.SHELL, eventType, null, null));
             }
-            if (segments.length == 4 && segments[0].equals("submodel-repository") && segments[2].equals("submodels")) {
+            if (segments.length == 4 && segments[0].equals("sm-repository") && segments[2].equals("submodels")) {
                 return eventType(segments[3], LIFECYCLE_EVENTS)
                         .map(eventType -> new BasyxTopic(AasElementKind.SUBMODEL, eventType, null, null));
             }

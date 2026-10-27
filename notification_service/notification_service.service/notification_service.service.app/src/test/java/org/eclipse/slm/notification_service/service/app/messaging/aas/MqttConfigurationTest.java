@@ -43,6 +43,6 @@ class MqttConfigurationTest {
                 "aas-repository/+/shells/+",
                 "aas-repository/+/shells/submodels/+/+",
                 "aas-repository/+/shells/+/submodelReferences/+",
-                "submodel-repository/+/submodels/+");
+                "sm-repository/+/submodels/+");
     }
 }
