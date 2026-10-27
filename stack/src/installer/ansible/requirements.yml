@@ -9,6 +9,11 @@ collections:
     version: main
 
 roles:
+  - name: molecule_generic
+    src: https://github.com/eclipse-slm/molecule_generic.git
+    scm: git
+    version: main
+
   - name: eclipse-slm.awx_client
     src: "git+https://github.com/eclipse-slm/slm-ansible-role-awx-client"
     scm: git
@@ -26,11 +31,6 @@ roles:
 
   - name: eclipse-slm.minio_client
     src: "git+https://github.com/eclipse-slm/slm-ansible-role-minio-client"
-    scm: git
-    version: main
-    
-  - name: molecule_generic
-    src: https://github.com/eclipse-slm/molecule_generic.git
     scm: git
     version: main
 
