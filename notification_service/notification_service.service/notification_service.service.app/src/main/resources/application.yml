@@ -118,7 +118,7 @@ aas:
   broker:
     enabled: true
     scheme: tcp
-    host: localhost
+    host: aas-broker
     port: 1884
     url: ${aas.broker.scheme}://${aas.broker.host}:${aas.broker.port}
     client-id: ${spring.application.name}-${random.uuid}
@@ -133,7 +133,7 @@ aas:
       - sm-repository/+/submodels/+
   aas-repository:
     scheme: http
-    host: localhost
+    host: aas-environment
     port: 8081
     path: /aas/environment
     url: ${aas.aas-repository.scheme}://${aas.aas-repository.host}:${aas.aas-repository.port}${aas.aas-repository.path}
