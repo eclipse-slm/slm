@@ -113,6 +113,31 @@ notification-service:
   path: ""
   url: ${notification-service.scheme}://${notification-service.host}:${notification-service.port}${notification-service.path}
 
+### AAS
+aas:
+  broker:
+    enabled: true
+    scheme: tcp
+    host: localhost
+    port: 1884
+    url: ${aas.broker.scheme}://${aas.broker.host}:${aas.broker.port}
+    client-id: ${spring.application.name}-${random.uuid}
+    username:
+    password:
+    qos: 1
+    recovery-interval-ms: 10000
+    topics:
+      - aas-repository/+/shells/+
+      - aas-repository/+/shells/submodels/+/+
+      - aas-repository/+/shells/+/submodelReferences/+
+      - submodel-repository/+/submodels/+
+  aas-repository:
+    scheme: http
+    host: localhost
+    port: 8081
+    path: /aas/environment
+    url: ${aas.aas-repository.scheme}://${aas.aas-repository.host}:${aas.aas-repository.port}${aas.aas-repository.path}
+
 ### Security
 security:
   auth-white-list: "/ws/**"
