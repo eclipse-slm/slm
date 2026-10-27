@@ -3,11 +3,13 @@ package org.eclipse.slm.notification_service.service.app.messaging
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import org.eclipse.slm.notification_service.model.IEventNotification
+import org.eclipse.slm.notification_service.service.app.messaging.EventNotification.Companion.AAS_EVENT_CLASS
 import org.eclipse.slm.notification_service.service.app.messaging.EventNotification.Companion.CAPABILITY_JOB_EVENT_CLASS
 import org.eclipse.slm.notification_service.service.app.messaging.EventNotification.Companion.DISCOVERY_EVENT_CLASS
 import org.eclipse.slm.notification_service.service.app.messaging.EventNotification.Companion.FIRMWARE_UPDATE_JOB_EVENT_CLASS
 import org.eclipse.slm.notification_service.service.app.messaging.EventNotification.Companion.RESOURCE_EVENT_CLASS
 import org.eclipse.slm.notification_service.service.app.messaging.EventNotification.Companion.SERVICE_INSTANCE_EVENT_CLASS
+import org.eclipse.slm.notification_service.service.app.messaging.aas.AasEventNotification
 import org.eclipse.slm.notification_service.service.app.messaging.resources.DiscoveryJobEventNotification
 import org.eclipse.slm.notification_service.service.app.messaging.resources.CapabilityJobEventNotification
 import org.eclipse.slm.notification_service.service.app.messaging.resources.FirmwareUpdateJobEventNotification
@@ -25,7 +27,8 @@ import java.util.*
     JsonSubTypes.Type(value = DiscoveryJobEventNotification::class, name = DISCOVERY_EVENT_CLASS),
     JsonSubTypes.Type(value = CapabilityJobEventNotification::class, name = CAPABILITY_JOB_EVENT_CLASS),
     JsonSubTypes.Type(value = FirmwareUpdateJobEventNotification::class, name = FIRMWARE_UPDATE_JOB_EVENT_CLASS),
-    JsonSubTypes.Type(value = ServiceInstanceEventNotification::class, name = SERVICE_INSTANCE_EVENT_CLASS)
+    JsonSubTypes.Type(value = ServiceInstanceEventNotification::class, name = SERVICE_INSTANCE_EVENT_CLASS),
+    JsonSubTypes.Type(value = AasEventNotification::class, name = AAS_EVENT_CLASS)
 )
 abstract class EventNotification (
 
@@ -41,6 +44,7 @@ abstract class EventNotification (
         const val CAPABILITY_JOB_EVENT_CLASS = "CAPABILITY_JOB_EVENT"
         const val FIRMWARE_UPDATE_JOB_EVENT_CLASS = "FIRMWARE_UPDATE_JOB_EVENT"
         const val SERVICE_INSTANCE_EVENT_CLASS = "SERVICE_INSTANCE_EVENT"
+        const val AAS_EVENT_CLASS = "AAS_EVENT"
     }
 
     override fun toString(): String {
@@ -58,4 +62,5 @@ enum class EVENT_CLASS {
     CAPABILITY_JOB_EVENT,
     FIRMWARE_UPDATE_JOB_EVENT,
     SERVICE_INSTANCE_EVENT,
+    AAS_EVENT,
 }

@@ -2,6 +2,7 @@ package org.eclipse.slm.notification_service.service.app.endpoints
 
 import org.eclipse.slm.notification_service.service.app.messaging.EventNotification
 import org.eclipse.slm.notification_service.service.app.messaging.EVENT_CLASS
+import org.eclipse.slm.notification_service.service.app.messaging.aas.AasEventNotification
 import org.eclipse.slm.notification_service.service.app.messaging.resources.DiscoveryJobEventNotification
 import org.eclipse.slm.notification_service.service.app.messaging.resources.CapabilityJobEventNotification
 import org.eclipse.slm.notification_service.service.app.messaging.resources.FirmwareUpdateJobEventNotification
@@ -17,5 +18,6 @@ class EventNotificationModel(
     var discoveryEventNotification: DiscoveryJobEventNotification? = null,
     var firmwareUpdateJobEventNotification: FirmwareUpdateJobEventNotification? = null,
     var serviceInstanceEventNotification: ServiceInstanceEventNotification? = null,
+    var aasEventNotification: AasEventNotification? = null,
 
 )
