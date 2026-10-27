@@ -64,9 +64,18 @@ class SubmodelShellIndexTest {
         when(client.getAas("Resource_" + r2)).thenThrow(new RuntimeException("aas repository down"));
         when(client.getAas("Resource_" + r3)).thenReturn(Optional.empty());
 
-        index.initialize(List.of(r2, r1, r3), client);
+        var complete = index.initialize(List.of(r2, r1, r3), client);
 
+        assertThat(complete).isFalse();
         assertThat(index.getShellId("sm-1")).contains("Resource_" + r1);
         assertThat(index.getShellId("sm-2")).contains("Resource_" + r1);
+    }
+
+    @Test
+    void initializeReportsCompleteWhenNoResourceFails() {
+        var client = mock(AasRepositoryClient.class);
+        when(client.getAas(org.mockito.ArgumentMatchers.anyString())).thenReturn(Optional.empty());
+
+        assertThat(index.initialize(List.of(UUID.randomUUID()), client)).isTrue();
     }
 }

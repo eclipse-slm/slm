@@ -100,13 +100,14 @@ class AasEventMessageHandlerTest {
     }
 
     @Test
-    void submodelDeletedRemovesIndexEntry() {
+    void submodelDeletedKeepsIndexEntrySoRecreatedSubmodelIsResolved() {
         index.put("sm-1", shell);
 
         handler.handle("sm-repository/r/submodels/deleted", "{\"id\":\"sm-1\"}");
+        handler.handle("sm-repository/r/submodels/created", "{\"id\":\"sm-1\"}");
 
-        verify(ws, times(2)).notifyFrontend(any(IEventNotification.class));
-        assertThat(index.getShellId("sm-1")).isEmpty();
+        verify(ws, times(4)).notifyFrontend(any(IEventNotification.class));
+        assertThat(index.getShellId("sm-1")).contains(shell);
     }
 
     @Test

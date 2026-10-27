@@ -36,7 +36,13 @@ public class SubmodelShellIndex {
         this.submodelIdToShellId.values().removeIf(shellId::equals);
     }
 
-    public void initialize(Collection<UUID> resourceIds, AasRepositoryClient aasRepositoryClient) {
+    /**
+     * Adds the submodels referenced by the shells of the given resources.
+     *
+     * @return {@code true} if the shells of all resources could be read
+     */
+    public boolean initialize(Collection<UUID> resourceIds, AasRepositoryClient aasRepositoryClient) {
+        var complete = true;
         for (var resourceId : resourceIds) {
             var aasId = ResourceAas.createAasIdFromResourceId(resourceId);
             try {
@@ -48,7 +54,9 @@ public class SubmodelShellIndex {
                 }
             } catch (Exception e) {
                 LOG.warn("Unable to index submodels of AAS '{}': {}", aasId, e.getMessage());
+                complete = false;
             }
         }
+        return complete;
     }
 }

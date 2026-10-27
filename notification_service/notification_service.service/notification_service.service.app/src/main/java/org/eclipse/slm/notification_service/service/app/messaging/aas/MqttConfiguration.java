@@ -5,9 +5,8 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.slm.aas.clients.shellrepository.AasRepositoryClientFactory;
 import org.eclipse.slm.notification_service.communication.websocket.NotificationWsService;
 import org.eclipse.slm.notification_service.service.app.messaging.resources.ResourceUserResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -18,14 +17,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.context.IntegrationContextUtils;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
+import org.springframework.integration.mqtt.event.MqttConnectionFailedEvent;
+import org.springframework.integration.mqtt.event.MqttSubscribedEvent;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.integration.mqtt.support.MqttHeaders;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
+import org.springframework.scheduling.TaskScheduler;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 
 /**
@@ -36,8 +41,6 @@ import java.util.Arrays;
 @ConditionalOnProperty(name = "aas.broker.enabled", havingValue = "true")
 @EnableConfigurationProperties(AasBrokerProperties.class)
 public class MqttConfiguration {
-
-    private final static Logger LOG = LoggerFactory.getLogger(MqttConfiguration.class);
 
     private static final String INPUT_CHANNEL = "aasMqttInputChannel";
 
@@ -101,15 +104,27 @@ public class MqttConfiguration {
     }
 
     @Bean
-    public ApplicationListener<ApplicationReadyEvent> submodelShellIndexInitializer(SubmodelShellIndex submodelShellIndex,
-                                                                                    ResourceUserResolver resourceUserResolver,
-                                                                                    AasRepositoryClientFactory aasRepositoryClientFactory) {
-        return event -> {
-            try {
-                submodelShellIndex.initialize(resourceUserResolver.getKnownResourceIds(), aasRepositoryClientFactory.getClient());
-            } catch (Exception e) {
-                LOG.warn("Unable to initialize submodel index from AAS repository: {}", e.getMessage());
-            }
-        };
+    public AasBrokerConnectionMonitor aasBrokerConnectionMonitor(AasBrokerProperties properties, SubmodelShellIndex submodelShellIndex,
+                                                                 ResourceUserResolver resourceUserResolver,
+                                                                 AasRepositoryClientFactory aasRepositoryClientFactory) {
+        return new AasBrokerConnectionMonitor(properties.url(), submodelShellIndex, resourceUserResolver, aasRepositoryClientFactory);
+    }
+
+    @Bean
+    public ApplicationListener<MqttSubscribedEvent> aasMqttSubscribedListener(AasBrokerConnectionMonitor monitor) {
+        return event -> monitor.onSubscribed();
+    }
+
+    @Bean
+    public ApplicationListener<MqttConnectionFailedEvent> aasMqttConnectionFailedListener(AasBrokerConnectionMonitor monitor) {
+        return event -> monitor.onConnectionFailed(event.getCause());
+    }
+
+    @Bean
+    public ApplicationListener<ApplicationReadyEvent> aasBrokerConnectionCheckScheduler(AasBrokerProperties properties,
+                                                                                        AasBrokerConnectionMonitor monitor,
+                                                                                        @Qualifier(IntegrationContextUtils.TASK_SCHEDULER_BEAN_NAME) TaskScheduler taskScheduler) {
+        var interval = Duration.ofMillis(properties.recoveryIntervalMs());
+        return event -> taskScheduler.scheduleWithFixedDelay(monitor::check, Instant.now().plus(interval), interval);
     }
 }

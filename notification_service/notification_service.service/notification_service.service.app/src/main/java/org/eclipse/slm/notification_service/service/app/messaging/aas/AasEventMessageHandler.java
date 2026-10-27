@@ -103,10 +103,9 @@ public class AasEventMessageHandler {
                         LOG.debug("Ignoring event of submodel '{}' not referenced by a known resource shell", submodelId);
                         return;
                     }
+                    // The index entry is kept on DELETED: a submodel can be re-created while its reference stays in
+                    // the shell (e.g. AASX re-upload). Reference and shell DELETED events clean the entry up.
                     shellId = shellIdOptional.get();
-                    if (basyxTopic.eventType() == AasEventType.DELETED) {
-                        this.submodelShellIndex.remove(submodelId);
-                    }
                 }
                 default -> throw new IllegalStateException("Unexpected element kind: " + basyxTopic.elementKind());
             }
