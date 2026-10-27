@@ -38,7 +38,7 @@ public class NotificationRestController {
     public void createNotification(@RequestBody Notification notification) {
         notificationRepository.save(notification);
         notificationWsService.notifyFrontend(notification);
-        LOG.info("Createed new notification: " + notification);
+        LOG.info("Created new notification: " + notification);
     }
 
     @RequestMapping(value = "/notifications", method = RequestMethod.GET)
