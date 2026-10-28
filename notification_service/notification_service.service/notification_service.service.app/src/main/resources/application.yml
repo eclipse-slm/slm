@@ -128,7 +128,7 @@ aas:
     recovery-interval-ms: 10000
     topics:
       - aas-repository/+/shells/+
-      - aas-repository/+/shells/submodels/+/+
+      - aas-repository/+/shells/submodels/#
       - aas-repository/+/shells/+/submodelReferences/+
       - sm-repository/+/submodels/+
   aas-repository:
