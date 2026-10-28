@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "UI (dev)",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/ui",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev"],
+            "console": "integratedTerminal",
+            "serverReadyAction": {
+                "pattern": "ready in",
+                "uriFormat": "https://localhost:8080",
+                "action": "debugWithChrome",
+                "webRoot": "${workspaceFolder}/ui",
+                "killOnServerStop": true
+            }
+        }
+    ]
+}
