@@ -1,6 +1,6 @@
 - name: "Export configuration"
   hosts: localhost
-  gather_facts: no
+  gather_facts: false
   vars:
     ansible_python_interpreter: /usr/bin/python3
   tasks:
@@ -22,13 +22,16 @@
         spring_profile: "{{ lookup('env', 'SPRING_PROFILE', default='dev') }}"
 
     - name: "Get meta data of SLM node from Consul"
-      include_tasks: get_consul_node_meta.yml
+      ansible.builtin.include_tasks: get_consul_node_meta.yml
       vars:
         _node_name: "SLM"
-    - ansible.builtin.set_fact:
+
+    - name: "Set SLM node meta fact"
+      ansible.builtin.set_fact:
         SLM_NODE_META: "{{ node_meta }}"
 
-    - ansible.builtin.set_fact:
+    - name: "Load external service configs from Consul"
+      ansible.builtin.set_fact:
         traefik_certificate_crt: "{{ lookup('community.general.consul_kv', 'certs/traefik/crt', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) }}"
         traefik_certificate_key: "{{ lookup('community.general.consul_kv', 'certs/traefik/key', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) }}"
         keycloak_config: "{{ lookup('community.general.consul_kv', 'config/keycloak/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
@@ -49,7 +52,8 @@
         monitoring_config: "{{ lookup('community.general.consul_kv', 'config/monitoring/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
         minio_config: "{{ lookup('community.general.consul_kv', 'config/minio/data', scheme=consul_scheme, host=consul_host, port=consul_port, token=consul_token) | from_yaml }}"
 
-    - ansible.builtin.set_fact:
+    - name: Set external service configs of SLM services
+      ansible.builtin.set_fact:
         platform_management_external_config:  "{{ platform_management_config  | combine({'database':{'port': platform_db_port}}, recursive=True)      | combine(lookup('template', '../templates/service_external_consul_kv_entry.j2') | from_yaml, recursive=True) }}"
         resource_management_external_config:  "{{ resource_management_config  | combine({'database':{'port': resource_db_port}}, recursive=True)      | combine(lookup('template', '../templates/service_external_consul_kv_entry.j2') | from_yaml, recursive=True) }}"
         service_management_external_config:   "{{ service_management_config   | combine({'database':{'port': service_db_port}}, recursive=True)       | combine(lookup('template', '../templates/service_external_consul_kv_entry.j2') | from_yaml, recursive=True) }}"
@@ -85,15 +89,16 @@
           value: "{{ service_management_external_config | to_yaml }}"
 
     - name: "Trust SLM root CA"
-      include_tasks: trust_slm_root_ca.yml
+      ansible.builtin.include_tasks: trust_slm_root_ca.yml
       vars:
         vault_url: "{{ SLM_NODE_META.vault_url }}"
 
-    - ansible.builtin.set_fact:
+    - name: Init service_urls fact
+      ansible.builtin.set_fact:
         service_urls: {}
 
     - name: "Get service config from Consul"
-      include_tasks: discover_consul_service.yml
+      ansible.builtin.include_tasks: discover_consul_service.yml
       vars:
         _service_name: "{{ item.service_name }}"
       loop:
@@ -112,7 +117,8 @@
         - service_name: "catalog-service"
         - service_name: "minio"
 
-    - debug:
+    - name: "Debug service URLs"
+      ansible.builtin.debug:
         var: service_urls
 
     - name: "Ensures /project/_config_generated dir exists"
@@ -127,15 +133,15 @@
         - "/project/_config_generated/keycloak/service-management"
 
     - name: "Copy slm-config"
-      template:
+      ansible.builtin.template:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
-      with_items:
-       - src: /templates/slm-config.yml
-         dest: /project/_config_generated/slm-config.yml
+      loop:
+        - src: /templates/slm-config.yml
+          dest: /project/_config_generated/slm-config.yml
 
     - name: "Update config in application.yml files"
-      include_tasks: update_application_properties.yml
+      ansible.builtin.include_tasks: update_application_properties.yml
       vars:
         _application_yml_file: "{{ module.application_yml_file }}"
         _app_config: "{{ module.app_config }}"
@@ -180,7 +186,7 @@
       ignore_errors: true
 
     - name: "Generate certificate for UI"
-      include_tasks: get_vault_pki_cert.yml
+      ansible.builtin.include_tasks: get_vault_pki_cert.yml
       vars:
         _vault_url: "{{ SLM_NODE_META.vault_url }}"
         _vault_token: "{{ vault_config.tokens.root }}"
@@ -190,6 +196,4 @@
         _cert_ttl: "8760h"
         _key_dest: "/project/ui/certs/cert.key"
         _certificate_dest: "/project/ui/certs/cert.crt"
-      when: CONFIGURE_CORE_PROJECT|default(false)|bool == true
-
-
+      when: CONFIGURE_CORE_PROJECT | default(false) | bool == true
