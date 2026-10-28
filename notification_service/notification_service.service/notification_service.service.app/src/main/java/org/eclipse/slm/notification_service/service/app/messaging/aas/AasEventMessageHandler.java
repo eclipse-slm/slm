@@ -3,6 +3,8 @@ package org.eclipse.slm.notification_service.service.app.messaging.aas;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelDescriptor;
+import org.eclipse.slm.aas.clients.submodelregistry.SubmodelRegistryClientFactory;
 import org.eclipse.slm.notification_service.communication.websocket.NotificationWsService;
 import org.eclipse.slm.notification_service.service.app.messaging.resources.ResourceUserResolver;
 import org.eclipse.slm.resource_management.common.aas.ResourceAas;
@@ -10,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -28,12 +31,16 @@ public class AasEventMessageHandler {
 
     private final ObjectMapper objectMapper;
 
+    private final SubmodelRegistryClientFactory submodelRegistryClientFactory;
+
     public AasEventMessageHandler(ResourceUserResolver resourceUserResolver, SubmodelShellIndex submodelShellIndex,
-                                  NotificationWsService notificationWsService, ObjectMapper objectMapper) {
+                                  NotificationWsService notificationWsService, ObjectMapper objectMapper,
+                                  SubmodelRegistryClientFactory submodelRegistryClientFactory) {
         this.resourceUserResolver = resourceUserResolver;
         this.submodelShellIndex = submodelShellIndex;
         this.notificationWsService = notificationWsService;
         this.objectMapper = objectMapper;
+        this.submodelRegistryClientFactory = submodelRegistryClientFactory;
     }
 
     public void handle(String topic, String payload) {
@@ -128,6 +135,21 @@ public class AasEventMessageHandler {
                 return;
             }
 
+            // Submodel references carry neither idShort nor semanticId of the submodel
+            if (basyxTopic.elementKind() == AasElementKind.SUBMODEL_REFERENCE && (submodelIdShort == null || semanticId == null)) {
+                var descriptorOptional = this.getSubmodelDescriptor(submodelId);
+                if (descriptorOptional.isPresent()) {
+                    var descriptor = descriptorOptional.get();
+                    if (submodelIdShort == null) {
+                        submodelIdShort = descriptor.getIdShort();
+                    }
+                    if (semanticId == null && descriptor.getSemanticId() != null && descriptor.getSemanticId().getKeys() != null
+                            && !descriptor.getSemanticId().getKeys().isEmpty()) {
+                        semanticId = descriptor.getSemanticId().getKeys().get(0).getValue();
+                    }
+                }
+            }
+
             for (var userId : userIds) {
                 var eventNotification = new AasEventNotification(userId, new Date(), basyxTopic.eventType(), basyxTopic.elementKind(),
                         resourceId, shellId, submodelId, submodelIdShort, semanticId);
@@ -136,6 +158,19 @@ public class AasEventMessageHandler {
             }
         } catch (Exception e) {
             LOG.error("Error processing MQTT message on topic '{}': {}", topic, e.getMessage(), e);
+        }
+    }
+
+    private Optional<SubmodelDescriptor> getSubmodelDescriptor(String submodelId) {
+        try {
+            var descriptorOptional = this.submodelRegistryClientFactory.getClient().getSubmodelDescriptor(submodelId);
+            if (descriptorOptional.isEmpty()) {
+                LOG.debug("No descriptor of submodel '{}' in submodel registry", submodelId);
+            }
+            return descriptorOptional;
+        } catch (Exception e) {
+            LOG.warn("Unable to get descriptor of submodel '{}' from submodel registry: {}", submodelId, e.getMessage());
+            return Optional.empty();
         }
     }
 

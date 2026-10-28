@@ -1,6 +1,13 @@
 package org.eclipse.slm.notification_service.service.app.messaging.aas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.eclipse.digitaltwin.aas4j.v3.model.KeyTypes;
+import org.eclipse.digitaltwin.aas4j.v3.model.ReferenceTypes;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultKey;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultReference;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodelDescriptor;
+import org.eclipse.slm.aas.clients.submodelregistry.SubmodelRegistryClient;
+import org.eclipse.slm.aas.clients.submodelregistry.SubmodelRegistryClientFactory;
 import org.eclipse.slm.notification_service.communication.websocket.NotificationWsService;
 import org.eclipse.slm.notification_service.model.IEventNotification;
 import org.eclipse.slm.notification_service.service.app.messaging.resources.ResourceUserResolver;
@@ -10,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -30,6 +38,8 @@ class AasEventMessageHandlerTest {
 
     private NotificationWsService ws;
 
+    private SubmodelRegistryClient submodelRegistryClient;
+
     private AasEventMessageHandler handler;
 
     private final ArgumentCaptor<IEventNotification> captor = ArgumentCaptor.forClass(IEventNotification.class);
@@ -44,7 +54,11 @@ class AasEventMessageHandlerTest {
         resolver = mock(ResourceUserResolver.class);
         ws = mock(NotificationWsService.class);
         when(resolver.getUserIds(rid)).thenReturn(List.of("u1", "u2"));
-        handler = new AasEventMessageHandler(resolver, index, ws, new ObjectMapper());
+        submodelRegistryClient = mock(SubmodelRegistryClient.class);
+        when(submodelRegistryClient.getSubmodelDescriptor(any())).thenReturn(Optional.empty());
+        var submodelRegistryClientFactory = mock(SubmodelRegistryClientFactory.class);
+        when(submodelRegistryClientFactory.getClient()).thenReturn(submodelRegistryClient);
+        handler = new AasEventMessageHandler(resolver, index, ws, new ObjectMapper(), submodelRegistryClientFactory);
     }
 
     private AasEventNotification firstSent() {
@@ -120,6 +134,40 @@ class AasEventMessageHandlerTest {
         assertThat(n.getEventType()).isEqualTo(AasEventType.CREATED);
         assertThat(n.getSubmodelId()).isEqualTo("sm-9");
         assertThat(n.getShellId()).isEqualTo(shell);
+    }
+
+    @Test
+    void repositoryReferenceIsEnrichedFromSubmodelRegistry() {
+        var descriptor = new DefaultSubmodelDescriptor.Builder()
+                .id("sm-9")
+                .idShort("Nameplate")
+                .semanticId(new DefaultReference.Builder()
+                        .type(ReferenceTypes.EXTERNAL_REFERENCE)
+                        .keys(new DefaultKey.Builder().type(KeyTypes.GLOBAL_REFERENCE).value("urn:np").build())
+                        .build())
+                .build();
+        when(submodelRegistryClient.getSubmodelDescriptor("sm-9")).thenReturn(Optional.of(descriptor));
+
+        handler.handle("aas-repository/r/shells/submodels/sm-9/created", "{\"id\":\"" + shell + "\"}");
+
+        var n = firstSent();
+        assertThat(n.getSubmodelId()).isEqualTo("sm-9");
+        assertThat(n.getSubmodelIdShort()).isEqualTo("Nameplate");
+        assertThat(n.getSemanticId()).isEqualTo("urn:np");
+        verify(submodelRegistryClient, times(1)).getSubmodelDescriptor("sm-9");
+    }
+
+    @Test
+    void referenceIsSentWithoutMetadataWhenSubmodelRegistryFails() {
+        when(submodelRegistryClient.getSubmodelDescriptor("sm-9")).thenThrow(new RuntimeException("registry down"));
+
+        handler.handle("aas-repository/r/shells/submodels/sm-9/created", "{\"id\":\"" + shell + "\"}");
+
+        verify(ws, times(2)).notifyFrontend(any(IEventNotification.class));
+        var n = firstSent();
+        assertThat(n.getSubmodelId()).isEqualTo("sm-9");
+        assertThat(n.getSubmodelIdShort()).isNull();
+        assertThat(n.getSemanticId()).isNull();
     }
 
     @Test

@@ -3,6 +3,7 @@ package org.eclipse.slm.notification_service.service.app.messaging.aas;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.slm.aas.clients.shellrepository.AasRepositoryClientFactory;
+import org.eclipse.slm.aas.clients.submodelregistry.SubmodelRegistryClientFactory;
 import org.eclipse.slm.notification_service.communication.websocket.NotificationWsService;
 import org.eclipse.slm.notification_service.service.app.messaging.resources.ResourceUserResolver;
 import org.springframework.beans.factory.ObjectProvider;
@@ -86,14 +87,22 @@ public class MqttConfiguration {
     }
 
     @Bean
+    public SubmodelRegistryClientFactory submodelRegistryClientFactory(@Value("${aas.submodel-registry.url}") String submodelRegistryUrl,
+                                                                       ObjectProvider<DiscoveryClient> discoveryClient) {
+        return new SubmodelRegistryClientFactory(submodelRegistryUrl, discoveryClient.getIfAvailable());
+    }
+
+    @Bean
     public SubmodelShellIndex submodelShellIndex() {
         return new SubmodelShellIndex();
     }
 
     @Bean
     public AasEventMessageHandler aasEventMessageHandler(ResourceUserResolver resourceUserResolver, SubmodelShellIndex submodelShellIndex,
-                                                         NotificationWsService notificationWsService, ObjectMapper objectMapper) {
-        return new AasEventMessageHandler(resourceUserResolver, submodelShellIndex, notificationWsService, objectMapper);
+                                                         NotificationWsService notificationWsService, ObjectMapper objectMapper,
+                                                         SubmodelRegistryClientFactory submodelRegistryClientFactory) {
+        return new AasEventMessageHandler(resourceUserResolver, submodelShellIndex, notificationWsService, objectMapper,
+                submodelRegistryClientFactory);
     }
 
     @Bean
