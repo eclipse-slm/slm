@@ -90,7 +90,7 @@ class MqttConfigurationTest {
         assertThat(properties.recoveryIntervalMs()).isEqualTo(10000);
         assertThat(properties.topics()).containsExactly(
                 "aas-repository/+/shells/+",
-                "aas-repository/+/shells/submodels/+/+",
+                "aas-repository/+/shells/submodels/#",
                 "aas-repository/+/shells/+/submodelReferences/+",
                 "sm-repository/+/submodels/+");
     }

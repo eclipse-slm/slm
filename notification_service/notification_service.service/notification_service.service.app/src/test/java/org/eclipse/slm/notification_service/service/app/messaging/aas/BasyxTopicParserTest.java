@@ -47,6 +47,21 @@ class BasyxTopicParserTest {
                 .extracting(BasyxTopic::submodelId).isEqualTo(id);
     }
 
+    @Test
+    void keepsRawIdOfBasyxVersionsWithoutTopicEncoding() {
+        // Valid Base64URL characters, but decoding yields no UTF-8 text
+        var id = "Nameplate-aa9fd3af-defb-44e2-921b-4ac05a16c577";
+        assertThat(parse("aas-repository/r/shells/submodels/" + id + "/created")).get()
+                .extracting(BasyxTopic::submodelId).isEqualTo(id);
+    }
+
+    @Test
+    void keepsRawIdContainingSlashes() {
+        var id = "https://example.com/ids/sm/1";
+        assertThat(parse("aas-repository/r/shells/submodels/" + id + "/deleted"))
+                .contains(new BasyxTopic(AasElementKind.SUBMODEL_REFERENCE, AasEventType.DELETED, null, id));
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {
             "aas-repository/r/shells/patched",
