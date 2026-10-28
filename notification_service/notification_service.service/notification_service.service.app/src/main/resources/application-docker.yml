@@ -23,6 +23,9 @@ aas:
   aas-repository:
     host: aas-environment
     port: 8081
+  submodel-registry:
+    host: submodel-registry
+    port: 8083
 
 ### AWX
 awx:

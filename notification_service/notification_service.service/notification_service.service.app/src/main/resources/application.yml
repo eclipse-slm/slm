@@ -137,6 +137,12 @@ aas:
     port: 8081
     path: /aas/environment
     url: ${aas.aas-repository.scheme}://${aas.aas-repository.host}:${aas.aas-repository.port}${aas.aas-repository.path}
+  submodel-registry:
+    scheme: http
+    host: localhost
+    port: 8083
+    path: /aas/submodel-registry
+    url: ${aas.submodel-registry.scheme}://${aas.submodel-registry.host}:${aas.submodel-registry.port}${aas.submodel-registry.path}
 
 ### Security
 security:
