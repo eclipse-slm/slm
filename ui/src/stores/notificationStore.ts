@@ -129,7 +129,7 @@ export const useNotificationStore = defineStore('notificationStore', {
             const resourceDevicesStore = useResourceDevicesStore();
             resourceDevicesStore.getResourceById(aasEventNotification.resourceId);
           }
-          $toast.info(NotificationTextGenerator.generateLocalizedText(eventNotification, i18n.global))
+          // $toast.info(NotificationTextGenerator.generateLocalizedText(eventNotification, i18n.global))
           break;
         }
 
