@@ -5,6 +5,7 @@ set -euo pipefail
 
 VAULT_HEALTH_URL="http://vault:8200/v1/sys/health"
 CONSUL_URL="${CONSUL_SCHEME}://${CONSUL_HOST}:${CONSUL_PORT}"
+SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE:-docker}"
 ###endregion Variables & Config
 
 ###region Methods
@@ -84,8 +85,8 @@ wait_for_keycloak() {
 
 start_app() {
   # Start App
-  echo "[ Starting Java Application... ]"
-  java -jar -Djava.security.egd=file:/dev/./urandom /app/app.jar
+  echo "[ Starting Java Application with Spring profile(s) '${SPRING_PROFILES_ACTIVE}'... ]"
+  java -jar -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active="${SPRING_PROFILES_ACTIVE}" /app/app.jar
 }
 
 ###endregion Methods

@@ -75,6 +75,20 @@ class MqttConfigurationTest {
     }
 
     @Test
+    void dockerProfileUsesContainerHostnames() throws Exception {
+        var propertySources = new MutablePropertySources();
+        new YamlPropertySourceLoader().load("application-docker", new ClassPathResource("application-docker.yml"))
+                .forEach(propertySources::addLast);
+        new YamlPropertySourceLoader().load("application", new ClassPathResource("application.yml"))
+                .forEach(propertySources::addLast);
+        var binder = new Binder(ConfigurationPropertySources.from(propertySources),
+                new PropertySourcesPlaceholdersResolver(propertySources));
+
+        assertThat(binder.bind("aas.broker", AasBrokerProperties.class).get().url()).isEqualTo("tcp://aas-broker:1884");
+        assertThat(binder.bind("aas.aas-repository.url", String.class).get()).isEqualTo("http://aas-environment:8081/aas/environment");
+    }
+
+    @Test
     void propertiesBindDefaultsFromYaml() throws Exception {
         var propertySources = new MutablePropertySources();
         new YamlPropertySourceLoader().load("application", new ClassPathResource("application.yml"))

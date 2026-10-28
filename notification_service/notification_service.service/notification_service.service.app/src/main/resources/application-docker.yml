@@ -1,0 +1,37 @@
+### Hostnames of the containers deployed by https://github.com/eclipse-slm/ansible-collection-slm
+
+### Database
+database:
+  host: notification-service-database
+  port: 3306
+
+### Spring
+spring:
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+
+### Components - Internal
+notification-service:
+  host: notification-service
+
+### AAS
+aas:
+  broker:
+    host: aas-broker
+    port: 1884
+  aas-repository:
+    host: aas-environment
+    port: 8081
+
+### AWX
+awx:
+  host: awx
+  port: 8013
+
+### Consul
+consul:
+  service:
+    address: notification-service
+  host: consul
+  port: 8500

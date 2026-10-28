@@ -1,0 +1,18 @@
+### Hostnames of the containers deployed by https://github.com/eclipse-slm/ansible-collection-slm
+
+### Database
+database:
+  host: platform-management-database
+  port: 3306
+
+### Consul
+consul:
+  service:
+    address: platform-management
+  host: consul
+  port: 8500
+
+### Vault
+vault:
+  host: vault
+  port: 8200

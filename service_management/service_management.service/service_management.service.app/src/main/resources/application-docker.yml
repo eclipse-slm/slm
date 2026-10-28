@@ -1,0 +1,62 @@
+### Hostnames of the containers deployed by https://github.com/eclipse-slm/ansible-collection-slm
+
+### Database
+database:
+  host: service-management-database
+  port: 3306
+
+### Components - Internal
+notification-service:
+  host: notification-service
+  port: 9002
+
+### Resource Management Config
+resource-management:
+  host: resource-management
+  port: 9010
+
+### AWX
+awx:
+  host: awx
+  port: 8013
+
+### Vault
+vault:
+  host: vault
+  port: 8200
+
+### Minio
+minio:
+  host: minio
+  port: 9000
+
+### AAS
+aas:
+  broker:
+    host: aas-broker
+    port: 1884
+  aas-registry:
+    host: aas-registry
+    port: 8082
+  aas-repository:
+    host: aas-environment
+    port: 8081
+  submodel-registry:
+    host: submodel-registry
+    port: 8083
+  submodel-repository:
+    host: aas-environment
+    port: 8081
+  concept-descriptions-repository:
+    host: aas-environment
+    port: 8081
+
+### Consul
+consul:
+  service:
+    address: service-management
+  host: consul
+  port: 8500
+
+service-management:
+  url: http://service-management:9020/service-management

@@ -1,7 +1,6 @@
 # Dockerfile is copied to target/copied-sources via maven resources plugin (see module pom.xml of using module)
 
 FROM eclipse-temurin:21-jdk-noble
-MAINTAINER Matthias Schneider (matthias.schneider@ipa.fraunhofer.de)
 
 ENV CONSUL_SCHEME="http" \
     CONSUL_HOST="consul" \

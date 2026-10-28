@@ -145,7 +145,6 @@ vault:
   port: 8500
   url: ${vault.scheme}://${vault.host}:${vault.port}
   authentication: APPROLE
-  #  token: your-secret-token
   app-role:
     role-id: platform-management
     secret-id: your-secret-id
