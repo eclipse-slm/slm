@@ -51,11 +51,11 @@ ansible:
         - -e BUILD_INSTALLER_API_IMAGE="false"
 
   playbooks:
-    create: ../default/create-kv.yml
-    converge: ../default-docker-build/converge.yml
-    destroy: ../default/destroy-kv.yml
-    cleanup: cleanup.yml
+    create: ../default/create.yml
     prepare: ../default/prepare.yml
+    cleanup: cleanup.yml
+    destroy: ../default/destroy.yml
+    converge: converge.yml
     verify: ../default/verify.yml
 
 scenario:

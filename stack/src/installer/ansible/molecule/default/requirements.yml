@@ -1,5 +1,10 @@
 ---
 roles:
+  - src: "git+https://github.com/eclipse-slm/molecule_generic"
+    scm: git
+    version: main
+    name: eclipse-slm.molecule_generic
+
   - src: "git+https://github.com/eclipse-slm/molecule_kubevirt"
     scm: git
     version: main
