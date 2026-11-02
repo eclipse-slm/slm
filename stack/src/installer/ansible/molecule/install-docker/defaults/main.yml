@@ -1,0 +1,6 @@
+---
+control_node_src_dir: "{{ playbook_dir }}/../../../"
+target_host_src_dir: "/tmp/installer"
+target_host_docker_compose_base_dir: "{{ target_host_src_dir }}"
+
+slm_installer_container_name: eclipse-slm-installer-installer-api-1
