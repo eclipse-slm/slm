@@ -16,6 +16,9 @@ import org.eclipse.slm.service_management.features.service_offerings.api.service
 import org.eclipse.slm.service_management.features.service_offerings.api.servicecategories.ServiceOfferingCategory;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevTag;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.TagOpt;
@@ -147,8 +150,7 @@ public class ServiceOfferingGitUpdater implements ServiceOfferingGitUpdateTaskLi
                 var version = tagName.replace("refs/tags/", "");
                 var tagList = gitRepo.tagList().call();
                 var tag = tagList.stream().filter(t -> t.getName().endsWith(tagName)).findAny().get();
-                var revWalk = new RevWalk(gitRepo.getRepository());
-                var tagDate = revWalk.parseTag(tag.getObjectId()).getTaggerIdent().getWhen();
+                var tagDate = getTagDate(gitRepo.getRepository(), tag);
 
                 serviceOfferingDTOFileImport.getVersion().setVersion(version);
 
@@ -275,6 +277,18 @@ public class ServiceOfferingGitUpdater implements ServiceOfferingGitUpdateTaskLi
         }
 
         return null;
+    }
+
+    static Date getTagDate(Repository repository, Ref tag) throws IOException {
+        try (var revWalk = new RevWalk(repository)) {
+            var tagObject = revWalk.parseAny(tag.getObjectId());
+            // Annotated tags have their own tagger date, lightweight tags point directly to a commit
+            if (tagObject instanceof RevTag revTag && revTag.getTaggerIdent() != null) {
+                return revTag.getTaggerIdent().getWhen();
+            }
+            var commit = revWalk.parseCommit(tag.getObjectId());
+            return commit.getCommitterIdent().getWhen();
+        }
     }
 
     private boolean isVersionTag(ServiceOfferingGitRepository serviceOfferingGitRepository, String tagName) {
