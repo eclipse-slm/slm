@@ -114,7 +114,7 @@ export default {
           serviceVendorId: this.serviceVendorId,
           description: 'My new service description',
           shortDescription: 'My new service short description',
-          coverImage: 'none',
+          coverImage: null,
           serviceCategoryId: null,
         },
       }
@@ -149,7 +149,7 @@ export default {
       onStepCompleted (stepNumber) {
         switch (stepNumber) {
           case 1:
-            if (this.newServiceOffering.coverImage.includes('image/')) {
+            if (this.newServiceOffering.coverImage?.includes('image/')) {
               this.newServiceOffering.coverImage =
                   this.newServiceOffering.coverImage.slice(this.newServiceOffering.coverImage.indexOf(',') + 1, this.newServiceOffering.coverImage.length)
             }

@@ -33,5 +33,5 @@ export default function getImageUrl (imageData) {
         return `data:${mimeType};base64,${normalizedImageData}`
     }
 
-    return 'noImage'
+    return undefined
 }

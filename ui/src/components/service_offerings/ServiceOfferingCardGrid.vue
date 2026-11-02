@@ -66,7 +66,7 @@
               align="center"
               justify="center"
             >
-              <progress-circular v-if="!getImageUrl(serviceOffering.coverImage).includes('none')" />
+              <progress-circular />
             </v-row>
           </template>
         </v-img>
