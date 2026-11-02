@@ -1,8 +1,8 @@
 package org.eclipse.slm.resource_management.features.profiler
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeName
 import org.eclipse.slm.awx.model.SurveyItem
 import org.eclipse.slm.resource_management.common.remote_access.ConnectionType
@@ -18,10 +18,10 @@ class AwxAction(): Action(AwxAction::class.java.simpleName) {
 
     var playbook: String = ""
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     var username: String = ""
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     var password: String = ""
 
     var parameter: List<SurveyItem>? = null
