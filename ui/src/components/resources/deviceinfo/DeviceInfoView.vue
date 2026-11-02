@@ -3,6 +3,7 @@
     v-model="show"
     width="90%"
     height="90%"
+    scrollable
     @click:outside="onCloseButtonClicked"
   >
     <template #default="{}">
@@ -15,7 +16,14 @@
           color="primary"
           theme="dark"
         >
-          {{ resource.hostname }}
+          <v-toolbar-title>
+            {{ resource.hostname }}
+          </v-toolbar-title>
+          <v-spacer />
+          <v-btn
+            icon="mdi-close"
+            @click="onCloseButtonClicked"
+          />
         </v-toolbar>
 
         <v-card-text>
