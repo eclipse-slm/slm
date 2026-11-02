@@ -109,6 +109,16 @@ jobs:
         ]
     steps:
       - uses: actions/checkout@v6
+      # Docker 29 (on the ubuntu-26.04 runners) defaults to the containerd image store. With the parallel
+      # Maven build (-T 1C) several modules pull/build the same base image concurrently, which fails in the
+      # containerd snapshotter ("failed to extract layer", "failed to commit snapshot"). Use overlay2 instead.
+      - name: Disable containerd image store
+        run: |
+          DAEMON_JSON=/etc/docker/daemon.json
+          CURRENT=$(sudo cat "$DAEMON_JSON" 2>/dev/null || echo '{}')
+          echo "$CURRENT" | jq '.features["containerd-snapshotter"] = false' | sudo tee "$DAEMON_JSON"
+          sudo systemctl restart docker
+          docker info -f '{{ .Driver }}'
       - name: Set up JDK 21
         uses: actions/setup-java@v5
         with:
