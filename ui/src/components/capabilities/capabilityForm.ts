@@ -71,6 +71,21 @@ export function requiredActions(form: CapabilityFormData): FormActionType[] {
   return effectiveTypes(form).flatMap(t => ACTIONS_BY_TYPE[t])
 }
 
+export function hasActionErrors(
+  actionType: FormActionType,
+  errors: Record<string, string | undefined>,
+): boolean {
+  const prefix = `${actionType}.`
+  return Object.entries(errors).some(([field, message]) => field.startsWith(prefix) && !!message)
+}
+
+export function getActionTabColorProps(
+  actionType: FormActionType,
+  errors: Record<string, string | undefined>,
+): { color?: 'error'; baseColor?: 'error' } {
+  return hasActionErrors(actionType, errors) ? { color: 'error', baseColor: 'error' } : {}
+}
+
 export function fallbackLogo(name: string): string {
   const first = name.trim().charAt(0).toLowerCase()
   if (/^[a-z]$/.test(first)) {

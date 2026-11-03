@@ -4,6 +4,8 @@ import {
   buildCapabilityRequest,
   cloneActions,
   fallbackLogo,
+  getActionTabColorProps,
+  hasActionErrors,
   isNameTaken,
   newActionFormData,
   newCapabilityFormData,
@@ -23,6 +25,20 @@ const base = (over: Partial<CapabilityFormData> = {}): CapabilityFormData => ({
   }, ...over })
 
 describe('capabilityForm', () => {
+  test('getActionTabColorProps keeps invalid tabs colored when unselected', () => {
+    expect(getActionTabColorProps('INSTALL', { 'INSTALL.playbook': 'Playbook is required' }))
+      .toEqual({ color: 'error', baseColor: 'error' })
+    expect(getActionTabColorProps('INSTALL', {})).toEqual({})
+  })
+
+  test('hasActionErrors identifies non-empty errors for the exact action type', () => {
+    expect(hasActionErrors('INSTALL', { 'INSTALL.playbook': 'Playbook is required' })).toBe(true)
+    expect(hasActionErrors('INSTALL', { 'UNINSTALL.playbook': 'Playbook is required' })).toBe(false)
+    expect(hasActionErrors('INSTALL', { 'INSTALLATION.playbook': 'Playbook is required' })).toBe(false)
+    expect(hasActionErrors('INSTALL', { 'INSTALL.playbook': '' })).toBe(false)
+    expect(hasActionErrors('INSTALL', { 'INSTALL.playbook': undefined })).toBe(false)
+  })
+
   test('fallbackLogo', () => {
     expect(fallbackLogo('Docker')).toBe('mdi-alpha-d-box')
     expect(fallbackLogo('  kubernetes')).toBe('mdi-alpha-k-box')

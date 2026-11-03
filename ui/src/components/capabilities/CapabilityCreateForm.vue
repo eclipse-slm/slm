@@ -9,6 +9,7 @@ import {
   cloneActions,
   effectiveTypes,
   fallbackLogo,
+  getActionTabColorProps,
   isNameTaken,
   newActionFormData,
   prefillUntouchedActions,
@@ -35,7 +36,7 @@ const deploymentTypeItems = [
   { title: 'CODESYS', value: 'CODESYS' },
 ];
 
-const { validate } = useForm();
+const { errors, validate } = useForm();
 
 const { value: name, errorMessage: nameError } = useField<string>('name', (v: string) => {
   if (!v || !v.trim()) return 'Name is required';
@@ -208,6 +209,7 @@ watch([name, logo, capabilityClass, deploymentTypes, types, actions], async () =
           v-for="t in actionTypes"
           :key="`tab-${t}`"
           :value="t"
+          v-bind="getActionTabColorProps(t, errors)"
         >
           {{ t }}
         </v-tab>
