@@ -37,8 +37,8 @@ export function loadMdiIcons(fetchFn: typeof fetch = fetch): Promise<MdiIconMeta
   return pending
 }
 
-export function filterIcons(icons: MdiIconMeta[], query: string): MdiIconMeta[] {
-  const q = query.trim().toLowerCase()
+export function filterIcons(icons: MdiIconMeta[], query: string | null | undefined): MdiIconMeta[] {
+  const q = (query ?? '').trim().toLowerCase()
   if (!q) return icons
   return icons.filter(
     (icon) =>

@@ -61,6 +61,9 @@ describe('filterIcons', () => {
   it('matches tags', () => {
     expect(filterIcons(icons, 'developer').map((i) => i.name)).toEqual(['kubernetes'])
   })
+  it('treats null query as empty', () => {
+    expect(filterIcons(icons, null)).toHaveLength(2)
+  })
   it('returns all for blank query', () => {
     expect(filterIcons(icons, '  ')).toHaveLength(2)
   })

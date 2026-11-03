@@ -19,7 +19,7 @@ const emit = defineEmits<{
 const icons = ref<MdiIconMeta[]>([])
 const loading = ref(false)
 const loadFailed = ref(false)
-const searchInput = ref('')
+const searchInput = ref<string | null>('')
 const query = ref('')
 const manualName = ref('')
 
@@ -28,7 +28,7 @@ let debounceTimer: ReturnType<typeof setTimeout> | undefined
 watch(searchInput, (value) => {
   clearTimeout(debounceTimer)
   debounceTimer = setTimeout(() => {
-    query.value = value
+    query.value = value ?? ''
   }, 150)
 })
 
@@ -114,6 +114,7 @@ function useManualName() {
           variant="outlined"
           density="compact"
           clearable
+          autofocus
           hide-details
           class="mb-4"
         />
