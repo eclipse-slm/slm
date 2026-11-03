@@ -50,6 +50,27 @@ describe('capabilitiesStore', () => {
             .toBeLessThan(api.getCapabilities.mock.invocationCallOrder[0])
     })
 
+    it('createCapability resolves when reload fails after successful create', async () => {
+        vi.spyOn(console, 'error').mockImplementation(() => {})
+        api.createCapability.mockResolvedValue({})
+        api.getCapabilities.mockRejectedValue(new Error('reload failed'))
+        const store = useCapabilitiesStore()
+
+        await expect(store.createCapability({id: 'c1', name: 'Cap'} as any)).resolves.toBeUndefined()
+        expect(api.createCapability).toHaveBeenCalled()
+    })
+
+    it('deleteCapability resolves when reload fails after successful delete', async () => {
+        vi.spyOn(console, 'error').mockImplementation(() => {})
+        api.getAllCapabilityServices.mockResolvedValue({data: []})
+        api.deleteCapability.mockResolvedValue({})
+        api.getCapabilities.mockRejectedValue(new Error('reload failed'))
+        const store = useCapabilitiesStore()
+
+        await expect(store.deleteCapability('c1')).resolves.toBeUndefined()
+        expect(api.deleteCapability).toHaveBeenCalledWith('c1')
+    })
+
     it('deleteCapability refuses when installed', async () => {
         api.getAllCapabilityServices.mockResolvedValue({
             data: [{capabilityId: 'c1'}, {capabilityId: 'c1'}],

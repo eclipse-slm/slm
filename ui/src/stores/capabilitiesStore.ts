@@ -106,7 +106,7 @@ export const useCapabilitiesStore = defineStore('capabilitiesStore', {
 
         async createCapability(body: GetCapabilities200ResponseInner) {
             await ResourceManagementClient.capabilityApi.createCapability(body)
-            await this.getCapabilities()
+            await this.reloadAfterChange()
         },
 
         async deleteCapability(capabilityId: string) {
@@ -123,7 +123,16 @@ export const useCapabilitiesStore = defineStore('capabilitiesStore', {
             }
 
             await ResourceManagementClient.capabilityApi.deleteCapability(capabilityId)
-            await this.getCapabilities()
+            await this.reloadAfterChange()
+        },
+
+        // The change already succeeded; a failed reload must not make it look failed (a retry would duplicate it)
+        async reloadAfterChange() {
+            try {
+                await this.getCapabilities()
+            } catch (e) {
+                console.error('Failed to reload capabilities after a successful change', e)
+            }
         },
 
         async updateStore () {
