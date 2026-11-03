@@ -1,0 +1,57 @@
+{
+  "capabilityClass": "DeploymentCapability",
+  "name": "Docker",
+  "logo": "mdi-docker",
+  "type": [
+    "SETUP",
+    "DEPLOY"
+  ],
+  "actions": {
+    "INSTALL": {
+      "actionClass": "AwxAction",
+      "actionType": "INSTALL",
+      "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
+      "awxBranch": "1.0.3",
+      "playbook": "install.yml",
+      "skipable": true,
+      "connectionTypes": ["ssh", "WinSsh"]
+    },
+    "UNINSTALL": {
+      "actionClass": "AwxAction",
+      "actionType": "UNINSTALL",
+      "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
+      "awxBranch": "1.0.3",
+      "playbook": "uninstall.yml",
+      "connectionTypes": ["ssh", "WinSsh"]
+    },
+    "DEPLOY": {
+      "actionClass": "AwxAction",
+      "actionType": "DEPLOY",
+      "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
+      "awxBranch": "1.0.3",
+      "playbook": "deploy.yml",
+      "connectionTypes": ["ssh", "WinSsh"]
+    },
+    "UNDEPLOY": {
+      "actionClass": "AwxAction",
+      "actionType": "UNDEPLOY",
+      "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
+      "awxBranch": "1.0.3",
+      "playbook": "undeploy.yml",
+      "connectionTypes": ["ssh", "WinSsh"]
+    },
+    "UPDATE": {
+      "actionClass": "AwxAction",
+      "actionType": "UPDATE",
+      "awxRepo": "https://github.com/eclipse-slm/slm-dc-docker",
+      "awxBranch": "1.0.3",
+      "playbook": "deploy.yml",
+      "connectionTypes": ["ssh", "WinSsh"]
+    }
+  },
+  "supportedDeploymentTypes": [
+    "DOCKER_CONTAINER",
+    "DOCKER_COMPOSE"
+  ],
+  "clusterMemberTypes": []
+}
