@@ -132,6 +132,44 @@ export function prefillUntouchedActions(
   return result
 }
 
+// Capability definition as returned by the git import endpoint; only the fields the form can show
+export interface ImportedCapability {
+  capabilityClass?: string
+  name?: string
+  logo?: string
+  type?: string[]
+  supportedDeploymentTypes?: string[]
+  actions?: Record<string, { awxRepo?: string; awxBranch?: string; playbook?: string } | undefined>
+}
+
+const FORM_ACTION_TYPES: FormActionType[] = ['INSTALL', 'UNINSTALL', 'DEPLOY', 'UNDEPLOY']
+
+export function capabilityToFormData(c: ImportedCapability): CapabilityFormData {
+  const capabilityClass: CapabilityClass = c.capabilityClass === 'BaseConfigurationCapability'
+    ? 'BaseConfigurationCapability'
+    : 'DeploymentCapability'
+  const actions: Partial<Record<FormActionType, ActionFormData>> = {}
+  for (const t of FORM_ACTION_TYPES) {
+    const a = c.actions?.[t]
+    if (a) {
+      actions[t] = { awxRepo: a.awxRepo ?? '', awxBranch: a.awxBranch ?? DEFAULT_BRANCH, playbook: a.playbook ?? '' }
+    }
+  }
+  return {
+    name: c.name ?? '',
+    logo: c.logo ?? '',
+    capabilityClass,
+    supportedDeploymentTypes: capabilityClass === 'DeploymentCapability' ? [...(c.supportedDeploymentTypes ?? [])] : [],
+    types: TYPE_ORDER.filter(t => (c.type ?? []).includes(t)),
+    actions,
+  }
+}
+
+export function importErrorMessage(e: unknown): string {
+  const message = (e as { response?: { data?: { message?: unknown } } })?.response?.data?.message
+  return typeof message === 'string' && message ? message : 'Failed to import capability'
+}
+
 export function buildCapabilityRequest(form: CapabilityFormData, id?: string): GetCapabilities200ResponseInner {
   const name = form.name.trim()
   const actions: Record<string, unknown> = {}

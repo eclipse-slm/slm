@@ -4,6 +4,7 @@ import { useField, useForm } from 'vee-validate';
 import { useCapabilitiesStore } from '@/stores/capabilitiesStore';
 import IconPickerDialog from '@/components/base/IconPickerDialog.vue';
 import CapabilityActionCard from './CapabilityActionCard.vue';
+import CapabilityImportDialog from './CapabilityImportDialog.vue';
 import {
   allowedTypes,
   cloneActions,
@@ -57,6 +58,7 @@ const actions = ref<Partial<Record<FormActionType, ActionFormData>>>(
   cloneActions(props.modelValue.formData.actions));
 
 const showIconPicker = ref(false);
+const showImportDialog = ref(false);
 const activeActionTab = ref<FormActionType | null>(null);
 
 const isDeployment = computed(() => capabilityClass.value === 'DeploymentCapability');
@@ -123,6 +125,20 @@ function onSourceChanged(t: FormActionType) {
   actions.value = prefillUntouchedActions(actions.value, t);
 }
 
+async function onImported(f: CapabilityFormData) {
+  showImportDialog.value = false;
+  name.value = f.name;
+  logo.value = f.logo;
+  capabilityClass.value = f.capabilityClass;
+  deploymentTypes.value = [...f.supportedDeploymentTypes];
+  types.value = [...f.types];
+  actions.value = cloneActions(f.actions);
+  // Show errors of the imported values right away; wait until new action cards registered their fields
+  await nextTick();
+  await nextTick();
+  await validate();
+}
+
 function onIconSelected(icon: string) {
   logo.value = icon;
   showIconPicker.value = false;
@@ -141,6 +157,22 @@ watch([name, logo, capabilityClass, deploymentTypes, types, actions], async () =
 
 <template>
   <form @submit.prevent>
+    <div class="d-flex justify-end mb-2">
+      <v-btn
+        variant="outlined"
+        prepend-icon="mdi-import"
+        @click="showImportDialog = true"
+      >
+        Import
+      </v-btn>
+    </div>
+
+    <CapabilityImportDialog
+      :show="showImportDialog"
+      @imported="onImported"
+      @canceled="showImportDialog = false"
+    />
+
     <div class="text-subtitle-2 mb-2">Icon &amp; Capability Name</div>
     <v-text-field
       v-model="name"
@@ -220,6 +252,7 @@ watch([name, logo, capabilityClass, deploymentTypes, types, actions], async () =
           v-for="t in actionTypes"
           :key="`panel-${t}`"
           :value="t"
+          eager
         >
           <CapabilityActionCard
             v-if="actions[t]"

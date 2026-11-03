@@ -2,10 +2,12 @@ import { describe, expect, test } from 'vitest'
 import { reactive } from 'vue'
 import {
   buildCapabilityRequest,
+  capabilityToFormData,
   cloneActions,
   fallbackLogo,
   getActionTabColorProps,
   hasActionErrors,
+  importErrorMessage,
   isNameTaken,
   newActionFormData,
   newCapabilityFormData,
@@ -115,5 +117,60 @@ describe('cloneActions', () => {
     expect(() => structuredClone(result)).not.toThrow()
     result.INSTALL!.playbook = 'changed.yml'
     expect(source.INSTALL.playbook).toBe('')
+  })
+})
+
+describe('capabilityToFormData', () => {
+  const repo = 'https://github.com/eclipse-slm/slm-dc-docker'
+  const awx = (playbook: string) => ({ actionClass: 'AwxAction', awxRepo: repo, awxBranch: '1.0.3', playbook })
+
+  test('maps a deployment capability and drops unsupported actions', () => {
+    expect(capabilityToFormData({
+      capabilityClass: 'DeploymentCapability', name: 'Docker', logo: 'mdi-docker', type: ['SETUP', 'DEPLOY'],
+      supportedDeploymentTypes: ['DOCKER_CONTAINER', 'DOCKER_COMPOSE'],
+      actions: {
+        INSTALL: awx('install.yml'), UNINSTALL: awx('uninstall.yml'),
+        DEPLOY: awx('deploy.yml'), UNDEPLOY: awx('undeploy.yml'), UPDATE: awx('deploy.yml'),
+      },
+    })).toEqual({
+      name: 'Docker', logo: 'mdi-docker', capabilityClass: 'DeploymentCapability',
+      supportedDeploymentTypes: ['DOCKER_CONTAINER', 'DOCKER_COMPOSE'], types: ['SETUP', 'DEPLOY'],
+      actions: {
+        INSTALL:   { awxRepo: repo, awxBranch: '1.0.3', playbook: 'install.yml' },
+        UNINSTALL: { awxRepo: repo, awxBranch: '1.0.3', playbook: 'uninstall.yml' },
+        DEPLOY:    { awxRepo: repo, awxBranch: '1.0.3', playbook: 'deploy.yml' },
+        UNDEPLOY:  { awxRepo: repo, awxBranch: '1.0.3', playbook: 'undeploy.yml' },
+      },
+    })
+  })
+
+  test('maps base configuration and ignores deployment types', () => {
+    const f = capabilityToFormData({ capabilityClass: 'BaseConfigurationCapability', supportedDeploymentTypes: ['DOCKER_CONTAINER'] })
+    expect(f.capabilityClass).toBe('BaseConfigurationCapability')
+    expect(f.supportedDeploymentTypes).toEqual([])
+  })
+
+  test('filters unknown types and fills missing fields', () => {
+    const f = capabilityToFormData({
+      capabilityClass: 'DeploymentCapability', type: ['DEPLOY', 'SCALE'], actions: { DEPLOY: { playbook: 'd.yml' } },
+    })
+    expect(f.types).toEqual(['DEPLOY'])
+    expect(f.name).toBe('')
+    expect(f.logo).toBe('')
+    expect(f.actions.DEPLOY).toEqual({ awxRepo: '', awxBranch: 'main', playbook: 'd.yml' })
+  })
+
+  test('defaults unknown class to DeploymentCapability', () => {
+    expect(capabilityToFormData({ capabilityClass: 'Other' }).capabilityClass).toBe('DeploymentCapability')
+  })
+})
+
+describe('importErrorMessage', () => {
+  test('uses the server message when present', () => {
+    expect(importErrorMessage({ response: { data: { message: 'File not found' } } })).toBe('File not found')
+  })
+  test('falls back to a generic message', () => {
+    expect(importErrorMessage(new Error('x'))).toBe('Failed to import capability')
+    expect(importErrorMessage({ response: { data: { message: '' } } })).toBe('Failed to import capability')
   })
 })
