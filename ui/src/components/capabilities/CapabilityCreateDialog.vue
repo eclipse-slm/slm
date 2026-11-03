@@ -21,9 +21,11 @@ const capabilitiesStore = useCapabilitiesStore();
 
 const active = toRef(props, 'show');
 const loading = ref(false);
+const formKey = ref(0);
 const form = ref<CapabilityForm>({ isFormValid: false, formData: newCapabilityFormData() });
 
 function clearDialog() {
+  formKey.value++; // remount the form to reset vee-validate state
   form.value = { isFormValid: false, formData: newCapabilityFormData() };
 }
 
@@ -66,7 +68,7 @@ async function createCapability() {
     @confirmed="createCapability"
   >
     <template #content>
-      <CapabilityCreateForm v-model="form" />
+      <CapabilityCreateForm :key="formKey" v-model="form" />
     </template>
   </ConfirmDialog>
 </template>

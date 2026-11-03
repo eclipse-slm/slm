@@ -108,9 +108,12 @@ function onIconSelected(icon: string) {
 }
 
 // Emit changes to parent
+let validationRun = 0;
 watch([name, logo, capabilityClass, deploymentTypes, types, actions], async () => {
+  const run = ++validationRun;
   await nextTick(); // let newly mounted action cards register their fields
-  const result = await validate();
+  const result = await validate({ mode: 'silent' }); // silent: do not flag untouched fields as errors
+  if (run !== validationRun) return; // a newer change superseded this run
   emit('update:modelValue', { isFormValid: result.valid, formData: currentFormData() });
 }, { deep: true, immediate: true });
 </script>
