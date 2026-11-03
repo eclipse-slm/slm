@@ -57,6 +57,9 @@
         },
         "service-vendors":{
           "title": "Service Vendors"
+        },
+        "capabilities":{
+          "title": "Capabilities"
         }
       }
     }

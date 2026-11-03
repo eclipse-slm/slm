@@ -178,6 +178,13 @@ export const defaultNavigation: NavItem[] = [
                 visible: isAdmin,
             },
             {
+                id: 'main-menu-button-admin-capabilities',
+                titleKey: 'drawer.section.admin.capabilities.title',
+                icon: 'mdi-puzzle',
+                to: 'capabilities',
+                visible: isAdmin,
+            },
+            {
                 id: 'main-menu-button-admin-users',
                 // Original used the literal string 'User Management' (no i18n key); kept as-is.
                 titleKey: 'User Management',
