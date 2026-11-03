@@ -1,7 +1,14 @@
 import ApiState from '@/api/apiState'
 import {defineStore} from "pinia";
 import ResourceManagementClient from "@/api/resource-management/resource-management-client";
-import {CapabilityServiceDTO, ResourceDTO} from "@/api/resource-management/client";
+import {CapabilityServiceDTO, GetCapabilities200ResponseInner, ResourceDTO} from "@/api/resource-management/client";
+
+export class CapabilityInUseError extends Error {
+    constructor(public installCount: number) {
+        super(`Capability is installed ${installCount} time(s)`)
+        this.name = 'CapabilityInUseError'
+    }
+}
 
 interface CapabilitiesStoreState{
     apiState: number,
@@ -45,6 +52,10 @@ export const useCapabilitiesStore = defineStore('capabilitiesStore', {
             const capability = state.capabilities.find(capability => capability.id === capabilityService.capabilityId)
 
             return capability;
+        },
+
+        installCountOfCapability: (state) => (capabilityId: string) => {
+            return state.capabilityServices.filter(capabilityService => capabilityService.capabilityId === capabilityId).length
         },
 
         isCapabilityInstalledOnResource: (state) => (resource: ResourceDTO, capabilityId) => {
@@ -91,6 +102,25 @@ export const useCapabilitiesStore = defineStore('capabilitiesStore', {
                     console.debug(e)
                     this.capabilityServices = [];
                 })
+        },
+
+        async createCapability(body: GetCapabilities200ResponseInner) {
+            await ResourceManagementClient.capabilityApi.createCapability(body)
+            await this.getCapabilities()
+        },
+
+        async deleteCapability(capabilityId: string) {
+            // Fetch directly (not via getCapabilityServices, which swallows errors) so a failed fetch aborts the delete
+            const response = await ResourceManagementClient.capabilityApi.getAllCapabilityServices()
+            this.capabilityServices = response.data ?? []
+
+            const installCount = this.installCountOfCapability(capabilityId)
+            if (installCount > 0) {
+                throw new CapabilityInUseError(installCount)
+            }
+
+            await ResourceManagementClient.capabilityApi.deleteCapability(capabilityId)
+            await this.getCapabilities()
         },
 
         async updateStore () {
