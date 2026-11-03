@@ -19,6 +19,7 @@
   "files": [
     "src",
     "!src/api/*/client",
+    "!src/**/*.test.ts",
     "index.html",
     "public",
     "vite/dist",
@@ -29,6 +30,7 @@
     "build": "vite build",
     "serve": "vite preview",
     "lint": "eslint --fix src",
+    "test:unit": "vitest run --config vitest.config.ts",
     "test:plugin": "vitest run --config vite/vitest.config.ts",
     "build:plugin": "tsc -p vite/tsconfig.json",
     "prepack": "npm run build:plugin"
