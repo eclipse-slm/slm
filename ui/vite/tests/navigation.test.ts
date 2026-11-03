@@ -45,6 +45,7 @@ describe('navigation', () => {
         ['main-menu-button-admin-components', 'components', undefined],
         ['main-menu-button-admin-service-categories', 'service-categories', undefined],
         ['main-menu-button-admin-service-vendors', 'service-vendors', undefined],
+        ['main-menu-button-admin-capabilities', 'capabilities', undefined],
         ['main-menu-button-admin-users', 'users', undefined],
       ]],
     ])
