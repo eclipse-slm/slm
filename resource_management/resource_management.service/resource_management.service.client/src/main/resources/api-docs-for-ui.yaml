@@ -1489,6 +1489,44 @@
         }
       }
     },
+    "/resources/capabilities/import-from-git": {
+      "post": {
+        "tags": [
+          "Capabilities"
+        ],
+        "summary": "Import capability definition from git repository",
+        "operationId": "importCapabilityFromGit",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CapabilityGitImportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/BaseConfigurationCapabilityDTOApi"
+                    },
+                    {
+                      "$ref": "#/components/schemas/DeploymentCapabilityDTOApi"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/importer/resources": {
       "post": {
         "tags": [
@@ -7240,6 +7278,23 @@
           },
           "Upstreams": {
             "type": "object"
+          }
+        }
+      },
+      "CapabilityGitImportRequest": {
+        "required": [
+          "repositoryUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "repositoryUrl": {
+            "type": "string"
+          },
+          "branch": {
+            "type": "string"
+          },
+          "filePath": {
+            "type": "string"
           }
         }
       },

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotCreatedException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.dto.CapabilityDTOApi;
+import org.eclipse.slm.resource_management.features.capabilities.gitimport.CapabilityGitImportRequest;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityFilter;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityServiceDTO;
 import org.springframework.http.MediaType;
@@ -30,6 +31,12 @@ public interface CapabilitiesRestApi {
     ResponseEntity<Void> createCapability(
             @RequestBody CapabilityDTOApi capabilityDTOApi
     ) throws ResourceNotFoundException, IllegalAccessException, ResourceNotCreatedException, JsonProcessingException;
+
+    @RequestMapping(value = "/capabilities/import-from-git", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Import capability definition from git repository")
+    ResponseEntity<CapabilityDTOApi> importCapabilityFromGit(
+            @RequestBody CapabilityGitImportRequest request
+    );
 
     @RequestMapping(value = "/capabilities/{capabilityId}", method = RequestMethod.DELETE)
     @Operation(summary = "Delete capability")

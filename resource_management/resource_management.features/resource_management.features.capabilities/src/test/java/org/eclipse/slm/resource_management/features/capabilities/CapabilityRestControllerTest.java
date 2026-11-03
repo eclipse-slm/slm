@@ -7,6 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.slm.common.model.DeploymentType;
 import org.assertj.core.api.Assertions;
 import org.eclipse.slm.resource_management.features.capabilities.clusters.model.ClusterMemberType;
+import org.eclipse.slm.resource_management.features.capabilities.dto.DeploymentCapabilityDTOApi;
+import org.eclipse.slm.resource_management.features.capabilities.gitimport.CapabilityGitImportRequest;
+import org.eclipse.slm.resource_management.features.capabilities.gitimport.CapabilityGitImporter;
+import org.eclipse.slm.resource_management.features.capabilities.gitimport.CapabilityImportException;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityFilter;
 import org.eclipse.slm.resource_management.features.capabilities.model.CapabilityType;
 import org.eclipse.slm.resource_management.features.capabilities.model.DeploymentCapability;
@@ -20,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -75,6 +80,9 @@ public class CapabilityRestControllerTest {
 
     @MockBean
     private CapabilitiesManager capabilitiesManager;
+
+    @MockBean
+    private CapabilityGitImporter capabilityGitImporter;
     //endregion
 
     //region Functions
@@ -312,6 +320,45 @@ public class CapabilityRestControllerTest {
                         .andExpect(status().isOk())
                         .andDo(MockMvcResultHandlers.print());
             }
+        }
+    }
+
+    @Nested
+    @Order(30)
+    @DisplayName("Import Capability From Git")
+    public class testImportCapabilityFromGit {
+        private static final String IMPORT_PATH = BASE_PATH + "/import-from-git";
+        private static final String REQUEST_BODY =
+                "{\"repositoryUrl\":\"https://example.org/r.git\",\"branch\":\"main\",\"filePath\":\"capability.json\"}";
+
+        @Test
+        @DisplayName("Import returns the parsed capability (POST " + IMPORT_PATH + ")")
+        public void importFromGitReturnsCapability() throws Exception {
+            var imported = new DeploymentCapabilityDTOApi();
+            imported.setName("Docker");
+            Mockito.when(capabilityGitImporter.importCapability(any())).thenReturn(imported);
+
+            mockMvc.perform(post(IMPORT_PATH).with(csrf())
+                            .content(REQUEST_BODY)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.name").value("Docker"))
+                    .andExpect(jsonPath("$.capabilityClass").value("DeploymentCapability"));
+
+            Mockito.verify(capabilityGitImporter).importCapability(
+                    new CapabilityGitImportRequest("https://example.org/r.git", "main", "capability.json"));
+        }
+
+        @Test
+        @DisplayName("Import errors keep their HTTP status (POST " + IMPORT_PATH + ")")
+        public void importFromGitPropagatesStatus() throws Exception {
+            Mockito.when(capabilityGitImporter.importCapability(any()))
+                    .thenThrow(new CapabilityImportException(HttpStatus.NOT_FOUND, "File 'x' not found"));
+
+            mockMvc.perform(post(IMPORT_PATH).with(csrf())
+                            .content(REQUEST_BODY)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isNotFound());
         }
     }
 }

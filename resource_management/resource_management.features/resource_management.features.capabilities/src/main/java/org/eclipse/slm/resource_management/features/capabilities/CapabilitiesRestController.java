@@ -6,6 +6,8 @@ import org.eclipse.slm.common.consul.model.exceptions.ConsulLoginFailedException
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotCreatedException;
 import org.eclipse.slm.resource_management.common.exceptions.ResourceNotFoundException;
 import org.eclipse.slm.resource_management.features.capabilities.dto.CapabilityDTOApi;
+import org.eclipse.slm.resource_management.features.capabilities.gitimport.CapabilityGitImportRequest;
+import org.eclipse.slm.resource_management.features.capabilities.gitimport.CapabilityGitImporter;
 import org.eclipse.slm.resource_management.features.capabilities.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +32,12 @@ public class CapabilitiesRestController implements CapabilitiesRestApi {
 
     private final CapabilitiesManager capabilitiesService;
 
+    private final CapabilityGitImporter capabilityGitImporter;
+
     @Autowired
-    public CapabilitiesRestController(CapabilitiesManager capabilitiesService) {
+    public CapabilitiesRestController(CapabilitiesManager capabilitiesService, CapabilityGitImporter capabilityGitImporter) {
         this.capabilitiesService = capabilitiesService;
+        this.capabilityGitImporter = capabilityGitImporter;
     }
 
     public ResponseEntity<List<CapabilityDTOApi>> getCapabilities(Optional<CapabilityFilter> filter) {
@@ -56,6 +61,12 @@ public class CapabilitiesRestController implements CapabilitiesRestApi {
         LOG.info("Added capability: " + capabilityDTOApi.toString());
 
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    public ResponseEntity<CapabilityDTOApi> importCapabilityFromGit(
+            CapabilityGitImportRequest request
+    ) {
+        return ResponseEntity.ok(capabilityGitImporter.importCapability(request));
     }
 
     public ResponseEntity<Object> deleteCapability(
