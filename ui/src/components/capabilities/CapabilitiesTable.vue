@@ -140,12 +140,13 @@ async function onDeleteConfirmed() {
   deleting.value = true;
   try {
     await capabilitiesStore.deleteCapability(capability.id);
-    $toast.info('Capability deleted');
+    $toast.success('Capability deleted');
   } catch (e) {
     if (e instanceof CapabilityInUseError) {
       $toast.error(`Capability is installed on ${e.installCount} device(s) and cannot be deleted`);
     } else {
       logRequestError(e);
+      $toast.error('Failed to delete capability');
     }
   } finally {
     deleting.value = false;

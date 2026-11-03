@@ -49,6 +49,7 @@ async function createCapability() {
     emit('confirmed');
   } catch (e) {
     logRequestError(e);
+    $toast.error('Failed to create capability');
   } finally {
     loading.value = false;
   }
