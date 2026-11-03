@@ -112,7 +112,10 @@ export const useCapabilitiesStore = defineStore('capabilitiesStore', {
         async deleteCapability(capabilityId: string) {
             // Fetch directly (not via getCapabilityServices, which swallows errors) so a failed fetch aborts the delete
             const response = await ResourceManagementClient.capabilityApi.getAllCapabilityServices()
-            this.capabilityServices = response.data ?? []
+            if (!Array.isArray(response.data)) {
+                throw new Error("Could not verify where the capability is installed")
+            }
+            this.capabilityServices = response.data
 
             const installCount = this.installCountOfCapability(capabilityId)
             if (installCount > 0) {

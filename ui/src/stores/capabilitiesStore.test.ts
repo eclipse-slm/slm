@@ -71,6 +71,14 @@ describe('capabilitiesStore', () => {
         expect(api.deleteCapability).not.toHaveBeenCalled()
     })
 
+    it('deleteCapability fails closed when services response has no data', async () => {
+        api.getAllCapabilityServices.mockResolvedValue({})
+        const store = useCapabilitiesStore()
+
+        await expect(store.deleteCapability('c1')).rejects.toThrow()
+        expect(api.deleteCapability).not.toHaveBeenCalled()
+    })
+
     it('installCountOfCapability counts services per capability', () => {
         const store = useCapabilitiesStore()
         store.capabilityServices = [
