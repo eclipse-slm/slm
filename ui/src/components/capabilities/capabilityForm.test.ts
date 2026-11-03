@@ -1,6 +1,8 @@
 import { describe, expect, test } from 'vitest'
+import { reactive } from 'vue'
 import {
   buildCapabilityRequest,
+  cloneActions,
   fallbackLogo,
   isNameTaken,
   newActionFormData,
@@ -80,5 +82,16 @@ describe('capabilityForm', () => {
     expect(out.UNINSTALL).toEqual({ awxRepo: 'https://r', awxBranch: 'v1', playbook: '' })
     expect(out.DEPLOY).toEqual({ awxRepo: '', awxBranch: 'main', playbook: 'deploy.yml' })
     expect(out.INSTALL!.awxBranch).toBe('v1')
+  })
+})
+
+describe('cloneActions', () => {
+  test('copies reactive actions into a plain, independent object', () => {
+    const source = reactive({ INSTALL: newActionFormData() })
+    const result = cloneActions(source)
+    expect(result).toEqual({ INSTALL: newActionFormData() })
+    expect(() => structuredClone(result)).not.toThrow()
+    result.INSTALL!.playbook = 'changed.yml'
+    expect(source.INSTALL.playbook).toBe('')
   })
 })

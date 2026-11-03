@@ -6,6 +6,7 @@ import IconPickerDialog from '@/components/base/IconPickerDialog.vue';
 import CapabilityActionCard from './CapabilityActionCard.vue';
 import {
   allowedTypes,
+  cloneActions,
   effectiveTypes,
   fallbackLogo,
   isNameTaken,
@@ -52,7 +53,7 @@ const { value: types, errorMessage: typesError } = useField<FormCapabilityType[]
   () => effectiveTypes(currentFormData()).length > 0 || 'Select at least one capability type',
   { initialValue: props.modelValue.formData.types });
 const actions = ref<Partial<Record<FormActionType, ActionFormData>>>(
-  structuredClone(props.modelValue.formData.actions));
+  cloneActions(props.modelValue.formData.actions));
 
 const showIconPicker = ref(false);
 
@@ -81,7 +82,7 @@ watch(() => props.modelValue, (val) => {
   capabilityClass.value = f.capabilityClass;
   deploymentTypes.value = [...f.supportedDeploymentTypes];
   types.value = [...f.types];
-  actions.value = structuredClone(f.actions);
+  actions.value = cloneActions(f.actions);
 });
 
 // Create missing action entries when their type appears

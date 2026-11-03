@@ -84,6 +84,17 @@ function isUntouched(action: ActionFormData): boolean {
   return action.awxRepo === '' && action.playbook === '' && action.awxBranch === DEFAULT_BRANCH
 }
 
+// Plain-object copy; structuredClone throws on Vue reactive proxies
+export function cloneActions(
+  actions: Partial<Record<FormActionType, ActionFormData>>,
+): Partial<Record<FormActionType, ActionFormData>> {
+  const result: Partial<Record<FormActionType, ActionFormData>> = {}
+  for (const [key, value] of Object.entries(actions) as [FormActionType, ActionFormData][]) {
+    result[key] = { ...value }
+  }
+  return result
+}
+
 export function prefillUntouchedActions(
   actions: Partial<Record<FormActionType, ActionFormData>>,
   source: FormActionType,
