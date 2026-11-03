@@ -38,3 +38,5 @@ certs/
 /test-consumer/dist
 /test-consumer/package-lock.json
 /eclipse-slm-ui.tgz
+
+.env.development
