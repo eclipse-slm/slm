@@ -16,7 +16,7 @@ jobs:
       (startsWith(github.event.ref, 'feature/') || startsWith(github.event.ref, 'fix/'))) ||
       (github.event_name == 'workflow_dispatch' &&
       (startsWith(inputs.branch_ref, 'feature/') || startsWith(inputs.branch_ref, 'fix/')))
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write

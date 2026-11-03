@@ -19,7 +19,7 @@ on:
 
 jobs:
   prepare:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       has_release_tag: ${{ steps.evaluate.outputs.has_release_tag }}
       should_snapshot_deploy: ${{ steps.evaluate.outputs.should_snapshot_deploy }}
@@ -82,7 +82,7 @@ jobs:
 
   build:
     needs: prepare
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
@@ -197,7 +197,7 @@ jobs:
   ui-package:
     needs: [prepare, build]
     if: needs.prepare.outputs.should_verify == 'true' || needs.prepare.outputs.should_snapshot_deploy == 'true' || needs.prepare.outputs.should_release_deploy == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       id-token: write # npm trusted publishing (OIDC) and provenance
