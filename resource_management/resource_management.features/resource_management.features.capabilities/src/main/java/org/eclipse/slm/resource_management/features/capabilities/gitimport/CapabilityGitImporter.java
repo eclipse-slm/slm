@@ -34,6 +34,7 @@ public class CapabilityGitImporter {
     static final String DEFAULT_REF = "main";
     static final String DEFAULT_FILE_PATH = "capability.json";
     private static final int TIMEOUT_SECONDS = 30;
+    private static final long MAX_FILE_SIZE_BYTES = 1024 * 1024;
     private static final Set<String> ALLOWED_SCHEMES = Set.of("http", "https");
 
     private final ObjectMapper objectMapper;
@@ -152,7 +153,16 @@ public class CapabilityGitImporter {
         }
 
         try {
-            return objectMapper.readValue(Files.readAllBytes(realFile), CapabilityDTOApi.class);
+            if (Files.size(realFile) > MAX_FILE_SIZE_BYTES) {
+                throw new CapabilityImportException(HttpStatus.UNPROCESSABLE_ENTITY,
+                        "File '" + filePath + "' is larger than " + MAX_FILE_SIZE_BYTES / 1024 + " KiB");
+            }
+            var capability = objectMapper.readValue(Files.readAllBytes(realFile), CapabilityDTOApi.class);
+            if (capability == null) {
+                throw new CapabilityImportException(HttpStatus.UNPROCESSABLE_ENTITY,
+                        "File '" + filePath + "' does not contain a capability definition");
+            }
+            return capability;
         } catch (IOException e) {
             throw new CapabilityImportException(HttpStatus.UNPROCESSABLE_ENTITY,
                     "File '" + filePath + "' is not a valid capability definition: " + e.getMessage(), e);

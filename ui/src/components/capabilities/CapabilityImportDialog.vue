@@ -21,13 +21,19 @@ const repositoryUrl = ref('');
 const branch = ref(DEFAULT_BRANCH);
 const filePath = ref(DEFAULT_FILE_PATH);
 const loading = ref(false);
+// Bumped whenever the dialog closes, so a response that arrives after cancel is ignored
+let requestId = 0;
 
 const urlRule = (v: string) => /^https?:\/\/\S+$/i.test((v ?? '').trim()) || 'Must start with http:// or https://';
 const isUrlValid = computed(() => urlRule(repositoryUrl.value) === true);
 
 // Start from the defaults each time the dialog opens
 watch(() => props.show, (open) => {
-  if (!open) return;
+  if (!open) {
+    requestId++;
+    loading.value = false;
+    return;
+  }
   repositoryUrl.value = '';
   branch.value = DEFAULT_BRANCH;
   filePath.value = DEFAULT_FILE_PATH;
@@ -35,6 +41,7 @@ watch(() => props.show, (open) => {
 
 async function importCapability() {
   if (!isUrlValid.value) return;
+  const id = ++requestId;
   loading.value = true;
   try {
     const response = await ResourceManagementClient.capabilityApi.importCapabilityFromGit({
@@ -42,12 +49,18 @@ async function importCapability() {
       branch: branch.value.trim(),
       filePath: filePath.value.trim(),
     });
+    if (id !== requestId) return;
+    if (!response.data || typeof response.data !== 'object') {
+      $toast.error('Failed to import capability');
+      return;
+    }
     emit('imported', capabilityToFormData(response.data as ImportedCapability));
   } catch (e) {
+    if (id !== requestId) return;
     logRequestError(e);
     $toast.error(importErrorMessage(e));
   } finally {
-    loading.value = false;
+    if (id === requestId) loading.value = false;
   }
 }
 </script>

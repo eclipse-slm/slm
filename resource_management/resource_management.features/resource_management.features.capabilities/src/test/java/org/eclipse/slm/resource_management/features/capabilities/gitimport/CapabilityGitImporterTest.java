@@ -109,6 +109,23 @@ public class CapabilityGitImporterTest {
                 .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
+    @Test
+    void nullJsonIs422() throws Exception {
+        commitFile("null.json", "null");
+
+        assertThat(statusOf(() -> importer.fetch(repoUri, "main", "null.json")))
+                .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @Test
+    void oversizedFileIs422() throws Exception {
+        // valid capability JSON, only too large
+        commitFile("big.json", "{\"capabilityClass\":\"DeploymentCapability\",\"name\":\"" + "x".repeat(1024 * 1024) + "\"}");
+
+        assertThat(statusOf(() -> importer.fetch(repoUri, "main", "big.json")))
+                .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"../x.json", "/etc/passwd"})
     void rejectsPathTraversal(String path) {
