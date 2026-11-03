@@ -153,8 +153,12 @@ export default {
 @use 'vuetify/lib/styles/tools/_rtl.sass' as *
 
 #core-navigation-drawer
+  // Vuetify adds the group's prepend width (40px) to the child indent. Set it through Vuetify's own
+  // variable: overriding --prepend-width directly only works when our CSS happens to load after Vuetify's.
+  --v-list-group-prepend: 0px
+
   .v-list-group
-    --list-indent-size: 12px
+    --list-indent-size: 8px
 
   .v-list-group--sub-group .v-list-group__items
     --indent-padding: 24px
