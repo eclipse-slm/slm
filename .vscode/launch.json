@@ -12,7 +12,6 @@
             "serverReadyAction": {
                 "pattern": "ready in",
                 "uriFormat": "https://localhost:8080",
-                "action": "debugWithChrome",
                 "webRoot": "${workspaceFolder}/ui",
                 "killOnServerStop": true
             }
