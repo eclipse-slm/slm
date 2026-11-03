@@ -39,8 +39,9 @@ describe('capabilitiesStore', () => {
     it('deleteCapability deletes when not installed', async () => {
         api.getAllCapabilityServices.mockResolvedValue({data: [{capabilityId: 'other'}]})
         api.deleteCapability.mockResolvedValue({})
-        api.getCapabilities.mockResolvedValue({data: []})
+        api.getCapabilities.mockResolvedValue({data: [{id: 'c1', name: 'Deleted capability'}]})
         const store = useCapabilitiesStore()
+        store.capabilities = [{id: 'c1', name: 'Deleted capability'}]
 
         await store.deleteCapability('c1')
 
@@ -48,6 +49,7 @@ describe('capabilitiesStore', () => {
         expect(api.getCapabilities).toHaveBeenCalled()
         expect(api.deleteCapability.mock.invocationCallOrder[0])
             .toBeLessThan(api.getCapabilities.mock.invocationCallOrder[0])
+        expect(store.capabilities).toEqual([])
     })
 
     it('createCapability resolves when reload fails after successful create', async () => {
@@ -66,9 +68,11 @@ describe('capabilitiesStore', () => {
         api.deleteCapability.mockResolvedValue({})
         api.getCapabilities.mockRejectedValue(new Error('reload failed'))
         const store = useCapabilitiesStore()
+        store.capabilities = [{id: 'c1', name: 'Deleted capability'}]
 
         await expect(store.deleteCapability('c1')).resolves.toBeUndefined()
         expect(api.deleteCapability).toHaveBeenCalledWith('c1')
+        expect(store.capabilities).toEqual([])
     })
 
     it('deleteCapability refuses when installed', async () => {

@@ -52,7 +52,10 @@ watch(dialogActive, (active) => {
       :width="width"
   >
     <template #default="{}">
-      <v-card v-if="dialogActive">
+      <v-card
+        v-if="dialogActive"
+        class="custom-dialog-card"
+      >
         <v-toolbar color="primary" theme="dark">
           <slot name="header">
             <div class="dialog-toolbar">
@@ -68,7 +71,7 @@ watch(dialogActive, (active) => {
             </div>
           </slot>
         </v-toolbar>
-        <v-card-text class="mt-8 mx-4">
+        <v-card-text class="custom-dialog-content mt-8 mx-4">
             <slot name="content">
               {{ text }}
             </slot>
@@ -82,6 +85,18 @@ watch(dialogActive, (active) => {
 </template>
 
 <style scoped>
+.custom-dialog-card {
+  display: flex;
+  flex-direction: column;
+  max-height: min(90vh, calc(100vh - 48px));
+}
+
+.custom-dialog-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 .dialog-toolbar {
   display: flex;
   align-items: center;
@@ -89,6 +104,12 @@ watch(dialogActive, (active) => {
   position: relative;
   width: 100%;
 }
+
+.v-toolbar,
+.v-card-actions {
+  flex: 0 0 auto;
+}
+
 .close-btn {
   margin-left: auto;
 }

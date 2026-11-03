@@ -26,6 +26,13 @@ export interface CapabilityForm {
 
 export const DEFAULT_BRANCH = 'main'
 
+const DEFAULT_PLAYBOOKS: Record<FormActionType, string> = {
+  INSTALL: 'install.yml',
+  UNINSTALL: 'uninstall.yml',
+  DEPLOY: 'deploy.yml',
+  UNDEPLOY: 'undeploy.yml',
+}
+
 const TYPE_ORDER: FormCapabilityType[] = ['SETUP', 'DEPLOY']
 
 export const ACTIONS_BY_TYPE: Record<FormCapabilityType, FormActionType[]> = {
@@ -33,8 +40,8 @@ export const ACTIONS_BY_TYPE: Record<FormCapabilityType, FormActionType[]> = {
   DEPLOY: ['DEPLOY', 'UNDEPLOY'],
 }
 
-export function newActionFormData(): ActionFormData {
-  return { awxRepo: '', awxBranch: DEFAULT_BRANCH, playbook: '' }
+export function newActionFormData(actionType?: FormActionType): ActionFormData {
+  return { awxRepo: '', awxBranch: DEFAULT_BRANCH, playbook: actionType ? DEFAULT_PLAYBOOKS[actionType] : '' }
 }
 
 export function newCapabilityFormData(): CapabilityFormData {
@@ -80,8 +87,9 @@ export function isNameTaken(name: string, existing: { name: string }[]): boolean
   return existing.some(c => c.name.trim().toLowerCase() === wanted)
 }
 
-function isUntouched(action: ActionFormData): boolean {
-  return action.awxRepo === '' && action.playbook === '' && action.awxBranch === DEFAULT_BRANCH
+function isUntouched(action: ActionFormData, actionType: FormActionType): boolean {
+  return action.awxRepo === '' && action.playbook === DEFAULT_PLAYBOOKS[actionType]
+    && action.awxBranch === DEFAULT_BRANCH
 }
 
 // Plain-object copy; structuredClone throws on Vue reactive proxies
@@ -102,7 +110,7 @@ export function prefillUntouchedActions(
   const src = actions[source]
   const result: Partial<Record<FormActionType, ActionFormData>> = {}
   for (const [key, value] of Object.entries(actions) as [FormActionType, ActionFormData][]) {
-    result[key] = src && key !== source && isUntouched(value)
+    result[key] = src && key !== source && isUntouched(value, key)
       ? { ...value, awxRepo: src.awxRepo, awxBranch: src.awxBranch }
       : { ...value }
   }

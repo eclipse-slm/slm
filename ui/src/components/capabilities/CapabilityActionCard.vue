@@ -44,13 +44,14 @@ watch([awxRepo, awxBranch, playbook], () => {
 </script>
 
 <template>
-  <v-card variant="outlined" class="mb-4">
-    <v-card-title class="text-subtitle-1">{{ actionType }}</v-card-title>
+  <v-card variant="outlined" class="mt-4 mb-4">
     <v-card-text>
       <v-text-field
         v-model="awxRepo"
         label="AWX repository"
         required
+        class="mb-2"
+        hide-details="auto"
         :error-messages="repoError"
         @blur="emit('source-changed')"
       />
@@ -58,6 +59,8 @@ watch([awxRepo, awxBranch, playbook], () => {
         v-model="awxBranch"
         label="Branch"
         required
+        class="mb-2"
+        hide-details="auto"
         :error-messages="branchError"
         @blur="emit('source-changed')"
       />
@@ -65,6 +68,7 @@ watch([awxRepo, awxBranch, playbook], () => {
         v-model="playbook"
         label="Playbook"
         required
+        hide-details="auto"
         :error-messages="playbookError"
       />
     </v-card-text>

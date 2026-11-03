@@ -124,6 +124,8 @@ export const useCapabilitiesStore = defineStore('capabilitiesStore', {
 
             await ResourceManagementClient.capabilityApi.deleteCapability(capabilityId)
             await this.reloadAfterChange()
+            // A successful delete is authoritative even if the list reload failed or returned stale data.
+            this.capabilities = this.capabilities.filter(capability => capability.id !== capabilityId)
         },
 
         // The change already succeeded; a failed reload must not make it look failed (a retry would duplicate it)
@@ -155,4 +157,3 @@ export const useCapabilitiesStore = defineStore('capabilitiesStore', {
         },
     },
 });
-

@@ -63,51 +63,57 @@
           @device="showChooserDialog = false; showCreateDialog = true"
           @capability="showChooserDialog = false; showCapabilityDialog = true"
         />
-        <v-speed-dial
+        <!-- Speed dial sits inside the fab with activator="parent": with :app the fab's root element is the
+             full-height layout wrapper, so using it as activator would anchor the sub-buttons at the top of the page -->
+        <v-fab
           v-if="isAdmin"
-          open-on-hover
-          location="top center"
+          :active="!showCreateButton"
+          icon
+          class="mx-4"
+          elevation="15"
+          color="primary"
+          location="right bottom"
+          :app="true"
+          @click="showChooserDialog = true"
         >
-          <template #activator="{ props: activatorProps }">
+          <v-icon>mdi-plus</v-icon>
+          <v-speed-dial
+            activator="parent"
+            open-on-hover
+            location="left center"
+          >
             <v-fab
-              v-bind="activatorProps"
-              :active="!showCreateButton"
-              icon="mdi-plus"
-              class="mx-4"
-              elevation="15"
+              key="device"
+              icon
+              size="small"
               color="primary"
-              location="right bottom"
-              :app="true"
-              @click="showChooserDialog = true"
-            />
-          </template>
-          <v-fab
-            icon="mdi-devices"
-            size="small"
-            color="primary"
-            @click="showCreateDialog = true"
-          >
-            <v-tooltip
-              activator="parent"
-              location="start"
+              @click="showCreateDialog = true"
             >
-              Add device
-            </v-tooltip>
-          </v-fab>
-          <v-fab
-            icon="mdi-puzzle"
-            size="small"
-            color="primary"
-            @click="showCapabilityDialog = true"
-          >
-            <v-tooltip
-              activator="parent"
-              location="start"
+              <v-icon>mdi-devices</v-icon>
+              <v-tooltip
+                activator="parent"
+                location="top"
+              >
+                Add device
+              </v-tooltip>
+            </v-fab>
+            <v-fab
+              key="capability"
+              icon
+              size="small"
+              color="primary"
+              @click="showCapabilityDialog = true"
             >
-              Add capability
-            </v-tooltip>
-          </v-fab>
-        </v-speed-dial>
+              <v-icon>mdi-puzzle</v-icon>
+              <v-tooltip
+                activator="parent"
+                location="top"
+              >
+                Add capability
+              </v-tooltip>
+            </v-fab>
+          </v-speed-dial>
+        </v-fab>
         <v-fab
           v-else
           :active="!showCreateButton"

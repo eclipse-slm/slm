@@ -42,6 +42,12 @@ describe('capabilityForm', () => {
     expect(requiredActions(base({ capabilityClass: 'BaseConfigurationCapability', types: ['DEPLOY'] })))
       .toEqual(['INSTALL', 'UNINSTALL'])
   })
+  test('newActionFormData provides a default playbook for each action type', () => {
+    expect(newActionFormData('INSTALL').playbook).toBe('install.yml')
+    expect(newActionFormData('UNINSTALL').playbook).toBe('uninstall.yml')
+    expect(newActionFormData('DEPLOY').playbook).toBe('deploy.yml')
+    expect(newActionFormData('UNDEPLOY').playbook).toBe('undeploy.yml')
+  })
   test('buildCapabilityRequest: deployment capability', () => {
     const body: any = buildCapabilityRequest(base({ name: ' Docker ', logo: 'mdi-docker' }), 'id-1')
     expect(body).toMatchObject({ id: 'id-1', capabilityClass: 'DeploymentCapability', name: 'Docker',
@@ -76,11 +82,11 @@ describe('capabilityForm', () => {
   test('prefillUntouchedActions fills only untouched cards', () => {
     const out = prefillUntouchedActions({
       INSTALL:   { awxRepo: 'https://r', awxBranch: 'v1', playbook: 'install.yml' },
-      UNINSTALL: newActionFormData(),
+      UNINSTALL: newActionFormData('UNINSTALL'),
       DEPLOY:    { awxRepo: '', awxBranch: 'main', playbook: 'deploy.yml' },
     }, 'INSTALL')
-    expect(out.UNINSTALL).toEqual({ awxRepo: 'https://r', awxBranch: 'v1', playbook: '' })
-    expect(out.DEPLOY).toEqual({ awxRepo: '', awxBranch: 'main', playbook: 'deploy.yml' })
+    expect(out.UNINSTALL).toEqual({ awxRepo: 'https://r', awxBranch: 'v1', playbook: 'uninstall.yml' })
+    expect(out.DEPLOY).toEqual({ awxRepo: 'https://r', awxBranch: 'v1', playbook: 'deploy.yml' })
     expect(out.INSTALL!.awxBranch).toBe('v1')
   })
 })

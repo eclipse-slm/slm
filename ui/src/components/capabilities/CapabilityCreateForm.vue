@@ -46,7 +46,7 @@ const { value: capabilityClass } = useField<CapabilityClass>('capabilityClass', 
   { initialValue: props.modelValue.formData.capabilityClass });
 const { value: deploymentTypes, errorMessage: deploymentTypesError } = useField<string[]>(
   'supportedDeploymentTypes',
-  (v: string[]) => capabilityClass.value !== 'DeploymentCapability' || (v && v.length > 0)
+  (v: string[]) => !isDeployTypeSelected.value || (v && v.length > 0)
     || 'Select at least one deployment type',
   { initialValue: props.modelValue.formData.supportedDeploymentTypes });
 const { value: types, errorMessage: typesError } = useField<FormCapabilityType[]>('types',
@@ -56,8 +56,12 @@ const actions = ref<Partial<Record<FormActionType, ActionFormData>>>(
   cloneActions(props.modelValue.formData.actions));
 
 const showIconPicker = ref(false);
+const activeActionTab = ref<FormActionType | null>(null);
 
 const isDeployment = computed(() => capabilityClass.value === 'DeploymentCapability');
+const isDeployTypeSelected = computed(
+  () => isDeployment.value && (types.value ?? []).includes('DEPLOY')
+);
 const typeChoices = computed(() => allowedTypes(capabilityClass.value));
 const displayedLogo = computed(() => logo.value || fallbackLogo(name.value ?? ''));
 const actionTypes = computed(() => requiredActions(currentFormData()));
@@ -89,8 +93,23 @@ watch(() => props.modelValue, (val) => {
 watch(actionTypes, (needed) => {
   for (const t of needed) {
     if (!actions.value[t]) {
-      actions.value = { ...actions.value, [t]: newActionFormData() };
+      actions.value = { ...actions.value, [t]: newActionFormData(t) };
     }
+  }
+
+  if (!needed.length) {
+    activeActionTab.value = null;
+    return;
+  }
+
+  if (!activeActionTab.value || !needed.includes(activeActionTab.value)) {
+    activeActionTab.value = needed[0];
+  }
+}, { immediate: true });
+
+watch(isDeployTypeSelected, (selected) => {
+  if (!selected) {
+    deploymentTypes.value = [];
   }
 }, { immediate: true });
 
@@ -121,30 +140,16 @@ watch([name, logo, capabilityClass, deploymentTypes, types, actions], async () =
 
 <template>
   <form @submit.prevent>
+    <div class="text-subtitle-2 mb-2">Icon &amp; Capability Name</div>
     <v-text-field
       v-model="name"
       label="Name"
       required
-      prepend-icon="mdi-puzzle"
+      :prepend-icon="displayedLogo"
       :error-messages="nameError"
+      @click:prepend="showIconPicker = true"
     />
 
-    <div class="d-flex align-center mb-4">
-      <v-btn variant="outlined" @click="showIconPicker = true">
-        <v-icon start>{{ displayedLogo }}</v-icon>
-        {{ displayedLogo }}
-      </v-btn>
-      <v-btn
-        v-if="logo"
-        icon="mdi-close"
-        variant="text"
-        size="small"
-        class="ml-2"
-        aria-label="Clear logo"
-        @click="logo = ''"
-      />
-      <span v-else class="text-caption ml-3">Default: first letter of name</span>
-    </div>
     <IconPickerDialog
       :show="showIconPicker"
       :model-value="logo"
@@ -152,54 +157,88 @@ watch([name, logo, capabilityClass, deploymentTypes, types, actions], async () =
       @canceled="showIconPicker = false"
     />
 
-    <v-radio-group v-model="capabilityClass" inline label="Class">
-      <v-radio label="Deployment" value="DeploymentCapability" />
-      <v-radio label="Base configuration" value="BaseConfigurationCapability" />
-    </v-radio-group>
-
-    <v-select
-      v-if="isDeployment"
-      v-model="deploymentTypes"
-      label="Supported deployment types"
-      multiple
-      chips
-      :items="deploymentTypeItems"
-      :error-messages="deploymentTypesError"
-    />
+    <div class="mb-4">
+      <div class="text-subtitle-2">Class</div>
+      <v-radio-group v-model="capabilityClass" inline hide-details>
+        <v-radio label="Deployment" value="DeploymentCapability" />
+        <v-radio label="Base configuration" value="BaseConfigurationCapability" />
+      </v-radio-group>
+    </div>
 
     <div class="mb-4">
       <div class="text-subtitle-2">Capability types</div>
-      <template v-if="isDeployment">
+      <div class="d-flex align-center flex-wrap">
+        <template v-if="isDeployment">
+          <v-checkbox
+            v-for="t in typeChoices"
+            :key="t"
+            v-model="types"
+            :label="t"
+            :value="t"
+            multiple
+            hide-details
+            density="compact"
+            class="mr-4"
+            inline
+          />
+        </template>
         <v-checkbox
-          v-for="t in typeChoices"
-          :key="t"
-          v-model="types"
-          :label="t"
-          :value="t"
-          multiple
+          v-else
+          :model-value="true"
+          label="SETUP"
+          disabled
           hide-details
           density="compact"
+          inline
         />
-      </template>
-      <v-checkbox
-        v-else
-        :model-value="true"
-        label="SETUP"
-        disabled
-        hide-details
-        density="compact"
-      />
+      </div>
       <div v-if="typesError" class="text-caption text-error">{{ typesError }}</div>
     </div>
 
-    <template v-for="t in actionTypes" :key="t">
-      <CapabilityActionCard
-        v-if="actions[t]"
-        :action-type="t"
-        :model-value="actions[t]!"
-        @update:model-value="setAction(t, $event)"
-        @source-changed="onSourceChanged(t)"
+    <div v-if="actionTypes.length" class="mt-2">
+      <div class="text-subtitle-2 mb-2">Action types</div>
+
+      <v-tabs
+        v-model="activeActionTab"
+        color="primary"
+        density="compact"
+        class="mb-2"
+      >
+        <v-tab
+          v-for="t in actionTypes"
+          :key="`tab-${t}`"
+          :value="t"
+        >
+          {{ t }}
+        </v-tab>
+      </v-tabs>
+
+      <v-window v-model="activeActionTab">
+        <v-window-item
+          v-for="t in actionTypes"
+          :key="`panel-${t}`"
+          :value="t"
+        >
+          <CapabilityActionCard
+            v-if="actions[t]"
+            :action-type="t"
+            :model-value="actions[t]!"
+            @update:model-value="setAction(t, $event)"
+            @source-changed="onSourceChanged(t)"
+          />
+        </v-window-item>
+      </v-window>
+    </div>
+
+    <div v-if="isDeployTypeSelected" class="mb-2">
+      <div class="text-subtitle-2 mb-2">Supported deployment types</div>
+      <v-select
+        v-model="deploymentTypes"
+        multiple
+        chips
+        :items="deploymentTypeItems"
+        :error-messages="deploymentTypesError"
       />
-    </template>
+    </div>
   </form>
 </template>

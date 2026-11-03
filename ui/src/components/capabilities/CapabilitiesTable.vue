@@ -15,6 +15,8 @@
       :items="capabilities"
       item-value="id"
       show-expand
+      v-model:expanded="expanded"
+      @click:row="onRowClick"
     >
       <template #item.logo="{ item }">
         <v-icon>{{ item.logo }}</v-icon>
@@ -63,12 +65,14 @@
           <template #activator="{ props: tooltipProps }">
             <span v-bind="tooltipProps">
               <v-btn
-                icon="mdi-delete"
+                prepend-icon="mdi-delete"
                 size="small"
                 color="error"
                 :disabled="capabilitiesStore.installCountOfCapability(item.id) > 0"
-                @click="capabilityToDelete = item"
-              />
+                @click.stop="capabilityToDelete = item"
+              >
+                Delete
+              </v-btn>
             </span>
           </template>
           Installed on {{ capabilitiesStore.installCountOfCapability(item.id) }} device(s). Uninstall it first.
@@ -77,15 +81,31 @@
 
       <template #expanded-row="{ columns, item }">
         <tr>
-          <td :colspan="columns.length">
-            <div
-              v-for="[actionType, action] in Object.entries(item.actions ?? {})"
-              :key="actionType"
-              class="py-1"
-            >
-              <strong>{{ actionType }}</strong>:
-              repo {{ action.awxRepo }}, branch {{ action.awxBranch }}, playbook {{ action.playbook }}
-            </div>
+          <td
+            :colspan="columns.length"
+            class="expanded-actions-cell"
+          >
+            <table class="action-details-table">
+              <thead>
+                <tr>
+                  <th>Action type</th>
+                  <th>Repository</th>
+                  <th>Branch</th>
+                  <th>Playbook</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="[actionType, action] in Object.entries(item.actions ?? {})"
+                  :key="actionType"
+                >
+                  <td>{{ actionType }}</td>
+                  <td>{{ action.awxRepo }}</td>
+                  <td>{{ action.awxBranch }}</td>
+                  <td>{{ action.playbook }}</td>
+                </tr>
+              </tbody>
+            </table>
           </td>
         </tr>
       </template>
@@ -119,10 +139,12 @@ const capabilitiesStore = useCapabilitiesStore();
 
 const capabilityToDelete = ref<any>(null);
 const deleting = ref(false);
+const expanded = ref<Array<string | number>>([]);
 
 const capabilities = computed(() => capabilitiesStore.capabilities);
 
 const headers = [
+  { title: '', key: 'data-table-expand', sortable: false },
   { title: 'Logo', key: 'logo', sortable: false },
   { title: 'Name', key: 'name' },
   { title: 'Class', key: 'capabilityClass' },
@@ -131,6 +153,12 @@ const headers = [
   { title: 'In use', key: 'installCount', sortable: false },
   { title: '', key: 'deleteAction', sortable: false },
 ];
+
+function onRowClick(_event: MouseEvent, { item }: { item: { id: string | number } }) {
+  expanded.value = expanded.value.includes(item.id)
+    ? expanded.value.filter((id) => id !== item.id)
+    : [...expanded.value, item.id];
+}
 
 async function onDeleteConfirmed() {
   const capability = capabilityToDelete.value;
@@ -154,3 +182,28 @@ async function onDeleteConfirmed() {
   }
 }
 </script>
+
+<style scoped>
+.action-details-table {
+  border-collapse: collapse;
+  max-width: 100%;
+  margin: 8px 0 8px 48px;
+  text-align: left;
+  white-space: nowrap;
+  width: auto;
+}
+
+.expanded-actions-cell {
+  background-color: rgba(var(--v-theme-on-surface), 0.04);
+}
+
+.action-details-table th,
+.action-details-table td {
+  border: 0;
+  padding: 4px 8px;
+}
+
+.action-details-table th {
+  font-weight: 700;
+}
+</style>

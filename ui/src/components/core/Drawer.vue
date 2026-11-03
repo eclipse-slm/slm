@@ -153,6 +153,12 @@ export default {
 @use 'vuetify/lib/styles/tools/_rtl.sass' as *
 
 #core-navigation-drawer
+  .v-list-group
+    --list-indent-size: 12px
+
+  .v-list-group--sub-group .v-list-group__items
+    --indent-padding: 24px
+
   .v-list-group__header.v-list-item--active:before
     opacity: .24
 
@@ -180,10 +186,10 @@ export default {
   .v-list-group--sub-group
     .v-list-item
       +ltr()
-        padding-left: 8px
+        padding-left: 4px
 
       +rtl()
-        padding-right: 8px
+        padding-right: 4px
 
     .v-list-group__header
       +ltr()

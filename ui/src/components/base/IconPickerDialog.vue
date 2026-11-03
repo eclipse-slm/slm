@@ -109,7 +109,8 @@ function useManualName() {
       <div v-else>
         <v-text-field
           v-model="searchInput"
-          label="Search icons"
+          placeholder="Search icons"
+          aria-label="Search icons"
           prepend-inner-icon="mdi-magnify"
           variant="outlined"
           density="compact"
