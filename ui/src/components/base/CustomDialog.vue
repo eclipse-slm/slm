@@ -36,13 +36,20 @@ const showProp = toRef(props,'show'); // react to prop
 watch(showProp, (value) => {
   dialogActive.value = Boolean(value);
 }, { immediate: true });
+
+// Esc and outside click close the v-dialog by setting its v-model to false; tell the parent
+// (which still has show=true) exactly once. When the parent closes via show=false, no emit.
+watch(dialogActive, (active) => {
+  if (!active && props.show) {
+    emit('canceled');
+  }
+});
 </script>
 
 <template>
   <v-dialog
       v-model="dialogActive"
       :width="width"
-      @click:outside="emit('canceled')"
   >
     <template #default="{}">
       <v-card v-if="dialogActive">
