@@ -52,7 +52,64 @@
           @canceled="showCreateDialog = false"
           @confirmed="showCreateDialog = false"
         />
+        <CapabilityCreateDialog
+          :show="showCapabilityDialog"
+          @canceled="showCapabilityDialog = false"
+          @confirmed="showCapabilityDialog = false"
+        />
+        <AddItemChooserDialog
+          :show="showChooserDialog"
+          @canceled="showChooserDialog = false"
+          @device="showChooserDialog = false; showCreateDialog = true"
+          @capability="showChooserDialog = false; showCapabilityDialog = true"
+        />
+        <v-speed-dial
+          v-if="isAdmin"
+          open-on-hover
+          location="top center"
+        >
+          <template #activator="{ props: activatorProps }">
+            <v-fab
+              v-bind="activatorProps"
+              :active="!showCreateButton"
+              icon="mdi-plus"
+              class="mx-4"
+              elevation="15"
+              color="primary"
+              location="right bottom"
+              :app="true"
+              @click="showChooserDialog = true"
+            />
+          </template>
+          <v-fab
+            icon="mdi-devices"
+            size="small"
+            color="primary"
+            @click="showCreateDialog = true"
+          >
+            <v-tooltip
+              activator="parent"
+              location="start"
+            >
+              Add device
+            </v-tooltip>
+          </v-fab>
+          <v-fab
+            icon="mdi-puzzle"
+            size="small"
+            color="primary"
+            @click="showCapabilityDialog = true"
+          >
+            <v-tooltip
+              activator="parent"
+              location="start"
+            >
+              Add capability
+            </v-tooltip>
+          </v-fab>
+        </v-speed-dial>
         <v-fab
+          v-else
           :active="!showCreateButton"
           icon="mdi-plus"
           class="mx-4"
@@ -77,14 +134,22 @@ import DeviceInfoView from "@/components/resources/deviceinfo/DeviceInfoView.vue
 import OverviewHeading from "@/components/base/OverviewHeading.vue";
 import ResourcesTableDevices from "@/components/resources/ResourcesTableDevices.vue";
 import {useCapabilitiesStore} from "@/stores/capabilitiesStore";
+import {useUserStore} from "@/stores/userStore";
+import AddItemChooserDialog from "@/components/resources/dialogs/AddItemChooserDialog.vue";
+import CapabilityCreateDialog from "@/components/capabilities/CapabilityCreateDialog.vue";
 
 const resourceDevicesStore = useResourceDevicesStore();
 const capabilitiesStore = useCapabilitiesStore();
+const userStore = useUserStore();
+
+const isAdmin = computed(() => userStore.userRoles.includes('slm-admin'));
 
 const selectedResource = ref(null);
 const selectedSection = ref("common");
 const showCreateDialog = ref(false);
 const showCreateButton = ref(false);
+const showChooserDialog = ref(false);
+const showCapabilityDialog = ref(false);
 
 const resources = computed(() => resourceDevicesStore.resources);
 
