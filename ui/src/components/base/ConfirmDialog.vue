@@ -10,33 +10,40 @@
     </template>
 
     <template #actions>
-      <v-btn
-          id="button-confirm-dialog"
-          variant="text"
-          :disabled="confirmLoading"
-          @click="$emit('canceled')"
-      >
-        {{ cancelButtonLabel }}
-      </v-btn>
+      <!-- Three equal columns keep the optional centre action centred regardless of button widths -->
+      <div class="confirm-dialog-action justify-start">
+        <v-btn
+            id="button-confirm-dialog"
+            variant="text"
+            :disabled="confirmLoading"
+            @click="$emit('canceled')"
+        >
+          {{ cancelButtonLabel }}
+        </v-btn>
+      </div>
 
-      <v-spacer />
+      <div class="confirm-dialog-action justify-center">
+        <slot name="actions-center" />
+      </div>
 
-      <v-btn
-          id="button-confirm-dialog"
-          variant="text"
-          :color="attention ? 'error' : ''"
-          :disabled="confirmButtonDisabled || confirmLoading"
-          @click="$emit('confirmed')"
-      >
-        <v-progress-circular
-          v-if="confirmLoading"
-          size="16"
-          width="2"
-          indeterminate
-          class="mr-2"
-        />
-        {{ confirmButtonLabel }}
-      </v-btn>
+      <div class="confirm-dialog-action justify-end">
+        <v-btn
+            id="button-confirm-dialog"
+            variant="text"
+            :color="attention ? 'error' : ''"
+            :disabled="confirmButtonDisabled || confirmLoading"
+            @click="$emit('confirmed')"
+        >
+          <v-progress-circular
+            v-if="confirmLoading"
+            size="16"
+            width="2"
+            indeterminate
+            class="mr-2"
+          />
+          {{ confirmButtonLabel }}
+        </v-btn>
+      </div>
     </template>
   </CustomDialog>
 </template>
@@ -85,3 +92,10 @@ const props = defineProps({
   }
 });
 </script>
+
+<style scoped>
+.confirm-dialog-action {
+  display: flex;
+  flex: 1 1 0;
+}
+</style>

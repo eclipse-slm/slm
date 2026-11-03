@@ -22,6 +22,7 @@ const capabilitiesStore = useCapabilitiesStore();
 const active = toRef(props, 'show');
 const loading = ref(false);
 const formKey = ref(0);
+const formRef = ref<InstanceType<typeof CapabilityCreateForm> | null>(null);
 const form = ref<CapabilityForm>({ isFormValid: false, formData: newCapabilityFormData() });
 
 function clearDialog() {
@@ -69,7 +70,17 @@ async function createCapability() {
     @confirmed="createCapability"
   >
     <template #content>
-      <CapabilityCreateForm :key="formKey" v-model="form" />
+      <CapabilityCreateForm ref="formRef" :key="formKey" v-model="form" />
+    </template>
+    <template #actions-center>
+      <v-btn
+        variant="text"
+        prepend-icon="mdi-import"
+        :disabled="loading"
+        @click="formRef?.openImport()"
+      >
+        Import
+      </v-btn>
     </template>
   </ConfirmDialog>
 </template>

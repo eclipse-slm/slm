@@ -139,6 +139,12 @@ async function onImported(f: CapabilityFormData) {
   await validate();
 }
 
+function openImport() {
+  showImportDialog.value = true;
+}
+
+defineExpose({ openImport });
+
 function onIconSelected(icon: string) {
   logo.value = icon;
   showIconPicker.value = false;
@@ -157,16 +163,6 @@ watch([name, logo, capabilityClass, deploymentTypes, types, actions], async () =
 
 <template>
   <form @submit.prevent>
-    <div class="d-flex justify-end mb-2">
-      <v-btn
-        variant="outlined"
-        prepend-icon="mdi-import"
-        @click="showImportDialog = true"
-      >
-        Import
-      </v-btn>
-    </div>
-
     <CapabilityImportDialog
       :show="showImportDialog"
       @imported="onImported"
@@ -191,7 +187,7 @@ watch([name, logo, capabilityClass, deploymentTypes, types, actions], async () =
     />
 
     <div class="mb-4">
-      <div class="text-subtitle-2">Class</div>
+      <div class="text-subtitle-2">Capability class</div>
       <v-radio-group v-model="capabilityClass" inline hide-details>
         <v-radio label="Deployment" value="DeploymentCapability" />
         <v-radio label="Base configuration" value="BaseConfigurationCapability" />
