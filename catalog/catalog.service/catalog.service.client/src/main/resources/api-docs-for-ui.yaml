@@ -1,0 +1,78 @@
+---
+components:
+  schemas:
+    AASSubmodelTemplate:
+      properties:
+        id:
+          format: "int64"
+          type: "integer"
+        name:
+          type: "string"
+        semanticId:
+          type: "string"
+      type: "object"
+info:
+  contact:
+    email: "matthias.schneider@ipa.fraunhofer.de"
+    name: "Fraunhofer IPA"
+    url: "https://www.ipa.fraunhofer.de"
+  description: "REST API of Service Lifecycle Management Catalog"
+  title: "Service Lifecycle Management Catalog"
+  version: "1.5.0-SNAPSHOT"
+openapi: "3.0.1"
+paths:
+  /catalog/aas/submodels/templates:
+    get:
+      operationId: "getAASSubmodelTemplates"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: "#/components/schemas/AASSubmodelTemplate"
+                type: "array"
+          description: "OK"
+      summary: "Get AAS submodel templates"
+      tags:
+      - "aas-submodel-templates-rest-controller"
+    post:
+      operationId: "addAASSubmodelTemplate"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AASSubmodelTemplate"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: "string"
+          description: "OK"
+      summary: "Add AAS submodel template"
+      tags:
+      - "aas-submodel-templates-rest-controller"
+  /catalog/aas/submodels/templates/{aasSubmodelTemplateId}:
+    delete:
+      operationId: "removeAASSubmodelTemplate"
+      parameters:
+      - in: "path"
+        name: "aasSubmodelTemplateId"
+        required: true
+        schema:
+          format: "int64"
+          type: "integer"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: "string"
+          description: "OK"
+      summary: "Remove AAS submodel template by id"
+      tags:
+      - "aas-submodel-templates-rest-controller"
+servers:
+- url: "https://localhost:443/catalog-service"

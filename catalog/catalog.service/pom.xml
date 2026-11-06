@@ -16,6 +16,7 @@
 
     <modules>
         <module>catalog.service.app</module>
+        <module>catalog.service.client</module>
     </modules>
 
 </project>
