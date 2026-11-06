@@ -1,4464 +1,2809 @@
-{
-  "openapi": "3.0.1",
-  "info": {
-    "title": "Service Management",
-    "description": "REST API of Service Management",
-    "contact": {
-      "name": "Fraunhofer IPA",
-      "url": "https://www.ipa.fraunhofer.de",
-      "email": "matthias.schneider@ipa.fraunhofer.de"
-    },
-    "version": "1.5.0-SNAPSHOT"
-  },
-  "servers": [
-    {
-      "url": "http://localhost:9020/service-management",
-      "description": "Generated server url"
-    }
-  ],
-  "security": [
-    {
-      "bearer_auth": []
-    },
-    {
-      "spring_oauth": []
-    }
-  ],
-  "paths": {
-    "/services/vendors/{serviceVendorId}": {
-      "get": {
-        "tags": [
-          "Service Vendors"
-        ],
-        "summary": "Get service vendor by id",
-        "operationId": "getServiceVendorById",
-        "parameters": [
-          {
-            "name": "serviceVendorId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "withImage",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceVendor"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Service Vendors"
-        ],
-        "operationId": "createOrUpdateServiceVendorWithId",
-        "parameters": [
-          {
-            "name": "serviceVendorId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceVendorDTOApi"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Service Vendors"
-        ],
-        "operationId": "deleteServiceVendor",
-        "parameters": [
-          {
-            "name": "serviceVendorId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/services/vendors/{serviceVendorId}/repositories/{serviceRepositoryId}": {
-      "put": {
-        "tags": [
-          "Service Repositories"
-        ],
-        "summary": "Create or update a repository containing files for service offerings",
-        "operationId": "createOrUpdateRepository",
-        "parameters": [
-          {
-            "name": "serviceVendorId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "serviceRepositoryId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceRepository"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceRepositoryCreateResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/vendors/{serviceVendorId}/developers/{userId}": {
-      "put": {
-        "tags": [
-          "Service Vendors"
-        ],
-        "operationId": "addDeveloperToServiceVendor",
-        "parameters": [
-          {
-            "name": "serviceVendorId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Service Vendors"
-        ],
-        "operationId": "removeDeveloperFromServiceVendor",
-        "parameters": [
-          {
-            "name": "serviceVendorId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}": {
-      "get": {
-        "tags": [
-          "Service Offerings"
-        ],
-        "summary": "Get service offering by id",
-        "operationId": "getServiceOfferingById",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "withImage",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceOfferingDTOApi"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Service Offerings"
-        ],
-        "summary": "Create new service offering with specified id or update existing one",
-        "operationId": "createOrUpdateServiceOfferingWithId",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceOfferingCreateOrUpdateRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceOfferingCreateResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Service Offerings"
-        ],
-        "summary": "Delete service offering",
-        "operationId": "deleteServiceOffering",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}": {
-      "get": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Get service offering version by id",
-        "operationId": "getServiceOfferingVersionById",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "serviceOfferingVersionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceOfferingVersionDTOApi"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Create new service offering version with specified id or update existing one",
-        "operationId": "createOrUpdateServiceOfferingVersionWithId",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "serviceOfferingVersionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceOfferingVersionDTOApi"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceOfferingVersionCreateResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Delete service offering version",
-        "operationId": "deleteServiceOfferingVersion",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "serviceOfferingVersionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/requirements": {
-      "get": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Get service offering version requirements by id",
-        "operationId": "getServiceOfferingVersionRequirementsById",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "serviceOfferingVersionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ServiceRequirement"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Create or update requirements for service offering version",
-        "operationId": "createOrUpdateServiceOfferingVersionRequirementsWithId",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "serviceOfferingVersionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/ServiceRequirement"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/services/offerings/categories": {
-      "get": {
-        "tags": [
-          "Service Categories"
-        ],
-        "summary": "Get service categories",
-        "operationId": "getServiceCategories",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ServiceOfferingCategory"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Service Categories"
-        ],
-        "summary": "Create or update a service category",
-        "operationId": "createOrUpdateServiceCategory",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceOfferingCategory"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Service Categories"
-        ],
-        "summary": "Create a service category",
-        "operationId": "createServiceCategory",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceOfferingCategory"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceCategoryCreateResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/instances/{serviceInstanceId}/groups": {
-      "put": {
-        "tags": [
-          "Service Instances"
-        ],
-        "summary": "Set groups for service instance",
-        "operationId": "setGroupsOfServiceInstance",
-        "parameters": [
-          {
-            "name": "serviceInstanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/services/instances/groups/{serviceInstanceGroupId}": {
-      "put": {
-        "tags": [
-          "Service Instance Groups"
-        ],
-        "summary": "Create or update service instance group",
-        "operationId": "createOrUpdateServiceInstanceGroup",
-        "parameters": [
-          {
-            "name": "serviceInstanceGroupId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceInstanceGroup"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceInstanceGroup"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/vendors": {
-      "get": {
-        "tags": [
-          "Service Vendors"
-        ],
-        "summary": "Get service vendors",
-        "operationId": "getServiceVendors",
-        "parameters": [
-          {
-            "name": "withImage",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ServiceVendor"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Service Vendors"
-        ],
-        "operationId": "createServiceVendor",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceVendorDTOApi"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceVendorCreateResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/vendors/{serviceVendorId}/repositories": {
-      "get": {
-        "tags": [
-          "Service Repositories"
-        ],
-        "summary": "Get repositories containing files for service offerings",
-        "operationId": "getRepositories",
-        "parameters": [
-          {
-            "name": "serviceVendorId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ServiceRepositoryDTOApiRead"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Service Repositories"
-        ],
-        "summary": "Create repository containing files for service offerings",
-        "operationId": "createRepository",
-        "parameters": [
-          {
-            "name": "serviceVendorId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceRepository"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceRepositoryCreateResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings": {
-      "get": {
-        "tags": [
-          "Service Offerings"
-        ],
-        "summary": "Get service offerings",
-        "operationId": "getServiceOfferings",
-        "parameters": [
-          {
-            "name": "withImage",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "filterByServiceVendorId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ServiceOfferingDTOApi"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Service Offerings"
-        ],
-        "summary": "Create new service offering",
-        "operationId": "createServiceOfferingWithAutoGeneratedId",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceOfferingCreateOrUpdateRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceOfferingCreateResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/versions": {
-      "get": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Get service offering versions of service offering",
-        "operationId": "getServiceOfferingVersionsOfServiceOffering",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ServiceOfferingVersionDTOApi"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Create new service offering version",
-        "operationId": "createServiceOfferingVersionWithAutoGeneratedId",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceOfferingVersionDTOApi"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceOfferingVersionCreateResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/order": {
-      "post": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Order service offering version",
-        "operationId": "orderServiceOfferingVersionById",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "serviceOfferingVersionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceOrder"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/file": {
-      "post": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Upload new service offering file for deployment ",
-        "operationId": "createOrUpdateServiceOfferingFileWithId",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "serviceOfferingVersionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "required": [
-                  "file"
-                ],
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/services/offerings/git": {
-      "post": {
-        "tags": [
-          "Service Offerings"
-        ],
-        "summary": "Create new service offering from a git repository",
-        "operationId": "addServiceOfferingWithAutoGeneratedIdFromGitRepo",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceOfferingGitRepository"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/instances/{serviceInstanceId}/versions": {
-      "get": {
-        "tags": [
-          "Service Instances"
-        ],
-        "summary": "Get available version changes for service instance",
-        "operationId": "getAvailableVersionChangesForServiceInstance",
-        "parameters": [
-          {
-            "name": "serviceInstanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AvailableServiceInstanceVersionChange"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Service Instances"
-        ],
-        "summary": "Change service instance to version",
-        "operationId": "updateServiceInstanceToVersion",
-        "parameters": [
-          {
-            "name": "serviceInstanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "targetServiceOfferingVersionId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/services/instances/groups": {
-      "get": {
-        "tags": [
-          "Service Instance Groups"
-        ],
-        "summary": "Get service instance groups",
-        "operationId": "getServiceInstanceGroups",
-        "parameters": [
-          {
-            "name": "filterById",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ServiceInstanceGroup"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Service Instance Groups"
-        ],
-        "summary": "Create service instance group",
-        "operationId": "createServiceInstanceGroup",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceInstanceGroup"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceInstanceGroup"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Service Instance Groups"
-        ],
-        "summary": "Delete service instance group",
-        "operationId": "deleteServiceInstanceGroup",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/variables/system": {
-      "get": {
-        "tags": [
-          "Service Management Variables"
-        ],
-        "summary": "Get system variables",
-        "operationId": "getSystemVariables",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SystemVariable"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/variables/deployment": {
-      "get": {
-        "tags": [
-          "Service Management Variables"
-        ],
-        "summary": "Get deployment variables",
-        "operationId": "getDeploymentVariables",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DeploymentVariableType"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/vendors/{serviceVendorId}/logo": {
-      "get": {
-        "tags": [
-          "Service Vendors"
-        ],
-        "operationId": "getLogoOfServiceVendor",
-        "parameters": [
-          {
-            "name": "serviceVendorId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "image/png": {
-                "schema": {
-                  "type": "string",
-                  "format": "byte"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/vendors/{serviceVendorId}/developers": {
-      "get": {
-        "tags": [
-          "Service Vendors"
-        ],
-        "operationId": "getDevelopersOfServiceVendor",
-        "parameters": [
-          {
-            "name": "serviceVendorId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ServiceVendorDeveloper"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/users": {
-      "get": {
-        "tags": [
-          "Users"
-        ],
-        "summary": "Get users",
-        "operationId": "getUsers",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/users/vendors": {
-      "get": {
-        "tags": [
-          "Users"
-        ],
-        "summary": "Get service vendors of authenticated user",
-        "operationId": "getServiceVendorsOfUser",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/users/id": {
-      "get": {
-        "tags": [
-          "Users"
-        ],
-        "summary": "Get user id of authenticated user",
-        "operationId": "getUserIdOfAuthenticatedUser",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/matching-resources": {
-      "get": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Get possible resources matching service requirements",
-        "operationId": "getResourcesMatchingServiceRequirements",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "serviceOfferingVersionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MatchingResourceDTO"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/file/{fileName}": {
-      "get": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Download service offering file ",
-        "operationId": "getServiceOfferingFileWithId",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "serviceOfferingVersionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "fileName",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels": {
-      "get": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Returns all Submodels",
-        "operationId": "getAllSubmodels",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "description": "Id of the service offering",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "aasId",
-            "in": "path",
-            "description": "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "semanticId",
-            "in": "query",
-            "description": "The value of the semantic id reference (UTF8-BASE64-URL-encoded)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "idShort",
-            "in": "query",
-            "description": "The Asset Administration Shell’s IdShort",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of elements in the response array",
-            "required": false,
-            "schema": {
-              "minimum": 1,
-              "type": "string",
-              "enum": [
-                "1"
-              ]
-            }
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "description": "A server-generated identifier retrieved from pagingMetadata that specifies from which position the result listing should continue",
-            "required": false,
-            "schema": {
-              "$ref": "#/components/schemas/Base64UrlEncodedCursor"
-            }
-          },
-          {
-            "name": "level",
-            "in": "query",
-            "description": "Determines the structural depth of the respective resource content",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "deep",
-              "enum": [
-                "deep",
-                "core"
-              ]
-            }
-          },
-          {
-            "name": "extent",
-            "in": "query",
-            "description": "Determines to which extent the resource is being serialized",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "withoutBlobValue",
-              "enum": [
-                "withBlobValue",
-                "withoutBlobValue"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Requested Submodels",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetSubmodelsResult"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Result"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels/{submodelIdentifier}": {
-      "get": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Returns a specific Submodel",
-        "operationId": "getSubmodelById",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "description": "Id of the service offering",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "aasId",
-            "in": "path",
-            "description": "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "submodelIdentifier",
-            "in": "path",
-            "description": "The Submodel’s unique id (UTF8-BASE64-URL-encoded)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "level",
-            "in": "query",
-            "description": "Determines the structural depth of the respective resource content",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "deep",
-              "enum": [
-                "deep",
-                "core"
-              ]
-            }
-          },
-          {
-            "name": "extent",
-            "in": "query",
-            "description": "Determines to which extent the resource is being serialized",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "withoutBlobValue",
-              "enum": [
-                "withBlobValue",
-                "withoutBlobValue"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Requested Submodel",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Submodel"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Result"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Result"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels/{submodelIdentifier}/submodel-elements": {
-      "get": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Returns all submodel elements including their hierarchy",
-        "operationId": "getAllSubmodelElements",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "description": "Id of the service offering",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "aasId",
-            "in": "path",
-            "description": "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "submodelIdentifier",
-            "in": "path",
-            "description": "The Submodel’s unique id (UTF8-BASE64-URL-encoded)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of elements in the response array",
-            "required": false,
-            "schema": {
-              "minimum": 1,
-              "type": "string",
-              "enum": [
-                "1"
-              ]
-            }
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "description": "A server-generated identifier retrieved from pagingMetadata that specifies from which position the result listing should continue",
-            "required": false,
-            "schema": {
-              "$ref": "#/components/schemas/Base64UrlEncodedCursor"
-            }
-          },
-          {
-            "name": "level",
-            "in": "query",
-            "description": "Determines the structural depth of the respective resource content",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "deep",
-              "enum": [
-                "deep",
-                "core"
-              ]
-            }
-          },
-          {
-            "name": "extent",
-            "in": "query",
-            "description": "Determines to which extent the resource is being serialized",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "withoutBlobValue",
-              "enum": [
-                "withBlobValue",
-                "withoutBlobValue"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of found submodel elements",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Result"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Result"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels/{submodelIdentifier}/submodel-elements/{idShortPath}": {
-      "get": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Returns a specific submodel element from the Submodel at a specified path",
-        "operationId": "getSubmodelElementByPathSubmodelRepo",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "description": "Id of the service offering",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "aasId",
-            "in": "path",
-            "description": "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "submodelIdentifier",
-            "in": "path",
-            "description": "The Submodel’s unique id (UTF8-BASE64-URL-encoded)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "idShortPath",
-            "in": "path",
-            "description": "IdShort path to the submodel element (dot-separated)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "level",
-            "in": "query",
-            "description": "Determines the structural depth of the respective resource content",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "deep",
-              "enum": [
-                "deep",
-                "core"
-              ]
-            }
-          },
-          {
-            "name": "extent",
-            "in": "query",
-            "description": "Determines to which extent the resource is being serialized",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "withoutBlobValue",
-              "enum": [
-                "withBlobValue",
-                "withoutBlobValue"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Requested submodel element",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubmodelElement"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Result"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Result"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels/{submodelIdentifier}/submodel-elements/{idShortPath}/$value": {
-      "get": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Returns a specific submodel element from the Submodel at a specified path in the ValueOnly representation",
-        "operationId": "getSubmodelElementByPathValueOnlySubmodelRepo",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "description": "Id of the service offering",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "aasId",
-            "in": "path",
-            "description": "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "submodelIdentifier",
-            "in": "path",
-            "description": "The Submodel’s unique id (UTF8-BASE64-URL-encoded)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "idShortPath",
-            "in": "path",
-            "description": "IdShort path to the submodel element (dot-separated)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "level",
-            "in": "query",
-            "description": "Determines the structural depth of the respective resource content",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "deep",
-              "enum": [
-                "deep",
-                "core"
-              ]
-            }
-          },
-          {
-            "name": "extent",
-            "in": "query",
-            "description": "Determines to which extent the resource is being serialized",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "withoutBlobValue",
-              "enum": [
-                "withBlobValue",
-                "withoutBlobValue"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Requested submodel element",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubmodelElementValue"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Result"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Result"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels/{submodelIdentifier}/$value": {
-      "get": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Returns a specific Submodel in the value only representation",
-        "operationId": "getSubmodelByIdValueOnly",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "description": "Id of the service offering",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "aasId",
-            "in": "path",
-            "description": "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "submodelIdentifier",
-            "in": "path",
-            "description": "The Submodel’s unique id (UTF8-BASE64-URL-encoded)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "level",
-            "in": "query",
-            "description": "Determines the structural depth of the respective resource content",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "deep",
-              "enum": [
-                "deep",
-                "core"
-              ]
-            }
-          },
-          {
-            "name": "extent",
-            "in": "query",
-            "description": "Determines to which extent the resource is being serialized",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "withoutBlobValue",
-              "enum": [
-                "withBlobValue",
-                "withoutBlobValue"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Requested Submodel in value only representation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubmodelValueOnly"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Result"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Result"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels/{submodelIdentifier}/$metadata": {
-      "get": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Returns the metadata attributes of a specific Submodel",
-        "operationId": "getSubmodelByIdMetadata",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "description": "Id of the service offering",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "aasId",
-            "in": "path",
-            "description": "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "submodelIdentifier",
-            "in": "path",
-            "description": "The Submodel’s unique id (UTF8-BASE64-URL-encoded)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "level",
-            "in": "query",
-            "description": "Determines the structural depth of the respective resource content",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "deep",
-              "enum": [
-                "deep",
-                "core"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Requested Submodel in the metadata representation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Submodel"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Result"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Result"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels/$value": {
-      "get": {
-        "tags": [
-          "Service Offering Versions"
-        ],
-        "summary": "Returns all Submodels in their ValueOnly representation",
-        "operationId": "getAllSubmodelsValueOnly",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "description": "Id of the service offering",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "aasId",
-            "in": "path",
-            "description": "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "semanticId",
-            "in": "query",
-            "description": "The value of the semantic id reference (UTF8-BASE64-URL-encoded)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "idShort",
-            "in": "query",
-            "description": "The Asset Administration Shell’s IdShort",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of elements in the response array",
-            "required": false,
-            "schema": {
-              "minimum": 1,
-              "type": "string",
-              "enum": [
-                "1"
-              ]
-            }
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "description": "A server-generated identifier retrieved from pagingMetadata that specifies from which position the result listing should continue",
-            "required": false,
-            "schema": {
-              "$ref": "#/components/schemas/Base64UrlEncodedCursor"
-            }
-          },
-          {
-            "name": "level",
-            "in": "query",
-            "description": "Determines the structural depth of the respective resource content",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "deep",
-              "enum": [
-                "deep",
-                "core"
-              ]
-            }
-          },
-          {
-            "name": "extent",
-            "in": "query",
-            "description": "Determines to which extent the resource is being serialized",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "withoutBlobValue",
-              "enum": [
-                "withBlobValue",
-                "withoutBlobValue"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Requested Submodels in value only representation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetSubmodelsValueOnlyResult"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Result"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings/{serviceOfferingId}/cover": {
-      "get": {
-        "tags": [
-          "Service Offerings"
-        ],
-        "operationId": "getServiceOfferingCover",
-        "parameters": [
-          {
-            "name": "serviceOfferingId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "image/png": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings/deploymenttypes": {
-      "get": {
-        "tags": [
-          "Service Offerings"
-        ],
-        "summary": "Get possible deployment types",
-        "operationId": "getDeploymentTypes",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DeploymentType"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/offerings/categories/{serviceCategoryId}": {
-      "get": {
-        "tags": [
-          "Service Categories"
-        ],
-        "summary": "Get service categories",
-        "operationId": "getServiceCategoryById",
-        "parameters": [
-          {
-            "name": "serviceCategoryId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceOfferingCategory"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Service Categories"
-        ],
-        "summary": "Delete a service category",
-        "operationId": "deleteServiceCategories",
-        "parameters": [
-          {
-            "name": "serviceCategoryId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceCategoryCreateResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/instances": {
-      "get": {
-        "tags": [
-          "Service Instances"
-        ],
-        "summary": "Get all services of user",
-        "operationId": "getServicesOfUser",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ServiceInstance"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/instances/{serviceInstanceId}/orders": {
-      "get": {
-        "tags": [
-          "Service Instances"
-        ],
-        "summary": "Get orders of service instance",
-        "operationId": "getOrdersOfServiceInstance",
-        "parameters": [
-          {
-            "name": "serviceInstanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ServiceOrder"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/instances/{serviceInstanceId}/details": {
-      "get": {
-        "tags": [
-          "Service Instances"
-        ],
-        "summary": "Get details of service instance",
-        "operationId": "getServiceInstanceDetails",
-        "parameters": [
-          {
-            "name": "serviceInstanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceInstanceDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/services/vendors/{serviceVendorId}/repositories/{repositoryId}": {
-      "delete": {
-        "tags": [
-          "Service Repositories"
-        ],
-        "summary": "Delete repository containing files for service offerings",
-        "operationId": "deleteRepository",
-        "parameters": [
-          {
-            "name": "serviceVendorId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "repositoryId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/services/instances/{serviceInstanceId}": {
-      "delete": {
-        "tags": [
-          "Service Instances"
-        ],
-        "summary": "Delete a service instance",
-        "operationId": "deleteServiceInstance",
-        "parameters": [
-          {
-            "name": "serviceInstanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "ServiceVendorDTOApi": {
-        "required": [
-          "description",
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "logo": {
-            "type": "string",
-            "format": "byte"
-          }
-        }
-      },
-      "ServiceRepository": {
-        "required": [
-          "address",
-          "id",
-          "password",
-          "username"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "serviceVendorId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "address": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "type": {
-            "$ref": "#/components/schemas/ServiceRepositoryType"
-          }
-        }
-      },
-      "ServiceRepositoryType": {
-        "type": "string",
-        "enum": [
-          "DOCKER_REGISTRY"
-        ]
-      },
-      "ServiceRepositoryCreateResponse": {
-        "required": [
-          "serviceRepositoryId"
-        ],
-        "type": "object",
-        "properties": {
-          "serviceRepositoryId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      },
-      "ServiceOfferingCreateOrUpdateRequest": {
-        "required": [
-          "description",
-          "name",
-          "serviceCategoryId",
-          "serviceVendorId",
-          "shortDescription"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "shortDescription": {
-            "type": "string"
-          },
-          "serviceCategoryId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "serviceVendorId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "coverImage": {
-            "type": "string",
-            "format": "byte"
-          }
-        }
-      },
-      "ServiceOfferingCreateResponse": {
-        "type": "object",
-        "properties": {
-          "serviceOfferingId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      },
-      "CodesysDeploymentDefinition": {
-        "required": [
-          "applicationPath",
-          "deploymentType"
-        ],
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/DeploymentDefinition"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "applicationPath": {
-                "type": "string"
-              }
-            }
-          }
-        ]
-      },
-      "DeploymentDefinition": {
-        "required": [
-          "deploymentType"
-        ],
-        "type": "object",
-        "properties": {
-          "deploymentType": {
-            "$ref": "#/components/schemas/DeploymentType"
-          }
-        },
-        "discriminator": {
-          "propertyName": "deploymentType"
-        }
-      },
-      "DeploymentType": {
-        "type": "string",
-        "enum": [
-          "DOCKER_CONTAINER",
-          "DOCKER_COMPOSE",
-          "KUBERNETES",
-          "CODESYS"
-        ]
-      },
-      "DockerComposeDeploymentDefinition": {
-        "required": [
-          "composeFile",
-          "deploymentType",
-          "dotEnvFile",
-          "envFiles"
-        ],
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/DeploymentDefinition"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "composeFile": {
-                "type": "string"
-              },
-              "dotEnvFile": {
-                "type": "string"
-              },
-              "envFiles": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ]
-      },
-      "DockerContainerDeploymentDefinition": {
-        "required": [
-          "deploymentType",
-          "environmentVariables",
-          "imageRepository",
-          "imageTag",
-          "labels",
-          "portMappings",
-          "restartPolicy",
-          "volumes"
-        ],
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/DeploymentDefinition"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "imageRepository": {
-                "type": "string"
-              },
-              "imageTag": {
-                "type": "string"
-              },
-              "restartPolicy": {
-                "$ref": "#/components/schemas/DockerRestartPolicy"
-              },
-              "environmentVariables": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/ServiceOfferingEnvironmentVariable"
-                }
-              },
-              "labels": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/DockerContainerLabel"
-                }
-              },
-              "portMappings": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/DockerContainerPortMapping"
-                }
-              },
-              "volumes": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/DockerContainerVolume"
-                }
-              }
-            }
-          }
-        ]
-      },
-      "DockerContainerLabel": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "value": {
-            "type": "object"
-          }
-        }
-      },
-      "DockerContainerPortMapping": {
-        "required": [
-          "containerPort",
-          "hostPort",
-          "protocol"
-        ],
-        "type": "object",
-        "properties": {
-          "hostPort": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "containerPort": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "protocol": {
-            "type": "string"
-          }
-        }
-      },
-      "DockerContainerVolume": {
-        "required": [
-          "containerPath",
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "containerPath": {
-            "type": "string"
-          }
-        }
-      },
-      "DockerRestartPolicy": {
-        "type": "string",
-        "enum": [
-          "NO",
-          "ALWAYS",
-          "ON_FAILURE",
-          "UNLESS_STOPPED"
-        ]
-      },
-      "KubernetesDeploymentDefinition": {
-        "required": [
-          "deploymentType",
-          "manifestFile"
-        ],
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/DeploymentDefinition"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "manifestFile": {
-                "type": "string"
-              }
-            }
-          }
-        ]
-      },
-      "RequirementLogicType": {
-        "type": "string",
-        "enum": [
-          "ANY",
-          "ALL"
-        ]
-      },
-      "RequirementProperty": {
-        "required": [
-          "parentSubmodelsSemanticIds"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "semanticId": {
-            "type": "string"
-          },
-          "value": {
-            "type": "string"
-          },
-          "parentSubmodelsSemanticIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "ServiceOfferingEnvironmentVariable": {
-        "required": [
-          "key"
-        ],
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string"
-          },
-          "value": {
-            "type": "object"
-          }
-        }
-      },
-      "ServiceOfferingVersionDTOApi": {
-        "required": [
-          "deploymentDefinition",
-          "serviceOfferingId",
-          "serviceOptionCategories",
-          "servicePorts",
-          "serviceRepositories",
-          "serviceRequirements",
-          "version"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "serviceOfferingId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "version": {
-            "type": "string"
-          },
-          "created": {
-            "type": "string",
-            "format": "date-time",
-            "readOnly": true
-          },
-          "serviceOptionCategories": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ServiceOptionCategory"
-            }
-          },
-          "serviceRequirements": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ServiceRequirement"
-            }
-          },
-          "serviceRepositories": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          "deploymentDefinition": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CodesysDeploymentDefinition"
-              },
-              {
-                "$ref": "#/components/schemas/DockerComposeDeploymentDefinition"
-              },
-              {
-                "$ref": "#/components/schemas/DockerContainerDeploymentDefinition"
-              },
-              {
-                "$ref": "#/components/schemas/KubernetesDeploymentDefinition"
-              }
-            ]
-          },
-          "servicePorts": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        }
-      },
-      "ServiceOption": {
-        "required": [
-          "description",
-          "editable",
-          "key",
-          "name",
-          "optionType",
-          "relation",
-          "required",
-          "valueType"
-        ],
-        "type": "object",
-        "properties": {
-          "relation": {
-            "type": "string"
-          },
-          "key": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "optionType": {
-            "$ref": "#/components/schemas/ServiceOptionType"
-          },
-          "defaultValue": {
-            "type": "object"
-          },
-          "valueType": {
-            "$ref": "#/components/schemas/ServiceOptionValueType"
-          },
-          "valueOptions": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "required": {
-            "type": "boolean"
-          },
-          "editable": {
-            "type": "boolean"
-          }
-        }
-      },
-      "ServiceOptionCategory": {
-        "required": [
-          "id",
-          "name",
-          "serviceOptions"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          },
-          "serviceOptions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ServiceOption"
-            }
-          }
-        }
-      },
-      "ServiceOptionType": {
-        "type": "string",
-        "enum": [
-          "ENVIRONMENT_VARIABLE",
-          "PORT_MAPPING",
-          "VOLUME",
-          "LABEL",
-          "STRING_REPLACE"
-        ]
-      },
-      "ServiceOptionValueType": {
-        "type": "string",
-        "enum": [
-          "STRING",
-          "PASSWORD",
-          "BOOLEAN",
-          "NUMBER",
-          "INTEGER",
-          "DECIMAL",
-          "EMAIL",
-          "IP",
-          "ENUM",
-          "AUTO_GENERATED_UUID",
-          "PORT",
-          "VOLUME",
-          "AAS_SM_TEMPLATE",
-          "SYSTEM_VARIABLE",
-          "DEPLOYMENT_VARIABLE"
-        ]
-      },
-      "ServiceRequirement": {
-        "required": [
-          "logics"
-        ],
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "logics": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ServiceRequirementLogic"
-            }
-          }
-        }
-      },
-      "ServiceRequirementLogic": {
-        "required": [
-          "properties"
-        ],
-        "type": "object",
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/RequirementLogicType"
-          },
-          "properties": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RequirementProperty"
-            }
-          }
-        }
-      },
-      "ServiceOfferingVersionCreateResponse": {
-        "type": "object",
-        "properties": {
-          "serviceOfferingId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "serviceOfferingVersionId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      },
-      "ServiceOfferingCategory": {
-        "required": [
-          "id",
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "ServiceInstanceGroup": {
-        "required": [
-          "id",
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          }
-        }
-      },
-      "ServiceVendorCreateResponse": {
-        "required": [
-          "serviceVendorId"
-        ],
-        "type": "object",
-        "properties": {
-          "serviceVendorId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      },
-      "ServiceOptionValue": {
-        "required": [
-          "serviceOptionId",
-          "value"
-        ],
-        "type": "object",
-        "properties": {
-          "serviceOptionId": {
-            "type": "string"
-          },
-          "value": {
-            "type": "object"
-          }
-        }
-      },
-      "ServiceOrder": {
-        "required": [
-          "created",
-          "id",
-          "serviceOptionValues"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "created": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "serviceInstanceId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "serviceOptionValues": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ServiceOptionValue"
-            }
-          },
-          "deploymentCapabilityServiceId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "serviceOrderResult": {
-            "$ref": "#/components/schemas/ServiceOrderResult"
-          }
-        }
-      },
-      "ServiceOrderResult": {
-        "type": "string",
-        "enum": [
-          "FAILED",
-          "SUCCESSFULL"
-        ]
-      },
-      "ServiceOffering": {
-        "required": [
-          "description",
-          "id",
-          "name",
-          "shortDescription",
-          "versions"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "shortDescription": {
-            "type": "string"
-          },
-          "coverImage": {
-            "type": "string",
-            "format": "byte"
-          },
-          "serviceCategory": {
-            "$ref": "#/components/schemas/ServiceOfferingCategory"
-          },
-          "serviceVendor": {
-            "$ref": "#/components/schemas/ServiceVendor"
-          },
-          "versions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ServiceOfferingVersion"
-            }
-          },
-          "gitRepository": {
-            "$ref": "#/components/schemas/ServiceOfferingGitRepository"
-          }
-        }
-      },
-      "ServiceOfferingGitRepository": {
-        "required": [
-          "gitPassword",
-          "gitTagRegEx",
-          "gitUsername",
-          "id",
-          "repositoryUrl"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "repositoryUrl": {
-            "type": "string"
-          },
-          "gitUsername": {
-            "type": "string"
-          },
-          "gitPassword": {
-            "type": "string"
-          },
-          "gitTagRegEx": {
-            "type": "string"
-          },
-          "serviceOffering": {
-            "$ref": "#/components/schemas/ServiceOffering"
-          },
-          "serviceVendorId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      },
-      "ServiceOfferingVersion": {
-        "required": [
-          "created",
-          "id",
-          "serviceOptionCategories",
-          "servicePorts",
-          "serviceRepositories",
-          "serviceRequirements",
-          "version"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "serviceOffering": {
-            "$ref": "#/components/schemas/ServiceOffering"
-          },
-          "version": {
-            "type": "string"
-          },
-          "deploymentDefinition": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CodesysDeploymentDefinition"
-              },
-              {
-                "$ref": "#/components/schemas/DockerComposeDeploymentDefinition"
-              },
-              {
-                "$ref": "#/components/schemas/DockerContainerDeploymentDefinition"
-              },
-              {
-                "$ref": "#/components/schemas/KubernetesDeploymentDefinition"
-              }
-            ]
-          },
-          "created": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "serviceOptionCategories": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ServiceOptionCategory"
-            }
-          },
-          "serviceRequirements": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ServiceRequirement"
-            }
-          },
-          "serviceRepositories": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          "servicePorts": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        }
-      },
-      "ServiceVendor": {
-        "required": [
-          "description",
-          "id",
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "logo": {
-            "type": "string",
-            "format": "byte"
-          }
-        }
-      },
-      "ServiceCategoryCreateResponse": {
-        "required": [
-          "serviceCategoryId"
-        ],
-        "type": "object",
-        "properties": {
-          "serviceCategoryId": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "SystemVariable": {
-        "required": [
-          "key",
-          "name",
-          "valuePath",
-          "valueSource"
-        ],
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "valueSource": {
-            "$ref": "#/components/schemas/SystemVariableValueSource"
-          },
-          "valuePath": {
-            "type": "string"
-          },
-          "value": {
-            "type": "object"
-          }
-        }
-      },
-      "SystemVariableValueSource": {
-        "type": "string",
-        "enum": [
-          "APPLICATION_PROPERTIES"
-        ]
-      },
-      "DeploymentVariableType": {
-        "type": "string",
-        "enum": [
-          "TARGET_RESOURCE_ID",
-          "TARGET_RESOURCE_IP"
-        ]
-      },
-      "ServiceRepositoryDTOApiRead": {
-        "required": [
-          "address",
-          "id",
-          "username"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "serviceVendorId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "address": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          },
-          "type": {
-            "$ref": "#/components/schemas/ServiceRepositoryType"
-          }
-        }
-      },
-      "ServiceVendorDeveloper": {
-        "required": [
-          "username"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "username": {
-            "type": "string"
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          }
-        }
-      },
-      "User": {
-        "required": [
-          "id"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          }
-        }
-      },
-      "ServiceOfferingDTOApi": {
-        "required": [
-          "description",
-          "name",
-          "scmBased",
-          "serviceCategoryId",
-          "serviceVendorId",
-          "shortDescription",
-          "versions"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "shortDescription": {
-            "type": "string"
-          },
-          "serviceCategoryId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "serviceVendorId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "coverImage": {
-            "type": "string",
-            "format": "byte"
-          },
-          "versions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ServiceOfferingVersionDTOShort"
-            }
-          },
-          "scmBased": {
-            "type": "boolean"
-          }
-        }
-      },
-      "ServiceOfferingVersionDTOShort": {
-        "required": [
-          "created",
-          "version"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "version": {
-            "type": "string"
-          },
-          "created": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "MatchingResourceDTO": {
-        "required": [
-          "capabilityServiceId",
-          "isCluster",
-          "resourceId"
-        ],
-        "type": "object",
-        "properties": {
-          "resourceId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "capabilityServiceId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isCluster": {
-            "type": "boolean"
-          }
-        }
-      },
-      "Base64UrlEncodedCursor": {
-        "type": "object",
-        "properties": {
-          "encodedCursor": {
-            "type": "string"
-          },
-          "decodedCursor": {
-            "type": "string"
-          }
-        }
-      },
-      "Message": {
-        "type": "object",
-        "properties": {
-          "text": {
-            "type": "string"
-          },
-          "timestamp": {
-            "type": "string"
-          },
-          "correlationId": {
-            "type": "string"
-          },
-          "messageType": {
-            "$ref": "#/components/schemas/MessageTypeEnum"
-          },
-          "code": {
-            "type": "string"
-          }
-        }
-      },
-      "MessageTypeEnum": {
-        "type": "string",
-        "enum": [
-          "ERROR",
-          "EXCEPTION",
-          "INFO",
-          "WARNING"
-        ]
-      },
-      "Result": {
-        "type": "object",
-        "properties": {
-          "messages": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Message"
-            }
-          }
-        }
-      },
-      "AdministrativeInformation": {
-        "type": "object",
-        "properties": {
-          "version": {
-            "type": "string"
-          },
-          "templateId": {
-            "type": "string"
-          },
-          "revision": {
-            "type": "string"
-          },
-          "creator": {
-            "$ref": "#/components/schemas/Reference"
-          },
-          "embeddedDataSpecifications": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EmbeddedDataSpecification"
-            }
-          }
-        }
-      },
-      "DataSpecificationContent": {
-        "type": "object"
-      },
-      "DataTypeDefXsd": {
-        "type": "string",
-        "enum": [
-          "ANY_URI",
-          "BASE64BINARY",
-          "BOOLEAN",
-          "BYTE",
-          "DATE",
-          "DATE_TIME",
-          "DECIMAL",
-          "DOUBLE",
-          "DURATION",
-          "FLOAT",
-          "GDAY",
-          "GMONTH",
-          "GMONTH_DAY",
-          "GYEAR",
-          "GYEAR_MONTH",
-          "HEX_BINARY",
-          "INT",
-          "INTEGER",
-          "LONG",
-          "NEGATIVE_INTEGER",
-          "NON_NEGATIVE_INTEGER",
-          "NON_POSITIVE_INTEGER",
-          "POSITIVE_INTEGER",
-          "SHORT",
-          "STRING",
-          "TIME",
-          "UNSIGNED_BYTE",
-          "UNSIGNED_INT",
-          "UNSIGNED_LONG",
-          "UNSIGNED_SHORT"
-        ]
-      },
-      "EmbeddedDataSpecification": {
-        "type": "object",
-        "properties": {
-          "dataSpecificationContent": {
-            "$ref": "#/components/schemas/DataSpecificationContent"
-          },
-          "dataSpecification": {
-            "$ref": "#/components/schemas/Reference"
-          }
-        }
-      },
-      "Extension": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "value": {
-            "type": "string"
-          },
-          "refersTo": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Reference"
-            }
-          },
-          "valueType": {
-            "$ref": "#/components/schemas/DataTypeDefXsd"
-          },
-          "semanticId": {
-            "$ref": "#/components/schemas/Reference"
-          },
-          "supplementalSemanticIds": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Reference"
-            }
-          }
-        }
-      },
-      "GetSubmodelsResult": {
-        "type": "object",
-        "properties": {
-          "paging_metadata": {
-            "$ref": "#/components/schemas/PagedResultPagingMetadata"
-          },
-          "result": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Submodel"
-            }
-          }
-        }
-      },
-      "Key": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/KeyTypes"
-          },
-          "value": {
-            "type": "string"
-          }
-        }
-      },
-      "KeyTypes": {
-        "type": "string",
-        "enum": [
-          "ANNOTATED_RELATIONSHIP_ELEMENT",
-          "ASSET_ADMINISTRATION_SHELL",
-          "BASIC_EVENT_ELEMENT",
-          "BLOB",
-          "CAPABILITY",
-          "CONCEPT_DESCRIPTION",
-          "DATA_ELEMENT",
-          "ENTITY",
-          "EVENT_ELEMENT",
-          "FILE",
-          "FRAGMENT_REFERENCE",
-          "GLOBAL_REFERENCE",
-          "IDENTIFIABLE",
-          "MULTI_LANGUAGE_PROPERTY",
-          "OPERATION",
-          "PROPERTY",
-          "RANGE",
-          "REFERABLE",
-          "REFERENCE_ELEMENT",
-          "RELATIONSHIP_ELEMENT",
-          "SUBMODEL",
-          "SUBMODEL_ELEMENT",
-          "SUBMODEL_ELEMENT_COLLECTION",
-          "SUBMODEL_ELEMENT_LIST"
-        ]
-      },
-      "LangStringNameType": {
-        "type": "object",
-        "properties": {
-          "language": {
-            "type": "string"
-          },
-          "text": {
-            "type": "string"
-          }
-        }
-      },
-      "LangStringTextType": {
-        "type": "object",
-        "properties": {
-          "language": {
-            "type": "string"
-          },
-          "text": {
-            "type": "string"
-          }
-        }
-      },
-      "ModellingKind": {
-        "type": "string",
-        "enum": [
-          "INSTANCE",
-          "TEMPLATE"
-        ]
-      },
-      "PagedResultPagingMetadata": {
-        "type": "object",
-        "properties": {
-          "cursor": {
-            "type": "string",
-            "example": "wJlCDLIl6KTWypN7T6vc6nWEmEYe99Hjf1XY1xmqV-M=#"
-          }
-        }
-      },
-      "Qualifier": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string"
-          },
-          "value": {
-            "type": "string"
-          },
-          "kind": {
-            "$ref": "#/components/schemas/QualifierKind"
-          },
-          "valueType": {
-            "$ref": "#/components/schemas/DataTypeDefXsd"
-          },
-          "valueId": {
-            "$ref": "#/components/schemas/Reference"
-          },
-          "semanticId": {
-            "$ref": "#/components/schemas/Reference"
-          },
-          "supplementalSemanticIds": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Reference"
-            }
-          }
-        }
-      },
-      "QualifierKind": {
-        "type": "string",
-        "enum": [
-          "CONCEPT_QUALIFIER",
-          "TEMPLATE_QUALIFIER",
-          "VALUE_QUALIFIER"
-        ]
-      },
-      "Reference": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/ReferenceTypes"
-          },
-          "keys": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Key"
-            }
-          },
-          "referredSemanticId": {
-            "$ref": "#/components/schemas/Reference"
-          }
-        }
-      },
-      "ReferenceTypes": {
-        "type": "string",
-        "enum": [
-          "EXTERNAL_REFERENCE",
-          "MODEL_REFERENCE"
-        ]
-      },
-      "Submodel": {
-        "type": "object",
-        "properties": {
-          "submodelElements": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SubmodelElement"
-            }
-          },
-          "id": {
-            "type": "string"
-          },
-          "administration": {
-            "$ref": "#/components/schemas/AdministrativeInformation"
-          },
-          "description": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LangStringTextType"
-            }
-          },
-          "displayName": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LangStringNameType"
-            }
-          },
-          "idShort": {
-            "type": "string"
-          },
-          "category": {
-            "type": "string"
-          },
-          "extensions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Extension"
-            }
-          },
-          "embeddedDataSpecifications": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EmbeddedDataSpecification"
-            }
-          },
-          "semanticId": {
-            "$ref": "#/components/schemas/Reference"
-          },
-          "supplementalSemanticIds": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Reference"
-            }
-          },
-          "qualifiers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Qualifier"
-            }
-          },
-          "kind": {
-            "$ref": "#/components/schemas/ModellingKind"
-          }
-        }
-      },
-      "SubmodelElement": {
-        "type": "object",
-        "properties": {
-          "embeddedDataSpecifications": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EmbeddedDataSpecification"
-            }
-          },
-          "description": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LangStringTextType"
-            }
-          },
-          "displayName": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LangStringNameType"
-            }
-          },
-          "idShort": {
-            "type": "string"
-          },
-          "category": {
-            "type": "string"
-          },
-          "extensions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Extension"
-            }
-          },
-          "semanticId": {
-            "$ref": "#/components/schemas/Reference"
-          },
-          "supplementalSemanticIds": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Reference"
-            }
-          },
-          "qualifiers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Qualifier"
-            }
-          }
-        }
-      },
-      "SubmodelElementValue": {
-        "type": "object"
-      },
-      "SubmodelValueOnly": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "idShort": {
-            "type": "string"
-          },
-          "semanticId": {
-            "type": "string"
-          },
-          "valuesOnlyMap": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/SubmodelElementValue"
-            }
-          }
-        }
-      },
-      "GetSubmodelsValueOnlyResult": {
-        "type": "object",
-        "properties": {
-          "empty": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": {
-          "type": "object"
-        }
-      },
-      "ServiceInstance": {
-        "required": [
-          "capabilityServiceId",
-          "groupIds",
-          "id",
-          "metaData",
-          "ports",
-          "resourceId",
-          "serviceOfferingId",
-          "serviceOfferingVersionId",
-          "tags"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "metaData": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "resourceId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "capabilityServiceId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "serviceOfferingId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "serviceOfferingVersionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "ports": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          "groupIds": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        }
-      },
-      "AvailableServiceInstanceVersionChange": {
-        "required": [
-          "changeType",
-          "serviceOfferingVersionId",
-          "version",
-          "versionDate"
-        ],
-        "type": "object",
-        "properties": {
-          "serviceOfferingVersionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "version": {
-            "type": "string"
-          },
-          "versionDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "changeType": {
-            "$ref": "#/components/schemas/AvailableServiceInstanceVersionChangeType"
-          }
-        }
-      },
-      "AvailableServiceInstanceVersionChangeType": {
-        "type": "string",
-        "enum": [
-          "UP",
-          "DOWN"
-        ]
-      },
-      "ServiceInstanceDetails": {
-        "required": [
-          "deploymentCapabilityServiceId",
-          "groupIds",
-          "id",
-          "initialCreation",
-          "lastUpdate",
-          "metaData",
-          "orderHistory",
-          "serviceOfferingId",
-          "serviceOfferingVersionId",
-          "serviceOptions",
-          "tags"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "serviceOfferingId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "serviceOfferingVersionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "initialCreation": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "lastUpdate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "groupIds": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          "metaData": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "serviceOptions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ServiceOptionWithCurrentValue"
-            }
-          },
-          "deploymentCapabilityServiceId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "orderHistory": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ServiceOrder"
-            }
-          }
-        }
-      },
-      "ServiceOptionWithCurrentValue": {
-        "required": [
-          "description",
-          "editable",
-          "key",
-          "name",
-          "optionType",
-          "relation",
-          "required",
-          "valueType"
-        ],
-        "type": "object",
-        "properties": {
-          "currentValue": {
-            "type": "object"
-          },
-          "relation": {
-            "type": "string"
-          },
-          "key": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "optionType": {
-            "$ref": "#/components/schemas/ServiceOptionType"
-          },
-          "defaultValue": {
-            "type": "object"
-          },
-          "valueType": {
-            "$ref": "#/components/schemas/ServiceOptionValueType"
-          },
-          "valueOptions": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "required": {
-            "type": "boolean"
-          },
-          "editable": {
-            "type": "boolean"
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "spring_oauth": {
-        "type": "oauth2",
-        "description": "Oauth2 flow",
-        "flows": {
-          "authorizationCode": {
-            "authorizationUrl": "https://localhost/auth/realms/fabos/protocol/openid-connect/auth",
-            "tokenUrl": "https://localhost/auth/realms/fabos/protocol/openid-connect/token",
-            "refreshUrl": "https://localhost/auth/realms/fabos/protocol/openid-connect/token",
-            "scopes": {}
-          }
-        }
-      },
-      "bearer_auth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      }
-    }
-  }
-}
+---
+components:
+  schemas:
+    AdministrativeInformation:
+      properties:
+        creator:
+          $ref: "#/components/schemas/Reference"
+        embeddedDataSpecifications:
+          items:
+            $ref: "#/components/schemas/EmbeddedDataSpecification"
+          type: "array"
+        revision:
+          type: "string"
+        templateId:
+          type: "string"
+        version:
+          type: "string"
+      type: "object"
+    AvailableServiceInstanceVersionChange:
+      properties:
+        changeType:
+          $ref: "#/components/schemas/AvailableServiceInstanceVersionChangeType"
+        serviceOfferingVersionId:
+          format: "uuid"
+          type: "string"
+        version:
+          type: "string"
+        versionDate:
+          format: "date-time"
+          type: "string"
+      type: "object"
+    AvailableServiceInstanceVersionChangeType:
+      enum:
+      - "UP"
+      - "DOWN"
+      type: "string"
+    Base64UrlEncodedCursor:
+      properties:
+        decodedCursor:
+          type: "string"
+        encodedCursor:
+          type: "string"
+      type: "object"
+    Base64UrlEncodedIdentifier:
+      properties:
+        encodedIdentifier:
+          type: "string"
+        identifier:
+          type: "string"
+      type: "object"
+    CodesysDeploymentDefinition:
+      allOf:
+      - $ref: "#/components/schemas/DeploymentDefinition"
+      - properties:
+          applicationPath:
+            type: "string"
+        type: "object"
+      type: "object"
+    DataSpecificationContent:
+      type: "object"
+    DataTypeDefXsd:
+      enum:
+      - "ANY_URI"
+      - "BASE64BINARY"
+      - "BOOLEAN"
+      - "BYTE"
+      - "DATE"
+      - "DATE_TIME"
+      - "DECIMAL"
+      - "DOUBLE"
+      - "DURATION"
+      - "FLOAT"
+      - "GDAY"
+      - "GMONTH"
+      - "GMONTH_DAY"
+      - "GYEAR"
+      - "GYEAR_MONTH"
+      - "HEX_BINARY"
+      - "INT"
+      - "INTEGER"
+      - "LONG"
+      - "NEGATIVE_INTEGER"
+      - "NON_NEGATIVE_INTEGER"
+      - "NON_POSITIVE_INTEGER"
+      - "POSITIVE_INTEGER"
+      - "SHORT"
+      - "STRING"
+      - "TIME"
+      - "UNSIGNED_BYTE"
+      - "UNSIGNED_INT"
+      - "UNSIGNED_LONG"
+      - "UNSIGNED_SHORT"
+      type: "string"
+    DeploymentDefinition:
+      discriminator:
+        propertyName: "deploymentType"
+      properties:
+        deploymentType:
+          $ref: "#/components/schemas/DeploymentType"
+      type: "object"
+    DeploymentType:
+      enum:
+      - "DOCKER_CONTAINER"
+      - "DOCKER_COMPOSE"
+      - "KUBERNETES"
+      - "CODESYS"
+      type: "string"
+    DeploymentVariableType:
+      enum:
+      - "TARGET_RESOURCE_ID"
+      - "TARGET_RESOURCE_IP"
+      type: "string"
+    DockerComposeDeploymentDefinition:
+      allOf:
+      - $ref: "#/components/schemas/DeploymentDefinition"
+      - properties:
+          composeFile:
+            type: "string"
+          dotEnvFile:
+            type: "string"
+          envFiles:
+            additionalProperties:
+              type: "string"
+            type: "object"
+        type: "object"
+      type: "object"
+    DockerContainerDeploymentDefinition:
+      allOf:
+      - $ref: "#/components/schemas/DeploymentDefinition"
+      - properties:
+          environmentVariables:
+            items:
+              $ref: "#/components/schemas/ServiceOfferingEnvironmentVariable"
+            type: "array"
+          imageRepository:
+            type: "string"
+          imageTag:
+            type: "string"
+          labels:
+            items:
+              $ref: "#/components/schemas/DockerContainerLabel"
+            type: "array"
+          portMappings:
+            items:
+              $ref: "#/components/schemas/DockerContainerPortMapping"
+            type: "array"
+          restartPolicy:
+            $ref: "#/components/schemas/DockerRestartPolicy"
+          volumes:
+            items:
+              $ref: "#/components/schemas/DockerContainerVolume"
+            type: "array"
+        type: "object"
+      type: "object"
+    DockerContainerLabel:
+      properties:
+        name:
+          type: "string"
+        value:
+          type: "object"
+      type: "object"
+    DockerContainerPortMapping:
+      properties:
+        containerPort:
+          format: "int32"
+          type: "integer"
+        hostPort:
+          format: "int32"
+          type: "integer"
+        protocol:
+          type: "string"
+      type: "object"
+    DockerContainerVolume:
+      properties:
+        containerPath:
+          type: "string"
+        name:
+          type: "string"
+      type: "object"
+    DockerRestartPolicy:
+      enum:
+      - "NO"
+      - "ALWAYS"
+      - "ON_FAILURE"
+      - "UNLESS_STOPPED"
+      type: "string"
+    EmbeddedDataSpecification:
+      properties:
+        dataSpecification:
+          $ref: "#/components/schemas/Reference"
+        dataSpecificationContent:
+          $ref: "#/components/schemas/DataSpecificationContent"
+      type: "object"
+    Extension:
+      properties:
+        name:
+          type: "string"
+        refersTo:
+          items:
+            $ref: "#/components/schemas/Reference"
+          type: "array"
+        semanticId:
+          $ref: "#/components/schemas/Reference"
+        supplementalSemanticIds:
+          items:
+            $ref: "#/components/schemas/Reference"
+          type: "array"
+        value:
+          type: "string"
+        valueType:
+          $ref: "#/components/schemas/DataTypeDefXsd"
+      type: "object"
+    GetSubmodelsResult:
+      properties:
+        paging_metadata:
+          $ref: "#/components/schemas/PagedResultPagingMetadata"
+        result:
+          items:
+            $ref: "#/components/schemas/Submodel"
+          type: "array"
+      type: "object"
+    GetSubmodelsValueOnlyResult:
+      additionalProperties:
+        type: "object"
+      properties:
+        empty:
+          type: "boolean"
+      type: "object"
+    Key:
+      properties:
+        type:
+          $ref: "#/components/schemas/KeyTypes"
+        value:
+          type: "string"
+      type: "object"
+    KeyTypes:
+      enum:
+      - "ANNOTATED_RELATIONSHIP_ELEMENT"
+      - "ASSET_ADMINISTRATION_SHELL"
+      - "BASIC_EVENT_ELEMENT"
+      - "BLOB"
+      - "CAPABILITY"
+      - "CONCEPT_DESCRIPTION"
+      - "DATA_ELEMENT"
+      - "ENTITY"
+      - "EVENT_ELEMENT"
+      - "FILE"
+      - "FRAGMENT_REFERENCE"
+      - "GLOBAL_REFERENCE"
+      - "IDENTIFIABLE"
+      - "MULTI_LANGUAGE_PROPERTY"
+      - "OPERATION"
+      - "PROPERTY"
+      - "RANGE"
+      - "REFERABLE"
+      - "REFERENCE_ELEMENT"
+      - "RELATIONSHIP_ELEMENT"
+      - "SUBMODEL"
+      - "SUBMODEL_ELEMENT"
+      - "SUBMODEL_ELEMENT_COLLECTION"
+      - "SUBMODEL_ELEMENT_LIST"
+      type: "string"
+    KubernetesDeploymentDefinition:
+      allOf:
+      - $ref: "#/components/schemas/DeploymentDefinition"
+      - properties:
+          manifestFile:
+            type: "string"
+        type: "object"
+      type: "object"
+    LangStringNameType:
+      properties:
+        language:
+          type: "string"
+        text:
+          type: "string"
+      type: "object"
+    LangStringTextType:
+      properties:
+        language:
+          type: "string"
+        text:
+          type: "string"
+      type: "object"
+    MatchingResourceDTO:
+      properties:
+        capabilityServiceId:
+          format: "uuid"
+          type: "string"
+        cluster:
+          type: "boolean"
+        resourceId:
+          format: "uuid"
+          type: "string"
+      type: "object"
+    Message:
+      properties:
+        code:
+          type: "string"
+        correlationId:
+          type: "string"
+        messageType:
+          $ref: "#/components/schemas/MessageTypeEnum"
+        text:
+          type: "string"
+        timestamp:
+          type: "string"
+      type: "object"
+    MessageTypeEnum:
+      enum:
+      - "ERROR"
+      - "EXCEPTION"
+      - "INFO"
+      - "WARNING"
+      type: "string"
+    ModellingKind:
+      enum:
+      - "INSTANCE"
+      - "TEMPLATE"
+      type: "string"
+    PagedResultPagingMetadata:
+      properties:
+        cursor:
+          example: "wJlCDLIl6KTWypN7T6vc6nWEmEYe99Hjf1XY1xmqV-M=#"
+          type: "string"
+      type: "object"
+    Qualifier:
+      properties:
+        kind:
+          $ref: "#/components/schemas/QualifierKind"
+        semanticId:
+          $ref: "#/components/schemas/Reference"
+        supplementalSemanticIds:
+          items:
+            $ref: "#/components/schemas/Reference"
+          type: "array"
+        type:
+          type: "string"
+        value:
+          type: "string"
+        valueId:
+          $ref: "#/components/schemas/Reference"
+        valueType:
+          $ref: "#/components/schemas/DataTypeDefXsd"
+      type: "object"
+    QualifierKind:
+      enum:
+      - "CONCEPT_QUALIFIER"
+      - "TEMPLATE_QUALIFIER"
+      - "VALUE_QUALIFIER"
+      type: "string"
+    Reference:
+      properties:
+        keys:
+          items:
+            $ref: "#/components/schemas/Key"
+          type: "array"
+        referredSemanticId:
+          $ref: "#/components/schemas/Reference"
+        type:
+          $ref: "#/components/schemas/ReferenceTypes"
+      type: "object"
+    ReferenceTypes:
+      enum:
+      - "EXTERNAL_REFERENCE"
+      - "MODEL_REFERENCE"
+      type: "string"
+    RequirementLogicType:
+      enum:
+      - "ANY"
+      - "ALL"
+      type: "string"
+    RequirementProperty:
+      properties:
+        name:
+          type: "string"
+        parentSubmodelsSemanticIds:
+          items:
+            type: "string"
+          type: "array"
+        semanticId:
+          type: "string"
+        value:
+          type: "string"
+      type: "object"
+    Result:
+      properties:
+        messages:
+          items:
+            $ref: "#/components/schemas/Message"
+          type: "array"
+      type: "object"
+    ServiceCategoryCreateResponse:
+      properties:
+        serviceCategoryId:
+          format: "int64"
+          type: "integer"
+      type: "object"
+    ServiceInstance:
+      properties:
+        capabilityServiceId:
+          format: "uuid"
+          type: "string"
+        groupIds:
+          items:
+            format: "uuid"
+            type: "string"
+          type: "array"
+        id:
+          format: "uuid"
+          type: "string"
+        metaData:
+          additionalProperties:
+            type: "string"
+          type: "object"
+        ports:
+          items:
+            format: "int32"
+            type: "integer"
+          type: "array"
+        resourceId:
+          format: "uuid"
+          type: "string"
+        serviceOfferingId:
+          format: "uuid"
+          type: "string"
+        serviceOfferingVersionId:
+          format: "uuid"
+          type: "string"
+        tags:
+          items:
+            type: "string"
+          type: "array"
+      type: "object"
+    ServiceInstanceDetails:
+      properties:
+        deploymentCapabilityServiceId:
+          format: "uuid"
+          type: "string"
+        groupIds:
+          items:
+            format: "uuid"
+            type: "string"
+          type: "array"
+        id:
+          format: "uuid"
+          type: "string"
+        initialCreation:
+          format: "date-time"
+          type: "string"
+        lastUpdate:
+          format: "date-time"
+          type: "string"
+        metaData:
+          additionalProperties:
+            type: "string"
+          type: "object"
+        orderHistory:
+          items:
+            $ref: "#/components/schemas/ServiceOrder"
+          type: "array"
+        serviceOfferingId:
+          format: "uuid"
+          type: "string"
+        serviceOfferingVersionId:
+          format: "uuid"
+          type: "string"
+        serviceOptions:
+          items:
+            $ref: "#/components/schemas/ServiceOptionWithCurrentValue"
+          type: "array"
+        tags:
+          items:
+            type: "string"
+          type: "array"
+      type: "object"
+    ServiceInstanceGroup:
+      properties:
+        id:
+          format: "uuid"
+          type: "string"
+        name:
+          type: "string"
+      type: "object"
+    ServiceOffering:
+      properties:
+        coverImage:
+          format: "byte"
+          type: "string"
+        description:
+          type: "string"
+        gitRepository:
+          $ref: "#/components/schemas/ServiceOfferingGitRepository"
+        id:
+          format: "uuid"
+          type: "string"
+        name:
+          type: "string"
+        serviceCategory:
+          $ref: "#/components/schemas/ServiceOfferingCategory"
+        serviceVendor:
+          $ref: "#/components/schemas/ServiceVendor"
+        shortDescription:
+          type: "string"
+        versions:
+          items:
+            $ref: "#/components/schemas/ServiceOfferingVersion"
+          type: "array"
+      type: "object"
+    ServiceOfferingCategory:
+      properties:
+        id:
+          format: "int64"
+          type: "integer"
+        name:
+          type: "string"
+      type: "object"
+    ServiceOfferingCreateOrUpdateRequest:
+      properties:
+        coverImage:
+          format: "byte"
+          type: "string"
+        description:
+          type: "string"
+        id:
+          format: "uuid"
+          type: "string"
+        name:
+          type: "string"
+        serviceCategoryId:
+          format: "int64"
+          type: "integer"
+        serviceVendorId:
+          format: "uuid"
+          type: "string"
+        shortDescription:
+          type: "string"
+      required:
+      - "description"
+      - "name"
+      - "serviceCategoryId"
+      - "serviceVendorId"
+      - "shortDescription"
+      type: "object"
+    ServiceOfferingCreateResponse:
+      properties:
+        serviceOfferingId:
+          format: "uuid"
+          type: "string"
+      type: "object"
+    ServiceOfferingDTOApi:
+      properties:
+        coverImage:
+          format: "byte"
+          type: "string"
+        description:
+          type: "string"
+        id:
+          format: "uuid"
+          type: "string"
+        name:
+          type: "string"
+        scmBased:
+          type: "boolean"
+        serviceCategoryId:
+          format: "int64"
+          type: "integer"
+        serviceVendorId:
+          format: "uuid"
+          type: "string"
+        shortDescription:
+          type: "string"
+        versions:
+          items:
+            $ref: "#/components/schemas/ServiceOfferingVersionDTOShort"
+          type: "array"
+      required:
+      - "description"
+      - "name"
+      - "serviceCategoryId"
+      - "serviceVendorId"
+      - "shortDescription"
+      type: "object"
+    ServiceOfferingEnvironmentVariable:
+      properties:
+        key:
+          type: "string"
+        value:
+          type: "object"
+      type: "object"
+    ServiceOfferingGitRepository:
+      properties:
+        gitPassword:
+          type: "string"
+        gitTagRegEx:
+          type: "string"
+        gitUsername:
+          type: "string"
+        id:
+          format: "uuid"
+          type: "string"
+        repositoryUrl:
+          type: "string"
+        serviceOffering:
+          $ref: "#/components/schemas/ServiceOffering"
+        serviceVendorId:
+          format: "uuid"
+          type: "string"
+      type: "object"
+    ServiceOfferingVersion:
+      properties:
+        created:
+          format: "date-time"
+          type: "string"
+        deploymentDefinition:
+          oneOf:
+          - $ref: "#/components/schemas/CodesysDeploymentDefinition"
+          - $ref: "#/components/schemas/DockerComposeDeploymentDefinition"
+          - $ref: "#/components/schemas/DockerContainerDeploymentDefinition"
+          - $ref: "#/components/schemas/KubernetesDeploymentDefinition"
+        id:
+          format: "uuid"
+          type: "string"
+        serviceOffering:
+          $ref: "#/components/schemas/ServiceOffering"
+        serviceOptionCategories:
+          items:
+            $ref: "#/components/schemas/ServiceOptionCategory"
+          type: "array"
+        servicePorts:
+          items:
+            format: "int32"
+            type: "integer"
+          type: "array"
+        serviceRepositories:
+          items:
+            format: "uuid"
+            type: "string"
+          type: "array"
+        serviceRequirements:
+          items:
+            $ref: "#/components/schemas/ServiceRequirement"
+          type: "array"
+        version:
+          type: "string"
+      type: "object"
+    ServiceOfferingVersionCreateResponse:
+      properties:
+        serviceOfferingId:
+          format: "uuid"
+          type: "string"
+        serviceOfferingVersionId:
+          format: "uuid"
+          type: "string"
+      type: "object"
+    ServiceOfferingVersionDTOApi:
+      properties:
+        created:
+          format: "date-time"
+          readOnly: true
+          type: "string"
+        deploymentDefinition:
+          oneOf:
+          - $ref: "#/components/schemas/CodesysDeploymentDefinition"
+          - $ref: "#/components/schemas/DockerComposeDeploymentDefinition"
+          - $ref: "#/components/schemas/DockerContainerDeploymentDefinition"
+          - $ref: "#/components/schemas/KubernetesDeploymentDefinition"
+        id:
+          format: "uuid"
+          type: "string"
+        serviceOfferingId:
+          format: "uuid"
+          type: "string"
+        serviceOptionCategories:
+          items:
+            $ref: "#/components/schemas/ServiceOptionCategory"
+          type: "array"
+        servicePorts:
+          items:
+            format: "int32"
+            type: "integer"
+          type: "array"
+        serviceRepositories:
+          items:
+            format: "uuid"
+            type: "string"
+          type: "array"
+        serviceRequirements:
+          items:
+            $ref: "#/components/schemas/ServiceRequirement"
+          type: "array"
+        version:
+          type: "string"
+      required:
+      - "deploymentDefinition"
+      - "serviceOfferingId"
+      - "version"
+      type: "object"
+    ServiceOfferingVersionDTOShort:
+      properties:
+        created:
+          format: "date-time"
+          type: "string"
+        id:
+          format: "uuid"
+          type: "string"
+        version:
+          type: "string"
+      required:
+      - "version"
+      type: "object"
+    ServiceOption:
+      properties:
+        defaultValue:
+          type: "object"
+        description:
+          type: "string"
+        editable:
+          type: "boolean"
+        key:
+          type: "string"
+        name:
+          type: "string"
+        optionType:
+          $ref: "#/components/schemas/ServiceOptionType"
+        relation:
+          type: "string"
+        required:
+          type: "boolean"
+        valueOptions:
+          items:
+            type: "string"
+          type: "array"
+        valueType:
+          $ref: "#/components/schemas/ServiceOptionValueType"
+      type: "object"
+    ServiceOptionCategory:
+      properties:
+        id:
+          format: "int64"
+          type: "integer"
+        name:
+          type: "string"
+        serviceOptions:
+          items:
+            $ref: "#/components/schemas/ServiceOption"
+          type: "array"
+      type: "object"
+    ServiceOptionType:
+      enum:
+      - "ENVIRONMENT_VARIABLE"
+      - "PORT_MAPPING"
+      - "VOLUME"
+      - "LABEL"
+      - "STRING_REPLACE"
+      type: "string"
+    ServiceOptionValue:
+      properties:
+        serviceOptionId:
+          type: "string"
+        value:
+          type: "object"
+      type: "object"
+    ServiceOptionValueType:
+      enum:
+      - "STRING"
+      - "PASSWORD"
+      - "BOOLEAN"
+      - "NUMBER"
+      - "INTEGER"
+      - "DECIMAL"
+      - "EMAIL"
+      - "IP"
+      - "ENUM"
+      - "AUTO_GENERATED_UUID"
+      - "PORT"
+      - "VOLUME"
+      - "AAS_SM_TEMPLATE"
+      - "SYSTEM_VARIABLE"
+      - "DEPLOYMENT_VARIABLE"
+      type: "string"
+    ServiceOptionWithCurrentValue:
+      properties:
+        currentValue:
+          type: "object"
+        defaultValue:
+          type: "object"
+        description:
+          type: "string"
+        editable:
+          type: "boolean"
+        key:
+          type: "string"
+        name:
+          type: "string"
+        optionType:
+          $ref: "#/components/schemas/ServiceOptionType"
+        relation:
+          type: "string"
+        required:
+          type: "boolean"
+        valueOptions:
+          items:
+            type: "string"
+          type: "array"
+        valueType:
+          $ref: "#/components/schemas/ServiceOptionValueType"
+      type: "object"
+    ServiceOrder:
+      properties:
+        created:
+          format: "date-time"
+          type: "string"
+        deploymentCapabilityServiceId:
+          format: "uuid"
+          type: "string"
+        id:
+          format: "uuid"
+          type: "string"
+        serviceInstanceId:
+          format: "uuid"
+          type: "string"
+        serviceOptionValues:
+          items:
+            $ref: "#/components/schemas/ServiceOptionValue"
+          type: "array"
+        serviceOrderResult:
+          $ref: "#/components/schemas/ServiceOrderResult"
+      type: "object"
+    ServiceOrderResult:
+      enum:
+      - "FAILED"
+      - "SUCCESSFULL"
+      type: "string"
+    ServiceRepository:
+      properties:
+        address:
+          type: "string"
+        id:
+          format: "uuid"
+          type: "string"
+        password:
+          type: "string"
+        serviceVendorId:
+          format: "uuid"
+          type: "string"
+        type:
+          $ref: "#/components/schemas/ServiceRepositoryType"
+        username:
+          type: "string"
+      type: "object"
+    ServiceRepositoryCreateResponse:
+      properties:
+        serviceRepositoryId:
+          format: "uuid"
+          type: "string"
+      type: "object"
+    ServiceRepositoryDTOApiRead:
+      properties:
+        address:
+          type: "string"
+        id:
+          format: "uuid"
+          type: "string"
+        serviceVendorId:
+          format: "uuid"
+          type: "string"
+        type:
+          $ref: "#/components/schemas/ServiceRepositoryType"
+        username:
+          type: "string"
+      type: "object"
+    ServiceRepositoryType:
+      enum:
+      - "DOCKER_REGISTRY"
+      type: "string"
+    ServiceRequirement:
+      properties:
+        key:
+          type: "string"
+        logics:
+          items:
+            $ref: "#/components/schemas/ServiceRequirementLogic"
+          type: "array"
+        name:
+          type: "string"
+      type: "object"
+    ServiceRequirementLogic:
+      properties:
+        properties:
+          items:
+            $ref: "#/components/schemas/RequirementProperty"
+          type: "array"
+        type:
+          $ref: "#/components/schemas/RequirementLogicType"
+      type: "object"
+    ServiceVendor:
+      properties:
+        description:
+          type: "string"
+        id:
+          format: "uuid"
+          type: "string"
+        logo:
+          format: "byte"
+          type: "string"
+        name:
+          type: "string"
+      type: "object"
+    ServiceVendorCreateResponse:
+      properties:
+        serviceVendorId:
+          format: "uuid"
+          type: "string"
+      type: "object"
+    ServiceVendorDTOApi:
+      properties:
+        description:
+          type: "string"
+        id:
+          format: "uuid"
+          type: "string"
+        logo:
+          format: "byte"
+          type: "string"
+        name:
+          type: "string"
+      type: "object"
+    ServiceVendorDeveloper:
+      properties:
+        email:
+          type: "string"
+        firstName:
+          type: "string"
+        id:
+          format: "uuid"
+          type: "string"
+        lastName:
+          type: "string"
+        username:
+          type: "string"
+      type: "object"
+    Submodel:
+      properties:
+        administration:
+          $ref: "#/components/schemas/AdministrativeInformation"
+        category:
+          type: "string"
+        description:
+          items:
+            $ref: "#/components/schemas/LangStringTextType"
+          type: "array"
+        displayName:
+          items:
+            $ref: "#/components/schemas/LangStringNameType"
+          type: "array"
+        embeddedDataSpecifications:
+          items:
+            $ref: "#/components/schemas/EmbeddedDataSpecification"
+          type: "array"
+        extensions:
+          items:
+            $ref: "#/components/schemas/Extension"
+          type: "array"
+        id:
+          type: "string"
+        idShort:
+          type: "string"
+        kind:
+          $ref: "#/components/schemas/ModellingKind"
+        qualifiers:
+          items:
+            $ref: "#/components/schemas/Qualifier"
+          type: "array"
+        semanticId:
+          $ref: "#/components/schemas/Reference"
+        submodelElements:
+          items:
+            $ref: "#/components/schemas/SubmodelElement"
+          type: "array"
+        supplementalSemanticIds:
+          items:
+            $ref: "#/components/schemas/Reference"
+          type: "array"
+      type: "object"
+    SubmodelElement:
+      properties:
+        category:
+          type: "string"
+        description:
+          items:
+            $ref: "#/components/schemas/LangStringTextType"
+          type: "array"
+        displayName:
+          items:
+            $ref: "#/components/schemas/LangStringNameType"
+          type: "array"
+        embeddedDataSpecifications:
+          items:
+            $ref: "#/components/schemas/EmbeddedDataSpecification"
+          type: "array"
+        extensions:
+          items:
+            $ref: "#/components/schemas/Extension"
+          type: "array"
+        idShort:
+          type: "string"
+        qualifiers:
+          items:
+            $ref: "#/components/schemas/Qualifier"
+          type: "array"
+        semanticId:
+          $ref: "#/components/schemas/Reference"
+        supplementalSemanticIds:
+          items:
+            $ref: "#/components/schemas/Reference"
+          type: "array"
+      type: "object"
+    SubmodelElementValue:
+      type: "object"
+    SubmodelValueOnly:
+      properties:
+        id:
+          type: "string"
+        idShort:
+          type: "string"
+        semanticId:
+          type: "string"
+        valuesOnlyMap:
+          additionalProperties:
+            $ref: "#/components/schemas/SubmodelElementValue"
+          type: "object"
+      type: "object"
+    SystemVariable:
+      properties:
+        key:
+          type: "string"
+        name:
+          type: "string"
+        value:
+          type: "object"
+        valuePath:
+          type: "string"
+        valueSource:
+          $ref: "#/components/schemas/SystemVariableValueSource"
+      type: "object"
+    SystemVariableValueSource:
+      enum:
+      - "APPLICATION_PROPERTIES"
+      type: "string"
+    User:
+      properties:
+        email:
+          type: "string"
+        firstName:
+          type: "string"
+        id:
+          type: "string"
+        lastName:
+          type: "string"
+        username:
+          type: "string"
+      type: "object"
+  securitySchemes:
+    bearer_auth:
+      bearerFormat: "JWT"
+      scheme: "bearer"
+      type: "http"
+    spring_oauth:
+      description: "Oauth2 flow"
+      flows:
+        authorizationCode:
+          authorizationUrl: ""
+          refreshUrl: ""
+          scopes: {}
+          tokenUrl: ""
+      type: "oauth2"
+info:
+  contact:
+    email: "matthias.schneider@ipa.fraunhofer.de"
+    name: "Fraunhofer IPA"
+    url: "https://www.ipa.fraunhofer.de"
+  description: "REST API of Service Management"
+  title: "Service Management"
+  version: "1.5.0-SNAPSHOT"
+openapi: "3.0.1"
+paths:
+  /services/instances:
+    get:
+      operationId: "getServicesOfUser"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: "#/components/schemas/ServiceInstance"
+                type: "array"
+          description: "OK"
+      summary: "Get all services of user"
+      tags:
+      - "Service Instances"
+  /services/instances/groups:
+    delete:
+      operationId: "deleteServiceInstanceGroup"
+      parameters:
+      - in: "query"
+        name: "id"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+      summary: "Delete service instance group"
+      tags:
+      - "Service Instance Groups"
+    get:
+      operationId: "getServiceInstanceGroups"
+      parameters:
+      - in: "query"
+        name: "filterById"
+        required: false
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: "#/components/schemas/ServiceInstanceGroup"
+                type: "array"
+          description: "OK"
+      summary: "Get service instance groups"
+      tags:
+      - "Service Instance Groups"
+    post:
+      operationId: "createServiceInstanceGroup"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceInstanceGroup"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceInstanceGroup"
+          description: "OK"
+      summary: "Create service instance group"
+      tags:
+      - "Service Instance Groups"
+  /services/instances/groups/{serviceInstanceGroupId}:
+    put:
+      operationId: "createOrUpdateServiceInstanceGroup"
+      parameters:
+      - in: "path"
+        name: "serviceInstanceGroupId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceInstanceGroup"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceInstanceGroup"
+          description: "OK"
+      summary: "Create or update service instance group"
+      tags:
+      - "Service Instance Groups"
+  /services/instances/{serviceInstanceId}:
+    delete:
+      operationId: "deleteServiceInstance"
+      parameters:
+      - in: "path"
+        name: "serviceInstanceId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+      summary: "Delete a service instance"
+      tags:
+      - "Service Instances"
+  /services/instances/{serviceInstanceId}/details:
+    get:
+      operationId: "getServiceInstanceDetails"
+      parameters:
+      - in: "path"
+        name: "serviceInstanceId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceInstanceDetails"
+          description: "OK"
+      summary: "Get details of service instance"
+      tags:
+      - "Service Instances"
+  /services/instances/{serviceInstanceId}/groups:
+    put:
+      operationId: "setGroupsOfServiceInstance"
+      parameters:
+      - in: "path"
+        name: "serviceInstanceId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                format: "uuid"
+                type: "string"
+              type: "array"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+      summary: "Set groups for service instance"
+      tags:
+      - "Service Instances"
+  /services/instances/{serviceInstanceId}/orders:
+    get:
+      operationId: "getOrdersOfServiceInstance"
+      parameters:
+      - in: "path"
+        name: "serviceInstanceId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: "#/components/schemas/ServiceOrder"
+                type: "array"
+          description: "OK"
+      summary: "Get orders of service instance"
+      tags:
+      - "Service Instances"
+  /services/instances/{serviceInstanceId}/versions:
+    get:
+      operationId: "getAvailableVersionChangesForServiceInstance"
+      parameters:
+      - in: "path"
+        name: "serviceInstanceId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: "#/components/schemas/AvailableServiceInstanceVersionChange"
+                type: "array"
+          description: "OK"
+      summary: "Get available version changes for service instance"
+      tags:
+      - "Service Instances"
+    post:
+      operationId: "updateServiceInstanceToVersion"
+      parameters:
+      - in: "path"
+        name: "serviceInstanceId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "query"
+        name: "targetServiceOfferingVersionId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+      summary: "Change service instance to version"
+      tags:
+      - "Service Instances"
+  /services/offerings:
+    get:
+      operationId: "getServiceOfferings"
+      parameters:
+      - in: "query"
+        name: "withImage"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+      - in: "query"
+        name: "filterByServiceVendorId"
+        required: false
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/ServiceOfferingDTOApi"
+                type: "array"
+          description: "OK"
+      summary: "Get service offerings"
+      tags:
+      - "Service Offerings"
+    post:
+      operationId: "createServiceOfferingWithAutoGeneratedId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceOfferingCreateOrUpdateRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceOfferingCreateResponse"
+          description: "OK"
+      summary: "Create new service offering"
+      tags:
+      - "Service Offerings"
+  /services/offerings/categories:
+    get:
+      operationId: "getServiceCategories"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/ServiceOfferingCategory"
+                type: "array"
+          description: "OK"
+      summary: "Get service categories"
+      tags:
+      - "Service Categories"
+    post:
+      operationId: "createServiceCategory"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceOfferingCategory"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceCategoryCreateResponse"
+          description: "OK"
+      summary: "Create a service category"
+      tags:
+      - "Service Categories"
+    put:
+      operationId: "createOrUpdateServiceCategory"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceOfferingCategory"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+      summary: "Create or update a service category"
+      tags:
+      - "Service Categories"
+  /services/offerings/categories/{serviceCategoryId}:
+    delete:
+      operationId: "deleteServiceCategories"
+      parameters:
+      - in: "path"
+        name: "serviceCategoryId"
+        required: true
+        schema:
+          format: "int64"
+          type: "integer"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceCategoryCreateResponse"
+          description: "OK"
+      summary: "Delete a service category"
+      tags:
+      - "Service Categories"
+    get:
+      operationId: "getServiceCategoryById"
+      parameters:
+      - in: "path"
+        name: "serviceCategoryId"
+        required: true
+        schema:
+          format: "int64"
+          type: "integer"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceOfferingCategory"
+          description: "OK"
+      summary: "Get service categories"
+      tags:
+      - "Service Categories"
+  /services/offerings/deploymenttypes:
+    get:
+      operationId: "getDeploymentTypes"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/DeploymentType"
+                type: "array"
+          description: "OK"
+      summary: "Get possible deployment types"
+      tags:
+      - "Service Offerings"
+  /services/offerings/git:
+    post:
+      operationId: "addServiceOfferingWithAutoGeneratedIdFromGitRepo"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceOfferingGitRepository"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                additionalProperties:
+                  format: "uuid"
+                  type: "string"
+                type: "object"
+          description: "OK"
+      summary: "Create new service offering from a git repository"
+      tags:
+      - "Service Offerings"
+  /services/offerings/{serviceOfferingId}:
+    delete:
+      operationId: "deleteServiceOffering"
+      parameters:
+      - in: "path"
+        name: "serviceOfferingId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+      summary: "Delete service offering"
+      tags:
+      - "Service Offerings"
+    get:
+      operationId: "getServiceOfferingById"
+      parameters:
+      - in: "path"
+        name: "serviceOfferingId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "query"
+        name: "withImage"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceOfferingDTOApi"
+          description: "OK"
+      summary: "Get service offering by id"
+      tags:
+      - "Service Offerings"
+    put:
+      operationId: "createOrUpdateServiceOfferingWithId"
+      parameters:
+      - in: "path"
+        name: "serviceOfferingId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceOfferingCreateOrUpdateRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceOfferingCreateResponse"
+          description: "OK"
+      summary: "Create new service offering with specified id or update existing one"
+      tags:
+      - "Service Offerings"
+  /services/offerings/{serviceOfferingId}/cover:
+    get:
+      operationId: "getServiceOfferingCover"
+      parameters:
+      - in: "path"
+        name: "serviceOfferingId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          content:
+            image/png:
+              schema:
+                type: "string"
+          description: "OK"
+      tags:
+      - "Service Offerings"
+  /services/offerings/{serviceOfferingId}/versions:
+    get:
+      operationId: "getServiceOfferingVersionsOfServiceOffering"
+      parameters:
+      - in: "path"
+        name: "serviceOfferingId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/ServiceOfferingVersionDTOApi"
+                type: "array"
+          description: "OK"
+      summary: "Get service offering versions of service offering"
+      tags:
+      - "Service Offering Versions"
+    post:
+      operationId: "createServiceOfferingVersionWithAutoGeneratedId"
+      parameters:
+      - in: "path"
+        name: "serviceOfferingId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceOfferingVersionDTOApi"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceOfferingVersionCreateResponse"
+          description: "OK"
+      summary: "Create new service offering version"
+      tags:
+      - "Service Offering Versions"
+  /services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels:
+    get:
+      operationId: "getAllSubmodels"
+      parameters:
+      - description: "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)"
+        in: "path"
+        name: "aasId"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedIdentifier"
+      - description: "The value of the semantic id reference (UTF8-BASE64-URL-encoded)"
+        in: "query"
+        name: "semanticId"
+        required: false
+        schema:
+          type: "string"
+      - description: "The Asset Administration Shell’s IdShort"
+        in: "query"
+        name: "idShort"
+        required: false
+        schema:
+          type: "string"
+      - description: "The maximum number of elements in the response array"
+        in: "query"
+        name: "limit"
+        required: false
+        schema:
+          enum:
+          - "1"
+          minimum: 1
+          type: "string"
+      - description: "A server-generated identifier retrieved from pagingMetadata\
+          \ that specifies from which position the result listing should continue"
+        in: "query"
+        name: "cursor"
+        required: false
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedCursor"
+      - description: "Determines the structural depth of the respective resource content"
+        in: "query"
+        name: "level"
+        required: false
+        schema:
+          default: "deep"
+          enum:
+          - "deep"
+          - "core"
+          type: "string"
+      - description: "Determines to which extent the resource is being serialized"
+        in: "query"
+        name: "extent"
+        required: false
+        schema:
+          default: "withoutBlobValue"
+          enum:
+          - "withBlobValue"
+          - "withoutBlobValue"
+          type: "string"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetSubmodelsResult"
+          description: "Requested Submodels"
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+          description: "Internal Server Error"
+      summary: "Returns all Submodels"
+      tags:
+      - "Service Offering Versions"
+    parameters:
+    - description: "Id of the service offering"
+      in: "path"
+      name: "serviceOfferingId"
+      required: true
+      schema:
+        format: "uuid"
+        type: "string"
+  /services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels/$value:
+    get:
+      operationId: "getAllSubmodelsValueOnly"
+      parameters:
+      - description: "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)"
+        in: "path"
+        name: "aasId"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedIdentifier"
+      - description: "The value of the semantic id reference (UTF8-BASE64-URL-encoded)"
+        in: "query"
+        name: "semanticId"
+        required: false
+        schema:
+          type: "string"
+      - description: "The Asset Administration Shell’s IdShort"
+        in: "query"
+        name: "idShort"
+        required: false
+        schema:
+          type: "string"
+      - description: "The maximum number of elements in the response array"
+        in: "query"
+        name: "limit"
+        required: false
+        schema:
+          enum:
+          - "1"
+          minimum: 1
+          type: "string"
+      - description: "A server-generated identifier retrieved from pagingMetadata\
+          \ that specifies from which position the result listing should continue"
+        in: "query"
+        name: "cursor"
+        required: false
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedCursor"
+      - description: "Determines the structural depth of the respective resource content"
+        in: "query"
+        name: "level"
+        required: false
+        schema:
+          default: "deep"
+          enum:
+          - "deep"
+          - "core"
+          type: "string"
+      - description: "Determines to which extent the resource is being serialized"
+        in: "query"
+        name: "extent"
+        required: false
+        schema:
+          default: "withoutBlobValue"
+          enum:
+          - "withBlobValue"
+          - "withoutBlobValue"
+          type: "string"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetSubmodelsValueOnlyResult"
+          description: "Requested Submodels in value only representation"
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+          description: "Internal Server Error"
+      summary: "Returns all Submodels in their ValueOnly representation"
+      tags:
+      - "Service Offering Versions"
+    parameters:
+    - description: "Id of the service offering"
+      in: "path"
+      name: "serviceOfferingId"
+      required: true
+      schema:
+        format: "uuid"
+        type: "string"
+  /services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels/{submodelIdentifier}:
+    get:
+      operationId: "getSubmodelById"
+      parameters:
+      - description: "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)"
+        in: "path"
+        name: "aasId"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedIdentifier"
+      - description: "The Submodel’s unique id (UTF8-BASE64-URL-encoded)"
+        in: "path"
+        name: "submodelIdentifier"
+        required: true
+        schema:
+          type: "string"
+      - description: "Determines the structural depth of the respective resource content"
+        in: "query"
+        name: "level"
+        required: false
+        schema:
+          default: "deep"
+          enum:
+          - "deep"
+          - "core"
+          type: "string"
+      - description: "Determines to which extent the resource is being serialized"
+        in: "query"
+        name: "extent"
+        required: false
+        schema:
+          default: "withoutBlobValue"
+          enum:
+          - "withBlobValue"
+          - "withoutBlobValue"
+          type: "string"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Submodel"
+          description: "Requested Submodel"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+          description: "Not Found"
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+          description: "Internal Server Error"
+      summary: "Returns a specific Submodel"
+      tags:
+      - "Service Offering Versions"
+    parameters:
+    - description: "Id of the service offering"
+      in: "path"
+      name: "serviceOfferingId"
+      required: true
+      schema:
+        format: "uuid"
+        type: "string"
+  /services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels/{submodelIdentifier}/$metadata:
+    get:
+      operationId: "getSubmodelByIdMetadata"
+      parameters:
+      - description: "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)"
+        in: "path"
+        name: "aasId"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedIdentifier"
+      - description: "The Submodel’s unique id (UTF8-BASE64-URL-encoded)"
+        in: "path"
+        name: "submodelIdentifier"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedIdentifier"
+      - description: "Determines the structural depth of the respective resource content"
+        in: "query"
+        name: "level"
+        required: false
+        schema:
+          default: "deep"
+          enum:
+          - "deep"
+          - "core"
+          type: "string"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Submodel"
+          description: "Requested Submodel in the metadata representation"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+          description: "Not Found"
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+          description: "Internal Server Error"
+      summary: "Returns the metadata attributes of a specific Submodel"
+      tags:
+      - "Service Offering Versions"
+    parameters:
+    - description: "Id of the service offering"
+      in: "path"
+      name: "serviceOfferingId"
+      required: true
+      schema:
+        format: "uuid"
+        type: "string"
+  /services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels/{submodelIdentifier}/$value:
+    get:
+      operationId: "getSubmodelByIdValueOnly"
+      parameters:
+      - description: "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)"
+        in: "path"
+        name: "aasId"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedIdentifier"
+      - description: "The Submodel’s unique id (UTF8-BASE64-URL-encoded)"
+        in: "path"
+        name: "submodelIdentifier"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedIdentifier"
+      - description: "Determines the structural depth of the respective resource content"
+        in: "query"
+        name: "level"
+        required: false
+        schema:
+          default: "deep"
+          enum:
+          - "deep"
+          - "core"
+          type: "string"
+      - description: "Determines to which extent the resource is being serialized"
+        in: "query"
+        name: "extent"
+        required: false
+        schema:
+          default: "withoutBlobValue"
+          enum:
+          - "withBlobValue"
+          - "withoutBlobValue"
+          type: "string"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmodelValueOnly"
+          description: "Requested Submodel in value only representation"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+          description: "Not Found"
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+          description: "Internal Server Error"
+      summary: "Returns a specific Submodel in the value only representation"
+      tags:
+      - "Service Offering Versions"
+    parameters:
+    - description: "Id of the service offering"
+      in: "path"
+      name: "serviceOfferingId"
+      required: true
+      schema:
+        format: "uuid"
+        type: "string"
+  /services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels/{submodelIdentifier}/submodel-elements:
+    get:
+      operationId: "getAllSubmodelElements"
+      parameters:
+      - description: "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)"
+        in: "path"
+        name: "aasId"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedIdentifier"
+      - description: "The Submodel’s unique id (UTF8-BASE64-URL-encoded)"
+        in: "path"
+        name: "submodelIdentifier"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedIdentifier"
+      - description: "The maximum number of elements in the response array"
+        in: "query"
+        name: "limit"
+        required: false
+        schema:
+          enum:
+          - "1"
+          minimum: 1
+          type: "string"
+      - description: "A server-generated identifier retrieved from pagingMetadata\
+          \ that specifies from which position the result listing should continue"
+        in: "query"
+        name: "cursor"
+        required: false
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedCursor"
+      - description: "Determines the structural depth of the respective resource content"
+        in: "query"
+        name: "level"
+        required: false
+        schema:
+          default: "deep"
+          enum:
+          - "deep"
+          - "core"
+          type: "string"
+      - description: "Determines to which extent the resource is being serialized"
+        in: "query"
+        name: "extent"
+        required: false
+        schema:
+          default: "withoutBlobValue"
+          enum:
+          - "withBlobValue"
+          - "withoutBlobValue"
+          type: "string"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: "string"
+          description: "List of found submodel elements"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+          description: "Not Found"
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+          description: "Internal Server Error"
+      summary: "Returns all submodel elements including their hierarchy"
+      tags:
+      - "Service Offering Versions"
+    parameters:
+    - description: "Id of the service offering"
+      in: "path"
+      name: "serviceOfferingId"
+      required: true
+      schema:
+        format: "uuid"
+        type: "string"
+  /services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels/{submodelIdentifier}/submodel-elements/{idShortPath}:
+    get:
+      operationId: "getSubmodelElementByPathSubmodelRepo"
+      parameters:
+      - description: "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)"
+        in: "path"
+        name: "aasId"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedIdentifier"
+      - description: "The Submodel’s unique id (UTF8-BASE64-URL-encoded)"
+        in: "path"
+        name: "submodelIdentifier"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedIdentifier"
+      - description: "IdShort path to the submodel element (dot-separated)"
+        in: "path"
+        name: "idShortPath"
+        required: true
+        schema:
+          type: "string"
+      - description: "Determines the structural depth of the respective resource content"
+        in: "query"
+        name: "level"
+        required: false
+        schema:
+          default: "deep"
+          enum:
+          - "deep"
+          - "core"
+          type: "string"
+      - description: "Determines to which extent the resource is being serialized"
+        in: "query"
+        name: "extent"
+        required: false
+        schema:
+          default: "withoutBlobValue"
+          enum:
+          - "withBlobValue"
+          - "withoutBlobValue"
+          type: "string"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmodelElement"
+          description: "Requested submodel element"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+          description: "Not Found"
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+          description: "Internal Server Error"
+      summary: "Returns a specific submodel element from the Submodel at a specified\
+        \ path"
+      tags:
+      - "Service Offering Versions"
+    parameters:
+    - description: "Id of the service offering"
+      in: "path"
+      name: "serviceOfferingId"
+      required: true
+      schema:
+        format: "uuid"
+        type: "string"
+  ? /services/offerings/{serviceOfferingId}/versions/{aasId}/aas/submodels/{submodelIdentifier}/submodel-elements/{idShortPath}/$value
+  : get:
+      operationId: "getSubmodelElementByPathValueOnlySubmodelRepo"
+      parameters:
+      - description: "Id of the AAS the submodel repository belongs to (UTF8-BASE64-URL-encoded)"
+        in: "path"
+        name: "aasId"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedIdentifier"
+      - description: "The Submodel’s unique id (UTF8-BASE64-URL-encoded)"
+        in: "path"
+        name: "submodelIdentifier"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Base64UrlEncodedIdentifier"
+      - description: "IdShort path to the submodel element (dot-separated)"
+        in: "path"
+        name: "idShortPath"
+        required: true
+        schema:
+          type: "string"
+      - description: "Determines the structural depth of the respective resource content"
+        in: "query"
+        name: "level"
+        required: false
+        schema:
+          default: "deep"
+          enum:
+          - "deep"
+          - "core"
+          type: "string"
+      - description: "Determines to which extent the resource is being serialized"
+        in: "query"
+        name: "extent"
+        required: false
+        schema:
+          default: "withoutBlobValue"
+          enum:
+          - "withBlobValue"
+          - "withoutBlobValue"
+          type: "string"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmodelElementValue"
+          description: "Requested submodel element"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+          description: "Not Found"
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+          description: "Internal Server Error"
+      summary: "Returns a specific submodel element from the Submodel at a specified\
+        \ path in the ValueOnly representation"
+      tags:
+      - "Service Offering Versions"
+    parameters:
+    - description: "Id of the service offering"
+      in: "path"
+      name: "serviceOfferingId"
+      required: true
+      schema:
+        format: "uuid"
+        type: "string"
+  /services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}:
+    delete:
+      operationId: "deleteServiceOfferingVersion"
+      parameters:
+      - in: "path"
+        name: "serviceOfferingId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "path"
+        name: "serviceOfferingVersionId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+      summary: "Delete service offering version"
+      tags:
+      - "Service Offering Versions"
+    get:
+      operationId: "getServiceOfferingVersionById"
+      parameters:
+      - in: "path"
+        name: "serviceOfferingId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "path"
+        name: "serviceOfferingVersionId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceOfferingVersionDTOApi"
+          description: "OK"
+      summary: "Get service offering version by id"
+      tags:
+      - "Service Offering Versions"
+    put:
+      operationId: "createOrUpdateServiceOfferingVersionWithId"
+      parameters:
+      - in: "path"
+        name: "serviceOfferingId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "path"
+        name: "serviceOfferingVersionId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceOfferingVersionDTOApi"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceOfferingVersionCreateResponse"
+          description: "OK"
+      summary: "Create new service offering version with specified id or update existing\
+        \ one"
+      tags:
+      - "Service Offering Versions"
+  /services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/file:
+    post:
+      operationId: "createOrUpdateServiceOfferingFileWithId"
+      parameters:
+      - in: "path"
+        name: "serviceOfferingId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "path"
+        name: "serviceOfferingVersionId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  format: "binary"
+                  type: "string"
+              required:
+              - "file"
+              type: "object"
+      responses:
+        "200":
+          description: "OK"
+      summary: "Upload new service offering file for deployment "
+      tags:
+      - "Service Offering Versions"
+  /services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/file/{fileName}:
+    get:
+      operationId: "getServiceOfferingFileWithId"
+      parameters:
+      - in: "path"
+        name: "serviceOfferingId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "path"
+        name: "serviceOfferingVersionId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "path"
+        name: "fileName"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                format: "binary"
+                type: "string"
+          description: "OK"
+      summary: "Download service offering file "
+      tags:
+      - "Service Offering Versions"
+  /services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/matching-resources:
+    get:
+      operationId: "getResourcesMatchingServiceRequirements"
+      parameters:
+      - in: "path"
+        name: "serviceOfferingId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "path"
+        name: "serviceOfferingVersionId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/MatchingResourceDTO"
+                type: "array"
+          description: "OK"
+      summary: "Get possible resources matching service requirements"
+      tags:
+      - "Service Offering Versions"
+  /services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/order:
+    post:
+      operationId: "orderServiceOfferingVersionById"
+      parameters:
+      - in: "path"
+        name: "serviceOfferingId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "path"
+        name: "serviceOfferingVersionId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceOrder"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+      summary: "Order service offering version"
+      tags:
+      - "Service Offering Versions"
+  /services/offerings/{serviceOfferingId}/versions/{serviceOfferingVersionId}/requirements:
+    get:
+      operationId: "getServiceOfferingVersionRequirementsById"
+      parameters:
+      - in: "path"
+        name: "serviceOfferingId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "path"
+        name: "serviceOfferingVersionId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/ServiceRequirement"
+                type: "array"
+          description: "OK"
+      summary: "Get service offering version requirements by id"
+      tags:
+      - "Service Offering Versions"
+    put:
+      operationId: "createOrUpdateServiceOfferingVersionRequirementsWithId"
+      parameters:
+      - in: "path"
+        name: "serviceOfferingId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "path"
+        name: "serviceOfferingVersionId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: "#/components/schemas/ServiceRequirement"
+              type: "array"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+      summary: "Create or update requirements for service offering version"
+      tags:
+      - "Service Offering Versions"
+  /services/users:
+    get:
+      operationId: "getUsers"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: "#/components/schemas/User"
+                type: "array"
+          description: "OK"
+      summary: "Get users"
+      tags:
+      - "Users"
+  /services/users/id:
+    get:
+      operationId: "getUserIdOfAuthenticatedUser"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                format: "uuid"
+                type: "string"
+          description: "OK"
+      summary: "Get user id of authenticated user"
+      tags:
+      - "Users"
+  /services/users/vendors:
+    get:
+      operationId: "getServiceVendorsOfUser"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  format: "uuid"
+                  type: "string"
+                type: "array"
+          description: "OK"
+      summary: "Get service vendors of authenticated user"
+      tags:
+      - "Users"
+  /services/vendors:
+    get:
+      operationId: "getServiceVendors"
+      parameters:
+      - in: "query"
+        name: "withImage"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/ServiceVendor"
+                type: "array"
+          description: "OK"
+      summary: "Get service vendors"
+      tags:
+      - "Service Vendors"
+    post:
+      operationId: "createServiceVendor"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceVendorDTOApi"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceVendorCreateResponse"
+          description: "OK"
+      tags:
+      - "Service Vendors"
+  /services/vendors/{serviceVendorId}:
+    delete:
+      operationId: "deleteServiceVendor"
+      parameters:
+      - in: "path"
+        name: "serviceVendorId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+      tags:
+      - "Service Vendors"
+    get:
+      operationId: "getServiceVendorById"
+      parameters:
+      - in: "path"
+        name: "serviceVendorId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "query"
+        name: "withImage"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceVendor"
+          description: "OK"
+      summary: "Get service vendor by id"
+      tags:
+      - "Service Vendors"
+    put:
+      operationId: "createOrUpdateServiceVendorWithId"
+      parameters:
+      - in: "path"
+        name: "serviceVendorId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceVendorDTOApi"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+      tags:
+      - "Service Vendors"
+  /services/vendors/{serviceVendorId}/developers:
+    get:
+      operationId: "getDevelopersOfServiceVendor"
+      parameters:
+      - in: "path"
+        name: "serviceVendorId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/ServiceVendorDeveloper"
+                type: "array"
+          description: "OK"
+      tags:
+      - "Service Vendors"
+  /services/vendors/{serviceVendorId}/developers/{userId}:
+    delete:
+      operationId: "removeDeveloperFromServiceVendor"
+      parameters:
+      - in: "path"
+        name: "serviceVendorId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "path"
+        name: "userId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+      tags:
+      - "Service Vendors"
+    put:
+      operationId: "addDeveloperToServiceVendor"
+      parameters:
+      - in: "path"
+        name: "serviceVendorId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "path"
+        name: "userId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+      tags:
+      - "Service Vendors"
+  /services/vendors/{serviceVendorId}/logo:
+    get:
+      operationId: "getLogoOfServiceVendor"
+      parameters:
+      - in: "path"
+        name: "serviceVendorId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          content:
+            image/png:
+              schema:
+                format: "byte"
+                type: "string"
+          description: "OK"
+      tags:
+      - "Service Vendors"
+  /services/vendors/{serviceVendorId}/repositories:
+    get:
+      operationId: "getRepositories"
+      parameters:
+      - in: "path"
+        name: "serviceVendorId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: "#/components/schemas/ServiceRepositoryDTOApiRead"
+                type: "array"
+          description: "OK"
+      summary: "Get repositories containing files for service offerings"
+      tags:
+      - "Service Repositories"
+    post:
+      operationId: "createRepository"
+      parameters:
+      - in: "path"
+        name: "serviceVendorId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceRepository"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceRepositoryCreateResponse"
+          description: "OK"
+      summary: "Create repository containing files for service offerings"
+      tags:
+      - "Service Repositories"
+  /services/vendors/{serviceVendorId}/repositories/{repositoryId}:
+    delete:
+      operationId: "deleteRepository"
+      parameters:
+      - in: "path"
+        name: "serviceVendorId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "path"
+        name: "repositoryId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+      summary: "Delete repository containing files for service offerings"
+      tags:
+      - "Service Repositories"
+  /services/vendors/{serviceVendorId}/repositories/{serviceRepositoryId}:
+    put:
+      operationId: "createOrUpdateRepository"
+      parameters:
+      - in: "path"
+        name: "serviceVendorId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "path"
+        name: "serviceRepositoryId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceRepository"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceRepositoryCreateResponse"
+          description: "OK"
+      summary: "Create or update a repository containing files for service offerings"
+      tags:
+      - "Service Repositories"
+  /variables/deployment:
+    get:
+      operationId: "getDeploymentVariables"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: "#/components/schemas/DeploymentVariableType"
+                type: "array"
+          description: "OK"
+      summary: "Get deployment variables"
+      tags:
+      - "Service Management Variables"
+  /variables/system:
+    get:
+      operationId: "getSystemVariables"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: "#/components/schemas/SystemVariable"
+                type: "array"
+          description: "OK"
+      summary: "Get system variables"
+      tags:
+      - "Service Management Variables"
+security:
+- bearer_auth: []
+- spring_oauth: []
+servers:
+- url: "http://localhost:9020/service-management"

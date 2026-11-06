@@ -16,6 +16,7 @@
 
     <modules>
         <module>information_service.service.app</module>
+        <module>information_service.service.client</module>
     </modules>
 
 </project>
