@@ -36,6 +36,11 @@ public interface ProfilerRestApi {
     @Operation(summary = "Run one Profiler")
     ResponseEntity<Void> runProfiler(@PathVariable(name = "profilerId") UUID profilerId);
 
+    @RequestMapping(value = "/{profilerId}", method = RequestMethod.PUT)
+    @Operation(summary = "Update Profiler")
+    ResponseEntity<Profiler> updateProfiler(@PathVariable(name = "profilerId") UUID profilerId,
+                                            @RequestBody ProfilerDTOApi profilerDTOApi);
+
     @RequestMapping(value = "/{profilerId}", method = RequestMethod.DELETE)
     @Operation(summary = "Delete Profiler")
     ResponseEntity<Void> deleteProfiler(@PathVariable(name = "profilerId") UUID profilerId);

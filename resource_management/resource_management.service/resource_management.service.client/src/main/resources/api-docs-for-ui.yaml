@@ -3806,6 +3806,46 @@
           }
         }
       },
+      "put": {
+        "tags": [
+          "Profiler"
+        ],
+        "summary": "Update Profiler",
+        "operationId": "updateProfiler",
+        "parameters": [
+          {
+            "name": "profilerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfilerDTOApi"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Profiler"
+                }
+              }
+            }
+          }
+        }
+      },
       "delete": {
         "tags": [
           "Profiler"
@@ -4944,6 +4984,14 @@
               },
               "playbook": {
                 "type": "string"
+              },
+              "username": {
+                "type": "string",
+                "writeOnly": true
+              },
+              "password": {
+                "type": "string",
+                "writeOnly": true
               },
               "parameter": {
                 "type": "array",

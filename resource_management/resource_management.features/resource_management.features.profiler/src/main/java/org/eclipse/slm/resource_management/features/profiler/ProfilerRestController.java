@@ -62,6 +62,15 @@ public class ProfilerRestController implements ProfilerRestApi {
         return ResponseEntity.ok(createdProfiler);
     }
 
+    public ResponseEntity<Profiler> updateProfiler(UUID profilerId, ProfilerDTOApi profilerDTOApi) {
+        var updatedProfiler = profilerService.updateProfiler(
+                profilerId,
+                ProfilerToProfilerDTOApiMapper.INSTANCE.toEntity(profilerDTOApi)
+        );
+
+        return ResponseEntity.ok(updatedProfiler);
+    }
+
     public ResponseEntity<Void> deleteProfiler(UUID profilerId) {
         profilerService.deleteProfiler(profilerId);
 
