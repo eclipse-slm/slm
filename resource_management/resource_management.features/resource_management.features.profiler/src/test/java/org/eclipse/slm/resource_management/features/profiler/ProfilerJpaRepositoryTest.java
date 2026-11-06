@@ -1,5 +1,8 @@
 package org.eclipse.slm.resource_management.features.profiler;
 
+import jakarta.persistence.EntityManager;
+import org.eclipse.slm.awx.model.SurveyItem;
+import org.eclipse.slm.awx.model.SurveyItemType;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +33,9 @@ public class ProfilerJpaRepositoryTest {
 
     @Autowired
     private ProfilerJpaRepository profilerJpaRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Nested
     @Order(10)
@@ -95,6 +101,49 @@ public class ProfilerJpaRepositoryTest {
             assertTrue(
                 optionalProfiler.get().equals(testProfiler)
             );
+        }
+
+        @Test
+        @Order(32)
+        public void updateParameterOnly() {
+            var surveyItem = new SurveyItem(SurveyItemType.text, "name", "description", "variable");
+
+            assertEquals(List.of(surveyItem), saveAndReload(actionWith(List.of(surveyItem), false)).getParameter());
+        }
+
+        @Test
+        @Order(34)
+        public void updateSurveyItemFieldOnly() {
+            var surveyItem = new SurveyItem(SurveyItemType.text, "name", "description", "variable");
+            surveyItem.setRequired(true);
+
+            var storedItem = saveAndReload(actionWith(List.of(surveyItem), false)).getParameter().get(0);
+
+            assertTrue(storedItem.getRequired());
+        }
+
+        @Test
+        @Order(36)
+        public void updateSkipableOnly() {
+            assertTrue(saveAndReload(actionWith(null, true)).getSkipable());
+        }
+
+        private AwxAction actionWith(List<SurveyItem> parameter, boolean skipable) {
+            var action = new AwxAction(testAction.getAwxRepo(), testAction.getAwxBranch(), testAction.getPlaybook());
+            action.setParameter(parameter);
+            action.setSkipable(skipable);
+            return action;
+        }
+
+        private AwxAction saveAndReload(AwxAction action) {
+            var update = new Profiler(testProfilerId);
+            update.setName(testProfiler.getName());
+            update.setAction(action);
+
+            profilerJpaRepository.saveAndFlush(update);
+            entityManager.clear();
+
+            return (AwxAction) profilerJpaRepository.findById(testProfilerId).orElseThrow().getAction();
         }
 
         @Test

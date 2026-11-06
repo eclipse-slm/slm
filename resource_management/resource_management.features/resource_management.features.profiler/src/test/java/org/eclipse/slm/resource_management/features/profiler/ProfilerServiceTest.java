@@ -131,6 +131,30 @@ class ProfilerServiceTest {
     }
 
     @Test
+    void changeOfSurveyItemFieldOutsideEqualsReplacesSurvey() throws Throwable {
+        ((AwxAction) stored.getAction()).setParameter(List.of(item("a")));
+        stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
+        var changedItem = item("a");
+        changedItem.setRequired(true);
+        var update = profiler("old", action("repo", "main", "play.yml", List.of(changedItem)));
+
+        service.updateProfiler(stored.getId(), update);
+
+        verify(awxClient).deleteSurvey(OLD_TEMPLATE_ID);
+        verify(awxClient).createSurvey(eq(OLD_TEMPLATE_ID), any());
+    }
+
+    @Test
+    void renameWithUnchangedParametersDoesNotTouchAwx() {
+        ((AwxAction) stored.getAction()).setParameter(List.of(item("a")));
+        var update = profiler("new", action("repo", "main", "play.yml", List.of(item("a"))));
+
+        service.updateProfiler(stored.getId(), update);
+
+        verifyNoInteractions(awxClient);
+    }
+
+    @Test
     void clearingParametersDeletesSurveyWithoutCreating() throws Throwable {
         ((AwxAction) stored.getAction()).setParameter(List.of(item("a")));
         stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);

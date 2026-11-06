@@ -2,7 +2,7 @@ package org.eclipse.slm.resource_management.features.profiler
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-class ActionConfigParameter(
+data class ActionConfigParameter(
 
     @JsonProperty("name")
     val name: String,

@@ -70,9 +70,8 @@ public class ProfilerService implements IAwxJobObserverListener {
         var newAction = (AwxAction) profiler.getAction();
 
         if (hasSameSource(oldAction, newAction)) {
-            var oldParameter = oldAction.getParameter() == null ? List.<SurveyItem>of() : oldAction.getParameter();
-            var newParameter = newAction.getParameter() == null ? List.<SurveyItem>of() : newAction.getParameter();
-            if (!oldParameter.equals(newParameter)) {
+            if (!oldAction.hasSameParameter(newAction)) {
+                var newParameter = newAction.getParameter() == null ? List.<SurveyItem>of() : newAction.getParameter();
                 replaceSurvey(profilerId, newAction, newParameter);
             }
         } else {
