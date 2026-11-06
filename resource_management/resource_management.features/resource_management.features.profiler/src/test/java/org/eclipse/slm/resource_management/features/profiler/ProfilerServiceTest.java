@@ -157,6 +157,27 @@ class ProfilerServiceTest {
     }
 
     @Test
+    void parameterChangeTargetsFirstProjectEvenWhenLaterProjectHasExactUrl() throws Throwable {
+        ((AwxAction) stored.getAction()).setAwxRepo("https://host/x");
+        stubProjects("https://host/x", "main", List.of(
+                project(OLD_PROJECT_ID, "https://host/x.git"),
+                project(51, "https://host/x")));
+        stubTemplate(OLD_PROJECT_ID, "play.yml", OLD_TEMPLATE_ID);
+        stubTemplate(51, "play.yml", 61);
+        var update = profiler("old", action("https://host/x", "main", "play.yml", List.of(item("a"))));
+
+        service.updateProfiler(stored.getId(), update);
+
+        verify(awxClient).deleteSurvey(OLD_TEMPLATE_ID);
+        verify(awxClient).createSurvey(eq(OLD_TEMPLATE_ID), any());
+        verify(awxClient).enableSurvey(OLD_TEMPLATE_ID);
+        verify(awxClient, never()).deleteSurvey(61);
+        verify(awxClient, never()).createSurvey(eq(61), any());
+        verify(awxClient, never()).enableSurvey(61);
+        verify(repository).save(update);
+    }
+
+    @Test
     void changeOfSurveyItemFieldOutsideEqualsReplacesSurvey() throws Throwable {
         ((AwxAction) stored.getAction()).setParameter(List.of(item("a")));
         stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);

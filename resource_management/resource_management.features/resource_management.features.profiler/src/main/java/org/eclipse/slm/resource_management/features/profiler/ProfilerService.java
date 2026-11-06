@@ -310,9 +310,7 @@ public class ProfilerService implements IAwxJobObserverListener {
     }
 
     private Optional<JobTemplate> findJobTemplate(AwxAction action) {
-        var projects = findProjects(action);
-        return findProjectWithSameUrl(projects, action)
-                .or(() -> projects.stream().findFirst())
+        return findProjects(action).stream().findFirst()
                 .flatMap(project -> findJobTemplates(project, action.getPlaybook()).stream().findFirst());
     }
 
