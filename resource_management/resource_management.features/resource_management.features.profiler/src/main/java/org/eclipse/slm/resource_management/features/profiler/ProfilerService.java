@@ -127,7 +127,7 @@ public class ProfilerService implements IAwxJobObserverListener {
         Profiler profiler = optionalProfiler.get();
 
         if (isProfilerActionAwxAction(profiler)) {
-            removeAwxResources((AwxAction) profiler.getAction(), profilerId);
+            removeAwxResources((AwxAction) profiler.getAction(), profilerId, false);
         }
 
         profilerJpaRepository.deleteById(profilerId);
@@ -208,10 +208,10 @@ public class ProfilerService implements IAwxJobObserverListener {
             throw new ProfilerRuntimeException(profilerId, "Failed to create AWX resources: " + e);
         }
 
-        removeAwxResources(oldAction, profilerId);
+        removeAwxResources(oldAction, profilerId, true);
     }
 
-    private void removeAwxResources(AwxAction action, UUID ownerProfilerId) {
+    private void removeAwxResources(AwxAction action, UUID ownerProfilerId, boolean ignoreFailures) {
         var otherActions = profilerJpaRepository.findAll().stream()
                 .filter(other -> !ownerProfilerId.equals(other.getId()))
                 .filter(this::isProfilerActionAwxAction)
@@ -223,10 +223,20 @@ public class ProfilerService implements IAwxJobObserverListener {
                 .anyMatch(other -> hasSameSource(other, action));
 
         if (!sharedJobTemplate) {
-            awxClient.deleteJobTemplate(action.getAwxRepo(), action.getAwxBranch(), action.getPlaybook());
+            try {
+                awxClient.deleteJobTemplate(action.getAwxRepo(), action.getAwxBranch(), action.getPlaybook());
+            } catch (Exception e) {
+                if (!ignoreFailures) throw e;
+                LOG.error("Failed to remove old AWX job template of " + action.getAwxRepo(), e);
+            }
         }
         if (!sharedProject) {
-            awxClient.deleteProject(action.getAwxRepo(), action.getAwxBranch());
+            try {
+                awxClient.deleteProject(action.getAwxRepo(), action.getAwxBranch());
+            } catch (Exception e) {
+                if (!ignoreFailures) throw e;
+                LOG.error("Failed to remove old AWX project of " + action.getAwxRepo(), e);
+            }
         }
     }
 

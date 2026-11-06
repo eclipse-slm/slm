@@ -221,6 +221,28 @@ class ProfilerServiceTest {
     }
 
     @Test
+    void sourceChangeStillSavesWhenRemovingOldResourcesFails() throws Throwable {
+        stubAbsent("newRepo", "dev");
+        stubCreation();
+        doThrow(new RuntimeException("template")).when(awxClient).deleteJobTemplate("repo", "main", "play.yml");
+        doThrow(new RuntimeException("project")).when(awxClient).deleteProject("repo", "main");
+
+        service.updateProfiler(stored.getId(), profiler("old", action("newRepo", "dev", "new.yml", null)));
+
+        verify(awxClient).deleteProject("repo", "main");
+        verify(repository).save(argThat(p -> p.getId().equals(stored.getId())));
+    }
+
+    @Test
+    void deleteStillPropagatesAwxFailure() {
+        doThrow(new RuntimeException("project")).when(awxClient).deleteProject("repo", "main");
+
+        assertThrows(RuntimeException.class, () -> service.deleteProfiler(stored.getId()));
+
+        verify(repository, never()).deleteById(any());
+    }
+
+    @Test
     void sourceChangeKeepsResourcesSharedWithOtherProfiler() throws Throwable {
         stubAbsent("newRepo", "dev");
         stubCreation();
