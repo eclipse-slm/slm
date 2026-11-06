@@ -1,6 +1,6 @@
 import axios from "axios";
 import {
-     CredentialsApi,
+     CredentialManagementApi,
      type UserCreateRequest,
 } from "@/api/platform-management/client";
 
@@ -16,7 +16,7 @@ class PlatformManagementClient{
 
     apiUrl = "/platform-management";
 
-    credentialsApi = new CredentialsApi(undefined, this.apiUrl);
+    credentialsApi = new CredentialManagementApi(undefined, this.apiUrl);
 
     async getUsers(): Promise<UserOverviewResponse[]> {
         return axios
