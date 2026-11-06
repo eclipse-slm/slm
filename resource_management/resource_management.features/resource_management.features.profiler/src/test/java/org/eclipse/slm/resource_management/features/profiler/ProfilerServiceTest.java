@@ -450,6 +450,20 @@ class ProfilerServiceTest {
     }
 
     @Test
+    void sourceChangeStillReturnsSavedProfilerWhenSharedResourceLookupFails() throws Throwable {
+        stubAbsent("newRepo", "dev");
+        stubCreation();
+        when(repository.findAll()).thenThrow(new RuntimeException("database lookup"));
+        var update = profiler("old", action("newRepo", "dev", "new.yml", null));
+
+        var result = assertDoesNotThrow(() -> service.updateProfiler(stored.getId(), update));
+
+        assertSame(update, result);
+        verify(repository).save(update);
+        verifyNothingRemoved();
+    }
+
+    @Test
     void sourceChangeKeepsResourcesSharedWithOtherProfiler() throws Throwable {
         stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
         stubAbsent("newRepo", "dev");

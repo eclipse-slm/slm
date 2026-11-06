@@ -125,6 +125,9 @@ public class ProfilerJpaRepositoryTest {
         @Test
         @Order(36)
         public void updateSkipableOnly() {
+            // First clear the previous test's parameters so skipable is the only changed field.
+            saveAndReload(actionWith(null, false));
+
             assertTrue(saveAndReload(actionWith(null, true)).getSkipable());
         }
 

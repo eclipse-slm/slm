@@ -208,9 +208,9 @@ public class ProfilerService implements IAwxJobObserverListener {
         }
 
         if (oldAction != null) {
-            var actionsInUse = new ArrayList<>(otherActions(profilerId));
-            actionsInUse.add(newAction);
             try {
+                var actionsInUse = new ArrayList<>(otherActions(profilerId));
+                actionsInUse.add(newAction);
                 removeAwxResources(oldAction, actionsInUse);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
