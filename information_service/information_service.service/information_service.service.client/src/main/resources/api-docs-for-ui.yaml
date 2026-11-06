@@ -1,0 +1,14 @@
+---
+components: {}
+info:
+  contact:
+    email: "matthias.schneider@ipa.fraunhofer.de"
+    name: "Fraunhofer IPA"
+    url: "https://www.ipa.fraunhofer.de"
+  description: "REST API of Information Service"
+  title: "Information Service"
+  version: "1.5.0-SNAPSHOT"
+openapi: "3.0.1"
+paths: {}
+servers:
+- url: "http://localhost:9003/information-service"

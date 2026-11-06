@@ -1,1 +1,479 @@
-{"openapi":"3.0.1","info":{"title":"Platform Management","description":"REST API of Platform Management","contact":{"name":"Fraunhofer IPA","url":"https://www.ipa.fraunhofer.de","email":"matthias.schneider@ipa.fraunhofer.de"},"version":"1.5.0-SNAPSHOT"},"servers":[{"url":"http://localhost:9001/platform-management","description":"Generated server url"}],"security":[{"bearer_auth":[]},{"spring_oauth":[]}],"paths":{"/credentials/{credentialId}":{"get":{"tags":["Credentials"],"summary":"Get credential by id","operationId":"getCredentialById","parameters":[{"name":"credentialId","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/CredentialReadDTO"}}}}}},"put":{"tags":["Credentials"],"summary":"Create or update credential","operationId":"createOrUpdateCredential","parameters":[{"name":"credentialId","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CredentialCreateRequest"}}},"required":true},"responses":{"200":{"description":"OK"}}},"delete":{"tags":["Credentials"],"summary":"Delete credential by id","operationId":"deleteCredential","parameters":[{"name":"credentialId","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"responses":{"200":{"description":"OK"}}}},"/users":{"post":{"tags":["User Management"],"summary":"Add user","operationId":"createUser","parameters":[{"name":"arg0","in":"query","required":true,"schema":{"$ref":"#/components/schemas/UserCreateRequest"}}],"responses":{"200":{"description":"OK"}}}},"/credentials/{credentialId}/scopes":{"post":{"tags":["Credentials"],"summary":"Add scopes to credential","operationId":"addCredentialScopes","parameters":[{"name":"credentialId","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"requestBody":{"content":{"application/json":{"schema":{"type":"array","items":{"type":"string"}}}},"required":true},"responses":{"200":{"description":"OK"}}},"delete":{"tags":["Credentials"],"summary":"Remove scopes from credential","operationId":"removeCredentialScopes","parameters":[{"name":"credentialId","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"requestBody":{"content":{"application/json":{"schema":{"type":"array","items":{"type":"string"}}}},"required":true},"responses":{"200":{"description":"OK"}}}},"/credentials/{credentialId}/links":{"post":{"tags":["Credentials"],"summary":"Link existing credential to entity","operationId":"linkCredentialToEntity","parameters":[{"name":"credentialId","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CredentialEntityLinkCreateDTO"}}},"required":true},"responses":{"200":{"description":"OK"}}},"delete":{"tags":["Credentials"],"summary":"Delete credential entity link","operationId":"deleteCredentialEntityLink","parameters":[{"name":"credentialId","in":"path","required":true,"schema":{"type":"string","format":"uuid"}},{"name":"entityType","in":"query","required":true,"schema":{"type":"string"}},{"name":"entityId","in":"query","required":true,"schema":{"type":"string"}},{"name":"deleteIfOrphaned","in":"query","required":false,"schema":{"type":"boolean","default":false}}],"responses":{"200":{"description":"OK"}}}},"/credentials/":{"post":{"tags":["Credentials"],"summary":"Create credential","operationId":"createCredential","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CredentialCreateRequest"}}},"required":true},"responses":{"200":{"description":"OK"}}}},"/credentials":{"get":{"tags":["Credentials"],"summary":"Get credentials of user","operationId":"getCredentialsOfUser","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/CredentialReadDTO"}}}}}}}},"/credentials/entities/{entityId}":{"get":{"tags":["Credentials"],"summary":"Get credentials of entity","operationId":"getCredentialsOfEntity","parameters":[{"name":"entityId","in":"path","required":true,"schema":{"type":"string"}},{"name":"entityType","in":"query","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/CredentialReadDTO"}}}}}}}},"/users/{username}":{"delete":{"tags":["User Management"],"summary":"Delete user by username","operationId":"deleteUser","parameters":[{"name":"username","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK"}}}}},"components":{"schemas":{"Credential":{"required":["data","id","name","scopesRaw"],"type":"object","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"scopesRaw":{"type":"array","items":{"type":"string"}},"data":{"oneOf":[{"$ref":"#/components/schemas/CredentialDataKeyPair"},{"$ref":"#/components/schemas/CredentialDataUsernamePassword"}]}}},"CredentialCreateRequest":{"required":["credential","entityLinks","fullPathOwnerGroupId"],"type":"object","properties":{"entityLinks":{"type":"array","items":{"$ref":"#/components/schemas/CredentialEntityLinkCreateDTO"}},"credential":{"$ref":"#/components/schemas/Credential"},"fullPathOwnerGroupId":{"type":"string"}}},"CredentialData":{"required":["credentialDataType"],"type":"object","properties":{"credentialDataType":{"$ref":"#/components/schemas/CredentialDataType"}},"discriminator":{"propertyName":"credentialDataType"}},"CredentialDataKeyPair":{"required":["credentialDataType","privateKey","publicKey"],"type":"object","allOf":[{"$ref":"#/components/schemas/CredentialData"},{"type":"object","properties":{"privateKey":{"type":"string"},"publicKey":{"type":"string"}}}]},"CredentialDataType":{"type":"string","enum":["USERNAME_PASSWORD","KEY_PAIR"]},"CredentialDataUsernamePassword":{"required":["credentialDataType","password","username"],"type":"object","allOf":[{"$ref":"#/components/schemas/CredentialData"},{"type":"object","properties":{"username":{"type":"string"},"password":{"type":"string"}}}]},"CredentialEntityLinkCreateDTO":{"required":["entityId","entityType"],"type":"object","properties":{"entityType":{"type":"string"},"entityId":{"type":"string"}}},"UserCreateRequest":{"required":["email","firstName","isPasswordTemporary","lastName","password","username"],"type":"object","properties":{"username":{"type":"string"},"firstName":{"type":"string"},"lastName":{"type":"string"},"password":{"type":"string"},"isPasswordTemporary":{"type":"boolean"},"email":{"type":"string"}}},"CredentialDataKeyPairReadDTO":{"required":["credentialDataType","publicKey"],"type":"object","allOf":[{"$ref":"#/components/schemas/CredentialDataReadDTO"},{"type":"object","properties":{"publicKey":{"type":"string"}}}]},"CredentialDataReadDTO":{"required":["credentialDataType"],"type":"object","properties":{"credentialDataType":{"$ref":"#/components/schemas/CredentialDataType"}},"discriminator":{"propertyName":"credentialDataType"}},"CredentialDataUsernamePasswordReadDTO":{"required":["credentialDataType","username"],"type":"object","allOf":[{"$ref":"#/components/schemas/CredentialDataReadDTO"},{"type":"object","properties":{"username":{"type":"string"}}}]},"CredentialEntityLinkReadDTO":{"required":["entityId","entityType"],"type":"object","properties":{"entityType":{"type":"string"},"entityId":{"type":"string"}}},"CredentialReadDTO":{"required":["data","id","name","scopesRaw"],"type":"object","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"scopesRaw":{"type":"array","items":{"type":"string"}},"data":{"oneOf":[{"$ref":"#/components/schemas/CredentialDataKeyPairReadDTO"},{"$ref":"#/components/schemas/CredentialDataUsernamePasswordReadDTO"}]},"entityLinks":{"type":"array","items":{"$ref":"#/components/schemas/CredentialEntityLinkReadDTO"}}}}},"securitySchemes":{"spring_oauth":{"type":"oauth2","description":"Oauth2 flow","flows":{"authorizationCode":{"authorizationUrl":"https://slm.dev-vm.local/auth/realms/fabos/protocol/openid-connect/auth","tokenUrl":"https://slm.dev-vm.local/auth/realms/fabos/protocol/openid-connect/token","refreshUrl":"https://slm.dev-vm.local/auth/realms/fabos/protocol/openid-connect/token","scopes":{}}}},"bearer_auth":{"type":"http","scheme":"bearer","bearerFormat":"JWT"}}}}
+---
+components:
+  schemas:
+    Credential:
+      properties:
+        data:
+          oneOf:
+          - $ref: "#/components/schemas/CredentialDataKeyPair"
+          - $ref: "#/components/schemas/CredentialDataUsernamePassword"
+        id:
+          format: "uuid"
+          type: "string"
+        name:
+          type: "string"
+        scopesRaw:
+          items:
+            type: "string"
+          type: "array"
+      type: "object"
+    CredentialCreateRequest:
+      properties:
+        credential:
+          $ref: "#/components/schemas/Credential"
+        entityLinks:
+          items:
+            $ref: "#/components/schemas/CredentialEntityLinkCreateDTO"
+          type: "array"
+        fullPathOwnerGroupId:
+          type: "string"
+      type: "object"
+    CredentialData:
+      discriminator:
+        propertyName: "credentialDataType"
+      properties:
+        credentialDataType:
+          $ref: "#/components/schemas/CredentialDataType"
+      type: "object"
+    CredentialDataKeyPair:
+      allOf:
+      - $ref: "#/components/schemas/CredentialData"
+      - properties:
+          privateKey:
+            type: "string"
+          publicKey:
+            type: "string"
+        type: "object"
+      type: "object"
+    CredentialDataKeyPairReadDTO:
+      allOf:
+      - $ref: "#/components/schemas/CredentialDataReadDTO"
+      - properties:
+          publicKey:
+            type: "string"
+        type: "object"
+      type: "object"
+    CredentialDataReadDTO:
+      discriminator:
+        propertyName: "credentialDataType"
+      properties:
+        credentialDataType:
+          $ref: "#/components/schemas/CredentialDataType"
+      type: "object"
+    CredentialDataType:
+      enum:
+      - "USERNAME_PASSWORD"
+      - "KEY_PAIR"
+      type: "string"
+    CredentialDataUsernamePassword:
+      allOf:
+      - $ref: "#/components/schemas/CredentialData"
+      - properties:
+          password:
+            type: "string"
+          username:
+            type: "string"
+        type: "object"
+      type: "object"
+    CredentialDataUsernamePasswordReadDTO:
+      allOf:
+      - $ref: "#/components/schemas/CredentialDataReadDTO"
+      - properties:
+          username:
+            type: "string"
+        type: "object"
+      type: "object"
+    CredentialEntityLinkCreateDTO:
+      properties:
+        entityId:
+          type: "string"
+        entityType:
+          type: "string"
+      type: "object"
+    CredentialEntityLinkReadDTO:
+      properties:
+        entityId:
+          type: "string"
+        entityType:
+          type: "string"
+      type: "object"
+    CredentialReadDTO:
+      properties:
+        data:
+          oneOf:
+          - $ref: "#/components/schemas/CredentialDataKeyPairReadDTO"
+          - $ref: "#/components/schemas/CredentialDataUsernamePasswordReadDTO"
+        entityLinks:
+          items:
+            $ref: "#/components/schemas/CredentialEntityLinkReadDTO"
+          type: "array"
+        id:
+          format: "uuid"
+          type: "string"
+        name:
+          type: "string"
+        scopesRaw:
+          items:
+            type: "string"
+          type: "array"
+      type: "object"
+    UserCreateRequest:
+      properties:
+        admin:
+          type: "boolean"
+        email:
+          type: "string"
+        firstName:
+          pattern: "^[A-Za-z][A-Za-z .-]*$"
+          type: "string"
+        isAdmin:
+          type: "boolean"
+          writeOnly: true
+        isPasswordTemporary:
+          type: "boolean"
+          writeOnly: true
+        lastName:
+          pattern: "^[A-Za-z][A-Za-z.-]*$"
+          type: "string"
+        password:
+          type: "string"
+        passwordTemporary:
+          type: "boolean"
+        username:
+          pattern: "^[A-Za-z][A-Za-z0-9_-]*$"
+          type: "string"
+      required:
+      - "email"
+      - "firstName"
+      - "lastName"
+      - "username"
+      type: "object"
+  securitySchemes:
+    bearer_auth:
+      bearerFormat: "JWT"
+      scheme: "bearer"
+      type: "http"
+    spring_oauth:
+      description: "Oauth2 flow"
+      flows:
+        authorizationCode:
+          authorizationUrl: ""
+          refreshUrl: ""
+          scopes: {}
+          tokenUrl: ""
+      type: "oauth2"
+info:
+  contact:
+    email: "matthias.schneider@ipa.fraunhofer.de"
+    name: "Fraunhofer IPA"
+    url: "https://www.ipa.fraunhofer.de"
+  description: "REST API of Platform Management"
+  title: "Platform Management"
+  version: "1.5.0-SNAPSHOT"
+openapi: "3.0.1"
+paths:
+  /credentials:
+    get:
+      operationId: "getCredentialsOfUser"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: "#/components/schemas/CredentialReadDTO"
+                type: "array"
+          description: "OK"
+      summary: "Get credentials of user"
+      tags:
+      - "Credential Management"
+  /credentials/:
+    post:
+      operationId: "createCredential"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CredentialCreateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+      summary: "Create credential"
+      tags:
+      - "Credential Management"
+  /credentials/entities/{entityId}:
+    get:
+      operationId: "getCredentialsOfEntity"
+      parameters:
+      - in: "path"
+        name: "entityId"
+        required: true
+        schema:
+          type: "string"
+      - in: "query"
+        name: "entityType"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: "#/components/schemas/CredentialReadDTO"
+                type: "array"
+          description: "OK"
+      summary: "Get credentials of entity"
+      tags:
+      - "Credential Management"
+  /credentials/{credentialId}:
+    delete:
+      operationId: "deleteCredential"
+      parameters:
+      - in: "path"
+        name: "credentialId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+      summary: "Delete credential by id"
+      tags:
+      - "Credential Management"
+    get:
+      operationId: "getCredentialById"
+      parameters:
+      - in: "path"
+        name: "credentialId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CredentialReadDTO"
+          description: "OK"
+      summary: "Get credential by id"
+      tags:
+      - "Credential Management"
+    put:
+      operationId: "createOrUpdateCredential"
+      parameters:
+      - in: "path"
+        name: "credentialId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CredentialCreateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+      summary: "Create or update credential"
+      tags:
+      - "Credential Management"
+  /credentials/{credentialId}/data:
+    get:
+      operationId: "getCredentialDataById"
+      parameters:
+      - in: "path"
+        name: "credentialId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "query"
+        name: "impersonatedGroupId"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: "#/components/schemas/CredentialDataKeyPair"
+                - $ref: "#/components/schemas/CredentialDataUsernamePassword"
+          description: "OK"
+      summary: "Get credential data by id"
+      tags:
+      - "Credential Management"
+  /credentials/{credentialId}/links:
+    delete:
+      operationId: "deleteCredentialEntityLink"
+      parameters:
+      - in: "path"
+        name: "credentialId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      - in: "query"
+        name: "entityType"
+        required: true
+        schema:
+          type: "string"
+      - in: "query"
+        name: "entityId"
+        required: true
+        schema:
+          type: "string"
+      - in: "query"
+        name: "deleteIfOrphaned"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+      responses:
+        "200":
+          description: "OK"
+      summary: "Delete credential entity link"
+      tags:
+      - "Credential Management"
+    post:
+      operationId: "linkCredentialToEntity"
+      parameters:
+      - in: "path"
+        name: "credentialId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CredentialEntityLinkCreateDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+      summary: "Link existing credential to entity"
+      tags:
+      - "Credential Management"
+  /credentials/{credentialId}/scopes:
+    delete:
+      operationId: "removeCredentialScopes"
+      parameters:
+      - in: "path"
+        name: "credentialId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                type: "string"
+              type: "array"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+      summary: "Remove scopes from credential"
+      tags:
+      - "Credential Management"
+    post:
+      operationId: "addCredentialScopes"
+      parameters:
+      - in: "path"
+        name: "credentialId"
+        required: true
+        schema:
+          format: "uuid"
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                type: "string"
+              type: "array"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+      summary: "Add scopes to credential"
+      tags:
+      - "Credential Management"
+  /users:
+    get:
+      operationId: "getUsers"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  additionalProperties:
+                    type: "object"
+                  type: "object"
+                type: "array"
+          description: "OK"
+      summary: "Get users"
+      tags:
+      - "User Management"
+    post:
+      operationId: "createUser"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+      summary: "Add user"
+      tags:
+      - "User Management"
+  /users/{username}:
+    delete:
+      operationId: "deleteUser"
+      parameters:
+      - in: "path"
+        name: "username"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+      summary: "Delete user by username"
+      tags:
+      - "User Management"
+  /users/{username}/admin:
+    post:
+      operationId: "makeUserAdmin"
+      parameters:
+      - in: "path"
+        name: "username"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+      summary: "Grant admin role to user by username"
+      tags:
+      - "User Management"
+security:
+- bearer_auth: []
+- spring_oauth: []
+servers:
+- url: "http://localhost:9001/platform-management"

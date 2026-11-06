@@ -9,6 +9,54 @@
                 "cwd": "${workspaceFolder}/stack/config-exporter"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "OpenAPI: platform management",
+            "type": "process",
+            "command": "mvn",
+            "args": ["-pl", "platform_management/platform_management.service/platform_management.service.app", "-am", "-Dtest=org.eclipse.slm.platform_management.service.app.OpenApiSpecGenerationTest", "-Dsurefire.failIfNoSpecifiedTests=false", "-DgenerateOpenApiSpec=true", "test"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "problemMatcher": []
+        },
+        {
+            "label": "OpenAPI: resource management",
+            "type": "process",
+            "command": "mvn",
+            "args": ["-pl", "resource_management/resource_management.service/resource_management.service.app", "-am", "-Dtest=org.eclipse.slm.resource_management.service.app.OpenApiSpecGenerationTest", "-Dsurefire.failIfNoSpecifiedTests=false", "-DgenerateOpenApiSpec=true", "test"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "problemMatcher": []
+        },
+        {
+            "label": "OpenAPI: service management",
+            "type": "process",
+            "command": "mvn",
+            "args": ["-pl", "service_management/service_management.service/service_management.service.app", "-am", "-Dtest=org.eclipse.slm.service_management.service.app.OpenApiSpecGenerationTest", "-Dsurefire.failIfNoSpecifiedTests=false", "-DgenerateOpenApiSpec=true", "test"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "problemMatcher": []
+        },
+        {
+            "label": "OpenAPI: notification service",
+            "type": "process",
+            "command": "mvn",
+            "args": ["-pl", "notification_service/notification_service.service/notification_service.service.app", "-am", "-Dtest=org.eclipse.slm.notification_service.service.app.OpenApiSpecGenerationTest", "-Dsurefire.failIfNoSpecifiedTests=false", "-DgenerateOpenApiSpec=true", "test"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "problemMatcher": []
+        },
+        {
+            "label": "OpenAPI: catalog",
+            "type": "process",
+            "command": "mvn",
+            "args": ["-pl", "catalog/catalog.service/catalog.service.app", "-am", "-Dtest=org.eclipse.slm.catalog.service.app.OpenApiSpecGenerationTest", "-Dsurefire.failIfNoSpecifiedTests=false", "-DgenerateOpenApiSpec=true", "test"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "problemMatcher": []
+        },
+        {
+            "label": "OpenAPI: information service",
+            "type": "process",
+            "command": "mvn",
+            "args": ["-pl", "information_service/information_service.service/information_service.service.app", "-am", "-Dtest=org.eclipse.slm.information_service.service.app.OpenApiSpecGenerationTest", "-Dsurefire.failIfNoSpecifiedTests=false", "-DgenerateOpenApiSpec=true", "test"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "problemMatcher": []
         }
     ]
 }
