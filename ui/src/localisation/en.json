@@ -60,6 +60,9 @@
         },
         "capabilities":{
           "title": "Capabilities"
+        },
+        "profilers":{
+          "title": "Profilers"
         }
       }
     }

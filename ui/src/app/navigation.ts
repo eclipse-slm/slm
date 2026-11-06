@@ -185,6 +185,13 @@ export const defaultNavigation: NavItem[] = [
                 visible: isAdmin,
             },
             {
+                id: 'main-menu-button-admin-profilers',
+                titleKey: 'drawer.section.admin.profilers.title',
+                icon: 'mdi-file-search-outline',
+                to: 'profilers',
+                visible: isAdmin,
+            },
+            {
                 id: 'main-menu-button-admin-users',
                 // Original used the literal string 'User Management' (no i18n key); kept as-is.
                 titleKey: 'User Management',

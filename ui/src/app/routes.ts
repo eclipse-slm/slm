@@ -188,6 +188,12 @@ export const defaultRoutes: RouteRecordRaw[] = [
         meta: { adminPermissionRequired: true },
       },
       {
+        name: 'AdminProfilers',
+        path: '/admin/profilers',
+        component: () => import('@/pages/AdminProfilersPage.vue'),
+        meta: { adminPermissionRequired: true },
+      },
+      {
         name: 'AdminUsers',
         path: '/admin/users',
         component: () => import('@/pages/AdminUsersPage.vue'),
