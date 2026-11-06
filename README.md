@@ -14,3 +14,4 @@ core components of the FabOS platform.
 
 Further information can be found in the documentation: https://eclipse-slm.github.io/slm/
 
+For backend API development, see [Regenerating backend OpenAPI specifications](docs/openapi-spec-generation.md).
