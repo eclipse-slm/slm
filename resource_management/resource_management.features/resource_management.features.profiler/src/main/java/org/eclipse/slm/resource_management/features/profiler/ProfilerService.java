@@ -17,14 +17,20 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
 public class ProfilerService implements IAwxJobObserverListener {
     private static final Logger LOG = LoggerFactory.getLogger(ProfilerService.class);
+
+    private record AwxResourceIds(Set<Integer> projectIds, Set<Integer> jobTemplateIds) {
+    }
 
     private final ProfilerJpaRepository profilerJpaRepository;
     private final AwxClient awxClient;
@@ -61,21 +67,21 @@ public class ProfilerService implements IAwxJobObserverListener {
         var existingProfiler = profilerJpaRepository.findById(profilerId)
                 .orElseThrow(() -> new ProfilerNotFoundException(profilerId));
 
-        if (profiler.getAction() == null || !isProfilerActionAwxAction(profiler)) {
+        if (!isProfilerActionAwxAction(profiler)) {
             throw new ProfilerBadRequestException("Action of profiler must be of type " + AwxAction.class.getSimpleName());
         }
 
         profiler.setId(profilerId);
-        var oldAction = (AwxAction) existingProfiler.getAction();
+        var oldAction = isProfilerActionAwxAction(existingProfiler) ? (AwxAction) existingProfiler.getAction() : null;
         var newAction = (AwxAction) profiler.getAction();
 
-        if (hasSameSource(oldAction, newAction)) {
-            if (!oldAction.hasSameParameter(newAction)) {
-                var newParameter = newAction.getParameter() == null ? List.<SurveyItem>of() : newAction.getParameter();
-                replaceSurvey(profilerId, newAction, newParameter);
-            }
-        } else {
-            replaceAwxResources(profilerId, oldAction, newAction);
+        if (oldAction == null || !hasSameSource(oldAction, newAction)) {
+            return replaceAwxResources(profiler, oldAction, newAction);
+        }
+
+        if (!oldAction.hasSameParameter(newAction)) {
+            var newParameter = newAction.getParameter() == null ? List.<SurveyItem>of() : newAction.getParameter();
+            replaceSurvey(profilerId, newAction, newParameter);
         }
 
         return profilerJpaRepository.save(profiler);
@@ -126,7 +132,12 @@ public class ProfilerService implements IAwxJobObserverListener {
         Profiler profiler = optionalProfiler.get();
 
         if (isProfilerActionAwxAction(profiler)) {
-            removeAwxResources((AwxAction) profiler.getAction(), profilerId, false);
+            try {
+                removeAwxResources((AwxAction) profiler.getAction(), otherActions(profilerId));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new ProfilerRuntimeException(profilerId, "Interrupted while removing AWX resources");
+            }
         }
 
         profilerJpaRepository.deleteById(profilerId);
@@ -154,7 +165,7 @@ public class ProfilerService implements IAwxJobObserverListener {
         }
 
         List<SurveyItem> params = action.getParameter();
-        if(params != null) {
+        if(params != null && !params.isEmpty()) {
             createSurvey(jobTemplate, params);
         }
     }
@@ -182,91 +193,141 @@ public class ProfilerService implements IAwxJobObserverListener {
         }
     }
 
-    private void replaceAwxResources(UUID profilerId, AwxAction oldAction, AwxAction newAction) {
-        var projectExisted = findProject(newAction).isPresent();
-        var jobTemplateExisted = findJobTemplate(newAction).isPresent();
+    private Profiler replaceAwxResources(Profiler profiler, AwxAction oldAction, AwxAction newAction) {
+        var profilerId = profiler.getId();
+        var existingIds = findAwxResourceIds(List.of(newAction));
 
+        Profiler savedProfiler;
         try {
             createAwxResources(newAction);
+            savedProfiler = profilerJpaRepository.save(profiler);
         } catch (Exception | AwxProjectUpdateFailedException e) {
-            LOG.error("Failed to create AWX resources for " + newAction.getAwxRepo() + " - " + newAction.getAwxBranch(), e);
-            if (!jobTemplateExisted) {
-                try {
-                    awxClient.deleteJobTemplate(newAction.getAwxRepo(), newAction.getAwxBranch(), newAction.getPlaybook());
-                } catch (Exception cleanupException) {
-                    LOG.error("Failed to remove AWX job template of " + newAction.getAwxRepo(), cleanupException);
-                }
-            }
-            if (!projectExisted) {
-                try {
-                    awxClient.deleteProject(newAction.getAwxRepo(), newAction.getAwxBranch());
-                } catch (Exception cleanupException) {
-                    LOG.error("Failed to remove AWX project of " + newAction.getAwxRepo(), cleanupException);
-                }
-            }
+            LOG.error("Failed to switch profiler " + profilerId + " to " + newAction.getAwxRepo() + " - " + newAction.getAwxBranch(), e);
+            removeCreatedAwxResources(newAction, existingIds);
             throw new ProfilerRuntimeException(profilerId, "Failed to create AWX resources: " + e);
         }
 
-        removeAwxResources(oldAction, profilerId, true);
+        if (oldAction != null) {
+            var actionsInUse = new ArrayList<>(otherActions(profilerId));
+            actionsInUse.add(newAction);
+            try {
+                removeAwxResources(oldAction, actionsInUse);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                LOG.error("Interrupted while removing old AWX resources of " + oldAction.getAwxRepo(), e);
+            } catch (Exception e) {
+                LOG.error("Failed to remove old AWX resources of " + oldAction.getAwxRepo(), e);
+            }
+        }
+
+        return savedProfiler;
     }
 
-    private void removeAwxResources(AwxAction action, UUID ownerProfilerId, boolean ignoreFailures) {
-        var otherActions = profilerJpaRepository.findAll().stream()
-                .filter(other -> !ownerProfilerId.equals(other.getId()))
+    private void removeCreatedAwxResources(AwxAction action, AwxResourceIds existingIds) {
+        try {
+            var currentIds = findAwxResourceIds(List.of(action));
+            for (var jobTemplateId : currentIds.jobTemplateIds()) {
+                if (!existingIds.jobTemplateIds().contains(jobTemplateId)) {
+                    awxClient.deleteJobTemplate(jobTemplateId);
+                }
+            }
+            for (var project : findProjects(action)) {
+                if (!existingIds.projectIds().contains(project.getId())) {
+                    removeProject(project);
+                }
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOG.error("Interrupted while removing created AWX resources of " + action.getAwxRepo(), e);
+        } catch (Exception e) {
+            LOG.error("Failed to remove created AWX resources of " + action.getAwxRepo(), e);
+        }
+    }
+
+    private void removeAwxResources(AwxAction action, List<AwxAction> actionsInUse) throws InterruptedException {
+        var project = findProjectWithSameUrl(findProjects(action), action);
+        if (project.isEmpty()) {
+            LOG.warn("No AWX project with URL " + action.getAwxRepo() + " and branch " + action.getAwxBranch() + " to remove");
+            return;
+        }
+
+        var idsInUse = findAwxResourceIds(actionsInUse);
+        for (var jobTemplate : findJobTemplates(project.get(), action.getPlaybook())) {
+            if (!idsInUse.jobTemplateIds().contains(jobTemplate.getId())) {
+                awxClient.deleteJobTemplate(jobTemplate.getId());
+            }
+        }
+        if (!idsInUse.projectIds().contains(project.get().getId())) {
+            removeProject(project.get());
+        }
+    }
+
+    // Does what AwxClient.deleteProject(String, String) does, but for a given project: that method
+    // removes the first project whose URL contains the given one, which may belong to another source
+    private void removeProject(Project project) throws InterruptedException {
+        if (awxClient.getJobTemplateFromProjectId(project.getId()).getCount() > 0) {
+            LOG.info("Keeping AWX project " + project.getId() + " because job templates are linked to it");
+            return;
+        }
+
+        awxClient.deleteProject(project.getId());
+        var credentialId = project.getCredential();
+        if (credentialId != null && awxClient.getProjectFromCredential(credentialId).getCount() == 0) {
+            awxClient.deleteCredential(credentialId);
+        }
+    }
+
+    private List<AwxAction> otherActions(UUID profilerId) {
+        return profilerJpaRepository.findAll().stream()
+                .filter(other -> !profilerId.equals(other.getId()))
                 .filter(this::isProfilerActionAwxAction)
                 .map(other -> (AwxAction) other.getAction())
                 .toList();
-
-        var sharedProject = otherActions.stream().anyMatch(other -> hasSameProject(other, action));
-        var sharedJobTemplate = sharedProject && otherActions.stream()
-                .anyMatch(other -> hasSameSource(other, action));
-
-        if (!sharedJobTemplate) {
-            try {
-                awxClient.deleteJobTemplate(action.getAwxRepo(), action.getAwxBranch(), action.getPlaybook());
-            } catch (Exception e) {
-                if (!ignoreFailures) throw e;
-                LOG.error("Failed to remove old AWX job template of " + action.getAwxRepo(), e);
-            }
-        }
-        if (!sharedProject) {
-            try {
-                awxClient.deleteProject(action.getAwxRepo(), action.getAwxBranch());
-            } catch (Exception e) {
-                if (!ignoreFailures) throw e;
-                LOG.error("Failed to remove old AWX project of " + action.getAwxRepo(), e);
-            }
-        }
     }
 
-    private Optional<Project> findProject(AwxAction action) {
-        var projects = awxClient.getProjectFromRepoAndBranch(action.getAwxRepo(), action.getAwxBranch());
-        if (projects == null || projects.getResults().isEmpty()) {
-            return Optional.empty();
+    private AwxResourceIds findAwxResourceIds(List<AwxAction> actions) {
+        var projectIds = new HashSet<Integer>();
+        var jobTemplateIds = new HashSet<Integer>();
+        for (var action : actions) {
+            for (var project : findProjects(action)) {
+                projectIds.add(project.getId());
+                findJobTemplates(project, action.getPlaybook()).forEach(jobTemplate -> jobTemplateIds.add(jobTemplate.getId()));
+            }
         }
-        return Optional.of(projects.getResults().iterator().next());
+        return new AwxResourceIds(projectIds, jobTemplateIds);
+    }
+
+    // AWX matches the URL as a case-insensitive substring, so this can include projects of other URLs.
+    // The client reuses the first of them when creating resources and running jobs.
+    private List<Project> findProjects(AwxAction action) {
+        var projects = awxClient.getProjectFromRepoAndBranch(action.getAwxRepo(), action.getAwxBranch());
+        return projects == null ? List.of() : List.copyOf(projects.getResults());
+    }
+
+    private List<JobTemplate> findJobTemplates(Project project, String playbook) {
+        var jobTemplates = awxClient.getJobTemplateFromProjectIdAndPlaybook(project.getId(), playbook);
+        return jobTemplates == null ? List.of() : List.copyOf(jobTemplates.getResults());
     }
 
     private Optional<JobTemplate> findJobTemplate(AwxAction action) {
-        return findProject(action).flatMap(project -> {
-            var jobTemplates = awxClient.getJobTemplateFromProjectIdAndPlaybook(project.getId(), action.getPlaybook());
-            if (jobTemplates == null || jobTemplates.getResults().isEmpty()) {
-                return Optional.empty();
-            }
-            return Optional.of(jobTemplates.getResults().iterator().next());
-        });
+        var projects = findProjects(action);
+        return findProjectWithSameUrl(projects, action)
+                .or(() -> projects.stream().findFirst())
+                .flatMap(project -> findJobTemplates(project, action.getPlaybook()).stream().findFirst());
     }
 
-    private static boolean hasSameProject(AwxAction a, AwxAction b) {
-        return a.getAwxRepo().equals(b.getAwxRepo()) && a.getAwxBranch().equals(b.getAwxBranch());
+    private static Optional<Project> findProjectWithSameUrl(List<Project> projects, AwxAction action) {
+        return projects.stream().filter(project -> action.getAwxRepo().equals(project.getScm_url())).findFirst();
     }
 
     private static boolean hasSameSource(AwxAction a, AwxAction b) {
-        return hasSameProject(a, b) && a.getPlaybook().equals(b.getPlaybook());
+        return a.getAwxRepo().equals(b.getAwxRepo())
+                && a.getAwxBranch().equals(b.getAwxBranch())
+                && a.getPlaybook().equals(b.getPlaybook());
     }
 
     private Boolean isProfilerActionAwxAction(Profiler profiler) {
-        return profiler.getAction().getActionClass().equals(AwxAction.class.getSimpleName());
+        return profiler.getAction() != null && profiler.getAction().getActionClass().equals(AwxAction.class.getSimpleName());
     }
 
     @Override

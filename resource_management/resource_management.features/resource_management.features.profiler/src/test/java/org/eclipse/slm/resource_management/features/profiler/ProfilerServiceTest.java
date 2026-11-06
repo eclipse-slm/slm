@@ -45,6 +45,7 @@ class ProfilerServiceTest {
         when(repository.findById(stored.getId())).thenReturn(java.util.Optional.of(stored));
         when(repository.findAll()).thenReturn(List.of(stored));
         when(repository.save(any(Profiler.class))).thenAnswer(i -> i.getArgument(0));
+        when(awxClient.getJobTemplateFromProjectId(anyInt())).thenReturn(results(Collections.emptyList()));
     }
 
     private static AwxAction action(String repo, String branch, String playbook, List<SurveyItem> parameter) {
@@ -68,13 +69,38 @@ class ProfilerServiceTest {
         return new Results<>(items.size(), null, null, items);
     }
 
-    private void stubExisting(String repo, String branch, String playbook, int projectId, int templateId) {
+    private static Project project(int id, String repo) {
         var project = mock(Project.class);
-        when(project.getId()).thenReturn(projectId);
+        when(project.getId()).thenReturn(id);
+        when(project.getScm_url()).thenReturn(repo);
+        when(project.getCredential()).thenReturn(null);
+        return project;
+    }
+
+    private void stubTemplate(int projectId, String playbook, int templateId) {
         var template = mock(JobTemplate.class);
         when(template.getId()).thenReturn(templateId);
-        when(awxClient.getProjectFromRepoAndBranch(repo, branch)).thenReturn(results(List.of(project)));
         when(awxClient.getJobTemplateFromProjectIdAndPlaybook(projectId, playbook)).thenReturn(results(List.of(template)));
+    }
+
+    @SafeVarargs
+    private void stubProjects(String repo, String branch, List<Project>... consecutiveLookups) {
+        var stubbing = when(awxClient.getProjectFromRepoAndBranch(repo, branch)).thenReturn(results(consecutiveLookups[0]));
+        for (var i = 1; i < consecutiveLookups.length; i++) {
+            stubbing = stubbing.thenReturn(results(consecutiveLookups[i]));
+        }
+    }
+
+    private void stubExisting(String repo, String branch, String playbook, int projectId, int templateId) {
+        stubProjects(repo, branch, List.of(project(projectId, repo)));
+        stubTemplate(projectId, playbook, templateId);
+    }
+
+    private void verifyNothingRemoved() throws Throwable {
+        verify(awxClient, never()).deleteJobTemplate(anyInt());
+        verify(awxClient, never()).deleteProject(anyInt());
+        verify(awxClient, never()).deleteJobTemplate(anyString(), anyString(), anyString());
+        verify(awxClient, never()).deleteProject(anyString(), anyString());
     }
 
     private void stubAbsent(String repo, String branch) {
@@ -179,7 +205,8 @@ class ProfilerServiceTest {
     }
 
     @Test
-    void sourceChangeCreatesNewBeforeDeletingOld() throws Throwable {
+    void sourceChangeCreatesNewAndSavesBeforeDeletingOld() throws Throwable {
+        stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
         stubAbsent("newRepo", "dev");
         stubCreation();
         var update = profiler("old", action("newRepo", "dev", "new.yml", null));
@@ -189,13 +216,127 @@ class ProfilerServiceTest {
         assertEquals(stored.getId(), result.getId());
         InOrder inOrder = inOrder(awxClient, repository);
         inOrder.verify(awxClient).createJobTemplateAndAddExecuteRoleToDefaultTeam(eq("newRepo"), eq("dev"), eq("new.yml"), anyList(), any());
-        inOrder.verify(awxClient).deleteJobTemplate("repo", "main", "play.yml");
-        inOrder.verify(awxClient).deleteProject("repo", "main");
         inOrder.verify(repository).save(argThat(p -> p.getId().equals(stored.getId())));
+        inOrder.verify(awxClient).deleteJobTemplate(OLD_TEMPLATE_ID);
+        inOrder.verify(awxClient).deleteProject(OLD_PROJECT_ID);
+    }
+
+    @Test
+    void sourceChangeWithEmptyParametersCreatesNoSurvey() throws Throwable {
+        stubAbsent("repo", "main");
+        stubAbsent("newRepo", "dev");
+        stubCreation();
+
+        service.updateProfiler(stored.getId(), profiler("old", action("newRepo", "dev", "new.yml", Collections.emptyList())));
+
+        verify(awxClient, never()).createSurvey(anyInt(), any());
+        verify(awxClient, never()).enableSurvey(anyInt());
+    }
+
+    @Test
+    void urlChangeResolvingToOldResourcesRemovesNothing() throws Throwable {
+        ((AwxAction) stored.getAction()).setAwxRepo("https://host/x.git");
+        stubExisting("https://host/x.git", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
+        // AWX matches the URL as a case-insensitive substring, so the shorter URL finds the old project
+        stubProjects("https://host/x", "main", List.of(project(OLD_PROJECT_ID, "https://host/x.git")));
+        stubCreation();
+
+        service.updateProfiler(stored.getId(), profiler("old", action("https://host/x", "main", "play.yml", null)));
+
+        verifyNothingRemoved();
+        verify(repository).save(argThat(p -> ((AwxAction) p.getAction()).getAwxRepo().equals("https://host/x")));
+    }
+
+    @Test
+    void caseOnlyUrlChangeRemovesNothing() throws Throwable {
+        ((AwxAction) stored.getAction()).setAwxRepo("https://host/X");
+        stubExisting("https://host/X", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
+        stubProjects("https://host/x", "main", List.of(project(OLD_PROJECT_ID, "https://host/X")));
+        stubCreation();
+
+        service.updateProfiler(stored.getId(), profiler("old", action("https://host/x", "main", "play.yml", null)));
+
+        verifyNothingRemoved();
+        verify(repository).save(any(Profiler.class));
+    }
+
+    @Test
+    void urlChangeToLongerUrlRemovesOnlyOldResources() throws Throwable {
+        ((AwxAction) stored.getAction()).setAwxRepo("https://host/x");
+        var newProject = project(51, "https://host/x.git");
+        var oldProject = project(OLD_PROJECT_ID, "https://host/x");
+        // The old URL is a substring of the new one, so looking it up finds both projects, new one first
+        stubProjects("https://host/x", "main", List.of(newProject, oldProject));
+        stubProjects("https://host/x.git", "main", List.of(), List.of(newProject));
+        stubTemplate(51, "play.yml", 61);
+        stubTemplate(OLD_PROJECT_ID, "play.yml", OLD_TEMPLATE_ID);
+        stubCreation();
+
+        service.updateProfiler(stored.getId(), profiler("old", action("https://host/x.git", "main", "play.yml", null)));
+
+        verify(awxClient).deleteJobTemplate(OLD_TEMPLATE_ID);
+        verify(awxClient).deleteProject(OLD_PROJECT_ID);
+        verify(awxClient, never()).deleteJobTemplate(61);
+        verify(awxClient, never()).deleteProject(51);
+    }
+
+    @Test
+    void playbookChangeRemovesOldTemplateButKeepsProject() throws Throwable {
+        stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
+        stubCreation();
+
+        service.updateProfiler(stored.getId(), profiler("old", action("repo", "main", "new.yml", null)));
+
+        verify(awxClient).deleteJobTemplate(OLD_TEMPLATE_ID);
+        verify(awxClient, never()).deleteProject(anyInt());
+    }
+
+    @Test
+    void removedProjectAlsoRemovesItsUnusedCredential() throws Throwable {
+        var oldProject = project(OLD_PROJECT_ID, "repo");
+        when(oldProject.getCredential()).thenReturn(71);
+        stubProjects("repo", "main", List.of(oldProject));
+        stubTemplate(OLD_PROJECT_ID, "play.yml", OLD_TEMPLATE_ID);
+        when(awxClient.getProjectFromCredential(71)).thenReturn(results(Collections.emptyList()));
+
+        service.deleteProfiler(stored.getId());
+
+        verify(awxClient).deleteProject(OLD_PROJECT_ID);
+        verify(awxClient).deleteCredential(71);
+    }
+
+    @Test
+    void projectWithOtherJobTemplatesIsKept() throws Throwable {
+        stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
+        var otherTemplate = mock(JobTemplate.class);
+        when(awxClient.getJobTemplateFromProjectId(OLD_PROJECT_ID)).thenReturn(results(List.of(otherTemplate)));
+
+        service.deleteProfiler(stored.getId());
+
+        verify(awxClient).deleteJobTemplate(OLD_TEMPLATE_ID);
+        verify(awxClient, never()).deleteProject(anyInt());
+    }
+
+    @Test
+    void failedSaveRemovesNewResourcesAndKeepsOld() throws Throwable {
+        stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
+        stubProjects("newRepo", "dev", List.of(), List.of(project(51, "newRepo")));
+        stubTemplate(51, "new.yml", 61);
+        stubCreation();
+        when(repository.save(any(Profiler.class))).thenThrow(new RuntimeException("database"));
+
+        assertThrows(ProfilerRuntimeException.class,
+                () -> service.updateProfiler(stored.getId(), profiler("old", action("newRepo", "dev", "new.yml", null))));
+
+        verify(awxClient).deleteJobTemplate(61);
+        verify(awxClient).deleteProject(51);
+        verify(awxClient, never()).deleteJobTemplate(OLD_TEMPLATE_ID);
+        verify(awxClient, never()).deleteProject(OLD_PROJECT_ID);
     }
 
     @Test
     void sourceChangeWithCredentialsUsesScmCredentialVariant() throws Throwable {
+        stubAbsent("repo", "main");
         stubAbsent("newRepo", "dev");
         var template = createdTemplate(31);
         when(awxClient.createJobTemplateAddExecuteRoleToDefaultTeamAddScmCredential(
@@ -214,7 +355,9 @@ class ProfilerServiceTest {
 
     @Test
     void failedCreationKeepsOldAndRemovesOnlyNewResources() throws Throwable {
-        stubAbsent("newRepo", "dev");
+        stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
+        stubProjects("newRepo", "dev", List.of(), List.of(project(51, "newRepo")));
+        stubTemplate(51, "new.yml", 61);
         when(awxClient.createJobTemplateAndAddExecuteRoleToDefaultTeam(any(), any(), any(), any(), any()))
                 .thenThrow(new AwxProjectUpdateFailedException("failed", null));
         var update = profiler("old", action("newRepo", "dev", "new.yml", null));
@@ -222,44 +365,84 @@ class ProfilerServiceTest {
         assertThrows(ProfilerRuntimeException.class, () -> service.updateProfiler(stored.getId(), update));
 
         verify(repository, never()).save(any(Profiler.class));
-        verify(awxClient, never()).deleteJobTemplate("repo", "main", "play.yml");
-        verify(awxClient, never()).deleteProject("repo", "main");
-        verify(awxClient).deleteJobTemplate("newRepo", "dev", "new.yml");
-        verify(awxClient).deleteProject("newRepo", "dev");
+        verify(awxClient, never()).deleteJobTemplate(OLD_TEMPLATE_ID);
+        verify(awxClient, never()).deleteProject(OLD_PROJECT_ID);
+        verify(awxClient).deleteJobTemplate(61);
+        verify(awxClient).deleteProject(51);
     }
 
     @Test
     void failedCreationKeepsResourcesThatAlreadyExisted() throws Throwable {
-        var project = mock(Project.class);
-        when(project.getId()).thenReturn(41);
-        when(awxClient.getProjectFromRepoAndBranch("newRepo", "dev")).thenReturn(results(List.of(project)));
-        when(awxClient.getJobTemplateFromProjectIdAndPlaybook(41, "new.yml")).thenReturn(results(Collections.emptyList()));
+        stubProjects("newRepo", "dev", List.of(project(41, "newRepo")));
+        var template = createdTemplate(61);
+        when(awxClient.getJobTemplateFromProjectIdAndPlaybook(41, "new.yml"))
+                .thenReturn(results(Collections.emptyList()), results(List.of(template)));
         when(awxClient.createJobTemplateAndAddExecuteRoleToDefaultTeam(any(), any(), any(), any(), any()))
                 .thenThrow(new AwxProjectUpdateFailedException("failed", null));
         var update = profiler("old", action("newRepo", "dev", "new.yml", null));
 
         assertThrows(ProfilerRuntimeException.class, () -> service.updateProfiler(stored.getId(), update));
 
-        verify(awxClient).deleteJobTemplate("newRepo", "dev", "new.yml");
-        verify(awxClient, never()).deleteProject("newRepo", "dev");
+        verify(awxClient).deleteJobTemplate(61);
+        verify(awxClient, never()).deleteProject(anyInt());
+    }
+
+    @Test
+    void failedCreationKeepsProjectFoundBySubstring() throws Throwable {
+        stubProjects("https://host/x", "main", List.of(project(41, "https://host/x.git")));
+        stubTemplate(41, "play.yml", 61);
+        when(awxClient.createJobTemplateAndAddExecuteRoleToDefaultTeam(any(), any(), any(), any(), any()))
+                .thenThrow(new AwxProjectUpdateFailedException("failed", null));
+        var update = profiler("old", action("https://host/x", "main", "play.yml", null));
+
+        assertThrows(ProfilerRuntimeException.class, () -> service.updateProfiler(stored.getId(), update));
+
+        verifyNothingRemoved();
+    }
+
+    @Test
+    void failingRollbackStillEndsInProfilerRuntimeException() throws Throwable {
+        stubProjects("newRepo", "dev", List.of(), List.of(project(51, "newRepo")));
+        stubTemplate(51, "new.yml", 61);
+        when(awxClient.createJobTemplateAndAddExecuteRoleToDefaultTeam(any(), any(), any(), any(), any()))
+                .thenThrow(new AwxProjectUpdateFailedException("failed", null));
+        doThrow(new RuntimeException("template")).when(awxClient).deleteJobTemplate(61);
+        var update = profiler("old", action("newRepo", "dev", "new.yml", null));
+
+        assertThrows(ProfilerRuntimeException.class, () -> service.updateProfiler(stored.getId(), update));
+
+        verify(repository, never()).save(any(Profiler.class));
+    }
+
+    @Test
+    void failingRollbackLookupStillEndsInProfilerRuntimeException() throws Throwable {
+        when(awxClient.getProjectFromRepoAndBranch("newRepo", "dev"))
+                .thenReturn(results(Collections.emptyList()))
+                .thenThrow(new RuntimeException("lookup"));
+        when(awxClient.createJobTemplateAndAddExecuteRoleToDefaultTeam(any(), any(), any(), any(), any()))
+                .thenThrow(new AwxProjectUpdateFailedException("failed", null));
+        var update = profiler("old", action("newRepo", "dev", "new.yml", null));
+
+        assertThrows(ProfilerRuntimeException.class, () -> service.updateProfiler(stored.getId(), update));
     }
 
     @Test
     void sourceChangeStillSavesWhenRemovingOldResourcesFails() throws Throwable {
+        stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
         stubAbsent("newRepo", "dev");
         stubCreation();
-        doThrow(new RuntimeException("template")).when(awxClient).deleteJobTemplate("repo", "main", "play.yml");
-        doThrow(new RuntimeException("project")).when(awxClient).deleteProject("repo", "main");
+        doThrow(new RuntimeException("template")).when(awxClient).deleteJobTemplate(OLD_TEMPLATE_ID);
 
         service.updateProfiler(stored.getId(), profiler("old", action("newRepo", "dev", "new.yml", null)));
 
-        verify(awxClient).deleteProject("repo", "main");
+        verify(awxClient).deleteJobTemplate(OLD_TEMPLATE_ID);
         verify(repository).save(argThat(p -> p.getId().equals(stored.getId())));
     }
 
     @Test
-    void deleteStillPropagatesAwxFailure() {
-        doThrow(new RuntimeException("project")).when(awxClient).deleteProject("repo", "main");
+    void deleteStillPropagatesAwxFailure() throws Throwable {
+        stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
+        doThrow(new RuntimeException("project")).when(awxClient).deleteProject(OLD_PROJECT_ID);
 
         assertThrows(RuntimeException.class, () -> service.deleteProfiler(stored.getId()));
 
@@ -268,6 +451,7 @@ class ProfilerServiceTest {
 
     @Test
     void sourceChangeKeepsResourcesSharedWithOtherProfiler() throws Throwable {
+        stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
         stubAbsent("newRepo", "dev");
         stubCreation();
         var other = profiler("other", action("repo", "main", "play.yml", null));
@@ -275,13 +459,13 @@ class ProfilerServiceTest {
 
         service.updateProfiler(stored.getId(), profiler("old", action("newRepo", "dev", "new.yml", null)));
 
-        verify(awxClient, never()).deleteJobTemplate(anyString(), anyString(), anyString());
-        verify(awxClient, never()).deleteProject(anyString(), anyString());
+        verifyNothingRemoved();
         verify(repository).save(any(Profiler.class));
     }
 
     @Test
     void sourceChangeKeepsProjectSharedWithOtherPlaybook() throws Throwable {
+        stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
         stubAbsent("newRepo", "dev");
         stubCreation();
         var other = profiler("other", action("repo", "main", "other.yml", null));
@@ -289,29 +473,93 @@ class ProfilerServiceTest {
 
         service.updateProfiler(stored.getId(), profiler("old", action("newRepo", "dev", "new.yml", null)));
 
-        verify(awxClient).deleteJobTemplate("repo", "main", "play.yml");
-        verify(awxClient, never()).deleteProject(anyString(), anyString());
+        verify(awxClient).deleteJobTemplate(OLD_TEMPLATE_ID);
+        verify(awxClient, never()).deleteProject(anyInt());
     }
 
     @Test
     void deleteKeepsResourcesSharedWithOtherProfiler() throws Throwable {
+        stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
         var other = profiler("other", action("repo", "main", "play.yml", null));
         when(repository.findAll()).thenReturn(List.of(stored, other));
 
         service.deleteProfiler(stored.getId());
 
-        verify(awxClient, never()).deleteJobTemplate(anyString(), anyString(), anyString());
-        verify(awxClient, never()).deleteProject(anyString(), anyString());
+        verifyNothingRemoved();
+        verify(repository).deleteById(stored.getId());
+    }
+
+    @Test
+    void deleteKeepsResourcesOtherProfilerResolvesToBySubstring() throws Throwable {
+        ((AwxAction) stored.getAction()).setAwxRepo("https://host/x.git");
+        stubExisting("https://host/x.git", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
+        stubProjects("https://host/x", "main", List.of(project(OLD_PROJECT_ID, "https://host/x.git")));
+        var other = profiler("other", action("https://host/x", "main", "play.yml", null));
+        when(repository.findAll()).thenReturn(List.of(stored, other));
+
+        service.deleteProfiler(stored.getId());
+
+        verifyNothingRemoved();
         verify(repository).deleteById(stored.getId());
     }
 
     @Test
     void deleteRemovesUnsharedResources() throws Throwable {
+        stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
+
         service.deleteProfiler(stored.getId());
 
-        verify(awxClient).deleteJobTemplate("repo", "main", "play.yml");
-        verify(awxClient).deleteProject("repo", "main");
+        verify(awxClient).deleteJobTemplate(OLD_TEMPLATE_ID);
+        verify(awxClient).deleteProject(OLD_PROJECT_ID);
         verify(repository).deleteById(stored.getId());
+    }
+
+    @Test
+    void storedProfilerWithoutActionDoesNotBreakDelete() throws Throwable {
+        stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
+        when(repository.findAll()).thenReturn(List.of(stored, profiler("broken", null)));
+
+        service.deleteProfiler(stored.getId());
+
+        verify(awxClient).deleteJobTemplate(OLD_TEMPLATE_ID);
+        verify(repository).deleteById(stored.getId());
+    }
+
+    @Test
+    void storedProfilerWithoutActionCanBeDeleted() {
+        var broken = profiler("broken", null);
+        when(repository.findById(broken.getId())).thenReturn(java.util.Optional.of(broken));
+
+        service.deleteProfiler(broken.getId());
+
+        verifyNoInteractions(awxClient);
+        verify(repository).deleteById(broken.getId());
+    }
+
+    @Test
+    void storedProfilerWithoutActionDoesNotBreakUpdateOfOtherProfiler() throws Throwable {
+        stubExisting("repo", "main", "play.yml", OLD_PROJECT_ID, OLD_TEMPLATE_ID);
+        stubAbsent("newRepo", "dev");
+        stubCreation();
+        when(repository.findAll()).thenReturn(List.of(stored, profiler("broken", null)));
+
+        service.updateProfiler(stored.getId(), profiler("old", action("newRepo", "dev", "new.yml", null)));
+
+        verify(awxClient).deleteJobTemplate(OLD_TEMPLATE_ID);
+    }
+
+    @Test
+    void storedProfilerWithoutActionCanBeUpdated() throws Throwable {
+        var broken = profiler("broken", null);
+        when(repository.findById(broken.getId())).thenReturn(java.util.Optional.of(broken));
+        stubAbsent("newRepo", "dev");
+        stubCreation();
+
+        service.updateProfiler(broken.getId(), profiler("fixed", action("newRepo", "dev", "new.yml", null)));
+
+        verify(awxClient).createJobTemplateAndAddExecuteRoleToDefaultTeam(eq("newRepo"), eq("dev"), eq("new.yml"), anyList(), any());
+        verifyNothingRemoved();
+        verify(repository).save(argThat(p -> p.getId().equals(broken.getId())));
     }
 
     @Test
