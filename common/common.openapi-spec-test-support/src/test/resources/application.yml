@@ -1,0 +1,8 @@
+open-api:
+  title: Fixture API
+deployment:
+  url: http://localhost:9000/fixture-service
+server:
+  port: 1
+  servlet:
+    context-path: /ignored-by-generator
