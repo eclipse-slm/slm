@@ -28,6 +28,7 @@
         <module>common.credentials</module>
         <module>common.restclient</module>
         <module>common.restserver</module>
+        <module>common.openapi-spec-test-support</module>
     </modules>
 
     <build>
