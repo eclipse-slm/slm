@@ -23,17 +23,17 @@ function required(label: string) {
 const { value: name, errorMessage: nameError } = useField<string>('name', (v: string) => {
   if (!v || !v.trim()) return 'Name is required';
   return !isNameTaken(v, profilersStore.profilers, props.profiler?.id) || 'A profiler with this name already exists';
-}, { initialValue: props.modelValue.formData.name });
+}, { initialValue: props.modelValue.formData.name, validateOnMount: props.edit });
 const { value: awxRepo, errorMessage: repoError } = useField<string>('awxRepo', required('Repository'),
   { initialValue: props.modelValue.formData.awxRepo });
 const { value: awxBranch, errorMessage: branchError } = useField<string>('awxBranch', required('Branch'),
   { initialValue: props.modelValue.formData.awxBranch });
 const { value: playbook, errorMessage: playbookError } = useField<string>('playbook', required('Playbook'),
   { initialValue: props.modelValue.formData.playbook });
-const { value: username, errorMessage: usernameError } = useField<string>('username',
+const { value: username, errorMessage: usernameError, validate: validateUsername } = useField<string>('username',
   () => credentialsError(currentFormData()),
   { initialValue: props.modelValue.formData.username });
-const { value: password, errorMessage: passwordError } = useField<string>('password',
+const { value: password, errorMessage: passwordError, validate: validatePassword } = useField<string>('password',
   () => credentialsError(currentFormData()),
   { initialValue: props.modelValue.formData.password });
 
@@ -47,6 +47,12 @@ function currentFormData(): ProfilerFormData {
     password: password.value ?? '',
   };
 }
+
+// Each credential's error depends on the other one
+watch([username, password], () => {
+  validateUsername();
+  validatePassword();
+});
 
 // Sync incoming modelValue (e.g. dialog reset) to fields
 watch(() => props.modelValue, (val) => {

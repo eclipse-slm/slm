@@ -21,7 +21,7 @@ export function newProfilerFormData(): ProfilerFormData {
   return { name: '', awxRepo: '', awxBranch: DEFAULT_BRANCH, playbook: DEFAULT_PLAYBOOK, username: '', password: '' }
 }
 
-// Credentials are never prefilled; leaving them empty on update keeps the stored ones
+// Credentials are never prefilled because they aren't stored; empty on a source change means no credential
 export function profilerToFormData(profiler: Profiler): ProfilerFormData {
   return {
     name: profiler.name,
