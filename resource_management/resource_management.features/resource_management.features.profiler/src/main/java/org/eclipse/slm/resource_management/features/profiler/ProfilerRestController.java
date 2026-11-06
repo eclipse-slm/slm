@@ -1,6 +1,7 @@
 package org.eclipse.slm.resource_management.features.profiler;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.eclipse.slm.common.restserver.annotations.AuthorizedAsSlmAdminOrApiKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +55,7 @@ public class ProfilerRestController implements ProfilerRestApi {
         return ResponseEntity.ok().build();
     }
 
+    @AuthorizedAsSlmAdminOrApiKey
     public ResponseEntity<Profiler> createProfiler(ProfilerDTOApi profilerDTOApi) {
         var createdProfiler = profilerService.createProfiler(
                 ProfilerToProfilerDTOApiMapper.INSTANCE.toEntity(profilerDTOApi)
@@ -62,6 +64,7 @@ public class ProfilerRestController implements ProfilerRestApi {
         return ResponseEntity.ok(createdProfiler);
     }
 
+    @AuthorizedAsSlmAdminOrApiKey
     public ResponseEntity<Profiler> updateProfiler(UUID profilerId, ProfilerDTOApi profilerDTOApi) {
         var updatedProfiler = profilerService.updateProfiler(
                 profilerId,
@@ -71,6 +74,7 @@ public class ProfilerRestController implements ProfilerRestApi {
         return ResponseEntity.ok(updatedProfiler);
     }
 
+    @AuthorizedAsSlmAdminOrApiKey
     public ResponseEntity<Void> deleteProfiler(UUID profilerId) {
         profilerService.deleteProfiler(profilerId);
 
