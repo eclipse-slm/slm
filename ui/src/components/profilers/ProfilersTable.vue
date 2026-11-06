@@ -16,22 +16,23 @@
       item-value="id"
     >
       <template #item.actions="{ item }">
-        <v-btn
-          class="mr-2"
-          prepend-icon="mdi-pencil"
-          size="small"
-          @click.stop="emit('edit', item)"
-        >
-          Edit
-        </v-btn>
-        <v-btn
-          prepend-icon="mdi-delete"
-          size="small"
-          color="error"
-          @click.stop="profilerToDelete = item"
-        >
-          Delete
-        </v-btn>
+        <div class="d-flex flex-wrap justify-end ga-3 py-2">
+          <v-btn
+            prepend-icon="mdi-pencil"
+            size="small"
+            @click.stop="emit('edit', item)"
+          >
+            Edit
+          </v-btn>
+          <v-btn
+            prepend-icon="mdi-delete"
+            size="small"
+            color="error"
+            @click.stop="profilerToDelete = item"
+          >
+            Delete
+          </v-btn>
+        </div>
       </template>
     </v-data-table>
 
@@ -74,7 +75,7 @@ const headers = [
   { title: 'Repository', key: 'action.awxRepo' },
   { title: 'Branch', key: 'action.awxBranch' },
   { title: 'Playbook', key: 'action.playbook' },
-  { title: '', key: 'actions', sortable: false },
+  { title: '', key: 'actions', sortable: false, cellProps: { class: 'px-6' } },
 ];
 
 async function onDeleteConfirmed() {
